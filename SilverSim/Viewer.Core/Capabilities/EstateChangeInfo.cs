@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
 
             string estateName = reqmap["estate_name"].ToString();
-            double sun_hour = reqmap["sun_hour"].AsReal - 6;
+            double sun_hour = reqmap["sun_hour"].AsReal;
             bool isSunFixed = reqmap["is_sun_fixed"].AsBoolean;
             bool isExternallyVisible = reqmap["is_externally_visible"].AsBoolean;
             bool allowDirectTeleport = reqmap["allow_direct_teleport"].AsBoolean;
@@ -76,8 +76,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 m_Scene.EstateService.TryGetValue(estateID, out estate))
             {
                 estate.Name = estateName;
-                estate.SunPosition = sun_hour;
-                estate.UseGlobalTime = (sun_hour < double.Epsilon);
+                estate.SunPosition = sun_hour - 6;
+                estate.UseGlobalTime = (sun_hour < 6);
                 if (isSunFixed)
                 {
                     estate.Flags |= RegionOptionFlags.SunFixed;

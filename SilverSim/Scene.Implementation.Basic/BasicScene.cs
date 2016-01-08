@@ -1237,6 +1237,11 @@ namespace SilverSim.Scene.Implementation.Basic
             if(RegionSettings.IsSunFixed)
             {
                 res.RegionFlags |= RegionOptionFlags.SunFixed;
+                res.SunHour = RegionSettings.SunPosition + 6;
+            }
+            else
+            {
+                res.SunHour = 0;
             }
             res.SimAccess = Access;
             res.MaxAgents = (uint)RegionSettings.AgentLimit;
@@ -1247,7 +1252,6 @@ namespace SilverSim.Scene.Implementation.Basic
             res.RedirectGridX = 0;
             res.RedirectGridY = 0;
             res.UseEstateSun = RegionSettings.UseEstateSun;
-            res.SunHour = RegionSettings.SunPosition + 6;
             res.ProductSKU = VersionInfo.SimulatorVersion;
             res.ProductName = ProductName;
             res.RegionFlagsExtended.Add((ulong)(RegionSettings.AsFlags | estateFlags));
