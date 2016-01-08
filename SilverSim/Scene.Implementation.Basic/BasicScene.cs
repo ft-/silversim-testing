@@ -1200,6 +1200,12 @@ namespace SilverSim.Scene.Implementation.Basic
                 if (null != viewerAgent)
                 {
                     SendRegionInfo(viewerAgent);
+
+                    ParcelInfo pInfo;
+                    if(Parcels.TryGetValue(viewerAgent.GlobalPosition, out pInfo))
+                    {
+                        viewerAgent.SendUpdatedParcelInfo(pInfo, ID);
+                    }
                 }
             }
             UpdateEnvironmentSettings();
@@ -1226,6 +1232,12 @@ namespace SilverSim.Scene.Implementation.Basic
                 if(null != viewerAgent)
                 {
                     SendRegionInfo(viewerAgent);
+
+                    ParcelInfo pInfo;
+                    if (Parcels.TryGetValue(viewerAgent.GlobalPosition, out pInfo))
+                    {
+                        viewerAgent.SendUpdatedParcelInfo(pInfo, ID);
+                    }
                 }
             }
             UpdateEnvironmentSettings();
