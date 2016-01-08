@@ -195,8 +195,8 @@ namespace SilverSim.Scene.Types.WindLight
                 writer.WriteNamedValue("key", "enable_cloud_scroll");
                 writer.WriteStartElement("array");
                 {
-                    writer.WriteNamedValue("boolean", EnableCloudScrollX);
-                    writer.WriteNamedValue("boolean", EnableCloudScrollY);
+                    writer.WriteNamedValue("boolean", EnableCloudScrollX ? "1" : "0");
+                    writer.WriteNamedValue("boolean", EnableCloudScrollY ? "1" : "0");
                 }
                 writer.WriteEndElement();
 
