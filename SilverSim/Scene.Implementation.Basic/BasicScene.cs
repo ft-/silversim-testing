@@ -1175,26 +1175,23 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             uint estateID;
             EstateInfo estateInfo;
-            lock(m_EstateDataUpdateLock)
+            try /* we need a fail protection here */
             {
-                try /* we need a fail protection here */
+                if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                   EstateService.TryGetValue(estateID, out estateInfo))
                 {
-                    if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
-                       EstateService.TryGetValue(estateID, out estateInfo))
+                    lock (m_EstateDataUpdateLock)
                     {
-                        lock(m_EstateDataUpdateLock)
-                        {
-                            m_EstateData = estateInfo;
-                        }
+                        m_EstateData = estateInfo;
                     }
                 }
-                catch (Exception e)
-                {
-                    m_Log.WarnFormat("Exception when accessing EstateService: {0}: {1}\n{2}",
-                        e.GetType().FullName,
-                        e.Message,
-                        e.StackTrace);
-                }
+            }
+            catch (Exception e)
+            {
+                m_Log.WarnFormat("Exception when accessing EstateService: {0}: {1}\n{2}",
+                    e.GetType().FullName,
+                    e.Message,
+                    e.StackTrace);
             }
 
             foreach (IAgent agent in Agents)
