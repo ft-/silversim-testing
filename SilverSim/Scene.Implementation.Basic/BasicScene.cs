@@ -1194,6 +1194,8 @@ namespace SilverSim.Scene.Implementation.Basic
                     e.StackTrace);
             }
 
+            UpdateAllParcelFlags();
+
             foreach (IAgent agent in Agents)
             {
                 ViewerAgent viewerAgent = agent as ViewerAgent;
@@ -1211,6 +1213,21 @@ namespace SilverSim.Scene.Implementation.Basic
             UpdateEnvironmentSettings();
         }
 
+        void UpdateAllParcelFlags()
+        {
+            foreach (ParcelInfo pInfo in Parcels)
+            {
+                lock (m_ParcelUpdateLock)
+                {
+                    ParcelFlags newFlags = FilterParcelFlags(pInfo.Flags);
+                    if (newFlags != pInfo.Flags && m_Parcels.ContainsKey(pInfo.ID))
+                    {
+                        m_SimulationDataStorage.Parcels.Store(ID, pInfo);
+                    }
+                }
+            }
+        }
+
         public override void TriggerRegionDataChanged()
         {
             foreach (IAgent agent in Agents)
@@ -1226,7 +1243,9 @@ namespace SilverSim.Scene.Implementation.Basic
         public override void TriggerRegionSettingsChanged()
         {
             m_SimulationDataStorage.RegionSettings[ID] = RegionSettings;
-            foreach(IAgent agent in Agents)
+            UpdateAllParcelFlags();
+
+            foreach (IAgent agent in Agents)
             {
                 ViewerAgent viewerAgent = agent as ViewerAgent;
                 if(null != viewerAgent)
