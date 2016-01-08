@@ -43,6 +43,23 @@ namespace SilverSim.Main.Common
             }
         }
 
+        /** <summary>only for testing code</summary> */
+        public static void LoadSceneSync(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage)
+        {
+            lock (scene.m_LoaderThreadLock)
+            {
+                if (scene.m_LoaderThread == null && !scene.IsSceneEnabled)
+                {
+                    SceneLoadingParams loadparams = new SceneLoadingParams();
+                    loadparams.Scene = scene;
+                    loadparams.SimulationDataStorage = simulationDataStorage;
+                    scene.m_LoaderThread = new Thread(LoadSceneThread);
+                    /* we put a thread in there for ensuring correct sequence but we do not start it */
+                    LoadSceneThread(loadparams);
+                }
+            }
+        }
+
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static void LoadSceneThread(object o)
