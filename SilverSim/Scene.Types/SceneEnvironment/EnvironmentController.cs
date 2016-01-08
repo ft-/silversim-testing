@@ -179,13 +179,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     SendSimulatorTimeMessageToAllClients();
                 }
             }
-            if (null != Wind)
+            if (null != Wind && newTickCount - m_LastWindModelUpdateTickCount >= m_UpdateWindModelEveryMsecs)
             {
-                if (newTickCount - m_LastWindModelUpdateTickCount >= m_UpdateWindModelEveryMsecs)
-                {
-                    m_LastWindModelUpdateTickCount = m_UpdateWindModelEveryMsecs;
-                    Wind.UpdateModel(m_SunData);
-                }
+                m_LastWindModelUpdateTickCount = m_UpdateWindModelEveryMsecs;
+                Wind.UpdateModel(m_SunData);
             }
         }
 
