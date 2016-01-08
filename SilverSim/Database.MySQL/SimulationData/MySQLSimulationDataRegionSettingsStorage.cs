@@ -61,6 +61,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             settings.WaterHeight = reader.GetDouble("WaterHeight");
             settings.TerrainRaiseLimit = reader.GetDouble("TerrainRaiseLimit");
             settings.TerrainLowerLimit = reader.GetDouble("TerrainLowerLimit");
+            settings.SunPosition = reader.GetDouble("SunPosition");
+            settings.IsSunFixed = reader.GetBoolean("IsSunFixed");
+            settings.UseEstateSun = reader.GetBoolean("UseEstateSun");
+
             return settings;
         }
 
@@ -111,6 +115,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     data["WaterHeight"] = value.WaterHeight;
                     data["TerrainRaiseLimit"] = value.TerrainRaiseLimit;
                     data["TerrainLowerLimit"] = value.TerrainLowerLimit;
+                    data["SunPosition"] = value.SunPosition;
+                    data["IsSunFixed"] = value.IsSunFixed ? 1 : 0;
+                    data["UseEstateSun"] = value.UseEstateSun ? 1 : 0;
 
                     conn.ReplaceInto("regionsettings", data);
                 }
@@ -207,8 +214,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "WaterHeight DOUBLE NOT NULL DEFAULT '0'," +
                 "TerrainRaiseLimit DOUBLE NOT NULL DEFAULT '0'," +
                 "TerrainLowerLimit DOUBLE NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(RegionID))"
+                "PRIMARY KEY(RegionID))",
+            "ALTER TABLE %tablename% ADD COLUMN (UseEstateSun INT(1) UNSIGNED NOT NULL DEFAULT '1', IsSunFixed INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
+                "SunPosition DOUBLE NOT NULL DEFAULT '0'),"
         };
+
         #endregion
     }
 }

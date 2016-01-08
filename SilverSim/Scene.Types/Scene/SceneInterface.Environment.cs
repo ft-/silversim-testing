@@ -186,6 +186,7 @@ namespace SilverSim.Scene.Types.Scene
                 public UInt32 SecPerYear;
                 public Vector3 SunDirection;
                 public double SunPhase;
+                public double FixedSunPhase;
                 public Vector3 SunAngVelocity;
                 public bool IsSunFixed;
             }
@@ -207,8 +208,74 @@ namespace SilverSim.Scene.Types.Scene
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
             SunData m_SunData = new SunData();
             readonly SceneInterface m_Scene;
-            readonly System.Timers.Timer m_Timer = new System.Timers.Timer(10000);
+            readonly System.Timers.Timer m_Timer = new System.Timers.Timer(1000 / 60f);
             readonly RwLockedDictionary<UUID, bool> m_OverrideLightSharePerAgent = new RwLockedDictionary<UUID, bool>();
+
+            int m_SunUpdateEveryMsecs = 10000;
+            uint m_SendSimTimeAfterNSunUpdates = 10 - 1;
+            int m_UpdateWindModelEveryMsecs = 10000;
+
+            uint m_SunUpdatesUntilSendSimTime;
+
+            public int SunUpdateEveryMsecs
+            {
+                get
+                {
+                    lock(this)
+                    {
+                        return m_SunUpdateEveryMsecs;
+                    }
+                }
+                set
+                {
+                    lock(this)
+                    {
+                        m_SunUpdateEveryMsecs = value;
+                    }
+                }
+            }
+
+            public uint SendSimTimeEveryNthSunUpdate
+            {
+                get
+                {
+                    lock(this)
+                    {
+                        return m_SendSimTimeAfterNSunUpdates + 1;
+                    }
+                }
+                set
+                {
+                    lock(this)
+                    {
+                        if (value >= 1)
+                        {
+                            m_SendSimTimeAfterNSunUpdates = value - 1;
+                        }
+                    }
+                }
+            }
+
+            public int UpdateWindModelEveryMsecs
+            {
+                get
+                {
+                    lock(this)
+                    {
+                        return m_UpdateWindModelEveryMsecs;
+                    }
+                }
+                set
+                {
+                    lock(this)
+                    {
+                        if (value >= 1)
+                        {
+                            m_UpdateWindModelEveryMsecs = value;
+                        }
+                    }
+                }
+            }
 
             public Vector3 SunDirection
             {
@@ -245,6 +312,10 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         EnvironmentTimer(this, null);
                         m_Timer.Elapsed += EnvironmentTimer;
+                        m_LastFpsTickCount = System.Environment.TickCount;
+                        m_LastWindModelUpdateTickCount = m_LastFpsTickCount;
+                        m_LastSunUpdateTickCount = m_LastFpsTickCount;
+                        m_CountedTicks = 0;
                         m_Timer.Start();
                     }
                 }
@@ -262,13 +333,55 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
+            int m_LastFpsTickCount;
+            int m_LastWindModelUpdateTickCount;
+            int m_LastSunUpdateTickCount;
+            int m_CountedTicks;
+            double m_EnvironmentFps;
+
+            public double EnvironmentFps
+            {
+                get
+                {
+                    lock (this)
+                    {
+                        return m_EnvironmentFps;
+                    }
+                }
+            }
+            
             private void EnvironmentTimer(object sender, System.Timers.ElapsedEventArgs e)
             {
-                UpdateSunDirection();
-                SendSimulatorTimeMessageToAllClients();
+                ++m_CountedTicks;
+                int newTickCount = System.Environment.TickCount;
+                if (newTickCount - m_LastFpsTickCount >= 1000)
+                {
+                    int timeDiff = newTickCount - m_LastFpsTickCount;
+                    m_LastFpsTickCount = System.Environment.TickCount;
+                    lock(this)
+                    {
+                        m_EnvironmentFps = m_CountedTicks * (double)timeDiff / 1000f;
+                    }
+                    m_CountedTicks = 0;
+                }
+
+                if(newTickCount - m_LastSunUpdateTickCount >= m_SunUpdateEveryMsecs)
+                {
+                    m_LastSunUpdateTickCount = newTickCount;
+                    UpdateSunDirection();
+                    if(m_SunUpdatesUntilSendSimTime-- == 0)
+                    {
+                        m_SunUpdatesUntilSendSimTime = m_SendSimTimeAfterNSunUpdates;
+                        SendSimulatorTimeMessageToAllClients();
+                    }
+                }
                 if (null != Wind)
                 {
-                    Wind.UpdateModel(m_SunData);
+                    if(newTickCount - m_LastWindModelUpdateTickCount >= m_UpdateWindModelEveryMsecs)
+                    {
+                        m_LastWindModelUpdateTickCount = m_UpdateWindModelEveryMsecs;
+                        Wind.UpdateModel(m_SunData);
+                    }
                 }
             }
 
@@ -278,6 +391,24 @@ namespace SilverSim.Scene.Types.Scene
             double SeasonalSunTilt = 0.03 * Math.PI;
             double SunNormalizedOffset = 0.45;
 
+            public void SetSunDurationParams(uint secperday, uint daysperyear)
+            {
+                lock(this)
+                {
+                    m_SunData.SecPerDay = secperday;
+                    m_SunData.SecPerYear = secperday * daysperyear;
+                }
+            }
+
+            public void GetSunDurationParams(out uint secperday, out uint daysperyear)
+            {
+                lock(this)
+                {
+                    secperday = m_SunData.SecPerDay;
+                    daysperyear = m_SunData.SecPerYear / m_SunData.SecPerDay;
+                }
+            }
+
             public double TimeOfDay
             {
                 get
@@ -286,6 +417,53 @@ namespace SilverSim.Scene.Types.Scene
                     return m_SunData.IsSunFixed ?
                         utctime :
                         utctime % (m_SunData.SecPerDay);
+                }
+            }
+
+            public double ActualSunPosition
+            {
+                get
+                {
+                    lock(this)
+                    {
+                        return m_SunData.SunPhase * 12 / Math.PI;
+                    }
+                }
+            }
+
+            public double FixedSunPosition
+            {
+                get
+                {
+                    lock(this)
+                    {
+                        return m_SunData.FixedSunPhase * 12 / Math.PI;
+                    }
+                }
+                set
+                {
+                    lock(this)
+                    {
+                        m_SunData.FixedSunPhase = value * Math.PI / 12;
+                    }
+                }
+            }
+
+            public bool IsSunFixed
+            {
+                get
+                {
+                    lock(this)
+                    {
+                        return m_SunData.IsSunFixed;
+                    }
+                }
+                set
+                {
+                    lock(this)
+                    {
+                        m_SunData.IsSunFixed = value;
+                    }
                 }
             }
 
@@ -310,6 +488,7 @@ namespace SilverSim.Scene.Types.Scene
                 double yearly_phase = YearlyOmega * utctime;
                 double tilt = AverageSunTilt + SeasonalSunTilt * Math.Sin(yearly_phase);
 
+                m_SunData.SunPhase = sun_phase;
                 Vector3 sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
                 Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
 

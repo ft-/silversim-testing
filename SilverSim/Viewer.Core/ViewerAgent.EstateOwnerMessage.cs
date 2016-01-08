@@ -458,12 +458,12 @@ namespace SilverSim.Viewer.Core
             scene.RegionSettings.TerrainRaiseLimit = float.Parse(req.ParamList[1].FromUTF8Bytes(), CultureInfo.InvariantCulture);
             scene.RegionSettings.TerrainLowerLimit = float.Parse(req.ParamList[2].FromUTF8Bytes(), CultureInfo.InvariantCulture);
 
-            bool useEstateSun = ParamStringToBool(req.ParamList[3]);
-            bool useFixedSun = ParamStringToBool(req.ParamList[4]);
-            float sunHour = float.Parse(req.ParamList[5].FromUTF8Bytes(), CultureInfo.InvariantCulture);
-            bool useGlobal = ParamStringToBool(req.ParamList[6]);
-            bool isEstateFixedSun = ParamStringToBool(req.ParamList[7]);
-            float estateSunHour = float.Parse(req.ParamList[8].FromUTF8Bytes(), CultureInfo.InvariantCulture);
+            scene.RegionSettings.IsSunFixed = ParamStringToBool(req.ParamList[4]);
+            scene.RegionSettings.SunPosition = double.Parse(req.ParamList[5].FromUTF8Bytes(), CultureInfo.InvariantCulture);
+            scene.RegionSettings.UseEstateSun = ParamStringToBool(req.ParamList[3]);
+            /* 6 is bool estate use global time */
+            /* 7 is bool for IsEstateFixedSun */
+            /* 8 estate sun_hour */
 
             scene.TriggerRegionSettingsChanged();
         }

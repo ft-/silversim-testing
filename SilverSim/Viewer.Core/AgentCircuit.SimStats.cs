@@ -107,6 +107,7 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = (double)agentUpdatesReceived * 1000f / dt;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
             m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = Scene.Primitives.Count;
+            m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = Scene.Environment.EnvironmentFps;
             IPhysicsScene physics = Scene.PhysicsScene;
             if(physics != null)
             {
