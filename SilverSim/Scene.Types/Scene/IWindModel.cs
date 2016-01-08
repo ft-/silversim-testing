@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
-using EnvironmentController = SilverSim.Scene.Types.Scene.SceneInterface.EnvironmentController;
+using EnvironmentController = SilverSim.Scene.Types.SceneEnvironment.EnvironmentController;
 
 namespace SilverSim.Scene.Types.Scene
 {

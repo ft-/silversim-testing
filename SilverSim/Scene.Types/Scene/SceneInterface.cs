@@ -5,6 +5,7 @@ using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
+using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;

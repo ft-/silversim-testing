@@ -11,6 +11,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scripting.Common;
