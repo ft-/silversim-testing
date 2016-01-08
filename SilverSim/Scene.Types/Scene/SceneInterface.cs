@@ -93,7 +93,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public readonly RegionSettings RegionSettings = new RegionSettings();
         protected EstateInfo m_EstateData;
-        protected object m_EstateDataUpdateLock;
+        protected readonly object m_EstateDataUpdateLock = new object();
 
         #region Scene Loading fields (do not use for anything else)
         public Thread m_LoaderThread;

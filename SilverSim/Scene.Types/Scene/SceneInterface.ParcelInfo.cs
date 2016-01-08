@@ -174,7 +174,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 flags &= ~ParcelFlags.AllowDamage;
             }
-            if(0 == (regionflags & RegionOptionFlags.BlockTerraform))
+            if(0 != (regionflags & RegionOptionFlags.BlockTerraform))
             {
                 flags &= ~ParcelFlags.AllowTerraform;
             }
