@@ -217,6 +217,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_WindlightValid = false;
                     windlightUpdated = true;
+                    m_ImmediateSunUpdate = true;
                 }
             }
             finally
@@ -257,6 +258,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                         m_SkyWindlight = value;
                         windlightUpdated = true;
                         m_WindlightValid = true;
+                        m_ImmediateSunUpdate = true;
                     }
                 }
                 finally
