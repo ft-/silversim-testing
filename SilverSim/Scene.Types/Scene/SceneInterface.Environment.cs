@@ -65,6 +65,7 @@ namespace SilverSim.Scene.Types.Scene
         public class EnvironmentController
         {
             private const int BASE_REGION_SIZE = 256;
+            readonly object m_EnvironmentLock = new object();
 
             public struct WLVector4
             {
@@ -242,14 +243,14 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         return m_SunUpdateEveryMsecs;
                     }
                 }
                 set
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         m_SunUpdateEveryMsecs = value;
                     }
@@ -260,14 +261,14 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         return m_SendSimTimeAfterNSunUpdates + 1;
                     }
                 }
                 set
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         if (value >= 1)
                         {
@@ -281,14 +282,14 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         return m_UpdateWindModelEveryMsecs;
                     }
                 }
                 set
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         if (value >= 1)
                         {
@@ -302,14 +303,14 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         return m_SunData.SunDirection;
                     }
                 }
                 set
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         m_SunData.SunDirection = value;
                     }
@@ -327,7 +328,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Start()
             {
-                lock(this)
+                lock(m_EnvironmentLock)
                 {
                     if(!m_Timer.Enabled)
                     {
@@ -344,7 +345,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Stop()
             {
-                lock(this)
+                lock(m_EnvironmentLock)
                 {
                     if(m_Timer.Enabled)
                     {
@@ -379,7 +380,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     int timeDiff = newTickCount - m_LastFpsTickCount;
                     m_LastFpsTickCount = System.Environment.TickCount;
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         m_EnvironmentFps = m_CountedTicks * (double)timeDiff / 1000f;
                     }
@@ -415,7 +416,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void SetSunDurationParams(uint secperday, uint daysperyear)
             {
-                lock(this)
+                lock(m_EnvironmentLock)
                 {
                     m_SunData.SecPerDay = secperday;
                     m_SunData.SecPerYear = secperday * daysperyear;
@@ -424,7 +425,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void GetSunDurationParams(out uint secperday, out uint daysperyear)
             {
-                lock(this)
+                lock(m_EnvironmentLock)
                 {
                     secperday = m_SunData.SecPerDay;
                     daysperyear = m_SunData.SecPerYear / m_SunData.SecPerDay;
@@ -446,7 +447,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         return (m_SunData.SunPhase * 12 / Math.PI) % 24;
                     }
@@ -457,14 +458,14 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    lock (this)
+                    lock (m_EnvironmentLock)
                     {
                         return m_SunData.FixedSunPhase * 12 / Math.PI;
                     }
                 }
                 set
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
 #if DEBUG
                         m_Log.DebugFormat("FixedSunPosition set to {0}h Position", value);
@@ -511,7 +512,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 if(sunFixed)
                 {
-                    lock(this)
+                    lock(m_EnvironmentLock)
                     {
                         m_SunData.SunPhase = m_SunData.FixedSunPhase % (2 * Math.PI);
                     }
