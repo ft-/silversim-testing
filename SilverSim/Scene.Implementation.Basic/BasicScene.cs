@@ -1222,6 +1222,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     ParcelFlags newFlags = FilterParcelFlags(pInfo.Flags);
                     if (newFlags != pInfo.Flags && m_Parcels.ContainsKey(pInfo.ID))
                     {
+                        pInfo.Flags = newFlags;
                         m_SimulationDataStorage.Parcels.Store(ID, pInfo);
                     }
                 }
