@@ -329,6 +329,14 @@ namespace SilverSim.Viewer.Core
             scene.Access = (RegionAccess)int.Parse(req.ParamList[6].FromUTF8Bytes());
             scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
             scene.RegionSettings.AllowLandJoinDivide = ParamStringToBool(req.ParamList[8]);
+#if DEBUG
+            m_Log.DebugFormat("RegionFlags={0} Access={1} AgentLimit={2} ObjectBonus={3}",
+                scene.RegionSettings.AsFlags.ToString(),
+                scene.Access,
+                scene.RegionSettings.AgentLimit,
+                scene.RegionSettings.ObjectBonus);
+#endif
+
             scene.ReregisterRegion();
             scene.TriggerRegionSettingsChanged();
         }
@@ -499,6 +507,7 @@ namespace SilverSim.Viewer.Core
                 estateService.TryGetValue(estateID, out estate))
             {
                 estate.CovenantID = covenantID;
+                estate.CovenantTimestamp = Date.Now;
                 estateService[estate.ID] = estate;
                 foreach(UUID regionID in estateService.RegionMap[estateID])
                 {

@@ -12,6 +12,14 @@ namespace SilverSim.Types
         private DateTime m_Value;
 
         #region Properties
+        public static Date Now
+        {
+            get
+            {
+                return new Date();
+            }
+        }
+
         public ValueType Type
         {
             get

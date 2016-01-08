@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
@@ -19,7 +20,9 @@ namespace SilverSim.Viewer.Core.Capabilities
     {
         readonly ViewerAgent m_Agent;
         readonly SceneInterface m_Scene;
-
+#if DEBUG
+        private static readonly ILog m_Log = LogManager.GetLogger("DISPATCH REGION INFO");
+#endif
         public DispatchRegionInfo(ViewerAgent agent, SceneInterface scene)
         {
             m_Agent = agent;
@@ -78,8 +81,15 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_Scene.RegionSettings.ObjectBonus = reqmap["prim_bonus"].AsReal;
             m_Scene.Access = (RegionAccess)reqmap["sim_access"].AsUInt;
             m_Scene.RegionSettings.RestrictPushing = reqmap["restrict_pushobject"].AsBoolean;
-            m_Scene.RegionSettings.AllowLandResell = reqmap["allow_parcel_changes"].AsBoolean;
+            m_Scene.RegionSettings.AllowLandJoinDivide = reqmap["allow_parcel_changes"].AsBoolean;
             m_Scene.RegionSettings.BlockShowInSearch = reqmap["block_parcel_search"].AsBoolean;
+#if DEBUG
+            m_Log.DebugFormat("RegionFlags={0} Access={1} AgentLimit={2} ObjectBonus={3}", 
+                m_Scene.RegionSettings.AsFlags.ToString(), 
+                m_Scene.Access,
+                m_Scene.RegionSettings.AgentLimit,
+                m_Scene.RegionSettings.ObjectBonus);
+#endif
 
             m_Scene.TriggerRegionSettingsChanged();
             m_Scene.ReregisterRegion();
