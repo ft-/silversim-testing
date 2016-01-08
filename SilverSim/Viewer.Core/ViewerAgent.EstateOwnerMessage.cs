@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text;
 
 namespace SilverSim.Viewer.Core
 {
@@ -535,14 +534,14 @@ namespace SilverSim.Viewer.Core
             if((null == scene.GroupsNameService || !scene.GroupsNameService.TryGetValue(prey, out ugi)) &&
                 (flags & (EstateAccessDeltaFlags.AddGroup | EstateAccessDeltaFlags.RemoveGroup)) != 0)
             {
-                circuit.Agent.SendAlertMessage("Changing estate access not possible since group not known", scene.ID);
+                circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateAccessNotPossibleSinceGroupNotKnown", "Changing estate access not possible since group not known"), scene.ID);
                 return;
             }
             if (!scene.AvatarNameService.TryGetValue(prey, out uui) &&
                 (flags & (EstateAccessDeltaFlags.AddUser | EstateAccessDeltaFlags.AddManager | EstateAccessDeltaFlags.AddBan |
                         EstateAccessDeltaFlags.RemoveUser | EstateAccessDeltaFlags.RemoveManager | EstateAccessDeltaFlags.RemoveBan)) != 0)
             {
-                circuit.Agent.SendAlertMessage("Changing estate access not possible since agent not known", scene.ID);
+                circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateAccessNotPossibleSinceAgentNotKnown", "Changing estate access not possible since agent not known"), scene.ID);
                 return;
             }
 
@@ -565,7 +564,7 @@ namespace SilverSim.Viewer.Core
 
             if(allEstateIds.Count == 0)
             {
-                circuit.Agent.SendAlertMessage("Changing estate access not possible since no estate found", scene.ID);
+                circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateAccessNotPossibleSinceNoEstateFound", "Changing estate access not possible since no estate found"), scene.ID);
                 return;
             }
 
