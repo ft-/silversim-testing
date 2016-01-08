@@ -68,7 +68,7 @@ namespace SilverSim.Scene.Types.WindLight
                         writer.WriteNamedValue("key", "messageID");
                         writer.WriteNamedValue("uuid", UUID.Zero);
                         writer.WriteNamedValue("key", "regionID");
-                        writer.WriteNamedValue("uuuid", regionID);
+                        writer.WriteNamedValue("uuid", regionID);
                     }
                     writer.WriteEndElement();
 
