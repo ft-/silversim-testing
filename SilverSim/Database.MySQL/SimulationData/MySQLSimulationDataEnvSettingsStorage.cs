@@ -54,7 +54,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                     conn.Open();
                     if(value == null)
                     {
-                        using(MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+#if DEBUG
+                        m_Log.DebugFormat("Removing environment settings for {0}", regionID.ToString());
+#endif
+                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
                         {
                             cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                             cmd.ExecuteNonQuery();
@@ -62,6 +65,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                     else
                     {
+#if DEBUG
+                        m_Log.DebugFormat("Storing new environment settings for {0}", regionID.ToString());
+#endif
                         Dictionary<string, object> param = new Dictionary<string,object>();
                         param["RegionID"] = regionID.ToString();
                         using(MemoryStream ms = new MemoryStream())
@@ -71,6 +77,19 @@ namespace SilverSim.Database.MySQL.SimulationData
                         }
                         conn.ReplaceInto("environmentsettings", param);
                     }
+                }
+            }
+        }
+
+        public override bool Remove(UUID regionID)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }

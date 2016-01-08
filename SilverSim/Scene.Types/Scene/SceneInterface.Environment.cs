@@ -32,6 +32,8 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public abstract void TriggerStoreOfEnvironmentSettings();
+
         EnvironmentSettings m_EnvironmentSettings;
 
         public EnvironmentSettings EnvironmentSettings
@@ -48,7 +50,7 @@ namespace SilverSim.Scene.Types.Scene
             set
             {
                 m_EnvironmentSettings = (null != value) ?
-                    new EnvironmentSettings(m_EnvironmentSettings) :
+                    new EnvironmentSettings(value) :
                     null;
             }
         }

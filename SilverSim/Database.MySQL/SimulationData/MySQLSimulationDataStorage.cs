@@ -179,15 +179,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", connection))
-                {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM terrains WHERE RegionID LIKE ?regionid", connection))
                 {
                     cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
@@ -204,6 +195,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
 
+            EnvironmentSettings.Remove(regionID);
             Spawnpoints.Remove(regionID);
             LightShare.Remove(regionID);
         }

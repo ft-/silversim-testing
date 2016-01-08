@@ -1309,6 +1309,12 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        public override void TriggerStoreOfEnvironmentSettings()
+        {
+            m_SimulationDataStorage.EnvironmentSettings[ID] = EnvironmentSettings;
+            TriggerRegionDataChanged();
+        }
+
         public override void TriggerRegionSettingsChanged()
         {
             m_SimulationDataStorage.RegionSettings[ID] = RegionSettings;

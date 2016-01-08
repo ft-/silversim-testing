@@ -109,20 +109,36 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     Scene.EnvironmentSettings = envsettings;
-                    EnvironmentPostResponse(httpreq, UUID.Zero, true, string.Empty);
                     /* reading back EnvironmentSettings happens by RegionInfo UDP message */
                     /* Viewer triggers that by updating RegionInfo through UDP message */
-                    return;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     m_Log.ErrorFormat("Exception when storing Environment settings: {0}: {1}\n{2}",
                         e.GetType().FullName,
                         e.Message,
                         e.StackTrace);
+                    EnvironmentPostResponse(httpreq, UUID.Zero, false, this.GetLanguageString(Agent.CurrentCulture, "InternalError", "Internal Error"));
+                    return;
                 }
+                try
+                {
+                    Scene.TriggerStoreOfEnvironmentSettings();
+                }
+                catch(Exception e)
+                {
+                    /* ensure no exceptions from line before is passed on */
+                    m_Log.ErrorFormat("Exception when triggering actual store of Environment settings: {0}: {1}\n{2}",
+                        e.GetType().FullName,
+                        e.Message,
+                        e.StackTrace);
+                }
+                EnvironmentPostResponse(httpreq, UUID.Zero, true, string.Empty);
             }
-            EnvironmentPostResponse(httpreq, UUID.Zero, false, "Insufficient estate permissions, settings has not been saved.");
+            else
+            {
+                EnvironmentPostResponse(httpreq, UUID.Zero, false, this.GetLanguageString(Agent.CurrentCulture, "InsufficientPermissionsEnvironmentSettingsHaveNotBeenSaved", "Insufficient estate permissions, settings have not been saved."));
+            }
         }
     }
 }

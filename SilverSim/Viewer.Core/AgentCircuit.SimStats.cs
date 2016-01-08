@@ -11,6 +11,7 @@ using SilverSim.Viewer.Messages.Simulator;
 using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Scene.Types.Physics;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Viewer.Core
 {
@@ -84,6 +85,7 @@ namespace SilverSim.Viewer.Core
             int agentUpdatesReceived = m_AgentUpdatesReceived - m_LastAgentUpdatesReceived;
             int activeUploads = 0;
             ViewerAgent agent = Agent;
+            SceneInterface scene = Scene;
             if (agent != null)
             {
                 activeUploads += agent.m_TerrainTransactions.Count + agent.m_AssetTransactions.Count;
@@ -106,8 +108,11 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;
             m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = (double)agentUpdatesReceived * 1000f / dt;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
-            m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = Scene.Primitives.Count;
-            m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = Scene.Environment.EnvironmentFps;
+            if (null != scene)
+            {
+                m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = scene.Primitives.Count;
+                m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;
+            }
             IPhysicsScene physics = Scene.PhysicsScene;
             if(physics != null)
             {
@@ -116,8 +121,11 @@ namespace SilverSim.Viewer.Core
             }
 
             SimStats stats = new SimStats();
-            stats.RegionX = Scene.GridPosition.X;
-            stats.RegionY = Scene.GridPosition.Y;
+            if (scene != null)
+            {
+                stats.RegionX = scene.GridPosition.X;
+                stats.RegionY = scene.GridPosition.Y;
+            }
             stats.RegionFlags = 0;
             stats.ObjectCapacity = 15000;
             stats.PID = 0;
