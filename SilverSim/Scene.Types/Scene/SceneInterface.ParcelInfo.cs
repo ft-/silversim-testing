@@ -182,7 +182,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 flags &= ~ParcelFlags.ShowDirectory;
             }
-            if (0 == (regionflags & RegionOptionFlags.RestrictPushObject))
+            if (0 != (regionflags & RegionOptionFlags.RestrictPushObject))
             {
                 flags |= ParcelFlags.RestrictPushObject;
             }
