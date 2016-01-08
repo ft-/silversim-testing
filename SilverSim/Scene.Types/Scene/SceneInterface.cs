@@ -16,6 +16,7 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Economy;
+using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.Parcel;
 using System;
@@ -320,6 +321,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public abstract RegionOptionFlags GetRegionFlags();
         public abstract void ReregisterRegion();
         public GridServiceInterface RegionStorage { get; set; }
 

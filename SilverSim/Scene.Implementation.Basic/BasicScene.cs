@@ -1192,6 +1192,35 @@ namespace SilverSim.Scene.Implementation.Basic
             UpdateEnvironmentSettings();
         }
 
+        public override RegionOptionFlags GetRegionFlags()
+        {
+            EstateInfo estateInfo;
+            uint estateID;
+            RegionOptionFlags regionFlags = RegionOptionFlags.None;
+            try /* we need a fail protection here */
+            {
+                if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                   EstateService.TryGetValue(estateID, out estateInfo))
+                {
+                    regionFlags = estateInfo.Flags;
+                }
+            }
+            catch (Exception e)
+            {
+                m_Log.WarnFormat("Exception when accessing EstateService: {0}: {1}\n{2}",
+                    e.GetType().FullName,
+                    e.Message,
+                    e.StackTrace);
+            }
+            regionFlags &= ~RegionOptionFlags.SunFixed;
+            regionFlags |= RegionSettings.AsFlags;
+            if (RegionSettings.IsSunFixed)
+            {
+                regionFlags |= RegionOptionFlags.SunFixed;
+            }
+            return regionFlags;
+        }
+
         protected void SendRegionInfo(ViewerAgent agent)
         {
             Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
