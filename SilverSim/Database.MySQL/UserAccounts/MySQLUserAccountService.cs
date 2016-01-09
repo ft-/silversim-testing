@@ -63,11 +63,11 @@ namespace SilverSim.Database.MySQL.UserAccounts
             new AddColumn<int>("UserLevel") { IsNullAllowed = false, Default = (int)0 },
             new AddColumn<int>("UserFlags") { IsNullAllowed = false, Default = (int)0 },
             new AddColumn<string>("UserTitle") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
-            new PrimaryKeyInfo(new string[] { "ID" }),
-            new NamedKeyInfo("Email", new string[] { "Email" }),
-            new NamedKeyInfo("Name", new string[] { "FirstName", "LastName" }) { IsUnique = true },
-            new NamedKeyInfo("FirstName", new string[] { "FirstName" }),
-            new NamedKeyInfo("LastName", new string[] { "LastName" }),
+            new PrimaryKeyInfo("ID"),
+            new NamedKeyInfo("Email", "Email"),
+            new NamedKeyInfo("Name", "FirstName", "LastName") { IsUnique = true },
+            new NamedKeyInfo("FirstName", "FirstName"),
+            new NamedKeyInfo("LastName", "LastName"),
         };
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)

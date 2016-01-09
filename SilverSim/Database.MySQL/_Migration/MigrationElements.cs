@@ -8,6 +8,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.Database.MySQL._Migration
 {
@@ -37,7 +38,7 @@ namespace SilverSim.Database.MySQL._Migration
     {
         public string[] FieldNames { get; private set; }
         
-        public PrimaryKeyInfo(string[] fieldNames)
+        public PrimaryKeyInfo(params string[] fieldNames)
         {
             FieldNames = fieldNames;
         }
@@ -77,7 +78,7 @@ namespace SilverSim.Database.MySQL._Migration
         public string Name { get; private set; }
         public string[] FieldNames { get; private set; }
 
-        public NamedKeyInfo(string name, string[] fieldNames)
+        public NamedKeyInfo(string name, params string[] fieldNames)
         {
             Name = name;
             FieldNames = fieldNames;
@@ -150,7 +151,7 @@ namespace SilverSim.Database.MySQL._Migration
                     typeSql = "VARCHAR(" + colInfo.Cardinality.ToString() + ")";
                 }
             }
-            else if (f == typeof(UUI))
+            else if (f == typeof(UUI) || f == typeof(UGI))
             {
                 typeSql = "VARCHAR(255)";
             }
@@ -162,11 +163,11 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 typeSql = "DOUBLE";
             }
-            else if (f == typeof(int) || f == typeof(InventoryType) || f == typeof(AssetType) || f == typeof(InventoryItem.SaleInfoData.SaleType))
+            else if (f == typeof(int) || MySQLUtilities.MySqlSignedTypes.Contains(f))
             {
                 typeSql = "INT";
             }
-            else if (f == typeof(uint) || f == typeof(InventoryPermissionsMask) || f == typeof(AssetFlags) || f == typeof(InventoryFlags))
+            else if (f == typeof(uint) || MySQLUtilities.MySqlUnsignedTypes.Contains(f))
             {
                 typeSql = "INT UNSIGNED";
             }
@@ -272,6 +273,26 @@ namespace SilverSim.Database.MySQL._Migration
                 }
                 return result;
             }
+            else if (f == typeof(EnvironmentController.WLVector2))
+            {
+                if (colInfo.Default != null && !colInfo.IsNullAllowed)
+                {
+                    if (colInfo.Default.GetType() != f)
+                    {
+                        throw new ArgumentException("Default is not a EnvironmentController.WLVector4 for field " + colInfo.Name);
+                    }
+
+                    EnvironmentController.WLVector2 v = (EnvironmentController.WLVector2)colInfo.Default;
+                    result.Add(colInfo.Name + "X", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
+                    result.Add(colInfo.Name + "Y", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
+                }
+                else
+                {
+                    result.Add(colInfo.Name + "X", "DOUBLE " + notNull);
+                    result.Add(colInfo.Name + "Y", "DOUBLE " + notNull);
+                }
+                return result;
+            }
             else if (f == typeof(EnvironmentController.WLVector4))
             {
                 if (colInfo.Default != null && !colInfo.IsNullAllowed)
@@ -360,14 +381,16 @@ namespace SilverSim.Database.MySQL._Migration
             }
             else
             {
-                throw new ArgumentOutOfRangeException("FieldType is not supported in field " + colInfo.Name);
+                throw new ArgumentOutOfRangeException("FieldType " + f.FullName +  " is not supported in field " + colInfo.Name);
             }
 
             if (colInfo.Default != null && !colInfo.IsNullAllowed)
             {
                 if(colInfo.Default.GetType() != colInfo.FieldType &&
                     !(colInfo.Default.GetType() == typeof(UUID) &&
-                    colInfo.FieldType == typeof(UUI)))
+                    colInfo.FieldType == typeof(UUI)) &&
+                    !(colInfo.Default.GetType() == typeof(UUID) &&
+                    colInfo.FieldType == typeof(UGI)))
                 {
                     throw new ArgumentOutOfRangeException("Default does not match expected type in field " + colInfo.Name + " target type=" + colInfo.FieldType.FullName + " defaultType=" + colInfo.Default.GetType().FullName);
                 }
@@ -381,11 +404,11 @@ namespace SilverSim.Database.MySQL._Migration
                 {
                     def = ((Date)def).AsULong;
                 }
-                else if (f == typeof(InventoryType) || f == typeof(AssetType) || f == typeof(InventoryItem.SaleInfoData.SaleType))
+                else if (MySQLUtilities.MySqlSignedTypes.Contains(f))
                 {
                     def = (int)Convert.ChangeType(def, typeof(int));
                 }
-                else if (f == typeof(uint) || f == typeof(InventoryPermissionsMask) || f == typeof(AssetFlags) || f == typeof(InventoryFlags))
+                else if (MySQLUtilities.MySqlUnsignedTypes.Contains(f))
                 {
                     def = (uint)Convert.ChangeType(def, typeof(uint));
                 }

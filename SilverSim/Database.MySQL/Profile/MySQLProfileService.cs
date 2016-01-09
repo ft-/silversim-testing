@@ -158,7 +158,7 @@ namespace SilverSim.Database.MySQL.Profile
             new AddColumn<string>("parcelname") { Cardinality = 255, IsNullAllowed = false },
             new AddColumn<uint>("classifiedflags") { IsNullAllowed = false },
             new AddColumn<int>("priceforlisting") { IsNullAllowed = false },
-            new PrimaryKeyInfo(new string[] { "classifieduuid" }),
+            new PrimaryKeyInfo("classifieduuid"),
             new NamedKeyInfo("creatoruuid_index", new string[] { "creatoruuid" }),
             new TableRevision(2),
             /* some change entry needed for rev 1 tables */
@@ -170,8 +170,8 @@ namespace SilverSim.Database.MySQL.Profile
             new AddColumn<UUID>("useruuid") { IsNullAllowed = false },
             new AddColumn<UUID>("targetuuid") { IsNullAllowed = false },
             new AddColumn<string>("notes") { IsNullAllowed = false },
-            new PrimaryKeyInfo(new string[] { "useruuid", "targetuuid"}),
-            new NamedKeyInfo("useruuid", new string[] {"useruuid" }),
+            new PrimaryKeyInfo("useruuid", "targetuuid"),
+            new NamedKeyInfo("useruuid", "useruuid"),
 
             new SqlTable("userpicks"),
             new AddColumn<UUID>("pickuuid") { IsNullAllowed = false },
@@ -187,8 +187,8 @@ namespace SilverSim.Database.MySQL.Profile
             new AddColumn<string>("posglobal") { Cardinality = 255, IsNullAllowed = false },
             new AddColumn<int>("sortorder") { IsNullAllowed = false },
             new AddColumn<bool>("enabled") { IsNullAllowed = false },
-            new PrimaryKeyInfo(new string[] { "pickuuid" }),
-            new NamedKeyInfo("creatoruuid", new string[] {"creatoruuid" }),
+            new PrimaryKeyInfo("pickuuid"),
+            new NamedKeyInfo("creatoruuid", "creatoruuid"),
             new TableRevision(2),
             new ChangeColumn<Vector3>("posglobal") { IsNullAllowed = false },
 
@@ -207,7 +207,7 @@ namespace SilverSim.Database.MySQL.Profile
             new AddColumn<string>("profileAboutText"),
             new AddColumn<UUID>("profileFirstImage") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("profileFirstText"),
-            new PrimaryKeyInfo(new string[] { "useruuid" }),
+            new PrimaryKeyInfo("useruuid"),
             new TableRevision(2),
             /* needed changes for revision 1 tables */
             new ChangeColumn<bool>("profileAllowPublish") { IsNullAllowed = false },
@@ -217,7 +217,7 @@ namespace SilverSim.Database.MySQL.Profile
             new ChangeColumn<UUID>("useruuid") { IsNullAllowed = false, Default = UUID.Zero },
             new ChangeColumn<bool>("imviaemail") { IsNullAllowed = false, Default = false },
             new ChangeColumn<bool>("visible") { IsNullAllowed = false, Default = true },
-            new PrimaryKeyInfo(new string[] { "useruuid" })
+            new PrimaryKeyInfo("useruuid")
         };
     }
 

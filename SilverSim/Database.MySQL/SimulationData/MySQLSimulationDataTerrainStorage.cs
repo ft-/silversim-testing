@@ -122,20 +122,5 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return patches;
             }
         }
-
-        #region Migrations
-        public void ProcessMigrations()
-        {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "terrains", Migrations, m_Log);
-        }
-
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "PatchID INT(11) UNSIGNED NOT NULL," +
-                "TerrainData BLOB," +
-                "PRIMARY KEY(RegionID, PatchID))"
-        };
-        #endregion
     }
 }

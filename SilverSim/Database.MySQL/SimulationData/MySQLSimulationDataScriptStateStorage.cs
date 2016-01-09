@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataScriptStateStorage : SimulationDataScriptStateStorageInterface, IDBServiceInterface
+    public class MySQLSimulationDataScriptStateStorage : SimulationDataScriptStateStorageInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SCRIPT STATE SERVICE");
 
@@ -80,29 +80,5 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
         }
-
-        public void VerifyConnection()
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-            }
-        }
-
-        #region Migrations
-        public void ProcessMigrations()
-        {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "scriptstates", Migrations, m_Log);
-        }
-
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "PrimID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "ItemID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "ScriptState LONGTEXT," +
-                "PRIMARY KEY(RegionID, PrimID, ItemID))"
-        };
-        #endregion
     }
 }

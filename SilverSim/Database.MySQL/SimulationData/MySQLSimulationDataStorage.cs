@@ -21,7 +21,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Simulation Data Backend")]
-    public sealed class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IPluginShutdown
+    public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         readonly string m_ConnectionString;
@@ -126,18 +126,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 conn.Open();
             }
-        }
-
-        public void ProcessMigrations()
-        {
-            m_ObjectStorage.ProcessMigrations();
-            m_ScriptStateStorage.ProcessMigrations();
-            m_ParcelStorage.ProcessMigrations();
-            m_TerrainStorage.ProcessMigrations();
-            m_EnvironmentStorage.ProcessMigrations();
-            m_RegionSettingsStorage.ProcessMigrations();
-            m_SpawnPointStorage.ProcessMigrations();
-            m_LightShareStorage.ProcessMigrations();
         }
         #endregion
 

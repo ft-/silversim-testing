@@ -64,7 +64,7 @@ namespace SilverSim.Database.MySQL.GridUser
             new AddColumn<bool>("IsOnline") { IsNullAllowed = false, Default = false },
             new AddColumn<Date>("LastLogin") {IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
             new AddColumn<Date>("LastLogout") {IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
-            new PrimaryKeyInfo(new string[] { "ID" }),
+            new PrimaryKeyInfo("ID"),
             new NamedKeyInfo("LastRegionID", new string[] { "LastRegionID" }),
             new TableRevision(2),
             new ChangeColumn<Vector3>("HomePosition") { IsNullAllowed = false, Default = Vector3.Zero },

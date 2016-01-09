@@ -15,6 +15,11 @@ using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Parcel;
+using System.Linq;
+using SilverSim.Types.Agent;
+using SilverSim.Types.Primitive;
+using SilverSim.Types.Script;
 
 namespace SilverSim.Database.MySQL
 {
@@ -135,6 +140,35 @@ namespace SilverSim.Database.MySQL
         }
         #endregion
 
+        static internal readonly Type[] MySqlUnsignedTypes = new Type[]
+        {
+            typeof(InventoryFlags),
+            typeof(AssetFlags),
+            typeof(InventoryPermissionsMask),
+            typeof(ParcelCategory),
+            typeof(ParcelStatus),
+            typeof(ParcelFlags),
+            typeof(TeleportLandingType),
+            typeof(ParcelAccessFlags),
+            typeof(AttachmentPoint),
+            typeof(PrimitiveFlags),
+            typeof(PrimitiveCode),
+            typeof(ClickActionType),
+            typeof(ScriptPermissions)
+        };
+
+        static internal readonly Type[] MySqlSignedTypes = new Type[]
+        {
+            typeof(InventoryType),
+            typeof(AssetType),
+            typeof(InventoryItem.SaleInfoData.SaleType),
+            typeof(PrimitiveMaterial),
+            typeof(PrimitivePhysicsShapeType),
+            typeof(PrimitiveShapeType),
+            typeof(PrimitiveMediaPermission),
+            typeof(PrimitiveMediaControls)
+        };
+
         #region Transaction Helper
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static void InsideTransaction(this MySqlConnection connection, Action del)
@@ -206,6 +240,12 @@ namespace SilverSim.Database.MySQL
                     mysqlparam.AddWithValue("?v_" + key + "Blue", v.B);
                     mysqlparam.AddWithValue("?v_" + key + "Alpha", v.A);
                 }
+                else if (t == typeof(EnvironmentController.WLVector2))
+                {
+                    EnvironmentController.WLVector2 vec = (EnvironmentController.WLVector2)value;
+                    mysqlparam.AddWithValue("?v_" + key + "X", vec.X);
+                    mysqlparam.AddWithValue("?v_" + key + "Y", vec.Y);
+                }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
                     EnvironmentController.WLVector4 vec = (EnvironmentController.WLVector4)value;
@@ -234,11 +274,11 @@ namespace SilverSim.Database.MySQL
                 {
                     mysqlparam.AddWithValue("?v_" + key, ((Date)value).AsULong);
                 }
-                else if (t == typeof(InventoryFlags) || t == typeof(AssetFlags) || t == typeof(InventoryPermissionsMask))
+                else if (MySqlUnsignedTypes.Contains(t))
                 {
                     mysqlparam.AddWithValue("?v_" + key, Convert.ChangeType(value, typeof(uint)));
                 }
-                else if(t == typeof(InventoryType) || t == typeof(AssetType))
+                else if(MySqlSignedTypes.Contains(t))
                 {
                     mysqlparam.AddWithValue("?v_" + key, Convert.ChangeType(value, typeof(int)));
                 }
@@ -322,6 +362,13 @@ namespace SilverSim.Database.MySQL
                     q2 += "?v_" + key + "Blue,";
                     q1 += "`" + key + "Value`";
                     q2 += "?v_" + key + "Value";
+                }
+                else if (t == typeof(EnvironmentController.WLVector2))
+                {
+                    q1 += "`" + key + "X`,";
+                    q2 += "?v_" + key + "X,";
+                    q1 += "`" + key + "Y`,";
+                    q2 += "?v_" + key + "Y,";
                 }
                 else if (t == typeof(ColorAlpha))
                 {
@@ -416,6 +463,11 @@ namespace SilverSim.Database.MySQL
                     q1 += "`" + key + "Green` = ?v_" + key + "Green,";
                     q1 += "`" + key + "Blue` = ?v_" + key + "Blue";
                 }
+                else if (t == typeof(EnvironmentController.WLVector2))
+                {
+                    q1 += "`" + key + "X` = ?v_" + key + "X,";
+                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
+                }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
                     q1 += "`" + key + "Red` = ?v_" + key + "Red,";
@@ -500,6 +552,11 @@ namespace SilverSim.Database.MySQL
                     q1 += "`" + key + "Green` = ?v_" + key + "Green,";
                     q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
                     q1 += "`" + key + "Alpha` = ?v_" + key + "Alpha";
+                }
+                else if (t == typeof(EnvironmentController.WLVector2))
+                {
+                    q1 += "`" + key + "X` = ?v_" + key + "X,";
+                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
                 }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
@@ -635,7 +692,14 @@ namespace SilverSim.Database.MySQL
             return v;
         }
 
-        public static Vector3 GetVector(this MySqlDataReader dbReader, string prefix)
+        public static EnvironmentController.WLVector2 GetWLVector2(this MySqlDataReader dbReader, string prefix)
+        {
+            return new EnvironmentController.WLVector2(
+                (double)dbReader[prefix + "X"],
+                (double)dbReader[prefix + "Y"]);
+        }
+
+        public static Vector3 GetVector3(this MySqlDataReader dbReader, string prefix)
         {
             return new Vector3(
                 (double)dbReader[prefix + "X"],

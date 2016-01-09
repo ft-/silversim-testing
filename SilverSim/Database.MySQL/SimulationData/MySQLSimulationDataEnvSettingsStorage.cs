@@ -105,19 +105,5 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
         }
-
-        #region Migrations
-        public void ProcessMigrations()
-        {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "environmentsettings", Migrations, m_Log);
-        }
-
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "EnvironmentSettings LONGBLOB," +
-                "PRIMARY KEY(RegionID))"
-        };
-        #endregion
     }
 }

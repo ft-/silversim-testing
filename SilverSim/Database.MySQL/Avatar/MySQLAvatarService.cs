@@ -264,7 +264,7 @@ namespace SilverSim.Database.MySQL.Avatar
             new AddColumn<UUID>("PrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("Name") { Cardinality = 32, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<string>("Value"),
-            new PrimaryKeyInfo(new string[] { "PrincipalID", "Name"}),
+            new PrimaryKeyInfo("PrincipalID", "Name"),
             new NamedKeyInfo("avatars_principalid", new string[] { "PrincipalID" })
         };
 

@@ -342,7 +342,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             new AddColumn<byte[]>("hash") { Cardinality = 20, IsNullAllowed = false },
             new AddColumn<AssetType>("assetType") { IsNullAllowed = false },
             new AddColumn<byte[]>("data") { IsLong = true },
-            new PrimaryKeyInfo(new string[] { "hash", "assetType" }),
+            new PrimaryKeyInfo("hash", "assetType"),
 
             new SqlTable("assetrefs"),
             new AddColumn<UUID>("id") { IsNullAllowed = false, Default = UUID.Zero },
@@ -354,7 +354,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             new AddColumn<AssetFlags>("asset_flags") { IsNullAllowed = false },
             new AddColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<byte[]>("hash") { IsNullAllowed = false, Cardinality = 20 },
-            new PrimaryKeyInfo(new string[] { "id" }),
+            new PrimaryKeyInfo("id"),
             new TableRevision(2),
             /* normally not executed but needed */
             new ChangeColumn<bool>("temporary") { IsNullAllowed = false },

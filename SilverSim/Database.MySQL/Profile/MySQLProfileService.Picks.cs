@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.Profile
                                 pick.SnapshotID = reader.GetUUID("snapshotuuid");
                                 pick.SortOrder = reader.GetInt32("sortorder");
                                 pick.TopPick = reader.GetBoolean("toppick");
-                                pick.GlobalPosition = reader.GetVector("posglobal");
+                                pick.GlobalPosition = reader.GetVector3("posglobal");
                                 pick.ParcelName = reader.GetString("parcelname");
                                 return true;
                             }

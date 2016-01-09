@@ -14,7 +14,7 @@ using System.Text;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataSpawnPointStorage : SimulationDataSpawnPointStorageInterface, IDBServiceInterface
+    public class MySQLSimulationDataSpawnPointStorage : SimulationDataSpawnPointStorageInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
 
@@ -39,7 +39,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             while (reader.Read())
                             {
-                                res.Add(reader.GetVector("Distance"));
+                                res.Add(reader.GetVector3("Distance"));
                             }
                         }
                     }
@@ -84,28 +84,5 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
         }
-
-        public void ProcessMigrations()
-        {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "spawnpoints", Migrations, m_Log);
-        }
-
-        public void VerifyConnection()
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-            }
-        }
-
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "DistanceX DOUBLE NOT NULL," +
-                "DistanceY DOUBLE NOT NULL," +
-                "DistanceZ DOUBLE NOT NULL," +
-                "KEY RegionID (RegionID))"
-        };
-
     }
 }

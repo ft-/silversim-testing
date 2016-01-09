@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataParcelAccessListStorage : SimulationDataParcelAccessListStorageInterface, IDBServiceInterface
+    public class MySQLSimulationDataParcelAccessListStorage : SimulationDataParcelAccessListStorageInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PARCEL ACCESS LIST STORAGE");
         readonly string m_ConnectionString;
@@ -151,28 +151,5 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
         }
-
-        public void VerifyConnection()
-        {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
-            {
-                conn.Open();
-            }
-        }
-
-        public void ProcessMigrations()
-        {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, m_TableName, Migrations, m_Log);
-        }
-
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "ParcelID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Accessor VARCHAR(255) NOT NULL," +
-                "ExpiresAt BIGINT(20) NOT NULL)",
-            "ALTER TABLE %tablename% ADD KEY Accessor (Accessor), ADD KEY ExpiresAt (ExpiresAt),",
-            "ALTER TABLE %tablename% ADD COLUMN (RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'), ADD KEY RegionID (RegionID),",
-            "ALTER TABLE %tablename% ADD PRIMARY KEY (RegionID, ParcelID, Accessor),",
-        };
     }
 }

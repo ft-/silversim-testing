@@ -208,7 +208,10 @@ namespace SilverSim.Database.MySQL.ServerParam
             new AddColumn<UUID>("regionid") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("parametername") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<string>("parametervalue"),
-            new PrimaryKeyInfo(new string[] { "regionid", "parametername" })
+            new PrimaryKeyInfo("regionid", "parametername"),
+            new TableRevision(2),
+            new NamedKeyInfo("regionid", "regionid"),
+            new NamedKeyInfo("parametername", "parametername")
         };
     }
     #endregion

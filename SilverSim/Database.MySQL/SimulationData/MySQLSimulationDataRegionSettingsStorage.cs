@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataRegionSettingsStorage : SimulationDataRegionSettingsStorageInterface, IDBServiceInterface
+    public class MySQLSimulationDataRegionSettingsStorage : SimulationDataRegionSettingsStorageInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL REGION SETTINGS SERVICE");
 
@@ -21,30 +21,22 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
         }
 
-        public void VerifyConnection()
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-            }
-        }
-
         RegionSettings ToRegionSettings(MySqlDataReader reader)
         {
             RegionSettings settings = new RegionSettings();
-            settings.BlockTerraform = reader.GetBoolean("BlockTerraform");
-            settings.BlockFly = reader.GetBoolean("BlockFly");
-            settings.AllowDamage = reader.GetBoolean("AllowDamage");
-            settings.RestrictPushing = reader.GetBoolean("RestrictPushing");
-            settings.AllowLandResell = reader.GetBoolean("AllowLandResell");
-            settings.AllowLandJoinDivide = reader.GetBoolean("AllowLandJoinDivide");
-            settings.BlockShowInSearch = reader.GetBoolean("BlockShowInSearch");
+            settings.BlockTerraform = reader.GetBool("BlockTerraform");
+            settings.BlockFly = reader.GetBool("BlockFly");
+            settings.AllowDamage = reader.GetBool("AllowDamage");
+            settings.RestrictPushing = reader.GetBool("RestrictPushing");
+            settings.AllowLandResell = reader.GetBool("AllowLandResell");
+            settings.AllowLandJoinDivide = reader.GetBool("AllowLandJoinDivide");
+            settings.BlockShowInSearch = reader.GetBool("BlockShowInSearch");
             settings.AgentLimit = reader.GetInt32("AgentLimit");
             settings.ObjectBonus = reader.GetDouble("ObjectBonus");
-            settings.DisableScripts = reader.GetBoolean("DisableScripts");
-            settings.DisableCollisions = reader.GetBoolean("DisableCollisions");
-            settings.BlockFlyOver = reader.GetBoolean("BlockFlyOver");
-            settings.Sandbox = reader.GetBoolean("Sandbox");
+            settings.DisableScripts = reader.GetBool("DisableScripts");
+            settings.DisableCollisions = reader.GetBool("DisableCollisions");
+            settings.BlockFlyOver = reader.GetBool("BlockFlyOver");
+            settings.Sandbox = reader.GetBool("Sandbox");
             settings.TerrainTexture1 = reader.GetUUID("TerrainTexture1");
             settings.TerrainTexture2 = reader.GetUUID("TerrainTexture2");
             settings.TerrainTexture3 = reader.GetUUID("TerrainTexture3");
@@ -63,7 +55,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             settings.TerrainLowerLimit = reader.GetDouble("TerrainLowerLimit");
             settings.SunPosition = reader.GetDouble("SunPosition");
             settings.IsSunFixed = reader.GetBoolean("IsSunFixed");
-            settings.UseEstateSun = reader.GetBoolean("UseEstateSun");
+            settings.UseEstateSun = reader.GetBool("UseEstateSun");
 
             return settings;
         }
@@ -85,25 +77,25 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     conn.Open();
                     Dictionary<string, object> data = new Dictionary<string, object>();
-                    data["RegionID"] = regionID.ToString();
-                    data["BlockTerraform"] = value.BlockTerraform ? 1 : 0;
-                    data["BlockFly"] = value.BlockFly ? 1 : 0;
-                    data["AllowDamage"] = value.AllowDamage ? 1 : 0;
-                    data["RestrictPushing"] = value.RestrictPushing ? 1 : 0;
-                    data["AllowLandResell"] = value.AllowLandResell ? 1 : 0;
-                    data["AllowLandJoinDivide"] = value.AllowLandJoinDivide ? 1 : 0;
-                    data["BlockShowInSearch"] = value.BlockShowInSearch ? 1 : 0;
+                    data["RegionID"] = regionID;
+                    data["BlockTerraform"] = value.BlockTerraform;
+                    data["BlockFly"] = value.BlockFly;
+                    data["AllowDamage"] = value.AllowDamage;
+                    data["RestrictPushing"] = value.RestrictPushing;
+                    data["AllowLandResell"] = value.AllowLandResell;
+                    data["AllowLandJoinDivide"] = value.AllowLandJoinDivide;
+                    data["BlockShowInSearch"] = value.BlockShowInSearch;
                     data["AgentLimit"] = value.AgentLimit;
                     data["ObjectBonus"] = value.ObjectBonus;
                     data["DisableScripts"] = value.DisableScripts;
                     data["DisableCollisions"] = value.DisableCollisions;
                     data["BlockFlyOver"] = value.BlockFlyOver;
                     data["Sandbox"] = value.Sandbox;
-                    data["TerrainTexture1"] = value.TerrainTexture1.ToString();
-                    data["TerrainTexture2"] = value.TerrainTexture2.ToString();
-                    data["TerrainTexture3"] = value.TerrainTexture3.ToString();
-                    data["TerrainTexture4"] = value.TerrainTexture4.ToString();
-                    data["TelehubObject"] = value.TelehubObject.ToString();
+                    data["TerrainTexture1"] = value.TerrainTexture1;
+                    data["TerrainTexture2"] = value.TerrainTexture2;
+                    data["TerrainTexture3"] = value.TerrainTexture3;
+                    data["TerrainTexture4"] = value.TerrainTexture4;
+                    data["TelehubObject"] = value.TelehubObject;
                     data["Elevation1NW"] = value.Elevation1NW;
                     data["Elevation2NW"] = value.Elevation2NW;
                     data["Elevation1NE"] = value.Elevation1NE;
@@ -116,8 +108,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     data["TerrainRaiseLimit"] = value.TerrainRaiseLimit;
                     data["TerrainLowerLimit"] = value.TerrainLowerLimit;
                     data["SunPosition"] = value.SunPosition;
-                    data["IsSunFixed"] = value.IsSunFixed ? 1 : 0;
-                    data["UseEstateSun"] = value.UseEstateSun ? 1 : 0;
+                    data["IsSunFixed"] = value.IsSunFixed;
+                    data["UseEstateSun"] = value.UseEstateSun;
 
                     conn.ReplaceInto("regionsettings", data);
                 }
@@ -174,51 +166,5 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
         }
-
-        #region Migrations
-        public void ProcessMigrations()
-        {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "regionsettings", Migrations, m_Log);
-        }
-
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "BlockTerraform INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "BlockFly INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "AllowDamage INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "RestrictPushing INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "AllowLandResell INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "AllowLandJoinDivide INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "BlockShowInSearch INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "AgentLimit INT(11) NOT NULL DEFAULT '0'," +
-                "ObjectBonus DOUBLE NOT NULL DEFAULT '0'," +
-                "DisableScripts INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "DisableCollisions INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "DisablePhysics INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "BlockFlyOver INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "Sandbox INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "TerrainTexture1 CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "TerrainTexture2 CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "TerrainTexture3 CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "TerrainTexture4 CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "TelehubObject CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Elevation1NW DOUBLE NOT NULL DEFAULT '0'," +
-                "Elevation2NW DOUBLE NOT NULL DEFAULT '0'," +
-                "Elevation1NE DOUBLE NOT NULL DEFAULT '0'," +
-                "Elevation2NE DOUBLE NOT NULL DEFAULT '0'," +
-                "Elevation1SE DOUBLE NOT NULL DEFAULT '0'," +
-                "Elevation2SE DOUBLE NOT NULL DEFAULT '0'," +
-                "Elevation1SW DOUBLE NOT NULL DEFAULT '0'," +
-                "Elevation2SW DOUBLE NOT NULL DEFAULT '0'," +
-                "WaterHeight DOUBLE NOT NULL DEFAULT '0'," +
-                "TerrainRaiseLimit DOUBLE NOT NULL DEFAULT '0'," +
-                "TerrainLowerLimit DOUBLE NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(RegionID))",
-            "ALTER TABLE %tablename% ADD COLUMN (UseEstateSun INT(1) UNSIGNED NOT NULL DEFAULT '1', IsSunFixed INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "SunPosition DOUBLE NOT NULL DEFAULT '0'),"
-        };
-
-        #endregion
     }
 }

@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.Profile
                                 classified.Description = reader.GetString("description");
                                 classified.ExpirationDate = reader.GetDate("expirationdate");
                                 classified.Flags = reader.GetByte("classifiedflags");
-                                classified.GlobalPos = reader.GetVector("posglobal");
+                                classified.GlobalPos = reader.GetVector3("posglobal");
                                 classified.Name = reader.GetString("name");
                                 classified.ParcelID = reader.GetUUID("parceluuid");
                                 classified.ParcelName = reader.GetString("parcelname");

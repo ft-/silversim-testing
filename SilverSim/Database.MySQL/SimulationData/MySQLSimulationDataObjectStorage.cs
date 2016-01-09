@@ -19,7 +19,7 @@ using System.IO;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataObjectStorage : SimulationDataObjectStorageInterface, IDBServiceInterface
+    public class MySQLSimulationDataObjectStorage : SimulationDataObjectStorageInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
 
@@ -81,29 +81,29 @@ namespace SilverSim.Database.MySQL.SimulationData
             ObjectPart objpart = new ObjectPart();
             objpart.ID = dbReader.GetUUID("ID");
             objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
-            objpart.Position = dbReader.GetVector("Position");
+            objpart.Position = dbReader.GetVector3("Position");
             objpart.Rotation = dbReader.GetQuaternion("Rotation");
             objpart.SitText = (string)dbReader["SitText"];
             objpart.TouchText = (string)dbReader["TouchText"];
             objpart.Name = (string)dbReader["Name"];
             objpart.Description = (string)dbReader["Description"];
-            objpart.SitTargetOffset = dbReader.GetVector("SitTargetOffset");
+            objpart.SitTargetOffset = dbReader.GetVector3("SitTargetOffset");
             objpart.SitTargetOrientation = dbReader.GetQuaternion("SitTargetOrientation");
             objpart.Creator = dbReader.GetUUI("Creator");
             objpart.CreationDate = dbReader.GetDate("CreationDate");
             objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
 
-            objpart.CameraAtOffset = dbReader.GetVector("CameraAtOffset");
-            objpart.CameraEyeOffset = dbReader.GetVector("CameraEyeOffset");
+            objpart.CameraAtOffset = dbReader.GetVector3("CameraAtOffset");
+            objpart.CameraEyeOffset = dbReader.GetVector3("CameraEyeOffset");
 
             objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
             objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
-            objpart.Size = dbReader.GetVector("Size");
-            objpart.Slice = dbReader.GetVector("Slice");
+            objpart.Size = dbReader.GetVector3("Size");
+            objpart.Slice = dbReader.GetVector3("Slice");
 
             objpart.MediaURL = (string)dbReader["MediaURL"];
 
-            objpart.AngularVelocity = dbReader.GetVector("AngularVelocity");
+            objpart.AngularVelocity = dbReader.GetVector3("AngularVelocity");
 
             ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
             lp.Serialization = dbReader.GetBytes("LightData");
@@ -199,7 +199,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                     objgroup.PayPrice2 = (int)dbReader["PayPrice2"];
                                     objgroup.PayPrice3 = (int)dbReader["PayPrice3"];
                                     objgroup.PayPrice4 = (int)dbReader["PayPrice4"];
-                                    objgroup.AttachedPos = dbReader.GetVector("AttachedPos");
+                                    objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
                                     objgroup.AttachPoint = (AttachmentPoint)(uint)dbReader["AttachPoint"];
                                     objGroups[objgroupID] = objgroup;
                                 }
@@ -426,7 +426,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.PayPrice2 = (int)dbReader["PayPrice2"];
                             objgroup.PayPrice3 = (int)dbReader["PayPrice3"];
                             objgroup.PayPrice4 = (int)dbReader["PayPrice4"];
-                            objgroup.AttachedPos = dbReader.GetVector("AttachedPos");
+                            objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
                             objgroup.AttachPoint = (AttachmentPoint)(uint)dbReader["AttachPoint"];
                         }
                     }
@@ -755,152 +755,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        #endregion
-
-        #region IDBServiceInterface
-        public void VerifyConnection()
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-            }
-        }
-        #endregion
-
-        #region Migrations
-        public void ProcessMigrations()
-        {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "objects", ObjectsMigrations, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "prims", PrimsMigrations, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "primitems", PrimItemsMigrations, m_Log);
-        }
-
-        private static readonly string[] ObjectsMigrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "IsVolumeDetect TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "IsPhantom TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "IsPhysics TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "IsTempOnRez TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "`Owner` VARCHAR(255) NOT NULL DEFAULT ''," +
-                "LastOwner VARCHAR(255) NOT NULL DEFAULT ''," +
-                "`Group` VARCHAR(255) NOT NULL DEFAULT ''," +
-                "PRIMARY KEY(ID)" +
-            ")",
-            "ALTER TABLE %tablename% ADD COLUMN (OriginalAssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                        "NextOwnerAssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'),",
-            "ALTER TABLE %tablename% ADD COLUMN (Category INT(11) NOT NULL DEFAULT '0'," +
-                        "SaleType INT(11) NOT NULL DEFAULT '0'," + 
-                        "SalePrice INT(11) NOT NULL DEFAULT '0'," +
-                        "PayPrice0 INT(11) NOT NULL DEFAULT '0'," +
-                        "PayPrice1 INT(11) NOT NULL DEFAULT '0'," + 
-                        "PayPrice2 INT(11) NOT NULL DEFAULT '0'," + 
-                        "PayPrice3 INT(11) NOT NULL DEFAULT '0'," + 
-                        "PayPrice4 INT(11) NOT NULL DEFAULT '0'" + 
-                        "),",
-            "ALTER TABLE %tablename% ADD COLUMN (" +
-                "AttachedPosX REAL NOT NULL DEFAULT '0'," + 
-                "AttachedPosY REAL NOT NULL DEFAULT '0'," + 
-                "AttachedPosZ REAL NOT NULL DEFAULT '0'," + 
-                "AttachPoint INT(11) UNSIGNED NOT NULL DEFAULT '0'" +
-                "),",
-            "ALTER TABLE %tablename% ADD KEY RegionID (RegionID),"
-        };
-
-        private static readonly string[] PrimItemsMigrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "PrimID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "InventoryID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Name VARCHAR(255) NOT NULL," +
-                "Description VARCHAR(255) NOT NULL DEFAULT ''," +
-                "Flags INT(11) NOT NULL DEFAULT '0'," +
-                "AssetId CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "AssetType INT NOT NULL DEFAULT '0'," +
-                "CreationDate BIGINT(20) NOT NULL DEFAULT '0'," +
-                "Creator VARCHAR(255)," +
-                "`Group` VARCHAR(255)," +
-                "GroupOwned INT(1) UNSIGNED NOT NULL," +
-                "InventoryType INT(11) NOT NULL DEFAULT '0'," +
-                "LastOwner VARCHAR(255) NOT NULL DEFAULT ''," +
-                "`Owner` VARCHAR(255) NOT NULL," +
-                "ParentFolderID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "BasePermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
-                "CurrentPermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
-                "EveryOnePermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
-                "GroupPermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
-                "NextOwnerPermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
-                "SaleType INT(11) NOT NULL DEFAULT '0'," +
-                "SalePrice INT(11) NOT NULL DEFAULT '0'," +
-                "SalePermMask INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(PrimID, InventoryID)," +
-                "KEY primID (PrimID))",
-            "ALTER TABLE %tablename% ADD COLUMN (PermsGranter VARCHAR(255) NOT NULL DEFAULT ''," +
-                        "PermsMask INT(11) UNSIGNED NOT NULL DEFAULT '0'),",
-            "ALTER TABLE %tablename% MODIFY COLUMN Flags INT(11) UNSIGNED NOT NULL DEFAULT '0',"
-        };
-
-        private static readonly string[] PrimsMigrations = new string[] {
-            "CREATE TABLE %tablename% (" +
-                "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "RootPartID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "LinkNumber INT(11) NOT NULL," + 
-                "Flags INT(11) UNSIGNED NOT NULL," +
-                "PositionX REAL NOT NULL," +
-                "PositionY REAL NOT NULL," +
-                "PositionZ REAL NOT NULL," +
-                "RotationX REAL NOT NULL," +
-                "RotationY REAL NOT NULL," +
-                "RotationZ REAL NOT NULL," +
-                "RotationW REAL NOT NULL," +
-                "SitText TEXT," +
-                "TouchText TEXT," +
-                "Creator VARCHAR(255) NOT NULL DEFAULT ''," +
-                "CreationDate BIGINT(20) NOT NULL DEFAULT '0'," +
-                "Name VARCHAR(64) NOT NULL DEFAULT ''," +
-                "Description VARCHAR(255) NOT NULL DEFAULT ''," +
-                "DynAttrs BLOB," +
-                "SitTargetOffsetX DOUBLE NOT NULL DEFAULT '0'," +
-                "SitTargetOffsetY DOUBLE NOT NULL DEFAULT '0'," +
-                "SitTargetOffsetZ DOUBLE NOT NULL DEFAULT '0'," +
-                "SitTargetOrientationX DOUBLE NOT NULL DEFAULT '0'," +
-                "SitTargetOrientationY DOUBLE NOT NULL DEFAULT '0'," +
-                "SitTargetOrientationZ DOUBLE NOT NULL DEFAULT '0'," +
-                "SitTargetOrientationW DOUBLE NOT NULL DEFAULT '1'," +
-                "PhysicsShapeType INT(11) NOT NULL DEFAULT '0'," +
-                "Material INT(11) NOT NULL DEFAULT '0'," +
-                "SizeX REAL NOT NULL DEFAULT '0'," +
-                "SizeY REAL NOT NULL DEFAULT '0'," +
-                "SizeZ REAL NOT NULL DEFAULT '0'," +
-                "SliceX REAL NOT NULL DEFAULT '0'," +
-                "SliceY REAL NOT NULL DEFAULT '0'," +
-                "SliceZ REAL NOT NULL DEFAULT '0'," +
-                "MediaURL VARCHAR(255) NOT NULL DEFAULT ''," +
-                "AngularVelocityX REAL NOT NULL DEFAULT '0'," +
-                "AngularVelocityY REAL NOT NULL DEFAULT '0'," +
-                "AngularVelocityZ REAL NOT NULL DEFAULT '0'," +
-                "LightData BLOB," +
-                "HoverTextData BLOB," +
-                "FlexibleData BLOB," +
-                "LoopedSoundData BLOB," +
-                "ImpactSoundData BLOB," +
-                "PrimitiveShapeData BLOB," +
-                "ParticleSystem BLOB," +
-                "TextureEntryBytes BLOB," + 
-                "ScriptAccessPin INT(11) NOT NULL DEFAULT '0'," +
-                "TextureAnimationBytes BLOB," +
-                "KEY RootPartID (RootPartID)," +
-                "UNIQUE KEY ID (ID)," +
-                "PRIMARY KEY(ID, RootPartID)) ROW_FORMAT=DYNAMIC ",
-            "ALTER TABLE %tablename% ADD COLUMN (" +
-                    "CameraEyeOffsetX REAL NOT NULL DEFAULT '0'," +
-                    "CameraEyeOffsetY REAL NOT NULL DEFAULT '0'," +
-                    "CameraEyeOffsetZ REAL NOT NULL DEFAULT '0'," +
-                    "CameraAtOffsetX REAL NOT NULL DEFAULT '0'," +
-                    "CameraAtOffsetY REAL NOT NULL DEFAULT '0'," +
-                    "CameraAtOffsetZ REAL NOT NULL DEFAULT '0'," +
-                    "ForceMouselook INT(1) UNSIGNED NOT NULL),"
-        };
         #endregion
     }
 }

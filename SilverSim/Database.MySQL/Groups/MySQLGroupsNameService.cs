@@ -132,7 +132,7 @@ namespace SilverSim.Database.MySQL.Groups
             new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
-            new PrimaryKeyInfo(new string[] { "GroupID", "HomeURI" }),
+            new PrimaryKeyInfo("GroupID", "HomeURI"),
             new TableRevision(2),
             /* some corrections when revision 1 is found */
             new ChangeColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },

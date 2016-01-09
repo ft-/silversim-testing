@@ -72,8 +72,8 @@ namespace SilverSim.Database.MySQL.Estate
             new SqlTable("estate_regionmap"),
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
             new AddColumn<UUID>("RegionID") { Default = UUID.Zero, IsNullAllowed = false },
-            new PrimaryKeyInfo(new string[] { "RegionID" }),
-            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
+            new PrimaryKeyInfo("RegionID"),
+            new NamedKeyInfo("EstateID", "EstateID"),
             #endregion
 
             #region estate_managers
@@ -81,8 +81,8 @@ namespace SilverSim.Database.MySQL.Estate
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
             new AddColumn<UUID>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
-            new NamedKeyInfo("UserID", new string[] { "UserID" }),
-            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
+            new NamedKeyInfo("UserID", "UserID"),
+            new NamedKeyInfo("EstateID", "EstateID"),
             new TableRevision(2),
             new ChangeColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             #endregion
@@ -92,8 +92,8 @@ namespace SilverSim.Database.MySQL.Estate
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
             new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "GroupID" }),
-            new NamedKeyInfo("EstateID", new string[] {"EstateID" }),
-            new NamedKeyInfo("GroupID", new string[] { "GroupID" }),
+            new NamedKeyInfo("EstateID", "EstateID"),
+            new NamedKeyInfo("GroupID", "GroupID"),
             #endregion
 
             #region estate_users
@@ -101,8 +101,8 @@ namespace SilverSim.Database.MySQL.Estate
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
             new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
-            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
-            new NamedKeyInfo("UserID", new string[] { "UserID" }),
+            new NamedKeyInfo("EstateID", "EstateID"),
+            new NamedKeyInfo("UserID", "UserID"),
             new TableRevision(2),
             /* following two entries are not produced as change lines when not finding a revision 1 table */
             new ChangeColumn<uint>("EstateID") { IsNullAllowed = false },
@@ -114,8 +114,8 @@ namespace SilverSim.Database.MySQL.Estate
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
             new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
-            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
-            new NamedKeyInfo("UserID", new string[] { "UserID" }),
+            new NamedKeyInfo("EstateID", "EstateID"),
+            new NamedKeyInfo("UserID", "UserID"),
             new TableRevision(2),
             /* following two entries are not produced as change lines when not finding a revision 1 table */
             new ChangeColumn<uint>("EstateID") { IsNullAllowed = false },
@@ -132,10 +132,10 @@ namespace SilverSim.Database.MySQL.Estate
             new AddColumn<double>("BillableFactor") { IsNullAllowed = false, Default = (double)1 },
             new AddColumn<double>("SunPosition") { IsNullAllowed = false, Default = (double)0 },
             new AddColumn<string>("AbuseEmail") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
-            new PrimaryKeyInfo(new string[] { "ID" }),
-            new NamedKeyInfo("Name", new string[] { "Name" }) { IsUnique = true },
-            new NamedKeyInfo("Owner", new string[] { "Owner" }),
-            new NamedKeyInfo("ID_Owner", new string[] { "ID", "Owner" }),
+            new PrimaryKeyInfo("ID"),
+            new NamedKeyInfo("Name", "Name") { IsUnique = true },
+            new NamedKeyInfo("Owner", "Owner"),
+            new NamedKeyInfo("ID_Owner", "ID", "Owner"),
             new TableRevision(2),
             new AddColumn<UUID>("CovenantID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<ulong>("CovenantTimestamp") { IsNullAllowed = false, Default = (ulong)0 },

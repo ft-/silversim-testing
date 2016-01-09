@@ -236,7 +236,7 @@ namespace SilverSim.Database.MySQL.AvatarName
             new AddColumn<string>("HomeURI") { Cardinality = 255 },
             new AddColumn<string>("FirstName") { Cardinality = 255 },
             new AddColumn<string>("LastName") { Cardinality = 255 },
-            new PrimaryKeyInfo(new string[] {"AvatarID", "HomeURI" })
+            new PrimaryKeyInfo("AvatarID", "HomeURI")
         };
     }
     #endregion

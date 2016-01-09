@@ -19,6 +19,29 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         readonly RwLockedDictionary<UUID, bool> m_OverrideLightSharePerAgent = new RwLockedDictionary<UUID, bool>();
         bool m_WindlightValid;
 
+        public struct WLVector2
+        {
+            public double X;
+            public double Y;
+
+            public WLVector2(Vector3 v)
+            {
+                X = v.X;
+                Y = v.Y;
+            }
+
+            public WLVector2(double x, double y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public static implicit operator Vector3(WLVector2 v)
+            {
+                return new Vector3(v.X, v.Y, 0);
+            }
+        }
+
         public struct WLVector4
         {
             public double X;
@@ -57,9 +80,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public WLVector4 BlueDensity;
             public Vector3 CloudDetailXYDensity;
             public double CloudScale;
-            public double CloudScrollX;
+            public WLVector2 CloudScroll;
             public bool CloudScrollXLock;
-            public double CloudScrollY;
             public bool CloudScrollYLock;
             public Vector3 CloudXYDensity;
             public double DensityMultiplier;
@@ -102,8 +124,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     skyData.CloudCoverage = 0.27;
                     skyData.CloudScale = 0.42;
                     skyData.CloudDetailXYDensity = new Vector3(1.0, 0.52, 0.12);
-                    skyData.CloudScrollX = 0.2;
-                    skyData.CloudScrollY = 0.01;
+                    skyData.CloudScroll.X = 0.2;
+                    skyData.CloudScroll.Y = 0.01;
                     skyData.DrawClassicClouds = true;
                     skyData.CloudScrollXLock = false;
                     skyData.CloudScrollYLock = false;
@@ -116,8 +138,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public struct WindlightWaterData
         {
-            public Vector3 BigWaveDirection;
-            public Vector3 LittleWaveDirection;
+            public WLVector2 BigWaveDirection;
+            public WLVector2 LittleWaveDirection;
             public double BlurMultiplier;
             public double FresnelScale;
             public double FresnelOffset;
@@ -143,8 +165,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     waterData.RefractScaleAbove = 0.03;
                     waterData.RefractScaleBelow = 0.2;
                     waterData.BlurMultiplier = 0.04;
-                    waterData.BigWaveDirection = new Vector3(1.05, -0.42, 0);
-                    waterData.LittleWaveDirection = new Vector3(1.11, -1.16, 0);
+                    waterData.BigWaveDirection = new WLVector2(1.05, -0.42);
+                    waterData.LittleWaveDirection = new WLVector2(1.11, -1.16);
                     waterData.NormalMapTexture = new UUID("822ded49-9a6c-f61c-cb89-6df54f42cdf4");
 
                     return waterData;
@@ -360,8 +382,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             AddToCompiledWL(waterWindlight.RefractScaleAbove, ref mBlock, ref pos);
             AddToCompiledWL(waterWindlight.RefractScaleBelow, ref mBlock, ref pos);
             AddToCompiledWL(waterWindlight.BlurMultiplier, ref mBlock, ref pos);
-            AddToCompiledWLNoZ(waterWindlight.BigWaveDirection, ref mBlock, ref pos);
-            AddToCompiledWLNoZ(waterWindlight.LittleWaveDirection, ref mBlock, ref pos);
+            AddToCompiledWL(waterWindlight.BigWaveDirection, ref mBlock, ref pos);
+            AddToCompiledWL(waterWindlight.LittleWaveDirection, ref mBlock, ref pos);
             AddToCompiledWL(waterWindlight.NormalMapTexture, ref mBlock, ref pos);
 
             AddToCompiledWL(skyWindlight.Horizon, ref mBlock, ref pos);
@@ -383,8 +405,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             AddToCompiledWL(skyWindlight.CloudCoverage, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudScale, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudDetailXYDensity, ref mBlock, ref pos);
-            AddToCompiledWL(skyWindlight.CloudScrollX, ref mBlock, ref pos);
-            AddToCompiledWL(skyWindlight.CloudScrollY, ref mBlock, ref pos);
+            AddToCompiledWL(skyWindlight.CloudScroll, ref mBlock, ref pos);
             AddToCompiledWL((ushort)skyWindlight.MaxAltitude, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudScrollXLock, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudScrollYLock, ref mBlock, ref pos);
@@ -407,7 +428,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             AddToCompiledWL(v.Z, ref mBlock, ref pos);
         }
 
-        private void AddToCompiledWLNoZ(Vector3 v, ref byte[] mBlock, ref int pos)
+        private void AddToCompiledWL(WLVector2 v, ref byte[] mBlock, ref int pos)
         {
             AddToCompiledWL(v.X, ref mBlock, ref pos);
             AddToCompiledWL(v.Y, ref mBlock, ref pos);
