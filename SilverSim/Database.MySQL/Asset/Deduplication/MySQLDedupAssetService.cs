@@ -340,25 +340,25 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         {
             new SqlTable("assetdata") { IsDynamicRowFormat = true },
             new AddColumn<byte[]>("hash") { Cardinality = 20, IsNullAllowed = false },
-            new AddColumn<int>("assetType") { IsNullAllowed = false },
+            new AddColumn<AssetType>("assetType") { IsNullAllowed = false },
             new AddColumn<byte[]>("data") { IsLong = true },
             new PrimaryKeyInfo(new string[] { "hash", "assetType" }),
 
             new SqlTable("assetrefs"),
             new AddColumn<UUID>("id") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("name") { Cardinality = MAX_ASSET_NAME, IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<int>("assetType") { IsNullAllowed = false },
+            new AddColumn<AssetType>("assetType") { IsNullAllowed = false },
             new AddColumn<bool>("temporary") { IsNullAllowed = false },
             new AddColumn<Date>("create_time") { IsNullAllowed = false },
             new AddColumn<Date>("access_time") { IsNullAllowed = false },
-            new AddColumn<uint>("asset_flags") { IsNullAllowed = false },
+            new AddColumn<AssetFlags>("asset_flags") { IsNullAllowed = false },
             new AddColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<byte[]>("hash") { IsNullAllowed = false, Cardinality = 20 },
             new PrimaryKeyInfo(new string[] { "id" }),
             new TableRevision(2),
             /* normally not executed but needed */
             new ChangeColumn<bool>("temporary") { IsNullAllowed = false },
-            new ChangeColumn<uint>("asset_flags") { IsNullAllowed = false },
+            new ChangeColumn<AssetFlags>("asset_flags") { IsNullAllowed = false },
             new ChangeColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
         };
         #endregion

@@ -4,6 +4,8 @@
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 
@@ -161,11 +163,11 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 typeSql = "DOUBLE";
             }
-            else if (f == typeof(int))
+            else if (f == typeof(int) || f == typeof(InventoryType) || f == typeof(AssetType) || f == typeof(InventoryItem.SaleInfoData.SaleType))
             {
                 typeSql = "INT";
             }
-            else if (f == typeof(uint))
+            else if (f == typeof(uint) || f == typeof(InventoryPermissionsMask) || f == typeof(AssetFlags) || f == typeof(InventoryFlags))
             {
                 typeSql = "INT UNSIGNED";
             }
@@ -372,13 +374,21 @@ namespace SilverSim.Database.MySQL._Migration
                 }
 
                 object def = colInfo.Default;
-                if(typeof(bool) == colInfo.FieldType)
+                if(typeof(bool) == f)
                 {
                     def = ((bool)def) ? 1 : 0;
                 }
-                else if(typeof(Date) == colInfo.FieldType)
+                else if(typeof(Date) == f)
                 {
                     def = ((Date)def).AsULong;
+                }
+                else if (f == typeof(InventoryType) || f == typeof(AssetType) || f == typeof(InventoryItem.SaleInfoData.SaleType))
+                {
+                    def = (int)Convert.ChangeType(def, typeof(int));
+                }
+                else if (f == typeof(uint) || f == typeof(InventoryPermissionsMask) || f == typeof(AssetFlags) || f == typeof(InventoryFlags))
+                {
+                    def = (uint)Convert.ChangeType(def, typeof(uint));
                 }
                 result.Add(colInfo.Name, string.Format("{0} {1} DEFAULT '{2}'",
                     typeSql,
