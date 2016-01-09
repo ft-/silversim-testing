@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.ServerParam;
@@ -63,7 +64,11 @@ namespace SilverSim.Database.MySQL.ServerParam
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "serverparams", Migrations, m_Log);
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.MigrateTables(Migrations, m_Log);
+            }
         }
 
         public override List<string> this[UUID regionID]
@@ -197,12 +202,13 @@ namespace SilverSim.Database.MySQL.ServerParam
             return result;
         }
 
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "regionid CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "parametername VARCHAR(255)," +
-                "parametervalue TEXT," +
-                "PRIMARY KEY(regionid, parametername))"
+        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            new SqlTable("serverparams"),
+            new AddColumn<UUID>("regionid") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("parametername") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("parametervalue"),
+            new PrimaryKeyInfo(new string[] { "regionid", "parametername" })
         };
     }
     #endregion

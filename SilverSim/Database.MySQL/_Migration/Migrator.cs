@@ -14,9 +14,6 @@ namespace SilverSim.Database.MySQL._Migration
     {
         static void ExecuteStatement(MySqlConnection conn, string command, ILog log)
         {
-#if DEBUG
-            log.Debug(command);
-#endif
             using (MySqlCommand cmd = new MySqlCommand(command, conn))
             {
                 cmd.ExecuteNonQuery();
