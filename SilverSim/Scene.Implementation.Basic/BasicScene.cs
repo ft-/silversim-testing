@@ -515,33 +515,22 @@ namespace SilverSim.Scene.Implementation.Basic
                 throw new ArgumentNullException("regionStorage");
             }
 
-            m_RestartObject = new RestartObject(this, myFactory, regionStorage);
-            ID = ri.ID;
-            /* next line is there to break the circular dependencies */
-            TryGetScene = SceneManager.Scenes.TryGetValue;
-
-            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
+            #region Setup services
+            m_ChatService = chatService;
             GroupsNameService = groupsNameService;
             GroupsService = groupsService;
-            EstateService = estateService;
             m_NeighborService = neighborService;
             m_SimulationDataStorage = simulationDataStorage;
             PersistentAssetService = persistentAssetService;
             TemporaryAssetService = temporaryAssetService;
             GridService = gridService;
-            m_SceneObjects = new BasicSceneObjectsCollection(this);
-            m_SceneObjectParts = new BasicSceneObjectPartsCollection(this);
-            m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
-            m_SceneAgents = new BasicSceneAgentsCollection(this);
-            m_SceneRootAgents = new BasicSceneRootAgentsCollection(this);
-            m_SceneParcels = new BasicSceneParcelsCollection(this);
-            ServerParamService = serverParamService;
-            CapabilitiesConfig = capabilitiesConfig;
-            foreach (AvatarNameServiceInterface avNameService in avatarNameServices)
-            {
-                AvatarNameServices.Add(avNameService);
-            }
+            EstateService = estateService;
+            /* next line is there to break the circular dependencies */
+            TryGetScene = SceneManager.Scenes.TryGetValue;
+            #endregion
 
+            #region Setup Region Data
+            ID = ri.ID;
             GatekeeperURI = ri.GridURI;
             Access = ri.Access;
             ID = ri.ID;
@@ -549,25 +538,17 @@ namespace SilverSim.Scene.Implementation.Basic
             Owner = ri.Owner;
             GridPosition = ri.Location;
             ScopeID = ri.ScopeID;
-            Terrain = new TerrainController(this);
-            Environment = new EnvironmentController(this);
             ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
             ServerURI = ri.ServerURI;
             ServerHttpPort = ri.ServerHttpPort;
-
-            m_ChatService = chatService;
-            IMRouter.SceneIM.Add(IMSend);
-            OnRemove += RemoveScene;
+            ServerParamService = serverParamService;
             ExternalHostName = ri.ServerIP;
-            m_UDPServer.Start();
-            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
-            Terrain.TerrainListeners.Add(this);
-            SceneListeners.Add(m_SimulationDataStorage);
-            uint estateID;
-            EstateInfo estate;
+            #endregion
 
             /* load estate flags cache */
+            uint estateID;
+            EstateInfo estate;
             if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
                 EstateService.TryGetValue(estateID, out estate))
             {
@@ -575,11 +556,33 @@ namespace SilverSim.Scene.Implementation.Basic
             }
             else
             {
-                m_EstateData.ID = 1;
-                m_EstateData.ParentEstateID = 1;
-                m_EstateData.BillableFactor = 1;
-                m_EstateData.PricePerMeter = 1;
+                throw new ArgumentException("Could not load estate data");
             }
+
+            m_RestartObject = new RestartObject(this, myFactory, regionStorage);
+
+            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
+            m_SceneObjects = new BasicSceneObjectsCollection(this);
+            m_SceneObjectParts = new BasicSceneObjectPartsCollection(this);
+            m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
+            m_SceneAgents = new BasicSceneAgentsCollection(this);
+            m_SceneRootAgents = new BasicSceneRootAgentsCollection(this);
+            m_SceneParcels = new BasicSceneParcelsCollection(this);
+            CapabilitiesConfig = capabilitiesConfig;
+            foreach (AvatarNameServiceInterface avNameService in avatarNameServices)
+            {
+                AvatarNameServices.Add(avNameService);
+            }
+
+            Terrain = new TerrainController(this);
+            Environment = new EnvironmentController(this);
+
+            IMRouter.SceneIM.Add(IMSend);
+            OnRemove += RemoveScene;
+            m_UDPServer.Start();
+            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
+            Terrain.TerrainListeners.Add(this);
+            SceneListeners.Add(m_SimulationDataStorage);
 
             ScriptThreadPool = new ScriptWorkerThreadPool(50, 150);
             new Thread(StoreTerrainProcess).Start();
