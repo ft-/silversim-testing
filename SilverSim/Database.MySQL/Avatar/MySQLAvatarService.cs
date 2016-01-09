@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Avatar;
@@ -250,16 +251,21 @@ namespace SilverSim.Database.MySQL.Avatar
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "avatars", Migrations_avatars, m_Log);
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        private static readonly string[] Migrations_avatars = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "PrincipalID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Name VARCHAR(32) NOT NULL DEFAULT ''," +
-                "Value TEXT," +
-                "PRIMARY KEY(PrincipalID, Name)," +
-                "KEY avatars_principalid (PrincipalID))"
+        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            new SqlTable("avatars"),
+            new AddColumn<UUID>("PrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("Name") { Cardinality = 32, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("Value"),
+            new PrimaryKeyInfo(new string[] { "PrincipalID", "Name"}),
+            new NamedKeyInfo("avatars_principalid", new string[] { "PrincipalID" })
         };
 
         public void Remove(UUID scopeID, UUID userAccount)

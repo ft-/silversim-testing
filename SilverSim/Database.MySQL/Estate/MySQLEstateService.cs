@@ -4,9 +4,11 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.Types;
 using SilverSim.Types.Estate;
 using System;
 using System.Collections.Generic;
@@ -57,79 +59,92 @@ namespace SilverSim.Database.MySQL.Estate
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_managers", Migrations_estatemanagers, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_groups", Migrations_estategroups, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_users", Migrations_estateusers, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_bans", Migrations_estatebans, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "estates", Migrations_estates, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_regionmap", Migrations_estateregionmap, m_Log);
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        private static readonly string[] Migrations_estateregionmap = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "EstateID INT(10) UNSIGNED NOT NULL," +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',"+
-                "KEY EstateID (EstateID)," +
-                "PRIMARY KEY (RegionID))"
-        };
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            #region estate_regionmap
+            new SqlTable("estate_regionmap"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUID>("RegionID") { Default = UUID.Zero, IsNullAllowed = false },
+            new PrimaryKeyInfo(new string[] { "RegionID" }),
+            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
+            #endregion
 
-        private static readonly string[] Migrations_estatemanagers = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "EstateID INT(10) UNSIGNED NOT NULL," +
-                "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "PRIMARY KEY(EstateID, UserID)," +
-                "KEY UserID (UserID)," +
-                "KEY EstateID (EstateID))",
-            "ALTER TABLE %tablename% CHANGE UserID UserID VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
-        };
+            #region estate_managers
+            new SqlTable("estate_managers"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUID>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
+            new NamedKeyInfo("UserID", new string[] { "UserID" }),
+            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
+            new TableRevision(2),
+            new ChangeColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            #endregion
 
-        private static readonly string[] Migrations_estategroups = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "EstateID INT(10) UNSIGNED NOT NULL," +
-                "GroupID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "PRIMARY KEY(EstateID, GroupID)," +
-                "KEY EstateID (EstateID)," +
-                "KEY GroupID (GroupID))"
-        };
+            #region estate_groups
+            new SqlTable("estate_groups"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },
+            new PrimaryKeyInfo(new string[] { "EstateID", "GroupID" }),
+            new NamedKeyInfo("EstateID", new string[] {"EstateID" }),
+            new NamedKeyInfo("GroupID", new string[] { "GroupID" }),
+            #endregion
 
-        private static readonly string[] Migrations_estateusers = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "EstateID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "PRIMARY KEY(EstateID, UserID)," +
-                "KEY UserID (UserID)," +
-                "KEY EstateID (EstateID))",
-            "ALTER TABLE %tablename% CHANGE EstateID EstateID INT(10) UNSIGNED NOT NULL, CHANGE UserID UserID VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
-        };
+            #region estate_users
+            new SqlTable("estate_users"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
+            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
+            new NamedKeyInfo("UserID", new string[] { "UserID" }),
+            new TableRevision(2),
+            /* following two entries are not produced as change lines when not finding a revision 1 table */
+            new ChangeColumn<uint>("EstateID") { IsNullAllowed = false },
+            new ChangeColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            #endregion
 
-        private static readonly string[] Migrations_estatebans = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "EstateID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "PRIMARY KEY(EstateID, UserID)," +
-                "KEY UserID (UserID)," +
-                "KEY EstateID (EstateID))",
-            "ALTER TABLE %tablename% CHANGE EstateID EstateID INT(10) UNSIGNED NOT NULL, CHANGE UserID UserID VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
-        };
+            #region estate_bans
+            new SqlTable("estate_bans"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
+            new NamedKeyInfo("EstateID", new string[] { "EstateID" }),
+            new NamedKeyInfo("UserID", new string[] { "UserID" }),
+            new TableRevision(2),
+            /* following two entries are not produced as change lines when not finding a revision 1 table */
+            new ChangeColumn<uint>("EstateID") { IsNullAllowed = false },
+            new ChangeColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            #endregion
 
-        private static readonly string[] Migrations_estates = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT," + 
-                "Name VARCHAR(64) NOT NULL," +
-                "OwnerID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Flags INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
-                "PricePerMeter INT(11) NOT NULL DEFAULT '0'," +
-                "BillableFactor double not null default '1'," +
-                "SunPosition double not null default '1'," +
-                "AbuseEmail VARCHAR(255) NOT NULL DEFAULT ''," +
-                "PRIMARY KEY(ID)," +
-                "UNIQUE KEY Name (Name)," +
-                "KEY Owner (OwnerID)," +
-                "KEY ID_OwnerID (ID, OwnerID)) AUTO_INCREMENT=100 ",
-            "ALTER TABLE %tablename% ADD COLUMN (CovenantID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                                            "CovenantTimestamp BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'),",
-            "ALTER TABLE %tablename% ADD COLUMN (UseGlobalTime INT(11) NOT NULL DEFAULT '1'),",
-            "ALTER TABLE %tablename% CHANGE OwnerID Owner VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
+            #region estates
+            new SqlTable("estates"),
+            new AddColumn<uint>("ID") { IsNullAllowed = false },
+            new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false },
+            new AddColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<uint>("Flags") { IsNullAllowed = false, Default = (uint)0 },
+            new AddColumn<int>("PricePerMeter") { IsNullAllowed = false, Default = (int)0 },
+            new AddColumn<double>("BillableFactor") { IsNullAllowed = false, Default = (double)1 },
+            new AddColumn<double>("SunPosition") { IsNullAllowed = false, Default = (double)0 },
+            new AddColumn<string>("AbuseEmail") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new PrimaryKeyInfo(new string[] { "ID" }),
+            new NamedKeyInfo("Name", new string[] { "Name" }) { IsUnique = true },
+            new NamedKeyInfo("Owner", new string[] { "Owner" }),
+            new NamedKeyInfo("ID_Owner", new string[] { "ID", "Owner" }),
+            new TableRevision(2),
+            new AddColumn<UUID>("CovenantID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<ulong>("CovenantTimestamp") { IsNullAllowed = false, Default = (ulong)0 },
+            new TableRevision(3),
+            new AddColumn<bool>("UseGlobalTime") { IsNullAllowed = false, Default = true },
+            new TableRevision(4),
+            new ChangeColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" } 
+            /* ^^ this is for compatibility our list generator actually skips this field when not finding the revision 3 table */
+            #endregion
         };
 
         public override bool TryGetValue(uint estateID, out EstateInfo estateInfo)

@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Database;
@@ -166,9 +167,9 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             asset.Name = (string)dbReader["name"];
                             asset.CreateTime = dbReader.GetDate("create_time");
                             asset.AccessTime = dbReader.GetDate("access_time");
-                            asset.Creator.ID = dbReader.GetUUID("CreatorID");
+                            asset.Creator = dbReader.GetUUI("CreatorID");
                             asset.Flags = dbReader.GetAssetFlags("asset_flags");
-                            asset.Temporary = dbReader.GetBoolean("temporary");
+                            asset.Temporary = dbReader.GetBool("temporary");
 
                             if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
@@ -328,37 +329,37 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         public void ProcessMigrations()
         {
-            /*
-id, name, description, assetType, local, temporary, create_time, access_time, asset_flags, CreatorID, data
-             */
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "assetdata", Migrations_AssetData, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "assetrefs", Migrations_AssetRefs, m_Log);
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        private static readonly string[] Migrations_AssetData = new string[]
+        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
-            "CREATE TABLE %tablename% (" +
-                    "hash BINARY(20) NOT NULL," +
-                    "assetType INT(11) NOT NULL," + 
-                    "data LONGBLOB," + 
-                    "PRIMARY KEY(hash, assetType)" +
-                    ") ROW_FORMAT=DYNAMIC"
-        };
+            new SqlTable("assetdata") { IsDynamicRowFormat = true },
+            new AddColumn<byte[]>("hash") { Cardinality = 20, IsNullAllowed = false },
+            new AddColumn<int>("assetType") { IsNullAllowed = false },
+            new AddColumn<byte[]>("data") { IsLong = true },
+            new PrimaryKeyInfo(new string[] { "hash", "assetType" }),
 
-        private static readonly string[] Migrations_AssetRefs = new string[]
-        {
-            "CREATE TABLE %tablename% (" +
-                    "id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "name VARCHAR(64) NOT NULL DEFAULT ''," +
-                    "assetType INT(11) NOT NULL," + 
-                    "temporary INT(1) NOT NULL," + 
-                    "create_time BIGINT(20) NOT NULL," +
-                    "access_time BIGINT(20) NOT NULL," +
-                    "asset_flags INT(11) NOT NULL," +
-                    "CreatorID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "hash BINARY(20) NOT NULL," + 
-                    "PRIMARY KEY(id)" + 
-                    ") ROW_FORMAT=DYNAMIC"
+            new SqlTable("assetrefs"),
+            new AddColumn<UUID>("id") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("name") { Cardinality = MAX_ASSET_NAME, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<int>("assetType") { IsNullAllowed = false },
+            new AddColumn<bool>("temporary") { IsNullAllowed = false },
+            new AddColumn<Date>("create_time") { IsNullAllowed = false },
+            new AddColumn<Date>("access_time") { IsNullAllowed = false },
+            new AddColumn<uint>("asset_flags") { IsNullAllowed = false },
+            new AddColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<byte[]>("hash") { IsNullAllowed = false, Cardinality = 20 },
+            new PrimaryKeyInfo(new string[] { "id" }),
+            new TableRevision(2),
+            /* normally not executed but needed */
+            new ChangeColumn<bool>("temporary") { IsNullAllowed = false },
+            new ChangeColumn<uint>("asset_flags") { IsNullAllowed = false },
+            new ChangeColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
         };
         #endregion
 

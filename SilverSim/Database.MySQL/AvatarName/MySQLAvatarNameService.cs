@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
@@ -221,16 +222,21 @@ namespace SilverSim.Database.MySQL.AvatarName
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "avatarnames", Migrations, m_Log);
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "AvatarID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "HomeURI VARCHAR(255)," +
-                "FirstName VARCHAR(255)," +
-                "LastName VARCHAR(255)," +
-                "PRIMARY KEY(AvatarID, HomeURI))"
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            new SqlTable("avatarnames"),
+            new AddColumn<UUID>("AvatarID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("HomeURI") { Cardinality = 255 },
+            new AddColumn<string>("FirstName") { Cardinality = 255 },
+            new AddColumn<string>("LastName") { Cardinality = 255 },
+            new PrimaryKeyInfo(new string[] {"AvatarID", "HomeURI" })
         };
     }
     #endregion

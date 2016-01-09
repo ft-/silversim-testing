@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.Asset
                             metadata.ID = dbReader.GetUUID("id");
                             metadata.Type = (AssetType)(int)dbReader["assetType"];
                             metadata.Name = (string)dbReader["name"];
-                            metadata.Creator.ID = dbReader.GetUUID("CreatorID");
+                            metadata.Creator = dbReader.GetUUI("CreatorID");
                             metadata.CreateTime = dbReader.GetDate("create_time");
                             metadata.AccessTime = dbReader.GetDate("access_time");
                             metadata.Flags = dbReader.GetAssetFlags("asset_flags");

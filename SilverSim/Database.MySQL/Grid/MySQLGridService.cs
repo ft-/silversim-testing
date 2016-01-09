@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Grid;
@@ -62,7 +63,11 @@ namespace SilverSim.Database.MySQL.Grid
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "regions", Migrations, m_Log);
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.MigrateTables(Migrations_, m_Log);
+            }
         }
 
         #region Accessors
@@ -643,6 +648,38 @@ namespace SilverSim.Database.MySQL.Grid
         }
 
         #endregion
+
+        static readonly IMigrationElement[] Migrations_ = new IMigrationElement[]
+        {
+            new SqlTable("regions"),
+            new AddColumn<UUID>("uuid") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("regionName") { Cardinality = 128, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("regionSecret") { Cardinality = 128, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("serverIP") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<uint>("serverPort") { IsNullAllowed = false },
+            new AddColumn<string>("serverURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<GridVector>("loc") { IsNullAllowed = false, Default = GridVector.Zero },
+            new AddColumn<UUID>("regionMapTexture") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<uint>("serverHttpPort") { IsNullAllowed = false },
+            new AddColumn<UUI>("owner") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<uint>("access") { IsNullAllowed = false, Default = (uint)13 },
+            new AddColumn<UUID>("ScopeID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<GridVector>("Size") { IsNullAllowed = false, Default = GridVector.Zero },
+            new AddColumn<uint>("flags") { IsNullAllowed = false, Default = (uint)0 },
+            new AddColumn<Date>("last_seen") { IsNullAllowed = false , Default = Date.UnixTimeToDateTime(0) },
+            new AddColumn<string>("AuthenticatingToken") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<UUI>("AuthenticatingPrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("parcelMapTexture") { IsNullAllowed = false, Default = UUID.Zero },
+            new PrimaryKeyInfo(new string[] { "uuid" }),
+            new NamedKeyInfo("regionName", new string[] { "regionName" }),
+            new NamedKeyInfo("ScopeID", new string[] { "ScopeID" }),
+            new NamedKeyInfo("flags", new string[] {"flags" }),
+            new TableRevision(2),
+            new AddColumn<string>("ProductName") { Cardinality = 255, IsNullAllowed = false, Default = "Mainland" },
+            new TableRevision(3),
+            /* only used as alter table when revision 2 table exists */
+            new ChangeColumn<UUI>("AuthenticatingPrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
+        };
 
         private static readonly string[] Migrations = new string[]{
             "CREATE TABLE %tablename% (" +

@@ -699,7 +699,7 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Migrations helper
-        private static uint GetTableRevision(this MySqlConnection connection, string name)
+        public static uint GetTableRevision(this MySqlConnection connection, string name)
         {
             using(MySqlCommand cmd = new MySqlCommand("SHOW TABLE STATUS WHERE name=?name", connection))
             {
@@ -745,6 +745,7 @@ namespace SilverSim.Database.MySQL
                 }
             }
         }
+
         #endregion
     }
 }
