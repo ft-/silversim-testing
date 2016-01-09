@@ -232,6 +232,17 @@ namespace SilverSim.Database.MySQL._Migration
                 }
             }
 
+            if (insideTransaction)
+            {
+                ExecuteStatement(conn, string.Format("ALTER TABLE {0} COMMENT='{1}';", table.Name, processingTableRevision), log);
+                ExecuteStatement(conn, "COMMIT", log);
+                insideTransaction = false;
+                if (currentAtRevision != 0)
+                {
+                    currentAtRevision = processingTableRevision;
+                }
+            }
+
             if (null != table && 0 != processingTableRevision)
             {
                 if (currentAtRevision == 0)

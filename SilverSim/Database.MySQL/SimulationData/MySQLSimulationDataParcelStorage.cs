@@ -46,7 +46,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
 
                             ParcelInfo pi = new ParcelInfo((int)dbReader["BitmapWidth"], (int)dbReader["BitmapHeight"]);
-                            pi.Area = dbReader.GetInt32("Area");
+                            pi.Area = (int)dbReader.GetUInt32("Area");
                             pi.AuctionID = (uint)dbReader["AuctionID"];
                             pi.AuthBuyer = dbReader.GetUUI("AuthBuyer");
                             pi.Category = (ParcelCategory)(uint)dbReader["Category"];
@@ -75,7 +75,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.SnapshotID = dbReader.GetUUID("SnapshotID");
                             pi.SalePrice = (int)dbReader["SalePrice"];
                             pi.OtherCleanTime = (int)dbReader["OtherCleanTime"];
-                            pi.MediaAutoScale = (uint)dbReader["MediaAutoScale"] != 0;
+                            pi.MediaAutoScale = dbReader.GetBool("MediaAutoScale");
                             pi.MediaType = (string)dbReader["MediaType"];
                             pi.MediaWidth = (int)dbReader["MediaWidth"];
                             pi.MediaHeight = (int)dbReader["MediaHeight"];
