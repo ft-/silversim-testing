@@ -581,16 +581,15 @@ namespace SilverSim.Database.MySQL._Migration
             oldFields = new List<string>(oldField.ColumnSql().Keys);
             newFields = this.ColumnSql();
 
-            /* remove anything that is still matching in name */
-            foreach(string fieldName in newFields.Keys)
-            {
-                oldFields.Remove(fieldName);
-            }
-
             List<string> sqlParts = new List<string>();
-            foreach(string fieldName in oldFields)
+
+            /* remove anything that is not needed anymore */
+            foreach (string fieldName in oldFields)
             {
-                sqlParts.Add("DROP COLUMN `" + MySqlHelper.EscapeString(fieldName) + "`");
+                if (!newFields.ContainsKey(fieldName))
+                {
+                    sqlParts.Add("DROP COLUMN `" + MySqlHelper.EscapeString(fieldName) + "`");
+                }
             }
 
             foreach(KeyValuePair<string, string> kvp in newFields)

@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
@@ -43,24 +44,34 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "griduser", Migrations, m_Log);
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        static readonly IMigrationElement[] Migrations
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "HomeRegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "HomePosition CHAR(64) NOT NULL DEFAULT '<0,0,0>'," +
-                "HomeLookAt CHAR(64) NOT NULL DEFAULT '<0,0,0>'," +
-                "LastRegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "LastPosition CHAR(64) NOT NULL DEFAULT '<0,0,0>'," +
-                "LastLookAt CHAR(64) NOT NULL DEFAULT '<0,0,0>'," +
-                "IsOnline TINYINT(1) NOT NULL DEFAULT '0'," +
-                "LastLogin BIGINT(20) NOT NULL DEFAULT '0'," +
-                "LastLogout BIGINT(20) NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(ID)," +
-                "KEY LastRegionID (LastRegionID))"
+        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            new SqlTable("griduser"),
+            new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("HomeRegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("HomePosition") { Cardinality = 64, IsNullAllowed = false, Default = "<0,0,0>" },
+            new AddColumn<string>("HomeLookAt") { Cardinality = 64, IsNullAllowed = false, Default = "<0,0,0>" },
+            new AddColumn<UUID>("LastRegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("LastPosition") { Cardinality = 64, IsNullAllowed = false, Default = "<0,0,0>" },
+            new AddColumn<string>("LastLookAt") { Cardinality = 64, IsNullAllowed = false, Default = "<0,0,0>" },
+            new AddColumn<bool>("IsOnline") { IsNullAllowed = false, Default = false },
+            new AddColumn<Date>("LastLogin") {IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+            new AddColumn<Date>("LastLogout") {IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+            new PrimaryKeyInfo(new string[] { "ID" }),
+            new NamedKeyInfo("LastRegionID", new string[] { "LastRegionID" }),
+            new TableRevision(2),
+            new ChangeColumn<Vector3>("HomePosition") { IsNullAllowed = false, Default = Vector3.Zero },
+            new ChangeColumn<Vector3>("HomeLookAt") { IsNullAllowed = false, Default = Vector3.Zero },
+            new ChangeColumn<Vector3>("LastPosition") { IsNullAllowed = false, Default = Vector3.Zero },
+            new ChangeColumn<Vector3>("LastLookAt") { IsNullAllowed = false, Default = Vector3.Zero },
+            new ChangeColumn<bool>("IsOnline") { IsNullAllowed = false, Default = false },
         };
 
         #region GridUserServiceInterface
