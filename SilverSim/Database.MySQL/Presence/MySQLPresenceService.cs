@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
@@ -45,10 +46,32 @@ namespace SilverSim.Database.MySQL.Presence
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "presence", Migrations, m_Log);
+            MySQLUtilities.ProcessMigrations(m_ConnectionString, "presence", Migrations_, m_Log);
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        private static readonly string[] Migrations = new string[]{
+        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            new SqlTable("presence"),
+            new AddColumn<UUID>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("SessionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("SecureSessionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<Date>("LastSeen") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+            new PrimaryKeyInfo(new string[] { "UserID" }),
+            new NamedKeyInfo("UserID", new string[] { "UserID" }),
+            new NamedKeyInfo("SecureSessionID", new string[] { "SecureSessionID" }),
+            new NamedKeyInfo("RegionID", new string[] { "RegionID" }),
+            new TableRevision(2),
+            /* necessary correction */
+            new ChangeColumn<Date>("LastSeen") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+        };
+
+        private static readonly string[] Migrations_ = new string[]{
             "CREATE TABLE %tablename% (" +
                 "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
