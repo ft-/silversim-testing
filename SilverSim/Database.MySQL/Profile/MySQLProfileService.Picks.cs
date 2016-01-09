@@ -116,19 +116,19 @@ namespace SilverSim.Database.MySQL.Profile
             public void Update(ProfilePick value)
             {
                 Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                replaceVals["pickuuid"] = value.PickID.ToString();
-                replaceVals["creatoruuid"] = value.Creator.ID.ToString();
-                replaceVals["toppick"] = value.TopPick ? 1 : 0;
-                replaceVals["parceluuid"] = value.ParcelID.ToString();
+                replaceVals["pickuuid"] = value.PickID;
+                replaceVals["creatoruuid"] = value.Creator.ID;
+                replaceVals["toppick"] = value.TopPick;
+                replaceVals["parceluuid"] = value.ParcelID;
                 replaceVals["name"] = value.Name;
                 replaceVals["description"] = value.Description;
-                replaceVals["snapshotuuid"] = value.SnapshotID.ToString();
+                replaceVals["snapshotuuid"] = value.SnapshotID;
                 replaceVals["parcelname"] = value.ParcelName;
                 replaceVals["originalname"] = value.OriginalName;
                 replaceVals["simname"] = value.SimName;
-                replaceVals["posglobal"] = value.GlobalPosition.ToString();
+                replaceVals["posglobal"] = value.GlobalPosition;
                 replaceVals["sortorder"] = value.SortOrder;
-                replaceVals["enabled"] = value.Enabled ? 1 : 0;
+                replaceVals["enabled"] = value.Enabled;
                 using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();

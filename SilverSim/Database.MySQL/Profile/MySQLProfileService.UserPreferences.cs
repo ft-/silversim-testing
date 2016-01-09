@@ -33,8 +33,8 @@ namespace SilverSim.Database.MySQL.Profile
                             {
                                 prefs = new ProfilePreferences();
                                 prefs.User = user;
-                                prefs.IMviaEmail = reader.GetBoolean("imviaemail");
-                                prefs.Visible = reader.GetBoolean("visible");
+                                prefs.IMviaEmail = reader.GetBool("imviaemail");
+                                prefs.Visible = reader.GetBool("visible");
                                 return true;
                             }
                             else
@@ -66,8 +66,8 @@ namespace SilverSim.Database.MySQL.Profile
                                 {
                                     ProfilePreferences prefs = new ProfilePreferences();
                                     prefs.User = user;
-                                    prefs.IMviaEmail = reader.GetBoolean("imviaemail");
-                                    prefs.Visible = reader.GetBoolean("visible");
+                                    prefs.IMviaEmail = reader.GetBool("imviaemail");
+                                    prefs.Visible = reader.GetBool("visible");
                                     return prefs;
                                 }
                                 else
@@ -85,9 +85,9 @@ namespace SilverSim.Database.MySQL.Profile
                 set
                 {
                     Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                    replaceVals["useruuid"] = user.ID.ToString();
-                    replaceVals["imviaemail"] = value.IMviaEmail ? 1 : 0;
-                    replaceVals["visible"] = value.Visible ? 1 : 0;
+                    replaceVals["useruuid"] = user.ID;
+                    replaceVals["imviaemail"] = value.IMviaEmail;
+                    replaceVals["visible"] = value.Visible;
                     using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();

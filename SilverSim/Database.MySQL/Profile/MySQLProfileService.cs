@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
@@ -132,88 +133,91 @@ namespace SilverSim.Database.MySQL.Profile
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "classifieds", m_ClassifiedsMigrations, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "usernotes", m_NotesMigrations, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "userpicks", m_PicksMigrations, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "userprofile", m_ProfileMigrations, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "usersettings", m_UserSettingsMigrations, m_Log);
-            
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        static readonly string[] m_ClassifiedsMigrations = new string[]
+        static IMigrationElement[] Migrations = new IMigrationElement[]
         {
-            "CREATE TABLE %tablename% (classifieduuid char(36) not null," +
-                                    "creatoruuid char(36) not null," +
-                                    "creationdate bigint(20) not null," +
-                                    "expirationdate bigint(20) not null," +
-                                    "category int(11) not null," +
-                                    "`name` varchar(255) not null," +
-                                    "description text not null," +
-                                    "parceluuid char(36) not null," +
-                                    "parentestate int(11) not null," +
-                                    "snapshotuuid char(36) not null," +
-                                    "simname varchar(255) not null," +
-                                    "posglobal varchar(255) not null," +
-                                    "parcelname varchar(255) not null," +
-                                    "classifiedflags int(11) unsigned not null," +
-                                    "priceforlisting int(11) not null," +
-                                    "PRIMARY KEY(classifieduuid)," +
-                                    "KEY creatoruuid_index (creatoruuid))"
-        };
+            new SqlTable("classifieds"),
+            new AddColumn<UUID>("classifieduuid") { IsNullAllowed = false },
+            new AddColumn<UUID>("creatoruuid") { IsNullAllowed = false },
+            new AddColumn<Date>("creationdate") { IsNullAllowed = false },
+            new AddColumn<Date>("expirationdate") { IsNullAllowed = false },
+            new AddColumn<int>("Category") { IsNullAllowed = false },
+            new AddColumn<string>("name") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<string>("description") { IsNullAllowed = false },
+            new AddColumn<UUID>("parceluuid") { IsNullAllowed = false },
+            new AddColumn<int>("parentestate") { IsNullAllowed = false },
+            new AddColumn<UUID>("snapshotuuid") { IsNullAllowed = false },
+            new AddColumn<string>("simname") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<string>("posglobal") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<string>("parcelname") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<uint>("classifiedflags") { IsNullAllowed = false },
+            new AddColumn<int>("priceforlisting") { IsNullAllowed = false },
+            new PrimaryKeyInfo(new string[] { "classifieduuid" }),
+            new NamedKeyInfo("creatoruuid_index", new string[] { "creatoruuid" }),
+            new TableRevision(2),
+            /* some change entry needed for rev 1 tables */
+            new ChangeColumn<Date>("creationdate") { IsNullAllowed = false },
+            new ChangeColumn<Date>("expirationdate") { IsNullAllowed = false },
+            new ChangeColumn<Vector3>("posglobal") { IsNullAllowed = false },
 
-        static readonly string[] m_NotesMigrations = new string[]
-        {
-            "CREATE TABLE %tablename% (useruuid char(36) not null," +
-                                        "targetuuid char(36) not null," +
-                                        "notes text not null," +
-                                        "primary key (useruuid, targetuuid)," +
-                                        "key useruuid (useruuid))"
-        };
+            new SqlTable("usernotes"),
+            new AddColumn<UUID>("useruuid") { IsNullAllowed = false },
+            new AddColumn<UUID>("targetuuid") { IsNullAllowed = false },
+            new AddColumn<string>("notes") { IsNullAllowed = false },
+            new PrimaryKeyInfo(new string[] { "useruuid", "targetuuid"}),
+            new NamedKeyInfo("useruuid", new string[] {"useruuid" }),
 
-        static readonly string[] m_PicksMigrations = new string[]
-        {
-            "CREATE TABLE %tablename% (pickuuid char(36) not null," +
-                                    "creatoruuid char(36) not null," +
-                                    "toppick tinyint(1) unsigned not null," +
-                                    "parceluuid char(36) not null," +
-                                    "`name` varchar(255) not null," +
-                                    "description text not null," +
-                                    "snapshotuuid char(36) not null," +
-                                    "parcelname varchar(255) not null," +
-                                    "originalname varchar(255) not null," +
-                                    "simname varchar(255) not null," +
-                                    "posglobal varchar(255) not null," +
-                                    "sortorder int(2) not null," +
-                                    "enabled tinyint(1) unsigned NOT NULL," +
-                                    "PRIMARY KEY (pickuuid)," +
-                                    "KEY creatoruuid (creatoruuid))"
-        };
+            new SqlTable("userpicks"),
+            new AddColumn<UUID>("pickuuid") { IsNullAllowed = false },
+            new AddColumn<UUID>("creatoruuid") { IsNullAllowed = false },
+            new AddColumn<bool>("toppick") { IsNullAllowed = false },
+            new AddColumn<UUID>("parceluuid") { IsNullAllowed = false },
+            new AddColumn<string>("name") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<string>("description") { IsNullAllowed = false },
+            new AddColumn<UUID>("snapshotuuid") { IsNullAllowed = false },
+            new AddColumn<string>("parcelname") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<string>("originalname") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<string>("simname") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<string>("posglobal") { Cardinality = 255, IsNullAllowed = false },
+            new AddColumn<int>("sortorder") { IsNullAllowed = false },
+            new AddColumn<bool>("enabled") { IsNullAllowed = false },
+            new PrimaryKeyInfo(new string[] { "pickuuid" }),
+            new NamedKeyInfo("creatoruuid", new string[] {"creatoruuid" }),
+            new TableRevision(2),
+            new ChangeColumn<Vector3>("posglobal") { IsNullAllowed = false },
 
-        static readonly string[] m_ProfileMigrations = new string[]
-        {
-            "CREATE TABLE %tablename% (useruuid char(36) not null," +
-                                    "profilePartner char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "profileAllowPublish int(1) not null," +
-                                    "profileMaturePublish int(1) not null," +
-                                    "profileURL varchar(255) not null default ''," +
-                                    "profileWantToMask unsigned int(11) not null",
-                                    "profileWantToText text," +
-                                    "profileSkillsMask unsigned int(11) not null," +
-                                    "profileSkillsText text," +
-                                    "profileLanguages text," +
-                                    "profileImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "profileAboutText text," +
-                                    "profileFirstImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "profileFirstText text," +
-                                    "primary key (useruuid))"
-        };
+            new SqlTable("userprofile"),
+            new AddColumn<UUID>("useruuid") { IsNullAllowed = false },
+            new AddColumn<UUID>("profilePartner") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<bool>("profileAllowPublish") { IsNullAllowed = false },
+            new AddColumn<bool>("profileMaturePublish") { IsNullAllowed = false },
+            new AddColumn<string>("profileURL") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<uint>("profileWantToMask") { IsNullAllowed = false },
+            new AddColumn<string>("profileWantToText"),
+            new AddColumn<uint>("profileSkillsMask") { IsNullAllowed = false },
+            new AddColumn<string>("profileSkillsText"),
+            new AddColumn<string>("profileLanguages"),
+            new AddColumn<UUID>("profileImage") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("profileAboutText"),
+            new AddColumn<UUID>("profileFirstImage") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("profileFirstText"),
+            new PrimaryKeyInfo(new string[] { "useruuid" }),
+            new TableRevision(2),
+            /* needed changes for revision 1 tables */
+            new ChangeColumn<bool>("profileAllowPublish") { IsNullAllowed = false },
+            new ChangeColumn<bool>("profileMaturePublish") { IsNullAllowed = false },
 
-        static readonly string[] m_UserSettingsMigrations = new string[]
-        {
-            "CREATE TABLE %tablename% (useruuid char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "imviaemail tinyint(1) unsigned not null default '0'," +
-                                    "visible tinyint(1) unsigned not null default '1'," +
-                                    "primary key(useruuid))"
+            new SqlTable("usersettings"),
+            new ChangeColumn<UUID>("useruuid") { IsNullAllowed = false, Default = UUID.Zero },
+            new ChangeColumn<bool>("imviaemail") { IsNullAllowed = false, Default = false },
+            new ChangeColumn<bool>("visible") { IsNullAllowed = false, Default = true },
+            new PrimaryKeyInfo(new string[] { "useruuid" })
         };
     }
 

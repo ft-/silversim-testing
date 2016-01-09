@@ -116,18 +116,18 @@ namespace SilverSim.Database.MySQL.Profile
             public void Update(ProfileClassified c)
             {
                 Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                replaceVals["classifieduuid"] = c.ClassifiedID.ToString();
-                replaceVals["creatoruuid"] = c.Creator.ID.ToString();
-                replaceVals["creationdate"] = c.CreationDate.AsULong;
-                replaceVals["expirationdate"] = c.ExpirationDate.AsULong;
+                replaceVals["classifieduuid"] = c.ClassifiedID;
+                replaceVals["creatoruuid"] = c.Creator.ID;
+                replaceVals["creationdate"] = c.CreationDate;
+                replaceVals["expirationdate"] = c.ExpirationDate;
                 replaceVals["category"] = c.Category;
                 replaceVals["name"] = c.Name;
                 replaceVals["description"] = c.Description;
-                replaceVals["parceluuid"] = c.ParcelID.ToString();
+                replaceVals["parceluuid"] = c.ParcelID;
                 replaceVals["parentestate"] = c.ParentEstate;
-                replaceVals["snapshotuuid"] = c.SnapshotID.ToString();
+                replaceVals["snapshotuuid"] = c.SnapshotID;
                 replaceVals["simname"] = c.SimName;
-                replaceVals["posglobal"] = c.GlobalPos.ToString();
+                replaceVals["posglobal"] = c.GlobalPos;
                 replaceVals["parcelname"] = c.ParcelName;
                 replaceVals["classifiedflags"] = c.Flags;
                 replaceVals["priceforlisting"] = c.Price;

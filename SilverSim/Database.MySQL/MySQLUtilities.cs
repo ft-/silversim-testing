@@ -14,6 +14,7 @@ using SilverSim.Types.Asset;
 using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.SceneEnvironment;
+using SilverSim.Types.Inventory;
 
 namespace SilverSim.Database.MySQL
 {
@@ -169,7 +170,7 @@ namespace SilverSim.Database.MySQL
                 object value = kvp.Value;
                 string key = kvp.Key;
                 Type t = value != null ? value.GetType() : null;
-                if(t == typeof(Vector3))
+                if (t == typeof(Vector3))
                 {
                     Vector3 v = (Vector3)value;
                     mysqlparam.AddWithValue("?v_" + key + "X", v.X);
@@ -232,6 +233,14 @@ namespace SilverSim.Database.MySQL
                 else if (t == typeof(Date))
                 {
                     mysqlparam.AddWithValue("?v_" + key, ((Date)value).AsULong);
+                }
+                else if (t == typeof(InventoryFlags) || t == typeof(AssetFlags) || t == typeof(InventoryPermissionsMask))
+                {
+                    mysqlparam.AddWithValue("?v_" + key, Convert.ChangeType(value, typeof(uint)));
+                }
+                else if(t == typeof(InventoryType) || t == typeof(AssetType))
+                {
+                    mysqlparam.AddWithValue("?v_" + key, Convert.ChangeType(value, typeof(int)));
                 }
                 else if (value == null)
                 {

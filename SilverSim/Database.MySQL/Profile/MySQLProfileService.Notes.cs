@@ -81,8 +81,8 @@ namespace SilverSim.Database.MySQL.Profile
                 set
                 {
                     Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                    replaceVals["user"] = user.ID.ToString();
-                    replaceVals["target"] = target.ID.ToString();
+                    replaceVals["user"] = user.ID;
+                    replaceVals["target"] = target.ID;
                     replaceVals["notes"] = value;
                     using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {

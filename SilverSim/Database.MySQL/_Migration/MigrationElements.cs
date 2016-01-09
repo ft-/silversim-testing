@@ -144,7 +144,6 @@ namespace SilverSim.Database.MySQL._Migration
                 if (colInfo.Cardinality == 0)
                 {
                     typeSql = colInfo.IsLong ? "LONGTEXT" : "TEXT";
-                    notNull = string.Empty;
                 }
                 else
                 {
