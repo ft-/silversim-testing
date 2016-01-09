@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
@@ -43,21 +44,30 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "useraccounts", Migrations, m_Log);
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "ScopeID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "FirstName VARCHAR(31) NOT NULL DEFAULT ''," +
-                "LastName VARCHAR(31) NOT NULL DEFAULT ''," +
-                "Email VARCHAR(255) NOT NULL DEFAULT ''," +
-                "Created BIGINT(20) NOT NULL DEFAULT '0'," +
-                "UserLevel INT(11) NOT NULL DEFAULT '0'," +
-                "UserFlags INT(11) NOT NULL DEFAULT '0'," +
-                "UserTitle VARCHAR(64) NOT NULL DEFAULT ''," +
-                "PRIMARY KEY(ID), KEY Email (Email), UNIQUE KEY Name (FirstName, LastName), KEY FirstName (FirstName), KEY LastName (LastName))"
+        static IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            new SqlTable("useraccounts"),
+            new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("ScopeID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("FirstName") { Cardinality = 31, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("LastName") { Cardinality = 31, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("Email") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<Date>("Created") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+            new AddColumn<int>("UserLevel") { IsNullAllowed = false, Default = (int)0 },
+            new AddColumn<int>("UserFlags") { IsNullAllowed = false, Default = (int)0 },
+            new AddColumn<string>("UserTitle") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
+            new PrimaryKeyInfo(new string[] { "ID" }),
+            new NamedKeyInfo("Email", new string[] { "Email" }),
+            new NamedKeyInfo("Name", new string[] { "FirstName", "LastName" }) { IsUnique = true },
+            new NamedKeyInfo("FirstName", new string[] { "FirstName" }),
+            new NamedKeyInfo("LastName", new string[] { "LastName" }),
         };
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)
