@@ -180,18 +180,15 @@ namespace SilverSim.Database.MySQL.GridUser
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 0, LastLogout = ?curtime, LastRegionID = ?regionID, LastPosition = ?position, LastLookAt = ?lookAt WHERE ID LIKE ?id", conn))
-                {
-                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
-                    cmd.Parameters.AddWithValue("?curtime", Date.GetUnixTime());
-                    cmd.Parameters.AddWithValue("?regionID", lastRegionID.ToString());
-                    cmd.Parameters.AddWithValue("?position", lastPosition.ToString());
-                    cmd.Parameters.AddWithValue("?lookAt", lastLookAt.ToString());
-                    if (cmd.ExecuteNonQuery() < 1)
-                    {
-                        throw new GridUserUpdateFailedException();
-                    }
-                }
+                Dictionary<string, object> data = new Dictionary<string, object>();
+                data.Add("IsOnline", false);
+                data.Add("LastLogout", Date.Now);
+                data.Add("LastRegionID", lastRegionID);
+                data.Add("LastPosition", lastPosition);
+                data.Add("LastLookAt", lastLookAt);
+                Dictionary<string, object> where = new Dictionary<string, object>();
+                where.Add("ID", userID.ID);
+                conn.UpdateSet("griduser", data, where);
             }
         }
 
@@ -200,17 +197,13 @@ namespace SilverSim.Database.MySQL.GridUser
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET HomeRegionID = ?regionID, HomePosition = ?position, HomeLookAt = ?lookAt WHERE ID LIKE ?id", conn))
-                {
-                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
-                    cmd.Parameters.AddWithValue("?regionID", homeRegionID.ToString());
-                    cmd.Parameters.AddWithValue("?position", homePosition.ToString());
-                    cmd.Parameters.AddWithValue("?lookAt", homeLookAt.ToString());
-                    if (cmd.ExecuteNonQuery() < 1)
-                    {
-                        throw new GridUserUpdateFailedException();
-                    }
-                }
+                Dictionary<string, object> data = new Dictionary<string, object>();
+                data.Add("HomeRegionID", homeRegionID);
+                data.Add("HomePosition", homePosition);
+                data.Add("HomeLookAt", homeLookAt);
+                Dictionary<string, object> where = new Dictionary<string, object>();
+                where.Add("ID", userID.ID);
+                conn.UpdateSet("griduser", data, where);
             }
         }
 
@@ -219,17 +212,13 @@ namespace SilverSim.Database.MySQL.GridUser
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET LastRegionID = ?regionID, LastPosition = ?position, LastLookAt = ?lookAt WHERE ID LIKE ?id", conn))
-                {
-                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
-                    cmd.Parameters.AddWithValue("?regionID", lastRegionID.ToString());
-                    cmd.Parameters.AddWithValue("?position", lastPosition.ToString());
-                    cmd.Parameters.AddWithValue("?lookAt", lastLookAt.ToString());
-                    if (cmd.ExecuteNonQuery() < 1)
-                    {
-                        throw new GridUserUpdateFailedException();
-                    }
-                }
+                Dictionary<string, object> data = new Dictionary<string, object>();
+                data.Add("LastRegionID", lastRegionID);
+                data.Add("LastPosition", lastPosition);
+                data.Add("LastLookAt", lastLookAt);
+                Dictionary<string, object> where = new Dictionary<string, object>();
+                where.Add("ID", userID.ID);
+                conn.UpdateSet("griduser", data, where);
             }
         }
         #endregion

@@ -15,12 +15,12 @@ namespace SilverSim.Database.MySQL.GridUser
 
             info.User.ID = reader.GetUUID("ID");
             info.HomeRegionID = reader.GetUUID("HomeRegionID");
-            info.HomeLookAt = reader.GetStringFormattedVector("HomeLookAt");
-            info.HomePosition = reader.GetStringFormattedVector("HomePosition");
+            info.HomeLookAt = reader.GetVector("HomeLookAt");
+            info.HomePosition = reader.GetVector("HomePosition");
             info.LastRegionID = reader.GetUUID("LastRegionID");
-            info.LastLookAt = reader.GetStringFormattedVector("LastLookAt");
-            info.LastPosition = reader.GetStringFormattedVector("LastPosition");
-            info.IsOnline = reader.GetBoolean("IsOnline");
+            info.LastLookAt = reader.GetVector("LastLookAt");
+            info.LastPosition = reader.GetVector("LastPosition");
+            info.IsOnline = reader.GetBool("IsOnline");
             info.LastLogin = reader.GetDate("LastLogin");
             info.LastLogout = reader.GetDate("LastLogout");
 
