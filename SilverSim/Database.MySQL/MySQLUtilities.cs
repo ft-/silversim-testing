@@ -694,33 +694,6 @@ namespace SilverSim.Database.MySQL
             }
             return 0;
         }
-
-        public static void ProcessMigrations(string connectionString, string tablename, string[] migrations, ILog log)
-        {
-
-            using(MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                uint revision = connection.GetTableRevision(tablename);
-                string sqlcmd;
-                while(revision < migrations.Length)
-                {
-                    sqlcmd = migrations[revision];
-                    sqlcmd = sqlcmd.Replace("%tablename%", tablename);
-                    sqlcmd += String.Format(" COMMENT='{0}'", ++revision);
-                    log.InfoFormat("[MYSQL MIGRATION]: Updating {0} to revision {1}", tablename, revision);
-                    using(MySqlCommand cmd = new MySqlCommand(sqlcmd, connection))
-                    {
-                        cmd.CommandTimeout = 3600;
-                        if(cmd.ExecuteNonQuery() < 0)
-                        {
-                            throw new MySQLMigrationException(string.Format("Failed to update {0} to revision {1}", tablename, revision));
-                        }
-                    }
-                }
-            }
-        }
-
         #endregion
     }
 }
