@@ -4,6 +4,7 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Groups;
@@ -118,15 +119,24 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "groupnames", Migrations, m_Log);
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.MigrateTables(Migrations, m_Log);
+            }
         }
 
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "GroupID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "HomeURI VARCHAR(255)," +
-                "GroupName VARCHAR(255)," +
-                "PRIMARY KEY(groupID, homeURI))"
+        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        {
+            new SqlTable("groupnames"),
+            new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new PrimaryKeyInfo(new string[] { "GroupID", "HomeURI" }),
+            new TableRevision(2),
+            /* some corrections when revision 1 is found */
+            new ChangeColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new ChangeColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
         };
     }
     #endregion
