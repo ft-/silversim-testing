@@ -66,7 +66,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.MigrateTables(Migrations_, m_Log);
+                connection.MigrateTables(Migrations, m_Log);
             }
         }
 
@@ -649,7 +649,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         #endregion
 
-        static readonly IMigrationElement[] Migrations_ = new IMigrationElement[]
+        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("regions"),
             new AddColumn<UUID>("uuid") { IsNullAllowed = false, Default = UUID.Zero },

@@ -46,6 +46,7 @@ namespace SilverSim.Database.MySQL.GridUser
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "griduser", Migrations, m_Log);
         }
 
+        static readonly IMigrationElement[] Migrations
         private static readonly string[] Migrations = new string[]{
             "CREATE TABLE %tablename% (" +
                 "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
