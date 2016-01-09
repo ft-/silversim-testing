@@ -214,6 +214,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new ChangeColumn<TeleportLandingType>("LandingType") { IsNullAllowed = false, Default = TeleportLandingType.Anywhere },
             new ChangeColumn<bool>("MediaAutoScale") { IsNullAllowed = false, Default = false },
             new ChangeColumn<bool>("MediaLoop") { IsNullAllowed = false, Default = false },
+            new TableRevision(7),
+            new ChangeColumn<ParcelStatus>("Status") { IsNullAllowed = false, Default = ParcelStatus.Leased },
             #endregion
 
             #region Table parcelaccesswhitelist

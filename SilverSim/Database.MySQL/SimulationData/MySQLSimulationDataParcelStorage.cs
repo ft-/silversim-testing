@@ -53,7 +53,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.ClaimDate = dbReader.GetDate("ClaimDate");
                             pi.ClaimPrice = (int)dbReader["ClaimPrice"];
                             pi.ID = dbReader.GetUUID("ParcelID");
-                            pi.Group = new UGI((string)dbReader["Group"]);
+                            pi.Group = dbReader.GetUGI("Group");
                             pi.GroupOwned = MySQLUtilities.GetBool(dbReader, "IsGroupOwned");
                             pi.Description = (string)dbReader["Description"];
                             pi.Flags = (ParcelFlags)(uint)dbReader["Flags"];
