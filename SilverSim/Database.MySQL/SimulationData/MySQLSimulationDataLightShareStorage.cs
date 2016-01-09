@@ -45,7 +45,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         skyData.BlueDensity = reader.GetWLVector4("BlueDensity");
                         skyData.CloudDetailXYDensity = reader.GetVector3("CloudDetailXYDensity");
                         skyData.CloudScale = reader.GetDouble("CloudScale");
-                        skyData.CloudScroll = reader.GetWLVector2("CloudScrollX");
+                        skyData.CloudScroll = reader.GetWLVector2("CloudScroll");
                         skyData.CloudScrollXLock = MySQLUtilities.GetBool(reader, "CloudScrollXLock");
                         skyData.CloudScrollYLock = MySQLUtilities.GetBool(reader, "CloudScrollYLock");
                         skyData.CloudXYDensity = reader.GetVector3("CloudXYDensity");

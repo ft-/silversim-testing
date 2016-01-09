@@ -297,89 +297,51 @@ namespace SilverSim.Database.MySQL
         #region Common REPLACE INTO/INSERT INTO helper
         public static void AnyInto(this MySqlConnection connection, string cmd, string tablename, Dictionary<string, object> vals)
         {
-            string q1 = cmd + " INTO " + tablename + " (";
-            string q2 = ") VALUES (";
-            bool first = true;
+            List<string> q = new List<string>();
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 object value = kvp.Value;
-                if (value != null)
-                {
-                    if (!first)
-                    {
-                        q1 += ",";
-                        q2 += ",";
-                    }
-                    first = false;
-                }
 
                 Type t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
                 {
-                    q1 += "`" + key + "X`,";
-                    q2 += "?v_" + key + "X,";
-                    q1 += "`" + key + "Y`,";
-                    q2 += "?v_" + key + "Y,";
-                    q1 += "`" + key + "Z`";
-                    q2 += "?v_" + key + "Z";
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
+                    q.Add(key + "Z");
                 }
-                else if (t == typeof(GridVector))
+                else if (t == typeof(GridVector) || t == typeof(EnvironmentController.WLVector2))
                 {
-                    q1 += "`" + key + "X`,";
-                    q2 += "?v_" + key + "X,";
-                    q1 += "`" + key + "Y`";
-                    q2 += "?v_" + key + "Y";
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
                 }
                 else if (t == typeof(Quaternion))
                 {
-                    q1 += "`" + key + "X`,";
-                    q2 += "?v_" + key + "X,";
-                    q1 += "`" + key + "Y`,";
-                    q2 += "?v_" + key + "Y,";
-                    q1 += "`" + key + "Z`,";
-                    q2 += "?v_" + key + "Z,";
-                    q1 += "`" + key + "W`";
-                    q2 += "?v_" + key + "W";
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
+                    q.Add(key + "Z");
+                    q.Add(key + "W");
                 }
                 else if (t == typeof(Color))
                 {
-                    q1 += "`" + key + "Red`,";
-                    q2 += "?v_" + key + "Red,";
-                    q1 += "`" + key + "Green`,";
-                    q2 += "?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue`";
-                    q2 += "?v_" + key + "Blue";
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
                 }
                 else if(t == typeof(EnvironmentController.WLVector4))
                 {
-                    q1 += "`" + key + "Red`,";
-                    q2 += "?v_" + key + "Red,";
-                    q1 += "`" + key + "Green`,";
-                    q2 += "?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue`,";
-                    q2 += "?v_" + key + "Blue,";
-                    q1 += "`" + key + "Value`";
-                    q2 += "?v_" + key + "Value";
-                }
-                else if (t == typeof(EnvironmentController.WLVector2))
-                {
-                    q1 += "`" + key + "X`,";
-                    q2 += "?v_" + key + "X,";
-                    q1 += "`" + key + "Y`,";
-                    q2 += "?v_" + key + "Y,";
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
+                    q.Add(key + "Value");
                 }
                 else if (t == typeof(ColorAlpha))
                 {
-                    q1 += "`" + key + "Red`,";
-                    q2 += "?v_" + key + "Red,";
-                    q1 += "`" + key + "Green`,";
-                    q2 += "?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue`,";
-                    q2 += "?v_" + key + "Blue,";
-                    q1 += "`" + key + "Alpha`";
-                    q2 += "?v_" + key + "Alpha";
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
+                    q.Add(key + "Alpha");
                 }
                 else if (value == null)
                 {
@@ -387,12 +349,24 @@ namespace SilverSim.Database.MySQL
                 }
                 else
                 {
-                    q1 += "`" + key + "`";
-                    q2 += "?v_" + key;
+                    q.Add(key);
                 }
             }
 
-            string query = q1 + q2 + ")";
+            string q1 = string.Empty;
+            string q2 = string.Empty;
+            foreach(string p in q)
+            {
+                if(q1.Length != 0)
+                {
+                    q1 += ",";
+                    q2 += ",";
+                }
+                q1 += "`" + p + "`";
+                q2 += "?v_" + p;
+            }
+
+            string query = cmd + " INTO `" + tablename + "` (" + q1 + ") VALUES (" + q2 + ")";
             using (MySqlCommand command = new MySqlCommand(query, connection))
             {
                 AddParameters(command.Parameters, vals);
@@ -419,10 +393,9 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region UPDATE SET helper
-        public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, string where)
+        static List<string> UpdateSetFromVals(Dictionary<string, object> vals)
         {
-            string q1 = "UPDATE " + tablename + " SET ";
-            bool first = true;
+            List<string> updates = new List<string>();
 
             foreach (KeyValuePair<string, object> kvp in vals)
             {
@@ -430,57 +403,44 @@ namespace SilverSim.Database.MySQL
                 Type t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
-                if (kvp.Value != null)
-                {
-                    if (!first)
-                    {
-                        q1 += ",";
-                    }
-                    first = false;
-                }
-
                 if (t == typeof(Vector3))
                 {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
-                    q1 += "`" + key + "Z` = ?v_" + key + "Z";
+
+                    updates.Add("`" + key + "X` = ?v_" + key + "X");
+                    updates.Add("`" + key + "Y` = ?v_" + key + "Y");
+                    updates.Add("`" + key + "Z` = ?v_" + key + "Z");
                 }
-                else if (t == typeof(GridVector))
+                else if (t == typeof(GridVector) || t == typeof(EnvironmentController.WLVector2))
                 {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y";
+                    updates.Add("`" + key + "X` = ?v_" + key + "X");
+                    updates.Add("`" + key + "Y` = ?v_" + key + "Y");
                 }
                 else if (t == typeof(Quaternion))
                 {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
-                    q1 += "`" + key + "Z` = ?v_" + key + "Z,";
-                    q1 += "`" + key + "W` = ?v_" + key + "W";
+                    updates.Add("`" + key + "X` = ?v_" + key + "X");
+                    updates.Add("`" + key + "Y` = ?v_" + key + "Y");
+                    updates.Add("`" + key + "Z` = ?v_" + key + "Z");
+                    updates.Add("`" + key + "W` = ?v_" + key + "W");
                 }
                 else if (t == typeof(Color))
                 {
-                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
-                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue";
-                }
-                else if (t == typeof(EnvironmentController.WLVector2))
-                {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
+                    updates.Add("`" + key + "Red` = ?v_" + key + "Red");
+                    updates.Add("`" + key + "Green` = ?v_" + key + "Green");
+                    updates.Add("`" + key + "Blue` = ?v_" + key + "Blue");
                 }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
-                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
-                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
-                    q1 += "`" + key + "Value` = ?v_" + key + "Value";
+                    updates.Add("`" + key + "Red` = ?v_" + key + "Red");
+                    updates.Add("`" + key + "Green` = ?v_" + key + "Green");
+                    updates.Add("`" + key + "Blue` = ?v_" + key + "Blue");
+                    updates.Add("`" + key + "Value` = ?v_" + key + "Value");
                 }
                 else if (t == typeof(ColorAlpha))
                 {
-                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
-                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
-                    q1 += "`" + key + "Alpha` = ?v_" + key + "Alpha";
+                    updates.Add("`" + key + "Red` = ?v_" + key + "Red");
+                    updates.Add("`" + key + "Green` = ?v_" + key + "Green");
+                    updates.Add("`" + key + "Blue` = ?v_" + key + "Blue");
+                    updates.Add("`" + key + "Alpha` = ?v_" + key + "Alpha");
                 }
                 else if (value == null)
                 {
@@ -488,9 +448,18 @@ namespace SilverSim.Database.MySQL
                 }
                 else
                 {
-                    q1 += "`" + key + "` = ?v_" + key;
+                    updates.Add("`" + key + "` = ?v_" + key);
                 }
             }
+            return updates;
+        }
+
+        public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, string where)
+        {
+            string q1 = "UPDATE " + tablename + " SET ";
+
+
+            q1 += string.Join(",", UpdateSetFromVals(vals));
 
             using (MySqlCommand command = new MySqlCommand(q1 + " WHERE " + where, connection))
             {
@@ -505,75 +474,8 @@ namespace SilverSim.Database.MySQL
         public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, Dictionary<string, object> where)
         {
             string q1 = "UPDATE " + tablename + " SET ";
-            bool first = true;
 
-            foreach (KeyValuePair<string, object> kvp in vals)
-            {
-                object value = kvp.Value;
-                Type t = value != null ? value.GetType() : null;
-                string key = kvp.Key;
-
-                if (value != null)
-                {
-                    if (!first)
-                    {
-                        q1 += ",";
-                    }
-                    first = false;
-                }
-
-                if (t == typeof(Vector3))
-                {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
-                    q1 += "`" + key + "Z` = ?v_" + key + "Z";
-                }
-                else if (t == typeof(GridVector))
-                {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y";
-                }
-                else if (t == typeof(Quaternion))
-                {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
-                    q1 += "`" + key + "Z` = ?v_" + key + "Z,";
-                    q1 += "`" + key + "W` = ?v_" + key + "W";
-                }
-                else if (t == typeof(Color))
-                {
-                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
-                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue";
-                }
-                else if (t == typeof(ColorAlpha))
-                {
-                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
-                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
-                    q1 += "`" + key + "Alpha` = ?v_" + key + "Alpha";
-                }
-                else if (t == typeof(EnvironmentController.WLVector2))
-                {
-                    q1 += "`" + key + "X` = ?v_" + key + "X,";
-                    q1 += "`" + key + "Y` = ?v_" + key + "Y,";
-                }
-                else if (t == typeof(EnvironmentController.WLVector4))
-                {
-                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
-                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
-                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
-                    q1 += "`" + key + "Value` = ?v_" + key + "Value";
-                }
-                else if (kvp.Value == null)
-                {
-                    /* skip */
-                }
-                else
-                {
-                    q1 += "`" + kvp.Key + "` = ?v_" + kvp.Key;
-                }
-            }
+            q1 += UpdateSetFromVals(vals);
 
             string wherestr = string.Empty;
             foreach(KeyValuePair<string, object> w in where)
