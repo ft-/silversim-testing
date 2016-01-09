@@ -22,30 +22,42 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
         }
 
+        public override bool TryGetValue(UUID regionID, out EnvironmentSettings settings)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            using (MemoryStream ms = new MemoryStream((byte[])reader["EnvironmentSettings"]))
+                            {
+                                settings = EnvironmentSettings.Deserialize(ms);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            settings = null;
+            return false;
+        }
+
         /* setting value to null will delete the entry */
         public override EnvironmentSettings this[UUID regionID]
         {
             get
             {
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                EnvironmentSettings settings;
+                if (!TryGetValue(regionID, out settings))
                 {
-                    conn.Open();
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
-                    {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                        using(MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                using (MemoryStream ms = new MemoryStream((byte[])reader["EnvironmentSettings"]))
-                                {
-                                    return EnvironmentSettings.Deserialize(ms);
-                                }
-                            }
-                        }
-                    }
+                    throw new KeyNotFoundException();
                 }
-                throw new KeyNotFoundException();
+                return settings;
             }
             set
             {

@@ -19,6 +19,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             set;
         }
 
+        public abstract bool TryGetValue(UUID regionID, out EnvironmentSettings settings);
+
         public abstract bool Remove(UUID regionID);
     }
 }

@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.SceneEnvironment;
+using SilverSim.Scene.Types.WindLight;
 
 namespace SilverSim.Main.Common
 {
@@ -79,8 +80,12 @@ namespace SilverSim.Main.Common
                 {
                     try
                     {
-                        loadparams.Scene.EnvironmentSettings = loadparams.SimulationDataStorage.EnvironmentSettings[loadparams.Scene.ID];
-                        m_Log.InfoFormat("Loaded environment settings for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                        EnvironmentSettings settings;
+                        if (loadparams.SimulationDataStorage.EnvironmentSettings.TryGetValue(loadparams.Scene.ID, out settings))
+                        {
+                            loadparams.Scene.EnvironmentSettings = settings;
+                            m_Log.InfoFormat("Loaded environment settings for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                        }
                     }
                     catch(Exception e)
                     {
