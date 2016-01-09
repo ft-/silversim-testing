@@ -932,7 +932,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 len--;
             }
-            return Encoding.UTF8.GetString(buf, 0, len);
+            string s = Encoding.UTF8.GetString(buf, 0, len);
+            int i = s.IndexOf('\0');
+            if (i >= 0)
+            {
+                s = s.Substring(0, i);
+            }
+            return s;
         }
 
         public void WriteStringLen8(string val)
@@ -965,7 +971,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 len--;
             }
-            return Encoding.UTF8.GetString(buf, 0, len);
+            string s = Encoding.UTF8.GetString(buf, 0, len);
+            int i = s.IndexOf('\0');
+            if (i >= 0)
+            {
+                s = s.Substring(0, i);
+            }
+            return s;
         }
 
         public void WriteStringLen16(string val)
