@@ -46,7 +46,6 @@ namespace SilverSim.Database.MySQL.Presence
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "presence", Migrations_, m_Log);
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
@@ -69,19 +68,6 @@ namespace SilverSim.Database.MySQL.Presence
             new TableRevision(2),
             /* necessary correction */
             new ChangeColumn<Date>("LastSeen") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
-        };
-
-        private static readonly string[] Migrations_ = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "SessionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "SecureSessionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "LastSeen BIGINT(10) NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(SessionID)," +
-                "KEY UserID (UserID)," +
-                "KEY SecureSessionID (SecureSessionID)," +
-                "KEY RegionID (RegionID))"
         };
 
         #region PresenceServiceInterface
