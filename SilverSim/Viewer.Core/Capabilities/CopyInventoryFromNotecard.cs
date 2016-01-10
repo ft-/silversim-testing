@@ -119,20 +119,18 @@ namespace SilverSim.Viewer.Core.Capabilities
                 {
                     try
                     {
-                        if(destinationFolderID == UUID.Zero)
+                        if(destinationFolderID == UUID.Zero &&
+                            !destFolder.ContainsKey(ncitem.AssetType))
                         {
-                            if(!destFolder.ContainsKey(ncitem.AssetType))
+                            if(!m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, ncitem.AssetType, out destinationFolder) &&
+                                !m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, AssetType.Object, out destinationFolder))
                             {
-                                if(!m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, ncitem.AssetType, out destinationFolder) &&
-                                    !m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, AssetType.Object, out destinationFolder))
-                                {
-                                    m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.Owner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
-                                    continue;
-                                }
-                                else
-                                {
-                                    destFolder.Add(ncitem.AssetType, destinationFolder);
-                                }
+                                m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.Owner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
+                                continue;
+                            }
+                            else
+                            {
+                                destFolder.Add(ncitem.AssetType, destinationFolder);
                             }
                         }
                         UUID assetID = CreateInventoryItemFromNotecard(destinationFolder, ncitem, callbackID);
