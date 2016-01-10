@@ -316,7 +316,7 @@ namespace SilverSim.Database.MySQL.Asset
         {
             new SqlTable("assets") { IsDynamicRowFormat = true },
             new AddColumn<UUID>("id") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<string>("name") { Cardinality = MAX_ASSET_NAME, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("name") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<AssetType>("assetType") { IsNullAllowed = false },
             new AddColumn<bool>("temporary") { IsNullAllowed = false },
             new AddColumn<Date>("create_time") { IsNullAllowed = false },
