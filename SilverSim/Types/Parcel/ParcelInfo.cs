@@ -304,6 +304,17 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
+            public bool ContainsLocation(Vector3 v)
+            {
+                int x = ((int)v.X) / 4;
+                int y = ((int)v.Y) / 4;
+                if (v.X < 0 || v.Y < 0 || x < 0 || y < 0 || x >= m_BitmapWidth || y >= m_BitmapHeight)
+                {
+                    return false;
+                }
+                return (this[x / 4, y / 4]);
+            }
+
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public bool this[int x, int y]
             {

@@ -37,6 +37,33 @@ namespace SilverSim.ServiceInterfaces.GridUser
     }
 
     [Serializable]
+    public class GridUserSetHomeNotPossibleForForeignerException : KeyNotFoundException
+    {
+        public GridUserSetHomeNotPossibleForForeignerException()
+        {
+
+        }
+
+        public GridUserSetHomeNotPossibleForForeignerException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected GridUserSetHomeNotPossibleForForeignerException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public GridUserSetHomeNotPossibleForForeignerException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
+    }
+
+    [Serializable]
     public class GridUserUpdateFailedException : Exception
     {
         public GridUserUpdateFailedException()
