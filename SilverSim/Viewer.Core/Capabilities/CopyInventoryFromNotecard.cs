@@ -104,7 +104,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             if (m_Scene.Primitives.TryGetValue(objectID, out part) &&
                 part.Inventory.TryGetValue(itemID, out item) &&
                 item.InventoryType == InventoryType.Notecard &&
-                m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder))
+                (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)))
             {
                 AssetData data;
                 if(m_Scene.AssetService.TryGetValue(item.AssetID, out data))
@@ -114,12 +114,29 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
 
             List<UUID> transferItems = new List<UUID>();
+            Dictionary<AssetType, InventoryFolder> destFolder = new Dictionary<AssetType, InventoryFolder>();
             if(null != nc)
             {
                 foreach (NotecardInventoryItem ncitem in nc.Inventory.Values)
                 {
                     try
                     {
+                        if(destinationFolderID == UUID.Zero)
+                        {
+                            if(!destFolder.ContainsKey(ncitem.AssetType))
+                            {
+                                if(!m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, ncitem.AssetType, out destinationFolder) &&
+                                    !m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, AssetType.Object, out destinationFolder))
+                                {
+                                    m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.Owner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
+                                    continue;
+                                }
+                                else
+                                {
+                                    destFolder.Add(ncitem.AssetType, destinationFolder);
+                                }
+                            }
+                        }
                         UUID assetID = CreateInventoryItemFromNotecard(destinationFolder, ncitem, callbackID);
                         if (!transferItems.Contains(assetID))
                         {
