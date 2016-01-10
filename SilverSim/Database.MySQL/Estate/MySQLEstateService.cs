@@ -128,7 +128,7 @@ namespace SilverSim.Database.MySQL.Estate
             new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false },
             new AddColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<uint>("Flags") { IsNullAllowed = false, Default = (uint)0 },
-            new AddColumn<int>("PricePerMeter") { IsNullAllowed = false, Default = (int)0 },
+            new AddColumn<int>("PricePerMeter") { IsNullAllowed = false, Default = 0 },
             new AddColumn<double>("BillableFactor") { IsNullAllowed = false, Default = (double)1 },
             new AddColumn<double>("SunPosition") { IsNullAllowed = false, Default = (double)0 },
             new AddColumn<string>("AbuseEmail") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },

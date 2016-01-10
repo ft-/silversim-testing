@@ -5,12 +5,17 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 {
     public partial class EnvironmentController
     {
-        struct WeatherConfig
+        class WeatherConfig
         {
             public bool EnableLightShareControl;
+
+            public WeatherConfig()
+            {
+
+            }
         }
 
-        WeatherConfig m_WeatherConfig = new WeatherConfig();
+        readonly WeatherConfig m_WeatherConfig = new WeatherConfig();
 
         public enum BooleanWeatherParams
         {

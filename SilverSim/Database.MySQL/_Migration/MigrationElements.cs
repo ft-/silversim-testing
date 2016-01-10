@@ -140,14 +140,9 @@ namespace SilverSim.Database.MySQL._Migration
             Type f = colInfo.FieldType;
             if (f == typeof(string))
             {
-                if (colInfo.Cardinality == 0)
-                {
-                    typeSql = colInfo.IsLong ? "LONGTEXT" : "TEXT";
-                }
-                else
-                {
-                    typeSql = "VARCHAR(" + colInfo.Cardinality.ToString() + ")";
-                }
+                typeSql = (colInfo.Cardinality == 0) ?
+                    (colInfo.IsLong ? "LONGTEXT" : "TEXT") :
+                    "VARCHAR(" + colInfo.Cardinality.ToString() + ")";
             }
             else if (f == typeof(UUI) || f == typeof(UGI))
             {
@@ -177,7 +172,7 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 typeSql = "BIGINT";
             }
-            else if (f == typeof(ulong))
+            else if (f == typeof(ulong) || f == typeof(Date))
             {
                 typeSql = "BIGINT UNSIGNED";
             }
@@ -373,10 +368,6 @@ namespace SilverSim.Database.MySQL._Migration
                     notNull = string.Empty;
                 }
             }
-            else if(f == typeof(Date))
-            {
-                typeSql = "BIGINT";
-            }
             else
             {
                 throw new ArgumentOutOfRangeException("FieldType " + f.FullName +  " is not supported in field " + colInfo.Name);
@@ -542,8 +533,8 @@ namespace SilverSim.Database.MySQL._Migration
 
     class FormerFieldInfo : IColumnInfo
     {
-        IColumnInfo m_ColumnInfo;
-        Type m_OldFieldType;
+        readonly IColumnInfo m_ColumnInfo;
+        readonly Type m_OldFieldType;
         public FormerFieldInfo(IColumnInfo columnInfo, Type oldFieldType)
         {
             m_OldFieldType = oldFieldType;
@@ -605,8 +596,8 @@ namespace SilverSim.Database.MySQL._Migration
         {
             FormerFieldInfo oldField = new FormerFieldInfo(this, formerType);
             string[] fieldNames = new string[] { Name };
-            List<string> oldFields = new List<string>();
-            Dictionary<string, string> newFields = new Dictionary<string, string>();
+            List<string> oldFields;
+            Dictionary<string, string> newFields;
 
             oldFields = new List<string>(oldField.ColumnSql().Keys);
             newFields = this.ColumnSql();

@@ -100,17 +100,15 @@ namespace SilverSim.Viewer.Core.Capabilities
             ObjectPartInventoryItem item;
             Notecard nc = null;
             InventoryFolder destinationFolder = null;
+            AssetData data;
 
             if (m_Scene.Primitives.TryGetValue(objectID, out part) &&
                 part.Inventory.TryGetValue(itemID, out item) &&
                 item.InventoryType == InventoryType.Notecard &&
-                (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)))
+                (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)) &&
+                m_Scene.AssetService.TryGetValue(item.AssetID, out data))
             {
-                AssetData data;
-                if(m_Scene.AssetService.TryGetValue(item.AssetID, out data))
-                {
-                    nc = new Notecard(data);
-                }
+                nc = new Notecard(data);
             }
 
             List<UUID> transferItems = new List<UUID>();
