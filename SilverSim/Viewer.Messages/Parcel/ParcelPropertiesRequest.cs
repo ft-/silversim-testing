@@ -39,5 +39,16 @@ namespace SilverSim.Viewer.Messages.Parcel
             m.SnapSelection = p.ReadBoolean();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteFloat((float)West);
+            p.WriteFloat((float)South);
+            p.WriteFloat((float)East);
+            p.WriteFloat((float)North);
+            p.WriteBoolean(SnapSelection);
+        }
     }
 }

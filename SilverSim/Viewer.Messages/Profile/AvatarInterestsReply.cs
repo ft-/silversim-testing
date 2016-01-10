@@ -35,5 +35,18 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteStringLen8(SkillsText);
             p.WriteStringLen8(LanguagesText);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AvatarInterestsReply m = new AvatarInterestsReply();
+            m.AgentID = p.ReadUUID();
+            m.AvatarID = p.ReadUUID();
+            m.WantToMask = p.ReadUInt32();
+            m.WantToText = p.ReadStringLen8();
+            m.SkillsMask = p.ReadUInt32();
+            m.SkillsText = p.ReadStringLen8();
+            m.LanguagesText = p.ReadStringLen8();
+            return m;
+        }
     }
 }

@@ -53,5 +53,27 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteUInt8(ClassifiedFlags);
             p.WriteInt32(PriceForListing);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ClassifiedInfoReply m = new ClassifiedInfoReply();
+            m.AgentID = p.ReadUUID();
+            m.ClassifiedID = p.ReadUUID();
+            m.CreatorID = p.ReadUUID();
+            m.CreationDate = Date.UnixTimeToDateTime(p.ReadUInt32());
+            m.ExpirationDate = Date.UnixTimeToDateTime(p.ReadUInt32());
+            m.Category = p.ReadInt32();
+            m.Name = p.ReadStringLen8();
+            m.Description = p.ReadStringLen16();
+            m.ParcelID = p.ReadUUID();
+            m.ParentEstate = p.ReadInt32();
+            m.SnapshotID = p.ReadUUID();
+            m.SimName = p.ReadStringLen8();
+            m.PosGlobal = p.ReadVector3d();
+            m.ParcelName = p.ReadStringLen8();
+            m.ClassifiedFlags = p.ReadUInt8();
+            m.PriceForListing = p.ReadInt32();
+            return m;
+        }
     }
 }

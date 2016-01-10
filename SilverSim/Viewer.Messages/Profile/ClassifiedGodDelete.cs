@@ -29,5 +29,13 @@ namespace SilverSim.Viewer.Messages.Profile
             m.QueryID = p.ReadUUID();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(ClassifiedID);
+            p.WriteUUID(QueryID);
+        }
     }
 }

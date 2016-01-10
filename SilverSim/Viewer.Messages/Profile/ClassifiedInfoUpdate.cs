@@ -47,5 +47,21 @@ namespace SilverSim.Viewer.Messages.Profile
             m.PriceForListing = p.ReadInt32();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(ClassifiedID);
+            p.WriteInt32(Category);
+            p.WriteStringLen8(Name);
+            p.WriteStringLen16(Description);
+            p.WriteUUID(ParcelID);
+            p.WriteInt32(ParentEstate);
+            p.WriteUUID(SnapshotID);
+            p.WriteVector3d(PosGlobal);
+            p.WriteUInt8(ClassifiedFlags);
+            p.WriteInt32(PriceForListing);
+        }
     }
 }

@@ -30,5 +30,13 @@ namespace SilverSim.Viewer.Messages.Profile
             m.DirectoryVisibility = p.ReadStringLen8();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteBoolean(IMViaEmail);
+            p.WriteStringLen8(DirectoryVisibility);
+        }
     }
 }

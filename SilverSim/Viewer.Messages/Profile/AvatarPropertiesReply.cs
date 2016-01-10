@@ -29,22 +29,6 @@ namespace SilverSim.Viewer.Messages.Profile
 
         }
 
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarPropertiesReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -59,6 +43,23 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteUInt8((byte)CharterMember.Length);
             p.WriteBytes(CharterMember);
             p.WriteUInt32(Flags);
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AvatarPropertiesReply m = new AvatarPropertiesReply();
+            m.AgentID = p.ReadUUID();
+            m.AvatarID = p.ReadUUID();
+            m.ImageID = p.ReadUUID();
+            m.FLImageID = p.ReadUUID();
+            m.PartnerID = p.ReadUUID();
+            m.AboutText = p.ReadStringLen16();
+            m.FLAboutText = p.ReadStringLen8();
+            m.BornOn = p.ReadStringLen8();
+            m.ProfileURL = p.ReadStringLen8();
+            m.CharterMember = p.ReadBytes(p.ReadUInt8());
+            m.Flags = p.ReadUInt32();
+            return m;
         }
     }
 }

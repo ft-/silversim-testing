@@ -25,5 +25,14 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteUInt32(Command);
             p.WriteFloat((float)Time);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ParcelMediaCommandMessage m = new ParcelMediaCommandMessage();
+            m.Flags = p.ReadUInt32();
+            m.Command = p.ReadUInt32();
+            m.Time = p.ReadFloat();
+            return m;
+        }
     }
 }

@@ -27,5 +27,15 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteStringLen8(DirectoryVisibility);
             p.WriteStringLen8(EMail);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            UserInfoReply m = new UserInfoReply();
+            m.AgentID = p.ReadUUID();
+            m.IMViaEmail = p.ReadBoolean();
+            m.DirectoryVisibility = p.ReadStringLen8();
+            m.EMail = p.ReadStringLen8();
+            return m;
+        }
     }
 }

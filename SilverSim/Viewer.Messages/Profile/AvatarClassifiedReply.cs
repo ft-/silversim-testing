@@ -38,5 +38,21 @@ namespace SilverSim.Viewer.Messages.Profile
                 p.WriteStringLen8(d.Name);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AvatarClassifiedReply m = new AvatarClassifiedReply();
+            m.AgentID = p.ReadUUID();
+            m.TargetID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                ClassifiedData d = new ClassifiedData();
+                d.ClassifiedID = p.ReadUUID();
+                d.Name = p.ReadStringLen8();
+                m.Data.Add(d);
+            }
+            return m;
+        }
     }
 }

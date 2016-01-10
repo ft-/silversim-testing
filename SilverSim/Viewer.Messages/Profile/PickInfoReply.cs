@@ -46,5 +46,24 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteInt32(SortOrder);
             p.WriteBoolean(IsEnabled);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            PickInfoReply m = new PickInfoReply();
+            m.AgentID = p.ReadUUID();
+            m.PickID = p.ReadUUID();
+            m.CreatorID = p.ReadUUID();
+            m.TopPick = p.ReadBoolean();
+            m.ParcelID = p.ReadUUID();
+            m.Name = p.ReadStringLen8();
+            m.Description = p.ReadStringLen16();
+            m.SnapshotID = p.ReadUUID();
+            m.User = p.ReadStringLen8();
+            m.OriginalName = p.ReadStringLen8();
+            m.PosGlobal = p.ReadVector3d();
+            m.SortOrder = p.ReadInt32();
+            m.IsEnabled = p.ReadBoolean();
+            return m;
+        }
     }
 }

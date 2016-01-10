@@ -25,5 +25,13 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteUInt16((UInt16)Data.Length);
             p.WriteBytes(Data);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ParcelOverlay m = new ParcelOverlay();
+            m.SequenceID = p.ReadInt32();
+            m.Data = p.ReadBytes(p.ReadUInt16());
+            return m;
+        }
     }
 }

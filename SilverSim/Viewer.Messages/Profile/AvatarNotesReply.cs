@@ -26,5 +26,14 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteUUID(TargetID);
             p.WriteStringLen16(Notes);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AvatarNotesReply m = new AvatarNotesReply();
+            m.AgentID = p.ReadUUID();
+            m.TargetID = p.ReadUUID();
+            m.Notes = p.ReadStringLen16();
+            return m;
+        }
     }
 }

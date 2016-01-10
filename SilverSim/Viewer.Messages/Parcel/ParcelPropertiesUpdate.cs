@@ -61,14 +61,34 @@ namespace SilverSim.Viewer.Messages.Parcel
             m.Category = (ParcelCategory)p.ReadUInt8();
             m.AuthBuyerID = p.ReadUUID();
             m.SnapshotID = p.ReadUUID();
-            m.UserLocation.X = p.ReadFloat();
-            m.UserLocation.Y = p.ReadFloat();
-            m.UserLocation.Z = p.ReadFloat();
-            m.UserLookAt.X = p.ReadFloat();
-            m.UserLookAt.Y = p.ReadFloat();
-            m.UserLookAt.Z = p.ReadFloat();
+            m.UserLocation = p.ReadVector3f();
+            m.UserLookAt = p.ReadVector3f();
             m.LandingType = (TeleportLandingType)p.ReadUInt8();
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteInt32(LocalID);
+            p.WriteUInt32(Flags);
+            p.WriteUInt32((uint)ParcelFlags);
+            p.WriteInt32(SalePrice);
+            p.WriteStringLen8(Name);
+            p.WriteStringLen8(Description);
+            p.WriteStringLen8(MusicURL);
+            p.WriteStringLen8(MediaURL);
+            p.WriteBoolean(MediaAutoScale);
+            p.WriteUUID(GroupID);
+            p.WriteInt32(PassPrice);
+            p.WriteFloat((float)PassHours);
+            p.WriteUInt8((byte)Category);
+            p.WriteUUID(AuthBuyerID);
+            p.WriteUUID(SnapshotID);
+            p.WriteVector3f(UserLocation);
+            p.WriteVector3f(UserLookAt);
+            p.WriteUInt8((byte)LandingType);
         }
     }
 }

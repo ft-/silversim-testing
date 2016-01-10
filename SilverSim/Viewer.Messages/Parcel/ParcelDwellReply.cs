@@ -31,5 +31,15 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteUUID(ParcelID);
             p.WriteFloat((float)Dwell);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ParcelDwellReply m = new ParcelDwellReply();
+            m.AgentID = p.ReadUUID();
+            m.LocalID = p.ReadInt32();
+            m.ParcelID = p.ReadUUID();
+            m.Dwell = p.ReadFloat();
+            return m;
+        }
     }
 }

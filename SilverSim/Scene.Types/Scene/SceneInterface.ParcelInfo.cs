@@ -185,7 +185,7 @@ namespace SilverSim.Scene.Types.Scene
                 reply.Description = pinfo.Description;
                 reply.ActualArea = pinfo.ActualArea;
                 reply.BillableArea = pinfo.BillableArea;
-                reply.Flags = pinfo.Flags;
+                reply.Flags = (byte)pinfo.Flags;
                 reply.SimName = Name;
                 reply.SnapshotID = UUID.Zero;
                 reply.Dwell = pinfo.Dwell;

@@ -47,5 +47,25 @@ namespace SilverSim.Viewer.Messages.Parcel
                 p.WriteUInt32((uint)d.Flags);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ParcelAccessListReply m = new ParcelAccessListReply();
+            m.AgentID = p.ReadUUID();
+            m.SequenceID = p.ReadInt32();
+            m.Flags = (ParcelAccessList)p.ReadUInt32();
+            m.LocalID = p.ReadInt32();
+
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                Data d = new Data();
+                d.ID = p.ReadUUID();
+                d.Time = p.ReadUInt32();
+                d.Flags = (ParcelAccessList)p.ReadUInt32();
+                m.AccessList.Add(d);
+            }
+            return m;
+        }
     }
 }

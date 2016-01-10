@@ -39,5 +39,16 @@ namespace SilverSim.Viewer.Messages.Profile
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(WantToMask);
+            p.WriteStringLen8(WantToText);
+            p.WriteUInt32(SkillsMask);
+            p.WriteStringLen8(SkillsText);
+            p.WriteStringLen8(LanguagesText);
+        }
     }
 }
