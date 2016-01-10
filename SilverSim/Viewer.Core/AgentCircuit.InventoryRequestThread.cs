@@ -1056,51 +1056,46 @@ namespace SilverSim.Viewer.Core
                 item.Permissions.EveryOne = InventoryPermissionsMask.None;
                 item.Permissions.NextOwner = req.NextOwnerMask;
 
-                if (item.AssetType != AssetType.Link && item.AssetType != AssetType.LinkFolder)
+                try
                 {
-                    /* only check asset if we are not creating links */
-
-                    try
+                    switch (item.InventoryType)
                     {
-                        switch (item.InventoryType)
-                        {
-                            case InventoryType.Landmark:
-                                item.AssetID = CreateLandmarkForInventory(item);
-                                break;
+                        case InventoryType.Landmark:
+                            item.AssetID = CreateLandmarkForInventory(item);
+                            break;
 
-                            case InventoryType.LSLText:
-                                item.AssetID = CreateDefaultScriptForInventory(item);
-                                break;
+                        case InventoryType.LSLText:
+                            item.AssetID = CreateDefaultScriptForInventory(item);
+                            break;
 
-                            case InventoryType.Notecard:
-                                item.AssetID = CreateDefaultNotecardForInventory(item);
-                                break;
+                        case InventoryType.Notecard:
+                            item.AssetID = CreateDefaultNotecardForInventory(item);
+                            break;
 
-                            case InventoryType.Gesture:
-                                item.AssetID = CreateDefaultGestureForInventory(item);
-                                break;
+                        case InventoryType.Gesture:
+                            item.AssetID = CreateDefaultGestureForInventory(item);
+                            break;
 
-                            case InventoryType.Animation:
-                                item.AssetID = new UUID("ddc2400f-ecdb-b00e-aee7-442ff99d5fb7"); /* this is the handshake animation */
-                                break;
+                        case InventoryType.Animation:
+                            item.AssetID = new UUID("ddc2400f-ecdb-b00e-aee7-442ff99d5fb7"); /* this is the handshake animation */
+                            break;
 
-                            default:
-                                item.AssetID = UUID.Zero;
-                                break;
-                        }
+                        default:
+                            item.AssetID = UUID.Zero;
+                            break;
                     }
-                    catch(Exception e)
-                    {
-                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
-                        m_Log.ErrorFormat("Failed to create asset for type {0}: {1}: {2}\n{3}", item.InventoryType.ToString(), e.GetType().FullName, e.Message, e.StackTrace);
-                        return;
-                    }
-                    if (UUID.Zero == item.AssetID)
-                    {
-                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
-                        m_Log.ErrorFormat("Failed to create asset for type {0}", item.InventoryType.ToString());
-                        return;
-                    }
+                }
+                catch(Exception e)
+                {
+                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    m_Log.ErrorFormat("Failed to create asset for type {0}: {1}: {2}\n{3}", item.InventoryType.ToString(), e.GetType().FullName, e.Message, e.StackTrace);
+                    return;
+                }
+                if (UUID.Zero == item.AssetID)
+                {
+                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    m_Log.ErrorFormat("Failed to create asset for type {0}", item.InventoryType.ToString());
+                    return;
                 }
 
                 try
