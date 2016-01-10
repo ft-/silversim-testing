@@ -163,33 +163,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        protected ParcelFlags FilterParcelFlags(ParcelFlags flags)
-        {
-            RegionOptionFlags regionflags = GetRegionFlags();
-            if((regionflags & (RegionOptionFlags.BlockFly | RegionOptionFlags.BlockFlyOver)) != 0)
-            {
-                flags &= ~ParcelFlags.AllowFly;
-            }
-            if(0 == (regionflags & RegionOptionFlags.AllowDamage))
-            {
-                flags &= ~ParcelFlags.AllowDamage;
-            }
-            if(0 != (regionflags & RegionOptionFlags.BlockTerraform))
-            {
-                flags &= ~ParcelFlags.AllowTerraform;
-            }
-            if (0 == (regionflags & RegionOptionFlags.BlockParcelSearch))
-            {
-                flags &= ~ParcelFlags.ShowDirectory;
-            }
-            if (0 != (regionflags & RegionOptionFlags.RestrictPushObject))
-            {
-                flags |= ParcelFlags.RestrictPushObject;
-            }
-            
-            return flags;
-        }
-
         [PacketHandler(MessageType.ParcelInfoRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -212,7 +185,7 @@ namespace SilverSim.Scene.Types.Scene
                 reply.Description = pinfo.Description;
                 reply.ActualArea = pinfo.ActualArea;
                 reply.BillableArea = pinfo.BillableArea;
-                reply.Flags = FilterParcelFlags(pinfo.Flags);
+                reply.Flags = pinfo.Flags;
                 reply.SimName = Name;
                 reply.SnapshotID = UUID.Zero;
                 reply.Dwell = pinfo.Dwell;
@@ -257,7 +230,7 @@ namespace SilverSim.Scene.Types.Scene
             prop.SelectedPrims = 0;
             prop.ParcelPrimBonus = pinfo.ParcelPrimBonus;
             prop.OtherCleanTime = pinfo.OtherCleanTime;
-            prop.ParcelFlags = FilterParcelFlags(pinfo.Flags);
+            prop.ParcelFlags = pinfo.Flags;
             prop.SalePrice = pinfo.SalePrice;
             prop.Name = pinfo.Name;
             prop.Description = pinfo.Description;

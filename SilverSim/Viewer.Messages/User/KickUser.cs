@@ -30,5 +30,16 @@ namespace SilverSim.Viewer.Messages.User
             p.WriteUUID(SessionID);
             p.WriteStringLen16(Message);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            KickUser m = new KickUser();
+            m.IpAddr = p.ReadUInt32();
+            m.Port = p.ReadUInt16();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.Message = p.ReadStringLen16();
+            return m;
+        }
     }
 }

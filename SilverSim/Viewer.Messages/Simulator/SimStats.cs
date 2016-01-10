@@ -74,7 +74,7 @@ namespace SilverSim.Viewer.Messages.Simulator
 
         public Data[] Stat = new Data[0];
         public Int32 PID;
-        public UInt64[] RegionFlagsExtended = new UInt64[0];
+        public List<UInt64> RegionFlagsExtended = new List<UInt64>();
 
         public SimStats()
         {
@@ -95,8 +95,8 @@ namespace SilverSim.Viewer.Messages.Simulator
                 p.WriteFloat((float)Stat[i].StatValue);
             }
             p.WriteInt32(PID);
-            p.WriteUInt8((byte)RegionFlagsExtended.Length);
-            for(int i = 0; i < RegionFlagsExtended.Length; ++i)
+            p.WriteUInt8((byte)RegionFlagsExtended.Count);
+            for(int i = 0; i < RegionFlagsExtended.Count; ++i)
             {
                 p.WriteUInt64(RegionFlagsExtended[i]);
             }

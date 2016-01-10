@@ -1053,7 +1053,7 @@ namespace SilverSim.Scene.Implementation.Basic
             pi.ID = UUID.Random;
             pi.Name = "Your Parcel";
             pi.Owner = Owner;
-            pi.Flags = FilterParcelFlags(ParcelFlags.None); /* we keep all flags disabled initially */
+            pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
             pi.BillableArea = (int)(SizeX * SizeY);
             pi.LandBitmap.SetAllBits();
             pi.LandingPosition = new Vector3(128, 128, 23);
@@ -1074,7 +1074,6 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 if (m_Parcels.ContainsKey(pInfo.ID))
                 {
-                    pInfo.Flags = FilterParcelFlags(pInfo.Flags);
                     m_SimulationDataStorage.Parcels.Store(ID, pInfo);
                 }
             }
@@ -1265,8 +1264,6 @@ namespace SilverSim.Scene.Implementation.Basic
                     e.StackTrace);
             }
 
-            UpdateAllParcelFlags();
-
             foreach (IAgent agent in Agents)
             {
                 ViewerAgent viewerAgent = agent as ViewerAgent;
@@ -1282,22 +1279,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
             UpdateEnvironmentSettings();
-        }
-
-        void UpdateAllParcelFlags()
-        {
-            foreach (ParcelInfo pInfo in Parcels)
-            {
-                lock (m_ParcelUpdateLock)
-                {
-                    ParcelFlags newFlags = FilterParcelFlags(pInfo.Flags);
-                    if (newFlags != pInfo.Flags && m_Parcels.ContainsKey(pInfo.ID))
-                    {
-                        pInfo.Flags = newFlags;
-                        m_SimulationDataStorage.Parcels.Store(ID, pInfo);
-                    }
-                }
-            }
         }
 
         public override void TriggerRegionDataChanged()
@@ -1321,7 +1302,6 @@ namespace SilverSim.Scene.Implementation.Basic
         public override void TriggerRegionSettingsChanged()
         {
             m_SimulationDataStorage.RegionSettings[ID] = RegionSettings;
-            UpdateAllParcelFlags();
 
             foreach (IAgent agent in Agents)
             {

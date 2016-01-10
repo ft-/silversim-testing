@@ -12,6 +12,7 @@ using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Scene.Types.Physics;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Types.Estate;
 
 namespace SilverSim.Viewer.Core
 {
@@ -125,8 +126,10 @@ namespace SilverSim.Viewer.Core
             {
                 stats.RegionX = scene.GridPosition.X;
                 stats.RegionY = scene.GridPosition.Y;
+                RegionOptionFlags regionFlags = scene.GetRegionFlags();
+                stats.RegionFlags = (uint)regionFlags;
+                stats.RegionFlagsExtended.Add((ulong)regionFlags);
             }
-            stats.RegionFlags = 0;
             stats.ObjectCapacity = 15000;
             stats.PID = 0;
             stats.Stat = m_SimStatsData;
