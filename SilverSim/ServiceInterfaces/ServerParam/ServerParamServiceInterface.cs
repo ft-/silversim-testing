@@ -56,6 +56,12 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             get;
         }
 
+        /* specific for use by configuration loader */
+        public abstract List<KeyValuePair<UUID, string>> this[string parametername]
+        {
+            get;
+        }
+
         public abstract bool Remove(UUID regionID, string parameter);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]

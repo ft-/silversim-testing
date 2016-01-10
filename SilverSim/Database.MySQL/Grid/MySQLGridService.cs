@@ -19,27 +19,35 @@ namespace SilverSim.Database.MySQL.Grid
 {
     #region Service Implementation
     [Description("MySQL Grid Backend")]
-    public sealed class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin
+    [ServerParam("DeleteOnUnregister")]
+    [ServerParam("AllowDuplicateRegionNames")]
+    public sealed class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin, IServerParamListener
     {
         readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
-        private bool IsDeleteOnUnregister
-        {
-            get
-            {
-                return m_ServerParams.GetBoolean(UUID.Zero, "DeleteOnUnregister", false);
-            }
-        }
+        private bool IsDeleteOnUnregister;
+        private bool AllowDuplicateRegionNames;
 
-        private bool AllowDuplicateRegionNames
+        public void TriggerParameterUpdated(UUID regionid, string parameter, string value)
         {
-            get
+            if(regionid == UUID.Zero)
             {
-                return m_ServerParams.GetBoolean(UUID.Zero, "AllowDuplicateRegionNames", false);
-            }
-        }
+                switch(parameter)
+                {
+                    case "DeleteOnUnregister":
+                        IsDeleteOnUnregister = bool.Parse(value);
+                        break;
 
-        private ServerParamServiceInterface m_ServerParams;
+                    case "AllowDuplicateRegionNames":
+                        AllowDuplicateRegionNames = bool.Parse(value);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            
+        }
 
         #region Constructor
         public MySQLGridService(string connectionString)
@@ -49,7 +57,6 @@ namespace SilverSim.Database.MySQL.Grid
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_ServerParams = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
         }
         #endregion
 

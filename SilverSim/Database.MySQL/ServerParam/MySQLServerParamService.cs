@@ -96,6 +96,34 @@ namespace SilverSim.Database.MySQL.ServerParam
             }
         }
 
+        public override List<KeyValuePair<UUID, string>> this[string parametername]
+        {
+            get
+            {
+                List<KeyValuePair<UUID, string>> resultSet = new List<KeyValuePair<UUID, string>>();
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE parametername LIKE ?parametername", connection))
+                    {
+                        cmd.Parameters.AddParameter("?parametername", parametername);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (dbReader.Read())
+                            {
+                                UUID regionID = dbReader.GetUUID("regionid");
+                                string value = dbReader.GetString("parametervalue");
+                                m_Cache[regionID][parametername] = value;
+                                resultSet.Add(new KeyValuePair<UUID, string>(regionID, value));
+                            }
+                        }
+                    }
+                }
+                return resultSet;
+            }
+        }
+
         public override bool TryGetValue(UUID regionID, string parameter, out string value)
         {
             RwLockedDictionary<string, string> regParams;

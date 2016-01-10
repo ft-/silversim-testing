@@ -319,6 +319,7 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(HttpXmlRpcHandler)] = "XML RPC Server";
             FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
             FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
+            FeaturesTable[typeof(IServerParamListener)] = "Server Params";
         }
 
         public IConfigSource Config
@@ -1087,7 +1088,7 @@ namespace SilverSim.Main.Common
                 {
                     p.Value.VerifyConnection();
                 }
-                catch(Exception e)
+                catch
                 {
                     m_Log.FatalFormat("Database connection verification for {0} failed", p.Key);
                     throw;
@@ -1160,6 +1161,38 @@ namespace SilverSim.Main.Common
             foreach(IPlugin instance in PluginInstances.Values)
             {
                 instance.Startup(this);
+            }
+
+            if(PluginInstances.ContainsKey("ServerParamStorage"))
+            {
+                ServerParamServiceInterface serverParams = GetServerParamStorage();
+                Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
+
+                m_Log.Info("Distribute Server Params");
+                foreach (IPlugin instance in PluginInstances.Values)
+                {
+                    Type instanceType = instance.GetType();
+                    if (instanceType.GetInterfaces().Contains(typeof(IServerParamListener)))
+                    {
+                        ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                        foreach (ServerParamAttribute attr in attrs)
+                        {
+                            string parameterName = attr.ParameterName;
+                            List<KeyValuePair<UUID, string>> result;
+                            if (!cachedResults.TryGetValue(parameterName, out result))
+                            {
+                                result = serverParams[parameterName];
+                                cachedResults.Add(parameterName, result);
+                            }
+
+                            foreach(KeyValuePair<UUID, string> kvp in result)
+                            {
+                                IServerParamListener listener = (IServerParamListener)instance;
+                                listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
+                            }
+                        }
+                    }
+                }
             }
 
             ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
