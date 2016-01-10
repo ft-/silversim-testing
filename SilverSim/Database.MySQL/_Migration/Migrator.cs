@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static SilverSim.Database.MySQL.MySQLUtilities;
+using MySQLMigrationException = SilverSim.Database.MySQL.MySQLUtilities.MySQLMigrationException;
 
 namespace SilverSim.Database.MySQL._Migration
 {
