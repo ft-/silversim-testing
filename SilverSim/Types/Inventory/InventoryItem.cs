@@ -12,7 +12,19 @@ namespace SilverSim.Types.Inventory
         #region Inventory Data
         public UUID ID = UUID.Zero;
         public UUID ParentFolderID = UUID.Zero;
-        public string Name = string.Empty;
+        string m_Name = string.Empty;
+        public string Name
+        {
+            get
+            {
+                return m_Name;
+            }
+            set
+            {
+                /* ensure that no non-printable characters manage it into our inventory */
+                m_Name = value.FilterToAscii7Printable().TrimToMaxLength(63);
+            }
+        }
         public string Description = string.Empty;
         public InventoryType InventoryType = InventoryType.Unknown;
         public uint Flags;

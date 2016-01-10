@@ -992,7 +992,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set 
             { 
-                m_Name = value.TrimToMaxLength(63);
+                m_Name = value.FilterToAscii7Printable().TrimToMaxLength(63);
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
