@@ -59,7 +59,7 @@ namespace SilverSim.Viewer.Messages.Agent
             p.WriteVector3f(CameraUpAxis);
             p.WriteFloat((float)Far);
             p.WriteUInt32((uint)ControlFlags);
-            p.WriteUInt8((byte)Flags);
+            p.WriteUInt8(Flags);
         }
     }
 }

@@ -74,7 +74,7 @@ namespace SilverSim.Viewer.Messages.Appearance
             foreach(WearableDataEntry d in WearableData)
             {
                 p.WriteUUID(d.CacheID);
-                p.WriteUInt8((byte)d.TextureIndex);
+                p.WriteUInt8(d.TextureIndex);
             }
 
             p.WriteUInt16((ushort)ObjectData.Length);
