@@ -1,10 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
 
 namespace SilverSim.Viewer.Messages.Script
@@ -30,6 +26,16 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteStringLen8(SimName);
             p.WriteVector3f(SimPosition);
             p.WriteVector3f(LookAt);
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ScriptTeleportRequest m = new ScriptTeleportRequest();
+            m.ObjectName = p.ReadStringLen8();
+            m.SimName = p.ReadStringLen8();
+            m.SimPosition = p.ReadVector3f();
+            m.LookAt = p.ReadVector3f();
+            return m;
         }
     }
 }

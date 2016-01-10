@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Script
             public UUID TransactionID;
             public AssetType AssetType;
             public InventoryType InvType;
-            public UInt32 Flags;
+            public InventoryFlags Flags;
             public InventoryItem.SaleInfoData.SaleType SaleType;
             public Int32 SalePrice;
             public string Name;
@@ -73,8 +73,8 @@ namespace SilverSim.Viewer.Messages.Script
             m.InventoryBlock.TransactionID = p.ReadUUID();
             m.InventoryBlock.AssetType = (AssetType)p.ReadInt8();
             m.InventoryBlock.InvType = (InventoryType)p.ReadInt8();
-            m.InventoryBlock.Flags = p.ReadUInt32();
-            m.InventoryBlock.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadInt8();
+            m.InventoryBlock.Flags = (InventoryFlags)p.ReadUInt32();
+            m.InventoryBlock.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
             m.InventoryBlock.SalePrice = p.ReadInt32();
             m.InventoryBlock.Name = p.ReadStringLen8();
             m.InventoryBlock.Description = p.ReadStringLen8();
@@ -82,6 +82,35 @@ namespace SilverSim.Viewer.Messages.Script
             m.InventoryBlock.CRC = p.ReadUInt32();
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUInt32(ObjectLocalID);
+            p.WriteBoolean(IsEnabled);
+            p.WriteUUID(InventoryBlock.ItemID);
+            p.WriteUUID(InventoryBlock.FolderID);
+            p.WriteUUID(InventoryBlock.CreatorID);
+            p.WriteUUID(InventoryBlock.OwnerID);
+            p.WriteUInt32((uint)InventoryBlock.BaseMask);
+            p.WriteUInt32((uint)InventoryBlock.OwnerMask);
+            p.WriteUInt32((uint)InventoryBlock.GroupMask);
+            p.WriteUInt32((uint)InventoryBlock.EveryoneMask);
+            p.WriteUInt32((uint)InventoryBlock.NextOwnerMask);
+            p.WriteBoolean(InventoryBlock.IsGroupOwned);
+            p.WriteUUID(InventoryBlock.TransactionID);
+            p.WriteInt8((sbyte)InventoryBlock.AssetType);
+            p.WriteInt8((sbyte)InventoryBlock.InvType);
+            p.WriteUInt32((uint)InventoryBlock.Flags);
+            p.WriteUInt8((byte)InventoryBlock.SaleType);
+            p.WriteInt32(InventoryBlock.SalePrice);
+            p.WriteStringLen8(InventoryBlock.Name);
+            p.WriteStringLen8(InventoryBlock.Description);
+            p.WriteUInt32(InventoryBlock.CreationDate);
+            p.WriteUInt32(InventoryBlock.CRC);
         }
     }
 }

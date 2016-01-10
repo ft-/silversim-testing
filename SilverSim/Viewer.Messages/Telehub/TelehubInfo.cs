@@ -35,5 +35,20 @@ namespace SilverSim.Viewer.Messages.Telehub
                 p.WriteVector3f(spawn);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            TelehubInfo m = new TelehubInfo();
+            m.ObjectID = p.ReadUUID();
+            m.ObjectName = p.ReadStringLen8();
+            m.TelehubPos = p.ReadVector3f();
+            m.TelehubRot = p.ReadLLQuaternion();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                m.SpawnPoints.Add(p.ReadVector3f());
+            }
+            return m;
+        }
     }
 }

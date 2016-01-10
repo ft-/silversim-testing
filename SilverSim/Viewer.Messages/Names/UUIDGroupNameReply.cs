@@ -39,5 +39,19 @@ namespace SilverSim.Viewer.Messages.Names
                 p.WriteStringLen8(d.GroupName);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            UUIDGroupNameReply m = new UUIDGroupNameReply();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                Data d = new Data();
+                d.ID = p.ReadUUID();
+                d.GroupName = p.ReadStringLen8();
+                m.UUIDNameBlock.Add(d);
+            }
+            return m;
+        }
     }
 }

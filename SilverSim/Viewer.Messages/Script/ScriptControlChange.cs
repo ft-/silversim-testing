@@ -35,5 +35,20 @@ namespace SilverSim.Viewer.Messages.Script
                 p.WriteBoolean(d.PassToAgent);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ScriptControlChange m = new ScriptControlChange();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                DataEntry d = new DataEntry();
+                d.TakeControls = p.ReadBoolean();
+                d.Controls = p.ReadUInt32();
+                d.PassToAgent = p.ReadBoolean();
+                m.Data.Add(d);
+            }
+            return m;
+        }
     }
 }

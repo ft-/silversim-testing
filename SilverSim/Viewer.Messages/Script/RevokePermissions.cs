@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 
 namespace SilverSim.Viewer.Messages.Script
@@ -14,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         public UUID ObjectID = UUID.Zero;
-        public UInt32 ObjectPermissions;
+        public ScriptPermissions ObjectPermissions;
 
         public RevokePermissions()
         {
@@ -27,9 +28,17 @@ namespace SilverSim.Viewer.Messages.Script
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             m.ObjectID = p.ReadUUID();
-            m.ObjectPermissions = p.ReadUInt32();
+            m.ObjectPermissions = (ScriptPermissions)p.ReadUInt32();
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(ObjectID);
+            p.WriteUInt32((uint)ObjectPermissions);
         }
     }
 }

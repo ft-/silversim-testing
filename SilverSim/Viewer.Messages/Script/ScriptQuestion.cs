@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 
 namespace SilverSim.Viewer.Messages.Script
@@ -14,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ItemID = UUID.Zero;
         public string ObjectName;
         public string ObjectOwner;
-        public UInt32 Questions;
+        public ScriptPermissions Questions;
         public UUID ExperienceID = UUID.Zero;
 
         public ScriptQuestion()
@@ -28,8 +29,27 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteUUID(ItemID);
             p.WriteStringLen8(ObjectName);
             p.WriteStringLen8(ObjectOwner);
-            p.WriteUInt32(Questions);
+            p.WriteUInt32((uint)Questions);
             p.WriteUUID(ExperienceID);
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ScriptQuestion m = new ScriptQuestion();
+            m.TaskID = p.ReadUUID();
+            m.ItemID = p.ReadUUID();
+            m.ObjectName = p.ReadStringLen8();
+            m.ObjectOwner = p.ReadStringLen8();
+            m.Questions = (ScriptPermissions)p.ReadUInt32();
+            try
+            {
+                m.ExperienceID = p.ReadUUID();
+            }
+            catch
+            {
+                m.ExperienceID = UUID.Zero;
+            }
+            return m;
         }
     }
 }

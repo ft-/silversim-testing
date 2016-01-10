@@ -34,5 +34,14 @@ namespace SilverSim.Viewer.Messages.TaskInventory
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(FolderID);
+            p.WriteUInt32(LocalID);
+            p.WriteUUID(ItemID);
+        }
     }
 }

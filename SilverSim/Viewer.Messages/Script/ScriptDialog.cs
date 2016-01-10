@@ -51,5 +51,31 @@ namespace SilverSim.Viewer.Messages.Script
                 p.WriteUUID(d);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ScriptDialog m = new ScriptDialog();
+            m.ObjectID = p.ReadUUID();
+            m.FirstName = p.ReadStringLen8();
+            m.LastName = p.ReadStringLen8();
+            m.ObjectName = p.ReadStringLen8();
+            m.Message = p.ReadStringLen16();
+            m.ChatChannel = p.ReadInt32();
+            m.ImageID = p.ReadUUID();
+
+            uint n = p.ReadUInt8();
+
+            while(n-- != 0)
+            {
+                m.Buttons.Add(p.ReadStringLen8());
+            }
+
+            n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                m.OwnerData.Add(p.ReadUUID());
+            }
+            return m;
+        }
     }
 }

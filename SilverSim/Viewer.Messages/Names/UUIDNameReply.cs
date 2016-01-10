@@ -31,9 +31,24 @@ namespace SilverSim.Viewer.Messages.Names
             foreach(Data d in UUIDNameBlock)
             {
                 p.WriteUUID(d.ID);
-                p.WriteStringLen8(d.FirstName + "\0");
-                p.WriteStringLen8(d.LastName + "\0");
+                p.WriteStringLen8(d.FirstName);
+                p.WriteStringLen8(d.LastName);
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            UUIDNameReply m = new UUIDNameReply();
+            uint n = p.ReadUInt8();
+            while (n-- != 0)
+            {
+                Data d = new Data();
+                d.ID = p.ReadUUID();
+                d.FirstName = p.ReadStringLen8();
+                d.LastName = p.ReadStringLen8();
+                m.UUIDNameBlock.Add(d);
+            }
+            return m;
         }
     }
 }

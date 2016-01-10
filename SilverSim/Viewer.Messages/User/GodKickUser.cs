@@ -33,5 +33,14 @@ namespace SilverSim.Viewer.Messages.User
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(GodID);
+            p.WriteUUID(GodSessionID);
+            p.WriteUUID(AgentID);
+            p.WriteUInt32(KickFlags);
+            p.WriteStringLen16(Reason);
+        }
     }
 }

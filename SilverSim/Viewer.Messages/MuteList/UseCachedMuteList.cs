@@ -21,5 +21,12 @@ namespace SilverSim.Viewer.Messages.MuteList
         {
             p.WriteUUID(AgentID);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            UseCachedMuteList m = new UseCachedMuteList();
+            m.AgentID = p.ReadUUID();
+            return m;
+        }
     }
 }

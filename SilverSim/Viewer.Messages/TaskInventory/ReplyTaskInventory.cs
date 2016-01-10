@@ -27,6 +27,15 @@ namespace SilverSim.Viewer.Messages.TaskInventory
             p.WriteInt16(Serial);
             p.WriteStringLen8(Filename);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ReplyTaskInventory m = new ReplyTaskInventory();
+            m.TaskID = p.ReadUUID();
+            m.Serial = p.ReadInt16();
+            m.Filename = p.ReadStringLen8();
+            return m;
+        }
     }
 
     [UDPMessage(MessageType.ReplyTaskInventory)]

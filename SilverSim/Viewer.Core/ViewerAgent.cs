@@ -1436,7 +1436,7 @@ namespace SilverSim.Viewer.Core
             m.ItemID = itemID;
             m.ObjectName = part.ObjectGroup.Name;
             m.ObjectOwner = part.Owner.FullName;
-            m.Questions = (UInt32)permissions;
+            m.Questions = permissions;
             m.TaskID = part.ID;
             SendMessageAlways(m, part.ObjectGroup.Scene.ID);
             return ScriptPermissions.None;

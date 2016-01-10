@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.TaskInventory
         public UUID TransactionID;
         public AssetType AssetType;
         public InventoryType InvType;
-        public UInt32 Flags;
+        public InventoryFlags Flags;
         public InventoryItem.SaleInfoData.SaleType SaleType;
         public Int32 SalePrice;
         public string Name;
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Messages.TaskInventory
             m.TransactionID = p.ReadUUID();
             m.AssetType = (AssetType)p.ReadInt8();
             m.InvType = (InventoryType) p.ReadInt8();
-            m.Flags = p.ReadUInt32();
+            m.Flags = (InventoryFlags)p.ReadUInt32();
             m.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
             m.SalePrice = p.ReadInt32();
             m.Name = p.ReadStringLen8();
@@ -75,6 +75,35 @@ namespace SilverSim.Viewer.Messages.TaskInventory
             m.CRC = p.ReadUInt32();
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(LocalID);
+            p.WriteUInt8(Key);
+            p.WriteUUID(ItemID);
+            p.WriteUUID(FolderID);
+            p.WriteUUID(CreatorID);
+            p.WriteUUID(OwnerID);
+            p.WriteUUID(GroupID);
+            p.WriteUInt32((uint)BaseMask);
+            p.WriteUInt32((uint)OwnerMask);
+            p.WriteUInt32((uint)GroupMask);
+            p.WriteUInt32((uint)EveryoneMask);
+            p.WriteUInt32((uint)NextOwnerMask);
+            p.WriteBoolean(IsGroupOwned);
+            p.WriteUUID(TransactionID);
+            p.WriteInt8((sbyte)AssetType);
+            p.WriteInt8((sbyte)InvType);
+            p.WriteUInt32((uint)Flags);
+            p.WriteUInt8((byte)SaleType);
+            p.WriteInt32(SalePrice);
+            p.WriteStringLen8(Name);
+            p.WriteStringLen8(Description);
+            p.WriteUInt32(CreationDate);
+            p.WriteUInt32(CRC);
         }
     }
 }

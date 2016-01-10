@@ -49,5 +49,23 @@ namespace SilverSim.Viewer.Messages.User
             m.VersionString = p.ReadStringLen8();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt8(ReportType);
+            p.WriteUInt8(Category);
+            p.WriteVector3f(Position);
+            p.WriteUInt8(CheckFlags);
+            p.WriteUUID(ScreenshotID);
+            p.WriteUUID(ObjectID);
+            p.WriteUUID(AbuserID);
+            p.WriteStringLen8(AbuseRegionName);
+            p.WriteUUID(AbuseRegionID);
+            p.WriteStringLen8(Summary);
+            p.WriteStringLen16(Details);
+            p.WriteStringLen8(VersionString);
+        }
     }
 }

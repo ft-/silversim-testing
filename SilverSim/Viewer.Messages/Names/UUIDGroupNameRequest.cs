@@ -30,5 +30,14 @@ namespace SilverSim.Viewer.Messages.Names
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUInt8((byte)UUIDNameBlock.Count);
+            foreach(UUID id in UUIDNameBlock)
+            {
+                p.WriteUUID(id);
+            }
+        }
     }
 }

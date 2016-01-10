@@ -35,5 +35,15 @@ namespace SilverSim.Viewer.Messages.MuteList
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(MuteID);
+            p.WriteStringLen8(MuteName);
+            p.WriteInt32(MuteType);
+            p.WriteUInt32(MuteFlags);
+        }
     }
 }

@@ -37,5 +37,15 @@ namespace SilverSim.Viewer.Messages.Script
             m.ButtonLabel = p.ReadStringLen8();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(ObjectID);
+            p.WriteInt32(ChatChannel);
+            p.WriteInt32(ButtonIndex);
+            p.WriteStringLen8(ButtonLabel);
+        }
     }
 }
