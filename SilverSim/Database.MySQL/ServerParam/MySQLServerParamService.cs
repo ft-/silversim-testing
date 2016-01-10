@@ -96,18 +96,6 @@ namespace SilverSim.Database.MySQL.ServerParam
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override string this[UUID regionID, string parameter, string defvalue]
-        {
-            get
-            {
-                string value;
-                return (TryGetValue(regionID, parameter, out value)) ?
-                    value :
-                    defvalue;
-            }
-        }
-
         public override bool TryGetValue(UUID regionID, string parameter, out string value)
         {
             RwLockedDictionary<string, string> regParams;
@@ -147,34 +135,20 @@ namespace SilverSim.Database.MySQL.ServerParam
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override string this[UUID regionID, string parameter]
+        protected override void Store(UUID regionID, string parameter, string value)
         {
-            get
+            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
-                string value;
-                if(!TryGetValue(regionID, parameter, out value))
+                connection.Open();
+                connection.InsideTransaction(delegate()
                 {
-                    throw new KeyNotFoundException("Key " + regionID.ToString() + ":" + parameter);
-                }
-                return value;
-            }
-
-            set
-            {
-                using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                {
-                    connection.Open();
-                    connection.InsideTransaction(delegate()
-                    {
-                        Dictionary<string, object> param = new Dictionary<string, object>();
-                        param["regionid"] = regionID;
-                        param["parametername"] = parameter;
-                        param["parametervalue"] = value;
-                        connection.ReplaceInto("serverparams", param);
-                        m_Cache[regionID][parameter] = value;
-                    });
-                }
+                    Dictionary<string, object> param = new Dictionary<string, object>();
+                    param["regionid"] = regionID;
+                    param["parametername"] = parameter;
+                    param["parametervalue"] = value;
+                    connection.ReplaceInto("serverparams", param);
+                    m_Cache[regionID][parameter] = value;
+                });
             }
         }
 

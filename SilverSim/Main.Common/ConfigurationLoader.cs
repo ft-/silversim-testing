@@ -52,6 +52,7 @@ namespace SilverSim.Main.Common
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public sealed class ConfigurationLoader
     {
+        #region Rsource Assets support
         [Description("Resource Asset Backend")]
         sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
         {
@@ -65,7 +66,9 @@ namespace SilverSim.Main.Common
 
             }
         }
+        #endregion
 
+        #region Exceptions
         [Serializable]
         public class TestingErrorException : Exception
         {
@@ -146,6 +149,7 @@ namespace SilverSim.Main.Common
 
             }
         }
+        #endregion
 
         ~ConfigurationLoader()
         {
@@ -160,6 +164,8 @@ namespace SilverSim.Main.Common
         static public readonly Dictionary<Type, string> FeaturesTable = new Dictionary<Type, string>();
         readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
         public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
+
+        #region Simulator Shutdown Handler
         readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
         int m_ShutdownInSeconds = -1;
         bool m_FirstShutdownNotice;
@@ -246,23 +252,9 @@ namespace SilverSim.Main.Common
                 SimulatorShutdownAbortDelegate();
             }
         }
+        #endregion
 
-        public void ShowIssuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
-        {
-            if(UUID.Zero != limitedToScene)
-            {
-                io.Write("show issues not allowed on limited console");
-            }
-            else if(args[0] == "help")
-            {
-                io.Write("show issues");
-            }
-            else
-            {
-                io.Write("Known Configuration Issues:\n" + string.Join("\n", KnownConfigurationIssues));
-            }
-        }
-
+        #region Helo Responder
         public void SetHeloResponseHeader(string key, string val)
         {
             m_HeloResponseHeaders[key] = val;
@@ -289,6 +281,7 @@ namespace SilverSim.Main.Common
                 }
             }
         }
+        #endregion
 
         static ConfigurationLoader()
         {
@@ -336,6 +329,7 @@ namespace SilverSim.Main.Common
             }
         }
 
+        #region Plugin Registry
         public void AddPlugin(string name, IPlugin plugin)
         {
             PluginInstances.Add("$" + name, plugin);
@@ -401,6 +395,7 @@ namespace SilverSim.Main.Common
                 return GetService<BaseHttpServer>("HttpsServer");
             }
         }
+        #endregion
 
         #region Configuration Loader Helpers
         private interface ICFG_Source
@@ -1241,6 +1236,66 @@ namespace SilverSim.Main.Common
             }
         }
 
+        public void Shutdown()
+        {
+            List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
+            List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
+            List<IPluginShutdown> shutdownLogoutDatabaseList = new List<IPluginShutdown>();
+            List<IPluginShutdown> shutdownAnyList = new List<IPluginShutdown>();
+
+            foreach(IPluginShutdown s in GetServices<IPluginShutdown>().Values)
+            {
+                switch(s.ShutdownOrder)
+                {
+                    case ShutdownOrder.Any: shutdownAnyList.Add(s); break;
+                    case ShutdownOrder.LogoutAgents: shutdownLogoutAgentsList.Add(s); break;
+                    case ShutdownOrder.LogoutRegion: shutdownLogoutRegionsList.Add(s); break;
+                    case ShutdownOrder.LogoutDatabase: shutdownLogoutDatabaseList.Add(s); break;
+                    default: break;
+                }
+            }
+
+            foreach (IPluginShutdown s in shutdownLogoutAgentsList)
+            {
+                s.Shutdown();
+            }
+
+            SceneManager.Scenes.RemoveAll();
+
+            foreach (IPluginShutdown s in shutdownLogoutRegionsList)
+            {
+                s.Shutdown();
+            }
+
+            foreach (IPluginShutdown s in shutdownAnyList)
+            {
+                s.Shutdown();
+            }
+
+            foreach(IPluginShutdown s in shutdownLogoutDatabaseList)
+            {
+                s.Shutdown();
+            }
+        }
+        #endregion
+
+        #region Common Commands
+        public void ShowIssuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (UUID.Zero != limitedToScene)
+            {
+                io.Write("show issues not allowed on limited console");
+            }
+            else if (args[0] == "help")
+            {
+                io.Write("show issues");
+            }
+            else
+            {
+                io.Write("Known Configuration Issues:\n" + string.Join("\n", KnownConfigurationIssues));
+            }
+        }
+
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         static void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
@@ -1307,27 +1362,27 @@ namespace SilverSim.Main.Common
             {
                 io.Write("set serverparam is not possible with limited console");
             }
-            else if(args.Count == 4)
+            else if (args.Count == 4)
             {
                 try
                 {
                     GetServerParamStorage()[UUID.Zero, args[2]] = args[3];
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     io.Write(e.Message);
                 }
             }
-            else if(args.Count == 5)
+            else if (args.Count == 5)
             {
                 UUID regionId;
-                if(!UUID.TryParse(args[2], out regionId))
+                if (!UUID.TryParse(args[2], out regionId))
                 {
                     io.Write("regionid is not a UUID");
                     return;
                 }
                 try
-                { 
+                {
                     GetServerParamStorage()[regionId, args[3]] = args[4];
                 }
                 catch (Exception e)
@@ -1339,32 +1394,32 @@ namespace SilverSim.Main.Common
 
         void ShowModulesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            if(args[0] == "help")
+            if (args[0] == "help")
             {
                 io.Write("Show currently loaded modules");
             }
             else
             {
                 string output = "Module List:\n----------------------------------------------";
-                foreach(KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
+                foreach (KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
                 {
                     DescriptionAttribute desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
 
                     string features = string.Empty;
-                    if(null != desc)
+                    if (null != desc)
                     {
                         features += "\n   Description: " + desc.Description;
                     }
-                    foreach(KeyValuePair<Type, string> kvp in FeaturesTable)
+                    foreach (KeyValuePair<Type, string> kvp in FeaturesTable)
                     {
-                        if(kvp.Key.IsInterface)
+                        if (kvp.Key.IsInterface)
                         {
-                            if(moduledesc.Value.GetType().GetInterfaces().Contains(kvp.Key))
+                            if (moduledesc.Value.GetType().GetInterfaces().Contains(kvp.Key))
                             {
                                 features += "\n  - " + kvp.Value;
                             }
                         }
-                        else if(kvp.Key.IsAssignableFrom(moduledesc.Value.GetType()))
+                        else if (kvp.Key.IsAssignableFrom(moduledesc.Value.GetType()))
                         {
                             features += "\n  - " + kvp.Value;
                         }
@@ -1378,55 +1433,13 @@ namespace SilverSim.Main.Common
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         static void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            if(args[0] == "help")
+            if (args[0] == "help")
             {
                 io.Write("Show current thread count");
             }
             else
             {
                 io.WriteFormatted("Threads: {0}", Process.GetCurrentProcess().Threads.Count);
-            }
-        }
-
-        public void Shutdown()
-        {
-            List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
-            List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
-            List<IPluginShutdown> shutdownLogoutDatabaseList = new List<IPluginShutdown>();
-            List<IPluginShutdown> shutdownAnyList = new List<IPluginShutdown>();
-
-            foreach(IPluginShutdown s in GetServices<IPluginShutdown>().Values)
-            {
-                switch(s.ShutdownOrder)
-                {
-                    case ShutdownOrder.Any: shutdownAnyList.Add(s); break;
-                    case ShutdownOrder.LogoutAgents: shutdownLogoutAgentsList.Add(s); break;
-                    case ShutdownOrder.LogoutRegion: shutdownLogoutRegionsList.Add(s); break;
-                    case ShutdownOrder.LogoutDatabase: shutdownLogoutDatabaseList.Add(s); break;
-                    default: break;
-                }
-            }
-
-            foreach (IPluginShutdown s in shutdownLogoutAgentsList)
-            {
-                s.Shutdown();
-            }
-
-            SceneManager.Scenes.RemoveAll();
-
-            foreach (IPluginShutdown s in shutdownLogoutRegionsList)
-            {
-                s.Shutdown();
-            }
-
-            foreach (IPluginShutdown s in shutdownAnyList)
-            {
-                s.Shutdown();
-            }
-
-            foreach(IPluginShutdown s in shutdownLogoutDatabaseList)
-            {
-                s.Shutdown();
             }
         }
         #endregion

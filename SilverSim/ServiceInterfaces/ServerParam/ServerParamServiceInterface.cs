@@ -1,7 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Threading;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -14,19 +16,38 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         {
 
         }
-
+        
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract string this[UUID regionID, string parameter, string defvalue]
+        public string this[UUID regionID, string parameter, string defvalue]
         {
-            get;
+            get
+            {
+                string value;
+                return (TryGetValue(regionID, parameter, out value)) ?
+                    value :
+                    defvalue;
+            }
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract string this[UUID regionID, string parameter]
+        public string this[UUID regionID, string parameter]
         {
-            get;
-            set;
+            get
+            {
+                string value;
+                if(!TryGetValue(regionID, parameter, out value))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return value;
+            }
+            set
+            {
+                Store(regionID, parameter, value);
+            }
         }
+
+        protected abstract void Store(UUID regionID, string parameter, string value);
 
         public abstract bool TryGetValue(UUID regionID, string parameter, out string value);
 
