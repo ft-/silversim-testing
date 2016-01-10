@@ -65,74 +65,81 @@ namespace SilverSim.Viewer.Core
                     continue;
                 }
 
-                switch(m.Number)
+                try
                 {
-                    case MessageType.ChangeInventoryItemFlags:
-                        FetchInventoryThread_ChangeInventoryItemFlags(m);
-                        break;
+                    switch (m.Number)
+                    {
+                        case MessageType.ChangeInventoryItemFlags:
+                            FetchInventoryThread_ChangeInventoryItemFlags(m);
+                            break;
 
-                    case MessageType.TransferRequest:
-                        FetchInventoryThread_TransferRequest(m);
-                        break;
+                        case MessageType.TransferRequest:
+                            FetchInventoryThread_TransferRequest(m);
+                            break;
 
-                    case MessageType.CopyInventoryItem:
-                        FetchInventoryThread_CopyInventoryItem(m);
-                        break;
+                        case MessageType.CopyInventoryItem:
+                            FetchInventoryThread_CopyInventoryItem(m);
+                            break;
 
-                    case MessageType.CreateInventoryItem:
-                        FetchInventoryThread_CreateInventoryItem((Messages.Inventory.CreateInventoryItem)m);
-                        break;
+                        case MessageType.CreateInventoryItem:
+                            FetchInventoryThread_CreateInventoryItem((Messages.Inventory.CreateInventoryItem)m);
+                            break;
 
-                    case MessageType.CreateInventoryFolder:
-                        FetchInventoryThread_CreateInventoryFolder(m);
-                        break;
+                        case MessageType.CreateInventoryFolder:
+                            FetchInventoryThread_CreateInventoryFolder(m);
+                            break;
 
-                    case MessageType.FetchInventory:
-                        FetchInventoryThread_FetchInventory(m);
-                        break;
+                        case MessageType.FetchInventory:
+                            FetchInventoryThread_FetchInventory(m);
+                            break;
 
-                    case MessageType.FetchInventoryDescendents:
-                        FetchInventoryThread_FetchInventoryDescendents(m);
-                        break;
+                        case MessageType.FetchInventoryDescendents:
+                            FetchInventoryThread_FetchInventoryDescendents(m);
+                            break;
 
-                    case MessageType.LinkInventoryItem:
-                        FetchInventoryThread_LinkInventoryItem(m);
-                        break;
+                        case MessageType.LinkInventoryItem:
+                            FetchInventoryThread_LinkInventoryItem(m);
+                            break;
 
-                    case MessageType.MoveInventoryFolder:
-                        FetchInventoryThread_MoveInventoryFolder(m);
-                        break;
+                        case MessageType.MoveInventoryFolder:
+                            FetchInventoryThread_MoveInventoryFolder(m);
+                            break;
 
-                    case MessageType.MoveInventoryItem:
-                        FetchInventoryThread_MoveInventoryItem(m);
-                        break;
+                        case MessageType.MoveInventoryItem:
+                            FetchInventoryThread_MoveInventoryItem(m);
+                            break;
 
-                    case MessageType.PurgeInventoryDescendents:
-                        FetchInventoryThread_PurgeInventoryDescendents(m);
-                        break;
+                        case MessageType.PurgeInventoryDescendents:
+                            FetchInventoryThread_PurgeInventoryDescendents(m);
+                            break;
 
-                    case MessageType.RemoveInventoryFolder:
-                        FetchInventoryThread_RemoveInventoryFolder(m);
-                        break;
+                        case MessageType.RemoveInventoryFolder:
+                            FetchInventoryThread_RemoveInventoryFolder(m);
+                            break;
 
-                    case MessageType.RemoveInventoryItem:
-                        FetchInventoryThread_RemoveInventoryItem(m);
-                        break;
+                        case MessageType.RemoveInventoryItem:
+                            FetchInventoryThread_RemoveInventoryItem(m);
+                            break;
 
-                    case MessageType.RemoveInventoryObjects:
-                        FetchInventoryThread_RemoveInventoryObjects(m);
-                        break;
+                        case MessageType.RemoveInventoryObjects:
+                            FetchInventoryThread_RemoveInventoryObjects(m);
+                            break;
 
-                    case MessageType.UpdateInventoryFolder:
-                        FetchInventoryThread_UpdateInventoryFolder(m);
-                        break;
+                        case MessageType.UpdateInventoryFolder:
+                            FetchInventoryThread_UpdateInventoryFolder(m);
+                            break;
 
-                    case MessageType.UpdateInventoryItem:
-                        FetchInventoryThread_UpdateInventoryItem(m);
-                        break;
+                        case MessageType.UpdateInventoryItem:
+                            FetchInventoryThread_UpdateInventoryItem(m);
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
+                }
+                catch(Exception e)
+                {
+                    m_Log.ErrorFormat("Encountered exception in inventory handling: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                 }
             }
         }
