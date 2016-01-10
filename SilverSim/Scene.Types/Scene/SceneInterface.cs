@@ -374,6 +374,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void AbortRegionRestart();
         public abstract void RequestRegionRestart(int seconds);
         public abstract void TriggerLightShareSettingsChanged();
+        public abstract void SendRegionInfoToAgent(IAgent agent);
 
         public void TriggerAgentChangedScene(IAgent agent)
         {

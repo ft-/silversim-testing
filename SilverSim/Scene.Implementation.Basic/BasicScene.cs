@@ -1336,6 +1336,15 @@ namespace SilverSim.Scene.Implementation.Basic
             return regionFlags;
         }
 
+        public override void SendRegionInfoToAgent(IAgent agent)
+        {
+            ViewerAgent vagent = agent as ViewerAgent;
+            if(null != vagent)
+            {
+                SendRegionInfo(vagent);
+            }
+        }
+
         protected void SendRegionInfo(ViewerAgent agent)
         {
             Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();

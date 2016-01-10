@@ -1461,6 +1461,7 @@ namespace SilverSim.Viewer.Core
                 scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
                 scene.Environment.UpdateWindDataToSingleClient(this);
                 scene.SendAgentObjectToAllAgents(this);
+                scene.SendRegionInfoToAgent(this);
                 ParcelInfo pinfo;
                 if(scene.Parcels.TryGetValue(GlobalPosition, out pinfo))
                 {
@@ -1510,18 +1511,17 @@ namespace SilverSim.Viewer.Core
                 Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
                 amc.AgentID = cam.AgentID;
                 amc.ChannelVersion = VersionInfo.SimulatorVersion;
-#warning TODO: extract from agent
-                amc.LookAt = new Vector3(1, 1, 0);
+                amc.LookAt = circuit.Agent.LookAt;
                 amc.Position = GlobalPosition;
                 amc.SessionID = cam.SessionID;
                 amc.GridPosition = circuit.Scene.GridPosition;
 
                 circuit.SendMessage(amc);
 
-                Messages.Agent.CoarseLocationUpdate clu = new Messages.Agent.CoarseLocationUpdate();
+                CoarseLocationUpdate clu = new CoarseLocationUpdate();
                 clu.You = 0;
                 clu.Prey = -1;
-                Messages.Agent.CoarseLocationUpdate.AgentDataEntry ad = new Messages.Agent.CoarseLocationUpdate.AgentDataEntry();
+                CoarseLocationUpdate.AgentDataEntry ad = new CoarseLocationUpdate.AgentDataEntry();
                 ad.X = (byte)(uint)GlobalPosition.X;
                 ad.Y = (byte)(uint)GlobalPosition.Y;
                 ad.Z = (byte)(uint)GlobalPosition.Z;
