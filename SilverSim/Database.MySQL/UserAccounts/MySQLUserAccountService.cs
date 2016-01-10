@@ -69,7 +69,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             new NamedKeyInfo("FirstName", "FirstName"),
             new NamedKeyInfo("LastName", "LastName"),
             new TableRevision(2),
-            new ChangeColumn<uint>("UserFlags") { IsNullAllowed = false, Default = 0 }
+            new ChangeColumn<uint>("UserFlags") { IsNullAllowed = false, Default = (uint)0 }
         };
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)
