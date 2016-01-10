@@ -185,6 +185,54 @@ namespace SilverSim.Viewer.Messages.Inventory
             }
         }
 
+        public static Message Decode(UDPPacket p)
+        {
+            BulkUpdateInventory m = new BulkUpdateInventory();
+            m.AgentID = p.ReadUUID();
+            m.TransactionID = p.ReadUUID();
+
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                FolderDataEntry e = new FolderDataEntry();
+                e.FolderID = p.ReadUUID();
+                e.ParentID = p.ReadUUID();
+                e.Type = (InventoryType)p.ReadInt8();
+                e.Name = p.ReadStringLen8();
+                m.FolderData.Add(e);
+            }
+
+            n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                ItemDataEntry e = new ItemDataEntry();
+                e.ItemID = p.ReadUUID();
+                e.CallbackID = p.ReadUInt32();
+                e.FolderID = p.ReadUUID();
+                e.CreatorID = p.ReadUUID();
+                e.OwnerID = p.ReadUUID();
+                e.GroupID = p.ReadUUID();
+                e.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
+                e.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+                e.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
+                e.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
+                e.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+                e.IsGroupOwned = p.ReadBoolean();
+                e.AssetID = p.ReadUUID();
+                e.Type = (AssetType)p.ReadInt8();
+                e.InvType = (InventoryType)p.ReadInt8();
+                e.Flags = (InventoryFlags)p.ReadUInt32();
+                e.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
+                e.SalePrice = p.ReadInt32();
+                e.Name = p.ReadStringLen8();
+                e.Description = p.ReadStringLen8();
+                e.CreationDate = p.ReadUInt32();
+                p.ReadUInt32(); /* checksum */
+                m.ItemData.Add(e);
+            }
+            return m;
+        }
+
         BinaryData EncodeU32ToBinary(uint val)
         {
             byte[] ret = BitConverter.GetBytes(val);

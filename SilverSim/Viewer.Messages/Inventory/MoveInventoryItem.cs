@@ -46,5 +46,19 @@ namespace SilverSim.Viewer.Messages.Inventory
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteBoolean(Stamp);
+            p.WriteUInt8((byte)InventoryData.Count);
+            foreach(InventoryDataEntry d in InventoryData)
+            {
+                p.WriteUUID(d.ItemID);
+                p.WriteUUID(d.FolderID);
+                p.WriteStringLen8(d.NewName);
+            }
+        }
     }
 }

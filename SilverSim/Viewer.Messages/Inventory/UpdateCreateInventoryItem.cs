@@ -156,5 +156,46 @@ namespace SilverSim.Viewer.Messages.Inventory
                 p.WriteUInt32(checksum);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            UpdateCreateInventoryItem m = new UpdateCreateInventoryItem();
+
+            m.AgentID = p.ReadUUID();
+            m.SimApproved = p.ReadBoolean();
+            m.TransactionID = p.ReadUUID();
+
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
+            {
+                ItemDataEntry d = new ItemDataEntry();
+                d.ItemID = p.ReadUUID();
+                d.FolderID = p.ReadUUID();
+                d.CallbackID = p.ReadUInt32();
+                d.CreatorID = p.ReadUUID();
+                d.OwnerID = p.ReadUUID();
+                d.GroupID = p.ReadUUID();
+                d.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
+                d.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+                d.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
+                d.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
+                d.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+                d.IsGroupOwned = p.ReadBoolean();
+                d.AssetID = p.ReadUUID();
+                d.Type = (AssetType)p.ReadInt8();
+                d.InvType = (InventoryType)p.ReadInt8();
+                d.Flags = (InventoryFlags)p.ReadUInt32();
+                d.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
+                d.SalePrice = p.ReadInt32();
+                d.Name = p.ReadStringLen8();
+                d.Description = p.ReadStringLen8();
+                d.CreationDate = p.ReadUInt32();
+                p.ReadUInt32(); /* checksum */
+
+                m.ItemData.Add(d);
+            }
+
+            return m;
+        }
     }
 }
