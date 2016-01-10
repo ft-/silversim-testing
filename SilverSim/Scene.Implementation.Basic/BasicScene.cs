@@ -1305,16 +1305,12 @@ namespace SilverSim.Scene.Implementation.Basic
 
             foreach (IAgent agent in Agents)
             {
-                ViewerAgent viewerAgent = agent as ViewerAgent;
-                if(null != viewerAgent)
-                {
-                    SendRegionInfo(viewerAgent);
+                SendRegionInfo(agent);
 
-                    ParcelInfo pInfo;
-                    if (Parcels.TryGetValue(viewerAgent.GlobalPosition, out pInfo))
-                    {
-                        viewerAgent.SendUpdatedParcelInfo(pInfo, ID);
-                    }
+                ParcelInfo pInfo;
+                if (Parcels.TryGetValue(agent.GlobalPosition, out pInfo))
+                {
+                    agent.SendUpdatedParcelInfo(pInfo, ID);
                 }
             }
             UpdateEnvironmentSettings();
@@ -1336,20 +1332,11 @@ namespace SilverSim.Scene.Implementation.Basic
             return regionFlags;
         }
 
-        public override void SendRegionInfoToAgent(IAgent agent)
-        {
-            ViewerAgent vagent = agent as ViewerAgent;
-            if(null != vagent)
-            {
-                SendRegionInfo(vagent);
-            }
-        }
-
-        protected void SendRegionInfo(ViewerAgent agent)
+        public override void SendRegionInfo(IAgent agent)
         {
             Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
             res.AgentID = agent.Owner.ID;
-            res.SessionID = agent.SessionID;
+            res.SessionID = agent.Session.SessionID;
 
             EstateInfo estateInfo;
             lock(m_EstateDataUpdateLock)

@@ -1461,7 +1461,7 @@ namespace SilverSim.Viewer.Core
                 scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
                 scene.Environment.UpdateWindDataToSingleClient(this);
                 scene.SendAgentObjectToAllAgents(this);
-                scene.SendRegionInfoToAgent(this);
+                scene.SendRegionInfo(this);
                 ParcelInfo pinfo;
                 if(scene.Parcels.TryGetValue(GlobalPosition, out pinfo))
                 {
