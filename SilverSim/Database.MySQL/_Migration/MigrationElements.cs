@@ -595,7 +595,6 @@ namespace SilverSim.Database.MySQL._Migration
         public string Sql(string tableName, Type formerType)
         {
             FormerFieldInfo oldField = new FormerFieldInfo(this, formerType);
-            string[] fieldNames = new string[] { Name };
             List<string> oldFields;
             Dictionary<string, string> newFields;
 
