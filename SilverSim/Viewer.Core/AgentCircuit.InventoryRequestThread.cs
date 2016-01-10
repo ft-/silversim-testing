@@ -75,9 +75,6 @@ namespace SilverSim.Viewer.Core
                         FetchInventoryThread_TransferRequest(m);
                         break;
 
-                    case MessageType.CopyInventoryFromNotecard:
-                        break;
-
                     case MessageType.CopyInventoryItem:
                         FetchInventoryThread_CopyInventoryItem(m);
                         break;
