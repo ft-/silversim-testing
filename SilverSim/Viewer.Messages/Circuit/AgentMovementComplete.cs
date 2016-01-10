@@ -26,7 +26,6 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteVector3f(Position);

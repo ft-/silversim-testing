@@ -77,7 +77,6 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt8((byte)LayerType);
             p.WriteUInt16((UInt16)Data.Length);
             p.WriteBytes(Data);

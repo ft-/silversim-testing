@@ -17,7 +17,6 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteBoolean(Frozen);
         }
     }

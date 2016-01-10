@@ -89,7 +89,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
             full_packet.IsReliable = true;
-            full_packet.WriteMessageType(MessageType.ObjectUpdate);
+            full_packet.WriteMessageNumber(MessageType.ObjectUpdate);
             full_packet.WriteUInt64(regionHandle);
             full_packet.WriteUInt16(65535); /* dilation */
             full_packet.WriteUInt8((byte)full_packet_data.Count);
@@ -385,7 +385,7 @@ namespace SilverSim.Viewer.Core
                                             break;
                                         }
                                         terse_packet.IsReliable = true;
-                                        terse_packet.WriteMessageType(MessageType.ImprovedTerseObjectUpdate);
+                                        terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
                                         terse_packet.WriteUInt64(regionHandle);
                                         terse_packet.WriteUInt16(65535); /* dilation */
                                         terse_packet.WriteUInt8(0);

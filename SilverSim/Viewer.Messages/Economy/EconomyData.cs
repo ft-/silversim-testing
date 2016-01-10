@@ -35,7 +35,6 @@ namespace SilverSim.Viewer.Messages.Economy
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteInt32(ObjectCapacity);
             p.WriteInt32(ObjectCount);
             p.WriteInt32(PriceEnergyUnit);

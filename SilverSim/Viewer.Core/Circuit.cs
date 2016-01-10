@@ -275,7 +275,7 @@ namespace SilverSim.Viewer.Core
                     pck.ReadUInt32();
 
                     UDPPacket newpck = new UDPPacket();
-                    newpck.WriteMessageType(MessageType.CompletePingCheck);
+                    newpck.WriteMessageNumber(MessageType.CompletePingCheck);
                     newpck.WriteUInt8(pingID);
                     newpck.SequenceNumber = NextSequenceNumber;
                     m_Server.SendPacketTo(newpck, ep);

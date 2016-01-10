@@ -32,7 +32,6 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt64(ID);
             p.WriteUInt32(Packet);
             p.WriteUInt16((ushort)Data.Length);

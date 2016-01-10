@@ -22,7 +22,6 @@ namespace SilverSim.Viewer.Messages.God
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt8(GodLevel);

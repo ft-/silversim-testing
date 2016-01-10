@@ -37,7 +37,6 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(MessageType.AssetUploadComplete);
             p.WriteUUID(AssetID);
             p.WriteInt8((sbyte)AssetType);
             p.WriteBoolean(Success);

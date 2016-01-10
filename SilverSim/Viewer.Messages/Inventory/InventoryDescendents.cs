@@ -64,7 +64,6 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(FolderID);
             p.WriteUUID(OwnerID);

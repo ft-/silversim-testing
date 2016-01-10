@@ -36,7 +36,6 @@ namespace SilverSim.Viewer.Messages.Map
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUInt32((uint)Flags);
             p.WriteUInt32((uint)ItemType);

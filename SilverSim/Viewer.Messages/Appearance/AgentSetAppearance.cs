@@ -51,6 +51,7 @@ namespace SilverSim.Viewer.Messages.Appearance
                 WearableDataEntry d = new WearableDataEntry();
                 d.CacheID = p.ReadUUID();
                 d.TextureIndex = p.ReadUInt8();
+                m.WearableData.Add(d);
             }
 
             c = p.ReadUInt16();
@@ -60,6 +61,27 @@ namespace SilverSim.Viewer.Messages.Appearance
             m.VisualParams = p.ReadBytes((int)c);
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(SerialNum);
+            p.WriteVector3f(Size);
+
+            p.WriteUInt8((byte)WearableData.Count);
+            foreach(WearableDataEntry d in WearableData)
+            {
+                p.WriteUUID(d.CacheID);
+                p.WriteUInt8((byte)d.TextureIndex);
+            }
+
+            p.WriteUInt16((ushort)ObjectData.Length);
+            p.WriteBytes(ObjectData);
+
+            p.WriteUInt8((byte)VisualParams.Length);
+            p.WriteBytes(VisualParams);
         }
     }
 }

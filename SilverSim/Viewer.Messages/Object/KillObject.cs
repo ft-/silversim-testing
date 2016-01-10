@@ -20,7 +20,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt8((byte)LocalIDs.Count);
             foreach (UInt32 i in LocalIDs)
             {

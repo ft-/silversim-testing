@@ -19,7 +19,6 @@ namespace SilverSim.Viewer.Messages.Camera
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(ObjectID);
         }
     }

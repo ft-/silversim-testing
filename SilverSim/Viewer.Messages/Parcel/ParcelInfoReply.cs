@@ -35,7 +35,6 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(ParcelID);
             p.WriteUUID(OwnerID);

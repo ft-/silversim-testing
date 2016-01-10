@@ -28,15 +28,14 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt64(GridPosition.RegionHandle);
             p.WriteBytes(SimIP.GetAddressBytes());
             p.WriteUInt16(SimPort);
         }
 
-        public override SilverSim.Types.IValue SerializeEQG()
+        public override IValue SerializeEQG()
         {
-            SilverSim.Types.Map i = new SilverSim.Types.Map();
+            Types.Map i = new Types.Map();
             i.Add("Handle", new BinaryData(GridPosition.AsBytes));
             i.Add("IP", new BinaryData(SimIP.GetAddressBytes()));
             i.Add("Port", SimPort);

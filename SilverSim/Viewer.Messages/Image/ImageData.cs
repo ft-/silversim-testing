@@ -24,7 +24,6 @@ namespace SilverSim.Viewer.Messages.Image
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(ID);
             p.WriteUInt8((byte)Codec);
             p.WriteUInt32(Size);

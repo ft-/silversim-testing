@@ -24,7 +24,6 @@ namespace SilverSim.Viewer.Messages.User
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(MessageType.KickUser);
             p.WriteUInt32(IpAddr);
             p.WriteUInt16(Port);
             p.WriteUUID(AgentID);

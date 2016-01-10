@@ -21,7 +21,6 @@ namespace SilverSim.Viewer.Messages.Common
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteStringLen8(ErrorMessage);
             p.WriteUUID(AgentID);
             p.WriteUUID(TransactionID);

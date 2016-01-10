@@ -304,6 +304,7 @@ namespace SilverSim.Viewer.Core
                                 UDPPacket p = new UDPPacket();
                                 p.OutQueue = m.OutQueue;
                                 p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
+                                p.WriteMessageNumber(m.Number);
                                 m.Serialize(p);
                                 p.Flush();
                                 p.IsReliable = m.IsReliable;
@@ -409,7 +410,7 @@ namespace SilverSim.Viewer.Core
                 {
                     lastPingTick = Environment.TickCount;
                     UDPPacket p = new UDPPacket();
-                    p.WriteMessageType(MessageType.StartPingCheck);
+                    p.WriteMessageNumber(MessageType.StartPingCheck);
                     p.WriteUInt8(pingID++);
                     m_PingSendTicks[pingID] = Environment.TickCount;
                     p.WriteUInt32(0);
@@ -425,7 +426,7 @@ namespace SilverSim.Viewer.Core
                     while (c > 0)
                     {
                         UDPPacket p = new UDPPacket();
-                        p.WriteMessageType(MessageType.PacketAck);
+                        p.WriteMessageNumber(MessageType.PacketAck);
                         if (c > 100)
                         {
                             p.WriteUInt8(100);

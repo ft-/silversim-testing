@@ -93,7 +93,6 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUUID(TransactionID);

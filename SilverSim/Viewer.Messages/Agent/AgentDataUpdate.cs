@@ -25,9 +25,21 @@ namespace SilverSim.Viewer.Messages.Agent
 
         }
 
+        public static Message Decode(UDPPacket p)
+        {
+            AgentDataUpdate m = new AgentDataUpdate();
+            m.AgentID = p.ReadUUID();
+            m.FirstName = p.ReadStringLen8();
+            m.LastName = p.ReadStringLen8();
+            m.GroupTitle = p.ReadStringLen8();
+            m.ActiveGroupID = p.ReadUUID();
+            m.GroupPowers = (GroupPowers)p.ReadUInt64();
+            m.GroupName = p.ReadStringLen8();
+            return m;
+        }
+
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteStringLen8(FirstName);
             p.WriteStringLen8(LastName);

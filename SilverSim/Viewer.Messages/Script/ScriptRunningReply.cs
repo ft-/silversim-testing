@@ -23,7 +23,6 @@ namespace SilverSim.Viewer.Messages.Script
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(ObjectID);
             p.WriteUUID(ItemID);
             p.WriteBoolean(IsRunning);

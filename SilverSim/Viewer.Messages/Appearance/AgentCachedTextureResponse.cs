@@ -4,8 +4,6 @@
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Viewer.Messages.Appearance
 {
@@ -41,7 +39,6 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt32(SerialNum);
@@ -53,6 +50,25 @@ namespace SilverSim.Viewer.Messages.Appearance
                 p.WriteUInt8(d.TextureIndex);
                 p.WriteStringLen8(d.HostName);
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AgentCachedTextureResponse m = new AgentCachedTextureResponse();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.SerialNum = p.ReadUInt32();
+
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                WearableDataEntry d = new WearableDataEntry();
+                d.TextureID = p.ReadUUID();
+                d.TextureIndex = p.ReadUInt8();
+                d.HostName = p.ReadStringLen8();
+            }
+
+            return m;
         }
     }
 }

@@ -48,7 +48,6 @@ namespace SilverSim.Viewer.Messages.Avatar
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(Sender);
             p.WriteUInt8((byte)AnimationList.Count);
             foreach (AnimationData d in AnimationList)

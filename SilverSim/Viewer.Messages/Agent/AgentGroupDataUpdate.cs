@@ -36,7 +36,6 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUInt8((byte)GroupData.Count);
             foreach(GroupDataEntry d in GroupData)
@@ -48,6 +47,25 @@ namespace SilverSim.Viewer.Messages.Agent
                 p.WriteInt32(d.Contribution);
                 p.WriteStringLen8(d.GroupName);
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AgentGroupDataUpdate m = new AgentGroupDataUpdate();
+            m.AgentID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                GroupDataEntry e = new GroupDataEntry();
+                e.GroupID = p.ReadUUID();
+                e.GroupPowers = (GroupPowers)p.ReadUInt64();
+                e.AcceptNotices = p.ReadBoolean();
+                e.GroupInsigniaID = p.ReadUUID();
+                e.Contribution = p.ReadInt32();
+                e.GroupName = p.ReadStringLen8();
+                m.GroupData.Add(e);
+            }
+            return m;
         }
 
         public override IValue SerializeEQG()

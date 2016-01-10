@@ -27,7 +27,6 @@ namespace SilverSim.Viewer.Messages.Script
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt8((byte)Data.Count);
             foreach(DataEntry d in Data)
             {

@@ -40,7 +40,6 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt64(ID);
             p.WriteStringLen8(Filename);
             p.WriteUInt8(FilePath);

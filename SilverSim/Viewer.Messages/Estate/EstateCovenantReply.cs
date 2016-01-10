@@ -23,7 +23,6 @@ namespace SilverSim.Viewer.Messages.Estate
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(CovenantID);
             p.WriteUInt32(CovenantTimestamp);
             p.WriteStringLen8(EstateName);

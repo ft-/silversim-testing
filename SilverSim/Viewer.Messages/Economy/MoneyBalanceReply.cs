@@ -33,7 +33,6 @@ namespace SilverSim.Viewer.Messages.Economy
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(TransactionID);
             p.WriteBoolean(TransactionSuccess);

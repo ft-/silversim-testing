@@ -62,7 +62,6 @@ namespace SilverSim.Viewer.Messages.Region
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt32((uint)RegionFlags);
             p.WriteUInt8((byte)SimAccess);
             p.WriteStringLen8(SimName);

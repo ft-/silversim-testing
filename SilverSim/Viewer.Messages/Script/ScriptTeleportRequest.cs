@@ -26,7 +26,6 @@ namespace SilverSim.Viewer.Messages.Script
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteStringLen8(ObjectName);
             p.WriteStringLen8(SimName);
             p.WriteVector3f(SimPosition);

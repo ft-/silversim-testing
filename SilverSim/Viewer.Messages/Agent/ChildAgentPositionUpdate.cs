@@ -48,7 +48,6 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(MessageType.ChildAgentPositionUpdate);
             p.WriteUInt64(RegionLocation.RegionHandle);
             p.WriteUInt32(ViewerCircuitCode);
             p.WriteUUID(AgentID);

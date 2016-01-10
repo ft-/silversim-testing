@@ -21,7 +21,6 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(QueryID);
             p.WriteUUID(AssetID);
             p.WriteBoolean(IsReadable);

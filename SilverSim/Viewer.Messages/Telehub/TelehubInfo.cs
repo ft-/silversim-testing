@@ -25,7 +25,6 @@ namespace SilverSim.Viewer.Messages.Telehub
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(MessageType.TelehubInfo);
             p.WriteUUID(ObjectID);
             p.WriteStringLen8(ObjectName);
             p.WriteVector3f(TelehubPos);

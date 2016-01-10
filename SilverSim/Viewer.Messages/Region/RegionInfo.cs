@@ -47,7 +47,6 @@ namespace SilverSim.Viewer.Messages.Region
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteStringLen8(SimName);

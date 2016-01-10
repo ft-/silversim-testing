@@ -31,7 +31,6 @@ namespace SilverSim.Viewer.Messages.Search
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
             p.WriteUInt8((byte)QueryReplies.Count);

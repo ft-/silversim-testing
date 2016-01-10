@@ -21,7 +21,6 @@ namespace SilverSim.Viewer.Messages.Sound
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(ObjectID);
             p.WriteUUID(OwnerID);
             p.WriteUUID(SoundID);

@@ -40,7 +40,6 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(GroupID);
             p.WriteUUID(TransactionID);

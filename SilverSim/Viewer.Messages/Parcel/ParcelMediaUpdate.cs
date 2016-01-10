@@ -27,7 +27,6 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteStringLen8(MediaURL);
             p.WriteUUID(MediaID);
             p.WriteBoolean(MediaAutoScale);

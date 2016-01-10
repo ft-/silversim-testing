@@ -19,7 +19,6 @@ namespace SilverSim.Viewer.Messages.MuteList
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
         }
     }

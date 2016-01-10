@@ -23,7 +23,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(ObjectID);
             p.WriteInt32(DefaultPayPrice);
             p.WriteUInt8((byte)ButtonData.Count);

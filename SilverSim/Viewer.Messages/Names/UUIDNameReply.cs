@@ -27,7 +27,6 @@ namespace SilverSim.Viewer.Messages.Names
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt8((byte)UUIDNameBlock.Count);
             foreach(Data d in UUIDNameBlock)
             {

@@ -32,7 +32,6 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteBytes(SimIP.GetAddressBytes());
@@ -43,17 +42,17 @@ namespace SilverSim.Viewer.Messages.Circuit
             p.WriteVector3f(LookAt);
         }
 
-        public override SilverSim.Types.IValue SerializeEQG()
+        public override IValue SerializeEQG()
         {
-            SilverSim.Types.Map i = new SilverSim.Types.Map();
+            Types.Map i = new Types.Map();
             i.Add("LookAt", LookAt);
             i.Add("Position", Position);
 
-            SilverSim.Types.Map a = new SilverSim.Types.Map();
+            Types.Map a = new Types.Map();
             a.Add("AgentID", AgentID);
             a.Add("SessionID", SessionID);
 
-            SilverSim.Types.Map r = new SilverSim.Types.Map();
+            Types.Map r = new Types.Map();
             r.Add("RegionHandle", new BinaryData(GridPosition.AsBytes));
             r.Add("SeedCapability", SeedCapability);
             r.Add("SimIP", new BinaryData(SimIP.GetAddressBytes()));
@@ -61,7 +60,7 @@ namespace SilverSim.Viewer.Messages.Circuit
             r.Add("RegionSizeX", RegionSize.X);
             r.Add("RegionSizeY", RegionSize.Y);
 
-            SilverSim.Types.Map m = new SilverSim.Types.Map();
+            Types.Map m = new Types.Map();
             m.Add("Info", i);
             m.Add("AgentData", a);
             m.Add("RegionData", r);

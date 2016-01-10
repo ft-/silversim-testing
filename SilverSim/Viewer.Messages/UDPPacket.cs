@@ -262,7 +262,7 @@ namespace SilverSim.Viewer.Messages
         public static UDPPacket PacketAckImmediate(UInt32 seqno)
         {
             UDPPacket p = new UDPPacket();
-            p.WriteMessageType(MessageType.PacketAck);
+            p.WriteMessageNumber(MessageType.PacketAck);
             p.WriteUInt8(1);
             p.WriteUInt32(seqno);
             return p;
@@ -1092,7 +1092,7 @@ namespace SilverSim.Viewer.Messages
             return mType;
         }
 
-        public void WriteMessageType(MessageType type)
+        public void WriteMessageNumber(MessageType type)
         {
             UInt32 t = (UInt32)type;
             if (t < 256)

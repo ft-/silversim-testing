@@ -20,7 +20,6 @@ namespace SilverSim.Viewer.Messages.Friend
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt8((byte)AgentIDs.Count);
             foreach(UUID id in AgentIDs)
             {

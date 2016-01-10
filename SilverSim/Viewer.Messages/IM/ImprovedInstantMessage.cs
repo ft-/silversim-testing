@@ -81,7 +81,6 @@ namespace SilverSim.Viewer.Messages.IM
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteBoolean(FromGroup);

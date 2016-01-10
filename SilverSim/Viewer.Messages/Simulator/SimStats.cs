@@ -83,7 +83,6 @@ namespace SilverSim.Viewer.Messages.Simulator
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt32(RegionX);
             p.WriteUInt32(RegionY);
             p.WriteUInt32(RegionFlags);

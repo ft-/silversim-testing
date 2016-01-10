@@ -27,7 +27,6 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(AvatarID);
             p.WriteUInt32(WantToMask);

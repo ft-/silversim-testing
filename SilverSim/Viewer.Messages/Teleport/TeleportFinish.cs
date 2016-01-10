@@ -33,7 +33,6 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUInt32(LocationID);
             p.WriteBytes(SimIP.GetAddressBytes());
@@ -44,9 +43,9 @@ namespace SilverSim.Viewer.Messages.Teleport
             p.WriteUInt32((UInt32)TeleportFlags);
         }
 
-        public override SilverSim.Types.IValue SerializeEQG()
+        public override IValue SerializeEQG()
         {
-            SilverSim.Types.Map m = new SilverSim.Types.Map();
+            Types.Map m = new Types.Map();
             m.Add("AgentID", AgentID);
             m.Add("LocationID", LocationID);
             m.Add("RegionHandle", new BinaryData(GridPosition.AsBytes));

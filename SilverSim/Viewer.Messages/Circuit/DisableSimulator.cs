@@ -16,12 +16,12 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
+            /* no data to serialize */
         }
 
-        public override SilverSim.Types.IValue SerializeEQG()
+        public override Types.IValue SerializeEQG()
         {
-            SilverSim.Types.Map m = new SilverSim.Types.Map();
+            Types.Map m = new Types.Map();
 
             return m;
         }

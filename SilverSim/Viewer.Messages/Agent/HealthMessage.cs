@@ -17,8 +17,14 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteFloat((float)Health);
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            HealthMessage m = new HealthMessage();
+            m.Health = p.ReadFloat();
+            return m;
         }
     }
 }

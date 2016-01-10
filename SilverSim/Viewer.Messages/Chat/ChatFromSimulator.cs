@@ -26,7 +26,6 @@ namespace SilverSim.Viewer.Messages.Chat
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteStringLen8(FromName);
             p.WriteUUID(SourceID);
             p.WriteUUID(OwnerID);

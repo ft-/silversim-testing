@@ -47,5 +47,18 @@ namespace SilverSim.Viewer.Messages.Appearance
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteInt32(SerialNum);
+            p.WriteUInt8((byte)WearableData.Count);
+            foreach(WearableDataEntry d in WearableData)
+            {
+                p.WriteUUID(d.ID);
+                p.WriteUInt8(d.TextureIndex);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Asset.Format;
 using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Appearance
@@ -17,7 +18,7 @@ namespace SilverSim.Viewer.Messages.Appearance
         public struct WearableDataEntry
         {
             public UUID ItemID;
-            public SilverSim.Types.Asset.Format.WearableType WearableType;
+            public WearableType WearableType;
         }
 
         public List<WearableDataEntry> WearableData = new List<WearableDataEntry>();
@@ -38,11 +39,23 @@ namespace SilverSim.Viewer.Messages.Appearance
             {
                 WearableDataEntry d = new WearableDataEntry();
                 d.ItemID = p.ReadUUID();
-                d.WearableType = (SilverSim.Types.Asset.Format.WearableType)p.ReadUInt8();
+                d.WearableType = (WearableType)p.ReadUInt8();
                 m.WearableData.Add(d);
             }
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt8((byte)WearableData.Count);
+            foreach(WearableDataEntry d in WearableData)
+            {
+                p.WriteUUID(d.ItemID);
+                p.WriteUInt8((byte)d.WearableType);
+            }
         }
     }
 }

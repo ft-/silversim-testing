@@ -23,7 +23,6 @@ namespace SilverSim.Viewer.Messages.TaskInventory
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(TaskID);
             p.WriteInt16(Serial);
             p.WriteStringLen8(Filename);
@@ -46,7 +45,6 @@ namespace SilverSim.Viewer.Messages.TaskInventory
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(TaskID);
             p.WriteInt16(Serial);
             p.WriteUInt8(0);

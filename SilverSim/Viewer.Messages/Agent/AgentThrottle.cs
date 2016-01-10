@@ -23,6 +23,16 @@ namespace SilverSim.Viewer.Messages.Agent
 
         }
 
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(CircuitCode);
+            p.WriteUInt32(GenCounter);
+            p.WriteUInt8((byte)Throttles.Length);
+            p.WriteBytes(Throttles);
+        }
+
         public static Message Decode(UDPPacket p)
         {
             AgentThrottle m = new AgentThrottle();

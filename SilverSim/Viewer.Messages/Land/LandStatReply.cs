@@ -35,7 +35,6 @@ namespace SilverSim.Viewer.Messages.Land
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt32(ReportType);
             p.WriteUInt32(RequestFlags);
             p.WriteUInt32(TotalObjectCount);

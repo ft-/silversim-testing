@@ -29,7 +29,6 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(TargetID);
             p.WriteUInt8((byte)Data.Count);

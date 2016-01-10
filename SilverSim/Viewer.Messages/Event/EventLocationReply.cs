@@ -22,7 +22,6 @@ namespace SilverSim.Viewer.Messages.Event
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(QueryID);
             p.WriteBoolean(Success);
             p.WriteUUID(RegionID);

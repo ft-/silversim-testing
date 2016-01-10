@@ -20,7 +20,6 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt32((UInt32)TeleportFlags);
         }
     }

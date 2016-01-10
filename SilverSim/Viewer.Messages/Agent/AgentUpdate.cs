@@ -45,5 +45,21 @@ namespace SilverSim.Viewer.Messages.Agent
             m.Flags = p.ReadUInt8();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteLLQuaternion(BodyRotation);
+            p.WriteLLQuaternion(HeadRotation);
+            p.WriteUInt8((byte)State);
+            p.WriteVector3f(CameraCenter);
+            p.WriteVector3f(CameraAtAxis);
+            p.WriteVector3f(CameraLeftAxis);
+            p.WriteVector3f(CameraUpAxis);
+            p.WriteFloat((float)Far);
+            p.WriteUInt32((uint)ControlFlags);
+            p.WriteUInt8((byte)Flags);
+        }
     }
 }

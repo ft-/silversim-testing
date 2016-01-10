@@ -25,7 +25,6 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(TransferID);
             p.WriteInt32(ChannelType);
             p.WriteInt32(TargetType);

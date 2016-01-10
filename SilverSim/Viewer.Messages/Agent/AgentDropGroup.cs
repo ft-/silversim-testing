@@ -20,9 +20,16 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(GroupID);
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AgentDropGroup m = new AgentDropGroup();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            return m;
         }
     }
 }

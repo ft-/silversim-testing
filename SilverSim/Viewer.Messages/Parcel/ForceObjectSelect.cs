@@ -45,7 +45,6 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteBoolean(ResetList);
             p.WriteUInt8((byte)LocalIDs.Count);
             foreach (UUID d in LocalIDs)

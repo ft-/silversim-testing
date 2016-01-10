@@ -24,7 +24,6 @@ namespace SilverSim.Viewer.Messages.Script
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(TaskID);
             p.WriteUUID(ItemID);
             p.WriteStringLen8(ObjectName);

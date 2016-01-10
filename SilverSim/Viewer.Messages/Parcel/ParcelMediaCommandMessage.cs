@@ -21,7 +21,6 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt32(Flags);
             p.WriteUInt32(Command);
             p.WriteFloat((float)Time);

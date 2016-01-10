@@ -24,7 +24,6 @@ namespace SilverSim.Viewer.Messages.Region
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt64(UsecSinceStart);
             p.WriteUInt32(SecPerDay);
             p.WriteUInt32(SecPerYear);

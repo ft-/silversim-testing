@@ -29,7 +29,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUInt64(RegionHandle);
             p.WriteUInt16(TimeDilation);
             p.WriteUInt8((byte)ObjectData.Count);

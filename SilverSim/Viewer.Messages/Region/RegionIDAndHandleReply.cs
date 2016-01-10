@@ -20,7 +20,6 @@ namespace SilverSim.Viewer.Messages.Region
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(RegionID);
             p.WriteUInt64(RegionPosition.RegionHandle);
         }

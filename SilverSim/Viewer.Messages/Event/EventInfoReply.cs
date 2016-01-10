@@ -33,7 +33,6 @@ namespace SilverSim.Viewer.Messages.Event
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUInt32(EventID);
             p.WriteStringLen8(Creator);

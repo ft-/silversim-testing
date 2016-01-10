@@ -37,7 +37,6 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(Sender);
             p.WriteBoolean(IsTrial);
             p.WriteUInt16((UInt16)TextureEntry.Length);

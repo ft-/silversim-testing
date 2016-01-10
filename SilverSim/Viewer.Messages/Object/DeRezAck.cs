@@ -20,7 +20,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteUUID(TransactionID);
             p.WriteBoolean(Success);
         }

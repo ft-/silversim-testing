@@ -21,7 +21,6 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteMessageType(Number);
             p.WriteInt32(SequenceID);
             p.WriteUInt16((UInt16)Data.Length);
             p.WriteBytes(Data);
