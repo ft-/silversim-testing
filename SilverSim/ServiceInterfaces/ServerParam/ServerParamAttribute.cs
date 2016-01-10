@@ -5,7 +5,7 @@ using System;
 
 namespace SilverSim.ServiceInterfaces.ServerParam
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     [Serializable]
     public class ServerParamAttribute : Attribute
     {
