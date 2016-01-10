@@ -664,7 +664,6 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartSql, connection))
             {
-                Vector3 v;
                 cmd.Parameters.AddParameter("?v_ID", objpart.ID);
                 cmd.Parameters.AddParameter("?v_LinkNumber", objpart.LinkNumber);
                 cmd.Parameters.AddParameter("?v_RootPartID", objpart.ObjectGroup.RootPart.ID);
