@@ -12,6 +12,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
 {
     public abstract class ServerParamServiceInterface
     {
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamListener>> ServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamListener>>(delegate() { return new RwLockedList<IServerParamListener>(); });
         public ServerParamServiceInterface()
         {
 
@@ -29,6 +30,8 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             }
         }
 
+        readonly object m_UpdateSequenceLock = new object();
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public string this[UUID regionID, string parameter]
         {
@@ -43,7 +46,18 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             }
             set
             {
-                Store(regionID, parameter, value);
+                lock(m_UpdateSequenceLock)
+                {
+                    Store(regionID, parameter, value);
+                    RwLockedList<IServerParamListener> listenerList;
+                    if (ServerParamListeners.TryGetValue(parameter, out listenerList))
+                    {
+                        foreach (IServerParamListener listener in listenerList)
+                        {
+                            listener.TriggerParameterUpdated(regionID, parameter, value);
+                        }
+                    }
+                }
             }
         }
 
