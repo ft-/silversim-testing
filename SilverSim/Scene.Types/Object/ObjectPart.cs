@@ -171,7 +171,6 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-
         public void GetBoundingBox(out BoundingBox box)
         {
             box = new BoundingBox();
@@ -1357,9 +1356,16 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case ObjectDetailsType.ScriptMemory:
+                    case ObjectDetailsType.CharacterTime:
+                    case ObjectDetailsType.PathfindingType:
+                    case ObjectDetailsType.RenderWeight:
+                    case ObjectDetailsType.HoverHeight:
                         paramList.Add(0);
                         break;
 
+                    case ObjectDetailsType.ServerCost:
+                    case ObjectDetailsType.StreamingCost:
+                    case ObjectDetailsType.PhysicsCost:
                     case ObjectDetailsType.ScriptTime:
                         paramList.Add(0f);
                         break;
@@ -1368,32 +1374,12 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(ObjectGroup.Count);
                         break;
 
-                    case ObjectDetailsType.ServerCost:
-                        paramList.Add(0f);
-                        break;
-
-                    case ObjectDetailsType.StreamingCost:
-                        paramList.Add(0f);
-                        break;
-
-                    case ObjectDetailsType.PhysicsCost:
-                        paramList.Add(0f);
-                        break;
-
-                    case ObjectDetailsType.CharacterTime:
-                        paramList.Add(0);
-                        break;
-
                     case ObjectDetailsType.Root:
                         paramList.Add(ObjectGroup.ID);
                         break;
 
                     case ObjectDetailsType.AttachedPoint:
                         paramList.Add((int)ObjectGroup.AttachPoint);
-                        break;
-
-                    case ObjectDetailsType.PathfindingType:
-                        paramList.Add(0);
                         break;
 
                     case ObjectDetailsType.Physics:
@@ -1408,18 +1394,6 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(ObjectGroup.IsTempOnRez);
                         break;
 
-                    case ObjectDetailsType.RenderWeight:
-                        paramList.Add(0);
-                        break;
-
-                    case ObjectDetailsType.HoverHeight:
-                        paramList.Add(0);
-                        break;
-
-                    case ObjectDetailsType.BodyShapeType:
-                        paramList.Add(-1f);
-                        break;
-
                     case ObjectDetailsType.LastOwner:
                         paramList.Add(ObjectGroup.LastOwner.ID);
                         break;
@@ -1432,6 +1406,7 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(AngularVelocity);
                         break;
 
+                    case ObjectDetailsType.BodyShapeType:
                     default:
                         paramList.Add(-1);
                         break;
