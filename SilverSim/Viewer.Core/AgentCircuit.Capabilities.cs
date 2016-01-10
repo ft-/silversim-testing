@@ -302,6 +302,10 @@ namespace SilverSim.Viewer.Core
             {
                 return new DispatchRegionInfo(agent, Server.Scene);
             }, capConfig);
+            AddDefCapabilityFactory("CopyInventoryFromNotecard", regionSeedID, delegate (ViewerAgent agent)
+            {
+                return new CopyInventoryFromNotecard(agent, Server.Scene);
+            }, capConfig);
             AddDefCapabilityFactory("ParcelPropertiesUpdate", regionSeedID, delegate (ViewerAgent agent)
             {
                 return new ParcelPropertiesUpdate(agent, Server.Scene);

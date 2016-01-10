@@ -14,6 +14,7 @@ namespace SilverSim.Main.Common.Transfer
         readonly AssetServiceInterface m_DestinationAssetService;
         readonly AssetServiceInterface m_SourceAssetService;
         protected UUID m_AssetID { get; private set; }
+        private List<UUID> m_AssetIDList;
 
         public enum ReferenceSource
         {
@@ -29,16 +30,25 @@ namespace SilverSim.Main.Common.Transfer
             m_SourceAssetService = source;
             m_AssetID = assetid;
             m_RefSource = refsource;
+            m_AssetIDList = new List<UUID>();
+            m_AssetIDList.Add(assetid);
+        }
+
+        protected AssetTransferWorkItem(AssetServiceInterface dest, AssetServiceInterface source, List<UUID> assetids, ReferenceSource refsource)
+        {
+            m_DestinationAssetService = dest;
+            m_SourceAssetService = source;
+            m_AssetID = UUID.Zero;
+            m_RefSource = refsource;
+            m_AssetIDList = new List<UUID>(assetids);
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void ProcessAssetTransfer()
         {
-            List<UUID> new_assetids = new List<UUID>();;
+            List<UUID> new_assetids = m_AssetIDList;
             List<UUID> current_assetids;
             List<UUID> processed_assetids = new List<UUID>();
-
-            new_assetids.Add(m_AssetID);
 
             try
             {
