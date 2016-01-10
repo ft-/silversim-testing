@@ -11,14 +11,14 @@ namespace SilverSim.Database.MySQL.Estate
         public static EstateInfo ToEstateInfo(this MySqlDataReader reader)
         {
             EstateInfo ei = new EstateInfo();
-            ei.ID = (uint)reader["ID"];
-            ei.Name = (string)reader["Name"];
+            ei.ID = reader.GetUInt32("ID");
+            ei.Name = reader.GetString("Name");
             ei.Owner = reader.GetUUI("Owner");
-            ei.Flags = (RegionOptionFlags)(uint)reader["Flags"];
-            ei.PricePerMeter = (int)reader["PricePerMeter"];
-            ei.BillableFactor = (double)reader["BillableFactor"];
-            ei.SunPosition = (double)reader["SunPosition"];
-            ei.AbuseEmail = (string)reader["AbuseEmail"];
+            ei.Flags = reader.GetEnum<RegionOptionFlags>("Flags");
+            ei.PricePerMeter = reader.GetInt32("PricePerMeter");
+            ei.BillableFactor = reader.GetDouble("BillableFactor");
+            ei.SunPosition = reader.GetDouble("SunPosition");
+            ei.AbuseEmail = reader.GetString("AbuseEmail");
             ei.CovenantID = reader.GetUUID("CovenantID");
             ei.CovenantTimestamp = reader.GetDate("CovenantTimestamp");
             ei.UseGlobalTime = reader.GetBool("UseGlobalTime");

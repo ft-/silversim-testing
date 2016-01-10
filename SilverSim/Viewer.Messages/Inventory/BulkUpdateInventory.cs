@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             public UUID AssetID;
             public AssetType Type;
             public InventoryType InvType;
-            public UInt32 Flags;
+            public InventoryFlags Flags;
             public InventoryItem.SaleInfoData.SaleType SaleType;
             public Int32 SalePrice;
             public string Name;
@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                     checksum += (uint)EveryoneMask;
                     checksum += (uint)GroupMask;
 
-                    checksum += Flags; // Flags
+                    checksum += (uint)Flags; // Flags
                     checksum += (uint)InvType; // InvType
                     checksum += (uint)Type; // Type 
                     checksum += CreationDate; // CreationDate
@@ -176,7 +176,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                 p.WriteUUID(d.AssetID);
                 p.WriteInt8((sbyte)d.Type);
                 p.WriteInt8((sbyte)d.InvType);
-                p.WriteUInt32(d.Flags);
+                p.WriteUInt32((uint)d.Flags);
                 p.WriteUInt8((byte)d.SaleType);
                 p.WriteInt32(d.SalePrice);
                 p.WriteStringLen8(d.Name);
@@ -240,7 +240,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                 itemData.Add("AssetID", item.AssetID);
                 itemData.Add("Type", (int)item.Type);
                 itemData.Add("InvType", (int)item.InvType);
-                itemData.Add("Flags", EncodeU32ToBinary(item.Flags));
+                itemData.Add("Flags", EncodeU32ToBinary((uint)item.Flags));
                 itemData.Add("SaleType", (int)item.SaleType);
                 itemData.Add("SalePrice", item.SalePrice);
                 itemData.Add("Name", item.Name);

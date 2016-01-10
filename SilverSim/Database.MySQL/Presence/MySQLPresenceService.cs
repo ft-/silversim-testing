@@ -81,7 +81,7 @@ namespace SilverSim.Database.MySQL.Presence
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM presence WHERE UserID LIKE ?userID", conn))
                     {
-                        cmd.Parameters.AddWithValue("?userID", userID.ToString());
+                        cmd.Parameters.AddParameter("?userID", userID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             PresenceInfo pi = new PresenceInfo();
@@ -129,7 +129,7 @@ namespace SilverSim.Database.MySQL.Presence
                         conn.Open();
                         using(MySqlCommand cmd = new MySqlCommand("DELETE FROM presence WHERE SessionID LIKE ?sessionID", conn))
                         {
-                            cmd.Parameters.AddWithValue("?sessionID", sessionID.ToString());
+                            cmd.Parameters.AddParameter("?sessionID", sessionID);
                             if(cmd.ExecuteNonQuery() < 1)
                             {
                                 throw new PresenceUpdateFailedException();
@@ -140,11 +140,11 @@ namespace SilverSim.Database.MySQL.Presence
                 else if (reportType == SetType.Login)
                 {
                     Dictionary<string, object> post = new Dictionary<string, object>();
-                    post["UserID"] = value.UserID.ToString();
-                    post["SessionID"] = value.SessionID.ToString();
-                    post["SecureSessionID"] = value.SecureSessionID.ToString();
-                    post["RegionID"] = UUID.Zero.ToString();
-                    post["LastSeen"] = Date.GetUnixTime().ToString();
+                    post["UserID"] = value.UserID;
+                    post["SessionID"] = value.SessionID;
+                    post["SecureSessionID"] = value.SecureSessionID;
+                    post["RegionID"] = UUID.Zero;
+                    post["LastSeen"] = Date.Now;
 
                     using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
@@ -166,8 +166,8 @@ namespace SilverSim.Database.MySQL.Presence
                         conn.Open();
                         using (MySqlCommand cmd = new MySqlCommand("UPDATE presence SET RegionID = ?regionID WHERE SessionID LIKE ?sessionID", conn))
                         {
-                            cmd.Parameters.AddWithValue("?regionID", value.RegionID.ToString());
-                            cmd.Parameters.AddWithValue("?sessionID", value.SessionID.ToString());
+                            cmd.Parameters.AddParameter("?regionID", value.RegionID);
+                            cmd.Parameters.AddParameter("?sessionID", value.SessionID);
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -186,6 +186,7 @@ namespace SilverSim.Database.MySQL.Presence
                 connection.Open();
                 using(MySqlCommand cmd = new MySqlCommand("DELETE FROM presence WHERE RegionID LIKE ?regionid", connection))
                 {
+                    cmd.Parameters.AddParameter("?regionid", regionID);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -199,7 +200,7 @@ namespace SilverSim.Database.MySQL.Presence
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM presence WHERE UserID LIKE ?userid", conn))
                 {
-                    cmd.Parameters.AddWithValue("?userid", userAccount.ToString());
+                    cmd.Parameters.AddParameter("?userid", userAccount);
                     cmd.ExecuteNonQuery();
                 }
             }

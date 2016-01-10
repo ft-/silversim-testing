@@ -12,7 +12,7 @@ namespace SilverSim.Types.Account
         public string Email = string.Empty;
         public Date Created = new Date();
         public int UserLevel = -1;
-        public int UserFlags;
+        public uint UserFlags;
         public string UserTitle = string.Empty;
         public bool IsLocalToGrid;
         public Dictionary<string, string> ServiceURLs = new Dictionary<string,string>(); /* only valid when IsLocalToGrid is set to false */

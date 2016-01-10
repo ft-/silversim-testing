@@ -29,7 +29,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using(MySqlCommand cmd = new MySqlCommand("SELECT pickuuid, `name` FROM userpicks WHERE creatoruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
+                        cmd.Parameters.AddParameter("?uuid", user.ID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -49,7 +49,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT pickuuid FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        cmd.Parameters.AddParameter("?uuid", id);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -70,7 +70,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        cmd.Parameters.AddParameter("?uuid", id);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -143,7 +143,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM userpicks WHERE pickuuid LIKE ?pickuuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?pickuuid", id);
+                        cmd.Parameters.AddParameter("?pickuuid", id);
                         if (1 > cmd.ExecuteNonQuery())
                         {
                             throw new InvalidOperationException();

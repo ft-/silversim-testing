@@ -29,7 +29,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid, `name` FROM classifieds WHERE creatoruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
+                        cmd.Parameters.AddParameter("?uuid", user.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -50,7 +50,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        cmd.Parameters.AddParameter("?uuid", id);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        cmd.Parameters.AddParameter("?uuid", id);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -145,7 +145,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM classifieds WHERE classifieduuid LIKE ?classifieduuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?classifieduuid", id.ToString());
+                        cmd.Parameters.AddParameter("?classifieduuid", id);
                         if (1 > cmd.ExecuteNonQuery())
                         {
                             throw new InvalidOperationException();

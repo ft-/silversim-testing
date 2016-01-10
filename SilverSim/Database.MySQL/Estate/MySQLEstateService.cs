@@ -154,7 +154,7 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", estateID);
+                    cmd.Parameters.AddParameter("?id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -176,7 +176,7 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE Name LIKE ?name", conn))
                 {
-                    cmd.Parameters.AddWithValue("?name", estateName);
+                    cmd.Parameters.AddParameter("?name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -198,7 +198,7 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM estates WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", estateID);
+                    cmd.Parameters.AddParameter("?id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -219,7 +219,7 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM estates WHERE Name LIKE ?name", conn))
                 {
-                    cmd.Parameters.AddWithValue("?name", estateName);
+                    cmd.Parameters.AddParameter("?name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -238,15 +238,15 @@ namespace SilverSim.Database.MySQL.Estate
             Dictionary<string, object> dict = new Dictionary<string, object>();
             dict["ID"] = estateInfo.ID;
             dict["Name"] = estateInfo.Name;
-            dict["Owner"] = estateInfo.Owner.ToString();
-            dict["Flags"] = (uint)estateInfo.Flags;
+            dict["Owner"] = estateInfo.Owner;
+            dict["Flags"] = estateInfo.Flags;
             dict["PricePerMeter"] = estateInfo.PricePerMeter;
             dict["BillableFactor"] = estateInfo.BillableFactor;
             dict["SunPosition"] = estateInfo.SunPosition;
             dict["AbuseEmail"] = estateInfo.AbuseEmail;
-            dict["CovenantID"] = estateInfo.CovenantID.ToString();
-            dict["CovenantTimestamp"] = estateInfo.CovenantTimestamp.DateTimeToUnixTime();
-            dict["UseGlobalTime"] = estateInfo.UseGlobalTime ? 1 : 0;
+            dict["CovenantID"] = estateInfo.CovenantID;
+            dict["CovenantTimestamp"] = estateInfo.CovenantTimestamp;
+            dict["UseGlobalTime"] = estateInfo.UseGlobalTime;
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
@@ -263,7 +263,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", estateID);
+                        cmd.Parameters.AddParameter("?id", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())
@@ -282,15 +282,15 @@ namespace SilverSim.Database.MySQL.Estate
                     Dictionary<string, object> dict = new Dictionary<string, object>();
                     dict["ID"] = value.ID;
                     dict["Name"] = value.Name;
-                    dict["Owner"] = value.Owner.ToString();
+                    dict["Owner"] = value.Owner;
                     dict["Flags"] = (uint)value.Flags;
                     dict["PricePerMeter"] = value.PricePerMeter;
                     dict["BillableFactor"] = value.BillableFactor;
                     dict["SunPosition"] = value.SunPosition;
                     dict["AbuseEmail"] = value.AbuseEmail;
-                    dict["CovenantID"] = value.CovenantID.ToString();
-                    dict["CovenantTimestamp"] = value.CovenantTimestamp.DateTimeToUnixTime();
-                    dict["UseGlobalTime"] = value.UseGlobalTime ? 1 : 0;
+                    dict["CovenantID"] = value.CovenantID;
+                    dict["CovenantTimestamp"] = value.CovenantTimestamp;
+                    dict["UseGlobalTime"] = value.UseGlobalTime;
                     using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
@@ -304,7 +304,7 @@ namespace SilverSim.Database.MySQL.Estate
                         conn.Open();
                         using(MySqlCommand cmd = new MySqlCommand("DELETE FROM estates WHERE ID LIKE ?id", conn))
                         {
-                            cmd.Parameters.AddWithValue("?id", estateID);
+                            cmd.Parameters.AddParameter("?id", estateID);
                             if(cmd.ExecuteNonQuery() < 1)
                             {
                                 throw new EstateUpdateFailedException();
@@ -354,7 +354,7 @@ namespace SilverSim.Database.MySQL.Estate
                         {
                             while (reader.Read())
                             {
-                                list.Add((uint)reader["ID"]);
+                                list.Add(reader.GetUInt32("ID"));
                             }
                         }
                     }

@@ -19,12 +19,12 @@ namespace SilverSim.Viewer.Core
             writer.WriteKeyValuePair("asset_id", item.AssetID);
             writer.WriteKeyValuePair("created_at", (uint)item.CreationDate.DateTimeToUnixTime());
             writer.WriteKeyValuePair("desc", item.Description);
-            writer.WriteKeyValuePair("flags", item.Flags);
+            writer.WriteKeyValuePair("flags", (uint)item.Flags);
             writer.WriteKeyValuePair("item_id", item.ID);
             writer.WriteKeyValuePair("name", item.Name);
             writer.WriteKeyValuePair("parent_id", item.ParentFolderID);
-            writer.WriteKeyValuePair("type", (uint)item.AssetType);
-            writer.WriteKeyValuePair("inv_type", (uint)item.InventoryType);
+            writer.WriteKeyValuePair("type", (int)item.AssetType);
+            writer.WriteKeyValuePair("inv_type", (int)item.InventoryType);
 
             writer.WriteStartElement("key");
             writer.WriteValue("permissions");

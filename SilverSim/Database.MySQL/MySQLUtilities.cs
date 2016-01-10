@@ -1,25 +1,18 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Main.Common;
-using SilverSim.Types.StructuredData.Llsd;
-using SilverSim.Types;
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
+using SilverSim.Main.Common;
+using SilverSim.Scene.Types.SceneEnvironment;
+using SilverSim.Types;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using SilverSim.Types.Asset;
-using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
-using SilverSim.Scene.Types.SceneEnvironment;
-using SilverSim.Types.Inventory;
-using SilverSim.Types.Parcel;
-using System.Linq;
-using SilverSim.Types.Agent;
-using SilverSim.Types.Primitive;
-using SilverSim.Types.Script;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Database.MySQL
 {
@@ -140,35 +133,6 @@ namespace SilverSim.Database.MySQL
         }
         #endregion
 
-        static internal readonly Type[] MySqlUnsignedTypes = new Type[]
-        {
-            typeof(InventoryFlags),
-            typeof(AssetFlags),
-            typeof(InventoryPermissionsMask),
-            typeof(ParcelCategory),
-            typeof(ParcelStatus),
-            typeof(ParcelFlags),
-            typeof(TeleportLandingType),
-            typeof(ParcelAccessFlags),
-            typeof(AttachmentPoint),
-            typeof(PrimitiveFlags),
-            typeof(PrimitiveCode),
-            typeof(ClickActionType),
-            typeof(ScriptPermissions)
-        };
-
-        static internal readonly Type[] MySqlSignedTypes = new Type[]
-        {
-            typeof(InventoryType),
-            typeof(AssetType),
-            typeof(InventoryItem.SaleInfoData.SaleType),
-            typeof(PrimitiveMaterial),
-            typeof(PrimitivePhysicsShapeType),
-            typeof(PrimitiveShapeType),
-            typeof(PrimitiveMediaPermission),
-            typeof(PrimitiveMediaControls)
-        };
-
         #region Transaction Helper
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static void InsideTransaction(this MySqlConnection connection, Action del)
@@ -197,98 +161,96 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Push parameters
-        static void AddParameters(MySqlParameterCollection mysqlparam, Dictionary<string, object> vals)
+        public static void AddParameter(this MySqlParameterCollection mysqlparam, string key, object value)
+        {
+            Type t = value != null ? value.GetType() : null;
+            if (t == typeof(Vector3))
+            {
+                Vector3 v = (Vector3)value;
+                mysqlparam.AddWithValue(key + "X", v.X);
+                mysqlparam.AddWithValue(key + "Y", v.Y);
+                mysqlparam.AddWithValue(key + "Z", v.Z);
+            }
+            else if (t == typeof(GridVector))
+            {
+                GridVector v = (GridVector)value;
+                mysqlparam.AddWithValue(key + "X", v.X);
+                mysqlparam.AddWithValue(key + "Y", v.Y);
+            }
+            else if (t == typeof(Quaternion))
+            {
+                Quaternion v = (Quaternion)value;
+                mysqlparam.AddWithValue(key + "X", v.X);
+                mysqlparam.AddWithValue(key + "Y", v.Y);
+                mysqlparam.AddWithValue(key + "Z", v.Z);
+                mysqlparam.AddWithValue(key + "W", v.W);
+            }
+            else if (t == typeof(Color))
+            {
+                Color v = (Color)value;
+                mysqlparam.AddWithValue(key + "Red", v.R);
+                mysqlparam.AddWithValue(key + "Green", v.G);
+                mysqlparam.AddWithValue(key + "Blue", v.B);
+            }
+            else if (t == typeof(ColorAlpha))
+            {
+                ColorAlpha v = (ColorAlpha)value;
+                mysqlparam.AddWithValue(key + "Red", v.R);
+                mysqlparam.AddWithValue(key + "Green", v.G);
+                mysqlparam.AddWithValue(key + "Blue", v.B);
+                mysqlparam.AddWithValue(key + "Alpha", v.A);
+            }
+            else if (t == typeof(EnvironmentController.WLVector2))
+            {
+                EnvironmentController.WLVector2 vec = (EnvironmentController.WLVector2)value;
+                mysqlparam.AddWithValue(key + "X", vec.X);
+                mysqlparam.AddWithValue(key + "Y", vec.Y);
+            }
+            else if (t == typeof(EnvironmentController.WLVector4))
+            {
+                EnvironmentController.WLVector4 vec = (EnvironmentController.WLVector4)value;
+                mysqlparam.AddWithValue(key + "Red", vec.X);
+                mysqlparam.AddWithValue(key + "Green", vec.Y);
+                mysqlparam.AddWithValue(key + "Blue", vec.Z);
+                mysqlparam.AddWithValue(key + "Value", vec.W);
+            }
+            else if (t == typeof(bool))
+            {
+                mysqlparam.AddWithValue(key, (bool)value ? 1 : 0);
+            }
+            else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI) || t == typeof(Uri))
+            {
+                mysqlparam.AddWithValue(key, value.ToString());
+            }
+            else if (t == typeof(AnArray))
+            {
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    LlsdBinary.Serialize((AnArray)value, stream);
+                    mysqlparam.AddWithValue(key, stream.GetBuffer());
+                }
+            }
+            else if (t == typeof(Date))
+            {
+                mysqlparam.AddWithValue(key, ((Date)value).AsULong);
+            }
+            else if (t.IsEnum)
+            {
+                mysqlparam.AddWithValue(key, Convert.ChangeType(value, t.GetEnumUnderlyingType()));
+            }
+            else
+            {
+                mysqlparam.AddWithValue(key, value);
+            }
+        }
+
+        static void AddParameters(this MySqlParameterCollection mysqlparam, Dictionary<string, object> vals)
         {
             foreach (KeyValuePair<string, object> kvp in vals)
             {
-                object value = kvp.Value;
-                string key = kvp.Key;
-                Type t = value != null ? value.GetType() : null;
-                if (t == typeof(Vector3))
+                if (kvp.Value != null)
                 {
-                    Vector3 v = (Vector3)value;
-                    mysqlparam.AddWithValue("?v_" + key + "X", v.X);
-                    mysqlparam.AddWithValue("?v_" + key + "Y", v.Y);
-                    mysqlparam.AddWithValue("?v_" + key + "Z", v.Z);
-                }
-                else if (t == typeof(GridVector))
-                {
-                    GridVector v = (GridVector)value;
-                    mysqlparam.AddWithValue("?v_" + key + "X", v.X);
-                    mysqlparam.AddWithValue("?v_" + key + "Y", v.Y);
-                }
-                else if (t == typeof(Quaternion))
-                {
-                    Quaternion v = (Quaternion)value;
-                    mysqlparam.AddWithValue("?v_" + key + "X", v.X);
-                    mysqlparam.AddWithValue("?v_" + key + "Y", v.Y);
-                    mysqlparam.AddWithValue("?v_" + key + "Z", v.Z);
-                    mysqlparam.AddWithValue("?v_" + key + "W", v.W);
-                }
-                else if (t == typeof(Color))
-                {
-                    Color v = (Color)value;
-                    mysqlparam.AddWithValue("?v_" + key + "Red", v.R);
-                    mysqlparam.AddWithValue("?v_" + key + "Green", v.G);
-                    mysqlparam.AddWithValue("?v_" + key + "Blue", v.B);
-                }
-                else if (t == typeof(ColorAlpha))
-                {
-                    ColorAlpha v = (ColorAlpha)value;
-                    mysqlparam.AddWithValue("?v_" + key + "Red", v.R);
-                    mysqlparam.AddWithValue("?v_" + key + "Green", v.G);
-                    mysqlparam.AddWithValue("?v_" + key + "Blue", v.B);
-                    mysqlparam.AddWithValue("?v_" + key + "Alpha", v.A);
-                }
-                else if (t == typeof(EnvironmentController.WLVector2))
-                {
-                    EnvironmentController.WLVector2 vec = (EnvironmentController.WLVector2)value;
-                    mysqlparam.AddWithValue("?v_" + key + "X", vec.X);
-                    mysqlparam.AddWithValue("?v_" + key + "Y", vec.Y);
-                }
-                else if (t == typeof(EnvironmentController.WLVector4))
-                {
-                    EnvironmentController.WLVector4 vec = (EnvironmentController.WLVector4)value;
-                    mysqlparam.AddWithValue("?v_" + key + "Red", vec.X);
-                    mysqlparam.AddWithValue("?v_" + key + "Green", vec.Y);
-                    mysqlparam.AddWithValue("?v_" + key + "Blue", vec.Z);
-                    mysqlparam.AddWithValue("?v_" + key + "Value", vec.W);
-                }
-                else if (t == typeof(bool))
-                {
-                    mysqlparam.AddWithValue("?v_" + key, (bool)value ? 1 : 0);
-                }
-                else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI))
-                {
-                    mysqlparam.AddWithValue("?v_" + key, value.ToString());
-                }
-                else if (t == typeof(AnArray))
-                {
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        LlsdBinary.Serialize((AnArray)value, stream);
-                        mysqlparam.AddWithValue("?v_" + key, stream.GetBuffer());
-                    }
-                }
-                else if (t == typeof(Date))
-                {
-                    mysqlparam.AddWithValue("?v_" + key, ((Date)value).AsULong);
-                }
-                else if (MySqlUnsignedTypes.Contains(t))
-                {
-                    mysqlparam.AddWithValue("?v_" + key, Convert.ChangeType(value, typeof(uint)));
-                }
-                else if(MySqlSignedTypes.Contains(t))
-                {
-                    mysqlparam.AddWithValue("?v_" + key, Convert.ChangeType(value, typeof(int)));
-                }
-                else if (value == null)
-                {
-                    /* skip */
-                }
-                else
-                {
-                    mysqlparam.AddWithValue("?v_" + kvp.Key, kvp.Value);
+                    AddParameter(mysqlparam, "?v_" + kvp.Key, kvp.Value);
                 }
             }
         }
@@ -512,15 +474,11 @@ namespace SilverSim.Database.MySQL
                 (double)dbReader[prefix + "Value"]);
         }
 
-
-        public static AssetFlags GetAssetFlags(this MySqlDataReader dbreader, string prefix)
+        public static T GetEnum<T>(this MySqlDataReader dbreader, string prefix)
         {
-            uint assetFlags;
-            if(!uint.TryParse(dbreader[prefix].ToString(), out assetFlags))
-            {
-                assetFlags = 0;
-            }
-            return (AssetFlags)assetFlags;
+            Type enumType = typeof(T).GetEnumUnderlyingType();
+            object v = dbreader[prefix];
+            return (T)Convert.ChangeType(v, enumType);
         }
 
         public static UUID GetUUID(this MySqlDataReader dbReader, string prefix)
@@ -582,16 +540,6 @@ namespace SilverSim.Database.MySQL
                 throw new InvalidCastException("GetDate could not convert value for "+ prefix);
             }
             return Date.UnixTimeToDateTime(v);
-        }
-
-        public static Vector3 GetStringFormattedVector(this MySqlDataReader dbReader, string prefix)
-        {
-            Vector3 v;
-            if (!Vector3.TryParse((string)dbReader[prefix], out v))
-            {
-                throw new InvalidCastException("GetVectorFromString could not convert value for" + prefix);
-            }
-            return v;
         }
 
         public static EnvironmentController.WLVector2 GetWLVector2(this MySqlDataReader dbReader, string prefix)
@@ -670,6 +618,27 @@ namespace SilverSim.Database.MySQL
                 return new byte[0];
             }
             return (byte[])o;
+        }
+
+        public static Uri GetUri(this MySqlDataReader dbReader, string prefix)
+        {
+            object o = dbReader[prefix];
+            Type t = o != null ? o.GetType() : null;
+            if(t == typeof(DBNull))
+            {
+                return null;
+            }
+            string s = (string)o;
+            if(s.Length == 0)
+            {
+                return null;
+            }
+            return new Uri(s);
+        }
+
+        public static GridVector GetGridVector(this MySqlDataReader dbReader, string prefix)
+        {
+            return new GridVector(dbReader.GetUInt32(prefix + "X"), dbReader.GetUInt32(prefix + "Y"));
         }
         #endregion
 

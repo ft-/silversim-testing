@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             public UUID TransactionID;
             public AssetType Type;
             public InventoryType InvType;
-            public UInt32 Flags;
+            public InventoryFlags Flags;
             public InventoryItem.SaleInfoData.SaleType SaleType;
             public Int32 SalePrice;
             public string Name;
@@ -78,7 +78,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                 d.TransactionID = p.ReadUUID();
                 d.Type = (AssetType)p.ReadInt8();
                 d.InvType = (InventoryType)p.ReadInt8();
-                d.Flags = p.ReadUInt32();
+                d.Flags = (InventoryFlags)p.ReadUInt32();
                 d.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
                 d.SalePrice = p.ReadInt32();
                 d.Name = p.ReadStringLen8();
@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                 p.WriteUUID(d.TransactionID);
                 p.WriteInt8((sbyte)d.Type);
                 p.WriteInt8((sbyte)d.InvType);
-                p.WriteUInt32(d.Flags);
+                p.WriteUInt32((uint)d.Flags);
                 p.WriteUInt8((byte)d.SaleType);
                 p.WriteInt32(d.SalePrice);
                 p.WriteStringLen8(d.Name);

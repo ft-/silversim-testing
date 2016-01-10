@@ -24,7 +24,7 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", estateID);
+                    cmd.Parameters.AddParameter("?id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -49,7 +49,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT ID, Owner FROM estates WHERE Owner LIKE \"" + owner.ID.ToString() + "%\"", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", owner.ID.ToString());
+                        cmd.Parameters.AddParameter("?id", owner.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL.Estate
                                 UUI uui = reader.GetUUI("Owner");
                                 if (uui.EqualsGrid(owner))
                                 {
-                                    estates.Add((uint)reader["ID"]);
+                                    estates.Add(reader.GetUInt32("ID"));
                                 }
                             }
                             return estates;
@@ -86,8 +86,8 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("UPDATE estates SET Owner = ?ownerid WHERE ID = ?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", estateID);
-                        cmd.Parameters.AddWithValue("?ownerid", value.ToString());
+                        cmd.Parameters.AddParameter("?id", estateID);
+                        cmd.Parameters.AddParameter("?ownerid", value);
                         if(cmd.ExecuteNonQuery() < 1)
                         {
                             throw new EstateUpdateFailedException();

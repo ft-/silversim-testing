@@ -36,7 +36,7 @@ namespace SilverSim.Database.MySQL.Estate
                         conn.Open();
                         using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid", conn))
                         {
-                            cmd.Parameters.AddWithValue("?estateid", estateID);
+                            cmd.Parameters.AddParameter("?estateid", estateID);
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 while (reader.Read())
@@ -69,8 +69,8 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?estateid", estateID);
-                        cmd.Parameters.AddWithValue("?groupid", group.ID.ToString());
+                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        cmd.Parameters.AddParameter("?groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             return reader.Read();
@@ -89,8 +89,8 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("?estateid", estateID);
-                        cmd.Parameters.AddWithValue("?groupid", group.ID.ToString());
+                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        cmd.Parameters.AddParameter("?groupid", group.ID);
                         if (cmd.ExecuteNonQuery() < 1)
                         {
                             throw new EstateUpdateFailedException();

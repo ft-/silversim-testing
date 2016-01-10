@@ -156,11 +156,31 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 typeSql = "DOUBLE";
             }
-            else if (f == typeof(int) || MySQLUtilities.MySqlSignedTypes.Contains(f))
+            else if(f.IsEnum)
+            {
+                Type enumType = f.GetEnumUnderlyingType();
+                if (enumType == typeof(ulong))
+                {
+                    typeSql = "BIGINT UNSIGNED";
+                }
+                else if (enumType == typeof(long))
+                {
+                    typeSql = "BIGINT";
+                }
+                else if (enumType == typeof(byte) || enumType == typeof(ushort) || enumType == typeof(uint))
+                {
+                    typeSql = "INT UNSIGNED";
+                }
+                else
+                {
+                    typeSql = "INT";
+                }
+            }
+            else if (f == typeof(int))
             {
                 typeSql = "INT";
             }
-            else if (f == typeof(uint) || MySQLUtilities.MySqlUnsignedTypes.Contains(f))
+            else if (f == typeof(uint))
             {
                 typeSql = "INT UNSIGNED";
             }
@@ -393,13 +413,9 @@ namespace SilverSim.Database.MySQL._Migration
                 {
                     def = ((Date)def).AsULong;
                 }
-                else if (MySQLUtilities.MySqlSignedTypes.Contains(f))
+                else if(f.IsEnum)
                 {
-                    def = (int)Convert.ChangeType(def, typeof(int));
-                }
-                else if (MySQLUtilities.MySqlUnsignedTypes.Contains(f))
-                {
-                    def = (uint)Convert.ChangeType(def, typeof(uint));
+                    def = (uint)Convert.ChangeType(def, f.GetEnumUnderlyingType());
                 }
                 result.Add(colInfo.Name, string.Format("{0} {1} DEFAULT '{2}'",
                     typeSql,

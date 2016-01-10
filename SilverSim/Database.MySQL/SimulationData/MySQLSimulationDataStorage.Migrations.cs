@@ -216,6 +216,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             new ChangeColumn<bool>("MediaLoop") { IsNullAllowed = false, Default = false },
             new TableRevision(7),
             new ChangeColumn<ParcelStatus>("Status") { IsNullAllowed = false, Default = ParcelStatus.Leased },
+            new TableRevision(8),
+            new ChangeColumn<int>("Area") { IsNullAllowed = false, Default = 0 },
+            new ChangeColumn<int>("ActualArea") { IsNullAllowed = false, Default = 0 },
+            new ChangeColumn<int>("BillableArea") { IsNullAllowed = false, Default = 0 },
             #endregion
 
             #region Table parcelaccesswhitelist

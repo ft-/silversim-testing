@@ -326,7 +326,7 @@ namespace SilverSim.Types.Asset.Format
                     {
                         throw new NotANotecardFormatException();
                     }
-                    item.Flags = uval;
+                    item.Flags = (InventoryFlags)uval;
                 }
                 else if(data[0] == "sale_info")   
                 {

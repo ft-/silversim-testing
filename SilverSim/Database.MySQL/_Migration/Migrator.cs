@@ -51,7 +51,7 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 cmd += " ROW_FORMAT=DYNAMIC";
             }
-            cmd += ";";
+            cmd += " CHARACTER SET UTF8;";
             ExecuteStatement(conn, cmd, log);
         }
 

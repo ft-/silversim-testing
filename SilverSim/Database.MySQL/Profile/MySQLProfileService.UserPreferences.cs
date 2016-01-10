@@ -26,7 +26,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
+                        cmd.Parameters.AddParameter("?uuid", user.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -59,7 +59,7 @@ namespace SilverSim.Database.MySQL.Profile
                         conn.Open();
                         using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
                         {
-                            cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
+                            cmd.Parameters.AddParameter("?uuid", user.ID);
                             using(MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 if(reader.Read())

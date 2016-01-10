@@ -59,7 +59,7 @@ namespace SilverSim.Database.MySQL.Groups
                     {
                         if (dbReader.Read())
                         {
-                            ugi = new UGI(new UUID((string)dbReader["GroupID"]), (string)dbReader["GroupName"], new Uri((string)dbReader["HomeURI"]));
+                            ugi = ToUGI(dbReader);
                             return true;
                         }
                     }
@@ -67,6 +67,11 @@ namespace SilverSim.Database.MySQL.Groups
             }
             ugi = default(UGI);
             return false;
+        }
+
+        static UGI ToUGI(MySqlDataReader dbReader)
+        {
+            return new UGI(dbReader.GetUUID("GroupID"), dbReader.GetString("GroupName"), dbReader.GetUri("HomeURI"));
         }
 
         public override List<UGI> GetGroupsByName(string groupName, int limit)
@@ -78,13 +83,13 @@ namespace SilverSim.Database.MySQL.Groups
 
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName LIKE ?groupName LIMIT ?limit", connection))
                 {
-                    cmd.Parameters.AddWithValue("?groupName", groupName);
-                    cmd.Parameters.AddWithValue("?limit", limit);
+                    cmd.Parameters.AddParameter("?groupName", groupName);
+                    cmd.Parameters.AddParameter("?limit", limit);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while(dbReader.Read())
                         {
-                            groups.Add(new UGI(new UUID((string)dbReader["GroupID"]), (string)dbReader["GroupName"], new Uri((string)dbReader["HomeURI"])));
+                            groups.Add(ToUGI(dbReader));
                         }
                     }
                 }
@@ -100,9 +105,9 @@ namespace SilverSim.Database.MySQL.Groups
 
                 using (MySqlCommand cmd = new MySqlCommand("REPLACE INTO groupnames (GroupID, HomeURI, GroupName) VALUES (?groupID, ?homeURI, ?groupName)", connection))
                 {
-                    cmd.Parameters.AddWithValue("?groupID", group.ID.ToString());
-                    cmd.Parameters.AddWithValue("?homeURI", group.HomeURI.ToString());
-                    cmd.Parameters.AddWithValue("?groupName", group.GroupName);
+                    cmd.Parameters.AddParameter("?groupID", group.ID);
+                    cmd.Parameters.AddParameter("?homeURI", group.HomeURI);
+                    cmd.Parameters.AddParameter("?groupName", group.GroupName);
                     cmd.ExecuteNonQuery();
                 }
             }

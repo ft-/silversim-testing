@@ -123,14 +123,14 @@ namespace SilverSim.Database.MySQL.ServerParam
 
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                    cmd.Parameters.AddWithValue("?parametername", parameter);
+                    cmd.Parameters.AddParameter("?regionid", regionID);
+                    cmd.Parameters.AddParameter("?parametername", parameter);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
                         {
-                            m_Cache[regionID][parameter] = (string)dbReader["parametervalue"];
-                            value = (string)dbReader["parametervalue"];
+                            value = dbReader.GetString("parametervalue");
+                            m_Cache[regionID][parameter] = value;
                             return true;
                         }
                     }
@@ -168,7 +168,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                     connection.InsideTransaction(delegate()
                     {
                         Dictionary<string, object> param = new Dictionary<string, object>();
-                        param["regionid"] = regionID.ToString();
+                        param["regionid"] = regionID;
                         param["parametername"] = parameter;
                         param["parametervalue"] = value;
                         connection.ReplaceInto("serverparams", param);
@@ -188,8 +188,8 @@ namespace SilverSim.Database.MySQL.ServerParam
                 {
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                        cmd.Parameters.AddWithValue("?parametername", parameter);
+                        cmd.Parameters.AddParameter("?regionid", regionID);
+                        cmd.Parameters.AddParameter("?parametername", parameter);
                         if(cmd.ExecuteNonQuery() >= 1)
                         {
                             result = true;

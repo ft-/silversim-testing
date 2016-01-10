@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         public struct InventoryDataEntry
         {
             public UUID ItemID;
-            public UInt32 Flags;
+            public InventoryFlags Flags;
         }
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
@@ -37,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             {
                 InventoryDataEntry d = new InventoryDataEntry();
                 d.ItemID = p.ReadUUID();
-                d.Flags = p.ReadUInt32();
+                d.Flags = (InventoryFlags)p.ReadUInt32();
                 m.InventoryData.Add(d);
             }
 

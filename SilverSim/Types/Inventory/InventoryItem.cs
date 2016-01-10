@@ -27,7 +27,7 @@ namespace SilverSim.Types.Inventory
         }
         public string Description = string.Empty;
         public InventoryType InventoryType = InventoryType.Unknown;
-        public uint Flags;
+        public InventoryFlags Flags;
         public UUI Owner = new UUI();
         public UUI LastOwner = new UUI();
         #endregion

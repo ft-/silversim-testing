@@ -29,12 +29,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddParameter("?regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            using (MemoryStream ms = new MemoryStream((byte[])reader["EnvironmentSettings"]))
+                            using (MemoryStream ms = new MemoryStream(reader.GetBytes("EnvironmentSettings")))
                             {
                                 settings = EnvironmentSettings.Deserialize(ms);
                                 return true;
@@ -71,7 +71,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 #endif
                         using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
                         {
-                            cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                            cmd.Parameters.AddParameter("?regionid", regionID);
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -81,7 +81,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         m_Log.DebugFormat("Storing new environment settings for {0}", regionID.ToString());
 #endif
                         Dictionary<string, object> param = new Dictionary<string,object>();
-                        param["RegionID"] = regionID.ToString();
+                        param["RegionID"] = regionID;
                         using(MemoryStream ms = new MemoryStream())
                         {
                             value.Serialize(ms, regionID);
@@ -100,7 +100,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddParameter("?regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

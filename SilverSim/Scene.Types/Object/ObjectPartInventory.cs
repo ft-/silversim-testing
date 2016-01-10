@@ -386,7 +386,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Flags":
-                                item.Flags = reader.ReadElementValueAsUInt();
+                                item.Flags = (InventoryFlags)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "GroupID":

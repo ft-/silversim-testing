@@ -19,16 +19,16 @@ namespace SilverSim.Database.MySQL.UserAccounts
             UserAccount info = new UserAccount();
 
             info.Principal.ID = reader.GetUUID("ID");
-            info.Principal.FirstName = (string)reader["FirstName"];
-            info.Principal.LastName = (string)reader["LastName"];
+            info.Principal.FirstName = reader.GetString("FirstName");
+            info.Principal.LastName = reader.GetString("LastName");
             info.Principal.HomeURI = null;
             info.Principal.IsAuthoritative = true;
             info.ScopeID = reader.GetUUID("ScopeID");
-            info.Email = (string)reader["Email"];
+            info.Email = reader.GetString("Email");
             info.Created = reader.GetDate("Created");
-            info.UserLevel = (int)reader["UserLevel"];
-            info.UserFlags = (int)reader["UserFlags"];
-            info.UserTitle = (string)reader["UserTitle"];
+            info.UserLevel = reader.GetInt32("UserLevel");
+            info.UserFlags = reader.GetUInt32("UserFlags");
+            info.UserTitle = reader.GetString("UserTitle");
             info.IsLocalToGrid = true;
 
             return info;

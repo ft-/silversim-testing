@@ -38,19 +38,19 @@ namespace SilverSim.Database.MySQL.Asset
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id=?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", key.ToString());
+                    cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
                         {
                             metadata = new AssetMetadata();
                             metadata.ID = dbReader.GetUUID("id");
-                            metadata.Type = (AssetType)(int)dbReader["assetType"];
-                            metadata.Name = (string)dbReader["name"];
+                            metadata.Type = dbReader.GetEnum<AssetType>("assetType");
+                            metadata.Name = dbReader.GetString("name");
                             metadata.Creator = dbReader.GetUUI("CreatorID");
                             metadata.CreateTime = dbReader.GetDate("create_time");
                             metadata.AccessTime = dbReader.GetDate("access_time");
-                            metadata.Flags = dbReader.GetAssetFlags("asset_flags");
+                            metadata.Flags = dbReader.GetEnum<AssetFlags>("asset_flags");
                             metadata.Temporary = dbReader.GetBoolean("temporary");
                             return true;
                         }

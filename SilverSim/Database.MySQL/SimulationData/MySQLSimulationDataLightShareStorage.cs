@@ -46,12 +46,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                         skyData.CloudDetailXYDensity = reader.GetVector3("CloudDetailXYDensity");
                         skyData.CloudScale = reader.GetDouble("CloudScale");
                         skyData.CloudScroll = reader.GetWLVector2("CloudScroll");
-                        skyData.CloudScrollXLock = MySQLUtilities.GetBool(reader, "CloudScrollXLock");
-                        skyData.CloudScrollYLock = MySQLUtilities.GetBool(reader, "CloudScrollYLock");
+                        skyData.CloudScrollXLock = reader.GetBool("CloudScrollXLock");
+                        skyData.CloudScrollYLock = reader.GetBool("CloudScrollYLock");
                         skyData.CloudXYDensity = reader.GetVector3("CloudXYDensity");
                         skyData.DensityMultiplier = reader.GetDouble("DensityMultiplier");
                         skyData.DistanceMultiplier = reader.GetDouble("DistanceMultiplier");
-                        skyData.DrawClassicClouds = MySQLUtilities.GetBool(reader, "DrawClassicClouds");
+                        skyData.DrawClassicClouds = reader.GetBool("DrawClassicClouds");
                         skyData.EastAngle = reader.GetDouble("EastAngle");
                         skyData.HazeDensity = reader.GetDouble("HazeDensity");
                         skyData.HazeHorizon = reader.GetDouble("HazeHorizon");
@@ -139,7 +139,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM lightshare WHERE RegionID LIKE ?regionid", conn))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddParameter("?regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

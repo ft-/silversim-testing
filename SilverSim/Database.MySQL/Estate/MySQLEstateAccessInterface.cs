@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Estate
                         conn.Open();
                         using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = ?estateid", conn))
                         {
-                            cmd.Parameters.AddWithValue("?estateid", estateID);
+                            cmd.Parameters.AddParameter("?estateid", estateID);
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 while (reader.Read())
@@ -64,7 +64,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"", conn))
                     {
-                        cmd.Parameters.AddWithValue("?estateid", estateID);
+                        cmd.Parameters.AddParameter("?estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -91,10 +91,10 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("?estateid", estateID);
+                        cmd.Parameters.AddParameter("?estateid", estateID);
                         if (value)
                         {
-                            cmd.Parameters.AddWithValue("?userid", agent.ID.ToString());
+                            cmd.Parameters.AddParameter("?userid", agent.ID);
                         }
                         if (cmd.ExecuteNonQuery() < 1 && value)
                         {

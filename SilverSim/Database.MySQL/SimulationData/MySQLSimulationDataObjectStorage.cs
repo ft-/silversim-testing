@@ -11,6 +11,7 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
+using SilverSim.Types.Script;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
@@ -39,12 +40,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
                 using(MySqlCommand cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID LIKE ?id", connection))
                 {
-                    cmd.Parameters.AddWithValue("?id", key);
+                    cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
                         {
-                            objects.Add(new UUID(dbReader["ID"].ToString()));
+                            objects.Add(dbReader.GetUUID("ID"));
                         }
                     }
                 }
@@ -61,12 +62,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT prims.ID FROM objects INNER JOIN prims ON objects.ID LIKE prims.RootPartID WHERE RegionID LIKE ?id ORDER BY LinkNumber", connection))
                 {
-                    cmd.Parameters.AddWithValue("?id", key);
+                    cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
                         {
-                            objects.Add(new UUID(dbReader["ID"].ToString()));
+                            objects.Add(dbReader.GetUUID("ID"));
                         }
                     }
                 }
@@ -80,28 +81,28 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             ObjectPart objpart = new ObjectPart();
             objpart.ID = dbReader.GetUUID("ID");
-            objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
+            objpart.LoadedLinkNumber = dbReader.GetInt32("LinkNumber");
             objpart.Position = dbReader.GetVector3("Position");
             objpart.Rotation = dbReader.GetQuaternion("Rotation");
-            objpart.SitText = (string)dbReader["SitText"];
-            objpart.TouchText = (string)dbReader["TouchText"];
-            objpart.Name = (string)dbReader["Name"];
-            objpart.Description = (string)dbReader["Description"];
+            objpart.SitText = dbReader.GetString("SitText");
+            objpart.TouchText = dbReader.GetString("TouchText");
+            objpart.Name = dbReader.GetString("Name");
+            objpart.Description = dbReader.GetString("Description");
             objpart.SitTargetOffset = dbReader.GetVector3("SitTargetOffset");
             objpart.SitTargetOrientation = dbReader.GetQuaternion("SitTargetOrientation");
             objpart.Creator = dbReader.GetUUI("Creator");
             objpart.CreationDate = dbReader.GetDate("CreationDate");
-            objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
+            objpart.Flags = dbReader.GetEnum<PrimitiveFlags>("Flags");
 
             objpart.CameraAtOffset = dbReader.GetVector3("CameraAtOffset");
             objpart.CameraEyeOffset = dbReader.GetVector3("CameraEyeOffset");
 
-            objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
-            objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
+            objpart.PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType");
+            objpart.Material = dbReader.GetEnum<PrimitiveMaterial>("Material");
             objpart.Size = dbReader.GetVector3("Size");
             objpart.Slice = dbReader.GetVector3("Slice");
 
-            objpart.MediaURL = (string)dbReader["MediaURL"];
+            objpart.MediaURL = dbReader.GetString("MediaURL");
 
             objpart.AngularVelocity = dbReader.GetVector3("AngularVelocity");
 
@@ -133,8 +134,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             objpart.TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes");
             objpart.TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes");
 
-            objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
-            objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
+            objpart.ScriptAccessPin = dbReader.GetInt32("ScriptAccessPin");
+            objpart.LoadedLinkNumber = dbReader.GetInt32("LinkNumber");
 
             objpart.ForceMouselook = dbReader.GetBoolean("ForceMouselook");
 
@@ -173,7 +174,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE ?regionid", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
+                        cmd.Parameters.AddParameter("?regionid", regionID);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while(dbReader.Read())
@@ -183,24 +184,24 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                                     objgroupID = MySQLUtilities.GetUUID(dbReader, "id");
                                     ObjectGroup objgroup = new ObjectGroup();
-                                    objgroup.IsVolumeDetect = MySQLUtilities.GetBool(dbReader, "IsVolumeDetect");
-                                    objgroup.IsPhantom = MySQLUtilities.GetBool(dbReader, "IsPhantom");
-                                    objgroup.IsPhysics = MySQLUtilities.GetBool(dbReader, "IsPhysics");
-                                    objgroup.IsTempOnRez = MySQLUtilities.GetBool(dbReader, "IsTempOnRez");
+                                    objgroup.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
+                                    objgroup.IsPhantom = dbReader.GetBool("IsPhantom");
+                                    objgroup.IsPhysics = dbReader.GetBool("IsPhysics");
+                                    objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
                                     objgroup.Owner = dbReader.GetUUI("Owner");
-                                    objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
+                                    objgroup.LastOwner = dbReader.GetUUI("LastOwner");
                                     objgroup.Group = dbReader.GetUGI("Group");
                                     originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
                                     nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
-                                    objgroup.SaleType = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
-                                    objgroup.SalePrice = (int)dbReader["SalePrice"];
-                                    objgroup.PayPrice0 = (int)dbReader["PayPrice0"];
-                                    objgroup.PayPrice1 = (int)dbReader["PayPrice1"];
-                                    objgroup.PayPrice2 = (int)dbReader["PayPrice2"];
-                                    objgroup.PayPrice3 = (int)dbReader["PayPrice3"];
-                                    objgroup.PayPrice4 = (int)dbReader["PayPrice4"];
+                                    objgroup.SaleType = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
+                                    objgroup.SalePrice = dbReader.GetInt32("SalePrice");
+                                    objgroup.PayPrice0 = dbReader.GetInt32("PayPrice0");
+                                    objgroup.PayPrice1 = dbReader.GetInt32("PayPrice1");
+                                    objgroup.PayPrice2 = dbReader.GetInt32("PayPrice2");
+                                    objgroup.PayPrice3 = dbReader.GetInt32("PayPrice3");
+                                    objgroup.PayPrice4 = dbReader.GetInt32("PayPrice4");
                                     objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
-                                    objgroup.AttachPoint = (AttachmentPoint)(uint)dbReader["AttachPoint"];
+                                    objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
                                     objGroups[objgroupID] = objgroup;
                                 }
                                 catch(Exception e)
@@ -217,7 +218,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     using (MySqlCommand cmd = new MySqlCommand("SELECT prims.* FROM objects INNER JOIN prims ON objects.id LIKE prims.RootPartID WHERE objects.regionID LIKE ?regionid", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
+                        cmd.Parameters.AddParameter("?regionid", regionID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while (dbReader.Read())
@@ -336,7 +337,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE ?id", connection))
             {
-                cmd.Parameters.AddWithValue("?id", objpart.ID);
+                cmd.Parameters.AddParameter("?id", objpart.ID);
                 using (MySqlDataReader dbReader = cmd.ExecuteReader())
                 {
                     ObjectPartInventoryItem item;
@@ -345,27 +346,27 @@ namespace SilverSim.Database.MySQL.SimulationData
                     {
                         item = new ObjectPartInventoryItem();
                         item.AssetID = dbReader.GetUUID("AssetID");
-                        item.AssetType = (AssetType)(int)dbReader["AssetType"];
-                        item.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
+                        item.AssetType = dbReader.GetEnum<AssetType>("AssetType");
+                        item.CreationDate = dbReader.GetDate("CreationDate");
                         item.Creator = dbReader.GetUUI("Creator");
-                        item.Description = (string)dbReader["Description"];
-                        item.Flags = (uint)dbReader["Flags"];
+                        item.Description = dbReader.GetString("Description");
+                        item.Flags = dbReader.GetEnum<InventoryFlags>("Flags");
                         item.Group = dbReader.GetUGI("Group");
-                        item.IsGroupOwned = (uint)dbReader["GroupOwned"] != 0;
+                        item.IsGroupOwned = dbReader.GetBool("GroupOwned");
                         item.ID = dbReader.GetUUID("InventoryID");
-                        item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
-                        item.LastOwner = new UUI((string)dbReader["LastOwner"]);
-                        item.Name = (string)dbReader["Name"];
+                        item.InventoryType = dbReader.GetEnum<InventoryType>("InventoryType");
+                        item.LastOwner = dbReader.GetUUI("LastOwner");
+                        item.Name = dbReader.GetString("Name");
                         item.Owner = dbReader.GetUUI("Owner");
                         item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
-                        item.Permissions.Base = (InventoryPermissionsMask)(uint)dbReader["BasePermissions"];
-                        item.Permissions.Current = (InventoryPermissionsMask)(uint)dbReader["CurrentPermissions"];
-                        item.Permissions.EveryOne = (InventoryPermissionsMask)(uint)dbReader["EveryOnePermissions"];
-                        item.Permissions.Group = (InventoryPermissionsMask)(uint)dbReader["GroupPermissions"];
-                        item.Permissions.NextOwner = (InventoryPermissionsMask)(uint)dbReader["NextOwnerPermissions"];
-                        item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
-                        item.SaleInfo.Price = (int)dbReader["SalePrice"];
-                        item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
+                        item.Permissions.Base = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
+                        item.Permissions.Current = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
+                        item.Permissions.EveryOne = dbReader.GetEnum<InventoryPermissionsMask>("EveryOnePermissions");
+                        item.Permissions.Group = dbReader.GetEnum<InventoryPermissionsMask>("GroupPermissions");
+                        item.Permissions.NextOwner = dbReader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissions");
+                        item.SaleInfo.Type = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
+                        item.SaleInfo.Price = dbReader.GetInt32("SalePrice");
+                        item.SaleInfo.PermMask = dbReader.GetEnum<InventoryPermissionsMask>("SalePermMask");
                         ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
                         if (((string)dbReader["PermsGranter"]).Length != 0)
                         {
@@ -378,7 +379,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 /* no action required */
                             }
                         }
-                        grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];
+                        grantinfo.PermsMask = dbReader.GetEnum<ScriptPermissions>("PermsMask");
 
                         objpart.Inventory.Add(item.ID, item.Name, item);
                     }
@@ -400,8 +401,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE ?regionid AND ID LIKE ?id", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
-                        cmd.Parameters.AddWithValue("?id", key);
+                        cmd.Parameters.AddParameter("?regionid", regionID);
+                        cmd.Parameters.AddParameter("?id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (!dbReader.Read())
@@ -410,37 +411,37 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
 
                             objgroup = new ObjectGroup();
-                            objgroup.IsVolumeDetect = MySQLUtilities.GetBool(dbReader, "IsVolumeDetect");
-                            objgroup.IsPhantom = MySQLUtilities.GetBool(dbReader, "IsPhantom");
-                            objgroup.IsPhysics = MySQLUtilities.GetBool(dbReader, "IsPhysics");
-                            objgroup.IsTempOnRez = MySQLUtilities.GetBool(dbReader, "IsTempOnRez");
+                            objgroup.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
+                            objgroup.IsPhantom = dbReader.GetBool("IsPhantom");
+                            objgroup.IsPhysics = dbReader.GetBool("IsPhysics");
+                            objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
                             objgroup.Owner = dbReader.GetUUI("Owner");
-                            objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
+                            objgroup.LastOwner = dbReader.GetUUI("LastOwner");
                             objgroup.Group = dbReader.GetUGI("Group");
                             originalAssetID = dbReader.GetUUID("OriginalAssetID");
                             nextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID");
-                            objgroup.SaleType = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
-                            objgroup.SalePrice = (int)dbReader["SalePrice"];
-                            objgroup.PayPrice0 = (int)dbReader["PayPrice0"];
-                            objgroup.PayPrice1 = (int)dbReader["PayPrice1"];
-                            objgroup.PayPrice2 = (int)dbReader["PayPrice2"];
-                            objgroup.PayPrice3 = (int)dbReader["PayPrice3"];
-                            objgroup.PayPrice4 = (int)dbReader["PayPrice4"];
+                            objgroup.SaleType = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
+                            objgroup.SalePrice = dbReader.GetInt32("SalePrice");
+                            objgroup.PayPrice0 = dbReader.GetInt32("PayPrice0");
+                            objgroup.PayPrice1 = dbReader.GetInt32("PayPrice1");
+                            objgroup.PayPrice2 = dbReader.GetInt32("PayPrice2");
+                            objgroup.PayPrice3 = dbReader.GetInt32("PayPrice3");
+                            objgroup.PayPrice4 = dbReader.GetInt32("PayPrice4");
                             objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
-                            objgroup.AttachPoint = (AttachmentPoint)(uint)dbReader["AttachPoint"];
+                            objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
                         }
                     }
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddWithValue("?id", key);
+                        cmd.Parameters.AddParameter("?id", key);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while(dbReader.Read())
                             {
                                 ObjectPart objpart = FromDbReader(dbReader);
                                 LoadInventory(objpart);
-                                objgroup.Add((int)dbReader["LinkNumber"], objpart.ID, objpart);
+                                objgroup.Add(dbReader.GetInt32("LinkNumber"), objpart.ID, objpart);
                             }
                         }
                     }
@@ -465,8 +466,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?primid AND InventoryID LIKE ?itemid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?primid", primID);
-                    cmd.Parameters.AddWithValue("?itemid", itemID);
+                    cmd.Parameters.AddParameter("?primid", primID);
+                    cmd.Parameters.AddParameter("?itemid", itemID);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -487,12 +488,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?id", connection))
                 {
-                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.Parameters.AddParameter("?id", obj);
                     cmd.ExecuteNonQuery();
                 }
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
                 {
-                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.Parameters.AddParameter("?id", obj);
                     cmd.ExecuteNonQuery();
                 }
             });
@@ -513,7 +514,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE ?id", connection))
                 {
-                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.Parameters.AddParameter("?id", obj);
                     cmd.ExecuteNonQuery();
                 }
             });
@@ -564,32 +565,32 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartInventoryItemSql, connection))
             {
-                cmd.Parameters.AddWithValue("?AssetId", item.AssetID.ToString());
-                cmd.Parameters.AddWithValue("?AssetType", (int)item.AssetType);
-                cmd.Parameters.AddWithValue("?CreationDate", item.CreationDate.AsULong);
-                cmd.Parameters.AddWithValue("?Creator", item.Creator.ToString());
-                cmd.Parameters.AddWithValue("?Description", item.Description);
-                cmd.Parameters.AddWithValue("?Flags", item.Flags);
-                cmd.Parameters.AddWithValue("?Group", item.Group.ToString());
-                cmd.Parameters.AddWithValue("?GroupOwned", item.IsGroupOwned ? 1 : 0);
-                cmd.Parameters.AddWithValue("?PrimID", primID.ToString());
-                cmd.Parameters.AddWithValue("?Name", item.Name);
-                cmd.Parameters.AddWithValue("?InventoryID", item.ID.ToString());
-                cmd.Parameters.AddWithValue("?InventoryType", (int)item.InventoryType);
-                cmd.Parameters.AddWithValue("?LastOwner", item.LastOwner.ToString());
-                cmd.Parameters.AddWithValue("?Owner", item.Owner.ToString());
-                cmd.Parameters.AddWithValue("?ParentFolderID", item.ParentFolderID.ToString());
-                cmd.Parameters.AddWithValue("?BasePermissions", (uint)item.Permissions.Base);
-                cmd.Parameters.AddWithValue("?CurrentPermissions", (uint)item.Permissions.Current);
-                cmd.Parameters.AddWithValue("?EveryOnePermissions", (uint)item.Permissions.EveryOne);
-                cmd.Parameters.AddWithValue("?GroupPermissions", (uint)item.Permissions.Group);
-                cmd.Parameters.AddWithValue("?NextOwnerPermissions", (uint)item.Permissions.NextOwner);
-                cmd.Parameters.AddWithValue("?SaleType", (uint)item.SaleInfo.Type);
-                cmd.Parameters.AddWithValue("?SalePrice", item.SaleInfo.Price);
-                cmd.Parameters.AddWithValue("?SalePermMask", (uint)item.SaleInfo.PermMask);
+                cmd.Parameters.AddParameter("?AssetId", item.AssetID);
+                cmd.Parameters.AddParameter("?AssetType", item.AssetType);
+                cmd.Parameters.AddParameter("?CreationDate", item.CreationDate);
+                cmd.Parameters.AddParameter("?Creator", item.Creator);
+                cmd.Parameters.AddParameter("?Description", item.Description);
+                cmd.Parameters.AddParameter("?Flags", item.Flags);
+                cmd.Parameters.AddParameter("?Group", item.Group);
+                cmd.Parameters.AddParameter("?GroupOwned", item.IsGroupOwned);
+                cmd.Parameters.AddParameter("?PrimID", primID);
+                cmd.Parameters.AddParameter("?Name", item.Name);
+                cmd.Parameters.AddParameter("?InventoryID", item.ID);
+                cmd.Parameters.AddParameter("?InventoryType", item.InventoryType);
+                cmd.Parameters.AddParameter("?LastOwner", item.LastOwner);
+                cmd.Parameters.AddParameter("?Owner", item.Owner);
+                cmd.Parameters.AddParameter("?ParentFolderID", item.ParentFolderID);
+                cmd.Parameters.AddParameter("?BasePermissions", item.Permissions.Base);
+                cmd.Parameters.AddParameter("?CurrentPermissions", item.Permissions.Current);
+                cmd.Parameters.AddParameter("?EveryOnePermissions", item.Permissions.EveryOne);
+                cmd.Parameters.AddParameter("?GroupPermissions", item.Permissions.Group);
+                cmd.Parameters.AddParameter("?NextOwnerPermissions", item.Permissions.NextOwner);
+                cmd.Parameters.AddParameter("?SaleType", item.SaleInfo.Type);
+                cmd.Parameters.AddParameter("?SalePrice", item.SaleInfo.Price);
+                cmd.Parameters.AddParameter("?SalePermMask", item.SaleInfo.PermMask);
                 ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
-                cmd.Parameters.AddWithValue("?PermsGranter", grantinfo.PermsGranter.ToString());
-                cmd.Parameters.AddWithValue("?PermsMask", (uint)grantinfo.PermsMask);
+                cmd.Parameters.AddParameter("?PermsGranter", grantinfo.PermsGranter.ToString());
+                cmd.Parameters.AddParameter("?PermsMask", grantinfo.PermsMask);
                 if (cmd.ExecuteNonQuery() < 1)
                 {
                     throw new MySQLUtilities.MySQLInsertException();
@@ -608,28 +609,26 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             using(MySqlCommand cmd = new MySqlCommand(UpdateObjectGroupSql, connection))
             {
-                cmd.Parameters.AddWithValue("?ID", objgroup.ID.ToString());
-                cmd.Parameters.AddWithValue("?RegionID", objgroup.Scene.ID.ToString());
-                cmd.Parameters.AddWithValue("?IsVolumeDetect", objgroup.IsVolumeDetect ? 1 : 0);
-                cmd.Parameters.AddWithValue("?IsPhantom", objgroup.IsPhantom ? 1 : 0);
-                cmd.Parameters.AddWithValue("?IsPhysics", objgroup.IsPhysics ? 1 : 0);
-                cmd.Parameters.AddWithValue("?IsTempOnRez", objgroup.IsTempOnRez ? 1 : 0);
-                cmd.Parameters.AddWithValue("?Owner", objgroup.Owner.ToString());
-                cmd.Parameters.AddWithValue("?LastOwner", objgroup.LastOwner.ToString());
-                cmd.Parameters.AddWithValue("?Group", objgroup.Group.ToString());
-                cmd.Parameters.AddWithValue("?OriginalAssetID", objgroup.OriginalAssetID.ToString());
-                cmd.Parameters.AddWithValue("?NextOwnerAssetID", objgroup.NextOwnerAssetID.ToString());
-                cmd.Parameters.AddWithValue("?SaleType", (int)objgroup.SaleType);
-                cmd.Parameters.AddWithValue("?SalePrice", objgroup.SalePrice);
-                cmd.Parameters.AddWithValue("?PayPrice0", objgroup.PayPrice0);
-                cmd.Parameters.AddWithValue("?PayPrice1", objgroup.PayPrice1);
-                cmd.Parameters.AddWithValue("?PayPrice2", objgroup.PayPrice2);
-                cmd.Parameters.AddWithValue("?PayPrice3", objgroup.PayPrice3);
-                cmd.Parameters.AddWithValue("?PayPrice4", objgroup.PayPrice4);
-                cmd.Parameters.AddWithValue("?AttachedPosX", objgroup.AttachedPos.X);
-                cmd.Parameters.AddWithValue("?AttachedPosY", objgroup.AttachedPos.Y);
-                cmd.Parameters.AddWithValue("?AttachedPosZ", objgroup.AttachedPos.Z);
-                cmd.Parameters.AddWithValue("?AttachPoint", (uint)objgroup.AttachPoint);
+                cmd.Parameters.AddParameter("?ID", objgroup.ID);
+                cmd.Parameters.AddParameter("?RegionID", objgroup.Scene.ID);
+                cmd.Parameters.AddParameter("?IsVolumeDetect", objgroup.IsVolumeDetect);
+                cmd.Parameters.AddParameter("?IsPhantom", objgroup.IsPhantom);
+                cmd.Parameters.AddParameter("?IsPhysics", objgroup.IsPhysics);
+                cmd.Parameters.AddParameter("?IsTempOnRez", objgroup.IsTempOnRez);
+                cmd.Parameters.AddParameter("?Owner", objgroup.Owner);
+                cmd.Parameters.AddParameter("?LastOwner", objgroup.LastOwner);
+                cmd.Parameters.AddParameter("?Group", objgroup.Group);
+                cmd.Parameters.AddParameter("?OriginalAssetID", objgroup.OriginalAssetID);
+                cmd.Parameters.AddParameter("?NextOwnerAssetID", objgroup.NextOwnerAssetID);
+                cmd.Parameters.AddParameter("?SaleType", objgroup.SaleType);
+                cmd.Parameters.AddParameter("?SalePrice", objgroup.SalePrice);
+                cmd.Parameters.AddParameter("?PayPrice0", objgroup.PayPrice0);
+                cmd.Parameters.AddParameter("?PayPrice1", objgroup.PayPrice1);
+                cmd.Parameters.AddParameter("?PayPrice2", objgroup.PayPrice2);
+                cmd.Parameters.AddParameter("?PayPrice3", objgroup.PayPrice3);
+                cmd.Parameters.AddParameter("?PayPrice4", objgroup.PayPrice4);
+                cmd.Parameters.AddParameter("?AttachedPos", objgroup.AttachedPos);
+                cmd.Parameters.AddParameter("?AttachPoint", objgroup.AttachPoint);
                 if (cmd.ExecuteNonQuery() < 1)
                 {
                     throw new MySQLUtilities.MySQLInsertException();
@@ -666,81 +665,40 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartSql, connection))
             {
                 Vector3 v;
-                Quaternion q;
-                cmd.Parameters.AddWithValue("?v_ID", objpart.ID.ToString());
-                cmd.Parameters.AddWithValue("?v_LinkNumber", objpart.LinkNumber);
-                cmd.Parameters.AddWithValue("?v_RootPartID", objpart.ObjectGroup.RootPart.ID.ToString());
-                v = objpart.Position;
-                cmd.Parameters.AddWithValue("?v_PositionX", v.X);
-                cmd.Parameters.AddWithValue("?v_PositionY", v.Y);
-                cmd.Parameters.AddWithValue("?v_PositionZ", v.Z);
+                cmd.Parameters.AddParameter("?v_ID", objpart.ID);
+                cmd.Parameters.AddParameter("?v_LinkNumber", objpart.LinkNumber);
+                cmd.Parameters.AddParameter("?v_RootPartID", objpart.ObjectGroup.RootPart.ID);
+                cmd.Parameters.AddParameter("?v_Position", objpart.Position);
+                cmd.Parameters.AddParameter("?v_Rotation", objpart.Rotation);
 
-                q = objpart.Rotation;
-                cmd.Parameters.AddWithValue("?v_RotationX", q.X);
-                cmd.Parameters.AddWithValue("?v_RotationY", q.Y);
-                cmd.Parameters.AddWithValue("?v_RotationZ", q.Z);
-                cmd.Parameters.AddWithValue("?v_RotationW", q.W);
-
-                cmd.Parameters.AddWithValue("?v_SitText", objpart.SitText);
-                cmd.Parameters.AddWithValue("?v_TouchText", objpart.TouchText);
-                cmd.Parameters.AddWithValue("?v_Name", objpart.Name);
-                cmd.Parameters.AddWithValue("?v_Description", objpart.Description);
-
-                v = objpart.SitTargetOffset;
-                cmd.Parameters.AddWithValue("?v_SitTargetOffsetX", v.X);
-                cmd.Parameters.AddWithValue("?v_SitTargetOffsetY", v.Y);
-                cmd.Parameters.AddWithValue("?v_SitTargetOffsetZ", v.Z);
-
-                q = objpart.SitTargetOrientation;
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationX", q.X);
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationY", q.Y);
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationZ", q.Z);
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationW", q.W);
-
-                cmd.Parameters.AddWithValue("?v_PhysicsShapeType", (int)objpart.PhysicsShapeType);
-                cmd.Parameters.AddWithValue("?v_Material", (int)objpart.Material);
-
-                v = objpart.Size;
-                cmd.Parameters.AddWithValue("?v_SizeX", v.X);
-                cmd.Parameters.AddWithValue("?v_SizeY", v.Y);
-                cmd.Parameters.AddWithValue("?v_SizeZ", v.Z);
-
-                v = objpart.Slice;
-                cmd.Parameters.AddWithValue("?v_SliceX", v.X);
-                cmd.Parameters.AddWithValue("?v_SliceY", v.Y);
-                cmd.Parameters.AddWithValue("?v_SliceZ", v.Z);
-                cmd.Parameters.AddWithValue("?v_MediaURL", objpart.MediaURL);
-                cmd.Parameters.AddWithValue("?v_Creator", objpart.Creator.ToString());
-                cmd.Parameters.AddWithValue("?v_CreationDate", objpart.CreationDate.AsULong);
-                cmd.Parameters.AddWithValue("?v_Flags", (uint)objpart.Flags);
-
-                v = objpart.AngularVelocity;
-                cmd.Parameters.AddWithValue("?v_AngularVelocityX", v.X);
-                cmd.Parameters.AddWithValue("?v_AngularVelocityY", v.Y);
-                cmd.Parameters.AddWithValue("?v_AngularVelocityZ", v.Z);
-
-                cmd.Parameters.AddWithValue("?v_LightData", objpart.PointLight.Serialization);
-                cmd.Parameters.AddWithValue("?v_HoverTextData", objpart.Text.Serialization);
-                cmd.Parameters.AddWithValue("?v_FlexibleData", objpart.Flexible.Serialization);
-                cmd.Parameters.AddWithValue("?v_LoopedSoundData", objpart.Sound.Serialization);
-                cmd.Parameters.AddWithValue("?v_ImpactSoundData", objpart.CollisionSound.Serialization);
-                cmd.Parameters.AddWithValue("?v_PrimitiveShapeData", objpart.Shape.Serialization);
-                cmd.Parameters.AddWithValue("?v_ParticleSystem", objpart.ParticleSystemBytes);
-                cmd.Parameters.AddWithValue("?v_TextureEntryBytes", objpart.TextureEntryBytes);
-                cmd.Parameters.AddWithValue("?v_TextureAnimationBytes", objpart.TextureAnimationBytes);
-                cmd.Parameters.AddWithValue("?v_ScriptAccessPin", objpart.ScriptAccessPin);
-
-                v = objpart.CameraAtOffset;
-                cmd.Parameters.AddWithValue("?v_CameraAtOffsetX", v.X);
-                cmd.Parameters.AddWithValue("?v_CameraAtOffsetY", v.Y);
-                cmd.Parameters.AddWithValue("?v_CameraAtOffsetZ", v.Z);
-
-                v = objpart.CameraEyeOffset;
-                cmd.Parameters.AddWithValue("?v_CameraEyeOffsetX", v.X);
-                cmd.Parameters.AddWithValue("?v_CameraEyeOffsetY", v.Y);
-                cmd.Parameters.AddWithValue("?v_CameraEyeOffsetZ", v.Z);
-
-                cmd.Parameters.AddWithValue("?v_ForceMouselook", objpart.ForceMouselook ? 1 : 0);
+                cmd.Parameters.AddParameter("?v_SitText", objpart.SitText);
+                cmd.Parameters.AddParameter("?v_TouchText", objpart.TouchText);
+                cmd.Parameters.AddParameter("?v_Name", objpart.Name);
+                cmd.Parameters.AddParameter("?v_Description", objpart.Description);
+                cmd.Parameters.AddParameter("?v_SitTargetOffset", objpart.SitTargetOffset);
+                cmd.Parameters.AddParameter("?v_SitTargetOrientation", objpart.SitTargetOrientation);
+                cmd.Parameters.AddParameter("?v_PhysicsShapeType", objpart.PhysicsShapeType);
+                cmd.Parameters.AddParameter("?v_Material", objpart.Material);
+                cmd.Parameters.AddParameter("?v_Size", objpart.Size);
+                cmd.Parameters.AddParameter("?v_Slice", objpart.Slice);
+                cmd.Parameters.AddParameter("?v_MediaURL", objpart.MediaURL);
+                cmd.Parameters.AddParameter("?v_Creator", objpart.Creator);
+                cmd.Parameters.AddParameter("?v_CreationDate", objpart.CreationDate);
+                cmd.Parameters.AddParameter("?v_Flags", objpart.Flags);
+                cmd.Parameters.AddParameter("?v_AngularVelocity", objpart.AngularVelocity);
+                cmd.Parameters.AddParameter("?v_LightData", objpart.PointLight.Serialization);
+                cmd.Parameters.AddParameter("?v_HoverTextData", objpart.Text.Serialization);
+                cmd.Parameters.AddParameter("?v_FlexibleData", objpart.Flexible.Serialization);
+                cmd.Parameters.AddParameter("?v_LoopedSoundData", objpart.Sound.Serialization);
+                cmd.Parameters.AddParameter("?v_ImpactSoundData", objpart.CollisionSound.Serialization);
+                cmd.Parameters.AddParameter("?v_PrimitiveShapeData", objpart.Shape.Serialization);
+                cmd.Parameters.AddParameter("?v_ParticleSystem", objpart.ParticleSystemBytes);
+                cmd.Parameters.AddParameter("?v_TextureEntryBytes", objpart.TextureEntryBytes);
+                cmd.Parameters.AddParameter("?v_TextureAnimationBytes", objpart.TextureAnimationBytes);
+                cmd.Parameters.AddParameter("?v_ScriptAccessPin", objpart.ScriptAccessPin);
+                cmd.Parameters.AddParameter("?v_CameraAtOffset", objpart.CameraAtOffset);
+                cmd.Parameters.AddParameter("?v_CameraEyeOffset", objpart.CameraEyeOffset);
+                cmd.Parameters.AddParameter("?v_ForceMouselook", objpart.ForceMouselook);
 
                 using (MemoryStream ms = new MemoryStream())
                 { 

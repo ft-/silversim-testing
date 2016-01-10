@@ -35,8 +35,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT TerrainData FROM terrains WHERE RegionID LIKE ?regionid AND PatchID = ?patchid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                        cmd.Parameters.AddWithValue("?patchid", extendedPatchID);
+                        cmd.Parameters.AddParameter("?regionid", regionID);
+                        cmd.Parameters.AddParameter("?patchid", extendedPatchID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             LayerPatch patch;
@@ -45,7 +45,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             {
                                 patch = new LayerPatch();
                                 patch.ExtendedPatchID = extendedPatchID;
-                                patch.Serialization = (byte[])dbReader["TerrainData"];
+                                patch.Serialization = dbReader.GetBytes("TerrainData");
                                 return patch;
                             }
                         }
@@ -74,9 +74,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             using (cmd)
                             {
-                                cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                                cmd.Parameters.AddWithValue("?patchid", extendedPatchID);
-                                cmd.Parameters.AddWithValue("?terraindata", value.Serialization);
+                                cmd.Parameters.AddParameter("?regionid", regionID);
+                                cmd.Parameters.AddParameter("?patchid", extendedPatchID);
+                                cmd.Parameters.AddParameter("?terraindata", value.Serialization);
                                 cmd.ExecuteNonQuery();
                             }
                         }
@@ -104,7 +104,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     using (MySqlCommand cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM terrains WHERE RegionID LIKE ?id", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddWithValue("?id", regionID.ToString());
+                        cmd.Parameters.AddParameter("?id", regionID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             LayerPatch patch;
@@ -112,8 +112,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             while (dbReader.Read())
                             {
                                 patch = new LayerPatch();
-                                patch.ExtendedPatchID = (uint)dbReader["PatchID"];
-                                patch.Serialization = (byte[])dbReader["TerrainData"];
+                                patch.ExtendedPatchID = dbReader.GetUInt32("PatchID");
+                                patch.Serialization = dbReader.GetBytes("TerrainData");
                                 patches.Add(patch);
                             }
                         }

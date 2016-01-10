@@ -887,9 +887,9 @@ namespace SilverSim.Viewer.Core
                     item.SaleInfo.Price = d.SalePrice;
                     item.SaleInfo.Type = d.SaleType;
 
-                    if (item.InventoryType == InventoryType.Wearable && (d.Flags & 0xf) == 0 && (d.Flags & 0xf) != 0)
+                    if (item.InventoryType == InventoryType.Wearable && ((uint)d.Flags & 0xf) == 0 && ((uint)d.Flags & 0xf) != 0)
                     {
-                        item.Flags = (uint)(item.Flags & 0xfffffff0) | (d.Flags & 0xf);
+                        item.Flags = (InventoryFlags)(((uint)item.Flags & 0xfffffff0) | ((uint)d.Flags & 0xf));
                         sendUpdate = true;
                     }
 

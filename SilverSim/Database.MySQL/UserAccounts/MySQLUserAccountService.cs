@@ -68,6 +68,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
             new NamedKeyInfo("Name", "FirstName", "LastName") { IsUnique = true },
             new NamedKeyInfo("FirstName", "FirstName"),
             new NamedKeyInfo("LastName", "LastName"),
+            new TableRevision(2),
+            new ChangeColumn<uint>("UserFlags") { IsNullAllowed = false, Default = 0 }
         };
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)
@@ -79,8 +81,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
                     {
-                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        cmd.Parameters.AddParameter("?scopeid", scopeID);
+                        cmd.Parameters.AddParameter("?id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -94,7 +96,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ID LIKE ?id", connection))
                     {
-                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        cmd.Parameters.AddParameter("?id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -118,8 +120,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
                     {
-                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        cmd.Parameters.AddParameter("?scopeid", scopeID);
+                        cmd.Parameters.AddParameter("?id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -134,7 +136,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ID LIKE ?id", connection))
                     {
-                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        cmd.Parameters.AddParameter("?id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -172,8 +174,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
                 {
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                    cmd.Parameters.AddWithValue("?email", email);
+                    cmd.Parameters.AddParameter("?scopeid", scopeID);
+                    cmd.Parameters.AddParameter("?email", email);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -194,8 +196,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
                 {
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                    cmd.Parameters.AddWithValue("?email", email);
+                    cmd.Parameters.AddParameter("?scopeid", scopeID);
+                    cmd.Parameters.AddParameter("?email", email);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -234,9 +236,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
-                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        cmd.Parameters.AddWithValue("?firstname", firstName);
-                        cmd.Parameters.AddWithValue("?lastname", lastName);
+                        cmd.Parameters.AddParameter("?scopeid", scopeID);
+                        cmd.Parameters.AddParameter("?firstname", firstName);
+                        cmd.Parameters.AddParameter("?lastname", lastName);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -250,8 +252,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
-                        cmd.Parameters.AddWithValue("?firstname", firstName);
-                        cmd.Parameters.AddWithValue("?lastname", lastName);
+                        cmd.Parameters.AddParameter("?firstname", firstName);
+                        cmd.Parameters.AddParameter("?lastname", lastName);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -275,9 +277,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
-                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        cmd.Parameters.AddWithValue("?firstname", firstName);
-                        cmd.Parameters.AddWithValue("?lastname", lastName);
+                        cmd.Parameters.AddParameter("?scopeid", scopeID);
+                        cmd.Parameters.AddParameter("?firstname", firstName);
+                        cmd.Parameters.AddParameter("?lastname", lastName);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -292,8 +294,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
-                        cmd.Parameters.AddWithValue("?firstname", firstName);
-                        cmd.Parameters.AddWithValue("?lastname", lastName);
+                        cmd.Parameters.AddParameter("?firstname", firstName);
+                        cmd.Parameters.AddParameter("?lastname", lastName);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -343,10 +345,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 using (MySqlCommand cmd = new MySqlCommand(cmdstr, connection))
                 {
-                    cmd.Parameters.AddWithValue("?ScopeID", scopeID.ToString());
+                    cmd.Parameters.AddParameter("?ScopeID", scopeID);
                     for (int i = 0; i < words.Length; ++i)
                     {
-                        cmd.Parameters.AddWithValue("?word" + i.ToString(), words[i]);
+                        cmd.Parameters.AddParameter("?word" + i.ToString(), words[i]);
                     }
                     using (MySqlDataReader dbreader = cmd.ExecuteReader())
                     {
@@ -363,8 +365,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
         public override void Add(UserAccount userAccount)
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
-            data["ID"] = userAccount.Principal.ID.ToString();
-            data["ScopeID"] = userAccount.ScopeID.ToString();
+            data["ID"] = userAccount.Principal.ID;
+            data["ScopeID"] = userAccount.ScopeID;
             data["FirstName"] = userAccount.Principal.FirstName;
             data["LastName"] = userAccount.Principal.LastName;
             data["Email"] = userAccount.Email;
@@ -391,8 +393,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
             data["UserFlags"] = userAccount.UserFlags;
             data["UserTitle"] = userAccount.UserTitle;
             Dictionary<string, object> w = new Dictionary<string,object>();
-            w["ScopeID"] = userAccount.ScopeID.ToString();
-            w["ID"] = userAccount.Principal.ID.ToString();
+            w["ScopeID"] = userAccount.ScopeID;
+            w["ID"] = userAccount.Principal.ID;
 
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -408,8 +410,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM useraccounts WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?id", accountID.ToString());
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    cmd.Parameters.AddParameter("?id", accountID);
+                    cmd.Parameters.AddParameter("?scopeid", scopeID);
                     if (cmd.ExecuteNonQuery() < 1)
                     {
                         throw new KeyNotFoundException();

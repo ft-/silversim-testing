@@ -42,14 +42,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                     /* we use a specific implementation to reduce the result set here */
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE ?regionid AND ParcelID LIKE ?parcelid AND Accessor LIKE \"" + accessor.ID.ToString() + "\"%", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                        cmd.Parameters.AddWithValue("?parcelid", parcelID.ToString());
+                        cmd.Parameters.AddParameter("?regionid", regionID);
+                        cmd.Parameters.AddParameter("?parcelid", parcelID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             ParcelAccessEntry entry = new ParcelAccessEntry();
                             entry.ParcelID = reader.GetUUID("ParcelID");
                             entry.Accessor = reader.GetUUI("Accessor");
-                            ulong val = (ulong)reader["ExpiresAt"];
+                            ulong val = reader.GetUInt64("ExpiresAt");
                             if (val != 0)
                             {
                                 entry.ExpiresAt = Date.UnixTimeToDateTime(val);
@@ -75,14 +75,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= ?unixtime AND ExpiresAt > 0", connection))
                     {
-                        cmd.Parameters.AddWithValue("?unixtime", Date.GetUnixTime());
+                        cmd.Parameters.AddParameter("?unixtime", Date.Now);
                         cmd.ExecuteNonQuery();
                     }
 
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE ?regionid AND ParcelID LIKE ?parcelid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                        cmd.Parameters.AddWithValue("?parcelid", parcelID.ToString());
+                        cmd.Parameters.AddParameter("?regionid", regionID);
+                        cmd.Parameters.AddParameter("?parcelid", parcelID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -91,7 +91,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 entry.RegionID = reader.GetUUID("RegionID");
                                 entry.ParcelID = reader.GetUUID("ParcelID");
                                 entry.Accessor = reader.GetUUI("Accessor");
-                                ulong val = ulong.Parse(reader["ExpiresAt"].ToString());
+                                ulong val = reader.GetUInt64("ExpiresAt");
                                 if (val != 0)
                                 {
                                     entry.ExpiresAt = Date.UnixTimeToDateTime(val);
@@ -117,9 +117,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
 
                 Dictionary<string, object> data = new Dictionary<string, object>();
-                data["RegionID"] = entry.RegionID.ToString();
-                data["ParcelID"] = entry.ParcelID.ToString();
-                data["Accessor"] = entry.Accessor.ToString();
+                data["RegionID"] = entry.RegionID;
+                data["ParcelID"] = entry.ParcelID;
+                data["Accessor"] = entry.Accessor;
                 data["ExpiresAt"] = entry.ExpiresAt != null ? entry.ExpiresAt.AsULong : (ulong)0;
                 connection.ReplaceInto(m_TableName, data);
             }
@@ -132,7 +132,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE ?regionid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddParameter("?regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -145,8 +145,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE ?regionid AND ParcelID LIKE ?parcelid AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                    cmd.Parameters.AddWithValue("?parcelid", parcelID.ToString());
+                    cmd.Parameters.AddParameter("?regionid", regionID);
+                    cmd.Parameters.AddParameter("?parcelid", parcelID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

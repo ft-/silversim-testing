@@ -1,13 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
-using SilverSim.ServiceInterfaces.Estate;
 using MySql.Data.MySqlClient;
+using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.Types;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Estate
 {
@@ -30,7 +27,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT RegionID FROM estate_regionmap WHERE EstateID = ?estateid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?estateid", estateID);
+                        cmd.Parameters.AddParameter("?estateid", estateID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -51,12 +48,12 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = ?regionid", conn))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddParameter("?regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            estateID = (uint)reader["EstateID"];
+                            estateID = reader.GetUInt32("EstateID");
                             return true;
                         }
                     }
@@ -74,7 +71,7 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM estate_regionmap WHERE RegionID = ?regionid", conn))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddParameter("?regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -102,7 +99,7 @@ namespace SilverSim.Database.MySQL.Estate
             {
                 Dictionary<string, object> vals = new Dictionary<string,object>();
                 vals["EstateID"] = value;
-                vals["RegionID"] = regionID.ToString();
+                vals["RegionID"] = regionID;
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();

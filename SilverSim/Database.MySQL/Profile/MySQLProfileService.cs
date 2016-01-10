@@ -51,32 +51,32 @@ namespace SilverSim.Database.MySQL.Profile
                 {
                     using(MySqlCommand cmd = new MySqlCommand("DELETE FROM classifieds where creatoruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", userAccount.ToString());
+                        cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM userpicks where creatoruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", userAccount.ToString());
+                        cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM usernotes where useruuid LIKE ?uuid OR targetuuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", userAccount.ToString());
+                        cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM usersettings where useruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", userAccount.ToString());
+                        cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM userprofile where useruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", userAccount.ToString());
+                        cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
                     using (MySqlCommand cmd = new MySqlCommand("UPDATE userprofile set profilePartner = '00000000-0000-0000-0000-000000000000' where profilePartner LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", userAccount.ToString());
+                        cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
                 });

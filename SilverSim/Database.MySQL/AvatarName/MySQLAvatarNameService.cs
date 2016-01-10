@@ -43,8 +43,8 @@ namespace SilverSim.Database.MySQL.AvatarName
 
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstName AND LastName LIKE ?lastName", connection))
                 {
-                    cmd.Parameters.AddWithValue("?firstName", firstName);
-                    cmd.Parameters.AddWithValue("?lastName", lastName);
+                    cmd.Parameters.AddParameter("?firstName", firstName);
+                    cmd.Parameters.AddParameter("?lastName", lastName);
                     using (MySqlDataReader dbreader = cmd.ExecuteReader())
                     {
                         if (!dbreader.Read())
@@ -52,12 +52,7 @@ namespace SilverSim.Database.MySQL.AvatarName
                             uui = default(UUI);
                             return false;
                         }
-                        uui = new UUI();
-                        uui.ID = dbreader.GetUUID("AvatarID");
-                        uui.HomeURI = new Uri((string)dbreader["HomeURI"]);
-                        uui.FirstName = (string)dbreader["FirstName"];
-                        uui.LastName = (string)dbreader["LastName"];
-                        uui.IsAuthoritative = true;
+                        uui = ToUUI(dbreader);
                         return true;
                     }
                 }
@@ -86,7 +81,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE ?avatarid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?avatarid", key.ToString());
+                    cmd.Parameters.AddParameter("?avatarid", key);
                     using (MySqlDataReader dbreader = cmd.ExecuteReader())
                     {
                         if (!dbreader.Read())
@@ -94,12 +89,7 @@ namespace SilverSim.Database.MySQL.AvatarName
                             uui = default(UUI);
                             return false;
                         }
-                        uui = new UUI();
-                        uui.ID = dbreader.GetUUID("AvatarID");
-                        uui.HomeURI = new Uri((string)dbreader["HomeURI"]);
-                        uui.FirstName = (string)dbreader["FirstName"];
-                        uui.LastName = (string)dbreader["LastName"];
-                        uui.IsAuthoritative = true;
+                        uui = ToUUI(dbreader);
                         return true;
                     }
                 }
@@ -127,7 +117,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
                         using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
                         {
-                            cmd.Parameters.AddWithValue("?id", key.ToString());
+                            cmd.Parameters.AddParameter("?id", key);
                             if(cmd.ExecuteNonQuery() < 1)
                             {
                                 throw new KeyNotFoundException();
@@ -139,8 +129,8 @@ namespace SilverSim.Database.MySQL.AvatarName
                 else if(value.IsAuthoritative) /* do not store non-authoritative entries */
                 {
                     Dictionary<string, object> data = new Dictionary<string, object>();
-                    data["AvatarID"] = value.ID.ToString();
-                    data["HomeURI"] = value.HomeURI.ToString();
+                    data["AvatarID"] = value.ID;
+                    data["HomeURI"] = value.HomeURI;
                     data["FirstName"] = value.FirstName;
                     data["LastName"] = value.LastName;
                     using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -169,7 +159,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?name OR LastName LIKE ?name", connection))
                     {
-                        cmd.Parameters.AddWithValue("?name", "%" + names[0] + "%");
+                        cmd.Parameters.AddParameter("?name", "%" + names[0] + "%");
 
                         return GetSearchResults(cmd);
                     }
@@ -183,8 +173,8 @@ namespace SilverSim.Database.MySQL.AvatarName
 
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
-                        cmd.Parameters.AddWithValue("?firstname", "%" + names[0] + "%");
-                        cmd.Parameters.AddWithValue("?lastname", "%" + names[1] + "%");
+                        cmd.Parameters.AddParameter("?firstname", "%" + names[0] + "%");
+                        cmd.Parameters.AddParameter("?lastname", "%" + names[1] + "%");
 
                         return GetSearchResults(cmd);
                     }
@@ -199,17 +189,22 @@ namespace SilverSim.Database.MySQL.AvatarName
             {
                 while(dbreader.Read())
                 {
-                    UUI nd = new UUI();
-                    nd.ID = dbreader.GetUUID("AvatarID");
-                    nd.HomeURI = new Uri((string)dbreader["HomeURI"]);
-                    nd.FirstName = (string)dbreader["FirstName"];
-                    nd.LastName = (string)dbreader["LastName"];
-                    nd.IsAuthoritative = true;
-                    results.Add(nd);
+                    results.Add(ToUUI(dbreader));
                 }
                 return results;
             }
 
+        }
+
+        static UUI ToUUI(MySqlDataReader dbreader)
+        {
+            UUI nd = new UUI();
+            nd.ID = dbreader.GetUUID("AvatarID");
+            nd.HomeURI = dbreader.GetUri("HomeURI");
+            nd.FirstName = dbreader.GetString("FirstName");
+            nd.LastName = dbreader.GetString("LastName");
+            nd.IsAuthoritative = true;
+            return nd;
         }
 
         public void VerifyConnection()

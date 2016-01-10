@@ -144,12 +144,12 @@ namespace SilverSim.Database.MySQL.Asset
                             asset = new AssetData();
                             asset.ID = dbReader.GetUUID("id");
                             asset.Data = dbReader.GetBytes("data");
-                            asset.Type = (AssetType)(int)dbReader["assetType"];
-                            asset.Name = (string)dbReader["name"];
+                            asset.Type = dbReader.GetEnum<AssetType>("assetType");
+                            asset.Name = dbReader.GetString("name");
                             asset.CreateTime = dbReader.GetDate("create_time");
                             asset.AccessTime = dbReader.GetDate("access_time");
                             asset.Creator = dbReader.GetUUI("CreatorID");
-                            asset.Flags = dbReader.GetAssetFlags("asset_flags");
+                            asset.Flags = dbReader.GetEnum<AssetFlags>("asset_flags");
                             asset.Temporary = dbReader.GetBoolean("temporary");
 
                             if (asset.CreateTime - DateTime.UtcNow > TimeSpan.FromHours(1))
@@ -248,15 +248,15 @@ namespace SilverSim.Database.MySQL.Asset
                         {
                             // create unix epoch time
                             ulong now = Date.GetUnixTime();
-                            cmd.Parameters.AddWithValue("?id", asset.ID.ToString());
-                            cmd.Parameters.AddWithValue("?name", assetName);
-                            cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
-                            cmd.Parameters.AddWithValue("?temporary", asset.Temporary);
-                            cmd.Parameters.AddWithValue("?create_time", now);
-                            cmd.Parameters.AddWithValue("?access_time", now);
-                            cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID.ToString());
-                            cmd.Parameters.AddWithValue("?asset_flags", (uint)asset.Flags);
-                            cmd.Parameters.AddWithValue("?data", asset.Data);
+                            cmd.Parameters.AddParameter("?id", asset.ID);
+                            cmd.Parameters.AddParameter("?name", assetName);
+                            cmd.Parameters.AddParameter("?assetType", asset.Type);
+                            cmd.Parameters.AddParameter("?temporary", asset.Temporary);
+                            cmd.Parameters.AddParameter("?create_time", now);
+                            cmd.Parameters.AddParameter("?access_time", now);
+                            cmd.Parameters.AddParameter("?CreatorID", asset.Creator.ID);
+                            cmd.Parameters.AddParameter("?asset_flags", asset.Flags);
+                            cmd.Parameters.AddParameter("?data", asset.Data);
                             if(1 > cmd.ExecuteNonQuery())
                             {
                                 throw new AssetStoreFailedException(asset.ID);
@@ -284,7 +284,7 @@ namespace SilverSim.Database.MySQL.Asset
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assets WHERE id=?id AND asset_flags <> 0", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", id.ToString());
+                    cmd.Parameters.AddParameter("?id", id);
                     if(cmd.ExecuteNonQuery() < 1)
                     {
                         throw new AssetNotDeletedException(id);
