@@ -25,5 +25,14 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteUUID(GroupID);
             p.WriteBoolean(Success);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            EjectGroupMemberReply m = new EjectGroupMemberReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.Success = p.ReadBoolean();
+            return m;
+        }
     }
 }

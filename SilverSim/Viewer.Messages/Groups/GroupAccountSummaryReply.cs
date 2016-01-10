@@ -65,5 +65,32 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteStringLen8(LastTaxDate);
             p.WriteStringLen8(TaxDate);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupAccountSummaryReply m = new GroupAccountSummaryReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.RequestID = p.ReadUUID();
+            m.IntervalDays = p.ReadInt32();
+            m.CurrentInterval = p.ReadInt32();
+            m.StartDate = p.ReadStringLen8();
+            m.Balance = p.ReadInt32();
+            m.TotalCredits = p.ReadInt32();
+            m.TotalDebits = p.ReadInt32();
+            m.ObjectTaxCurrent = p.ReadInt32();
+            m.LightTaxCurrent = p.ReadInt32();
+            m.LandTaxCurrent = p.ReadInt32();
+            m.GroupTaxCurrent = p.ReadInt32();
+            m.ParcelDirFeeCurrent = p.ReadInt32();
+            m.ObjectTaxEstimate = p.ReadInt32();
+            m.LightTaxEstimate = p.ReadInt32();
+            m.GroupTaxEstimate = p.ReadInt32();
+            m.ParcelDirFeeEstimate = p.ReadInt32();
+            m.NonExemptMembers = p.ReadInt32();
+            m.LastTaxDate = p.ReadStringLen8();
+            m.TaxDate = p.ReadStringLen8();
+            return m;
+        }
     }
 }

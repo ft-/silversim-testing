@@ -27,6 +27,18 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public override void Serialize(UDPPacket p)
         {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(RequestID);
+            p.WriteInt32(IntervalDays);
+            p.WriteInt32(CurrentInterval);
+            p.WriteStringLen8(StartDate);
+            p.WriteStringLen8(Description);
+            p.WriteInt32(Amount);
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
             GroupAccountDetailsReply m = new GroupAccountDetailsReply();
             m.AgentID = p.ReadUUID();
             m.GroupID = p.ReadUUID();
@@ -36,6 +48,7 @@ namespace SilverSim.Viewer.Messages.Groups
             m.StartDate = p.ReadStringLen8();
             m.Description = p.ReadStringLen8();
             m.Amount = p.ReadInt32();
+            return m;
         }
     }
 }

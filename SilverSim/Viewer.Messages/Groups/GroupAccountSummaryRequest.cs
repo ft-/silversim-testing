@@ -35,5 +35,15 @@ namespace SilverSim.Viewer.Messages.Groups
             m.CurrentInterval = p.ReadInt32();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(RequestID);
+            p.WriteInt32(IntervalDays);
+            p.WriteInt32(CurrentInterval);
+        }
     }
 }

@@ -39,5 +39,17 @@ namespace SilverSim.Viewer.Messages.Friend
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(TransactionID);
+            p.WriteUInt8((byte)FolderIDs.Count);
+            foreach(UUID id in FolderIDs)
+            {
+                p.WriteUUID(id);
+            }
+        }
     }
 }

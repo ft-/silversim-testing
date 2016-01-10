@@ -48,5 +48,19 @@ namespace SilverSim.Viewer.Messages.Gestures
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(Flags);
+            p.WriteUInt8((byte)Data.Count);
+            foreach (DataEntry d in Data)
+            {
+                p.WriteUUID(d.ItemID);
+                p.WriteUUID(d.AssetID);
+                p.WriteUInt32(d.GestureFlags);
+            }
+        }
     }
 }

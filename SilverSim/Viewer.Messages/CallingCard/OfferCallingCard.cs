@@ -31,5 +31,13 @@ namespace SilverSim.Viewer.Messages.CallingCard
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(DestID);
+            p.WriteUUID(TransactionID);
+        }
     }
 }

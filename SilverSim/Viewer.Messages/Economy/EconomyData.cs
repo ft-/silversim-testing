@@ -53,5 +53,29 @@ namespace SilverSim.Viewer.Messages.Economy
             p.WriteInt32(PriceParcelRent);
             p.WriteInt32(PriceGroupCreate);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            EconomyData m = new EconomyData();
+            m.ObjectCapacity = p.ReadInt32();
+            m.ObjectCount = p.ReadInt32();
+            m.PriceEnergyUnit = p.ReadInt32();
+            m.PriceObjectClaim = p.ReadInt32();
+            m.PricePublicObjectDecay = p.ReadInt32();
+            m.PricePublicObjectDelete = p.ReadInt32();
+            m.PriceParcelClaim = p.ReadInt32();
+            m.PriceParcelClaimFactor = p.ReadFloat();
+            m.PriceUpload = p.ReadInt32();
+            m.PriceRentLight = p.ReadInt32();
+            m.TeleportMinPrice = p.ReadInt32();
+            m.TeleportPriceExponent = p.ReadFloat();
+            m.EnergyEfficiency = p.ReadFloat();
+            m.PriceObjectRent = p.ReadFloat();
+            m.PriceObjectScaleFactor = p.ReadFloat();
+            m.PriceParcelRent = p.ReadInt32();
+            m.PriceGroupCreate = p.ReadInt32();
+
+            return m;
+        }
     }
 }

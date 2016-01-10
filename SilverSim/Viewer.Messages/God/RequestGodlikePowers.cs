@@ -30,5 +30,13 @@ namespace SilverSim.Viewer.Messages.God
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteBoolean(IsGodlike);
+            p.WriteUUID(Token);
+        }
     }
 }

@@ -28,5 +28,23 @@ namespace SilverSim.Viewer.Messages.Groups
                 return MessageType.EjectGroupMemberRequest;
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            EjectGroupMemberRequest m = new EjectGroupMemberRequest();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.EjecteeID = p.ReadUUID();
+            return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(EjecteeID);
+        }
     }
 }

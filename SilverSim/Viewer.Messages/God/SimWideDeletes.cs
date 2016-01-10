@@ -38,5 +38,13 @@ namespace SilverSim.Viewer.Messages.God
             m.Flags = (DeleteFlags)p.ReadUInt32();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(TargetID);
+            p.WriteUInt32((uint)Flags);
+        }
     }
 }

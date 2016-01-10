@@ -37,5 +37,20 @@ namespace SilverSim.Viewer.Messages.Camera
                 p.WriteFloat((float)d.Value);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            SetFollowCamProperties m = new SetFollowCamProperties();
+            m.ObjectID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                CameraProperty d = new CameraProperty();
+                d.Type = p.ReadInt32();
+                d.Value = p.ReadFloat();
+                m.CameraProperties.Add(d);
+            }
+            return m;
+        }
     }
 }

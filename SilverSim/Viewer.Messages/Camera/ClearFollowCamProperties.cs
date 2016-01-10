@@ -21,5 +21,12 @@ namespace SilverSim.Viewer.Messages.Camera
         {
             p.WriteUUID(ObjectID);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ClearFollowCamProperties m = new ClearFollowCamProperties();
+            m.ObjectID = p.ReadUUID();
+            return m;
+        }
     }
 }

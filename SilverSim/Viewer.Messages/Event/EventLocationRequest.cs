@@ -27,5 +27,11 @@ namespace SilverSim.Viewer.Messages.Event
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(QueryID);
+            p.WriteUInt32(EventID);
+        }
     }
 }

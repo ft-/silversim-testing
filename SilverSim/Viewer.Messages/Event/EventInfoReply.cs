@@ -48,5 +48,25 @@ namespace SilverSim.Viewer.Messages.Event
             p.WriteVector3d(GlobalPos);
             p.WriteUInt32(EventFlags);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            EventInfoReply m = new EventInfoReply();
+            m.AgentID = p.ReadUUID();
+            m.EventID = p.ReadUInt32();
+            m.Creator = p.ReadStringLen8();
+            m.Name = p.ReadStringLen8();
+            m.Category = p.ReadStringLen8();
+            m.Desc = p.ReadStringLen16();
+            m.Date = p.ReadStringLen8();
+            m.DateUTC = p.ReadUInt32();
+            m.Duration = p.ReadUInt32();
+            m.Cover = p.ReadUInt32();
+            m.Amount = p.ReadUInt32();
+            m.SimName = p.ReadStringLen8();
+            m.GlobalPos = p.ReadVector3d();
+            m.EventFlags = p.ReadUInt32();
+            return m;
+        }
     }
 }

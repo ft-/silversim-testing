@@ -35,5 +35,19 @@ namespace SilverSim.Viewer.Messages.Chat
             p.WriteVector3f(Position);
             p.WriteStringLen16(Message);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ChatFromSimulator m = new ChatFromSimulator();
+            m.FromName = p.ReadStringLen8();
+            m.SourceID = p.ReadUUID();
+            m.OwnerID = p.ReadUUID();
+            m.SourceType = (ChatSourceType)p.ReadUInt8();
+            m.ChatType = (ChatType)p.ReadUInt8();
+            m.Audible = (ChatAudibleLevel)p.ReadUInt8();
+            m.Position = p.ReadVector3f();
+            m.Message = p.ReadStringLen16();
+            return m;
+        }
     }
 }

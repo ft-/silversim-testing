@@ -27,5 +27,15 @@ namespace SilverSim.Viewer.Messages.Event
             p.WriteUUID(RegionID);
             p.WriteVector3f(RegionPos);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            EventLocationReply m = new EventLocationReply();
+            m.QueryID = p.ReadUUID();
+            m.Success = p.ReadBoolean();
+            m.RegionID = p.ReadUUID();
+            m.RegionPos = p.ReadVector3f();
+            return m;
+        }
     }
 }

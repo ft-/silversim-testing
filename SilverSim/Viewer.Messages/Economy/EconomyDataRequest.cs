@@ -19,5 +19,10 @@ namespace SilverSim.Viewer.Messages.Economy
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            /* no data to serialize */
+        }
     }
 }

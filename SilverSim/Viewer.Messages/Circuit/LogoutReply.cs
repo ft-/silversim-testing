@@ -39,5 +39,18 @@ namespace SilverSim.Viewer.Messages.Circuit
                 }
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            LogoutReply m = new LogoutReply();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            for (uint i = 0; i < n; ++i)
+            {
+                m.InventoryData.Add(p.ReadUUID());
+            }
+            return m;
+        }
     }
 }

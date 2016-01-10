@@ -44,5 +44,19 @@ namespace SilverSim.Viewer.Messages.Economy
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(SourceID);
+            p.WriteUUID(DestID);
+            p.WriteUInt8(Flags);
+            p.WriteInt32(Amount);
+            p.WriteUInt8(AggregatePermNextOwner);
+            p.WriteUInt8(AggregatePermInventory);
+            p.WriteInt32(TransactionType);
+            p.WriteStringLen8(Description);
+        }
     }
 }

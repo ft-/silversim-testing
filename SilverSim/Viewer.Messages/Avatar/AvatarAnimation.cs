@@ -67,5 +67,34 @@ namespace SilverSim.Viewer.Messages.Avatar
                 p.WriteBytes(d.TypeData);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AvatarAnimation m = new AvatarAnimation();
+            m.Sender = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                AnimationData d = new AnimationData();
+                d.AnimID = p.ReadUUID();
+                d.AnimSequenceID = p.ReadUInt32();
+                m.AnimationList.Add(d);
+            }
+            n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                AnimationSourceData d = new AnimationSourceData();
+                d.ObjectID = p.ReadUUID();
+                m.AnimationSourceList.Add(d);
+            }
+            n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                PhysicalAvatarEventData d = new PhysicalAvatarEventData();
+                d.TypeData = p.ReadBytes(p.ReadUInt8());
+                m.PhysicalAvatarEventList.Add(d);
+            }
+            return m;
+        }
     }
 }

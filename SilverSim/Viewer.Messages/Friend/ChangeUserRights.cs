@@ -39,5 +39,21 @@ namespace SilverSim.Viewer.Messages.Friend
                 p.WriteInt32(d.RelatedRights);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ChangeUserRights m = new ChangeUserRights();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            for (uint i = 0; i < n; ++i)
+            {
+                RightsEntry d = new RightsEntry();
+                d.AgentRelated = p.ReadUUID();
+                d.RelatedRights = p.ReadInt32();
+                m.Rights.Add(d);
+            }
+            return m;
+        }
     }
 }
