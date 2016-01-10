@@ -527,7 +527,7 @@ namespace SilverSim.Types.Asset.Format
                 item.AssetID,
                 item.AssetTypeName,
                 item.InventoryTypeName,
-                item.Flags,
+                (uint)item.Flags,
                 item.SaleInfo.TypeName,
                 item.SaleInfo.Price,
                 item.Name,
