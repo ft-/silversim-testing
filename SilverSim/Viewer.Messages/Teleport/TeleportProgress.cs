@@ -27,5 +27,14 @@ namespace SilverSim.Viewer.Messages.Teleport
             p.WriteUInt32((UInt32)TeleportFlags);
             p.WriteStringLen8(Message);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            TeleportProgress m = new TeleportProgress();
+            m.AgentID = p.ReadUUID();
+            m.TeleportFlags = (TeleportFlags)p.ReadUInt32();
+            m.Message = p.ReadStringLen8();
+            return m;
+        }
     }
 }

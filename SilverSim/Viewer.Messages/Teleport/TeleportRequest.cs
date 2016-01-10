@@ -32,5 +32,14 @@ namespace SilverSim.Viewer.Messages.Teleport
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(RegionID);
+            p.WriteVector3f(Position);
+            p.WriteVector3f(LookAt);
+        }
     }
 }

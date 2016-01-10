@@ -31,6 +31,20 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         }
 
+        public static Message Decode(UDPPacket p)
+        {
+            TeleportFinish m = new TeleportFinish();
+            m.AgentID = p.ReadUUID();
+            m.LocationID = p.ReadUInt32();
+            m.SimIP = new IPAddress(p.ReadBytes(4));
+            m.SimPort = p.ReadUInt16();
+            m.GridPosition.RegionHandle = p.ReadUInt32();
+            m.SeedCapability = p.ReadStringLen16();
+            m.SimAccess = (RegionAccess)p.ReadUInt8();
+            m.TeleportFlags = (TeleportFlags)p.ReadUInt32();
+            return m;
+        }
+
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);

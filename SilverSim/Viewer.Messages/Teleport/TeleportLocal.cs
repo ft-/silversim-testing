@@ -31,5 +31,16 @@ namespace SilverSim.Viewer.Messages.Teleport
             p.WriteVector3f(LookAt);
             p.WriteUInt32((UInt32)TeleportFlags);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            TeleportLocal m = new TeleportLocal();
+            m.AgentID = p.ReadUUID();
+            m.LocationID = p.ReadUInt32();
+            m.Position = p.ReadVector3f();
+            m.LookAt = p.ReadVector3f();
+            m.TeleportFlags = (TeleportFlags)p.ReadUInt32();
+            return m;
+        }
     }
 }

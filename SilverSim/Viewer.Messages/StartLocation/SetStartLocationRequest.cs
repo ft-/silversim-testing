@@ -40,5 +40,15 @@ namespace SilverSim.Viewer.Messages.StartLocation
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteStringLen8(SimName);
+            p.WriteUInt32(LocationID);
+            p.WriteVector3f(LocationPos);
+            p.WriteVector3f(LocationLookAt);
+        }
     }
 }

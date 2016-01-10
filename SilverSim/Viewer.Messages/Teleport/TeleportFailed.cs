@@ -37,5 +37,21 @@ namespace SilverSim.Viewer.Messages.Teleport
                 p.WriteStringLen8(e.ExtraParams);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            TeleportFailed m = new TeleportFailed();
+            m.AgentID = p.ReadUUID();
+            m.Reason = p.ReadStringLen8();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                AlertInfoEntry e = new AlertInfoEntry();
+                e.Message = p.ReadStringLen8();
+                e.ExtraParams = p.ReadStringLen8();
+                m.AlertInfo.Add(e);
+            }
+            return m;
+        }
     }
 }
