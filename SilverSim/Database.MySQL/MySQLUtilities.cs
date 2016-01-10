@@ -475,7 +475,7 @@ namespace SilverSim.Database.MySQL
         {
             string q1 = "UPDATE " + tablename + " SET ";
 
-            q1 += UpdateSetFromVals(vals);
+            q1 += string.Join(",", UpdateSetFromVals(vals));
 
             string wherestr = string.Empty;
             foreach(KeyValuePair<string, object> w in where)
@@ -484,7 +484,7 @@ namespace SilverSim.Database.MySQL
                 {
                     wherestr += " AND ";
                 }
-                wherestr += string.Format("{0} LIKE ?w_{1}", w.Key, w.Key);
+                wherestr += string.Format("{0} LIKE ?w_{0}", w.Key);
             }
 
             using (MySqlCommand command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))
