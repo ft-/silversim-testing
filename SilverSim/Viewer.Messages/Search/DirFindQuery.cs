@@ -36,5 +36,15 @@ namespace SilverSim.Viewer.Messages.Search
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(QueryID);
+            p.WriteStringLen8(QueryText);
+            p.WriteUInt32((uint)QueryFlags);
+            p.WriteInt32(QueryStart);
+        }
     }
 }

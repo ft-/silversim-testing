@@ -40,5 +40,22 @@ namespace SilverSim.Viewer.Messages.Search
                 p.WriteStringLen8(d.LastName);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AvatarPickerReply m = new AvatarPickerReply();
+            m.AgentID = p.ReadUUID();
+            m.QueryID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                DataEntry d = new DataEntry();
+                d.AvatarID = p.ReadUUID();
+                d.FirstName = p.ReadStringLen8();
+                d.LastName = p.ReadStringLen8();
+                m.Data.Add(d);
+            }
+            return m;
+        }
     }
 }

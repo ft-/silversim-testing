@@ -53,5 +53,32 @@ namespace SilverSim.Viewer.Messages.Search
                 p.WriteUInt32(d.Status);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            DirPlacesReply m = new DirPlacesReply();
+            m.AgentID = p.ReadUUID();
+            m.QueryID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                QueryReplyData d = new QueryReplyData();
+                d.ParcelID = p.ReadUUID();
+                d.Name = p.ReadStringLen8();
+                d.ForSale = p.ReadBoolean();
+                d.Auction = p.ReadBoolean();
+                d.Dwell = p.ReadFloat();
+                m.QueryReplies.Add(d);
+            }
+
+            n = p.ReadUInt8();
+            for (int i = 0; i < n && i < m.QueryReplies.Count; ++i)
+            {
+                QueryReplyData d = m.QueryReplies[i];
+                d.Status = p.ReadUInt32();
+                m.QueryReplies[i] = d;
+            }
+            return m;
+        }
     }
 }
