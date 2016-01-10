@@ -19,8 +19,8 @@ namespace SilverSim.Viewer.Messages.Map
 
         public struct DataEntry
         {
-            public UInt16 X;
-            public UInt16 Y;
+            public uint X;
+            public uint Y;
             public UUID ID;
             public Int32 Extra;
             public Int32 Extra2;
@@ -43,12 +43,33 @@ namespace SilverSim.Viewer.Messages.Map
             foreach (DataEntry d in Data)
             {
                 p.WriteUInt32(d.X);
-                p.WriteUInt16(d.Y);
+                p.WriteUInt32(d.Y);
                 p.WriteUUID(d.ID);
                 p.WriteInt32(d.Extra);
                 p.WriteInt32(d.Extra2);
                 p.WriteStringLen8(d.Name);
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            MapItemReply m = new MapItemReply();
+            m.AgentID = p.ReadUUID();
+            m.Flags = (MapAgentFlags)p.ReadUInt32();
+            m.ItemType = (MapItemType)p.ReadUInt32();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                DataEntry d = new DataEntry();
+                d.X = p.ReadUInt32();
+                d.Y = p.ReadUInt32();
+                d.ID = p.ReadUUID();
+                d.Extra = p.ReadInt32();
+                d.Extra2 = p.ReadInt32();
+                d.Name = p.ReadStringLen8();
+                m.Data.Add(d);
+            }
+            return m;
         }
     }
 }

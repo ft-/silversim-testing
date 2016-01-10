@@ -35,5 +35,15 @@ namespace SilverSim.Viewer.Messages.Land
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(ReportType);
+            p.WriteUInt32(RequestFlags);
+            p.WriteStringLen8(Filter);
+            p.WriteInt32(ParcelLocalID);
+        }
     }
 }

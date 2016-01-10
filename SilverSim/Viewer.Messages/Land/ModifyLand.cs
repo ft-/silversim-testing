@@ -71,5 +71,31 @@ namespace SilverSim.Viewer.Messages.Land
             }
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt8(Action);
+            p.WriteUInt8(Size);
+            p.WriteFloat((float)Seconds);
+            p.WriteFloat((float)Height);
+
+            p.WriteUInt8((byte)ParcelData.Count);
+            foreach(Data d in ParcelData)
+            {
+                p.WriteInt32(d.LocalID);
+                p.WriteFloat((float)d.West);
+                p.WriteFloat((float)d.South);
+                p.WriteFloat((float)d.East);
+                p.WriteFloat((float)d.North);
+            }
+
+            p.WriteUInt8((byte)ParcelData.Count);
+            foreach(Data d in ParcelData)
+            {
+                p.WriteFloat((float)d.BrushSize);
+            }
+        }
     }
 }

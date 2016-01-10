@@ -10,6 +10,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Core;
@@ -139,7 +140,7 @@ namespace SilverSim.Viewer.Map
 
                 d.Name = ri.Name;
                 d.Access = ri.Access;
-                d.RegionFlags = ri.Flags;
+                d.RegionFlags = RegionOptionFlags.None; /* this is same RegionOptionFlags as seen in a sim */
                 d.WaterHeight = 21;
                 d.Agents = 0;
                 d.MapImageID = ri.RegionMapTexture;
@@ -266,7 +267,7 @@ namespace SilverSim.Viewer.Map
 
                     d.Name = ri.Name;
                     d.Access = ri.Access;
-                    d.RegionFlags = ri.Flags;
+                    d.RegionFlags = RegionOptionFlags.None; /* this is same region flags as seen on a sim */
                     d.WaterHeight = 21;
                     d.Agents = 0;
                     d.MapImageID = ri.RegionMapTexture;
@@ -300,7 +301,7 @@ namespace SilverSim.Viewer.Map
 
                         d.Name = ri.Name;
                         d.Access = ri.Access;
-                        d.RegionFlags = ri.Flags;
+                        d.RegionFlags = RegionOptionFlags.None; /* this is same region flags as seen on a sim */
                         d.WaterHeight = 21;
                         d.Agents = 0;
                         d.MapImageID = ri.RegionMapTexture;
@@ -319,7 +320,7 @@ namespace SilverSim.Viewer.Map
             end.Access = RegionAccess.NonExistent;
             end.MapImageID = UUID.Zero;
             end.Name = string.Empty;
-            end.RegionFlags = RegionFlags.None;
+            end.RegionFlags = RegionOptionFlags.None; /* this is same region flags as seen on a sim */
             end.WaterHeight = 0;
             end.X = 0;
             end.Y = 0;

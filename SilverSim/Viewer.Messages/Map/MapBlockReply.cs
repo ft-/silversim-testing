@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace SilverSim.Viewer.Messages.Map
             public UInt16 Y;
             public string Name;
             public RegionAccess Access;
-            public RegionFlags RegionFlags;
+            public RegionOptionFlags RegionFlags;
             public byte WaterHeight;
             public byte Agents;
             public UUID MapImageID;
@@ -65,6 +66,36 @@ namespace SilverSim.Viewer.Messages.Map
                 p.WriteUInt16(d.X);
                 p.WriteUInt16(d.Y);
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            MapBlockReply m = new MapBlockReply();
+            m.AgentID = p.ReadUUID();
+            m.Flags = (MapAgentFlags)p.ReadUInt32();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                DataEntry d = new DataEntry();
+                d.X = p.ReadUInt16();
+                d.Y = p.ReadUInt16();
+                d.Name = p.ReadStringLen8();
+                d.Access = (RegionAccess)p.ReadUInt8();
+                d.RegionFlags = (RegionOptionFlags)p.ReadUInt32();
+                d.WaterHeight = p.ReadUInt8();
+                d.Agents = p.ReadUInt8();
+                d.MapImageID = p.ReadUUID();
+                m.Data.Add(d);
+            }
+            n = p.ReadUInt8();
+            while(n--!=0)
+            {
+                SizeInfo d = new SizeInfo();
+                d.X = p.ReadUInt16();
+                d.Y = p.ReadUInt16();
+                m.Size.Add(d);
+            }
+            return m;
         }
     }
 }

@@ -39,5 +39,18 @@ namespace SilverSim.Viewer.Messages.Map
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32((uint)Flags);
+            p.WriteUInt32(EstateID);
+            p.WriteBoolean(IsGodlike);
+            p.WriteUInt16(Min.GridX);
+            p.WriteUInt16(Max.GridX);
+            p.WriteUInt16(Min.GridY);
+            p.WriteUInt16(Max.GridY);
+        }
     }
 }

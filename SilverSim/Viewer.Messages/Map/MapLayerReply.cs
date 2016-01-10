@@ -47,5 +47,24 @@ namespace SilverSim.Viewer.Messages.Map
                 p.WriteUUID(d.ImageID);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            MapLayerReply m = new MapLayerReply();
+            m.AgentID = p.ReadUUID();
+            m.Flags = (MapAgentFlags)p.ReadUInt32();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                LayerDataEntry d = new LayerDataEntry();
+                d.Left = p.ReadUInt32();
+                d.Right = p.ReadUInt32();
+                d.Top = p.ReadUInt32();
+                d.Bottom = p.ReadUInt32();
+                d.ImageID = p.ReadUUID();
+                m.LayerData.Add(d);
+            }
+            return m;
+        }
     }
 }

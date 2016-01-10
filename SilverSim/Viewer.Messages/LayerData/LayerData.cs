@@ -81,5 +81,13 @@ namespace SilverSim.Viewer.Messages.LayerData
             p.WriteUInt16((UInt16)Data.Length);
             p.WriteBytes(Data);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            LayerData m = new LayerData();
+            m.LayerType = (LayerDataType)p.ReadUInt8();
+            m.Data = p.ReadBytes(p.ReadUInt16());
+            return m;
+        }
     }
 }
