@@ -31,5 +31,16 @@ namespace SilverSim.Viewer.Messages.Transfer
             p.WriteUInt16((ushort)Data.Length);
             p.WriteBytes(Data);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            TransferPacket m = new TransferPacket();
+            m.TransferID = p.ReadUUID();
+            m.ChannelType = p.ReadInt32();
+            m.Packet = p.ReadInt32();
+            m.Status = p.ReadInt32();
+            m.Data = p.ReadBytes(p.ReadUInt16());
+            return m;
+        }
     }
 }

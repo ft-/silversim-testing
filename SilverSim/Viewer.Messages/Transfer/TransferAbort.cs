@@ -28,7 +28,7 @@ namespace SilverSim.Viewer.Messages.Transfer
             p.WriteInt32(ChannelType);
         }
 
-        public static TransferAbort Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             TransferAbort m = new TransferAbort();
             m.TransferID = p.ReadUUID();

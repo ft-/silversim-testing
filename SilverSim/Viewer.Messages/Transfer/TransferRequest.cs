@@ -34,5 +34,15 @@ namespace SilverSim.Viewer.Messages.Transfer
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(TransferID);
+            p.WriteInt32(ChannelType);
+            p.WriteInt32((int)SourceType);
+            p.WriteFloat((float)Priority);
+            p.WriteUInt16((ushort)Params.Length);
+            p.WriteBytes(Params);
+        }
     }
 }

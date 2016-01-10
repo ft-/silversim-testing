@@ -19,7 +19,7 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         }
 
-        public static AbortXfer Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             AbortXfer m = new AbortXfer();
             m.ID = p.ReadUInt64();

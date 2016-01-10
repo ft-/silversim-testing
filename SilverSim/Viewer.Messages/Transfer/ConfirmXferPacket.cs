@@ -19,7 +19,7 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         }
 
-        public static ConfirmXferPacket Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             ConfirmXferPacket m = new ConfirmXferPacket();
             m.ID = p.ReadUInt64();

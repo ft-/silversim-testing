@@ -22,7 +22,7 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         }
 
-        public static AssetUploadRequest Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             AssetUploadRequest m = new AssetUploadRequest();
             m.TransactionID = p.ReadUUID();
@@ -32,6 +32,16 @@ namespace SilverSim.Viewer.Messages.Transfer
             uint c = p.ReadUInt16();
             m.AssetData = p.ReadBytes((int)c);
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(TransactionID);
+            p.WriteInt8((sbyte)AssetType);
+            p.WriteBoolean(IsTemporary);
+            p.WriteBoolean(StoreLocal);
+            p.WriteUInt16((ushort)AssetData.Length);
+            p.WriteBytes(AssetData);
         }
     }
 }

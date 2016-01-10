@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         }
 
-        public static SendXferPacket Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             SendXferPacket m = new SendXferPacket();
             m.ID = p.ReadUInt64();

@@ -25,7 +25,7 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         }
 
-        public static RequestXfer Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             RequestXfer m = new RequestXfer();
             m.ID = p.ReadUInt64();

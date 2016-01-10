@@ -25,7 +25,7 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         }
 
-        public static AssetUploadComplete Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             AssetUploadComplete m = new AssetUploadComplete();
             m.AssetID = p.ReadUUID();
