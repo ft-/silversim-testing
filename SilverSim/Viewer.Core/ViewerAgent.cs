@@ -830,6 +830,7 @@ namespace SilverSim.Viewer.Core
                         paramList.Add(Velocity);
                         break;
 
+                    case ObjectDetailsType.LastOwner:
                     case ObjectDetailsType.Owner:
                     case ObjectDetailsType.Creator:
                     case ObjectDetailsType.Root:
@@ -868,38 +869,20 @@ namespace SilverSim.Viewer.Core
                         }
                         break;
 
-                    case ObjectDetailsType.ScriptMemory:
-                        paramList.Add(0);
-                        break;
-
-                    case ObjectDetailsType.ScriptTime:
-                        paramList.Add(0f);
-                        break;
-
                     case ObjectDetailsType.PrimEquivalence:
                         paramList.Add(1);
                         break;
 
+                    case ObjectDetailsType.ScriptTime:
                     case ObjectDetailsType.ServerCost:
-                        paramList.Add(0f);
-                        break;
-
                     case ObjectDetailsType.StreamingCost:
-                        paramList.Add(0f);
-                        break;
-
                     case ObjectDetailsType.PhysicsCost:
                         paramList.Add(0f);
                         break;
 
+                    case ObjectDetailsType.ScriptMemory:
                     case ObjectDetailsType.CharacterTime:
-                        paramList.Add(0);
-                        break;
-
                     case ObjectDetailsType.AttachedPoint:
-                        paramList.Add(0);
-                        break;
-
                     case ObjectDetailsType.PathfindingType:
                         paramList.Add(0);
                         break;
@@ -911,10 +894,6 @@ namespace SilverSim.Viewer.Core
                     case ObjectDetailsType.Phantom:
                     case ObjectDetailsType.TempOnRez:
                         paramList.Add(false);
-                        break;
-
-                    case ObjectDetailsType.RenderWeight:
-                        paramList.Add(-1f);
                         break;
 
                     case ObjectDetailsType.HoverHeight:
@@ -933,10 +912,6 @@ namespace SilverSim.Viewer.Core
                         }   
                         break;
 
-                    case ObjectDetailsType.LastOwner:
-                        paramList.Add(Owner.ID);
-                        break;
-
                     case ObjectDetailsType.ClickAction:
                         paramList.Add((int)ClickActionType.None);
                         break;
@@ -945,6 +920,7 @@ namespace SilverSim.Viewer.Core
                         paramList.Add(AngularVelocity);
                         break;
 
+                    case ObjectDetailsType.RenderWeight:
                     default:
                         paramList.Add(-1);
                         break;
