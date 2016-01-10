@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 
@@ -15,7 +16,7 @@ namespace SilverSim.Viewer.Messages.Object
         public struct Data
         {
             public UInt32 ObjectLocalID;
-            public byte SaleType;
+            public InventoryItem.SaleInfoData.SaleType SaleType;
             public Int32 SalePrice;
         }
 
@@ -42,11 +43,24 @@ namespace SilverSim.Viewer.Messages.Object
             {
                 Data d = new Data();
                 d.ObjectLocalID = p.ReadUInt32();
-                d.SaleType = p.ReadUInt8();
+                d.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
                 d.SalePrice = p.ReadInt32();
                 m.ObjectData.Add(d);
             }
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt8((byte)ObjectData.Count);
+            foreach(Data d in ObjectData)
+            {
+                p.WriteUInt32(d.ObjectLocalID);
+                p.WriteUInt8((byte)d.SaleType);
+                p.WriteInt32(d.SalePrice);
+            }
         }
     }
 }

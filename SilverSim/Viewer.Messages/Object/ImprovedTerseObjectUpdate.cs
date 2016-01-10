@@ -46,5 +46,21 @@ namespace SilverSim.Viewer.Messages.Object
                 p.WriteBytes(d.TextureEntry);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ImprovedTerseObjectUpdate m = new ImprovedTerseObjectUpdate();
+            m.GridPosition.RegionHandle = p.ReadUInt64();
+            m.TimeDilation = p.ReadUInt16();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                ObjData d = new ObjData();
+                d.Data = p.ReadBytes(p.ReadUInt8());
+                d.TextureEntry = p.ReadBytes(p.ReadUInt16());
+                m.ObjectData.Add(d);
+            }
+            return m;
+        }
     }
 }

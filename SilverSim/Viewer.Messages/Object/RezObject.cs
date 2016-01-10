@@ -110,5 +110,46 @@ namespace SilverSim.Viewer.Messages.Object
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(RezData.FromTaskID);
+            p.WriteUInt8(RezData.BypassRaycast);
+            p.WriteVector3f(RezData.RayStart);
+            p.WriteVector3f(RezData.RayEnd);
+            p.WriteUUID(RezData.RayTargetID);
+            p.WriteBoolean(RezData.RayEndIsIntersection);
+            p.WriteBoolean(RezData.RezSelected);
+            p.WriteBoolean(RezData.RemoveItem);
+            p.WriteUInt32(RezData.ItemFlags);
+            p.WriteUInt32((uint)RezData.GroupMask);
+            p.WriteUInt32((uint)RezData.EveryoneMask);
+            p.WriteUInt32((uint)RezData.NextOwnerMask);
+            p.WriteUUID(InventoryData.ItemID);
+            p.WriteUUID(InventoryData.FolderID);
+            p.WriteUUID(InventoryData.CreatorID);
+            p.WriteUUID(InventoryData.OwnerID);
+            p.WriteUUID(InventoryData.GroupID);
+            p.WriteUInt32((uint)InventoryData.BaseMask);
+            p.WriteUInt32((uint)InventoryData.OwnerMask);
+            p.WriteUInt32((uint)InventoryData.GroupMask);
+            p.WriteUInt32((uint)InventoryData.EveryoneMask);
+            p.WriteUInt32((uint)InventoryData.NextOwnerMask);
+            p.WriteBoolean(InventoryData.IsGroupOwned);
+            p.WriteUUID(InventoryData.TransactionID);
+            p.WriteInt8((sbyte)InventoryData.AssetType);
+            p.WriteInt8((sbyte)InventoryData.InvType);
+            p.WriteUInt32(InventoryData.Flags);
+            p.WriteUInt8((byte)InventoryData.SaleType);
+            p.WriteInt32(InventoryData.SalePrice);
+            p.WriteStringLen8(InventoryData.Name);
+            p.WriteStringLen8(InventoryData.Description);
+            p.WriteUInt32(InventoryData.CreationDate);
+            p.WriteUInt32(InventoryData.CRC);
+
+        }
     }
 }

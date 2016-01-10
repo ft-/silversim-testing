@@ -149,5 +149,67 @@ namespace SilverSim.Viewer.Messages.Object
                 p.WriteVector3f(d.JointAxisOrAnchor);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ObjectUpdate m = new ObjectUpdate();
+            m.GridPosition.RegionHandle = p.ReadUInt64();
+            m.TimeDilation = p.ReadUInt16();
+            uint n = p.ReadUInt8();
+            while (n-- != 0)
+            {
+                ObjData d = new ObjData();
+                d.LocalID = p.ReadUInt32();
+                d.State = p.ReadUInt8();
+                d.FullID = p.ReadUUID();
+                d.CRC = p.ReadUInt32();
+                d.PCode = (PrimitiveCode)p.ReadUInt8();
+                d.Material = (PrimitiveMaterial)p.ReadUInt8();
+                d.ClickAction = (ClickActionType)p.ReadUInt8();
+                d.Scale = p.ReadVector3f();
+                d.ObjectData = p.ReadBytes(p.ReadUInt8());
+                d.ParentID = p.ReadUInt32();
+                d.UpdateFlags = (PrimitiveFlags)p.ReadUInt32();
+                d.PathCurve = p.ReadUInt8();
+                d.ProfileCurve = p.ReadUInt8();
+                d.PathBegin = p.ReadUInt16();
+                d.PathEnd = p.ReadUInt16();
+                d.PathScaleX = p.ReadUInt8();
+                d.PathScaleY = p.ReadUInt8();
+                d.PathShearX = p.ReadUInt8();
+                d.PathShearY = p.ReadUInt8();
+                d.PathTwist = p.ReadInt8();
+                d.PathTwistBegin = p.ReadInt8();
+                d.PathRadiusOffset = p.ReadInt8();
+                d.PathTaperX = p.ReadInt8();
+                d.PathTaperY = p.ReadInt8();
+                d.PathRevolutions = p.ReadUInt8();
+                d.PathSkew = p.ReadInt8();
+                d.ProfileBegin = p.ReadUInt16();
+                d.ProfileEnd = p.ReadUInt16();
+                d.ProfileHollow = p.ReadUInt16();
+                d.TextureEntry = p.ReadBytes(p.ReadUInt16());
+                d.TextureAnim = p.ReadBytes(p.ReadUInt8());
+                d.NameValue = p.ReadStringLen16();
+                d.Data = p.ReadBytes(p.ReadUInt16());
+                d.Text = p.ReadStringLen8();
+                d.TextColor.R_AsByte = p.ReadUInt8();
+                d.TextColor.G_AsByte = p.ReadUInt8();
+                d.TextColor.B_AsByte = p.ReadUInt8();
+                d.TextColor.A_AsByte = (byte)(255 - p.ReadUInt8());
+                d.MediaURL = p.ReadStringLen8();
+                d.PSBlock = p.ReadBytes(p.ReadUInt8());
+                d.ExtraParams = p.ReadBytes(p.ReadUInt8());
+                d.LoopedSound = p.ReadUUID();
+                d.OwnerID = p.ReadUUID();
+                d.Gain = p.ReadFloat();
+                d.Flags = (PrimitiveSoundFlags)p.ReadUInt8();
+                d.Radius = p.ReadFloat();
+                d.JointType = p.ReadUInt8();
+                d.JointPivot = p.ReadVector3f();
+                d.JointAxisOrAnchor = p.ReadVector3f();
+            }
+            return m;
+        }
     }
 }

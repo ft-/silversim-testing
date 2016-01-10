@@ -37,5 +37,16 @@ namespace SilverSim.Viewer.Messages.Object
             m.CastsShadows = p.ReadBoolean();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(ObjectLocalID);
+            p.WriteBoolean(UsePhysics);
+            p.WriteBoolean(IsTemporary);
+            p.WriteBoolean(IsPhantom);
+            p.WriteBoolean(CastsShadows);
+        }
     }
 }

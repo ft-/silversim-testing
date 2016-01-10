@@ -73,5 +73,32 @@ namespace SilverSim.Viewer.Messages.Object
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(ItemID);
+            p.WriteUUID(FolderID);
+            p.WriteUUID(CreatorID);
+            p.WriteUUID(OwnerID);
+            p.WriteUUID(GroupID);
+            p.WriteUInt32((uint)BaseMask);
+            p.WriteUInt32((uint)OwnerMask);
+            p.WriteUInt32((uint)GroupMask);
+            p.WriteUInt32((uint)EveryoneMask);
+            p.WriteUInt32((uint)NextOwnerMask);
+            p.WriteBoolean(IsGroupOwned);
+            p.WriteUUID(TransactionID);
+            p.WriteInt8((sbyte)AssetType);
+            p.WriteInt8((sbyte)InvType);
+            p.WriteUInt32(Flags);
+            p.WriteUInt8((byte)SaleType);
+            p.WriteInt32(SalePrice);
+            p.WriteStringLen8(Name);
+            p.WriteStringLen8(Description);
+            p.WriteUInt32(CreationDate);
+            p.WriteUInt32(CRC);
+        }
     }
 }

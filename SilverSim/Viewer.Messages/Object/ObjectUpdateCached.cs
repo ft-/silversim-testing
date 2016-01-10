@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
@@ -11,7 +12,7 @@ namespace SilverSim.Viewer.Messages.Object
     [Trusted]
     public class ObjectUpdateCached : Message
     {
-        public UInt64 RegionHandle;
+        public GridVector Location;
         public UInt16 TimeDilation;
         public struct Data
         {
@@ -29,7 +30,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteUInt64(RegionHandle);
+            p.WriteUInt64(Location.RegionHandle);
             p.WriteUInt16(TimeDilation);
             p.WriteUInt8((byte)ObjectData.Count);
             foreach (Data d in ObjectData)
@@ -38,6 +39,23 @@ namespace SilverSim.Viewer.Messages.Object
                 p.WriteUInt32(d.CRC);
                 p.WriteUInt32(d.UpdateFlags);
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ObjectUpdateCached m = new ObjectUpdateCached();
+            m.Location.RegionHandle = p.ReadUInt64();
+            m.TimeDilation = p.ReadUInt16();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                Data d = new Data();
+                d.LocalID = p.ReadUInt32();
+                d.CRC = p.ReadUInt32();
+                d.UpdateFlags = p.ReadUInt32();
+                m.ObjectData.Add(d);
+            }
+            return m;
         }
     }
 }

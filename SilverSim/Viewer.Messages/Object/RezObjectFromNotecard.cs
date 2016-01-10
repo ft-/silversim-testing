@@ -82,5 +82,33 @@ namespace SilverSim.Viewer.Messages.Object
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(RezData.FromTaskID);
+            p.WriteUInt8(RezData.BypassRaycast);
+            p.WriteVector3f(RezData.RayStart);
+            p.WriteVector3f(RezData.RayEnd);
+            p.WriteUUID(RezData.RayTargetID);
+            p.WriteBoolean(RezData.RayEndIsIntersection);
+            p.WriteBoolean(RezData.RezSelected);
+            p.WriteBoolean(RezData.RemoveItem);
+            p.WriteUInt32(RezData.ItemFlags);
+            p.WriteUInt32((uint)RezData.GroupMask);
+            p.WriteUInt32((uint)RezData.EveryoneMask);
+            p.WriteUInt32((uint)RezData.NextOwnerMask);
+
+            p.WriteUUID(NotecardData.NotecardItemID);
+            p.WriteUUID(NotecardData.ObjectID);
+
+            p.WriteUInt8((byte)InventoryData.Count);
+            foreach(UUID id in InventoryData)
+            {
+                p.WriteUUID(id);
+            }
+        }
     }
 }

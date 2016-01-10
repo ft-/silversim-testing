@@ -26,5 +26,16 @@ namespace SilverSim.Viewer.Messages.Object
                 p.WriteUInt32(i);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            KillObject m = new KillObject();
+            uint n = p.ReadUInt8();
+            while (n-- != 0)
+            {
+                m.LocalIDs.Add(p.ReadUInt32());
+            }
+            return m;
+        }
     }
 }

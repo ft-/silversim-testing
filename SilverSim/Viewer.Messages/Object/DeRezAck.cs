@@ -23,5 +23,13 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(TransactionID);
             p.WriteBoolean(Success);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            DeRezAck m = new DeRezAck();
+            m.TransactionID = p.ReadUUID();
+            m.Success = p.ReadBoolean();
+            return m;
+        }
     }
 }

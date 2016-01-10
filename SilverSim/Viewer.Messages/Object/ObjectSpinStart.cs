@@ -27,5 +27,12 @@ namespace SilverSim.Viewer.Messages.Object
             m.ObjectID = p.ReadUUID();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(ObjectID);
+        }
     }
 }

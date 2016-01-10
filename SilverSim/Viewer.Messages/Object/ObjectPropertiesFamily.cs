@@ -54,5 +54,27 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteStringLen8(Name);
             p.WriteStringLen8(Description);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ObjectPropertiesFamily m = new ObjectPropertiesFamily();
+            m.RequestFlags = p.ReadUInt32();
+            m.ObjectID = p.ReadUUID();
+            m.OwnerID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.OwnershipCost = p.ReadInt32();
+            m.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
+            m.SalePrice = p.ReadInt32();
+            m.Category = p.ReadUInt32();
+            m.LastOwnerID = p.ReadUUID();
+            m.Name = p.ReadStringLen8();
+            m.Description = p.ReadStringLen8();
+            return m;
+        }
     }
 }

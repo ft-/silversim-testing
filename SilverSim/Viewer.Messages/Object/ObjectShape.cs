@@ -77,5 +77,35 @@ namespace SilverSim.Viewer.Messages.Object
             }
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+
+            p.WriteUInt8((byte)ObjectData.Count);
+            foreach (Data d in ObjectData)
+            {
+                p.WriteUInt32(d.ObjectLocalID);
+                p.WriteUInt8(d.PathCurve);
+                p.WriteUInt8(d.ProfileCurve);
+                p.WriteUInt16(d.PathBegin);
+                p.WriteUInt16(d.PathEnd);
+                p.WriteUInt8(d.PathScaleX);
+                p.WriteUInt8(d.PathScaleY);
+                p.WriteUInt8(d.PathShearX);
+                p.WriteUInt8(d.PathShearY);
+                p.WriteInt8(d.PathTwist);
+                p.WriteInt8(d.PathTwistBegin);
+                p.WriteInt8(d.PathRadiusOffset);
+                p.WriteInt8(d.PathTaperX);
+                p.WriteInt8(d.PathTaperY);
+                p.WriteUInt8(d.PathRevolutions);
+                p.WriteInt8(d.PathSkew);
+                p.WriteUInt16(d.ProfileBegin);
+                p.WriteUInt16(d.ProfileEnd);
+                p.WriteUInt16(d.ProfileHollow);
+            }
+        }
     }
 }

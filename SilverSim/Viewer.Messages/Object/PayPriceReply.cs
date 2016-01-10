@@ -31,5 +31,18 @@ namespace SilverSim.Viewer.Messages.Object
                 p.WriteInt32(d);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            PayPriceReply m = new PayPriceReply();
+            m.ObjectID = p.ReadUUID();
+            m.DefaultPayPrice = p.ReadInt32();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                m.ButtonData.Add(p.ReadInt32());
+            }
+            return m;
+        }
     }
 }

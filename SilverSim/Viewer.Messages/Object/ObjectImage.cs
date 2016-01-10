@@ -47,5 +47,20 @@ namespace SilverSim.Viewer.Messages.Object
             }
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+
+            p.WriteUInt8((byte)ObjectData.Count);
+            foreach (ObjectDataEntry d in ObjectData)
+            {
+                p.WriteUInt32(d.ObjectLocalID);
+                p.WriteStringLen8(d.MediaURL);
+                p.WriteUInt16((ushort)d.TextureEntry.Length);
+                p.WriteBytes(d.TextureEntry);
+            }
+        }
     }
 }

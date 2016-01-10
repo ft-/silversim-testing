@@ -106,5 +106,42 @@ namespace SilverSim.Viewer.Messages.Object
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+
+            p.WriteUInt8((byte)PCode);
+            p.WriteUInt8((byte)Material);
+            p.WriteUInt32(AddFlags);
+            p.WriteUInt8(PathCurve);
+            p.WriteUInt8(ProfileCurve);
+            p.WriteUInt16(PathBegin);
+            p.WriteUInt16(PathEnd);
+            p.WriteUInt8(PathScaleX);
+            p.WriteUInt8(PathScaleY);
+            p.WriteUInt8(PathShearX);
+            p.WriteUInt8(PathShearY);
+            p.WriteInt8(PathTwist);
+            p.WriteInt8(PathTwistBegin);
+            p.WriteInt8(PathRadiusOffset);
+            p.WriteInt8(PathTaperX);
+            p.WriteInt8(PathTaperY);
+            p.WriteUInt8(PathRevolutions);
+            p.WriteInt8(PathSkew);
+            p.WriteUInt16(ProfileBegin);
+            p.WriteUInt16(ProfileEnd);
+            p.WriteUInt16(ProfileHollow);
+            p.WriteUInt8(BypassRaycast ? (byte)1 : (byte)0);
+            p.WriteVector3f(RayStart);
+            p.WriteVector3f(RayEnd);
+            p.WriteUUID(RayTargetID);
+            p.WriteUInt8(RayEndIsIntersection ? (byte)1 : (byte)0);
+            p.WriteVector3f(Scale);
+            p.WriteLLQuaternion(Rotation);
+            p.WriteUInt8(State);
+        }
     }
 }
