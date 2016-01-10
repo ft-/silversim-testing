@@ -52,9 +52,63 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         #region Update of sun direction
         /* source of algorithm is secondlifescripters mailing list */
-        double AverageSunTilt = -0.25 * Math.PI;
-        double SeasonalSunTilt = 0.03 * Math.PI;
-        double SunNormalizedOffset = 0.45;
+        double m_AverageSunTilt = -0.25 * Math.PI;
+        double m_SeasonalSunTilt = 0.03 * Math.PI;
+        double m_SunNormalizedOffset = 0.45;
+
+        public double AverageSunTilt
+        {
+            get
+            {
+                lock(m_EnvironmentLock)
+                {
+                    return m_AverageSunTilt;
+                }
+            }
+            set
+            {
+                lock(m_EnvironmentLock)
+                {
+                    m_AverageSunTilt = value.Clamp(-Math.PI, Math.PI);
+                }
+            }
+        }
+
+        public double SeasonalSunTilt
+        {
+            get
+            {
+                lock (m_EnvironmentLock)
+                {
+                    return m_SeasonalSunTilt;
+                }
+            }
+            set
+            {
+                lock (m_EnvironmentLock)
+                {
+                    m_SeasonalSunTilt = value.Clamp(-Math.PI, Math.PI);
+                }
+            }
+        }
+
+        public double SunNormalizedOffset
+        {
+            get
+            {
+                lock (m_EnvironmentLock)
+                {
+                    return m_SunNormalizedOffset;
+                }
+            }
+            set
+            {
+                lock (m_EnvironmentLock)
+                {
+                    m_SunNormalizedOffset = value.Clamp(-1, 1);
+                }
+            }
+        }
 
         public void SetSunDurationParams(uint secperday, uint daysperyear)
         {
@@ -152,7 +206,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             double daily_phase = DailyOmega * utctime;
             double sun_phase = daily_phase % (2 * Math.PI);
             double yearly_phase = YearlyOmega * utctime;
-            double tilt = AverageSunTilt + SeasonalSunTilt * Math.Sin(yearly_phase);
+            double tilt = m_AverageSunTilt + m_SeasonalSunTilt * Math.Sin(yearly_phase);
 
             if (sunFixed)
             {
@@ -181,7 +235,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 sunVelocity = Vector3.Zero;
             }
             sunVelocity *= tiltRot;
-            sunDirection.Z += SunNormalizedOffset;
+            sunDirection.Z += m_SunNormalizedOffset;
             double radius = sunDirection.Length;
             sunDirection = sunDirection.Normalize();
             sunVelocity *= (1 / radius);
