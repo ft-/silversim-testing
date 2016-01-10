@@ -16,6 +16,7 @@ namespace SilverSim.Types.Inventory
     {
         None = 0,
         LandmarkVisited = 1,
+        GestureActive = 1,
         ObjectSlamPerm = 1 << 8,
         ObjectSlamSale = 1 << 12,
         ObjectPermOverwriteBase = 1 << 16,
