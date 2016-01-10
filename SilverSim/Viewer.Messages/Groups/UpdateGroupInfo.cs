@@ -47,5 +47,19 @@ namespace SilverSim.Viewer.Messages.Groups
             m.MaturePublish = p.ReadBoolean();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteStringLen16(Charter);
+            p.WriteBoolean(ShowInList);
+            p.WriteUUID(InsigniaID);
+            p.WriteInt32(MembershipFee);
+            p.WriteBoolean(OpenEnrollment);
+            p.WriteBoolean(AllowPublish);
+            p.WriteBoolean(MaturePublish);
+        }
     }
 }

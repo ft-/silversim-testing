@@ -43,13 +43,28 @@ namespace SilverSim.Viewer.Messages.Inventory
             m.FolderID = p.ReadUUID();
             m.TransactionID = p.ReadUUID();
             m.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-            m.AssetType = (AssetType)p.ReadUInt8();
-            m.InvType = (InventoryType)p.ReadUInt8();
+            m.AssetType = (AssetType)p.ReadInt8();
+            m.InvType = (InventoryType)p.ReadInt8();
             m.WearableType = (WearableType)p.ReadUInt8();
             m.Name = p.ReadStringLen8();
             m.Description = p.ReadStringLen8();
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(CallbackID);
+            p.WriteUUID(FolderID);
+            p.WriteUUID(TransactionID);
+            p.WriteUInt32((uint)NextOwnerMask);
+            p.WriteInt8((sbyte)AssetType);
+            p.WriteInt8((sbyte)InvType);
+            p.WriteUInt8((byte)WearableType);
+            p.WriteStringLen8(Name);
+            p.WriteStringLen8(Description);
         }
     }
 }

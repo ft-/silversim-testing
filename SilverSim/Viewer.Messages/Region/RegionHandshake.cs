@@ -99,5 +99,49 @@ namespace SilverSim.Viewer.Messages.Region
                 p.WriteUInt64(e.RegionProtocols);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            RegionHandshake m = new RegionHandshake();
+            m.RegionFlags = (RegionOptionFlags)p.ReadUInt32();
+            m.SimAccess = (RegionAccess)p.ReadUInt8();
+            m.SimName = p.ReadStringLen8();
+            m.SimOwner = p.ReadUUID();
+            m.IsEstateManager = p.ReadBoolean();
+            m.WaterHeight = p.ReadFloat();
+            m.BillableFactor = p.ReadFloat();
+            m.CacheID = p.ReadUUID();
+            m.TerrainBase0 = p.ReadUUID();
+            m.TerrainBase1 = p.ReadUUID();
+            m.TerrainBase2 = p.ReadUUID();
+            m.TerrainBase3 = p.ReadUUID();
+            m.TerrainDetail0 = p.ReadUUID();
+            m.TerrainDetail1 = p.ReadUUID();
+            m.TerrainDetail2 = p.ReadUUID();
+            m.TerrainDetail3 = p.ReadUUID();
+            m.TerrainStartHeight00 = p.ReadFloat();
+            m.TerrainStartHeight01 = p.ReadFloat();
+            m.TerrainStartHeight10 = p.ReadFloat();
+            m.TerrainStartHeight11 = p.ReadFloat();
+            m.TerrainHeightRange00 = p.ReadFloat();
+            m.TerrainHeightRange01 = p.ReadFloat();
+            m.TerrainHeightRange10 = p.ReadFloat();
+            m.TerrainHeightRange11 = p.ReadFloat();
+            m.RegionID = p.ReadUUID();
+            m.CPUClassID = p.ReadInt32();
+            m.CPURatio = p.ReadInt32();
+            m.ColoName = p.ReadStringLen8();
+            m.ProductSKU = p.ReadStringLen8();
+            m.ProductName = p.ReadStringLen8();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                RegionExtDataEntry d = new RegionExtDataEntry();
+                d.RegionFlagsExtended = p.ReadUInt64();
+                d.RegionProtocols = p.ReadUInt64();
+                m.RegionExtData.Add(d);
+            }
+            return m;
+        }
     }
 }

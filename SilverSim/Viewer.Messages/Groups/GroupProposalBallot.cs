@@ -32,5 +32,14 @@ namespace SilverSim.Viewer.Messages.Groups
             m.VoteCast = p.ReadStringLen8();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(ProposalID);
+            p.WriteUUID(GroupID);
+            p.WriteStringLen8(VoteCast);
+        }
     }
 }

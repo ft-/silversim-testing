@@ -30,5 +30,12 @@ namespace SilverSim.Viewer.Messages.Groups
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+        }
     }
 }

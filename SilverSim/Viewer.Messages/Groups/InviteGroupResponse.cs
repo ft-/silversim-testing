@@ -29,5 +29,16 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteUUID(RoleID);
             p.WriteInt32(MembershipFee);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            InviteGroupResponse m = new InviteGroupResponse();
+            m.AgentID = p.ReadUUID();
+            m.InviteeID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.RoleID = p.ReadUUID();
+            m.MembershipFee = p.ReadInt32();
+            return m;
+        }
     }
 }

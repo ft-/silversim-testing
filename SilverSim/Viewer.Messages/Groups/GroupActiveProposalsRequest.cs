@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.Messages.Groups
 
         }
 
-        public static GroupActiveProposalsRequest Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             GroupActiveProposalsRequest m = new GroupActiveProposalsRequest();
             m.AgentID = p.ReadUUID();
@@ -29,6 +29,14 @@ namespace SilverSim.Viewer.Messages.Groups
             m.TransactionID = p.ReadUUID();
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(TransactionID);
         }
     }
 }

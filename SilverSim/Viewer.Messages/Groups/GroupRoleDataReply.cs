@@ -59,5 +59,27 @@ namespace SilverSim.Viewer.Messages.Groups
                 p.WriteUInt32(e.Members);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupRoleDataReply m = new GroupRoleDataReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.RequestID = p.ReadUUID();
+            m.RoleCount = p.ReadInt32();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                RoleDataEntry d = new RoleDataEntry();
+                d.RoleID = p.ReadUUID();
+                d.Name = p.ReadStringLen8();
+                d.Title = p.ReadStringLen8();
+                d.Description = p.ReadStringLen8();
+                d.Powers = (GroupPowers)p.ReadUInt64();
+                d.Members = p.ReadUInt32();
+                m.RoleData.Add(d);
+            }
+            return m;
+        }
     }
 }

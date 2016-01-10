@@ -55,5 +55,28 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteBoolean(MaturePublish);
             p.WriteUUID(OwnerRoleID);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupProfileReply m = new GroupProfileReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.Name = p.ReadStringLen8();
+            m.Charter = p.ReadStringLen16();
+            m.ShowInList = p.ReadBoolean();
+            m.MemberTitle = p.ReadStringLen8();
+            m.PowersMask = (GroupPowers)p.ReadUInt64();
+            m.InsigniaID = p.ReadUUID();
+            m.FounderID = p.ReadUUID();
+            m.MembershipFee = p.ReadInt32();
+            m.OpenEnrollment = p.ReadBoolean();
+            m.Money = p.ReadInt32();
+            m.GroupMembershipCount = p.ReadInt32();
+            m.GroupRolesCount = p.ReadInt32();
+            m.AllowPublish = p.ReadBoolean();
+            m.MaturePublish = p.ReadBoolean();
+            m.OwnerRoleID = p.ReadUUID();
+            return m;
+        }
     }
 }

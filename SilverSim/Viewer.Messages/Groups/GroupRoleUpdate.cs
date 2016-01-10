@@ -46,7 +46,7 @@ namespace SilverSim.Viewer.Messages.Groups
 
         }
 
-        public static GroupRoleUpdate Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             GroupRoleUpdate m = new GroupRoleUpdate();
             m.AgentID = p.ReadUUID();
@@ -66,6 +66,24 @@ namespace SilverSim.Viewer.Messages.Groups
                 m.RoleData.Add(e);
             }
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+
+            p.WriteUInt8((byte)RoleData.Count);
+            foreach(RoleDataEntry d in RoleData)
+            {
+                p.WriteUUID(d.RoleID);
+                p.WriteStringLen8(d.Name);
+                p.WriteStringLen8(d.Description);
+                p.WriteStringLen8(d.Title);
+                p.WriteUInt64((ulong)d.Powers);
+                p.WriteUInt8((byte)d.UpdateType);
+            }
         }
     }
 }

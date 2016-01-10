@@ -24,7 +24,7 @@ namespace SilverSim.Viewer.Messages.Groups
 
         }
 
-        public static GroupAccountDetailsRequest Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             GroupAccountDetailsRequest m = new GroupAccountDetailsRequest();
             m.AgentID = p.ReadUUID();

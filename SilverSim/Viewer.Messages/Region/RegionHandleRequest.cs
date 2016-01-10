@@ -17,12 +17,17 @@ namespace SilverSim.Viewer.Messages.Region
 
         }
 
-        public static RegionHandleRequest Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             RegionHandleRequest m = new RegionHandleRequest();
             m.RegionID = p.ReadUUID();
 
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(RegionID);
         }
     }
 }

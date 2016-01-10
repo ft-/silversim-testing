@@ -58,5 +58,20 @@ namespace SilverSim.Viewer.Messages.Image
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt8((byte)RequestImageList.Count);
+            foreach(RequestImageEntry e in RequestImageList)
+            {
+                p.WriteUUID(e.ImageID);
+                p.WriteInt8(e.DiscardLevel);
+                p.WriteFloat((float)e.DownloadPriority);
+                p.WriteUInt32(e.Packet);
+                p.WriteUInt8((byte)e.Type);
+            }
+        }
     }
 }

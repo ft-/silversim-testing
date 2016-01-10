@@ -9,6 +9,7 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
 using System;
@@ -264,7 +265,8 @@ namespace SilverSim.Viewer.Core
 
                                             SceneInterface scene = Scene;
                                             Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
-                                            rh.RegionFlags = scene.GetRegionFlags();
+                                            RegionOptionFlags regionFlags = scene.GetRegionFlags();
+                                            rh.RegionFlags = regionFlags;
                                             rh.SimAccess = scene.Access;
                                             rh.SimName = scene.Name;
                                             rh.SimOwner = scene.Owner.ID;
@@ -296,7 +298,7 @@ namespace SilverSim.Viewer.Core
                                             rh.ProductName = scene.ProductName;
 
                                             Messages.Region.RegionHandshake.RegionExtDataEntry entry = new Messages.Region.RegionHandshake.RegionExtDataEntry();
-                                            entry.RegionFlagsExtended = 0;
+                                            entry.RegionFlagsExtended = (ulong)regionFlags;
                                             entry.RegionProtocols = 0; /* 0 => no SSB, 1 => SSB */
                                             rh.RegionExtData.Add(entry);
 

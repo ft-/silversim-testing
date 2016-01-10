@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.Messages.Groups
 
         }
 
-        public static GroupMembersRequest Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
             GroupMembersRequest m = new GroupMembersRequest();
             m.AgentID = p.ReadUUID();
@@ -28,6 +28,14 @@ namespace SilverSim.Viewer.Messages.Groups
             m.GroupID = p.ReadUUID();
             m.RequestID = p.ReadUUID();
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(RequestID);
         }
     }
 }

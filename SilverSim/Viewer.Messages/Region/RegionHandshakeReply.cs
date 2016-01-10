@@ -28,5 +28,12 @@ namespace SilverSim.Viewer.Messages.Region
             m.Flags = p.ReadUInt32();
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt32(Flags);
+        }
     }
 }

@@ -29,6 +29,21 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         }
 
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUInt8((byte)InventoryData.Count);
+            foreach(InventoryDataEntry d in InventoryData)
+            {
+                p.WriteUInt32(d.CallbackID);
+                p.WriteUUID(d.OldAgentID);
+                p.WriteUUID(d.OldItemID);
+                p.WriteUUID(d.NewFolderID);
+                p.WriteStringLen8(d.NewName);
+            }
+        }
+
         public static Message Decode(UDPPacket p)
         {
             CopyInventoryItem m = new CopyInventoryItem();

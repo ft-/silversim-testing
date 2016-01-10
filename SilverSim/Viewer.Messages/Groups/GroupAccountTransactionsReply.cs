@@ -58,5 +58,28 @@ namespace SilverSim.Viewer.Messages.Groups
                 p.WriteInt32(e.Amount);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupAccountTransactionsReply m = new GroupAccountTransactionsReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.RequestID = p.ReadUUID();
+            m.IntervalDays = p.ReadInt32();
+            m.CurrentInterval = p.ReadInt32();
+            m.StartDate = p.ReadStringLen8();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                HistoryDataEntry d = new HistoryDataEntry();
+                d.Time = p.ReadStringLen8();
+                d.User = p.ReadStringLen8();
+                d.Type = p.ReadInt32();
+                d.Item = p.ReadStringLen8();
+                d.Amount = p.ReadInt32();
+                m.HistoryData.Add(d);
+            }
+            return m;
+        }
     }
 }

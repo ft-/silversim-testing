@@ -64,5 +64,27 @@ namespace SilverSim.Viewer.Messages.Groups
                 p.WriteBoolean(e.IsOwner);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupMembersReply m = new GroupMembersReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.RequestID = p.ReadUUID();
+            m.MemberCount = p.ReadInt32();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                MemberDataEntry d = new MemberDataEntry();
+                d.AgentID = p.ReadUUID();
+                d.Contribution = p.ReadInt32();
+                d.OnlineStatus = p.ReadStringLen8();
+                d.AgentPowers = (GroupPowers)p.ReadUInt64();
+                d.Title = p.ReadStringLen8();
+                d.IsOwner = p.ReadBoolean();
+                m.MemberData.Add(d);
+            }
+            return m;
+        }
     }
 }

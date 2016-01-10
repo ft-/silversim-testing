@@ -63,5 +63,31 @@ namespace SilverSim.Viewer.Messages.Groups
                 p.WriteStringLen8(e.ProposalText);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupActiveProposalItemReply m = new GroupActiveProposalItemReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.TransactionID = p.ReadUUID();
+            m.TotalNumItems = p.ReadUInt32();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                ProposalDataEntry d = new ProposalDataEntry();
+                d.VoteID = p.ReadUUID();
+                d.VoteInitiatorID = p.ReadUUID();
+                d.TerseDateID = p.ReadStringLen8();
+                d.StartDateTime = p.ReadStringLen8();
+                d.EndDateTime = p.ReadStringLen8();
+                d.AlreadyVoted = p.ReadBoolean();
+                d.VoteCast = p.ReadStringLen8();
+                d.Majority = p.ReadFloat();
+                d.Quorum = p.ReadInt32();
+                d.ProposalText = p.ReadStringLen8();
+                m.ProposalData.Add(d);
+            }
+            return m;
+        }
     }
 }

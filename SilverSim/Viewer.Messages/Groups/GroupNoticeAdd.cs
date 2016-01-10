@@ -36,5 +36,18 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteUInt16((ushort)BinaryBucket.Length);
             p.WriteBytes(BinaryBucket);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupNoticeAdd m = new GroupNoticeAdd();
+            m.AgentID = p.ReadUUID();
+            m.ToGroupID = p.ReadUUID();
+            m.ID = p.ReadUUID();
+            m.Dialog = (GridInstantMessageDialog)p.ReadUInt8();
+            m.FromAgentName = p.ReadStringLen8();
+            m.Message = p.ReadStringLen16();
+            m.BinaryBucket = p.ReadBytes(p.ReadUInt16());
+            return m;
+        }
     }
 }

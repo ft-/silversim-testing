@@ -1368,6 +1368,8 @@ namespace SilverSim.Scene.Implementation.Basic
                 estateInfo = m_EstateData;
             }
 
+            RegionOptionFlags regionFlags = GetRegionFlags();
+
             res.EstateID = estateInfo.ID;
             res.ParentEstateID = estateInfo.ParentEstateID;
             res.BillableFactor = estateInfo.BillableFactor;
@@ -1375,7 +1377,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
             estateInfo.Flags &= ~RegionOptionFlags.SunFixed;
             res.SimName = Name;
-            res.RegionFlags = RegionSettings.AsFlags | estateInfo.Flags;
+            res.RegionFlags = regionFlags;
             if(RegionSettings.IsSunFixed)
             {
                 res.RegionFlags |= RegionOptionFlags.SunFixed;
@@ -1396,7 +1398,7 @@ namespace SilverSim.Scene.Implementation.Basic
             res.UseEstateSun = RegionSettings.UseEstateSun;
             res.ProductSKU = VersionInfo.SimulatorVersion;
             res.ProductName = ProductName;
-            res.RegionFlagsExtended.Add((ulong)(RegionSettings.AsFlags | estateInfo.Flags));
+            res.RegionFlagsExtended.Add((ulong)regionFlags);
 
             agent.SendMessageAlways(res, ID);
         }

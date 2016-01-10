@@ -31,5 +31,17 @@ namespace SilverSim.Viewer.Messages.Region
             p.WriteFloat((float)SunPhase);
             p.WriteVector3f(SunAngVelocity);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            SimulatorViewerTimeMessage m = new SimulatorViewerTimeMessage();
+            m.UsecSinceStart = p.ReadUInt64();
+            m.SecPerDay = p.ReadUInt32();
+            m.SecPerYear = p.ReadUInt32();
+            m.SunDirection = p.ReadVector3f();
+            m.SunPhase = p.ReadFloat();
+            m.SunAngVelocity = p.ReadVector3f();
+            return m;
+        }
     }
 }

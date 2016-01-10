@@ -23,5 +23,13 @@ namespace SilverSim.Viewer.Messages.Region
             p.WriteUUID(RegionID);
             p.WriteUInt64(RegionPosition.RegionHandle);
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            RegionIDAndHandleReply m = new RegionIDAndHandleReply();
+            m.RegionID = p.ReadUUID();
+            m.RegionPosition.RegionHandle = p.ReadUInt64();
+            return m;
+        }
     }
 }

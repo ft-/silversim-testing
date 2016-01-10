@@ -83,5 +83,38 @@ namespace SilverSim.Viewer.Messages.Region
                 p.WriteUInt64(v);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            RegionInfo m = new RegionInfo();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.SimName = p.ReadStringLen8();
+            m.EstateID = p.ReadUInt32();
+            m.ParentEstateID = p.ReadUInt32();
+            m.RegionFlags = (RegionOptionFlags)p.ReadUInt32();
+            m.SimAccess = (RegionAccess)p.ReadUInt8();
+            m.BillableFactor = p.ReadFloat();
+            m.ObjectBonusFactor = p.ReadFloat();
+            m.WaterHeight = p.ReadFloat();
+            m.TerrainRaiseLimit = p.ReadFloat();
+            m.TerrainLowerLimit = p.ReadFloat();
+            m.PricePerMeter = p.ReadInt32();
+            m.RedirectGridX = p.ReadInt32();
+            m.RedirectGridY = p.ReadInt32();
+            m.UseEstateSun = p.ReadBoolean();
+            m.SunHour = p.ReadFloat();
+            m.ProductSKU = p.ReadStringLen8();
+            m.ProductName = p.ReadStringLen8();
+            m.MaxAgents = p.ReadUInt32();
+            m.HardMaxAgents = p.ReadUInt32();
+            m.HardMaxObjects = p.ReadUInt32();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                m.RegionFlagsExtended.Add(p.ReadUInt64());
+            }
+            return m;
+        }
     }
 }

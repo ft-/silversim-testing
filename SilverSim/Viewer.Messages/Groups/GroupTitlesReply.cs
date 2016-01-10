@@ -50,5 +50,23 @@ namespace SilverSim.Viewer.Messages.Groups
                 p.WriteBoolean(e.Selected);
             }
         }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GroupTitlesReply m = new GroupTitlesReply();
+            m.AgentID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.RequestID = p.ReadUUID();
+            uint n = p.ReadUInt8();
+            for(uint i = 0; i < n; ++i)
+            {
+                GroupDataEntry d = new GroupDataEntry();
+                d.Title = p.ReadStringLen8();
+                d.RoleID = p.ReadUUID();
+                d.Selected = p.ReadBoolean();
+                m.GroupData.Add(d);
+            }
+            return m;
+        }
     }
 }
