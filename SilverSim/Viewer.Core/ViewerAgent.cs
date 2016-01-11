@@ -1130,6 +1130,16 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
+        public DetectedTypeFlags DetectedType
+        {
+            get
+            {
+                return (SittingOnObject != null) ? 
+                    (DetectedTypeFlags.Agent | DetectedTypeFlags.Passive) :
+                    (DetectedTypeFlags.Agent | DetectedTypeFlags.Active);
+            }
+        }
+
         #region Fields
 
         private AssetServiceInterface m_AssetService;

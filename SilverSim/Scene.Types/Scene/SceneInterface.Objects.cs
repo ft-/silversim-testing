@@ -10,6 +10,7 @@ using System;
 using MultipleObjectUpdate = SilverSim.Viewer.Messages.Object.MultipleObjectUpdate;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Types.Inventory;
+using SilverSim.Scene.Types.Script.Events;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -387,6 +388,37 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            IAgent agent;
+            if(!RootAgents.TryGetValue(req.AgentID, out agent) || !agent.IsActiveGod)
+            {
+                return;
+            }
+
+            UUI owner;
+            UGI group = UGI.Unknown;
+
+            if(!AvatarNameService.TryGetValue(req.OwnerID, out owner))
+            {
+                return;
+            }
+
+            if(UUID.Zero != group.ID && !GroupsNameService.TryGetValue(req.GroupID, out group))
+            {
+                return;
+            }
+
+            foreach (uint d in req.ObjectList)
+            {
+                ObjectPart prim;
+                if (!Primitives.TryGetValue(d, out prim))
+                {
+                    continue;
+                }
+
+                prim.Owner = owner;
+                prim.Group = group;
+            }
         }
 
         [PacketHandler(MessageType.ObjectName)]
@@ -476,7 +508,6 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
                 prim.ObjectGroup.Group = new UGI(req.GroupID);
-                prim.SendObjectUpdate();
             }
         }
 
@@ -818,6 +849,34 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        void PostTouchEvent(ObjectPart part, TouchEvent e)
+        {
+            if ((part.Flags & SilverSim.Types.Primitive.PrimitiveFlags.Touch) != 0)
+            {
+                part.PostEvent(e);
+            }
+            else if (part.LinkNumber != Object.ObjectGroup.LINK_ROOT)
+            {
+                ObjectPart rootPart = part.ObjectGroup.RootPart;
+                if ((rootPart.Flags & SilverSim.Types.Primitive.PrimitiveFlags.Touch) != 0 || part.IsPassTouches)
+                {
+                    rootPart.PostEvent(e);
+                }
+            }
+        }
+
+        void AddDetectAgentData(IAgent agent, DetectInfo detectdata)
+        {
+            detectdata.Key = agent.ID;
+            detectdata.Group = agent.Group;
+            detectdata.Owner = agent.Owner;
+            detectdata.Name = agent.Name;
+            detectdata.ObjType = agent.DetectedType;
+            detectdata.Position = agent.GlobalPosition;
+            detectdata.Velocity = agent.Velocity;
+            detectdata.Rotation = agent.GlobalRotation;
+        }
+
         [PacketHandler(MessageType.ObjectGrab)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectGrab(Message m)
@@ -828,6 +887,38 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            TouchEvent e = new TouchEvent();
+            e.Type = TouchEvent.TouchType.Start;
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            DetectInfo detectdata = new DetectInfo();
+            AddDetectAgentData(agent, detectdata);
+            detectdata.GrabOffset = req.GrabOffset;
+            detectdata.LinkNumber = part.LinkNumber;
+            if (req.ObjectData.Count > 0)
+            {
+                ObjectGrab.Data grabdata = req.ObjectData[0];
+                detectdata.TouchBinormal = grabdata.Binormal;
+                detectdata.TouchFace = grabdata.FaceIndex;
+                detectdata.TouchPosition = grabdata.Position;
+                detectdata.TouchST = grabdata.STCoord;
+                detectdata.TouchUV = grabdata.UVCoord;
+            }
+            e.Detected.Add(detectdata);
+
+            PostTouchEvent(part, e);
         }
 
         [PacketHandler(MessageType.ObjectGrabUpdate)]
@@ -840,6 +931,38 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            TouchEvent e = new TouchEvent();
+            e.Type = TouchEvent.TouchType.Continuous;
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            DetectInfo detectdata = new DetectInfo();
+            AddDetectAgentData(agent, detectdata);
+            detectdata.GrabOffset = req.GrabPosition;
+            detectdata.LinkNumber = part.LinkNumber;
+            if (req.ObjectData.Count > 0)
+            {
+                ObjectGrabUpdate.Data grabdata = req.ObjectData[0];
+                detectdata.TouchBinormal = grabdata.Binormal;
+                detectdata.TouchFace = grabdata.FaceIndex;
+                detectdata.TouchPosition = grabdata.Position;
+                detectdata.TouchST = grabdata.STCoord;
+                detectdata.TouchUV = grabdata.UVCoord;
+            }
+            e.Detected.Add(detectdata);
+
+            PostTouchEvent(part, e);
         }
 
         [PacketHandler(MessageType.ObjectDeGrab)]
@@ -852,6 +975,38 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            TouchEvent e = new TouchEvent();
+            e.Type = TouchEvent.TouchType.End;
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            DetectInfo detectdata = new DetectInfo();
+            AddDetectAgentData(agent, detectdata);
+            detectdata.GrabOffset = Vector3.Zero;
+            detectdata.LinkNumber = part.LinkNumber;
+            if (req.ObjectData.Count > 0)
+            {
+                ObjectDeGrab.Data grabdata = req.ObjectData[0];
+                detectdata.TouchBinormal = grabdata.Binormal;
+                detectdata.TouchFace = grabdata.FaceIndex;
+                detectdata.TouchPosition = grabdata.Position;
+                detectdata.TouchST = grabdata.STCoord;
+                detectdata.TouchUV = grabdata.UVCoord;
+            }
+            e.Detected.Add(detectdata);
+
+            PostTouchEvent(part, e);
         }
 
         [PacketHandler(MessageType.RequestObjectPropertiesFamily)]

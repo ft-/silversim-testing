@@ -299,7 +299,26 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-
+        public DetectedTypeFlags DetectedType
+        {
+            get
+            {
+                DetectedTypeFlags flags = 0;
+                if (Inventory.CountScripts != 0)
+                {
+                    flags |= DetectedTypeFlags.Scripted;
+                }
+                if(ObjectGroup.IsPhysics)
+                {
+                    flags |= DetectedTypeFlags.Active;
+                }
+                else
+                {
+                    flags |= DetectedTypeFlags.Passive;
+                }
+                return flags;
+            }
+        }
         #region Properties
         public UGI Group
         {

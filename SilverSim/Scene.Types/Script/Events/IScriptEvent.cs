@@ -18,7 +18,7 @@ namespace SilverSim.Scene.Types.Script.Events
         public UGI Group;
         public UUI Owner;
         public string Name;
-        public int ObjType;
+        public DetectedTypeFlags ObjType;
         public Vector3 Position;
         public Vector3 Velocity;
         public Quaternion Rotation;

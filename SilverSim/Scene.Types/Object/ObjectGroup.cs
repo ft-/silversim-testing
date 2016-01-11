@@ -166,6 +166,14 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public DetectedTypeFlags DetectedType
+        {
+            get
+            {
+                return RootPart.DetectedType;
+            }
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void TriggerOnUpdate(UpdateChangedFlags flags)
         {

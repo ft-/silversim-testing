@@ -190,6 +190,7 @@ namespace SilverSim.Scene.Types.Object
         void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList);
         void SetPrimitiveParams(AnArray.MarkEnumerator enumerator);
         void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList);
+        DetectedTypeFlags DetectedType { get; }
         void PostEvent(IScriptEvent ev);
         #endregion
     }
