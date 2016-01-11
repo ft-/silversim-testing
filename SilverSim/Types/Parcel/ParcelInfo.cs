@@ -109,7 +109,7 @@ namespace SilverSim.Types.Parcel
     {
         public int Area;
         public uint AuctionID;
-        public UUI AuthBuyer = new UUI();
+        public UUI AuthBuyer = UUI.Unknown;
         public ParcelCategory Category;
         public Date ClaimDate = new Date();
         public int ClaimPrice;
@@ -119,11 +119,10 @@ namespace SilverSim.Types.Parcel
         public string Description = string.Empty;
         public ParcelFlags Flags = ParcelFlags.AllowFly |
                             ParcelFlags.AllowLandmark |
-                            ParcelFlags.AllowAllPrimitiveEntry |
                             ParcelFlags.AllowDeedToGroup |
                             ParcelFlags.AllowTerraform |
-                            ParcelFlags.CreateObjects |
-                            ParcelFlags.AllowOtherScripts |
+                            ParcelFlags.CreateGroupObjects |
+                            ParcelFlags.AllowGroupScripts |
                             ParcelFlags.SoundLocal |
                             ParcelFlags.AllowVoiceChat;
         public TeleportLandingType LandingType;
