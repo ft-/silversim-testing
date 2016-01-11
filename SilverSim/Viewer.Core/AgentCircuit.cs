@@ -640,6 +640,7 @@ namespace SilverSim.Viewer.Core
             m_MessageRouting.Add(MessageType.FetchInventory, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.FetchInventoryDescendents, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.MoveInventoryFolder, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.MoveInventoryItem, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.PurgeInventoryDescendents, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.RemoveInventoryFolder, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.RemoveInventoryItem, m_InventoryRequestQueue.Enqueue);
