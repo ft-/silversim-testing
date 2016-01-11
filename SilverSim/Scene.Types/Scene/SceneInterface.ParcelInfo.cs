@@ -4,7 +4,6 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.Estate;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;

@@ -220,6 +220,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new ChangeColumn<int>("Area") { IsNullAllowed = false, Default = 0 },
             new ChangeColumn<int>("ActualArea") { IsNullAllowed = false, Default = 0 },
             new ChangeColumn<int>("BillableArea") { IsNullAllowed = false, Default = 0 },
+            new TableRevision(9),
+            new ChangeColumn<int>("SalePrice") { IsNullAllowed = false, Default = 0 },
             #endregion
 
             #region Table parcelaccesswhitelist
