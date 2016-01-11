@@ -140,9 +140,10 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
+        readonly object m_ThreadControlLock = new object();
         public void Start()
         {
-            lock(this)
+            lock(m_ThreadControlLock)
             {
                 if(m_InboundRunning)
                 {
@@ -169,7 +170,7 @@ namespace SilverSim.Viewer.Core
 
         public void Stop()
         {
-            lock(this)
+            lock(m_ThreadControlLock)
             {
                 if(m_InboundRunning)
                 {

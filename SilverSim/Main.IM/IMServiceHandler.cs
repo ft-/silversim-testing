@@ -21,6 +21,7 @@ namespace SilverSim.Main.IM
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();
         protected internal RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
         readonly uint m_MaxThreads;
+        readonly object m_Lock = new object();
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IMSendThread(object s)
@@ -65,7 +66,7 @@ namespace SilverSim.Main.IM
         public override void Send(GridInstantMessage im)
         {
             m_Queue.Enqueue(im);
-            lock(this)
+            lock(m_Lock)
             {
                 if(m_Queue.Count > m_Threads.Count && m_Threads.Count < m_MaxThreads)
                 {

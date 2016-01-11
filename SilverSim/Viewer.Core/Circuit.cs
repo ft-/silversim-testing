@@ -327,10 +327,12 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Thread control logic
+        readonly object m_ThreadControlLock = new object();
+
         protected abstract void StartSpecificThreads();
         public void Start()
         {
-            lock (this)
+            lock (m_ThreadControlLock)
             {
                 if (!m_TxRunning)
                 {
@@ -345,7 +347,7 @@ namespace SilverSim.Viewer.Core
         protected abstract void StopSpecificThreads();
         public void Stop()
         {
-            lock (this)
+            lock (m_ThreadControlLock)
             {
                 if (m_TxRunning)
                 {
