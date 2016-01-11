@@ -17,6 +17,7 @@ namespace SilverSim.Main.Common.Console
         readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
         readonly Thread m_LogThread;
         private bool m_Shutdown;
+        readonly object m_Lock = new object();
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public LogConsole(string consoleTitle)
@@ -75,7 +76,7 @@ namespace SilverSim.Main.Common.Console
         {
             try
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     try
                     {
