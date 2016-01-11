@@ -95,11 +95,12 @@ namespace SilverSim.Scene.Types.Object
         }
 
         private PermsGranterInfo m_PermsGranter;
+        readonly object m_PermsGranterLock = new object();
         public PermsGranterInfo PermsGranter 
         { 
             get
             {
-                lock(this)
+                lock(m_PermsGranterLock)
                 {
                     PermsGranterInfo permsGranter = m_PermsGranter;
                     return (null != permsGranter) ?
@@ -109,7 +110,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock(this)
+                lock(m_PermsGranterLock)
                 {
                     m_PermsGranter = (value == null) ?
                         null :
@@ -133,10 +134,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock(this)
-                {
-                    m_ScriptState = value;
-                }
+                m_ScriptState = value;
             }
         }
 
@@ -148,7 +146,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock(this)
+                lock(m_PermsGranterLock)
                 {
                     ScriptInstance instance = m_ScriptInstance;
                     if (null != instance)
@@ -165,7 +163,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_PermsGranterLock)
                 {
                     ScriptInstance instance = m_ScriptInstance;
                     m_ScriptInstance = null;
@@ -178,7 +176,7 @@ namespace SilverSim.Scene.Types.Object
 
         ~ObjectPartInventoryItem()
         {
-            lock(this)
+            lock(m_PermsGranterLock)
             {
                 if (m_ScriptInstance != null)
                 {

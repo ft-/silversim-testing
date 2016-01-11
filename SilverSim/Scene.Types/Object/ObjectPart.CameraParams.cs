@@ -19,14 +19,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_CameraEyeOffset;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_CameraEyeOffset = value;
                 }
@@ -38,14 +38,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_CameraAtOffset;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_CameraAtOffset = value;
                 }
