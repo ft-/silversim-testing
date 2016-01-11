@@ -26,7 +26,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     IPhysicsObject obj;
                     SceneInterface scene = Scene;

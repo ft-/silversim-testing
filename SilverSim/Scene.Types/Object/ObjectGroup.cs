@@ -89,6 +89,8 @@ namespace SilverSim.Scene.Types.Object
         public UUID FromItemID = UUID.Zero; /* used for attachments */
         public UUID RezzingObjectID = UUID.Zero; /* used alongside llRezObject and llRezAtRoot */
 
+        readonly object m_Lock = new object();
+
         AssetServiceInterface m_AssetService;
         public AssetServiceInterface AssetService /* specific for attachments usage */
         { 
@@ -134,14 +136,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     return m_OriginalAssetID;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     m_OriginalAssetID = value;
                 }
@@ -152,14 +154,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     return m_NextOwnerAssetID;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_NextOwnerAssetID = value;
                 }
@@ -181,7 +183,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 return;
             }
-            lock (this)
+            lock (m_Lock)
             {
                 OriginalAssetID = UUID.Zero;
                 NextOwnerAssetID = UUID.Zero;
@@ -450,7 +452,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock(this) 
+                lock(m_Lock) 
                 {
                     m_IsTemporary = value;
                 }
@@ -468,7 +470,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsTempOnRez = value;
-                lock(this) 
+                lock(m_Lock) 
                 {
                     m_IsTemporary = m_IsTemporary && m_IsTempOnRez;
                 }
@@ -493,7 +495,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     return m_IsGroupOwned;
                 }
@@ -501,7 +503,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 bool changed = false;
-                lock (this)
+                lock (m_Lock)
                 {
                     changed = m_IsGroupOwned != value;
                     m_IsGroupOwned = value;
@@ -518,14 +520,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     return new UGI(m_Group);
                 }
             }
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_Group = new UGI(value);
                 }
@@ -538,14 +540,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     return new UUI(m_LastOwner);
                 }
             }
             set
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     m_LastOwner = value;
                 }
@@ -558,14 +560,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     return new UUI(m_Owner);
                 }
             }
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_Owner = value;
                 }
@@ -586,14 +588,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     return m_Velocity;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_Velocity = value;
                 }
