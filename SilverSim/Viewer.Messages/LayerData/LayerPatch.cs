@@ -21,7 +21,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             }
             set
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     m_Serial = (value == 0) ?
                         1 :
@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public void IncrementSerial()
         {
-            lock(this)
+            lock(m_Lock)
             {
                 if(++m_Serial == 0)
                 {
@@ -46,6 +46,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         internal uint PackedSerial;
         readonly byte[] PackedDataBytes = new byte[651]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
         internal readonly BitPacker PackedData;
+        readonly object m_Lock = new object();
 
         public uint ExtendedPatchID
         {
@@ -84,7 +85,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             X = p.X;
             Y = p.Y;
             int x, y;
-            lock (this)
+            lock (m_Lock)
             {
                 Serial = p.Serial;
                 for (y = 0; y < 16; ++y)
@@ -104,7 +105,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                 throw new ArgumentException("p does not match in its parameters X and Y.");
             }
             int x, y;
-            lock (this)
+            lock (m_Lock)
             {
                 for (y = 0; y < 16; ++y)
                 {
@@ -127,7 +128,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                 throw new ArgumentException("p does not match in its parameters X and Y.");
             }
             int x, y;
-            lock (this)
+            lock (m_Lock)
             {
                 for (y = 0; y < 16; ++y)
                 {
@@ -152,7 +153,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             }
             set
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     Data[y, x] = value;
                 }
@@ -167,7 +168,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             }
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     Data[(int)y, (int)x] = value;
                 }
@@ -179,7 +180,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             get
             {
                 LayerPatch copy;
-                lock (this)
+                lock (m_Lock)
                 {
                     copy = new LayerPatch(this);
                 }
@@ -226,7 +227,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                         Array.Reverse(src, pos, 4);
                     }
                 }
-                lock (this)
+                lock (m_Lock)
                 {
                     Serial = BitConverter.ToUInt32(src, 0);
                     int x, y, pos = 4;
