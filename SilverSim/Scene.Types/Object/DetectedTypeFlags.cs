@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+
+using System;
 
 namespace SilverSim.Scene.Types.Object
 {
     [Flags]
     public enum DetectedTypeFlags
     {
-        Agent = 1,
-        Active = 2,
-        Passive = 4,
-        Scripted = 8
+        Agent = 1 << 0,
+        Active = 1 << 1,
+        Passive = 1 << 2,
+        Scripted = 1 << 3,
+        Npc = 1 << 5
     }
 }
