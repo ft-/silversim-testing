@@ -19,6 +19,7 @@ namespace SilverSim.Scene.Types.Object
         private bool m_Killed;
         public uint LocalID;
         public ObjectPart Part { get; private set; }
+
         public ObjectUpdateInfo(ObjectPart part)
         {
             Part = part;
@@ -27,10 +28,7 @@ namespace SilverSim.Scene.Types.Object
 
         public void KillObject()
         {
-            lock(this)
-            {
-                m_Killed = true;
-            }
+            m_Killed = true;
         }
 
         public bool IsKilled
@@ -45,12 +43,9 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                if(Part != null && !m_Killed)
                 {
-                    if(Part != null && !m_Killed)
-                    {
-                        return Part.ObjectGroup.IsPhysics;
-                    }
+                    return Part.ObjectGroup.IsPhysics;
                 }
                 return false;
             }
@@ -60,14 +55,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                if(Part != null && !m_Killed)
                 {
-                    if(Part != null && !m_Killed)
-                    {
-                        return Part.FullUpdateData;
-                    }
-                    return null;
+                    return Part.FullUpdateData;
                 }
+                return null;
             }
         }
 
@@ -75,14 +67,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                if (Part != null && !m_Killed)
                 {
-                    if (Part != null && !m_Killed)
-                    {
-                        return Part.TerseUpdateData;
-                    }
-                    return null;
+                    return Part.TerseUpdateData;
                 }
+                return null;
             }
         }
 
@@ -90,14 +79,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                if (Part != null && !m_Killed)
                 {
-                    if (Part != null && !m_Killed)
-                    {
-                        return Part.PropertiesUpdateData;
-                    }
-                    return null;
+                    return Part.PropertiesUpdateData;
                 }
+                return null;
             }
         }
 

@@ -40,6 +40,7 @@ namespace SilverSim.Scene.Types.Agent
             "walking"
         };
 
+        readonly object m_Lock = new object();
         public readonly Dictionary<string, UUID> m_AnimationOverride = new Dictionary<string, UUID>();
         public static readonly Dictionary<string, UUID> m_DefaultAnimationOverride = new Dictionary<string, UUID>();
 
@@ -106,7 +107,7 @@ namespace SilverSim.Scene.Types.Agent
         {
             AvatarAnimation m = new AvatarAnimation();
             m.Sender = m_AgentID;
-            lock (this)
+            lock (m_Lock)
             {
                 foreach (AnimationInfo ai in m_ActiveAnimations)
                 {
@@ -123,7 +124,7 @@ namespace SilverSim.Scene.Types.Agent
             int i;
             if ((permissions & ScriptPermissions.TriggerAnimation) != 0)
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     i = 0;
                     while (i < m_ActiveAnimations.Count)
@@ -145,7 +146,7 @@ namespace SilverSim.Scene.Types.Agent
         {
             if ("ALL" == anim_state)
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     if (m_AnimationOverride[m_CurrentDefaultAnimation] != m_DefaultAnimationOverride[m_CurrentDefaultAnimation])
                     {
@@ -163,7 +164,7 @@ namespace SilverSim.Scene.Types.Agent
             }
             else if (m_AnimStates.Contains<string>(anim_state))
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     if (m_CurrentDefaultAnimation == anim_state)
                     {
@@ -182,7 +183,7 @@ namespace SilverSim.Scene.Types.Agent
         {
             if (m_AnimStates.Contains<string>(anim_state))
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_AnimationOverride[anim_state] = anim_id;
                 }
@@ -193,7 +194,7 @@ namespace SilverSim.Scene.Types.Agent
         {
             if (m_AnimStates.Contains<string>(anim_state))
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     return (string)m_AnimationOverride[anim_state];
                 }
@@ -208,7 +209,7 @@ namespace SilverSim.Scene.Types.Agent
                 objectid = m_AgentID;
             }
 
-            lock (this)
+            lock (m_Lock)
             {
                 for (int i = 0; i < m_ActiveAnimations.Count; ++i)
                 {
@@ -225,7 +226,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public void StopAnimation(UUID animid, UUID objectid)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 for (int i = 0; i < m_ActiveAnimations.Count; ++i)
                 {
@@ -242,7 +243,7 @@ namespace SilverSim.Scene.Types.Agent
         public List<UUID> GetPlayingAnimations()
         {
             List<UUID> res = new List<UUID>();
-            lock(this)
+            lock(m_Lock)
             {
                 foreach(AnimationInfo info in m_ActiveAnimations)
                 {
@@ -256,7 +257,7 @@ namespace SilverSim.Scene.Types.Agent
         {
             if (m_AnimStates.Contains<string>(anim_state))
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     if (m_CurrentDefaultAnimation != anim_state)
                     {
@@ -270,7 +271,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public string GetDefaultAnimation()
         {
-            lock (this)
+            lock (m_Lock)
             {
                 return m_CurrentDefaultAnimation;
             }
