@@ -125,18 +125,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Properties
-        IScriptState m_ScriptState;
-        public IScriptState ScriptState
-        {
-            get
-            {
-                return m_ScriptState;
-            }
-            set
-            {
-                m_ScriptState = value;
-            }
-        }
+        public IScriptState ScriptState { get; set; }
 
         public ScriptInstance ScriptInstance
         {
@@ -154,7 +143,7 @@ namespace SilverSim.Scene.Types.Object
                         instance.Abort();
                         instance.Remove();
                     }
-                    m_ScriptState = null;
+                    ScriptState = null;
                     m_ScriptInstance = value;
                 }
             }
@@ -167,7 +156,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     ScriptInstance instance = m_ScriptInstance;
                     m_ScriptInstance = null;
-                    m_ScriptState = null;
+                    ScriptState = null;
                     return instance;
                 }
             }
