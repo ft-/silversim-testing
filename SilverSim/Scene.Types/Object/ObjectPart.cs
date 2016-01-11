@@ -310,14 +310,9 @@ namespace SilverSim.Scene.Types.Object
                 {
                     flags |= DetectedTypeFlags.Scripted;
                 }
-                if(ObjectGroup.IsPhysics)
-                {
-                    flags |= DetectedTypeFlags.Active;
-                }
-                else
-                {
-                    flags |= DetectedTypeFlags.Passive;
-                }
+                flags |= ObjectGroup.IsPhysics ? 
+                    DetectedTypeFlags.Active :
+                    DetectedTypeFlags.Passive;
                 return flags;
             }
         }
