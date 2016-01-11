@@ -14,6 +14,7 @@ namespace SilverSim.Scene.Physics.Common
     {
         readonly IAgent m_Agent;
         readonly PhysicsStateData m_StateData;
+        readonly object m_Lock = new object();
 
         protected AgentController(IAgent agent, UUID sceneID)
         {
@@ -23,7 +24,7 @@ namespace SilverSim.Scene.Physics.Common
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 IsPhysicsActive = false;
                 target.ReceiveState(m_StateData, positionOffset);
@@ -33,7 +34,7 @@ namespace SilverSim.Scene.Physics.Common
 
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 IsPhysicsActive = false;
                 m_StateData.Position = data.Position + positionOffset;
@@ -81,7 +82,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_ControlTargetVelocity = value;
                 }
@@ -93,7 +94,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             get
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     return m_ControlTargetVelocity;
                 }
@@ -194,7 +195,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_AppliedForce = value;
                 }
@@ -206,7 +207,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_AppliedTorque = value;
                 }
@@ -219,7 +220,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_LinearImpulse = value;
                 }
@@ -232,7 +233,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_AngularImpulse = value;
                 }
@@ -253,7 +254,7 @@ namespace SilverSim.Scene.Physics.Common
 
                 angularTorque += TargetRotationMotor(m_Agent, m_Agent.BodyRotation, 1f, dt);
 
-                lock (this)
+                lock (m_Lock)
                 {
                     linearForce += m_AppliedForce;
                     angularTorque += m_AppliedTorque;

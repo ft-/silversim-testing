@@ -19,6 +19,7 @@ namespace SilverSim.Scene.Physics.Common
         bool m_ContributesToCollisionSurfaceAsChild;
         bool m_VolumeDetect;
         readonly PhysicsStateData m_StateData;
+        readonly object m_Lock = new object();
 
         protected ObjectController(ObjectGroup part, UUID sceneID)
         {
@@ -30,7 +31,7 @@ namespace SilverSim.Scene.Physics.Common
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 IsPhysicsActive = false;
                 target.ReceiveState(m_StateData, positionOffset);
@@ -40,7 +41,7 @@ namespace SilverSim.Scene.Physics.Common
 
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 IsPhysicsActive = false;
                 m_StateData.Position = data.Position + positionOffset;
@@ -134,7 +135,7 @@ namespace SilverSim.Scene.Physics.Common
         { 
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_AppliedForce = value;
                 }
@@ -146,7 +147,7 @@ namespace SilverSim.Scene.Physics.Common
         { 
             set
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_AppliedTorque = value;
                 }
@@ -159,7 +160,7 @@ namespace SilverSim.Scene.Physics.Common
         { 
             set
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     m_LinearImpulse = value;
                 }
@@ -172,7 +173,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             set
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     m_AngularImpulse = value;
                 }
@@ -200,7 +201,7 @@ namespace SilverSim.Scene.Physics.Common
                 linearForce += m_Vehicle.LinearForce;
                 angularTorque += m_Vehicle.AngularTorque;
 
-                lock(this)
+                lock(m_Lock)
                 {
                     linearForce += m_AppliedForce;
                     angularTorque += m_AppliedTorque;
