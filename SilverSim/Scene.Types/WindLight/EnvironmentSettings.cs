@@ -19,19 +19,20 @@ namespace SilverSim.Scene.Types.WindLight
         public readonly RwLockedList<KeyValuePair<double, string>> DayCycle = new RwLockedList<KeyValuePair<double, string>>();
         public readonly RwLockedDictionary<string, SkyEntry> SkySettings = new RwLockedDictionary<string, SkyEntry>();
         WaterEntry m_WaterSettings = new WaterEntry();
+        readonly object m_WaterSettingsLock = new object();
 
         public WaterEntry WaterSettings
         {
             get
             {
-                lock(this)
+                lock(m_WaterSettingsLock)
                 {
                     return m_WaterSettings;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_WaterSettingsLock)
                 {
                     m_WaterSettings = value;
                 }

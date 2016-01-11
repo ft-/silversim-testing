@@ -16,6 +16,7 @@ namespace SilverSim.Scene.Types.Physics
         readonly IAgent m_Agent;
         Vector3 m_ControlTargetVelocity = Vector3.Zero;
         readonly PhysicsStateData m_StateData;
+        readonly object m_Lock = new object();
 
         public AgentUfoPhysics(IAgent agent, UUID sceneID)
         {
@@ -49,7 +50,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
         {
-            lock(this)
+            lock(m_Lock)
             {
                 IsPhysicsActive = false;
                 target.ReceiveState(m_StateData, positionOffset);
@@ -59,7 +60,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 IsPhysicsActive = false;
                 m_StateData.Position = data.Position + positionOffset;
@@ -77,7 +78,7 @@ namespace SilverSim.Scene.Types.Physics
             Vector3 controlTarget;
             if (IsPhysicsActive)
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     controlTarget = m_ControlTargetVelocity;
                 }
@@ -145,7 +146,7 @@ namespace SilverSim.Scene.Types.Physics
         {
             set 
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     m_ControlTargetVelocity = value;
                 }

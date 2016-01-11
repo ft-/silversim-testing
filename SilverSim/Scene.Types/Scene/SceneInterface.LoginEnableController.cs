@@ -31,6 +31,7 @@ namespace SilverSim.Scene.Types.Scene
         public class LoginController
         {
             ReadyFlags m_CurrentFlags = ReadyFlags.ExpectedFlags;
+            readonly object m_Lock = new object();
 
             public LoginController()
             {
@@ -39,7 +40,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Ready(ReadyFlags lf)
             {
-                lock(this)
+                lock(m_Lock)
                 {
                     ReadyFlags oldFlags = m_CurrentFlags;
                     m_CurrentFlags &= (~lf);
@@ -52,7 +53,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void NotReady(ReadyFlags lf)
             {
-                lock (this)
+                lock (m_Lock)
                 {
                     ReadyFlags oldFlags = m_CurrentFlags;
                     m_CurrentFlags |= lf;
