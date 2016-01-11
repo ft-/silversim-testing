@@ -27,7 +27,7 @@ namespace SilverSim.Scene.Types.Object
 
         public void ClearMedia()
         {
-            lock (this)
+            lock (m_DataLock)
             {
                 m_Media = null;
                 m_MediaURL = string.Empty;
@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Types.Object
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public void UpdateMedia(PrimitiveMedia media, UUID updaterID)
         {
-            lock(this)
+            lock(m_DataLock)
             {
                 string mediaURL;
                 if(string.IsNullOrEmpty(m_MediaURL))
@@ -64,7 +64,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 return;
             }
-            lock (this)
+            lock (m_DataLock)
             {
                 string mediaURL;
                 if (string.IsNullOrEmpty(m_MediaURL))

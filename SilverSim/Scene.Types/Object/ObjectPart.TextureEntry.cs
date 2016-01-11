@@ -22,7 +22,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_MediaURL;
                 }
@@ -31,14 +31,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 if (value != null)
                 {
-                    lock (this)
+                    lock (m_DataLock)
                     {
                         m_MediaURL = value;
                     }
                 }
                 else
                 {
-                    lock (this)
+                    lock (m_DataLock)
                     {
                         m_MediaURL = string.Empty;
                     }

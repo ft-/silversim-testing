@@ -30,6 +30,7 @@ namespace SilverSim.Scene.Types.Object
         public int InventorySerial = 1;
 
         public UUID PartID { get; internal set; }
+        readonly object m_DataLock = new object();
 
         public ObjectPartInventory()
         {
@@ -131,7 +132,7 @@ namespace SilverSim.Scene.Types.Object
 
         public void Add(ObjectPartInventoryItem item, bool nameChangeAllowed = true)
         {
-            lock(this)
+            lock(m_DataLock)
             {
                 if (nameChangeAllowed)
                 {
@@ -170,7 +171,7 @@ namespace SilverSim.Scene.Types.Object
         public new void ChangeKey(string newKey, string oldKey)
         {
             ObjectPartInventoryItem item;
-            lock (this)
+            lock (m_DataLock)
             {
                 base.ChangeKey(newKey, oldKey);
                 item = base[newKey];
@@ -192,7 +193,7 @@ namespace SilverSim.Scene.Types.Object
             ObjectPartInventoryItem oldItem;
             ScriptInstance script;
             newItem.Name = name;
-            lock(this)
+            lock(m_DataLock)
             {
                 oldItem = this[name];
                 script = oldItem.RemoveScriptInstance;

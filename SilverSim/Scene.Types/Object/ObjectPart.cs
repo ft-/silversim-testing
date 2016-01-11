@@ -26,6 +26,8 @@ namespace SilverSim.Scene.Types.Object
     {
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
 
+        readonly object m_DataLock = new object();
+
         #region Events
         public event Action<ObjectPart, UpdateChangedFlags> OnUpdate;
         public event Action<IObject> OnPositionChange;
@@ -41,7 +43,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 bool incSerial;
-                lock(this)
+                lock(m_DataLock)
                 {
                     incSerial = m_LocalID != 0;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID] = (byte)(value & 0xFF);
@@ -336,14 +338,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_Permissions.Base;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_Permissions.Base = value;
                 }
@@ -365,14 +367,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_Permissions.Current;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_Permissions.Current = value;
                 }
@@ -394,14 +396,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_Permissions.Group;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_Permissions.Group = value;
                 }
@@ -423,14 +425,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_Permissions.EveryOne;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_Permissions.EveryOne = value;
                 }
@@ -452,14 +454,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_Permissions.NextOwner;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_Permissions.NextOwner = value;
                 }
@@ -481,14 +483,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return new Date(m_CreationDate);
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_CreationDate = new Date(value);
                 }
@@ -510,14 +512,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_PrimitiveFlags;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_PrimitiveFlags = value;
                 }
@@ -530,14 +532,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return new UUI(m_Creator);
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_Creator = value;
                 }
@@ -622,7 +624,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_Velocity = value;
                 }
@@ -638,14 +640,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_AngularVelocity;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_AngularVelocity = value;
                 }
@@ -749,14 +751,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_SitTargetOffset;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_SitTargetOffset = value;
                 }
@@ -769,14 +771,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this) 
+                lock (m_DataLock) 
                 {
                     return m_SitTargetOrientation; 
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_SitTargetOrientation = value;
                 }
@@ -789,14 +791,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_SitText;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_SitText = value;
                 }
@@ -828,14 +830,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_TouchText;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_TouchText = value;
                 }
@@ -920,14 +922,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_Size;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_Size = value;
                 }
@@ -944,14 +946,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_Slice;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_Slice = value;
                 }
@@ -984,11 +986,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get 
             {
-                return m_ID; 
+                lock(m_DataLock)
+                {
+                    return m_ID;
+                }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_ID = value;
                     Inventory.PartID = value;
@@ -1047,14 +1052,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_PhysicsDensity;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_PhysicsDensity = value;
                 }
@@ -1067,14 +1072,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_PhysicsFriction;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_PhysicsFriction = value;
                 }
@@ -1087,14 +1092,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_PhysicsRestitution;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_PhysicsRestitution = value;
                 }
@@ -1108,14 +1113,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_PhysicsGravityMultiplier;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_PhysicsGravityMultiplier = value;
                 }
@@ -1130,14 +1135,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_LocalPosition;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_LocalPosition = value;
                 }
@@ -1155,7 +1160,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     if(null != ObjectGroup && ObjectGroup.RootPart != this)
                     {
@@ -1166,7 +1171,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     if (null != ObjectGroup && ObjectGroup.RootPart != this)
                     {
@@ -1189,14 +1194,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_LocalPosition;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_LocalPosition = value;
                 }
@@ -1217,14 +1222,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_LocalRotation;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_LocalRotation = value;
                 }
@@ -1243,7 +1248,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return (ObjectGroup != null && this != ObjectGroup.RootPart) ?
                         m_LocalRotation * ObjectGroup.RootPart.GlobalRotation :
@@ -1252,7 +1257,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     if (ObjectGroup != null && this != ObjectGroup.RootPart)
                     {
@@ -1275,14 +1280,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_LocalRotation;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_LocalRotation = value;
                 }
@@ -1301,7 +1306,7 @@ namespace SilverSim.Scene.Types.Object
         #region Link / Unlink
         protected internal void Link(ObjectGroup group)
         {
-            lock(this)
+            lock(m_DataLock)
             {
                 if(ObjectGroup != null)
                 {
@@ -1314,7 +1319,7 @@ namespace SilverSim.Scene.Types.Object
 
         protected internal void Unlink()
         {
-            lock (this)
+            lock (m_DataLock)
             {
                 ObjectGroup = null;
             }
@@ -1532,7 +1537,7 @@ namespace SilverSim.Scene.Types.Object
 
         public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            lock (this)
+            lock (m_DataLock)
             {
                 writer.WriteStartElement("SceneObjectPart");
                 {

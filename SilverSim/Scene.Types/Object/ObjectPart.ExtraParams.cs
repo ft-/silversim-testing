@@ -28,7 +28,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     if (value > 1)
                     {
@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     if (value > 1)
                     {
@@ -84,7 +84,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_IsFacelightDisabled = value;
                 }
@@ -104,7 +104,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_IsAttachmentLightsDisabled = value;
                 }
