@@ -35,14 +35,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_CameraPosition;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_CameraPosition = value;
                 }
@@ -66,14 +66,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_CameraAtAxis;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_CameraAtAxis = value;
                 }
@@ -84,14 +84,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_CameraLeftAxis;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_CameraLeftAxis = value;
                 }
@@ -102,14 +102,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_CameraUpAxis;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_CameraUpAxis = value;
                 }

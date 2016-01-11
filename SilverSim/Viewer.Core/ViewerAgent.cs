@@ -46,6 +46,7 @@ namespace SilverSim.Viewer.Core
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
         public event Action<IObject> OnPositionChange;
+        readonly object m_DataLock = new object();
 
         #region Agent fields
         readonly UUID m_AgentID;
@@ -127,7 +128,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     if(m_ActiveTeleportService != null && value != null)
                     {
@@ -246,14 +247,14 @@ namespace SilverSim.Viewer.Core
             /* we need to guard against our position routines and so on */
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_SittingOnObject;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_SittingOnObject = value;
                 }
@@ -350,7 +351,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return (m_SittingOnObject != null) ?
                         m_GlobalPosition - m_SittingOnObject.Position :
@@ -359,7 +360,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_GlobalPosition = (m_SittingOnObject != null) ?
                         value + m_SittingOnObject.Position :
@@ -374,14 +375,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_Velocity;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_Velocity = value;
                 }
@@ -393,14 +394,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_AngularVelocity;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_AngularVelocity = value;
                 }
@@ -412,14 +413,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_AngularAcceleration;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_AngularAcceleration = value;
                 }
@@ -430,14 +431,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_GlobalPosition;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_GlobalPosition = value;
                 }
@@ -449,7 +450,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return (m_SittingOnObject != null) ?
                         m_GlobalPosition - m_SittingOnObject.Position :
@@ -458,7 +459,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_GlobalPosition = (m_SittingOnObject != null) ?
                         value + m_SittingOnObject.Position :
@@ -474,14 +475,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_Acceleration;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_Acceleration = value;
                 }
@@ -494,7 +495,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return (m_SittingOnObject != null) ?
                         m_GlobalRotation * m_SittingOnObject.Rotation :
@@ -503,7 +504,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_GlobalRotation = (m_SittingOnObject != null) ?
                         value / m_SittingOnObject.Rotation :
@@ -517,7 +518,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return (m_SittingOnObject != null) ?
                         m_GlobalRotation / m_SittingOnObject.Rotation :
@@ -526,7 +527,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_GlobalRotation = (m_SittingOnObject != null) ?
                         value * m_SittingOnObject.Rotation :
@@ -540,14 +541,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return LocalRotation;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     LocalRotation = value;
                 }
@@ -556,7 +557,7 @@ namespace SilverSim.Viewer.Core
 
         public bool IsInScene(SceneInterface scene)
         {
-            lock (this)
+            lock (m_DataLock)
             {
                 return SceneID == scene.ID;
             }
@@ -566,14 +567,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return m_CurrentSceneID;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_CurrentSceneID = value;
                 }
@@ -962,14 +963,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_Health;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_Health = value.Clamp(0, 100);
 #warning Implement death
@@ -979,7 +980,7 @@ namespace SilverSim.Viewer.Core
 
         public void IncreaseHealth(double v)
         {
-            lock(this)
+            lock(m_DataLock)
             {
                 if (v >= 0)
                 {
@@ -990,7 +991,7 @@ namespace SilverSim.Viewer.Core
 
         public void DecreaseHealth(double v)
         {
-            lock (this)
+            lock (m_DataLock)
             {
                 if (v <= 0)
                 {
@@ -1310,7 +1311,7 @@ namespace SilverSim.Viewer.Core
         ~ViewerAgent()
         {
             OnPositionChange -= ChildUpdateOnPositionChange;
-            lock (this)
+            lock (m_DataLock)
             {
                 DetachAllAttachments();
                 if (m_EconomyService != null)
@@ -1345,7 +1346,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     IPhysicsObject obj;
                     if(!PhysicsActors.TryGetValue(SceneID, out obj))
@@ -1364,7 +1365,7 @@ namespace SilverSim.Viewer.Core
             set
             {
                 bool updateProcessed = false;
-                lock (this)
+                lock (m_DataLock)
                 {
                     if (SceneID == value.SceneID && null == m_SittingOnObject)
                     {
@@ -1399,7 +1400,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     int seqid = ++m_NextParcelSequenceId;
                     if (seqid < 0)

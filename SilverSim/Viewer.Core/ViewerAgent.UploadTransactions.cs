@@ -22,7 +22,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     if(++m_NextXferID == 0)
                     {

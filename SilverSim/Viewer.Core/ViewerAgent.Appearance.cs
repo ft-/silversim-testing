@@ -25,7 +25,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     return new Vector3(0.3, 0.3, AvatarHeight);
                 }

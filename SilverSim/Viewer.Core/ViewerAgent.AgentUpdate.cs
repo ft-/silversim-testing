@@ -96,14 +96,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_HeadRotation;
                 }
             }
             set
             {
-                lock (this)
+                lock (m_DataLock)
                 {
                     m_HeadRotation = value;
                 }
@@ -114,14 +114,14 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return m_BodyRotation;
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_BodyRotation = value;
                 }
