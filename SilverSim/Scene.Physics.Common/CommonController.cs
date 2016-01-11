@@ -10,7 +10,12 @@ namespace SilverSim.Scene.Physics.Common
     public abstract class CommonPhysicsController
     {
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
-        public static double GravityAccelerationConstant = 9.8f;
+        public static double GravityAccelerationConstant { get; set; }
+
+        static CommonPhysicsController()
+        {
+            GravityAccelerationConstant = 9.8f;
+        }
 
         protected CommonPhysicsController()
         {
