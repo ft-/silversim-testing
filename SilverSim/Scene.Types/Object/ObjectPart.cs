@@ -329,6 +329,33 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void SetClrBaseMask(InventoryPermissionsMask setflags, InventoryPermissionsMask clrflags)
+        {
+            InventoryPermissionsMask value;
+            lock (m_DataLock)
+            {
+                value = (m_Permissions.Base | setflags) & ~clrflags;
+                m_Permissions.Base = value;
+                InventoryPermissionsMask ownerMask = m_Permissions.Current;
+                ownerMask = m_Permissions.Base & InventoryPermissionsMask.ObjectPermissionsChangeable;
+
+                const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
+                m_Permissions.Current = (m_Permissions.Current & lockBits) | (ownerMask & ~lockBits);
+            }
+
+            lock (m_UpdateDataLock)
+            {
+                byte[] b = BitConverter.GetBytes((uint)value);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.BaseMask, b.Length);
+            }
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(0);
+        }
+
         public InventoryPermissionsMask BaseMask
         {
             get
@@ -343,7 +370,13 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Permissions.Base = value;
+                    InventoryPermissionsMask ownerMask = m_Permissions.Current;
+                    ownerMask = value & InventoryPermissionsMask.ObjectPermissionsChangeable;
+
+                    const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
+                    m_Permissions.Current = (m_Permissions.Current & lockBits) | (ownerMask & ~lockBits);
                 }
+
                 lock(m_UpdateDataLock)
                 {
                     byte[] b = BitConverter.GetBytes((uint)value);
@@ -356,6 +389,27 @@ namespace SilverSim.Scene.Types.Object
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
+        }
+
+        public void SetClrOwnerMask(InventoryPermissionsMask setflags, InventoryPermissionsMask clrflags)
+        {
+            InventoryPermissionsMask value;
+            lock (m_DataLock)
+            {
+                value = (m_Permissions.Current | setflags) & ~clrflags;
+                m_Permissions.Current = value;
+            }
+            lock (m_UpdateDataLock)
+            {
+                byte[] b = BitConverter.GetBytes((uint)value);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerMask, b.Length);
+            }
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(0);
         }
 
         public InventoryPermissionsMask OwnerMask
@@ -387,6 +441,27 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void SetClrGroupMask(InventoryPermissionsMask setflags, InventoryPermissionsMask clrflags)
+        {
+            InventoryPermissionsMask value;
+            lock (m_DataLock)
+            {
+                value = (m_Permissions.Group | setflags) & ~clrflags;
+                m_Permissions.Group = value;
+            }
+            lock (m_UpdateDataLock)
+            {
+                byte[] b = BitConverter.GetBytes((uint)value);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupMask, b.Length);
+            }
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(0);
+        }
+
         public InventoryPermissionsMask GroupMask
         {
             get
@@ -416,6 +491,27 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void SetClrEveryoneMask(InventoryPermissionsMask setflags, InventoryPermissionsMask clrflags)
+        {
+            InventoryPermissionsMask value;
+            lock (m_DataLock)
+            {
+                value = (m_Permissions.EveryOne | setflags) & ~clrflags;
+                m_Permissions.EveryOne = value;
+            }
+            lock (m_UpdateDataLock)
+            {
+                byte[] b = BitConverter.GetBytes((uint)value);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.EveryoneMask, b.Length);
+            }
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(0);
+        }
+
         public InventoryPermissionsMask EveryoneMask
         {
             get
@@ -443,6 +539,27 @@ namespace SilverSim.Scene.Types.Object
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
+        }
+
+        public void SetClrNextOwnerMask(InventoryPermissionsMask setflags, InventoryPermissionsMask clrflags)
+        {
+            InventoryPermissionsMask value;
+            lock (m_DataLock)
+            {
+                value = (m_Permissions.NextOwner | setflags) & ~clrflags;
+                m_Permissions.NextOwner = value;
+            }
+            lock (m_UpdateDataLock)
+            {
+                byte[] b = BitConverter.GetBytes((uint)value);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.NextOwnerMask, b.Length);
+            }
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(0);
         }
 
         public InventoryPermissionsMask NextOwnerMask

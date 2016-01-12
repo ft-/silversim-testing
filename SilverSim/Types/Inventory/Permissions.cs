@@ -18,6 +18,7 @@ namespace SilverSim.Types.Inventory
         Move = 1 << 19,
         Damage = 1 << 20, /* deprecated */
         All = Transfer | Modify | Copy | Move,
+        ObjectPermissionsChangeable = 0xFFFFFFF8,
         Every = 0x7FFFFFFF
     }
 

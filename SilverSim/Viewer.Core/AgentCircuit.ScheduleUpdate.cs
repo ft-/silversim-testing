@@ -6,6 +6,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Object;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -281,6 +282,8 @@ namespace SilverSim.Viewer.Core
                 byte terse_packet_count = 0;
                 List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data = null;
                 int full_packet_data_length = 0;
+                ObjectProperties props = null;
+                int props_bytelen = 0;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
@@ -362,6 +365,24 @@ namespace SilverSim.Viewer.Core
                                     full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
                                     full_packet_data_length += fullUpdate.Length;
                                 }
+
+                                byte[] propUpdate = ui.PropertiesUpdate;
+                                if(null != propUpdate)
+                                {
+                                    if(null == props)
+                                    {
+                                        props = new ObjectProperties();
+                                    }
+                                    if (props_bytelen + propUpdate.Length > 1400)
+                                    {
+                                        SendMessage(props);
+                                        props_bytelen = 0;
+                                        props = new ObjectProperties();
+                                    }
+
+                                    props.ObjectData.Add(propUpdate);
+                                    props_bytelen += propUpdate.Length;
+                                }
                             }
                             else
                             {
@@ -396,6 +417,11 @@ namespace SilverSim.Viewer.Core
                             }
                         }
                     }
+                }
+
+                if(props != null)
+                {
+                    SendMessage(props);
                 }
 
                 if(full_packet_data != null)
