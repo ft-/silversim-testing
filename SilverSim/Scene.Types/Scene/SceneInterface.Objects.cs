@@ -7,7 +7,6 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
-using MultipleObjectUpdate = SilverSim.Viewer.Messages.Object.MultipleObjectUpdate;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Types.Inventory;
 using SilverSim.Scene.Types.Script.Events;
@@ -16,6 +15,53 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
+        class ObjectPropertiesSendHandler : IDisposable
+        {
+            ObjectProperties m_Props;
+            int m_Bytelen = 0;
+            IAgent m_Agent;
+            UUID m_SceneID;
+
+            public ObjectPropertiesSendHandler(IAgent agent, UUID sceneID)
+            {
+                m_Agent = agent;
+                m_SceneID = sceneID;
+            }
+
+            public void Send(ObjectPart part)
+            {
+                byte[] propUpdate = part.PropertiesUpdateData;
+                if (null == propUpdate)
+                {
+                    return;
+                }
+
+                if (m_Bytelen + propUpdate.Length > 1400)
+                {
+                    m_Agent.SendMessageAlways(m_Props, m_SceneID);
+                    m_Bytelen = 0;
+                }
+
+                if (null == m_Props)
+                {
+                    m_Props = new ObjectProperties();
+                }
+
+                m_Props.ObjectData.Add(propUpdate);
+                m_Bytelen += propUpdate.Length;
+            }
+
+            public void Dispose()
+            {
+                if(null != m_Props)
+                {
+                    m_Agent.SendMessageAlways(m_Props, m_SceneID);
+                    m_Bytelen = 0;
+                    m_Props = null;
+                }
+            }
+        }
+
         [PacketHandler(MessageType.RequestPayPrice)]
         public void HandleRequestPayPrice(Message m)
         {
@@ -165,26 +211,29 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (ObjectSaleInfo.Data d in req.ObjectData)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (ObjectSaleInfo.Data d in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectSaleInfo localid={0}", d.ObjectLocalID);
+                    m_Log.DebugFormat("ObjectSaleInfo localid={0}", d.ObjectLocalID);
 #endif
 
-                ObjectPart prim;
-                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
-                {
-                    continue;
+                    ObjectPart prim;
+                    if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
+                    {
+                        continue;
+                    }
+
+                    if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    prim.ObjectGroup.SalePrice = d.SalePrice;
+                    prim.ObjectGroup.SaleType = (InventoryItem.SaleInfoData.SaleType)d.SaleType;
+                    propHandler.Send(prim);
                 }
-
-                if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
-                {
-                    continue;
-                }
-
-                prim.ObjectGroup.SalePrice = d.SalePrice;
-                prim.ObjectGroup.SaleType = (InventoryItem.SaleInfoData.SaleType)d.SaleType;
-
             }
         }
 
@@ -414,66 +463,68 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             bool isGod = agent.IsActiveGod && agent.IsInScene(this);
-
-            foreach (ObjectPermissions.Data d in req.ObjectData)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (ObjectPermissions.Data d in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectPermissions localid={0} field={1} change={2} mask=({3})", d.ObjectLocalID, d.Field.ToString(), d.ChangeType.ToString(), d.Mask.ToString());
+                    m_Log.DebugFormat("ObjectPermissions localid={0} field={1} change={2} mask=({3})", d.ObjectLocalID, d.Field.ToString(), d.ChangeType.ToString(), d.Mask.ToString());
 #endif
 
-                ObjectPart prim;
-                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
-                {
-                    continue;
-                }
-                Object.ObjectGroup grp = prim.ObjectGroup;
-                InventoryPermissionsMask setmask = InventoryPermissionsMask.Every;
-                if(!isGod)
-                {
-                    setmask = grp.RootPart.OwnerMask;
-                }
-
-                InventoryPermissionsMask clrmask = InventoryPermissionsMask.None;
-
-                switch (d.ChangeType)
-                {
-                    case ObjectPermissions.ChangeType.Set:
-                        setmask &= d.Mask;
-                        break;
-
-                    case ObjectPermissions.ChangeType.Clear:
-                    default:
-                        setmask = InventoryPermissionsMask.None;
-                        clrmask = d.Mask;
-                        break;
-                }
-
-                if (agent.IsActiveGod)
-                {
-                    foreach(ObjectPart part in grp.ValuesByKey1)
+                    ObjectPart prim;
+                    if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                     {
-                        ApplyPermissions(part, d, setmask, clrmask);
+                        continue;
                     }
-                }
-                else if (grp.RootPart.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Modify))
-                {
-                    ApplyPermissions(grp.RootPart, d, setmask, clrmask);
-                }
+                    Object.ObjectGroup grp = prim.ObjectGroup;
+                    InventoryPermissionsMask setmask = InventoryPermissionsMask.Every;
+                    if (!isGod)
+                    {
+                        setmask = grp.RootPart.OwnerMask;
+                    }
+
+                    InventoryPermissionsMask clrmask = InventoryPermissionsMask.None;
+
+                    switch (d.ChangeType)
+                    {
+                        case ObjectPermissions.ChangeType.Set:
+                            setmask &= d.Mask;
+                            break;
+
+                        case ObjectPermissions.ChangeType.Clear:
+                        default:
+                            setmask = InventoryPermissionsMask.None;
+                            clrmask = d.Mask;
+                            break;
+                    }
+
+                    if (agent.IsActiveGod)
+                    {
+                        foreach (ObjectPart part in grp.ValuesByKey1)
+                        {
+                            ApplyPermissions(part, d, setmask, clrmask, propHandler);
+                        }
+                    }
+                    else if (grp.RootPart.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Modify))
+                    {
+                        ApplyPermissions(grp.RootPart, d, setmask, clrmask, propHandler);
+                    }
 
 #if DEBUG
-                m_Log.DebugFormat("changed {5} => base=({0}) owner=({1}) group=({2}) everyone=({3}) nextowner=({4})", 
-                    grp.RootPart.BaseMask.ToString(),
-                    grp.RootPart.OwnerMask.ToString(),
-                    grp.RootPart.GroupMask.ToString(),
-                    grp.RootPart.EveryoneMask.ToString(),
-                    grp.RootPart.NextOwnerMask.ToString(),
-                    grp.RootPart.LocalID);
+                    m_Log.DebugFormat("changed {5} => base=({0}) owner=({1}) group=({2}) everyone=({3}) nextowner=({4})",
+                        grp.RootPart.BaseMask.ToString(),
+                        grp.RootPart.OwnerMask.ToString(),
+                        grp.RootPart.GroupMask.ToString(),
+                        grp.RootPart.EveryoneMask.ToString(),
+                        grp.RootPart.NextOwnerMask.ToString(),
+                        grp.RootPart.LocalID);
 #endif
-
+                }
             }
         }
 
-        void ApplyPermissions(ObjectPart prim, ObjectPermissions.Data d, InventoryPermissionsMask setmask, InventoryPermissionsMask clrmask)
+        void ApplyPermissions(ObjectPart prim, ObjectPermissions.Data d, InventoryPermissionsMask setmask, InventoryPermissionsMask clrmask,
+            ObjectPropertiesSendHandler propHandler)
         {
             if ((d.Field & ObjectPermissions.ChangeFieldMask.Base) != 0)
             {
@@ -495,6 +546,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 prim.SetClrOwnerMask(setmask, clrmask);
             }
+            propHandler.Send(prim);
         }
 
         [PacketHandler(MessageType.ObjectOwner)]
@@ -526,20 +578,25 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (uint d in req.ObjectList)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (uint d in req.ObjectList)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectOwner localid={0}", d);
+                    m_Log.DebugFormat("ObjectOwner localid={0}", d);
 #endif
 
-                ObjectPart prim;
-                if (!Primitives.TryGetValue(d, out prim))
-                {
-                    continue;
-                }
+                    ObjectPart prim;
+                    if (!Primitives.TryGetValue(d, out prim))
+                    {
+                        continue;
+                    }
 
-                prim.Owner = owner;
-                prim.Group = group;
+                    prim.Owner = owner;
+                    prim.Group = group;
+
+                    propHandler.Send(prim);
+                }
             }
         }
 
@@ -559,23 +616,28 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (ObjectName.Data d in req.ObjectData)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (ObjectName.Data d in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectName localid={0}", d.ObjectLocalID);
+                    m_Log.DebugFormat("ObjectName localid={0}", d.ObjectLocalID);
 #endif
 
-                ObjectPart prim;
-                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
-                {
-                    continue;
-                }
+                    ObjectPart prim;
+                    if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
+                    {
+                        continue;
+                    }
 
-                if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
-                {
-                    continue;
+                    if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                    {
+                        continue;
+                    }
+                    prim.Name = d.Name;
+
+                    propHandler.Send(prim);
                 }
-                prim.Name = d.Name;
             }
         }
 
@@ -617,23 +679,27 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach(UInt32 d in req.ObjectList)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (UInt32 d in req.ObjectList)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectGroup localid={0}", d);
+                    m_Log.DebugFormat("ObjectGroup localid={0}", d);
 #endif
 
-                ObjectPart prim;
-                if (!Primitives.TryGetValue(d, out prim))
-                {
-                    continue;
-                }
+                    ObjectPart prim;
+                    if (!Primitives.TryGetValue(d, out prim))
+                    {
+                        continue;
+                    }
 
-                if (!CanChangeGroup(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
-                {
-                    continue;
+                    if (!CanChangeGroup(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                    {
+                        continue;
+                    }
+                    prim.ObjectGroup.Group = new UGI(req.GroupID);
+                    propHandler.Send(prim);
                 }
-                prim.ObjectGroup.Group = new UGI(req.GroupID);
             }
         }
 
@@ -675,23 +741,27 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach(ObjectMaterial.Data d in req.ObjectData)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (ObjectMaterial.Data d in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectMaterial localid={0}", d.ObjectLocalID);
+                    m_Log.DebugFormat("ObjectMaterial localid={0}", d.ObjectLocalID);
 #endif
 
-                ObjectPart prim;
-                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
-                {
-                    continue;
-                }
+                    ObjectPart prim;
+                    if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
+                    {
+                        continue;
+                    }
 
-                if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
-                {
-                    continue;
+                    if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                    {
+                        continue;
+                    }
+                    prim.Material = d.Material;
+                    propHandler.Send(prim);
                 }
-                prim.Material = d.Material;
             }
         }
 
@@ -791,37 +861,22 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ObjectPart part;
-            int bytelen = 0;
-            ObjectProperties props = null;
-            foreach(uint primLocalID in req.ObjectData)
+
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (uint primLocalID in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectSelect localid={0}", primLocalID);
+                    m_Log.DebugFormat("ObjectSelect localid={0}", primLocalID);
 #endif
 
-                if (!Primitives.TryGetValue(primLocalID, out part))
-                {
-                    continue;
+                    if (!Primitives.TryGetValue(primLocalID, out part))
+                    {
+                        continue;
+                    }
+
+                    propHandler.Send(part);
                 }
-
-                byte[] propUpdate = part.PropertiesUpdateData;
-                if(null == propUpdate)
-                {
-                    continue;
-            }
-                if(bytelen + propUpdate.Length > 1400)
-                {
-                    agent.SendMessageAlways(props, ID);
-                    bytelen = 0;
-        }
-                props = new ObjectProperties();
-                props.ObjectData.Add(propUpdate);
-                bytelen += propUpdate.Length;
-            }
-
-            if(null != props)
-            {
-                agent.SendMessageAlways(props, ID);
             }
         }
 
@@ -863,23 +918,27 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (ObjectDescription.Data d in req.ObjectData)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (ObjectDescription.Data d in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectDescription localid={0}", d.ObjectLocalID);
+                    m_Log.DebugFormat("ObjectDescription localid={0}", d.ObjectLocalID);
 #endif
 
-                ObjectPart prim;
-                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
-                {
-                    continue;
-                }
+                    ObjectPart prim;
+                    if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
+                    {
+                        continue;
+                    }
 
-                if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
-                {
-                    continue;
+                    if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                    {
+                        continue;
+                    }
+                    prim.Description = d.Description;
+                    propHandler.Send(prim);
                 }
-                prim.Description = d.Description;
             }
         }
 
@@ -899,33 +958,18 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ObjectPart part;
-            int bytelen = 0;
-            ObjectProperties props = null;
-            foreach (uint primLocalID in req.ObjectData)
+
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
-                if (!Primitives.TryGetValue(primLocalID, out part))
+                foreach (uint primLocalID in req.ObjectData)
                 {
-                    continue;
+                    if (!Primitives.TryGetValue(primLocalID, out part))
+                    {
+                        continue;
+                    }
+
+                    propHandler.Send(part);
                 }
-
-                byte[] propUpdate = part.PropertiesUpdateData;
-                if (null == propUpdate)
-                {
-                    continue;
-            }
-                if (bytelen + propUpdate.Length > 1400)
-                {
-                    agent.SendMessageAlways(props, ID);
-                    bytelen = 0;
-        }
-                props = new ObjectProperties();
-                props.ObjectData.Add(propUpdate);
-                bytelen += propUpdate.Length;
-            }
-
-            if (null != props)
-            {
-                agent.SendMessageAlways(props, ID);
             }
         }
 
@@ -945,21 +989,25 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (ObjectClickAction.Data data in req.ObjectData)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (ObjectClickAction.Data data in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectClickAction localid={0}", data.ObjectLocalID);
+                    m_Log.DebugFormat("ObjectClickAction localid={0}", data.ObjectLocalID);
 #endif
 
-                ObjectPart part;
-                if (Primitives.TryGetValue(data.ObjectLocalID, out part))
-                {
-                    if (!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                    ObjectPart part;
+                    if (Primitives.TryGetValue(data.ObjectLocalID, out part))
                     {
-                        continue;
-                    }
+                        if (!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                        {
+                            continue;
+                        }
 
-                    part.ClickAction = data.ClickAction;
+                        part.ClickAction = data.ClickAction;
+                        propHandler.Send(part);
+                    }
                 }
             }
         }
@@ -980,21 +1028,25 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (ObjectCategory.Data data in req.ObjectData)
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+                foreach (ObjectCategory.Data data in req.ObjectData)
+                {
 #if DEBUG
-                m_Log.DebugFormat("ObjectCategory localid={0}", data.ObjectLocalID);
+                    m_Log.DebugFormat("ObjectCategory localid={0}", data.ObjectLocalID);
 #endif
 
-                ObjectPart part;
-                if (Primitives.TryGetValue(data.ObjectLocalID, out part))
-                {
-                    if (!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                    ObjectPart part;
+                    if (Primitives.TryGetValue(data.ObjectLocalID, out part))
                     {
-                        continue;
-                    }
+                        if (!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                        {
+                            continue;
+                        }
 
-                    part.ObjectGroup.Category = data.Category;
+                        part.ObjectGroup.Category = data.Category;
+                        propHandler.Send(part);
+                    }
                 }
             }
         }

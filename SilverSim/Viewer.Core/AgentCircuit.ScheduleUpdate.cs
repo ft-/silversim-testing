@@ -282,8 +282,6 @@ namespace SilverSim.Viewer.Core
                 byte terse_packet_count = 0;
                 List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data = null;
                 int full_packet_data_length = 0;
-                ObjectProperties props = null;
-                int props_bytelen = 0;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
@@ -327,7 +325,6 @@ namespace SilverSim.Viewer.Core
                         else
                         {
                             bool dofull = false;
-                            bool addedfresh = false;
                             if(LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
@@ -336,7 +333,6 @@ namespace SilverSim.Viewer.Core
                             else
                             {
                                 dofull = true;
-                                addedfresh = true;
                             }
 
                             if (dofull)
@@ -399,34 +395,8 @@ namespace SilverSim.Viewer.Core
                                     ++terse_packet_count;
                                 }
                             }
-
-                            if (!addedfresh) /* only send out ObjectProperties on following up changes */
-                            {
-                                byte[] propUpdate = ui.PropertiesUpdate;
-                                if (null != propUpdate)
-                                {
-                                    if (null == props)
-                                    {
-                                        props = new ObjectProperties();
-                                    }
-                                    if (props_bytelen + propUpdate.Length > 1400)
-                                    {
-                                        SendMessage(props);
-                                        props_bytelen = 0;
-                                        props = new ObjectProperties();
-                                    }
-
-                                    props.ObjectData.Add(propUpdate);
-                                    props_bytelen += propUpdate.Length;
-                                }
-                            }
                         }
                     }
-                }
-
-                if(props != null)
-                {
-                    SendMessage(props);
                 }
 
                 if(full_packet_data != null)
