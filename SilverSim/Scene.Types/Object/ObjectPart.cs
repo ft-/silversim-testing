@@ -336,7 +336,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 value = (m_Permissions.Base | setflags) & ~clrflags;
                 m_Permissions.Base = value;
-                InventoryPermissionsMask ownerMask = m_Permissions.Current;
+                InventoryPermissionsMask ownerMask;
                 ownerMask = m_Permissions.Base & InventoryPermissionsMask.ObjectPermissionsChangeable;
 
                 const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
@@ -370,7 +370,7 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Permissions.Base = value;
-                    InventoryPermissionsMask ownerMask = m_Permissions.Current;
+                    InventoryPermissionsMask ownerMask;
                     ownerMask = value & InventoryPermissionsMask.ObjectPermissionsChangeable;
 
                     const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
