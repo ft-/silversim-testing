@@ -18,9 +18,9 @@ namespace SilverSim.Scene.Types.Scene
         class ObjectPropertiesSendHandler : IDisposable
         {
             ObjectProperties m_Props;
-            int m_Bytelen = 0;
-            IAgent m_Agent;
-            UUID m_SceneID;
+            int m_Bytelen;
+            readonly IAgent m_Agent;
+            readonly UUID m_SceneID;
 
             public ObjectPropertiesSendHandler(IAgent agent, UUID sceneID)
             {
