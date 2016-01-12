@@ -327,6 +327,7 @@ namespace SilverSim.Viewer.Core
                         else
                         {
                             bool dofull = false;
+                            bool addedfresh = false;
                             if(LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
@@ -335,6 +336,7 @@ namespace SilverSim.Viewer.Core
                             else
                             {
                                 dofull = true;
+                                addedfresh = true;
                             }
 
                             if (dofull)
@@ -364,24 +366,6 @@ namespace SilverSim.Viewer.Core
 
                                     full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
                                     full_packet_data_length += fullUpdate.Length;
-                                }
-
-                                byte[] propUpdate = ui.PropertiesUpdate;
-                                if(null != propUpdate)
-                                {
-                                    if(null == props)
-                                    {
-                                        props = new ObjectProperties();
-                                    }
-                                    if (props_bytelen + propUpdate.Length > 1400)
-                                    {
-                                        SendMessage(props);
-                                        props_bytelen = 0;
-                                        props = new ObjectProperties();
-                                    }
-
-                                    props.ObjectData.Add(propUpdate);
-                                    props_bytelen += propUpdate.Length;
                                 }
                             }
                             else
@@ -413,6 +397,27 @@ namespace SilverSim.Viewer.Core
                                     }
                                     terse_packet.WriteBytes(terseUpdate);
                                     ++terse_packet_count;
+                                }
+                            }
+
+                            if (!addedfresh) /* only send out ObjectProperties on following up changes */
+                            {
+                                byte[] propUpdate = ui.PropertiesUpdate;
+                                if (null != propUpdate)
+                                {
+                                    if (null == props)
+                                    {
+                                        props = new ObjectProperties();
+                                    }
+                                    if (props_bytelen + propUpdate.Length > 1400)
+                                    {
+                                        SendMessage(props);
+                                        props_bytelen = 0;
+                                        props = new ObjectProperties();
+                                    }
+
+                                    props.ObjectData.Add(propUpdate);
+                                    props_bytelen += propUpdate.Length;
                                 }
                             }
                         }
