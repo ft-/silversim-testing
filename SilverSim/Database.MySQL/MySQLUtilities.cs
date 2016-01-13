@@ -11,6 +11,7 @@ using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 
@@ -337,6 +338,175 @@ namespace SilverSim.Database.MySQL
                     throw new MySQLInsertException();
                 }
             }
+        }
+        #endregion
+
+        #region Generate values
+        public static string GenerateFieldNames(Dictionary<string, object> vals)
+        {
+            List<string> q = new List<string>();
+            foreach (KeyValuePair<string, object> kvp in vals)
+            {
+                object value = kvp.Value;
+
+                Type t = value != null ? value.GetType() : null;
+                string key = kvp.Key;
+
+                if (t == typeof(Vector3))
+                {
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
+                    q.Add(key + "Z");
+                }
+                else if (t == typeof(GridVector) || t == typeof(EnvironmentController.WLVector2))
+                {
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
+                }
+                else if (t == typeof(Quaternion))
+                {
+                    q.Add(key + "X");
+                    q.Add(key + "Y");
+                    q.Add(key + "Z");
+                    q.Add(key + "W");
+                }
+                else if (t == typeof(Color))
+                {
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
+                }
+                else if (t == typeof(EnvironmentController.WLVector4))
+                {
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
+                    q.Add(key + "Value");
+                }
+                else if (t == typeof(ColorAlpha))
+                {
+                    q.Add(key + "Red");
+                    q.Add(key + "Green");
+                    q.Add(key + "Blue");
+                    q.Add(key + "Alpha");
+                }
+                else
+                {
+                    q.Add(key);
+                }
+            }
+
+            string q1 = string.Empty;
+            foreach (string p in q)
+            {
+                if (q1.Length != 0)
+                {
+                    q1 += ",";
+                }
+                q1 += "`" + p + "`";
+            }
+            return q1;
+        }
+
+        public static string GenerateValues(Dictionary<string, object> vals)
+        {
+            List<string> resvals = new List<string>();
+
+            foreach (object value in vals.Values)
+            {
+                Type t = value != null ? value.GetType() : null;
+                if (t == typeof(Vector3))
+                {
+                    Vector3 v = (Vector3)value;
+                    resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Z.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(GridVector))
+                {
+                    GridVector v = (GridVector)value;
+                    resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(Quaternion))
+                {
+                    Quaternion v = (Quaternion)value;
+                    resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Z.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.W.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(Color))
+                {
+                    Color v = (Color)value;
+                    resvals.Add(v.R.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.G.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.B.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(ColorAlpha))
+                {
+                    ColorAlpha v = (ColorAlpha)value;
+                    resvals.Add(v.R.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.G.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.B.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.A.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(EnvironmentController.WLVector2))
+                {
+                    EnvironmentController.WLVector2 v = (EnvironmentController.WLVector2)value;
+                    resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(EnvironmentController.WLVector4))
+                {
+                    EnvironmentController.WLVector4 v = (EnvironmentController.WLVector4)value;
+                    resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.Z.ToString(CultureInfo.InvariantCulture));
+                    resvals.Add(v.W.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(bool))
+                {
+                    resvals.Add((bool)value ? "1" : "0");
+                }
+                else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI) || t == typeof(Uri))
+                {
+                    resvals.Add("'" + MySqlHelper.EscapeString(value.ToString()) + "'");
+                }
+                else if (t == typeof(AnArray))
+                {
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        LlsdBinary.Serialize((AnArray)value, stream);
+                        resvals.Add("x" + stream.GetBuffer().ToHexString());
+                    }
+                }
+                else if (t == typeof(Date))
+                {
+                    resvals.Add(((Date)value).AsULong.ToString());
+                }
+                else if (t == typeof(float))
+                {
+                    resvals.Add(((float)value).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (t == typeof(double))
+                {
+                    resvals.Add(((double)value).ToString(CultureInfo.InvariantCulture));
+                }
+                else if (null == value)
+                {
+                    resvals.Add("NULL");
+                }
+                else if (t.IsEnum)
+                {
+                    resvals.Add(Convert.ChangeType(value, t.GetEnumUnderlyingType()).ToString());
+                }
+                else
+                {
+                    resvals.Add(value.ToString());
+                }
+            }
+            return string.Join(",", resvals);
         }
         #endregion
 

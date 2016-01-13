@@ -345,6 +345,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             new ChangeColumn<byte[]>("PrimitiveShapeData") { Cardinality = 255 },
             new ChangeColumn<byte[]>("ParticleSystem") { Cardinality = 255 },
             new ChangeColumn<byte[]>("TextureAnimationBytes") { Cardinality = 255 },
+            new TableRevision(6),
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new NamedKeyInfo("RegionID", "RegionID"),
+            new PrimaryKeyInfo("RegionID", "ID", "RootPartID"),
             #endregion
 
             #region Table primitems
@@ -382,6 +386,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             new TableRevision(4),
             /* type corrections */
             new ChangeColumn<Date>("CreationDate") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+            new TableRevision(5),
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new NamedKeyInfo("RegionID", "RegionID"),
+            new PrimaryKeyInfo("RegionID", "PrimID", "InventoryID"),
 
             #endregion
         };
