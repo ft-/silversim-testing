@@ -196,44 +196,28 @@ namespace SilverSim.Database.MySQL.SimulationData
             Thread.CurrentThread.Name = "Storage Worker Thread";
             bool m_SelfStopStorageThread = false;
             int retries = 20;
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            while((!m_StopStorageThread && !m_SelfStopStorageThread) || s.StorageRequestQueue.Count != 0)
             {
-                bool connected = false;
-                while (!connected)
+                /* thread always runs until queue is empty it does not stop before */
+                ObjectUpdateInfo info;
+                try
                 {
-                    try
-                    {
-                        connection.Open();
-                        connected = true;
-                    }
-                    catch
-                    {
-                        Thread.Sleep(1000);
-                        if (--retries == 0)
-                        {
-                            return;
-                        }
-                    }
+                    info = s.StorageRequestQueue.Dequeue(5000);
                 }
-                while((!m_StopStorageThread && !m_SelfStopStorageThread) || s.StorageRequestQueue.Count != 0)
+                catch
                 {
-                    /* thread always runs until queue is empty it does not stop before */
-                    ObjectUpdateInfo info;
-                    try
+                    lock (m_StorageThreads)
                     {
-                        info = s.StorageRequestQueue.Dequeue(5000);
+                        m_StorageThreads.Remove(s);
                     }
-                    catch
-                    {
-                        lock (m_StorageThreads)
-                        {
-                            m_StorageThreads.Remove(s);
-                        }
-                        m_SelfStopStorageThread = true;
-                        continue;
-                    }
+                    m_SelfStopStorageThread = true;
+                    continue;
+                }
 
-                    if(info.IsKilled)
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+                    if (info.IsKilled)
                     {
                         m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
                         m_ObjectStorage.DeleteObjectGroup(connection, info.Part.ObjectGroup.ID);
@@ -242,14 +226,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                     else
                     {
                         ObjectGroup grp = info.Part.ObjectGroup;
-                        if(null != grp && !grp.IsTemporary && !grp.IsAttached)
+                        if (null != grp && !grp.IsTemporary && !grp.IsAttached)
                         {
                             try
                             {
                                 m_ObjectStorage.UpdateObjectPartInner(connection, info.Part);
                                 m_KnownSerialNumbers[info.LocalID] = info.SerialNumber;
                             }
-                            catch(Exception e)
+                            catch (Exception e)
                             {
                                 SceneInterface scene = grp.Scene;
                                 if (scene != null)
@@ -262,7 +246,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 }
                             }
                         }
-                        else if(m_KnownSerialNumbers.ContainsKey(info.LocalID))
+                        else if (m_KnownSerialNumbers.ContainsKey(info.LocalID))
                         {
                             /* handle persistent => temporary change */
                             m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
