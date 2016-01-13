@@ -121,6 +121,7 @@ namespace SilverSim.Database.MySQL._Migration
         uint Cardinality { get; }
         bool IsNullAllowed { get; }
         bool IsLong { get; }
+        bool IsFixed { get; }
         object Default { get; }
         string FieldSql();
     }
@@ -142,7 +143,7 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 typeSql = (colInfo.Cardinality == 0) ?
                     (colInfo.IsLong ? "LONGTEXT" : "TEXT") :
-                    "VARCHAR(" + colInfo.Cardinality.ToString() + ")";
+                    (colInfo.IsFixed ? "CHAR" : "VARCHAR") + "(" + colInfo.Cardinality.ToString() + ")";
             }
             else if (f == typeof(UUI) || f == typeof(UGI))
             {
@@ -380,7 +381,7 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 if(colInfo.Cardinality > 0)
                 {
-                    typeSql = "BINARY(" + colInfo.Cardinality.ToString() + ")";
+                    typeSql = (colInfo.IsFixed ? "BINARY" : "VARBINARY") + "(" + colInfo.Cardinality.ToString() + ")";
                 }
                 else
                 {
@@ -446,6 +447,7 @@ namespace SilverSim.Database.MySQL._Migration
 
         public bool IsNullAllowed { get; set; }
         public bool IsLong { get; set;  }
+        public bool IsFixed { get; set; }
 
         public object Default { get; set; }
 
@@ -562,6 +564,7 @@ namespace SilverSim.Database.MySQL._Migration
         public Type FieldType { get { return m_OldFieldType; } }
         public bool IsNullAllowed { get { return true; } }
         public bool IsLong { get { return m_ColumnInfo.IsLong; } }
+        public bool IsFixed { get { return m_ColumnInfo.IsFixed;  } }
 
         public string Name { get { return m_ColumnInfo.Name; } }
         public string FieldSql()
@@ -584,7 +587,9 @@ namespace SilverSim.Database.MySQL._Migration
 
         public bool IsNullAllowed { get; set; }
         public bool IsLong { get; set; }
+        public bool IsFixed { get; set; }
         public uint Cardinality { get; set; }
+        public bool FixedLength { get; set; }
         public object Default { get; set; }
 
         public ChangeColumn(string name)

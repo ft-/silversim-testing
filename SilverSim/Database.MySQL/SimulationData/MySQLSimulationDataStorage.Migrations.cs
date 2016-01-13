@@ -337,6 +337,14 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<InventoryPermissionsMask>("EveryOnePermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
             new AddColumn<InventoryPermissionsMask>("GroupPermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
             new AddColumn<InventoryPermissionsMask>("NextOwnerPermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+            new TableRevision(5),
+            new ChangeColumn<byte[]>("LightData") { Cardinality = 255 },
+            new ChangeColumn<byte[]>("FlexibleData") { Cardinality = 255 },
+            new ChangeColumn<byte[]>("LoopedSoundData") { Cardinality = 255 },
+            new ChangeColumn<byte[]>("ImpactSoundData") { Cardinality = 255 },
+            new ChangeColumn<byte[]>("PrimitiveShapeData") { Cardinality = 255 },
+            new ChangeColumn<byte[]>("ParticleSystem") { Cardinality = 255 },
+            new ChangeColumn<byte[]>("TextureAnimationBytes") { Cardinality = 255 },
             #endregion
 
             #region Table primitems

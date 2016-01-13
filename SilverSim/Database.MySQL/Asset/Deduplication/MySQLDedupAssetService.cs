@@ -339,7 +339,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("assetdata") { IsDynamicRowFormat = true },
-            new AddColumn<byte[]>("hash") { Cardinality = 20, IsNullAllowed = false },
+            new AddColumn<byte[]>("hash") { IsFixed = true, Cardinality = 20, IsNullAllowed = false },
             new AddColumn<AssetType>("assetType") { IsNullAllowed = false },
             new AddColumn<byte[]>("data") { IsLong = true },
             new PrimaryKeyInfo("hash", "assetType"),
@@ -353,7 +353,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             new AddColumn<Date>("access_time") { IsNullAllowed = false },
             new AddColumn<AssetFlags>("asset_flags") { IsNullAllowed = false },
             new AddColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<byte[]>("hash") { IsNullAllowed = false, Cardinality = 20 },
+            new AddColumn<byte[]>("hash") { IsFixed = true, IsNullAllowed = false, Cardinality = 20 },
             new PrimaryKeyInfo("id"),
             new TableRevision(2),
             /* normally not executed but needed */
