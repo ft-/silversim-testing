@@ -195,7 +195,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             StorageThreadInfo s = (StorageThreadInfo)p;
             Thread.CurrentThread.Name = "Storage Worker Thread";
             bool m_SelfStopStorageThread = false;
-            int retries = 20;
+
             while((!m_StopStorageThread && !m_SelfStopStorageThread) || s.StorageRequestQueue.Count != 0)
             {
                 /* thread always runs until queue is empty it does not stop before */
