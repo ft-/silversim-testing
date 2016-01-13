@@ -38,9 +38,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID LIKE ?id", connection))
+                using(MySqlCommand cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID LIKE '" + key.ToString() + "'", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -60,9 +59,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT prims.ID FROM objects INNER JOIN prims ON objects.ID LIKE prims.RootPartID WHERE RegionID LIKE ?id ORDER BY LinkNumber", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT prims.ID FROM objects INNER JOIN prims ON objects.ID LIKE prims.RootPartID WHERE RegionID LIKE '" + key.ToString() + "' ORDER BY LinkNumber", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -139,6 +137,12 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             objpart.ForceMouselook = dbReader.GetBoolean("ForceMouselook");
 
+            objpart.BaseMask = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
+            objpart.OwnerMask = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
+            objpart.EveryoneMask = dbReader.GetEnum<InventoryPermissionsMask>("EveryOnePermissions");
+            objpart.GroupMask = dbReader.GetEnum<InventoryPermissionsMask>("GroupPermissions");
+            objpart.NextOwnerMask = dbReader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissions");
+
             using (MemoryStream ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
             {
                 foreach (KeyValuePair<string, IValue> kvp in (Map)LlsdBinary.Deserialize(ms))
@@ -171,10 +175,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     UUID objgroupID = UUID.Zero;
                     m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
 
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE ?regionid", connection))
+                    using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddParameter("?regionid", regionID);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while(dbReader.Read())
@@ -215,10 +218,9 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
                     int primcount = 0;
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT prims.* FROM objects INNER JOIN prims ON objects.id LIKE prims.RootPartID WHERE objects.regionID LIKE ?regionid", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT prims.* FROM objects INNER JOIN prims ON objects.id LIKE prims.RootPartID WHERE objects.regionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddParameter("?regionid", regionID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while (dbReader.Read())
@@ -335,9 +337,8 @@ namespace SilverSim.Database.MySQL.SimulationData
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadInventory(MySqlConnection connection, ObjectPart objpart)
         {
-            using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE ?id", connection))
+            using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE '" + objpart.ID.ToString() + "'", connection))
             {
-                cmd.Parameters.AddParameter("?id", objpart.ID);
                 using (MySqlDataReader dbReader = cmd.ExecuteReader())
                 {
                     ObjectPartInventoryItem item;
@@ -398,11 +399,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     connection.Open();
                     UUID originalAssetID;
                     UUID nextOwnerAssetID;
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE ?regionid AND ID LIKE ?id", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID LIKE '" + key.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddParameter("?regionid", regionID);
-                        cmd.Parameters.AddParameter("?id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (!dbReader.Read())
@@ -431,10 +430,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
                         }
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE '" + key.ToString() + "' ORDER BY LinkNumber", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddParameter("?id", key);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while(dbReader.Read())
@@ -464,10 +462,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?primid AND InventoryID LIKE ?itemid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE '" +  
+                    primID.ToString() + "' AND InventoryID LIKE '" + itemID.ToString() + "'", connection))
                 {
-                    cmd.Parameters.AddParameter("?primid", primID);
-                    cmd.Parameters.AddParameter("?itemid", itemID);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -486,14 +483,12 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             connection.InsideTransaction(delegate()
             {
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE '" + obj.ToString() + "'", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", obj);
                     cmd.ExecuteNonQuery();
                 }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE '" + obj.ToString() + "'", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", obj);
                     cmd.ExecuteNonQuery();
                 }
             });
@@ -512,9 +507,8 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             connection.InsideTransaction(delegate()
             {
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE '" + obj.ToString() + "'", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", obj);
                     cmd.ExecuteNonQuery();
                 }
             });
@@ -554,107 +548,68 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        const string UpdateObjectPartInventoryItemSql = "REPLACE INTO primitems " +
-            "(AssetId, AssetType, CreationDate, Creator, Description, Flags, `Group`, GroupOwned, PrimID, `Name`, InventoryID, " +
-            "InventoryType, LastOwner, Owner, ParentFolderID, BasePermissions, CurrentPermissions, EveryOnePermissions, " + 
-            "GroupPermissions, NextOwnerPermissions, SaleType, SalePrice, SalePermMask, PermsGranter, PermsMask)" +
-            "VALUES (?AssetId, ?AssetType, ?CreationDate, ?Creator, ?Description, ?Flags, ?Group, ?GroupOwned, ?PrimID, ?Name, ?InventoryID, " +
-            "?InventoryType, ?LastOwner, ?Owner, ?ParentFolderID, ?BasePermissions, ?CurrentPermissions, ?EveryOnePermissions, " +
-            "?GroupPermissions, ?NextOwnerPermissions, ?SaleType, ?SalePrice, ?SalePermMask, ?PermsGranter, ?PermsMask)";
         private void UpdateObjectPartInventoryItem(MySqlConnection connection, UUID primID, ObjectPartInventoryItem item)
         {
-            using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartInventoryItemSql, connection))
-            {
-                cmd.Parameters.AddParameter("?AssetId", item.AssetID);
-                cmd.Parameters.AddParameter("?AssetType", item.AssetType);
-                cmd.Parameters.AddParameter("?CreationDate", item.CreationDate);
-                cmd.Parameters.AddParameter("?Creator", item.Creator);
-                cmd.Parameters.AddParameter("?Description", item.Description);
-                cmd.Parameters.AddParameter("?Flags", item.Flags);
-                cmd.Parameters.AddParameter("?Group", item.Group);
-                cmd.Parameters.AddParameter("?GroupOwned", item.IsGroupOwned);
-                cmd.Parameters.AddParameter("?PrimID", primID);
-                cmd.Parameters.AddParameter("?Name", item.Name);
-                cmd.Parameters.AddParameter("?InventoryID", item.ID);
-                cmd.Parameters.AddParameter("?InventoryType", item.InventoryType);
-                cmd.Parameters.AddParameter("?LastOwner", item.LastOwner);
-                cmd.Parameters.AddParameter("?Owner", item.Owner);
-                cmd.Parameters.AddParameter("?ParentFolderID", item.ParentFolderID);
-                cmd.Parameters.AddParameter("?BasePermissions", item.Permissions.Base);
-                cmd.Parameters.AddParameter("?CurrentPermissions", item.Permissions.Current);
-                cmd.Parameters.AddParameter("?EveryOnePermissions", item.Permissions.EveryOne);
-                cmd.Parameters.AddParameter("?GroupPermissions", item.Permissions.Group);
-                cmd.Parameters.AddParameter("?NextOwnerPermissions", item.Permissions.NextOwner);
-                cmd.Parameters.AddParameter("?SaleType", item.SaleInfo.Type);
-                cmd.Parameters.AddParameter("?SalePrice", item.SaleInfo.Price);
-                cmd.Parameters.AddParameter("?SalePermMask", item.SaleInfo.PermMask);
-                ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
-                cmd.Parameters.AddParameter("?PermsGranter", grantinfo.PermsGranter.ToString());
-                cmd.Parameters.AddParameter("?PermsMask", grantinfo.PermsMask);
-                if (cmd.ExecuteNonQuery() < 1)
-                {
-                    throw new MySQLUtilities.MySQLInsertException();
-                }
-            }
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("AssetId", item.AssetID);
+            data.Add("AssetType", item.AssetType);
+            data.Add("CreationDate", item.CreationDate);
+            data.Add("Creator", item.Creator);
+            data.Add("Description", item.Description);
+            data.Add("Flags", item.Flags);
+            data.Add("Group", item.Group);
+            data.Add("GroupOwned", item.IsGroupOwned);
+            data.Add("PrimID", primID);
+            data.Add("Name", item.Name);
+            data.Add("InventoryID", item.ID);
+            data.Add("InventoryType", item.InventoryType);
+            data.Add("LastOwner", item.LastOwner);
+            data.Add("Owner", item.Owner);
+            data.Add("ParentFolderID", item.ParentFolderID);
+            data.Add("BasePermissions", item.Permissions.Base);
+            data.Add("CurrentPermissions", item.Permissions.Current);
+            data.Add("EveryOnePermissions", item.Permissions.EveryOne);
+            data.Add("GroupPermissions", item.Permissions.Group);
+            data.Add("NextOwnerPermissions", item.Permissions.NextOwner);
+            data.Add("SaleType", item.SaleInfo.Type);
+            data.Add("SalePrice", item.SaleInfo.Price);
+            data.Add("SalePermMask", item.SaleInfo.PermMask);
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
+            data.Add("PermsGranter", grantinfo.PermsGranter.ToString());
+            data.Add("PermsMask", grantinfo.PermsMask);
+            connection.ReplaceInto("primitems", data);
         }
 
-        const string UpdateObjectGroupSql = "REPLACE INTO objects " + 
-            "(ID, RegionID, IsVolumeDetect, IsPhantom, IsPhysics, IsTempOnRez, Owner, LastOwner, `Group`, OriginalAssetID, NextOwnerAssetID, SaleType, SalePrice, PayPrice0, PayPrice1, PayPrice2, PayPrice3, PayPrice4, AttachedPosX, AttachedPosY, AttachedPosZ, AttachPoint)" + 
-            "VALUES (?ID, ?RegionID, ?IsVolumeDetect, ?IsPhantom, ?IsPhysics, ?IsTempOnRez, ?Owner, ?LastOwner, ?Group, ?OriginalAssetID, ?NextOwnerAssetID, ?SaleType, ?SalePrice, ?PayPrice0, ?PayPrice1, ?PayPrice2, ?PayPrice3, ?PayPrice4, ?AttachedPosX, ?AttachedPosY, ?AttachedPosZ, ?AttachPoint)";
         private void UpdateObjectGroup(MySqlConnection connection, ObjectGroup objgroup)
         {
             if(objgroup.IsTemporary)
             {
                 return;
             }
-            using(MySqlCommand cmd = new MySqlCommand(UpdateObjectGroupSql, connection))
-            {
-                cmd.Parameters.AddParameter("?ID", objgroup.ID);
-                cmd.Parameters.AddParameter("?RegionID", objgroup.Scene.ID);
-                cmd.Parameters.AddParameter("?IsVolumeDetect", objgroup.IsVolumeDetect);
-                cmd.Parameters.AddParameter("?IsPhantom", objgroup.IsPhantom);
-                cmd.Parameters.AddParameter("?IsPhysics", objgroup.IsPhysics);
-                cmd.Parameters.AddParameter("?IsTempOnRez", objgroup.IsTempOnRez);
-                cmd.Parameters.AddParameter("?Owner", objgroup.Owner);
-                cmd.Parameters.AddParameter("?LastOwner", objgroup.LastOwner);
-                cmd.Parameters.AddParameter("?Group", objgroup.Group);
-                cmd.Parameters.AddParameter("?OriginalAssetID", objgroup.OriginalAssetID);
-                cmd.Parameters.AddParameter("?NextOwnerAssetID", objgroup.NextOwnerAssetID);
-                cmd.Parameters.AddParameter("?SaleType", objgroup.SaleType);
-                cmd.Parameters.AddParameter("?SalePrice", objgroup.SalePrice);
-                cmd.Parameters.AddParameter("?PayPrice0", objgroup.PayPrice0);
-                cmd.Parameters.AddParameter("?PayPrice1", objgroup.PayPrice1);
-                cmd.Parameters.AddParameter("?PayPrice2", objgroup.PayPrice2);
-                cmd.Parameters.AddParameter("?PayPrice3", objgroup.PayPrice3);
-                cmd.Parameters.AddParameter("?PayPrice4", objgroup.PayPrice4);
-                cmd.Parameters.AddParameter("?AttachedPos", objgroup.AttachedPos);
-                cmd.Parameters.AddParameter("?AttachPoint", objgroup.AttachPoint);
-                if (cmd.ExecuteNonQuery() < 1)
-                {
-                    throw new MySQLUtilities.MySQLInsertException();
-                }
-            }
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("ID", objgroup.ID);
+            data.Add("RegionID", objgroup.Scene.ID);
+            data.Add("IsVolumeDetect", objgroup.IsVolumeDetect);
+            data.Add("IsPhantom", objgroup.IsPhantom);
+            data.Add("IsPhysics", objgroup.IsPhysics);
+            data.Add("IsTempOnRez", objgroup.IsTempOnRez);
+            data.Add("Owner", objgroup.Owner);
+            data.Add("LastOwner", objgroup.LastOwner);
+            data.Add("Group", objgroup.Group);
+            data.Add("OriginalAssetID", objgroup.OriginalAssetID);
+            data.Add("NextOwnerAssetID", objgroup.NextOwnerAssetID);
+            data.Add("SaleType", objgroup.SaleType);
+            data.Add("SalePrice", objgroup.SalePrice);
+            data.Add("PayPrice0", objgroup.PayPrice0);
+            data.Add("PayPrice1", objgroup.PayPrice1);
+            data.Add("PayPrice2", objgroup.PayPrice2);
+            data.Add("PayPrice3", objgroup.PayPrice3);
+            data.Add("PayPrice4", objgroup.PayPrice4);
+            data.Add("AttachedPos", objgroup.AttachedPos);
+            data.Add("AttachPoint", objgroup.AttachPoint);
+            connection.ReplaceInto("objects", data);
         }
 
-        const string UpdateObjectPartSql = "REPLACE INTO prims (" +
-                "`PhysicsShapeType`,`ID`,`LinkNumber`,`RootPartID`,`PositionX`,`PositionY`,`PositionZ`,`RotationX`,`RotationY`,`RotationZ`,`RotationW`," +
-                "`SitText`,`TouchText`,`Name`,`Description`,`SitTargetOffsetX`,`SitTargetOffsetY`,`SitTargetOffsetZ`," +
-                "`SitTargetOrientationX`,`SitTargetOrientationY`,`SitTargetOrientationZ`,`SitTargetOrientationW`," +
-                "`Material`,`SizeX`,`SizeY`,`SizeZ`,`SliceX`,`SliceY`,`SliceZ`,`MediaURL`,`Creator`,`CreationDate`," +
-                "`Flags`,`AngularVelocityX`,`AngularVelocityY`,`AngularVelocityZ`,`LightData`,`HoverTextData`,`FlexibleData`," +
-                "`LoopedSoundData`,`ImpactSoundData`,`PrimitiveShapeData`," +
-                "`ParticleSystem`,`TextureEntryBytes`,`TextureAnimationBytes`,`ScriptAccessPin`,`DynAttrs`," +
-                "CameraAtOffsetX, CameraAtOffsetY, CameraAtOffsetZ, CameraEyeOffsetX, CameraEyeOffsetY, CameraEyeOffsetZ, ForceMouselook" +
-                ") VALUES " +
-                "(?v_PhysicsShapeType,?v_ID,?v_LinkNumber,?v_RootPartID,?v_PositionX,?v_PositionY,?v_PositionZ,?v_RotationX,?v_RotationY,?v_RotationZ," +
-                "?v_RotationW,?v_SitText,?v_TouchText,?v_Name,?v_Description,?v_SitTargetOffsetX,?v_SitTargetOffsetY,?v_SitTargetOffsetZ," +
-                "?v_SitTargetOrientationX,?v_SitTargetOrientationY,?v_SitTargetOrientationZ,?v_SitTargetOrientationW," +
-                "?v_Material,?v_SizeX,?v_SizeY,?v_SizeZ,?v_SliceX,?v_SliceY,?v_SliceZ,?v_MediaURL,?v_Creator,?v_CreationDate," +
-                "?v_Flags,?v_AngularVelocityX,?v_AngularVelocityY,?v_AngularVelocityZ,?v_LightData,?v_HoverTextData,?v_FlexibleData," +
-                "?v_LoopedSoundData,?v_ImpactSoundData,?v_PrimitiveShapeData," +
-                "?v_ParticleSystem,?v_TextureEntryBytes,?v_TextureAnimationBytes,?v_ScriptAccessPin,?v_DynAttrs, " +
-                "?v_CameraAtOffsetX, ?v_CameraAtOffsetY, ?v_CameraAtOffsetZ, " +
-                "?v_CameraEyeOffsetX, ?v_CameraEyeOffsetY, ?v_CameraEyeOffsetZ, ?v_ForceMouselook)";
         private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
         {
             if(objpart.ObjectGroup.IsTemporary || objpart.ObjectGroup.IsTempOnRez)
@@ -662,54 +617,53 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return;
             }
 
-            using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartSql, connection))
-            {
-                cmd.Parameters.AddParameter("?v_ID", objpart.ID);
-                cmd.Parameters.AddParameter("?v_LinkNumber", objpart.LinkNumber);
-                cmd.Parameters.AddParameter("?v_RootPartID", objpart.ObjectGroup.RootPart.ID);
-                cmd.Parameters.AddParameter("?v_Position", objpart.Position);
-                cmd.Parameters.AddParameter("?v_Rotation", objpart.Rotation);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data.Add("ID", objpart.ID);
+            data.Add("LinkNumber", objpart.LinkNumber);
+            data.Add("RootPartID", objpart.ObjectGroup.RootPart.ID);
+            data.Add("Position", objpart.Position);
+            data.Add("Rotation", objpart.Rotation);
+            data.Add("SitText", objpart.SitText);
+            data.Add("TouchText", objpart.TouchText);
+            data.Add("Name", objpart.Name);
+            data.Add("Description", objpart.Description);
+            data.Add("SitTargetOffset", objpart.SitTargetOffset);
+            data.Add("SitTargetOrientation", objpart.SitTargetOrientation);
+            data.Add("PhysicsShapeType", objpart.PhysicsShapeType);
+            data.Add("Material", objpart.Material);
+            data.Add("Size", objpart.Size);
+            data.Add("Slice", objpart.Slice);
+            data.Add("MediaURL", objpart.MediaURL);
+            data.Add("Creator", objpart.Creator);
+            data.Add("CreationDate", objpart.CreationDate);
+            data.Add("Flags", objpart.Flags);
+            data.Add("AngularVelocity", objpart.AngularVelocity);
+            data.Add("LightData", objpart.PointLight.Serialization);
+            data.Add("HoverTextData", objpart.Text.Serialization);
+            data.Add("FlexibleData", objpart.Flexible.Serialization);
+            data.Add("LoopedSoundData", objpart.Sound.Serialization);
+            data.Add("ImpactSoundData", objpart.CollisionSound.Serialization);
+            data.Add("PrimitiveShapeData", objpart.Shape.Serialization);
+            data.Add("ParticleSystem", objpart.ParticleSystemBytes);
+            data.Add("TextureEntryBytes", objpart.TextureEntryBytes);
+            data.Add("TextureAnimationBytes", objpart.TextureAnimationBytes);
+            data.Add("ScriptAccessPin", objpart.ScriptAccessPin);
+            data.Add("CameraAtOffset", objpart.CameraAtOffset);
+            data.Add("CameraEyeOffset", objpart.CameraEyeOffset);
+            data.Add("ForceMouselook", objpart.ForceMouselook);
+            data.Add("BasePermissions", objpart.BaseMask);
+            data.Add("CurrentPermissions", objpart.OwnerMask);
+            data.Add("EveryOnePermissions", objpart.EveryoneMask);
+            data.Add("GroupPermissions", objpart.GroupMask);
+            data.Add("NextOwnerPermissions", objpart.NextOwnerMask);
 
-                cmd.Parameters.AddParameter("?v_SitText", objpart.SitText);
-                cmd.Parameters.AddParameter("?v_TouchText", objpart.TouchText);
-                cmd.Parameters.AddParameter("?v_Name", objpart.Name);
-                cmd.Parameters.AddParameter("?v_Description", objpart.Description);
-                cmd.Parameters.AddParameter("?v_SitTargetOffset", objpart.SitTargetOffset);
-                cmd.Parameters.AddParameter("?v_SitTargetOrientation", objpart.SitTargetOrientation);
-                cmd.Parameters.AddParameter("?v_PhysicsShapeType", objpart.PhysicsShapeType);
-                cmd.Parameters.AddParameter("?v_Material", objpart.Material);
-                cmd.Parameters.AddParameter("?v_Size", objpart.Size);
-                cmd.Parameters.AddParameter("?v_Slice", objpart.Slice);
-                cmd.Parameters.AddParameter("?v_MediaURL", objpart.MediaURL);
-                cmd.Parameters.AddParameter("?v_Creator", objpart.Creator);
-                cmd.Parameters.AddParameter("?v_CreationDate", objpart.CreationDate);
-                cmd.Parameters.AddParameter("?v_Flags", objpart.Flags);
-                cmd.Parameters.AddParameter("?v_AngularVelocity", objpart.AngularVelocity);
-                cmd.Parameters.AddParameter("?v_LightData", objpart.PointLight.Serialization);
-                cmd.Parameters.AddParameter("?v_HoverTextData", objpart.Text.Serialization);
-                cmd.Parameters.AddParameter("?v_FlexibleData", objpart.Flexible.Serialization);
-                cmd.Parameters.AddParameter("?v_LoopedSoundData", objpart.Sound.Serialization);
-                cmd.Parameters.AddParameter("?v_ImpactSoundData", objpart.CollisionSound.Serialization);
-                cmd.Parameters.AddParameter("?v_PrimitiveShapeData", objpart.Shape.Serialization);
-                cmd.Parameters.AddParameter("?v_ParticleSystem", objpart.ParticleSystemBytes);
-                cmd.Parameters.AddParameter("?v_TextureEntryBytes", objpart.TextureEntryBytes);
-                cmd.Parameters.AddParameter("?v_TextureAnimationBytes", objpart.TextureAnimationBytes);
-                cmd.Parameters.AddParameter("?v_ScriptAccessPin", objpart.ScriptAccessPin);
-                cmd.Parameters.AddParameter("?v_CameraAtOffset", objpart.CameraAtOffset);
-                cmd.Parameters.AddParameter("?v_CameraEyeOffset", objpart.CameraEyeOffset);
-                cmd.Parameters.AddParameter("?v_ForceMouselook", objpart.ForceMouselook);
-
-                using (MemoryStream ms = new MemoryStream())
-                { 
-                    LlsdBinary.Serialize(objpart.DynAttrs, ms);
-                    cmd.Parameters.AddWithValue("?v_DynAttrs", ms.GetBuffer());
-                }
-
-                if (cmd.ExecuteNonQuery() < 1)
-                {
-                    throw new MySQLUtilities.MySQLInsertException();
-                }
+            using (MemoryStream ms = new MemoryStream())
+            { 
+                LlsdBinary.Serialize(objpart.DynAttrs, ms);
+                data.Add("DynAttrs", ms.GetBuffer());
             }
+
+            connection.ReplaceInto("prims", data);
         }
 
         #endregion

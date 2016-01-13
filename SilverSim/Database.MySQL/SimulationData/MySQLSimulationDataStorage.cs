@@ -154,31 +154,29 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 Objects.DeleteObjectGroup(objid);
             }
-            
+
+            string regionIdStr = regionID.ToString();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE ?regionid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE '" + regionIdStr + "'", connection))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                     cmd.ExecuteNonQuery();
                 }
             }
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM terrains WHERE RegionID LIKE ?regionid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM terrains WHERE RegionID LIKE '" + regionIdStr + "'", connection))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                     cmd.ExecuteNonQuery();
                 }
             }
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE ?regionid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE '" + regionIdStr + "'", connection))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                     cmd.ExecuteNonQuery();
                 }
             }

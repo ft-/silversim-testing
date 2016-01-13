@@ -33,10 +33,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT TerrainData FROM terrains WHERE RegionID LIKE ?regionid AND PatchID = ?patchid", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT TerrainData FROM terrains WHERE RegionID LIKE '" + regionID.ToString() + "' AND PatchID = " + extendedPatchID.ToString(), connection))
                     {
-                        cmd.Parameters.AddParameter("?regionid", regionID);
-                        cmd.Parameters.AddParameter("?patchid", extendedPatchID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             LayerPatch patch;
@@ -63,32 +61,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-
-                    using (MySqlCommand cmd =
-                        new MySqlCommand(
-                            "REPLACE INTO terrains (RegionID, PatchID, TerrainData)" +
-                            "VALUES(?regionid, ?patchid, ?terraindata)",
-                            conn))
-                    {
-                        try
-                        {
-                            using (cmd)
-                            {
-                                cmd.Parameters.AddParameter("?regionid", regionID);
-                                cmd.Parameters.AddParameter("?patchid", extendedPatchID);
-                                cmd.Parameters.AddParameter("?terraindata", value.Serialization);
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.Error(
-                                string.Format("MySQL failure creating terrain segment {1} for region {0}.  Exception  ",
-                                    regionID, extendedPatchID)
-                                , e);
-                            throw new TerrainStorageFailedException(regionID, extendedPatchID);
-                        }
-                    }
+                    Dictionary<string, object> data = new Dictionary<string, object>();
+                    data["RegionID"] = regionID;
+                    data["PatchID"] = extendedPatchID;
+                    data["TerrainData"] = value.Serialization;
+                    conn.ReplaceInto("terrains", data);
                 }
             }
         }
@@ -101,10 +78,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM terrains WHERE RegionID LIKE ?id", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM terrains WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddParameter("?id", regionID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             LayerPatch patch;

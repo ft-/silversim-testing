@@ -34,6 +34,11 @@ namespace SilverSim.Scene.Types.Scene
             TriggerParcelUpdate(p);
         }
 
+        public void AddParcelNoTrigger(ParcelInfo p)
+        {
+            m_Parcels.Add(p.ID, p.LocalID, p);
+        }
+
         public abstract bool RemoveParcel(ParcelInfo p, UUID mergeTo);
 
         public void ClearParcels()

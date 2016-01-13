@@ -32,9 +32,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT DistanceX, DistanceY, DistanceZ FROM spawnpoints WHERE RegionID LIKE ?regionid", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT DistanceX, DistanceY, DistanceZ FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -53,9 +52,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     conn.Open();
                     conn.InsideTransaction(delegate ()
                     {
-                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE ?regionid", conn))
+                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                         {
-                            cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                             cmd.ExecuteNonQuery();
                         }
 
@@ -77,9 +75,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE ?regionid", conn))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                 {
-                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

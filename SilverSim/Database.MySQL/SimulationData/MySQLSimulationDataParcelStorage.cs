@@ -34,10 +34,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID LIKE ?regionID AND ParcelID LIKE ?parcelID", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
                     {
-                        cmd.Parameters.AddParameter("?regionID", regionID);
-                        cmd.Parameters.AddParameter("?parcelID", parcelID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (!dbReader.Read())
@@ -111,10 +109,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE ?regionID AND ParcelID LIKE ?parcelID", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
                 {
-                    cmd.Parameters.AddParameter("?regionID", regionID);
-                    cmd.Parameters.AddParameter("?parcelID", parcelID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -126,9 +122,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID LIKE ?regionID", connection))
+                using(MySqlCommand cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID LIKE '" + key.ToString() + "'", connection))
                 {
-                    cmd.Parameters.AddParameter("?regionID", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())

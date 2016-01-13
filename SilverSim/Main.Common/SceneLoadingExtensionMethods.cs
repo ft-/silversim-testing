@@ -184,12 +184,12 @@ namespace SilverSim.Main.Common
                             lock (loadparams.Scene.m_LoaderThreadLock)
                             {
                                 ParcelInfo pi = loadparams.SimulationDataStorage.Parcels[loadparams.Scene.ID, parcelid];
-                                loadparams.Scene.AddParcel(pi);
+                                loadparams.Scene.AddParcelNoTrigger(pi);
                             }
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Loading parcel {0} for {3} ({4}) failed: {2}: {1}", parcelid, e.Message, e.GetType().FullName, loadparams.Scene.Name, loadparams.Scene.ID);
+                            m_Log.WarnFormat("Loading parcel {0} for {3} ({4}) failed: {2}: {1}\n{5}", parcelid, e.Message, e.GetType().FullName, loadparams.Scene.Name, loadparams.Scene.ID, e.StackTrace);
                         }
 
                     }

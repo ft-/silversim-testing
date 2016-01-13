@@ -331,6 +331,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             new TableRevision(3),
             /* type corrections */
             new ChangeColumn<Date>("CreationDate") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+            new TableRevision(4),
+            new AddColumn<InventoryPermissionsMask>("BasePermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.All | InventoryPermissionsMask.Export },
+            new AddColumn<InventoryPermissionsMask>("CurrentPermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.All | InventoryPermissionsMask.Export },
+            new AddColumn<InventoryPermissionsMask>("EveryOnePermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+            new AddColumn<InventoryPermissionsMask>("GroupPermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+            new AddColumn<InventoryPermissionsMask>("NextOwnerPermissions") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
             #endregion
 
             #region Table primitems
