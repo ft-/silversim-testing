@@ -148,11 +148,11 @@ namespace SilverSim.Database.MySQL.SimulationData
             List<UUID> prims = Objects.PrimitivesInRegion(regionID);
             foreach(UUID prim in prims)
             {
-                Objects.DeleteObjectPart(prim);
+                m_ObjectStorage.DeleteObjectPart(prim);
             }
             foreach(UUID objid in objects)
             {
-                Objects.DeleteObjectGroup(objid);
+                m_ObjectStorage.DeleteObjectGroup(objid);
             }
 
             string regionIdStr = regionID.ToString();
@@ -185,86 +185,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             Spawnpoints.Remove(regionID);
             LightShare.Remove(regionID);
         }
-
-
-        int m_ProcessedPrims;
-
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        protected override void StorageWorkerThread(object p)
-        {
-            StorageThreadInfo s = (StorageThreadInfo)p;
-            Thread.CurrentThread.Name = "Storage Worker Thread";
-            bool m_SelfStopStorageThread = false;
-
-            while((!m_StopStorageThread && !m_SelfStopStorageThread) || s.StorageRequestQueue.Count != 0)
-            {
-                /* thread always runs until queue is empty it does not stop before */
-                ObjectUpdateInfo info;
-                try
-                {
-                    info = s.StorageRequestQueue.Dequeue(5000);
-                }
-                catch
-                {
-                    lock (m_StorageThreads)
-                    {
-                        m_StorageThreads.Remove(s);
-                    }
-                    m_SelfStopStorageThread = true;
-                    continue;
-                }
-
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                {
-                    connection.Open();
-                    if (info.IsKilled)
-                    {
-                        m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
-                        m_ObjectStorage.DeleteObjectGroup(connection, info.Part.ObjectGroup.ID);
-                        m_KnownSerialNumbers.Remove(info.LocalID);
-                    }
-                    else
-                    {
-                        ObjectGroup grp = info.Part.ObjectGroup;
-                        if (null != grp && !grp.IsTemporary && !grp.IsAttached)
-                        {
-                            try
-                            {
-                                m_ObjectStorage.UpdateObjectPartInner(connection, info.Part);
-                                m_KnownSerialNumbers[info.LocalID] = info.SerialNumber;
-                            }
-                            catch (Exception e)
-                            {
-                                SceneInterface scene = grp.Scene;
-                                if (scene != null)
-                                {
-                                    m_Log.WarnFormat("Failed to update prim {0} for {1}: {2}\n{3}", info.Part.ID, scene.ID, e.Message, e.StackTrace);
-                                }
-                                else
-                                {
-                                    m_Log.WarnFormat("Failed to update prim {0}: {1}\n{2}", info.Part.ID, e.Message, e.StackTrace);
-                                }
-                            }
-                        }
-                        else if (m_KnownSerialNumbers.ContainsKey(info.LocalID))
-                        {
-                            /* handle persistent => temporary change */
-                            m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
-                            m_ObjectStorage.DeleteObjectGroup(connection, info.Part.ObjectGroup.ID);
-                            m_KnownSerialNumbers.Remove(info.LocalID);
-                        }
-                    }
-                    int count = Interlocked.Increment(ref m_ProcessedPrims);
-                    if (count % 100 == 0)
-                    {
-                        m_Log.DebugFormat("Processed {0} prims", count);
-                    }
-                    s.AssignedLocalIDs.Remove(info.Part.LocalID);
-                    Interlocked.Decrement(ref m_ActiveStorageRequests);
-                }
-            }
-        }
-
     }
     #endregion
 

@@ -271,7 +271,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     if (!objGroupParts.ContainsKey(kvp.Key))
                     {
-                        DeleteObjectGroup(kvp.Key);
+                        //DeleteObjectGroup(kvp.Key);
                         removeObjGroups.Add(kvp.Key);
                     }
                     else
@@ -290,7 +290,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         catch
                         {
                             m_Log.WarnFormat("deleting orphan object in region ID {0}: {1}", regionID, kvp.Key);
-                            DeleteObjectGroup(kvp.Key);
+                            //DeleteObjectGroup(kvp.Key);
                             removeObjGroups.Add(kvp.Key);
                         }
                     }
@@ -303,7 +303,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 foreach(UUID orphanedPrim in orphanedPrims)
                 {
-                    DeleteObjectPart(orphanedPrim);
+                    //DeleteObjectPart(orphanedPrim);
                 }
 
                 foreach(KeyValuePair<UUID, UUID> kvp in orphanedPrimInventories)
@@ -470,7 +470,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override void DeleteObjectPart(UUID obj)
+        internal void DeleteObjectPart(UUID obj)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -494,7 +494,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             });
         }
 
-        public override void DeleteObjectGroup(UUID obj)
+        internal void DeleteObjectGroup(UUID obj)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -513,10 +513,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             });
         }
-        #endregion
+#endregion
 
-        #region Storage Functions
-        public override void UpdateObjectPart(ObjectPart objpart)
+#region Storage Functions
+        internal void UpdateObjectPart(ObjectPart objpart)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -666,6 +666,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             connection.ReplaceInto("prims", data);
         }
 
-        #endregion
+#endregion
     }
 }

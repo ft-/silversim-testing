@@ -19,11 +19,13 @@ namespace SilverSim.Database.MySQL._Migration
     {
         public string Name { get; private set; }
         public bool IsDynamicRowFormat { get; set; }
+        public string Engine { get; set; }
         
         public SqlTable(string name)
         {
             IsDynamicRowFormat = false;
             Name = name;
+            Engine = "InnoDB";
         }
 
         public string Sql(string tableName)

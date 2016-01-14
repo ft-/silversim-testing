@@ -46,7 +46,7 @@ namespace SilverSim.Database.MySQL._Migration
 
             string cmd = "CREATE TABLE `" + MySqlHelper.EscapeString(table.Name) + "` (";
             cmd += string.Join(",", fieldSqls);
-            cmd += ") COMMENT='" + tableRevision.ToString() + "'";
+            cmd += ") COMMENT='" + tableRevision.ToString() + "' ENGINE=" + table.Engine;
             if(table.IsDynamicRowFormat)
             {
                 cmd += " ROW_FORMAT=DYNAMIC";

@@ -31,10 +31,5 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         public abstract List<UUID> ObjectsInRegion(UUID key);
 
         public abstract List<UUID> PrimitivesInRegion(UUID key);
-
-        public abstract void DeleteObjectPart(UUID obj);
-        public abstract void DeleteObjectGroup(UUID obj);
-
-        public abstract void UpdateObjectPart(ObjectPart objpart);
     }
 }

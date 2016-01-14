@@ -478,8 +478,14 @@ namespace SilverSim.Database.MySQL
                     using (MemoryStream stream = new MemoryStream())
                     {
                         LlsdBinary.Serialize((AnArray)value, stream);
-                        resvals.Add("x" + stream.GetBuffer().ToHexString());
+                        byte[] b = stream.GetBuffer();
+                        resvals.Add(b.Length == 0 ? "''" : "0x" + b.ToHexString());
                     }
+                }
+                else if(t == typeof(byte[]))
+                {
+                    byte[] b = (byte[])value;
+                    resvals.Add(b.Length == 0 ? "''" : "0x" + b.ToHexString());
                 }
                 else if (t == typeof(Date))
                 {
@@ -492,6 +498,10 @@ namespace SilverSim.Database.MySQL
                 else if (t == typeof(double))
                 {
                     resvals.Add(((double)value).ToString(CultureInfo.InvariantCulture));
+                }
+                else if(t == typeof(string))
+                {
+                    resvals.Add("'" + MySqlHelper.EscapeString(value.ToString()) + "'");
                 }
                 else if (null == value)
                 {

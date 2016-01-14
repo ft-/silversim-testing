@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         static readonly IMigrationElement[] Migrations_Regions = new IMigrationElement[]
         {
             #region Table terrains
-            new SqlTable("terrains"),
+            new SqlTable("terrains") { Engine = "MyISAM" },
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<uint>("PatchID") { IsNullAllowed = false },
             new AddColumn<byte[]>("TerrainData"),
@@ -38,7 +38,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             #endregion
 
             #region Table environmentsettings
-            new SqlTable("environmentsettings"),
+            new SqlTable("environmentsettings") { Engine = "MyISAM" },
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<byte[]>("EnvironmentSettings") { IsLong = true },
             new PrimaryKeyInfo("RegionID"),
@@ -258,7 +258,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         static readonly IMigrationElement[] Migrations_Objects = new IMigrationElement[]
         {
             #region Table objects
-            new SqlTable("objects"),
+            new SqlTable("objects") { Engine = "MyISAM" },
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<bool>("IsVolumeDetect") { IsNullAllowed = false, Default = false },
@@ -289,7 +289,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             #endregion
 
             #region Table prims
-            new SqlTable("prims") { IsDynamicRowFormat = true },
+            new SqlTable("prims") { IsDynamicRowFormat = true, Engine = "MyISAM" },
             new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<UUID>("RootPartID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<int>("LinkNumber") { IsNullAllowed = false, Default = 0 },
@@ -352,7 +352,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             #endregion
 
             #region Table primitems
-            new SqlTable("primitems"),
+            new SqlTable("primitems") { Engine = "MyISAM" },
             new AddColumn<UUID>("PrimID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<UUID>("InventoryID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("Name") { Cardinality = 255, Default = string.Empty },
