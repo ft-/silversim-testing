@@ -210,7 +210,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 bool processUpdatePrims = updatePrimsRequests.Count != 0;
                 bool processUpdatePrimItems = updatePrimItemsRequests.Count != 0;
 
-                if((emptyQueue && objectDeletionRequests.Count > 0) || objectDeletionRequests.Count > 256 || processUpdateObjects)
+                if(((emptyQueue || processUpdateObjects) && objectDeletionRequests.Count > 0) || objectDeletionRequests.Count > 256)
                 {
                     string elems = string.Join(" OR ", objectDeletionRequests);
                     try
@@ -232,7 +232,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                if ((emptyQueue && primDeletionRequests.Count > 0) || primDeletionRequests.Count > 256 || processUpdatePrims)
+                if (((emptyQueue || processUpdatePrims) && primDeletionRequests.Count > 0) || primDeletionRequests.Count > 256)
                 {
                     string elems = string.Join(" OR ", primDeletionRequests);
                     try
@@ -254,7 +254,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                if ((emptyQueue && primItemDeletionRequests.Count > 0) || primItemDeletionRequests.Count > 256 || processUpdatePrimItems)
+                if (((emptyQueue || processUpdatePrimItems) && primItemDeletionRequests.Count > 0) || primItemDeletionRequests.Count > 256)
                 {
                     string elems = string.Join(" OR ", primItemDeletionRequests);
                     try
