@@ -6,15 +6,11 @@ using MySql.Data.MySqlClient;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -142,48 +138,34 @@ namespace SilverSim.Database.MySQL.SimulationData
             StopStorageThread();
         }
 
+        static readonly string[] Tables = new string[]
+        {
+            "primitems",
+            "prims",
+            "objects",
+            "scriptstates",
+            "terrains",
+            "parcels",
+            "environmentsettings",
+            "lightshare",
+            "spawnpoints"
+        };
+
         public override void RemoveRegion(UUID regionID)
         {
-            List<UUID> objects = Objects.ObjectsInRegion(regionID);
-            List<UUID> prims = Objects.PrimitivesInRegion(regionID);
-            foreach(UUID prim in prims)
-            {
-                m_ObjectStorage.DeleteObjectPart(prim);
-            }
-            foreach(UUID objid in objects)
-            {
-                m_ObjectStorage.DeleteObjectGroup(objid);
-            }
 
             string regionIdStr = regionID.ToString();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            foreach (string table in Tables)
             {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE '" + regionIdStr + "'", connection))
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
-                    cmd.ExecuteNonQuery();
+                    connection.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + table + " WHERE RegionID LIKE '" + regionIdStr + "'", connection))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM terrains WHERE RegionID LIKE '" + regionIdStr + "'", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE '" + regionIdStr + "'", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            EnvironmentSettings.Remove(regionID);
-            Spawnpoints.Remove(regionID);
-            LightShare.Remove(regionID);
         }
     }
     #endregion

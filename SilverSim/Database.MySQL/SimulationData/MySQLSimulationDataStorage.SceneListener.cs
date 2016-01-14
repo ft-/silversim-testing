@@ -20,16 +20,17 @@ namespace SilverSim.Database.MySQL.SimulationData
         protected override void StorageMainThread()
         {
             Thread.CurrentThread.Name = "Storage Main Thread";
-            Dictionary<UUID, string> primDeletionRequests = new Dictionary<UUID, string>();
-            Dictionary<UUID, string> primItemDeletionRequests = new Dictionary<UUID, string>();
-            Dictionary<UUID, string> objectDeletionRequests = new Dictionary<UUID, string>();
-            Dictionary<UUID, string> updateObjectsRequests = new Dictionary<UUID, string>();
-            Dictionary<UUID, string> updatePrimsRequests = new Dictionary<UUID, string>();
-            Dictionary<UUID, string> updatePrimItemsRequests = new Dictionary<UUID, string>();
+            List<string> primDeletionRequests = new List<string>();
+            List<string> primItemDeletionRequests = new List<string>();
+            List<string> objectDeletionRequests = new List<string>();
+            List<string> updateObjectsRequests = new List<string>();
+            List<string> updatePrimsRequests = new List<string>();
+            List<string> updatePrimItemsRequests = new List<string>();
+
             Dictionary<uint, int> knownSerialNumbers = new Dictionary<uint, int>();
             Dictionary<uint, int> knownInventorySerialNumbers = new Dictionary<uint, int>();
             Dictionary<uint, List<UUID>> knownInventories = new Dictionary<uint, List<UUID>>();
-            Dictionary<uint, bool> knownRootPrim = new Dictionary<uint, bool>();
+
             string replaceIntoObjects = string.Empty;
             string replaceIntoPrims = string.Empty;
             string replaceIntoPrimItems = string.Empty;
@@ -55,11 +56,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                 if (req.IsKilled)
                 {
                     /* has to be processed */
-                    primDeletionRequests.Add(req.Part.ID, string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", req.Part.ObjectGroup.Scene.ID, req.Part.ID));
-                    primItemDeletionRequests.Add(req.Part.ID, string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}')", req.Part.ObjectGroup.Scene.ID, req.Part.ID));
+                    string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
+                    string partID = req.Part.ID.ToString();
+                    primDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
+                    primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}')", sceneID, partID));
+                    knownSerialNumbers.Remove(req.LocalID);
                     if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
                     {
-                        objectDeletionRequests.Add(req.Part.ID, string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", req.Part.ObjectGroup.Scene.ID, req.Part.ID));
+                        objectDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
                     }
                 }
                 else if (req.Part.SerialNumberLoadedFromDatabase == serialNumber)
@@ -78,11 +82,13 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     if (req.Part.ObjectGroup.IsAttached || req.Part.ObjectGroup.IsTemporary)
                     {
-                        primDeletionRequests.Add(req.Part.ID, string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", req.Part.ObjectGroup.Scene.ID, req.Part.ID));
-                        primItemDeletionRequests.Add(req.Part.ID, string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}')", req.Part.ObjectGroup.Scene.ID, req.Part.ID));
+                        string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
+                        string partID = req.Part.ID.ToString();
+                        primDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
+                        primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}')", sceneID, partID));
                         if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
                         {
-                            objectDeletionRequests.Add(req.Part.ID, string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", req.Part.ObjectGroup.Scene.ID, req.Part.ID));
+                            objectDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
                         }
                     }
                     else
@@ -92,12 +98,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                             /* prim update */
                             updatePrim = true;
                             updateInventory = true;
-                            primDeletionRequests.Remove(req.Part.ID);
-                            primItemDeletionRequests.Remove(req.Part.ID);
-                            if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
-                            {
-                                objectDeletionRequests.Remove(req.Part.ID);
-                            }
                         }
 
                         if (knownInventorySerialNumbers.TryGetValue(req.LocalID, out knownInventorySerial) &&
@@ -117,12 +117,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     updatePrim = true;
                     updateInventory = true;
-                    primDeletionRequests.Remove(req.Part.ID);
-                    primItemDeletionRequests.Remove(req.Part.ID);
-                    if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
-                    {
-                        objectDeletionRequests.Remove(req.Part.ID);
-                    }
                 }
 
                 int newPrimSerial = req.Part.SerialNumber;
@@ -144,26 +138,79 @@ namespace SilverSim.Database.MySQL.SimulationData
                     {
                         replaceIntoPrims = MySQLUtilities.GenerateFieldNames(primData);
                     }
-                    updatePrimsRequests.Add(req.Part.ID, "(" + MySQLUtilities.GenerateValues(primData) + ")");
+                    updatePrimsRequests.Add("(" + MySQLUtilities.GenerateValues(primData) + ")");
+                    knownSerialNumbers[req.LocalID] = req.SerialNumber;
 
                     Dictionary<string, object> objData = GenerateUpdateObjectGroup(grp);
                     if(replaceIntoObjects.Length == 0)
                     {
                         replaceIntoObjects = MySQLUtilities.GenerateFieldNames(objData);
                     }
-                    updateObjectsRequests.Add(req.Part.ID, "(" + MySQLUtilities.GenerateValues(objData) + ")");
+                    updateObjectsRequests.Add("(" + MySQLUtilities.GenerateValues(objData) + ")");
                 }
 
                 if(updateInventory)
                 {
+                    Dictionary<UUID, ObjectPartInventoryItem> items = new Dictionary<UUID, ObjectPartInventoryItem>();
+                    int inventoryNewSerial = req.Part.Inventory.InventorySerial;
+                    foreach(ObjectPartInventoryItem item in req.Part.Inventory.ValuesByKey1)
+                    {
+                        items.Add(item.ID, item);
+                    }
 
+                    List<UUID> knownInventory;
+                    if (knownInventories.TryGetValue(req.Part.LocalID, out knownInventory))
+                    {
+                        string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
+                        string partID = req.Part.ID.ToString();
+                        foreach (UUID itemID in knownInventories[req.Part.LocalID])
+                        {
+                            if (!items.ContainsKey(itemID))
+                            {
+                                primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}' AND ID LIKE '{2})",
+                                    sceneID, partID, itemID.ToString()));
+                            }
+                        }
+
+                        foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in items)
+                        {
+                            if(!knownInventory.Contains(kvp.Key))
+                            {
+                                Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
+                                data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
+                                if (replaceIntoPrimItems.Length == 0)
+                                {
+                                    replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
+                                }
+                                updatePrimItemsRequests.Add(MySQLUtilities.GenerateValues(data));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in items)
+                        {
+                            Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
+                            data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
+                            if (replaceIntoPrimItems.Length == 0)
+                            {
+                                replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
+                            }
+                            updatePrimItemsRequests.Add(MySQLUtilities.GenerateValues(data));
+                        }
+                    }
+                    knownInventories[req.Part.LocalID] = new List<UUID>(items.Keys);
+                    knownInventorySerialNumbers[req.Part.LocalID] = inventoryNewSerial;
                 }
 
                 bool emptyQueue = m_StorageMainRequestQueue.Count == 0;
+                bool processUpdateObjects = updateObjectsRequests.Count != 0;
+                bool processUpdatePrims = updatePrimsRequests.Count != 0;
+                bool processUpdatePrimItems = updatePrimItemsRequests.Count != 0;
 
-                if((emptyQueue && objectDeletionRequests.Count > 0) || objectDeletionRequests.Count > 256)
+                if((emptyQueue && objectDeletionRequests.Count > 0) || objectDeletionRequests.Count > 256 || processUpdateObjects)
                 {
-                    string elems = string.Join(" OR ", objectDeletionRequests.Values);
+                    string elems = string.Join(" OR ", objectDeletionRequests);
                     try
                     {
                         string command = "DELETE FROM objects WHERE " + elems;
@@ -183,9 +230,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                if ((emptyQueue && primDeletionRequests.Count > 0) || primDeletionRequests.Count > 256)
+                if ((emptyQueue && primDeletionRequests.Count > 0) || primDeletionRequests.Count > 256 || processUpdatePrims)
                 {
-                    string elems = string.Join(" OR ", primDeletionRequests.Values);
+                    string elems = string.Join(" OR ", primDeletionRequests);
                     try
                     {
                         string command = "DELETE FROM prims WHERE " + elems;
@@ -204,9 +251,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                if ((emptyQueue && primItemDeletionRequests.Count > 0) || primItemDeletionRequests.Count > 256)
+                if ((emptyQueue && primItemDeletionRequests.Count > 0) || primItemDeletionRequests.Count > 256 || processUpdatePrimItems)
                 {
-                    string elems = string.Join(" OR ", primItemDeletionRequests.Values);
+                    string elems = string.Join(" OR ", primItemDeletionRequests);
                     try
                     { 
                         string command = "DELETE FROM primitems WHERE " + elems;
@@ -228,7 +275,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 if ((emptyQueue && updateObjectsRequests.Count > 0) || updateObjectsRequests.Count > 256)
                 {
-                    string command = "REPLACE INTO objects (" + replaceIntoObjects + ") VALUES " + string.Join(",", updateObjectsRequests.Values);
+                    string command = "REPLACE INTO objects (" + replaceIntoObjects + ") VALUES " + string.Join(",", updateObjectsRequests);
                     try
                     {
                         using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
@@ -250,7 +297,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 if ((emptyQueue && updatePrimsRequests.Count > 0) || updatePrimsRequests.Count > 256)
                 {
-                    string command = "REPLACE INTO prims (" + replaceIntoPrims + ") VALUES " + string.Join(",", updatePrimsRequests.Values);
+                    string command = "REPLACE INTO prims (" + replaceIntoPrims + ") VALUES " + string.Join(",", updatePrimsRequests);
                     try
                     {
                         using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
@@ -272,7 +319,24 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 if ((emptyQueue && updatePrimItemsRequests.Count > 0) || updatePrimItemsRequests.Count > 256)
                 {
+                    string command = "REPLACE INTO primitems (" + replaceIntoPrimItems + ") VALUES " + string.Join(",", updatePrimItemsRequests);
+                    try
+                    {
+                        using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                        {
+                            conn.Open();
+                            using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                            {
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
 
+                        updatePrimItemsRequests.Clear();
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Error("Prim inventory update failed", e);
+                    }
                 }
             }
         }

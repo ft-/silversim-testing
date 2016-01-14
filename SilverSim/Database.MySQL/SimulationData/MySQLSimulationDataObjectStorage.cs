@@ -14,6 +14,7 @@ using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -59,7 +60,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT prims.ID FROM objects INNER JOIN prims ON objects.ID LIKE prims.RootPartID WHERE RegionID LIKE '" + key.ToString() + "' ORDER BY LinkNumber", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM prims WHERE RegionID LIKE '" + key.ToString() + "' ORDER BY ID, LinkNumber", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -75,7 +76,29 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region helpers
-        ObjectPart FromDbReader(MySqlDataReader dbReader)
+        ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader)
+        {
+            ObjectGroup objgroup = new ObjectGroup();
+            objgroup.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
+            objgroup.IsPhantom = dbReader.GetBool("IsPhantom");
+            objgroup.IsPhysics = dbReader.GetBool("IsPhysics");
+            objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
+            objgroup.Owner = dbReader.GetUUI("Owner");
+            objgroup.LastOwner = dbReader.GetUUI("LastOwner");
+            objgroup.Group = dbReader.GetUGI("Group");
+            objgroup.SaleType = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
+            objgroup.SalePrice = dbReader.GetInt32("SalePrice");
+            objgroup.PayPrice0 = dbReader.GetInt32("PayPrice0");
+            objgroup.PayPrice1 = dbReader.GetInt32("PayPrice1");
+            objgroup.PayPrice2 = dbReader.GetInt32("PayPrice2");
+            objgroup.PayPrice3 = dbReader.GetInt32("PayPrice3");
+            objgroup.PayPrice4 = dbReader.GetInt32("PayPrice4");
+            objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
+            objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
+            return objgroup;
+        }
+
+        ObjectPart ObjectPartFromDbReader(MySqlDataReader dbReader)
         {
             ObjectPart objpart = new ObjectPart();
             objpart.ID = dbReader.GetUUID("ID");
@@ -152,6 +175,48 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             return objpart;
         }
+
+        ObjectPartInventoryItem ObjectPartInventoryItemFromDbReader(MySqlDataReader dbReader)
+        {
+            ObjectPartInventoryItem item = new ObjectPartInventoryItem();
+            item.AssetID = dbReader.GetUUID("AssetID");
+            item.AssetType = dbReader.GetEnum<AssetType>("AssetType");
+            item.CreationDate = dbReader.GetDate("CreationDate");
+            item.Creator = dbReader.GetUUI("Creator");
+            item.Description = dbReader.GetString("Description");
+            item.Flags = dbReader.GetEnum<InventoryFlags>("Flags");
+            item.Group = dbReader.GetUGI("Group");
+            item.IsGroupOwned = dbReader.GetBool("GroupOwned");
+            item.ID = dbReader.GetUUID("InventoryID");
+            item.InventoryType = dbReader.GetEnum<InventoryType>("InventoryType");
+            item.LastOwner = dbReader.GetUUI("LastOwner");
+            item.Name = dbReader.GetString("Name");
+            item.Owner = dbReader.GetUUI("Owner");
+            item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
+            item.Permissions.Base = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
+            item.Permissions.Current = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
+            item.Permissions.EveryOne = dbReader.GetEnum<InventoryPermissionsMask>("EveryOnePermissions");
+            item.Permissions.Group = dbReader.GetEnum<InventoryPermissionsMask>("GroupPermissions");
+            item.Permissions.NextOwner = dbReader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissions");
+            item.SaleInfo.Type = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
+            item.SaleInfo.Price = dbReader.GetInt32("SalePrice");
+            item.SaleInfo.PermMask = dbReader.GetEnum<InventoryPermissionsMask>("SalePermMask");
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+            if (((string)dbReader["PermsGranter"]).Length != 0)
+            {
+                try
+                {
+                    grantinfo.PermsGranter = dbReader.GetUUI("PermsGranter");
+                }
+                catch
+                {
+                    /* no action required */
+                }
+            }
+            grantinfo.PermsMask = dbReader.GetEnum<ScriptPermissions>("PermsMask");
+
+            return item;
+        }
         #endregion
 
         #region Load all object groups of a single region
@@ -186,25 +251,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 {
 
                                     objgroupID = MySQLUtilities.GetUUID(dbReader, "id");
-                                    ObjectGroup objgroup = new ObjectGroup();
-                                    objgroup.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
-                                    objgroup.IsPhantom = dbReader.GetBool("IsPhantom");
-                                    objgroup.IsPhysics = dbReader.GetBool("IsPhysics");
-                                    objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
-                                    objgroup.Owner = dbReader.GetUUI("Owner");
-                                    objgroup.LastOwner = dbReader.GetUUI("LastOwner");
-                                    objgroup.Group = dbReader.GetUGI("Group");
                                     originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
                                     nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
-                                    objgroup.SaleType = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
-                                    objgroup.SalePrice = dbReader.GetInt32("SalePrice");
-                                    objgroup.PayPrice0 = dbReader.GetInt32("PayPrice0");
-                                    objgroup.PayPrice1 = dbReader.GetInt32("PayPrice1");
-                                    objgroup.PayPrice2 = dbReader.GetInt32("PayPrice2");
-                                    objgroup.PayPrice3 = dbReader.GetInt32("PayPrice3");
-                                    objgroup.PayPrice4 = dbReader.GetInt32("PayPrice4");
-                                    objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
-                                    objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
+                                    ObjectGroup objgroup = ObjectGroupFromDbReader(dbReader); ;
                                     objGroups[objgroupID] = objgroup;
                                 }
                                 catch(Exception e)
@@ -218,7 +267,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
                     int primcount = 0;
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT prims.* FROM objects INNER JOIN prims ON objects.id LIKE prims.RootPartID WHERE objects.regionID LIKE '" + regionID.ToString() + "'", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -233,7 +282,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                         objGroupParts.Add(rootPartID, new SortedDictionary<int, ObjectPart>());
                                     }
 
-                                    ObjectPart objpart = FromDbReader(dbReader);
+                                    ObjectPart objpart = ObjectPartFromDbReader(dbReader);
 
                                     objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
                                     objPartIDs.Add(objpart.ID);
@@ -255,12 +304,31 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     int primitemcount = 0;
                     m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
-                    foreach(ObjectPart part in objParts.Values)
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
-                        LoadInventory(connection, part);
-                        if ((++primitemcount) % 5000 == 0)
+                        cmd.CommandTimeout = 3600;
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
-                            m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
+                            while (dbReader.Read())
+                            {
+                                UUID partID = dbReader.GetUUID("RootPartID");
+                                ObjectPart part;
+                                if (objParts.TryGetValue(partID, out part))
+                                {
+                                    ObjectPartInventoryItem item = ObjectPartInventoryItemFromDbReader(dbReader);
+
+                                    part.Inventory.Add(item.ID, item.Name, item);
+                                    if ((++primitemcount) % 5000 == 0)
+                                    {
+                                        m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
+                                    }
+                                }
+                                else
+                                {
+                                    m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, dbReader.GetUUID("ID"));
+                                    orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(dbReader.GetUUID("PrimID"), dbReader.GetUUID("ID")));
+                                }
+                            }
                         }
                     }
                     m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
@@ -271,8 +339,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     if (!objGroupParts.ContainsKey(kvp.Key))
                     {
-                        //DeleteObjectGroup(kvp.Key);
                         removeObjGroups.Add(kvp.Key);
+                        objGroups.Remove(kvp.Key);
                     }
                     else
                     {
@@ -290,25 +358,48 @@ namespace SilverSim.Database.MySQL.SimulationData
                         catch
                         {
                             m_Log.WarnFormat("deleting orphan object in region ID {0}: {1}", regionID, kvp.Key);
-                            //DeleteObjectGroup(kvp.Key);
                             removeObjGroups.Add(kvp.Key);
                         }
                     }
                 }
 
-                foreach (UUID key in removeObjGroups)
+                for(int idx = 0; idx < removeObjGroups.Count; idx += 256)
                 {
-                    objGroups.Remove(key);
+                    int elemcnt = Math.Min(removeObjGroups.Count - idx, 256);
+                    string sqlcmd = "DELETE FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID IN (" +
+                        string.Join(",", from id in removeObjGroups.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
+                        ")";
+                    using (MySqlConnection conn = new MySqlConnection())
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
 
-                foreach(UUID orphanedPrim in orphanedPrims)
+                for(int idx = 0; idx < orphanedPrims.Count; idx += 256)
                 {
-                    //DeleteObjectPart(orphanedPrim);
+                    int elemcnt = Math.Min(removeObjGroups.Count - idx, 256);
+                    string sqlcmd = "DELETE FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "' ID IN (" +
+                        string.Join(",", from id in orphanedPrims.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
+                        ")";
+                    using (MySqlConnection conn = new MySqlConnection())
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
-
-                foreach(KeyValuePair<UUID, UUID> kvp in orphanedPrimInventories)
+                for(int idx = 0; idx < orphanedPrimInventories.Count; idx += 256)
                 {
-                    DeleteObjectPartPrimItem(kvp.Key, kvp.Value);
+                    int elemcnt = Math.Min(orphanedPrimInventories.Count - idx, 256);
+                    string sqlcmd = "DELETE FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "' AND (" +
+                        string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt) select 
+                                            string.Format("PrimID LIKE '{0}' AND ID LIKE '{1}'", id.Key.ToString(), id.Value.ToString()));
                 }
 
                 foreach (KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
@@ -323,231 +414,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
         #endregion
-
-        #region Load single object group
-        private void LoadInventory(ObjectPart objpart)
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                LoadInventory(connection, objpart);
-            }
-        }
-
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        private void LoadInventory(MySqlConnection connection, ObjectPart objpart)
-        {
-            using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE '" + objpart.ID.ToString() + "'", connection))
-            {
-                using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                {
-                    ObjectPartInventoryItem item;
-
-                    while (dbReader.Read())
-                    {
-                        item = new ObjectPartInventoryItem();
-                        item.AssetID = dbReader.GetUUID("AssetID");
-                        item.AssetType = dbReader.GetEnum<AssetType>("AssetType");
-                        item.CreationDate = dbReader.GetDate("CreationDate");
-                        item.Creator = dbReader.GetUUI("Creator");
-                        item.Description = dbReader.GetString("Description");
-                        item.Flags = dbReader.GetEnum<InventoryFlags>("Flags");
-                        item.Group = dbReader.GetUGI("Group");
-                        item.IsGroupOwned = dbReader.GetBool("GroupOwned");
-                        item.ID = dbReader.GetUUID("InventoryID");
-                        item.InventoryType = dbReader.GetEnum<InventoryType>("InventoryType");
-                        item.LastOwner = dbReader.GetUUI("LastOwner");
-                        item.Name = dbReader.GetString("Name");
-                        item.Owner = dbReader.GetUUI("Owner");
-                        item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
-                        item.Permissions.Base = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
-                        item.Permissions.Current = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
-                        item.Permissions.EveryOne = dbReader.GetEnum<InventoryPermissionsMask>("EveryOnePermissions");
-                        item.Permissions.Group = dbReader.GetEnum<InventoryPermissionsMask>("GroupPermissions");
-                        item.Permissions.NextOwner = dbReader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissions");
-                        item.SaleInfo.Type = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
-                        item.SaleInfo.Price = dbReader.GetInt32("SalePrice");
-                        item.SaleInfo.PermMask = dbReader.GetEnum<InventoryPermissionsMask>("SalePermMask");
-                        ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
-                        if (((string)dbReader["PermsGranter"]).Length != 0)
-                        {
-                            try
-                            {
-                                grantinfo.PermsGranter = dbReader.GetUUI("PermsGranter");
-                            }
-                            catch
-                            {
-                                /* no action required */
-                            }
-                        }
-                        grantinfo.PermsMask = dbReader.GetEnum<ScriptPermissions>("PermsMask");
-
-                        objpart.Inventory.Add(item.ID, item.Name, item);
-                    }
-                }
-            }
-        }
-
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override ObjectGroup this[UUID regionID, UUID key]
-        {
-            get
-            {
-                ObjectGroup objgroup;
-                using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                {
-                    connection.Open();
-                    UUID originalAssetID;
-                    UUID nextOwnerAssetID;
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID LIKE '" + key.ToString() + "'", connection))
-                    {
-                        cmd.CommandTimeout = 3600;
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            if (!dbReader.Read())
-                            {
-                                throw new InvalidOperationException();
-                            }
-
-                            objgroup = new ObjectGroup();
-                            objgroup.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
-                            objgroup.IsPhantom = dbReader.GetBool("IsPhantom");
-                            objgroup.IsPhysics = dbReader.GetBool("IsPhysics");
-                            objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
-                            objgroup.Owner = dbReader.GetUUI("Owner");
-                            objgroup.LastOwner = dbReader.GetUUI("LastOwner");
-                            objgroup.Group = dbReader.GetUGI("Group");
-                            originalAssetID = dbReader.GetUUID("OriginalAssetID");
-                            nextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID");
-                            objgroup.SaleType = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
-                            objgroup.SalePrice = dbReader.GetInt32("SalePrice");
-                            objgroup.PayPrice0 = dbReader.GetInt32("PayPrice0");
-                            objgroup.PayPrice1 = dbReader.GetInt32("PayPrice1");
-                            objgroup.PayPrice2 = dbReader.GetInt32("PayPrice2");
-                            objgroup.PayPrice3 = dbReader.GetInt32("PayPrice3");
-                            objgroup.PayPrice4 = dbReader.GetInt32("PayPrice4");
-                            objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
-                            objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
-                        }
-                    }
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE '" + key.ToString() + "' ORDER BY LinkNumber", connection))
-                    {
-                        cmd.CommandTimeout = 3600;
-                        using(MySqlDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            while(dbReader.Read())
-                            {
-                                ObjectPart objpart = FromDbReader(dbReader);
-                                LoadInventory(objpart);
-                                objgroup.Add(dbReader.GetInt32("LinkNumber"), objpart.ID, objpart);
-                            }
-                        }
-                    }
-                    objgroup.OriginalAssetID = originalAssetID;
-                    objgroup.NextOwnerAssetID = nextOwnerAssetID;
-                }
-                objgroup.FinalizeObject();
-                foreach (ObjectPart opart in objgroup.Values)
-                {
-                    opart.SerialNumberLoadedFromDatabase = opart.SerialNumber;
-                }
-                return objgroup;
-            }
-        }
-        #endregion
-
-        #region Delete functions
-        void DeleteObjectPartPrimItem(UUID primID, UUID itemID)
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE '" +  
-                    primID.ToString() + "' AND InventoryID LIKE '" + itemID.ToString() + "'", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        internal void DeleteObjectPart(UUID obj)
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                DeleteObjectPart(connection, obj);
-            }
-        }
-
-        public void DeleteObjectPart(MySqlConnection connection, UUID obj)
-        {
-            connection.InsideTransaction(delegate()
-            {
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE '" + obj.ToString() + "'", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE '" + obj.ToString() + "'", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-            });
-        }
-
-        internal void DeleteObjectGroup(UUID obj)
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                DeleteObjectGroup(connection, obj);
-            }
-        }
-
-        public void DeleteObjectGroup(MySqlConnection connection, UUID obj)
-        {
-            connection.InsideTransaction(delegate()
-            {
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE '" + obj.ToString() + "'", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-            });
-        }
-#endregion
-
-#region Storage Functions
-        internal void UpdateObjectPart(ObjectPart objpart)
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                ObjectGroup grp = objpart.ObjectGroup;
-                connection.Open();
-                if (null != grp && objpart.LinkNumber == 1)
-                {
-                    UpdateObjectGroup(connection, grp);
-                }
-                UpdateObjectPart(connection, objpart);
-                foreach (ObjectPartInventoryItem item in objpart.Inventory.Values)
-                {
-                    UpdateObjectPartInventoryItem(connection, objpart.ID, item);
-                }
-            }
-        }
-
-        public void UpdateObjectPartInner(MySqlConnection connection, ObjectPart objpart)
-        {
-            ObjectGroup grp = objpart.ObjectGroup;
-            if (null != grp && objpart.LinkNumber == 1)
-            {
-                UpdateObjectGroup(connection, grp);
-            }
-            UpdateObjectPart(connection, objpart);
-            foreach (ObjectPartInventoryItem item in objpart.Inventory.Values)
-            {
-                UpdateObjectPartInventoryItem(connection, objpart.ID, item);
-            }
-        }
-
+        
+        #region Storage Functions
         private void UpdateObjectPartInventoryItem(MySqlConnection connection, UUID primID, ObjectPartInventoryItem item)
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
@@ -579,93 +447,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             data.Add("PermsMask", grantinfo.PermsMask);
             connection.ReplaceInto("primitems", data);
         }
+        
 
-        private void UpdateObjectGroup(MySqlConnection connection, ObjectGroup objgroup)
-        {
-            if(objgroup.IsTemporary)
-            {
-                return;
-            }
-            Dictionary<string, object> data = new Dictionary<string, object>();
-            data.Add("ID", objgroup.ID);
-            data.Add("RegionID", objgroup.Scene.ID);
-            data.Add("IsVolumeDetect", objgroup.IsVolumeDetect);
-            data.Add("IsPhantom", objgroup.IsPhantom);
-            data.Add("IsPhysics", objgroup.IsPhysics);
-            data.Add("IsTempOnRez", objgroup.IsTempOnRez);
-            data.Add("Owner", objgroup.Owner);
-            data.Add("LastOwner", objgroup.LastOwner);
-            data.Add("Group", objgroup.Group);
-            data.Add("OriginalAssetID", objgroup.OriginalAssetID);
-            data.Add("NextOwnerAssetID", objgroup.NextOwnerAssetID);
-            data.Add("SaleType", objgroup.SaleType);
-            data.Add("SalePrice", objgroup.SalePrice);
-            data.Add("PayPrice0", objgroup.PayPrice0);
-            data.Add("PayPrice1", objgroup.PayPrice1);
-            data.Add("PayPrice2", objgroup.PayPrice2);
-            data.Add("PayPrice3", objgroup.PayPrice3);
-            data.Add("PayPrice4", objgroup.PayPrice4);
-            data.Add("AttachedPos", objgroup.AttachedPos);
-            data.Add("AttachPoint", objgroup.AttachPoint);
-            connection.ReplaceInto("objects", data);
-        }
-
-        private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
-        {
-            if(objpart.ObjectGroup.IsTemporary || objpart.ObjectGroup.IsTempOnRez)
-            {
-                return;
-            }
-
-            Dictionary<string, object> data = new Dictionary<string, object>();
-            data.Add("ID", objpart.ID);
-            data.Add("LinkNumber", objpart.LinkNumber);
-            data.Add("RootPartID", objpart.ObjectGroup.RootPart.ID);
-            data.Add("Position", objpart.Position);
-            data.Add("Rotation", objpart.Rotation);
-            data.Add("SitText", objpart.SitText);
-            data.Add("TouchText", objpart.TouchText);
-            data.Add("Name", objpart.Name);
-            data.Add("Description", objpart.Description);
-            data.Add("SitTargetOffset", objpart.SitTargetOffset);
-            data.Add("SitTargetOrientation", objpart.SitTargetOrientation);
-            data.Add("PhysicsShapeType", objpart.PhysicsShapeType);
-            data.Add("Material", objpart.Material);
-            data.Add("Size", objpart.Size);
-            data.Add("Slice", objpart.Slice);
-            data.Add("MediaURL", objpart.MediaURL);
-            data.Add("Creator", objpart.Creator);
-            data.Add("CreationDate", objpart.CreationDate);
-            data.Add("Flags", objpart.Flags);
-            data.Add("AngularVelocity", objpart.AngularVelocity);
-            data.Add("LightData", objpart.PointLight.Serialization);
-            data.Add("HoverTextData", objpart.Text.Serialization);
-            data.Add("FlexibleData", objpart.Flexible.Serialization);
-            data.Add("LoopedSoundData", objpart.Sound.Serialization);
-            data.Add("ImpactSoundData", objpart.CollisionSound.Serialization);
-            data.Add("PrimitiveShapeData", objpart.Shape.Serialization);
-            data.Add("ParticleSystem", objpart.ParticleSystemBytes);
-            data.Add("TextureEntryBytes", objpart.TextureEntryBytes);
-            data.Add("TextureAnimationBytes", objpart.TextureAnimationBytes);
-            data.Add("ScriptAccessPin", objpart.ScriptAccessPin);
-            data.Add("CameraAtOffset", objpart.CameraAtOffset);
-            data.Add("CameraEyeOffset", objpart.CameraEyeOffset);
-            data.Add("ForceMouselook", objpart.ForceMouselook);
-            data.Add("BasePermissions", objpart.BaseMask);
-            data.Add("CurrentPermissions", objpart.OwnerMask);
-            data.Add("EveryOnePermissions", objpart.EveryoneMask);
-            data.Add("GroupPermissions", objpart.GroupMask);
-            data.Add("NextOwnerPermissions", objpart.NextOwnerMask);
-
-            using (MemoryStream ms = new MemoryStream())
-            { 
-                LlsdBinary.Serialize(objpart.DynAttrs, ms);
-                data.Add("DynAttrs", ms.GetBuffer());
-            }
-
-            connection.ReplaceInto("prims", data);
-        }
-
-#endregion
+        #endregion
     }
 }
