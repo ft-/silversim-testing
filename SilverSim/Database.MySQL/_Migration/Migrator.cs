@@ -23,6 +23,7 @@ namespace SilverSim.Database.MySQL._Migration
         static void CreateTable(
             this MySqlConnection conn, 
             SqlTable table,
+            ChangeEngine engine,
             PrimaryKeyInfo primaryKey,
             Dictionary<string, IColumnInfo> fields,
             Dictionary<string, NamedKeyInfo> tableKeys,
@@ -46,7 +47,7 @@ namespace SilverSim.Database.MySQL._Migration
 
             string cmd = "CREATE TABLE `" + MySqlHelper.EscapeString(table.Name) + "` (";
             cmd += string.Join(",", fieldSqls);
-            cmd += ") COMMENT='" + tableRevision.ToString() + "' ENGINE=" + table.Engine;
+            cmd += ") COMMENT='" + tableRevision.ToString() + "' ENGINE=" + (engine != null ? engine.Engine : table.Engine);
             if(table.IsDynamicRowFormat)
             {
                 cmd += " ROW_FORMAT=DYNAMIC";
@@ -61,6 +62,7 @@ namespace SilverSim.Database.MySQL._Migration
             PrimaryKeyInfo primaryKey = null;
             Dictionary<string, NamedKeyInfo> tableKeys = new Dictionary<string, NamedKeyInfo>();
             SqlTable table = null;
+            ChangeEngine selectedEngine = null;
             uint processingTableRevision = 0;
             uint currentAtRevision = 0;
             bool insideTransaction = false;
@@ -94,6 +96,7 @@ namespace SilverSim.Database.MySQL._Migration
                         {
                             conn.CreateTable(
                                 table,
+                                selectedEngine,
                                 primaryKey,
                                 tableFields,
                                 tableKeys,
@@ -105,6 +108,7 @@ namespace SilverSim.Database.MySQL._Migration
                         primaryKey = null;
                     }
                     table = (SqlTable)migration;
+                    selectedEngine = null;
                     currentAtRevision = conn.GetTableRevision(table.Name);
                     processingTableRevision = 1;
                 }
@@ -187,6 +191,15 @@ namespace SilverSim.Database.MySQL._Migration
                         }
                         tableFields.Remove(columnInfo.Name);
                     }
+                    else if(migrationType == typeof(ChangeEngine))
+                    {
+                        ChangeEngine engineInfo = (ChangeEngine)migration;
+                        if(insideTransaction)
+                        {
+                            ExecuteStatement(conn, engineInfo.Sql(table.Name), log);
+                        }
+                        selectedEngine = engineInfo;
+                    }
                     else if(migrationType == typeof(PrimaryKeyInfo))
                     {
                         if(null != primaryKey && insideTransaction)
@@ -246,6 +259,7 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 conn.CreateTable(
                     table,
+                    selectedEngine,
                     primaryKey,
                     tableFields,
                     tableKeys,

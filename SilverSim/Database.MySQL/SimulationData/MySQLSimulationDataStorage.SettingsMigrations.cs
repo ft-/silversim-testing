@@ -17,6 +17,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<uint>("PatchID") { IsNullAllowed = false },
             new AddColumn<byte[]>("TerrainData"),
             new PrimaryKeyInfo("RegionID", "PatchID"),
+            new TableRevision(2),
+            new ChangeEngine("MyISAM"),
             #endregion
 
             #region Table environmentsettings
@@ -24,6 +26,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<byte[]>("EnvironmentSettings") { IsLong = true },
             new PrimaryKeyInfo("RegionID"),
+            new TableRevision(2),
+            new ChangeEngine("MyISAM"),
             #endregion
 
             #region Table lightshare
@@ -87,6 +91,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<UUID>("ItemID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("ScriptState") { IsLong = true },
             new PrimaryKeyInfo("RegionID", "PrimID", "ItemID"),
+            new TableRevision(2),
+            new ChangeEngine("MyISAM"),
             #endregion
 
             #region Table regionsettings

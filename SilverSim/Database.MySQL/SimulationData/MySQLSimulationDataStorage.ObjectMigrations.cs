@@ -107,6 +107,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new NamedKeyInfo("RegionID", "RegionID"),
             new PrimaryKeyInfo("RegionID", "ID", "RootPartID"),
+            new TableRevision(7),
+            new ChangeEngine("MyISAM"),
             #endregion
 
             #region Table primitems

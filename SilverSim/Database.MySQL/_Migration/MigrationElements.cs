@@ -34,6 +34,20 @@ namespace SilverSim.Database.MySQL._Migration
         }
     }
 
+    public class ChangeEngine : IMigrationElement
+    {
+        public string Engine { get; private set; }
+        public ChangeEngine(string engine)
+        {
+            Engine = engine;
+        }
+
+        public string Sql(string tableName)
+        {
+            return "ALTER TABLE " + tableName + " ENGINE=" + Engine;
+        }
+    }
+
     public class PrimaryKeyInfo : IMigrationElement
     {
         public string[] FieldNames { get; private set; }
