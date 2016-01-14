@@ -27,9 +27,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             List<string> updatePrimsRequests = new List<string>();
             List<string> updatePrimItemsRequests = new List<string>();
 
-            Dictionary<uint, int> knownSerialNumbers = new Dictionary<uint, int>();
-            Dictionary<uint, int> knownInventorySerialNumbers = new Dictionary<uint, int>();
-            Dictionary<uint, List<UUID>> knownInventories = new Dictionary<uint, List<UUID>>();
+            C5.TreeDictionary<uint, int> knownSerialNumbers = new C5.TreeDictionary<uint, int>();
+            C5.TreeDictionary<uint, int> knownInventorySerialNumbers = new C5.TreeDictionary<uint, int>();
+            C5.TreeDictionary<uint, List<UUID>> knownInventories = new C5.TreeDictionary<uint, List<UUID>>();
 
             string replaceIntoObjects = string.Empty;
             string replaceIntoPrims = string.Empty;
@@ -78,8 +78,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                         continue;
                     }
                 }
-                else if (knownSerialNumbers.TryGetValue(req.LocalID, out knownSerial))
+                else if (knownSerialNumbers.Contains(req.LocalID))
                 {
+                    knownSerial = knownSerialNumbers[req.LocalID];
                     if (req.Part.ObjectGroup.IsAttached || req.Part.ObjectGroup.IsTemporary)
                     {
                         string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
@@ -100,11 +101,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                             updateInventory = true;
                         }
 
-                        if (knownInventorySerialNumbers.TryGetValue(req.LocalID, out knownInventorySerial) &&
-                            knownInventorySerial != req.Part.Inventory.InventorySerial)
+                        if (knownInventorySerialNumbers.Contains(req.LocalID))
                         {
+                            knownInventorySerial = knownSerialNumbers[req.LocalID];
                             /* inventory update */
-                            updateInventory = true;
+                            updateInventory = knownInventorySerial != req.Part.Inventory.InventorySerial;
                         }
                     }
                 }
@@ -159,8 +160,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
 
                     List<UUID> knownInventory;
-                    if (knownInventories.TryGetValue(req.Part.LocalID, out knownInventory))
+                    if (knownInventories.Contains(req.Part.LocalID))
                     {
+                        knownInventory = knownInventories[req.Part.LocalID];
                         string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
                         string partID = req.Part.ID.ToString();
                         foreach (UUID itemID in knownInventories[req.Part.LocalID])
@@ -244,6 +246,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 cmd.ExecuteNonQuery();
                             }
                         }
+                        primDeletionRequests.Clear();
                     }
                     catch (Exception e)
                     {
@@ -265,7 +268,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        primDeletionRequests.Clear();
+                        primItemDeletionRequests.Clear();
                     }
                     catch(Exception e)
                     {

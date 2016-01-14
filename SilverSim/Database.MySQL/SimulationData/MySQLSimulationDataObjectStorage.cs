@@ -340,7 +340,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                     if (!objGroupParts.ContainsKey(kvp.Key))
                     {
                         removeObjGroups.Add(kvp.Key);
-                        objGroups.Remove(kvp.Key);
                     }
                     else
                     {
@@ -363,13 +362,18 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
+                foreach(UUID objid in removeObjGroups)
+                {
+                    objGroups.Remove(objid);
+                }
+
                 for(int idx = 0; idx < removeObjGroups.Count; idx += 256)
                 {
                     int elemcnt = Math.Min(removeObjGroups.Count - idx, 256);
                     string sqlcmd = "DELETE FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID IN (" +
                         string.Join(",", from id in removeObjGroups.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
                         ")";
-                    using (MySqlConnection conn = new MySqlConnection())
+                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
                         using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
@@ -381,11 +385,11 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 for(int idx = 0; idx < orphanedPrims.Count; idx += 256)
                 {
-                    int elemcnt = Math.Min(removeObjGroups.Count - idx, 256);
-                    string sqlcmd = "DELETE FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "' ID IN (" +
+                    int elemcnt = Math.Min(orphanedPrims.Count - idx, 256);
+                    string sqlcmd = "DELETE FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID IN (" +
                         string.Join(",", from id in orphanedPrims.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
                         ")";
-                    using (MySqlConnection conn = new MySqlConnection())
+                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
                         using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
@@ -400,6 +404,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                     string sqlcmd = "DELETE FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "' AND (" +
                         string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt) select 
                                             string.Format("PrimID LIKE '{0}' AND ID LIKE '{1}'", id.Key.ToString(), id.Value.ToString()));
+                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
                 }
 
                 foreach (KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
