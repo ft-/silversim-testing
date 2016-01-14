@@ -8,7 +8,6 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -17,7 +16,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Simulation Data Backend")]
-    public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IPluginShutdown
+    public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         readonly string m_ConnectionString;
@@ -46,7 +45,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public void Startup(ConfigurationLoader loader)
         {
-            StartStorageThread();
+            /* intentionally left empty */
         }
         #endregion
 
@@ -124,19 +123,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
         #endregion
-
-        public ShutdownOrder ShutdownOrder
-        {
-            get 
-            {
-                return ShutdownOrder.LogoutDatabase;
-            }
-        }
-
-        public void Shutdown()
-        {
-            StopStorageThread();
-        }
 
         static readonly string[] Tables = new string[]
         {

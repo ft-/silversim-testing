@@ -414,14 +414,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                foreach (KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
-                {
-                    foreach (ObjectPart opart in kvp.Value.Values)
-                    {
-                        opart.SerialNumberLoadedFromDatabase = opart.SerialNumber;
-                    }
-                }
-
                 return new List<ObjectGroup>(objGroups.Values);
             }
         }

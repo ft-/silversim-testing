@@ -296,6 +296,9 @@ namespace SilverSim.Main.Common
                     m_Log.InfoFormat("Loaded {0} terrain segments for {1} ({2})", patches.Count, loadparams.Scene.Name, loadparams.Scene.ID);
                 }
 
+                /* now we enable storing new data, scripts have to be started after executing this line */
+                loadparams.Scene.StartStorage();
+
                 {
                     uint px, py;
                     int count = 0;
@@ -306,7 +309,7 @@ namespace SilverSim.Main.Common
                             if (valid[px, py] == 0)
                             {
                                 LayerPatch p = loadparams.Scene.Terrain.Patch[px, py];
-                                loadparams.SimulationDataStorage.Terrains[loadparams.Scene.ID, p.ExtendedPatchID] = p;
+                                loadparams.Scene.Terrain.Patch.Update(p);
                                 ++count;
                             }
                         }

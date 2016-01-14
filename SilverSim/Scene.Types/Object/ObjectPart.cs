@@ -667,7 +667,6 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectGroup ObjectGroup { get; set; }
         public ObjectPartInventory Inventory { get; private set; }
-        public int SerialNumberLoadedFromDatabase; /* <summary>only to be set within DB modules</summary> */
 
         public bool IsChanged { get; private set; }
 

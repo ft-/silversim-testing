@@ -581,11 +581,8 @@ namespace SilverSim.Scene.Implementation.Basic
             OnRemove += RemoveScene;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
-            Terrain.TerrainListeners.Add(this);
-            SceneListeners.Add(m_SimulationDataStorage);
 
             ScriptThreadPool = new ScriptWorkerThreadPool(50, 150);
-            new Thread(StoreTerrainProcess).Start();
             if(null != physicsFactory)
             {
                 PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);
@@ -616,6 +613,20 @@ namespace SilverSim.Scene.Implementation.Basic
             return agent.IMSend(im);
         }
 
+        SimulationDataStorageInterface.TerrainListener m_TerrainListener;
+        SimulationDataStorageInterface.SceneListener m_SceneListener;
+
+        public override void StartStorage()
+        {
+            m_TerrainListener = m_SimulationDataStorage.GetTerrainListener(ID);
+            m_TerrainListener.StartStorageThread();
+            Terrain.TerrainListeners.Add(m_TerrainListener);
+
+            m_SceneListener = m_SimulationDataStorage.GetSceneListener(ID);
+            m_SceneListener.StartStorageThread();
+            SceneListeners.Add(m_SceneListener);
+        }
+
         void RemoveScene(SceneInterface s)
         {
             Environment.Stop();
@@ -628,8 +639,17 @@ namespace SilverSim.Scene.Implementation.Basic
                 rInfo.Flags &= (~RegionFlags.RegionOnline);
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
-            SceneListeners.Remove(m_SimulationDataStorage);
-            Terrain.TerrainListeners.Remove(this);
+            if (null != m_SceneListener)
+            {
+                m_SceneListener.StopStorageThread();
+                SceneListeners.Remove(m_SceneListener);
+            }
+            if (null != m_TerrainListener)
+            {
+                m_TerrainListener.StopStorageThread();
+                Terrain.TerrainListeners.Remove(m_TerrainListener);
+            }
+
             IMRouter.SceneIM.Remove(IMSend);
             UDPCircuitsManager udpServer = m_UDPServer;
             if (udpServer != null)
