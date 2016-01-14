@@ -311,7 +311,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             while (dbReader.Read())
                             {
-                                UUID partID = dbReader.GetUUID("RootPartID");
+                                UUID partID = dbReader.GetUUID("PrimID");
                                 ObjectPart part;
                                 if (objParts.TryGetValue(partID, out part))
                                 {
