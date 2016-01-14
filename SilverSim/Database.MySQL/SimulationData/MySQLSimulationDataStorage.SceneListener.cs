@@ -184,7 +184,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 {
                                     replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
                                 }
-                                updatePrimItemsRequests.Add(MySQLUtilities.GenerateValues(data));
+                                updatePrimItemsRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
                             }
                         }
                     }
@@ -198,7 +198,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             {
                                 replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
                             }
-                            updatePrimItemsRequests.Add(MySQLUtilities.GenerateValues(data));
+                            updatePrimItemsRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
                         }
                     }
                     knownInventories[req.Part.LocalID] = new List<UUID>(items.Keys);
