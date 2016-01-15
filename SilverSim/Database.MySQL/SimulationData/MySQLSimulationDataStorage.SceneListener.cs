@@ -91,7 +91,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         }
                         else
                         {
-                            if (knownSerial != req.SerialNumber && !req.Part.ObjectGroup.IsAttached && !req.Part.ObjectGroup.IsTemporary)
+                            if (knownSerial != serialNumber && !req.Part.ObjectGroup.IsAttached && !req.Part.ObjectGroup.IsTemporary)
                             {
                                 /* prim update */
                                 updatePrim = true;
@@ -117,9 +117,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         updateInventory = true;
                     }
 
-                    int newPrimSerial = req.Part.SerialNumber;
                     int newPrimInventorySerial = req.Part.Inventory.InventorySerial;
-                    bool rootPrim = req.Part.LinkNumber == ObjectGroup.LINK_ROOT;
 
                     int count = Interlocked.Increment(ref m_ProcessedPrims);
                     if (count % 100 == 0)
@@ -150,7 +148,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                     if (updateInventory)
                     {
                         Dictionary<UUID, ObjectPartInventoryItem> items = new Dictionary<UUID, ObjectPartInventoryItem>();
-                        int inventoryNewSerial = req.Part.Inventory.InventorySerial;
                         foreach (ObjectPartInventoryItem item in req.Part.Inventory.ValuesByKey1)
                         {
                             items.Add(item.ID, item);
@@ -199,7 +196,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
                         }
                         knownInventories[req.Part.LocalID] = new List<UUID>(items.Keys);
-                        knownInventorySerialNumbers[req.Part.LocalID] = inventoryNewSerial;
+                        knownInventorySerialNumbers[req.Part.LocalID] = newPrimInventorySerial;
                     }
 
                     bool emptyQueue = m_StorageMainRequestQueue.Count == 0;

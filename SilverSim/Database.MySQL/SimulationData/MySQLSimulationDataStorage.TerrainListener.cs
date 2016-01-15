@@ -56,6 +56,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             replaceIntoTerrain = "REPLACE INTO terrains (" + MySQLUtilities.GenerateFieldNames(data) + ") VALUES ";
                         }
                         updateRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
+                        knownSerialNumbers[req.ExtendedPatchID] = serialNumber;
                     }
 
                     if((m_StorageTerrainRequestQueue.Count == 0 && updateRequests.Count > 0) || updateRequests.Count >= 256)

@@ -469,7 +469,7 @@ namespace SilverSim.Database.MySQL
                 {
                     resvals.Add((bool)value ? "1" : "0");
                 }
-                else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI) || t == typeof(Uri))
+                else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI) || t == typeof(Uri) || t == typeof(string))
                 {
                     resvals.Add("'" + MySqlHelper.EscapeString(value.ToString()) + "'");
                 }
@@ -498,10 +498,6 @@ namespace SilverSim.Database.MySQL
                 else if (t == typeof(double))
                 {
                     resvals.Add(((double)value).ToString(CultureInfo.InvariantCulture));
-                }
-                else if(t == typeof(string))
-                {
-                    resvals.Add("'" + MySqlHelper.EscapeString(value.ToString()) + "'");
                 }
                 else if (null == value)
                 {
