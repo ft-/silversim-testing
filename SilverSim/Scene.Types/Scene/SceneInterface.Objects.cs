@@ -1,21 +1,20 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Object;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Types;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Types.Inventory;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Types;
+using SilverSim.Types.Inventory;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Object;
+using System;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        class ObjectPropertiesSendHandler : IDisposable
+        struct ObjectPropertiesSendHandler
         {
             ObjectProperties m_Props;
             int m_Bytelen;
@@ -26,6 +25,8 @@ namespace SilverSim.Scene.Types.Scene
             {
                 m_Agent = agent;
                 m_SceneID = sceneID;
+                m_Bytelen = 0;
+                m_Props = null;
             }
 
             public void Send(ObjectPart part)
@@ -51,7 +52,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_Bytelen += propUpdate.Length;
             }
 
-            public void Dispose()
+            public void Finish()
             {
                 if(null != m_Props)
                 {
@@ -192,48 +193,6 @@ namespace SilverSim.Scene.Types.Scene
                 shape.ProfileHollow = d.ProfileHollow;
 
                 prim.Shape = shape;
-            }
-        }
-
-        [PacketHandler(MessageType.ObjectSaleInfo)]
-        public void HandleObjectSaleInfo(Message m)
-        {
-            ObjectSaleInfo req = (ObjectSaleInfo)m;
-            if (req.CircuitSessionID != req.SessionID ||
-                req.CircuitAgentID != req.AgentID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
-            {
-                foreach (ObjectSaleInfo.Data d in req.ObjectData)
-                {
-#if DEBUG
-                    m_Log.DebugFormat("ObjectSaleInfo localid={0}", d.ObjectLocalID);
-#endif
-
-                    ObjectPart prim;
-                    if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
-                    {
-                        continue;
-                    }
-
-                    if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
-                    {
-                        continue;
-                    }
-
-                    prim.ObjectGroup.SalePrice = d.SalePrice;
-                    prim.ObjectGroup.SaleType = (InventoryItem.SaleInfoData.SaleType)d.SaleType;
-                    propHandler.Send(prim);
-                }
             }
         }
 
@@ -463,7 +422,8 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             bool isGod = agent.IsActiveGod && agent.IsInScene(this);
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (ObjectPermissions.Data d in req.ObjectData)
                 {
@@ -520,6 +480,10 @@ namespace SilverSim.Scene.Types.Scene
                         grp.RootPart.LocalID);
 #endif
                 }
+            }
+            finally
+            {
+                propHandler.Finish();
             }
         }
 
@@ -578,7 +542,8 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (uint d in req.ObjectList)
                 {
@@ -598,6 +563,10 @@ namespace SilverSim.Scene.Types.Scene
                     propHandler.Send(prim);
                 }
             }
+            finally
+            {
+                propHandler.Finish();
+            }
         }
 
         [PacketHandler(MessageType.ObjectName)]
@@ -616,7 +585,8 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (ObjectName.Data d in req.ObjectData)
                 {
@@ -638,6 +608,10 @@ namespace SilverSim.Scene.Types.Scene
 
                     propHandler.Send(prim);
                 }
+            }
+            finally
+            {
+                propHandler.Finish();
             }
         }
 
@@ -679,7 +653,8 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (UInt32 d in req.ObjectList)
                 {
@@ -700,6 +675,10 @@ namespace SilverSim.Scene.Types.Scene
                     prim.ObjectGroup.Group = new UGI(req.GroupID);
                     propHandler.Send(prim);
                 }
+            }
+            finally
+            {
+                propHandler.Finish();
             }
         }
 
@@ -741,7 +720,8 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (ObjectMaterial.Data d in req.ObjectData)
                 {
@@ -762,6 +742,10 @@ namespace SilverSim.Scene.Types.Scene
                     prim.Material = d.Material;
                     propHandler.Send(prim);
                 }
+            }
+            finally
+            {
+                propHandler.Finish();
             }
         }
 
@@ -862,7 +846,8 @@ namespace SilverSim.Scene.Types.Scene
 
             ObjectPart part;
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (uint primLocalID in req.ObjectData)
                 {
@@ -877,6 +862,10 @@ namespace SilverSim.Scene.Types.Scene
 
                     propHandler.Send(part);
                 }
+            }
+            finally
+            {
+                propHandler.Finish();
             }
         }
 
@@ -918,7 +907,8 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (ObjectDescription.Data d in req.ObjectData)
                 {
@@ -940,6 +930,10 @@ namespace SilverSim.Scene.Types.Scene
                     propHandler.Send(prim);
                 }
             }
+            finally
+            {
+                propHandler.Finish();
+            }
         }
 
         [PacketHandler(MessageType.ObjectDeselect)]
@@ -959,7 +953,8 @@ namespace SilverSim.Scene.Types.Scene
 
             ObjectPart part;
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (uint primLocalID in req.ObjectData)
                 {
@@ -970,6 +965,10 @@ namespace SilverSim.Scene.Types.Scene
 
                     propHandler.Send(part);
                 }
+            }
+            finally
+            {
+                propHandler.Finish();
             }
         }
 
@@ -989,7 +988,8 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (ObjectClickAction.Data data in req.ObjectData)
                 {
@@ -1010,6 +1010,10 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
             }
+            finally
+            {
+                propHandler.Finish();
+            }
         }
 
         [PacketHandler(MessageType.ObjectCategory)]
@@ -1028,7 +1032,8 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
+            try
             {
                 foreach (ObjectCategory.Data data in req.ObjectData)
                 {
@@ -1049,27 +1054,9 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
             }
-        }
-
-        [PacketHandler(MessageType.ObjectBuy)]
-        public void HandleObjectBuy(Message m)
-        {
-            ObjectBuy req = (ObjectBuy)m;
-            if (req.CircuitSessionID != req.SessionID ||
-                req.CircuitAgentID != req.AgentID)
+            finally
             {
-                return;
-            }
-        }
-
-        [PacketHandler(MessageType.BuyObjectInventory)]
-        public void HandleBuyObjectInventory(Message m)
-        {
-            BuyObjectInventory req = (BuyObjectInventory)m;
-            if (req.CircuitSessionID != req.SessionID ||
-                req.CircuitAgentID != req.AgentID)
-            {
-                return;
+                propHandler.Finish();
             }
         }
 
