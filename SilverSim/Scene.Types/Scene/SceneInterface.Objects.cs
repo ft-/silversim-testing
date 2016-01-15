@@ -41,6 +41,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_Agent.SendMessageAlways(m_Props, m_SceneID);
                     m_Bytelen = 0;
+                    m_Props = null;
                 }
 
                 if (null == m_Props)
