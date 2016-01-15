@@ -437,6 +437,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 data.Add("EveryOnePermissions", objpart.EveryoneMask);
                 data.Add("GroupPermissions", objpart.GroupMask);
                 data.Add("NextOwnerPermissions", objpart.NextOwnerMask);
+                data.Add("ClickAction", objpart.ClickAction);
 
                 using (MemoryStream ms = new MemoryStream())
                 {

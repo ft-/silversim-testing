@@ -109,6 +109,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new PrimaryKeyInfo("RegionID", "ID", "RootPartID"),
             new TableRevision(7),
             new ChangeEngine("MyISAM"),
+            new TableRevision(8),
+            new AddColumn<ClickActionType>("ClickAction") { Default = ClickActionType.None },
             #endregion
 
             #region Table primitems

@@ -166,6 +166,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             objpart.GroupMask = dbReader.GetEnum<InventoryPermissionsMask>("GroupPermissions");
             objpart.NextOwnerMask = dbReader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissions");
 
+            objpart.ClickAction = dbReader.GetEnum<ClickActionType>("ClickAction");
+
             using (MemoryStream ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
             {
                 foreach (KeyValuePair<string, IValue> kvp in (Map)LlsdBinary.Deserialize(ms))
