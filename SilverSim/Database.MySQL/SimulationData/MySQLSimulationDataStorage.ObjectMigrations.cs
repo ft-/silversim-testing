@@ -110,7 +110,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             new TableRevision(7),
             new ChangeEngine("MyISAM"),
             new TableRevision(8),
-            new AddColumn<ClickActionType>("ClickAction") { Default = ClickActionType.None },
+            new AddColumn<ClickActionType>("ClickAction") { IsNullAllowed = false, Default = ClickActionType.None },
             #endregion
 
             #region Table primitems
