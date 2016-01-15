@@ -37,6 +37,8 @@ namespace SilverSim.Viewer.Messages.Object
             ObjectBuy m = new ObjectBuy();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.CategoryID = p.ReadUUID();
 
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
@@ -54,6 +56,8 @@ namespace SilverSim.Viewer.Messages.Object
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(CategoryID);
             p.WriteUInt8((byte)ObjectData.Count);
             foreach(Data d in ObjectData)
             {
