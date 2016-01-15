@@ -14,7 +14,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        struct ObjectPropertiesSendHandler
+        class ObjectPropertiesSendHandler : IDisposable
         {
             ObjectProperties m_Props;
             int m_Bytelen;
@@ -25,8 +25,6 @@ namespace SilverSim.Scene.Types.Scene
             {
                 m_Agent = agent;
                 m_SceneID = sceneID;
-                m_Bytelen = 0;
-                m_Props = null;
             }
 
             public void Send(ObjectPart part)
@@ -53,7 +51,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_Bytelen += propUpdate.Length;
             }
 
-            public void Finish()
+            public void Dispose()
             {
                 if(null != m_Props)
                 {
@@ -423,8 +421,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             bool isGod = agent.IsActiveGod && agent.IsInScene(this);
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectPermissions.Data d in req.ObjectData)
                 {
@@ -481,10 +478,6 @@ namespace SilverSim.Scene.Types.Scene
                         grp.RootPart.LocalID);
 #endif
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 
@@ -543,8 +536,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (uint d in req.ObjectList)
                 {
@@ -564,10 +556,6 @@ namespace SilverSim.Scene.Types.Scene
                     propHandler.Send(prim);
                 }
             }
-            finally
-            {
-                propHandler.Finish();
-            }
         }
 
         [PacketHandler(MessageType.ObjectName)]
@@ -586,8 +574,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectName.Data d in req.ObjectData)
                 {
@@ -609,10 +596,6 @@ namespace SilverSim.Scene.Types.Scene
 
                     propHandler.Send(prim);
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 
@@ -654,8 +637,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (UInt32 d in req.ObjectList)
                 {
@@ -676,10 +658,6 @@ namespace SilverSim.Scene.Types.Scene
                     prim.ObjectGroup.Group = new UGI(req.GroupID);
                     propHandler.Send(prim);
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 
@@ -721,8 +699,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectMaterial.Data d in req.ObjectData)
                 {
@@ -743,10 +720,6 @@ namespace SilverSim.Scene.Types.Scene
                     prim.Material = d.Material;
                     propHandler.Send(prim);
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 
@@ -847,8 +820,7 @@ namespace SilverSim.Scene.Types.Scene
 
             ObjectPart part;
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (uint primLocalID in req.ObjectData)
                 {
@@ -863,10 +835,6 @@ namespace SilverSim.Scene.Types.Scene
 
                     propHandler.Send(part);
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 
@@ -908,8 +876,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectDescription.Data d in req.ObjectData)
                 {
@@ -931,10 +898,6 @@ namespace SilverSim.Scene.Types.Scene
                     propHandler.Send(prim);
                 }
             }
-            finally
-            {
-                propHandler.Finish();
-            }
         }
 
         [PacketHandler(MessageType.ObjectDeselect)]
@@ -954,8 +917,7 @@ namespace SilverSim.Scene.Types.Scene
 
             ObjectPart part;
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (uint primLocalID in req.ObjectData)
                 {
@@ -966,10 +928,6 @@ namespace SilverSim.Scene.Types.Scene
 
                     propHandler.Send(part);
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 
@@ -989,8 +947,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectClickAction.Data data in req.ObjectData)
                 {
@@ -1011,10 +968,6 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
             }
-            finally
-            {
-                propHandler.Finish();
-            }
         }
 
         [PacketHandler(MessageType.ObjectCategory)]
@@ -1033,8 +986,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectCategory.Data data in req.ObjectData)
                 {
@@ -1054,10 +1006,6 @@ namespace SilverSim.Scene.Types.Scene
                         propHandler.Send(part);
                     }
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 

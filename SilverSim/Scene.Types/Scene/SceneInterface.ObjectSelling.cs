@@ -28,8 +28,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID);
-            try
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectSaleInfo.Data d in req.ObjectData)
                 {
@@ -52,10 +51,6 @@ namespace SilverSim.Scene.Types.Scene
                     prim.ObjectGroup.SaleType = d.SaleType;
                     propHandler.Send(prim);
                 }
-            }
-            finally
-            {
-                propHandler.Finish();
             }
         }
 
