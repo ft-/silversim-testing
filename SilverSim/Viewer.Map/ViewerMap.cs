@@ -75,7 +75,12 @@ namespace SilverSim.Viewer.Map
                 }
 
                 Message m = req.Value;
-                SceneInterface scene = req.Key.Scene;
+                AgentCircuit circuit = req.Key;
+                if(circuit == null)
+                {
+                    continue;
+                }
+                SceneInterface scene = circuit.Scene;
                 if (scene == null)
                 {
                     continue;
@@ -85,15 +90,15 @@ namespace SilverSim.Viewer.Map
                     switch (m.Number)
                     {
                         case MessageType.MapNameRequest:
-                            HandleMapNameRequest(req.Key.Agent, scene, m);
+                            HandleMapNameRequest(circuit.Agent, scene, m);
                             break;
 
                         case MessageType.MapBlockRequest:
-                            HandleMapBlockRequest(req.Key.Agent, scene, m);
+                            HandleMapBlockRequest(circuit.Agent, scene, m);
                             break;
 
                         case MessageType.MapItemRequest:
-                            HandleMapItemRequest(req.Key.Agent, scene, m);
+                            HandleMapItemRequest(circuit.Agent, scene, m);
                             break;
 
                         default:
