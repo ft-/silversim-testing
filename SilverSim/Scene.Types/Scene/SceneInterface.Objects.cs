@@ -822,26 +822,21 @@ namespace SilverSim.Scene.Types.Scene
             ObjectPart part;
             RwLockedList<UUID> selectedObjects = agent.SelectedObjects(ID);
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            foreach (uint primLocalID in req.ObjectData)
             {
-                foreach (uint primLocalID in req.ObjectData)
-                {
 #if DEBUG
-                    m_Log.DebugFormat("ObjectSelect localid={0}", primLocalID);
+                m_Log.DebugFormat("ObjectSelect localid={0}", primLocalID);
 #endif
 
-                    if (!Primitives.TryGetValue(primLocalID, out part))
-                    {
-                        continue;
-                    }
+                if (!Primitives.TryGetValue(primLocalID, out part))
+                {
+                    continue;
+                }
 
-                    if (!selectedObjects.Contains(part.ID))
-                    {
-                        selectedObjects.Add(part.ID);
-                        agent.ScheduleUpdate(part.UpdateInfo, ID);
-                    }
-
-                    propHandler.Send(part);
+                if (!selectedObjects.Contains(part.ID))
+                {
+                    selectedObjects.Add(part.ID);
+                    agent.ScheduleUpdate(part.UpdateInfo, ID);
                 }
             }
         }

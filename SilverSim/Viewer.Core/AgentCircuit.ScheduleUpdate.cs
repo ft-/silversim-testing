@@ -3,10 +3,12 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Object;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -15,6 +17,60 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
+        #region ObjectProperties handler
+        sealed class ObjectPropertiesTriggerMessage : Message
+        {
+            readonly AgentCircuit m_Circuit;
+
+            public ObjectPropertiesTriggerMessage(AgentCircuit circuit)
+            {
+                m_Circuit = circuit;
+            }
+
+            public List<ObjectPart> ObjectParts = new List<ObjectPart>();
+
+            void HandleCompletion(bool f)
+            {
+                IAgent agent = m_Circuit.Agent;
+                if(null == agent)
+                {
+                    return;
+                }
+                ObjectProperties props = null;
+                int bytelen = 0;
+
+                foreach (ObjectPart part in ObjectParts)
+                {
+                    byte[] propUpdate = part.PropertiesUpdateData;
+                    if (null == propUpdate)
+                    {
+                        return;
+                    }
+
+                    if (bytelen + propUpdate.Length > 1400)
+                    {
+                        m_Circuit.SendMessage(props);
+                        bytelen = 0;
+                        props = null;
+                    }
+
+                    if (null == props)
+                    {
+                        props = new ObjectProperties();
+                    }
+
+                    props.ObjectData.Add(propUpdate);
+                    bytelen += propUpdate.Length;
+                }
+
+                if (null != props)
+                {
+                    m_Circuit.SendMessage(props);
+                }
+            }
+        }
+        #endregion
+
         readonly BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
         private bool m_TriggerFirstUpdate;
 
@@ -283,10 +339,11 @@ namespace SilverSim.Viewer.Core
                     m_TriggerFirstUpdate = false;
                 }
 
-                Messages.Object.KillObject ko = null;
+                KillObject ko = null;
                 UDPPacket terse_packet = null;
                 byte terse_packet_count = 0;
                 List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data = null;
+                ObjectPropertiesTriggerMessage full_packet_objprop = null;
                 int full_packet_data_length = 0;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
@@ -317,7 +374,7 @@ namespace SilverSim.Viewer.Core
                         {
                             if (ko == null)
                             {
-                                ko = new Messages.Object.KillObject();
+                                ko = new KillObject();
                             }
 
                             ko.LocalIDs.Add(ui.LocalID);
@@ -351,6 +408,11 @@ namespace SilverSim.Viewer.Core
                             else if(isSelected && !wasSelected)
                             {
                                 SendSelectedObjects.Add(ui.Part.ID);
+                                if(null == full_packet_objprop)
+                                {
+                                    full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
+                                    full_packet_objprop.ObjectParts.Add(ui.Part);
+                                }
                             }
 
                             if (dofull)
@@ -367,6 +429,8 @@ namespace SilverSim.Viewer.Core
                                         {
                                             break;
                                         }
+                                        full_packet.AckMessage = full_packet_objprop;
+                                        full_packet_objprop = null;
                                         SendFullUpdateMsg(full_packet, full_packet_data);
                                         full_packet_data = null;
                                     }
@@ -424,6 +488,7 @@ namespace SilverSim.Viewer.Core
                     {
                         break;
                     }
+                    full_packet.AckMessage = full_packet_objprop;
                     SendFullUpdateMsg(full_packet, full_packet_data);
                 }
 
