@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
+using SilverSim.Viewer.Messages.Object;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -241,7 +242,7 @@ namespace SilverSim.Scene.Types.Object
                         {
                             primUpdateFlags |= (uint)PrimitiveFlags.Physics;
                         }
-                        if (Inventory.CountScripts != 0)
+                        if (IsScripted)
                         {
                             primUpdateFlags |= (uint)PrimitiveFlags.Scripted;
                         }
@@ -427,7 +428,7 @@ namespace SilverSim.Scene.Types.Object
                         PutInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.SalePrice, ObjectGroup.SalePrice);
                         PutInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnershipCost, ObjectGroup.OwnershipCost);
                         PutInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.Category, (int)ObjectGroup.Category);
-                        //AggregatePerms = SalePrice + 4,
+                        m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.AggregatePerms] = (byte)BaseMask.GetAggregatePermissions();
                         //AggregatePermTextures = AggregatePerms + 1,
                         //AggregatePermTexturesOwner = AggregatePermTextures + 1,
                         //ItemID = InventorySerial + 2,

@@ -306,7 +306,7 @@ namespace SilverSim.Scene.Types.Object
             get
             {
                 DetectedTypeFlags flags = 0;
-                if (Inventory.CountScripts != 0)
+                if (IsScripted)
                 {
                     flags |= DetectedTypeFlags.Scripted;
                 }
@@ -1796,7 +1796,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("EveryoneMask", (uint)EveryoneMask);
                     writer.WriteNamedValue("NextOwnerMask", (uint)NextOwnerMask);
                     PrimitiveFlags flags = Flags;
-                    if(Inventory.CountScripts != 0)
+                    if(IsScripted)
                     {
                         flags |= PrimitiveFlags.Scripted;
                     }

@@ -315,7 +315,7 @@ namespace SilverSim.Viewer.Core
             foreach(ObjectPart part in grp.Values)
             {
                 isChanged = isChanged || part.IsChanged;
-                isScripted = isScripted || part.Inventory.CountScripts != 0;
+                isScripted = isScripted || part.IsScripted;
                 ObjectPart.PrimitiveShape shape = part.Shape;
                 shape.State = 0;
                 part.Shape = shape;
