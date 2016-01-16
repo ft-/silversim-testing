@@ -2,20 +2,17 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.IM;
-using SilverSim.Scene.ServiceInterfaces.Chat;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Types.IM;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Viewer.Messages.Agent;
 using System.Diagnostics.CodeAnalysis;
-using SilverSim.Types.IM;
 
 namespace SilverSim.Viewer.Core
 {

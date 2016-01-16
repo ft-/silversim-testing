@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -153,10 +152,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             items.Add(item.ID, item);
                         }
 
-                        List<UUID> knownInventory;
                         if (knownInventories.Contains(req.Part.LocalID))
                         {
-                            knownInventory = knownInventories[req.Part.LocalID];
                             string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
                             string partID = req.Part.ID.ToString();
                             foreach (UUID itemID in knownInventories[req.Part.LocalID])
