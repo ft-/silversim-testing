@@ -63,14 +63,16 @@ namespace SilverSim.Viewer.Core
 
             Scene.Name = req.SimName;
             Scene.ReregisterRegion();
-#warning GodUpdateRegionInfo.RegionFlags & RegionOptionFlags.FixedSun not yet supported
-
+            Scene.RegionSettings.IsSunFixed = (regionFlags & (uint)RegionOptionFlags.SunFixed) != 0;
+            Scene.RegionSettings.BlockDwell = (regionFlags & (uint)RegionOptionFlags.BlockDwell) != 0;
             Scene.RegionSettings.AllowDamage = (regionFlags & (uint)RegionOptionFlags.AllowDamage) != 0;
             Scene.RegionSettings.BlockTerraform = (regionFlags & (uint)RegionOptionFlags.BlockTerraform) != 0;
+            Scene.RegionSettings.ResetHomeOnTeleport = (regionFlags & (uint)RegionOptionFlags.ResetHomeOnTeleport) != 0;
             Scene.RegionSettings.Sandbox = (regionFlags & (uint)RegionOptionFlags.Sandbox) != 0;
             Scene.RegionSettings.DisableScripts = (regionFlags & (uint)RegionOptionFlags.DisableScripts) != 0;
             Scene.RegionSettings.DisableCollisions = (regionFlags & (uint)RegionOptionFlags.DisableAgentCollisions) != 0;
             Scene.RegionSettings.DisablePhysics = (regionFlags & (uint)RegionOptionFlags.DisablePhysics) != 0;
+            Scene.RegionSettings.BlockShowInSearch = (regionFlags & (uint)RegionOptionFlags.BlockParcelSearch) != 0;
             Scene.TriggerRegionSettingsChanged();
         }
     }

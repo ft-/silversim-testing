@@ -49,7 +49,6 @@ namespace SilverSim.Scene.Implementation.Basic
         private static readonly ILog m_Log = LogManager.GetLogger("BASIC SCENE");
 
         #region Fields
-        bool m_StopBasicSceneThreads;
         protected internal readonly RwLockedDoubleDictionary<UUID, UInt32, ObjectPart> m_Primitives = new RwLockedDoubleDictionary<UUID, UInt32, ObjectPart>();
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
@@ -632,7 +631,6 @@ namespace SilverSim.Scene.Implementation.Basic
             Environment.Stop();
             ScriptThreadPool.Shutdown();
             m_RestartObject = null;
-            m_StopBasicSceneThreads = true;
             if (null != m_NeighborService)
             {
                 RegionInfo rInfo = s.GetRegionInfo();
