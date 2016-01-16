@@ -1140,7 +1140,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_Description = value.TrimToMaxLength(127);
+                m_Description = value.FilterToNonControlChars().TrimToMaxLength(127);
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
