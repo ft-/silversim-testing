@@ -411,8 +411,8 @@ namespace SilverSim.Viewer.Core
                                 if(null == full_packet_objprop)
                                 {
                                     full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
-                                    full_packet_objprop.ObjectParts.Add(ui.Part);
                                 }
+                                full_packet_objprop.ObjectParts.Add(ui.Part);
                             }
 
                             if (dofull)
@@ -429,6 +429,7 @@ namespace SilverSim.Viewer.Core
                                         {
                                             break;
                                         }
+                                        full_packet.IsReliable = true;
                                         full_packet.AckMessage = full_packet_objprop;
                                         full_packet_objprop = null;
                                         SendFullUpdateMsg(full_packet, full_packet_data);
@@ -488,6 +489,7 @@ namespace SilverSim.Viewer.Core
                     {
                         break;
                     }
+                    full_packet.IsReliable = true;
                     full_packet.AckMessage = full_packet_objprop;
                     SendFullUpdateMsg(full_packet, full_packet_data);
                 }
