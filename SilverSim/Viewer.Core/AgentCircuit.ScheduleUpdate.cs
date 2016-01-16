@@ -25,6 +25,7 @@ namespace SilverSim.Viewer.Core
             public ObjectPropertiesTriggerMessage(AgentCircuit circuit)
             {
                 m_Circuit = circuit;
+                OnSendCompletion += HandleCompletion;
             }
 
             public List<ObjectPart> ObjectParts = new List<ObjectPart>();
