@@ -446,7 +446,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 data.Add("IsPassCollisions", objpart.IsPassCollisions);
                 data.Add("IsPassTouches", objpart.IsPassTouches);
                 data.Add("Velocity", objpart.Velocity);
-                data.Add("AngularVelocity", objpart.AngularVelocity);
                 data.Add("IsSoundQueueing", objpart.IsSoundQueueing);
                 data.Add("IsAllowedDrop", objpart.IsAllowedDrop);
                 data.Add("PhysicsDensity", objpart.PhysicsDensity);
