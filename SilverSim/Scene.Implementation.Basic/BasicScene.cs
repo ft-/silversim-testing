@@ -516,6 +516,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
             #region Setup services
             m_ChatService = chatService;
+            RegionStorage = regionStorage;
             GroupsNameService = groupsNameService;
             GroupsService = groupsService;
             m_NeighborService = neighborService;
@@ -745,6 +746,7 @@ namespace SilverSim.Scene.Implementation.Basic
             GridServiceInterface regionStorage = RegionStorage;
             if(null != regionStorage)
             {
+                m_Log.InfoFormat("Renamed region id={0} to {1}", ID, ri.Name);
                 regionStorage.RegisterRegion(ri);
             }
             foreach (IAgent agent in Agents)
