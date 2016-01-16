@@ -25,7 +25,18 @@ namespace SilverSim.Types.Inventory
                 m_Name = value.FilterToAscii7Printable().TrimToMaxLength(63);
             }
         }
-        public string Description = string.Empty;
+        string m_Description = string.Empty;
+        public string Description
+        {
+            get
+            {
+                return m_Description;
+            }
+            set
+            {
+                m_Description = value.FilterToNonControlChars().TrimToMaxLength(127);
+            }
+        }
         public InventoryType InventoryType = InventoryType.Unknown;
         public InventoryFlags Flags;
         public UUI Owner = new UUI();

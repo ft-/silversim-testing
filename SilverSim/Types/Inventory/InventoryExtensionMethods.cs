@@ -14,5 +14,15 @@ namespace SilverSim.Types.Inventory
             }
             return o;
         }
+
+        public static string FilterToNonControlChars(this string s)
+        {
+            string o = string.Empty;
+            foreach (char c in s)
+            {
+                o += (c <= 32) ? c.ToString() : " ";
+            }
+            return o;
+        }
     }
 }
