@@ -111,6 +111,16 @@ namespace SilverSim.Database.MySQL.SimulationData
             new ChangeEngine("MyISAM"),
             new TableRevision(8),
             new AddColumn<ClickActionType>("ClickAction") { IsNullAllowed = false, Default = ClickActionType.None },
+            new TableRevision(9),
+            new AddColumn<bool>("IsPassCollisions") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsPassTouches") { IsNullAllowed = false, Default = false },
+            new AddColumn<Vector3>("Velocity") { IsNullAllowed = false, Default = Vector3.Zero },
+            new AddColumn<bool>("IsSoundQueueing") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsAllowedDrop") { IsNullAllowed = false, Default = false },
+            new AddColumn<double>("PhysicsDensity") { IsNullAllowed = false, Default = (double)0 },
+            new AddColumn<double>("PhysicsFriction") { IsNullAllowed = false, Default = (double)0 },
+            new AddColumn<double>("PhysicsRestitution") { IsNullAllowed = false, Default = (double)0 },
+            new AddColumn<double>("PhysicsGravityMultiplier") { IsNullAllowed = false, Default = (double)0 },
             #endregion
 
             #region Table primitems

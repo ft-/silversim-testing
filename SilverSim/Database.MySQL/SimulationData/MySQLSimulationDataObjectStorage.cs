@@ -175,6 +175,19 @@ namespace SilverSim.Database.MySQL.SimulationData
                     objpart.DynAttrs.Add(kvp.Key, kvp.Value);
                 }
             }
+
+            objpart.IsPassCollisions = dbReader.GetBool("IsPassCollisions");
+            objpart.IsPassTouches = dbReader.GetBool("IsPassTouches");
+            objpart.Velocity = dbReader.GetVector3("Velocity");
+            objpart.AngularVelocity = dbReader.GetVector3("AngularVelocity");
+            objpart.IsSoundQueueing = dbReader.GetBool("IsSoundQueueing");
+            objpart.IsAllowedDrop = dbReader.GetBool("IsAllowedDrop");
+
+            objpart.PhysicsDensity = dbReader.GetDouble("PhysicsDensity");
+            objpart.PhysicsFriction = dbReader.GetDouble("PhysicsFriction");
+            objpart.PhysicsRestitution = dbReader.GetDouble("PhysicsRestitution");
+            objpart.PhysicsGravityMultiplier = dbReader.GetDouble("PhysicsGravityMultiplier");
+
             return objpart;
         }
 
