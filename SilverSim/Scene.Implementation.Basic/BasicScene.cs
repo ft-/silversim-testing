@@ -1334,22 +1334,6 @@ namespace SilverSim.Scene.Implementation.Basic
             UpdateEnvironmentSettings();
         }
 
-        public override RegionOptionFlags GetRegionFlags()
-        {
-            RegionOptionFlags regionFlags;
-            lock(m_EstateDataUpdateLock)
-            {
-                regionFlags = m_EstateData.Flags;
-            }
-            regionFlags &= ~RegionOptionFlags.SunFixed;
-            regionFlags |= RegionSettings.AsFlags;
-            if (RegionSettings.IsSunFixed)
-            {
-                regionFlags |= RegionOptionFlags.SunFixed;
-            }
-            return regionFlags;
-        }
-
         public override void SendRegionInfo(IAgent agent)
         {
             Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
@@ -1362,7 +1346,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 estateInfo = m_EstateData;
             }
 
-            RegionOptionFlags regionFlags = GetRegionFlags();
+            RegionOptionFlags regionFlags = RegionSettings.AsFlags;
 
             res.EstateID = estateInfo.ID;
             res.ParentEstateID = estateInfo.ParentEstateID;
@@ -1397,6 +1381,6 @@ namespace SilverSim.Scene.Implementation.Basic
             agent.SendMessageAlways(res, ID);
         }
 
-        #endregion
+#endregion
     }
 }

@@ -20,6 +20,7 @@ namespace SilverSim.Scene.Types.Scene
         public bool BlockTerraform;
         public bool BlockFly;
         public bool AllowDamage;
+        public bool BlockDwell = true;
         public bool RestrictPushing;
         public bool AllowLandResell;
         public bool AllowLandJoinDivide;
@@ -33,6 +34,9 @@ namespace SilverSim.Scene.Types.Scene
         public double SunPosition;
         public bool IsSunFixed;
         public bool UseEstateSun;
+        public bool ResetHomeOnTeleport;
+        public bool AllowLandmark;
+        public bool AllowDirectTeleport;
 
         private UUID m_TerrainTexture1 = DEFAULT_TERRAIN_TEXTURE_1;
         public UUID TerrainTexture1
@@ -116,7 +120,19 @@ namespace SilverSim.Scene.Types.Scene
             get
             {
                 RegionOptionFlags flags = 0;
-                if(IsSunFixed)
+                if (AllowDirectTeleport)
+                {
+                    flags |= RegionOptionFlags.AllowDirectTeleport;
+                }
+                if (AllowLandmark)
+                {
+                    flags |= RegionOptionFlags.AllowLandmark;
+                }
+                if (ResetHomeOnTeleport)
+                {
+                    flags |= RegionOptionFlags.ResetHomeOnTeleport;
+                }
+                if (IsSunFixed)
                 {
                     flags |= RegionOptionFlags.SunFixed;
                 }
@@ -132,7 +148,11 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     flags |= RegionOptionFlags.BlockLandResell;
                 }
-                if(BlockFlyOver)
+                if (BlockDwell)
+                {
+                    flags |= RegionOptionFlags.BlockDwell;
+                }
+                if (BlockFlyOver)
                 {
                     flags |= RegionOptionFlags.BlockFlyOver;
                 }
@@ -148,25 +168,29 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     flags |= RegionOptionFlags.DisablePhysics;
                 }
-                if(BlockFly)
+                if (BlockFly)
                 {
                     flags |= RegionOptionFlags.BlockFly;
                 }
-                if(RestrictPushing)
+                if (RestrictPushing)
                 {
                     flags |= RegionOptionFlags.RestrictPushObject;
                 }
-                if(AllowLandJoinDivide)
+                if (AllowLandJoinDivide)
                 {
                     flags |= RegionOptionFlags.AllowParcelChanges;
                 }
-                if(BlockShowInSearch)
+                if (BlockShowInSearch)
                 {
                     flags |= RegionOptionFlags.BlockParcelSearch;
                 }
-                if(Sandbox)
+                if (Sandbox)
                 {
                     flags |= RegionOptionFlags.Sandbox;
+                }
+                if (IsSunFixed)
+                {
+                    flags |= RegionOptionFlags.SunFixed;
                 }
 
                 return flags;

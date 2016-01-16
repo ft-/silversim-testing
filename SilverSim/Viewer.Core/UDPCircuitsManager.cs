@@ -266,7 +266,7 @@ namespace SilverSim.Viewer.Core
 
                                             SceneInterface scene = Scene;
                                             Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
-                                            RegionOptionFlags regionFlags = scene.GetRegionFlags();
+                                            RegionOptionFlags regionFlags = scene.RegionSettings.AsFlags;
                                             rh.RegionFlags = regionFlags;
                                             rh.SimAccess = scene.Access;
                                             rh.SimName = scene.Name;

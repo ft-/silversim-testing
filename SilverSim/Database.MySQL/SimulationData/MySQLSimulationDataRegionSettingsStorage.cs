@@ -5,7 +5,6 @@ using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System.Collections.Generic;
 
@@ -56,6 +55,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             settings.SunPosition = reader.GetDouble("SunPosition");
             settings.IsSunFixed = reader.GetBoolean("IsSunFixed");
             settings.UseEstateSun = reader.GetBool("UseEstateSun");
+            settings.BlockDwell = reader.GetBool("BlockDwell");
+            settings.ResetHomeOnTeleport = reader.GetBool("ResetHomeOnTeleport");
+            settings.AllowLandmark = reader.GetBool("AllowLandmark");
+            settings.AllowDirectTeleport = reader.GetBool("AllowDirectTeleport");
 
             return settings;
         }
@@ -110,6 +113,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                     data["SunPosition"] = value.SunPosition;
                     data["IsSunFixed"] = value.IsSunFixed;
                     data["UseEstateSun"] = value.UseEstateSun;
+                    data["BlockDwell"] = value.BlockDwell;
+                    data["ResetHomeOnTeleport"] = value.ResetHomeOnTeleport;
+                    data["AllowLandmark"] = value.AllowLandmark;
+                    data["AllowDirectTeleport"] = value.AllowDirectTeleport;
 
                     conn.ReplaceInto("regionsettings", data);
                 }

@@ -325,7 +325,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public abstract RegionOptionFlags GetRegionFlags();
         public abstract void ReregisterRegion();
         public GridServiceInterface RegionStorage { get; set; }
 

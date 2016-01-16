@@ -126,7 +126,7 @@ namespace SilverSim.Viewer.Core
             {
                 stats.RegionX = scene.GridPosition.X;
                 stats.RegionY = scene.GridPosition.Y;
-                RegionOptionFlags regionFlags = scene.GetRegionFlags();
+                RegionOptionFlags regionFlags = scene.RegionSettings.AsFlags;
                 stats.RegionFlags = (uint)regionFlags;
                 stats.RegionFlagsExtended.Add((ulong)regionFlags);
             }

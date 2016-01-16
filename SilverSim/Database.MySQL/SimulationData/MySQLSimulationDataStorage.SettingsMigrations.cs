@@ -133,6 +133,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<bool>("UseEstateSun") { IsNullAllowed = false, Default = true },
             new AddColumn<bool>("IsSunFixed") { IsNullAllowed = false, Default = false },
             new AddColumn<double>("SunPosition") { IsNullAllowed = false, Default = (double)0 },
+            new TableRevision(3),
+            new AddColumn<bool>("BlockDwell") { IsNullAllowed = false, Default = true },
+            new AddColumn<bool>("ResetHomeOnTeleport") { IsNullAllowed = false, Default = false },
+            new TableRevision(4),
+            new AddColumn<bool>("AllowDirectTeleport") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("AllowLandmark") { IsNullAllowed = false, Default = false },
             #endregion
         };
     }
