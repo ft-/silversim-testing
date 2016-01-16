@@ -926,19 +926,15 @@ namespace SilverSim.Scene.Types.Scene
             ObjectPart part;
             RwLockedList<UUID> selectedObjects = agent.SelectedObjects(ID);
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            foreach (uint primLocalID in req.ObjectData)
             {
-                foreach (uint primLocalID in req.ObjectData)
+                if (!Primitives.TryGetValue(primLocalID, out part))
                 {
-                    if (!Primitives.TryGetValue(primLocalID, out part))
-                    {
-                        continue;
-                    }
-
-                    selectedObjects.Remove(part.ID);
-                    agent.ScheduleUpdate(part.UpdateInfo, ID);
-                    propHandler.Send(part);
+                    continue;
                 }
+
+                selectedObjects.Remove(part.ID);
+                agent.ScheduleUpdate(part.UpdateInfo, ID);
             }
         }
 
