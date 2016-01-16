@@ -739,6 +739,28 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #endregion
 
+        public override void RelocateRegion(GridVector location)
+        {
+            RegionInfo ri = GetRegionInfo();
+            ri.Location = location;
+            try
+            {
+                GridService.RegisterRegion(ri);
+            }
+            catch
+            {
+                throw;
+            }
+            GridPosition = location;
+            
+            GridServiceInterface regionStorage = RegionStorage;
+            if (null != regionStorage)
+            {
+                regionStorage.RegisterRegion(ri);
+            }
+
+        }
+
         public override void ReregisterRegion()
         {
             RegionInfo ri = GetRegionInfo();

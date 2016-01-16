@@ -326,6 +326,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         public abstract void ReregisterRegion();
+        public abstract void RelocateRegion(GridVector location);
         public GridServiceInterface RegionStorage { get; set; }
 
         public SceneInterface(UInt32 sizeX, UInt32 sizeY)

@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Region;
@@ -49,20 +50,35 @@ namespace SilverSim.Viewer.Core
 
             uint regionFlags = req.RegionFlags;
 
-#if SUPPORT_REDIRECT_XY
-            if(req.RedirectGridX != 0)
+            if ((req.RedirectGridX != 0 || req.RedirectGridY != 0) && Scene.IsEstateManager(Agent.Owner))
             {
-                Scene.RegionData.Location.GridX = (ushort)req.RedirectGridX;
+                /* EO and EM only */
+                GridVector newLocation = Scene.GridPosition;
+                if (req.RedirectGridX > 0 && req.RedirectGridX <= 65535)
+                {
+                    newLocation.GridX = (ushort)req.RedirectGridX;
+                }
+
+                if (req.RedirectGridY > 0 && req.RedirectGridY <= 65535)
+                {
+                    newLocation.GridY = (ushort)req.RedirectGridY;
+                }
+                try
+                {
+                    Scene.RelocateRegion(newLocation);
+                }
+                catch
+                {
+                    Agent.SendAlertMessage(this.GetLanguageString(Agent.CurrentCulture, "YouAreNotPermittedToRelocateRegion", "You are not permitted to relocate region."), Scene.ID);
+                }
             }
 
-            if (req.RedirectGridY != 0)
+            if (Scene.Name != req.SimName)
             {
-                Scene.RegionData.Location.GridX = (ushort)req.RedirectGridY;
+                /* only process reregistration when sim name changes */
+                Scene.Name = req.SimName;
+                Scene.ReregisterRegion();
             }
-#endif
-
-            Scene.Name = req.SimName;
-            Scene.ReregisterRegion();
             Scene.RegionSettings.IsSunFixed = (regionFlags & (uint)RegionOptionFlags.SunFixed) != 0;
             Scene.RegionSettings.BlockDwell = (regionFlags & (uint)RegionOptionFlags.BlockDwell) != 0;
             Scene.RegionSettings.AllowDamage = (regionFlags & (uint)RegionOptionFlags.AllowDamage) != 0;
