@@ -391,6 +391,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 data.Add("PayPrice4", objgroup.PayPrice4);
                 data.Add("AttachedPos", objgroup.AttachedPos);
                 data.Add("AttachPoint", objgroup.AttachPoint);
+                data.Add("IsIncludedInSearch", objgroup.IsIncludedInSearch);
                 return data;
             }
 

@@ -95,6 +95,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             objgroup.PayPrice4 = dbReader.GetInt32("PayPrice4");
             objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
             objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
+            objgroup.IsIncludedInSearch = dbReader.GetBool("IsIncludedInSearch");
             return objgroup;
         }
 

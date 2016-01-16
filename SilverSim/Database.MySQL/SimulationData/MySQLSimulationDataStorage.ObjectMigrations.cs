@@ -44,6 +44,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<AttachmentPoint>("AttachPoint") { IsNullAllowed = false, Default = AttachmentPoint.NotAttached },
             new TableRevision(5),
             new NamedKeyInfo("RegionID", "RegionID"),
+            new TableRevision(6),
+            new AddColumn<bool>("IsIncludedInSearch") { IsNullAllowed = false, Default = false },
             #endregion
 
             #region Table prims
