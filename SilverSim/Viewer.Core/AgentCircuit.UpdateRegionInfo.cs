@@ -50,24 +50,31 @@ namespace SilverSim.Viewer.Core
 
             uint regionFlags = req.RegionFlags;
 
-            if ((req.RedirectGridX != 0 || req.RedirectGridY != 0) && Scene.IsEstateManager(Agent.Owner))
+            if ((req.RedirectGridX != 0 || req.RedirectGridY != 0))
             {
-                /* EO and EM only */
-                GridVector newLocation = Scene.GridPosition;
-                if (req.RedirectGridX > 0 && req.RedirectGridX <= 65535)
+                if (Scene.IsEstateManager(Agent.Owner))
                 {
-                    newLocation.GridX = (ushort)req.RedirectGridX;
-                }
+                    /* EO and EM only */
+                    GridVector newLocation = Scene.GridPosition;
+                    if (req.RedirectGridX > 0 && req.RedirectGridX <= 65535)
+                    {
+                        newLocation.GridX = (ushort)req.RedirectGridX;
+                    }
 
-                if (req.RedirectGridY > 0 && req.RedirectGridY <= 65535)
-                {
-                    newLocation.GridY = (ushort)req.RedirectGridY;
+                    if (req.RedirectGridY > 0 && req.RedirectGridY <= 65535)
+                    {
+                        newLocation.GridY = (ushort)req.RedirectGridY;
+                    }
+                    try
+                    {
+                        Scene.RelocateRegion(newLocation);
+                    }
+                    catch
+                    {
+                        Agent.SendAlertMessage(this.GetLanguageString(Agent.CurrentCulture, "ItHasNotBeenPossibleToRelocateRegion", "It has not been possible to relocate region."), Scene.ID);
+                    }
                 }
-                try
-                {
-                    Scene.RelocateRegion(newLocation);
-                }
-                catch
+                else
                 {
                     Agent.SendAlertMessage(this.GetLanguageString(Agent.CurrentCulture, "YouAreNotPermittedToRelocateRegion", "You are not permitted to relocate region."), Scene.ID);
                 }
