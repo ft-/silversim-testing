@@ -424,7 +424,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    GodlikeMessageHandlerAttribute[] godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GenericMessageHandlerAttribute));
+                    GodlikeMessageHandlerAttribute[] godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GodlikeMessageHandlerAttribute));
                     foreach (GodlikeMessageHandlerAttribute gm in godms)
                     {
                         if (m_GodlikeMessageRouting.ContainsKey(gm.Method))

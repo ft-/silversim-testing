@@ -158,7 +158,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 m_LastFpsTickCount = System.Environment.TickCount;
                 lock (m_EnvironmentLock)
                 {
-                    m_EnvironmentFps = m_CountedTicks * (double)timeDiff / 1000f;
+                    m_EnvironmentFps = m_CountedTicks * 1000f / (double)timeDiff;
                 }
                 m_CountedTicks = 0;
             }
