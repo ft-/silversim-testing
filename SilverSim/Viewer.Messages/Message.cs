@@ -96,6 +96,16 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
+    public sealed class GodlikeMessageHandlerAttribute : Attribute
+    {
+        public string Method { get; private set; }
+        public GodlikeMessageHandlerAttribute(string method)
+        {
+            Method = method;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public sealed class IMMessageHandlerAttribute : Attribute
     {
         public GridInstantMessageDialog Dialog { get; private set; }

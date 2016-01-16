@@ -15,6 +15,7 @@ using System.Text;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Viewer.Messages.Agent;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Types.IM;
 
 namespace SilverSim.Viewer.Core
 {
@@ -28,6 +29,11 @@ namespace SilverSim.Viewer.Core
         public GridVector RemoteLocation { get; protected set; }
         /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
         public Vector3 RemoteOffset { get; protected set; }
+
+        readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
+        readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
+        readonly Dictionary<string, Action<Message>> m_GodlikeMessageRouting = new Dictionary<string, Action<Message>>();
+        readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
         public SimCircuit(
             UDPCircuitsManager server,
@@ -150,14 +156,26 @@ namespace SilverSim.Viewer.Core
                         }
                         else if (m.Number == MessageType.GenericMessage)
                         {
-                            SilverSim.Viewer.Messages.Generic.GenericMessage genMsg = (SilverSim.Viewer.Messages.Generic.GenericMessage)m;
+                            Messages.Generic.GenericMessage genMsg = (Messages.Generic.GenericMessage)m;
                             if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
                             {
                                 mdel(m);
                             }
                             else
                             {
-                                m_Log.DebugFormat("Unhandled generic message {0} received", m.Number.ToString());
+                                m_Log.DebugFormat("Unhandled generic message {0} received", genMsg.Method);
+                            }
+                        }
+                        else if (m.Number == MessageType.GodlikeMessage)
+                        {
+                            Messages.Generic.GodlikeMessage genMsg = (Messages.Generic.GodlikeMessage)m;
+                            if (m_GodlikeMessageRouting.TryGetValue(genMsg.Method, out mdel))
+                            {
+                                mdel(m);
+                            }
+                            else
+                            {
+                                m_Log.DebugFormat("Unhandled godlike message {0} received", genMsg.Method);
                             }
                         }
                         else

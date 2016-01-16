@@ -38,6 +38,11 @@ namespace SilverSim.Viewer.Core
         private ChatServiceInterface.Listener m_ChatListener;
         private ChatServiceInterface.Listener m_DebugChannelListener;
 
+        readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
+        readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
+        readonly Dictionary<string, Action<Message>> m_GodlikeMessageRouting = new Dictionary<string, Action<Message>>();
+        readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
+
         private Thread m_TextureDownloadThread;
         private bool m_TextureDownloadThreadRunning;
         readonly BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
@@ -382,7 +387,7 @@ namespace SilverSim.Viewer.Core
                         {
                             m_Log.FatalFormat("Field {0} of {1} registered duplicate message {1}", fi.Name, t.GetType(), pa.Number.ToString());
                         }
-                        else if(pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage)
+                        else if(pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage || pa.Number == MessageType.GodlikeMessage)
                         {
                             m_Log.FatalFormat("Field {0} of {1} tries to register unallowed message {1}", fi.Name, t.GetType(), pa.Number.ToString());
                         }
@@ -419,6 +424,26 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
+                    GodlikeMessageHandlerAttribute[] godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GenericMessageHandlerAttribute));
+                    foreach (GodlikeMessageHandlerAttribute gm in godms)
+                    {
+                        if (m_GodlikeMessageRouting.ContainsKey(gm.Method))
+                        {
+                            m_Log.FatalFormat("Field {0} of {1} registered duplicate godlike {1}", fi.Name, t.GetType(), gm.Method);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                m_GodlikeMessageRouting.Add(gm.Method, DeriveActionDelegateFromFieldInfo(fi, t, o, "godlike " + gm.Method));
+                            }
+                            catch
+                            {
+                                m_Log.WarnFormat("Tried duplicate registration of godlike message {0}", gm.Method);
+                            }
+                        }
+                    }
+
                     IMMessageHandlerAttribute[] ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(IMMessageHandlerAttribute));
                     foreach (IMMessageHandlerAttribute im in ims)
                     {
@@ -448,6 +473,7 @@ namespace SilverSim.Viewer.Core
                     }
                     PacketHandlerAttribute[] pas = (PacketHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(PacketHandlerAttribute));
                     GenericMessageHandlerAttribute[] gms = (GenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(GenericMessageHandlerAttribute));
+                    GodlikeMessageHandlerAttribute[] godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(GodlikeMessageHandlerAttribute));
                     IMMessageHandlerAttribute[] ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(IMMessageHandlerAttribute));
 
                     foreach (PacketHandlerAttribute pa in pas)
@@ -456,7 +482,7 @@ namespace SilverSim.Viewer.Core
                         {
                             m_Log.FatalFormat("Method {0} registered duplicate message {1}", mi.Name, pa.Number.ToString());
                         }
-                        else if (pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage)
+                        else if (pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage || pa.Number == MessageType.GodlikeMessage)
                         {
                             m_Log.FatalFormat("Method {0} tries to register unallowed message {1}", mi.Name, pa.Number.ToString());
                         }
@@ -483,11 +509,30 @@ namespace SilverSim.Viewer.Core
                         {
                             try
                             {
-                                m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "message " + gm.Method));
+                                m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "generic " + gm.Method));
                             }
                             catch
                             {
                                 m_Log.WarnFormat("Tried duplicate registration of generic message {0}", gm.Method.ToString());
+                            }
+                        }
+                    }
+
+                    foreach (GodlikeMessageHandlerAttribute gm in godms)
+                    {
+                        if (m_GodlikeMessageRouting.ContainsKey(gm.Method))
+                        {
+                            m_Log.FatalFormat("Method {0} registered duplicate godlike {1}", mi.Name, gm.Method);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                m_GodlikeMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "godlike " + gm.Method));
+                            }
+                            catch
+                            {
+                                m_Log.WarnFormat("Tried duplicate registration of godlike message {0}", gm.Method.ToString());
                             }
                         }
                     }
@@ -864,7 +909,19 @@ namespace SilverSim.Viewer.Core
                             }
                             else
                             {
-                                m_Log.DebugFormat("Unhandled generic message {0} received", m.Number.ToString());
+                                m_Log.DebugFormat("Unhandled generic message {0} received", genMsg.Method);
+                            }
+                        }
+                        else if (m.Number == MessageType.GodlikeMessage)
+                        {
+                            Messages.Generic.GodlikeMessage genMsg = (Messages.Generic.GodlikeMessage)m;
+                            if (m_GodlikeMessageRouting.TryGetValue(genMsg.Method, out mdel))
+                            {
+                                mdel(m);
+                            }
+                            else
+                            {
+                                m_Log.DebugFormat("Unhandled godlike message {0} received", genMsg.Method);
                             }
                         }
                         else

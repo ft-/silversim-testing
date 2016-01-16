@@ -4,9 +4,9 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
+using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Object;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -177,6 +177,11 @@ namespace SilverSim.Viewer.Core
                 }
                 flags |= Types.Primitive.PrimitiveFlags.ObjectAnyOwner;
 
+                if(SelectedObjects.Count != 0 && SelectedObjects.Contains(kvp.Key.Part.ID))
+                {
+                    flags |= Types.Primitive.PrimitiveFlags.CreateSelected;
+                }
+
                 b = BitConverter.GetBytes((UInt32)flags);
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -193,6 +198,7 @@ namespace SilverSim.Viewer.Core
         {
             UInt64 regionHandle;
             C5.TreeDictionary<UInt32, int> LastObjSerialNo = new C5.TreeDictionary<uint, int>();
+            C5.TreeSet<UUID> SendSelectedObjects = new C5.TreeSet<UUID>();
             Queue<ObjectUpdateInfo>[] queues = new Queue<ObjectUpdateInfo>[2];
             Queue<ObjectUpdateInfo> physicalOutQueue = new Queue<ObjectUpdateInfo>();
             Queue<ObjectUpdateInfo> nonPhysicalOutQueue = new Queue<ObjectUpdateInfo>();
@@ -333,6 +339,18 @@ namespace SilverSim.Viewer.Core
                             else
                             {
                                 dofull = true;
+                            }
+
+                            bool isSelected = SelectedObjects.Contains(ui.Part.ID);
+                            bool wasSelected = SendSelectedObjects.Contains(ui.Part.ID);
+                            dofull |= (wasSelected && !isSelected) || (isSelected && !wasSelected);
+                            if(wasSelected && !isSelected)
+                            {
+                                SendSelectedObjects.Remove(ui.Part.ID);
+                            }
+                            else if(isSelected && !wasSelected)
+                            {
+                                SendSelectedObjects.Add(ui.Part.ID);
                             }
 
                             if (dofull)

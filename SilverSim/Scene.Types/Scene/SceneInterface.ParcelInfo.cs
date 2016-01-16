@@ -359,5 +359,29 @@ namespace SilverSim.Scene.Types.Scene
                 Agents[req.AgentID].SendMessageAlways(props, ID);
             }
         }
+
+        [PacketHandler(MessageType.ParcelGodForceOwner)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        public void HandleParcelGodForceOwner(Message m)
+        {
+            ParcelGodForceOwner req = (ParcelGodForceOwner)m;
+            UUI agentID;
+            ParcelInfo pInfo;
+            IAgent godAgent;
+            if(req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID ||
+                req.OwnerID != req.AgentID ||
+                !Agents.TryGetValue(req.AgentID, out godAgent) ||
+                !AvatarNameService.TryGetValue(req.OwnerID, out agentID) ||
+                !Parcels.TryGetValue(req.LocalID, out pInfo) ||
+                !godAgent.IsActiveGod ||
+                !godAgent.IsInScene(this))
+            {
+                return;
+            }
+            m_Log.InfoFormat("Forced parcel {0} ({1}) to be owned by {2}", pInfo.Name, pInfo.ID, agentID.FullName);
+            pInfo.Owner = agentID;
+            TriggerParcelUpdate(pInfo);
+        }
     }
 }

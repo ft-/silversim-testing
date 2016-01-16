@@ -4,6 +4,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
@@ -819,6 +820,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ObjectPart part;
+            RwLockedList<UUID> selectedObjects = agent.SelectedObjects(ID);
 
             using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
@@ -831,6 +833,12 @@ namespace SilverSim.Scene.Types.Scene
                     if (!Primitives.TryGetValue(primLocalID, out part))
                     {
                         continue;
+                    }
+
+                    if (!selectedObjects.Contains(part.ID))
+                    {
+                        selectedObjects.Add(part.ID);
+                        agent.ScheduleUpdate(part.UpdateInfo, ID);
                     }
 
                     propHandler.Send(part);
@@ -916,6 +924,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ObjectPart part;
+            RwLockedList<UUID> selectedObjects = agent.SelectedObjects(ID);
 
             using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
@@ -926,6 +935,8 @@ namespace SilverSim.Scene.Types.Scene
                         continue;
                     }
 
+                    selectedObjects.Remove(part.ID);
+                    agent.ScheduleUpdate(part.UpdateInfo, ID);
                     propHandler.Send(part);
                 }
             }
