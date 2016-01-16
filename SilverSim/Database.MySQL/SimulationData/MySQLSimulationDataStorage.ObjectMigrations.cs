@@ -162,6 +162,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
             new NamedKeyInfo("RegionID", "RegionID"),
             new PrimaryKeyInfo("RegionID", "PrimID", "InventoryID"),
+            new TableRevision(6),
+            new AddColumn<UUID>("NextOwnerAssetID") { IsNullAllowed = false, Default = UUID.Zero },
 
             #endregion
         };

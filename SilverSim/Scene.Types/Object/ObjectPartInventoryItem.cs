@@ -94,6 +94,8 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public UUID NextOwnerAssetID = UUID.Zero;
+
         private PermsGranterInfo m_PermsGranter;
         readonly object m_PermsGranterLock = new object();
         public PermsGranterInfo PermsGranter 

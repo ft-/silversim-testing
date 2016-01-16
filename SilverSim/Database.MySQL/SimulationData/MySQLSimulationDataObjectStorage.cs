@@ -216,6 +216,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             item.SaleInfo.Type = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
             item.SaleInfo.Price = dbReader.GetInt32("SalePrice");
             item.SaleInfo.PermMask = dbReader.GetEnum<InventoryPermissionsMask>("SalePermMask");
+            item.NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID");
             ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
             if (((string)dbReader["PermsGranter"]).Length != 0)
             {

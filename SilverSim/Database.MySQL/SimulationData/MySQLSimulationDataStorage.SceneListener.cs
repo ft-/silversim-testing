@@ -170,16 +170,13 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                             foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in items)
                             {
-                                if (!knownInventory.Contains(kvp.Key))
+                                Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
+                                data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
+                                if (replaceIntoPrimItems.Length == 0)
                                 {
-                                    Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
-                                    data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
-                                    if (replaceIntoPrimItems.Length == 0)
-                                    {
-                                        replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
-                                    }
-                                    updatePrimItemsRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
+                                    replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
                                 }
+                                updatePrimItemsRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
                             }
                         }
                         else
@@ -367,6 +364,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
                 data.Add("PermsGranter", grantinfo.PermsGranter.ToString());
                 data.Add("PermsMask", grantinfo.PermsMask);
+                data.Add("NextOwnerAssetID", item.NextOwnerAssetID);
                 return data;
             }
 
