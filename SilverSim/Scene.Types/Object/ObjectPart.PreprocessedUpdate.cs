@@ -433,8 +433,6 @@ namespace SilverSim.Scene.Types.Object
                         //ItemID = InventorySerial + 2,
                         //FolderID = ItemID + 16,
                         //FromTaskID = FolderID + 16,
-
-                        m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.SaleType] = (byte)ObjectGroup.SaleType;
                     }
 
                     Buffer.BlockCopy(m_PropUpdateFixedBlock, 0, newPropData, offset, m_PropUpdateFixedBlock.Length);
