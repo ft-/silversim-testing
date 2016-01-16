@@ -56,6 +56,7 @@ namespace SilverSim.Viewer.Core
                 {
                     /* EO and EM only */
                     GridVector newLocation = Scene.GridPosition;
+                    GridVector oldLocation = newLocation;
                     if (req.RedirectGridX > 0 && req.RedirectGridX <= 65535)
                     {
                         newLocation.GridX = (ushort)req.RedirectGridX;
@@ -68,6 +69,7 @@ namespace SilverSim.Viewer.Core
                     try
                     {
                         Scene.RelocateRegion(newLocation);
+                        m_Log.InfoFormat("Changed location of {0} ({1}) from {2} to {3}", Scene.Name, Scene.ID, oldLocation.GridLocation, newLocation.GridLocation);
                     }
                     catch
                     {
@@ -83,6 +85,7 @@ namespace SilverSim.Viewer.Core
             if (Scene.Name != req.SimName)
             {
                 /* only process reregistration when sim name changes */
+                m_Log.InfoFormat("Changing name of {0} ({1}) to {2}", Scene.Name, Scene.ID, req.SimName);
                 Scene.Name = req.SimName;
                 Scene.ReregisterRegion();
             }
