@@ -671,6 +671,27 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            {
+                foreach (ObjectIncludeInSearch.Data d in req.ObjectData)
+                {
+                    ObjectPart part;
+                    if (!Primitives.TryGetValue(d.ObjectLocalID, out part))
+                    {
+                        continue;
+                    }
+
+                    part.ObjectGroup.IsIncludedInSearch = d.IncludeInSearch;
+                    propHandler.Send(part);
+                }
+            }
         }
 
         [PacketHandler(MessageType.ObjectFlagUpdate)]
@@ -681,6 +702,45 @@ namespace SilverSim.Scene.Types.Scene
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
+            {
+                return;
+            }
+
+            Object.ObjectGroup grp = part.ObjectGroup;
+            if(null == grp)
+            {
+                return;
+            }
+
+            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            {
+                grp.IsPhantom = req.IsPhantom;
+                grp.IsTempOnRez = req.IsTemporary;
+                grp.IsPhysics = req.UsePhysics;
+                if(!req.IsTemporary && grp.IsTemporary)
+                {
+                    grp.IsTemporary = false;
+                }
+                if(req.ExtraPhysics.Count != 0)
+                {
+                    ObjectFlagUpdate.ExtraPhysicsData d = req.ExtraPhysics[0];
+                    part.PhysicsShapeType = d.PhysicsShapeType;
+                    part.PhysicsDensity = d.Density;
+                    part.PhysicsFriction = d.Friction;
+                    part.PhysicsRestitution = d.Restitution;
+                    part.PhysicsGravityMultiplier = d.GravityMultiplier;
+                }
+                propHandler.Send(part);
             }
         }
 

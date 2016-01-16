@@ -75,6 +75,7 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsTempOnRez;
         private bool m_IsTemporary;
         private bool m_IsGroupOwned;
+        private bool m_IsIncludedInSearch;
         private AttachmentPoint m_AttachPoint;
         private Vector3 m_AttachedPos = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
@@ -220,6 +221,20 @@ namespace SilverSim.Scene.Types.Object
         public int m_PayPrice2 = -1;
         public int m_PayPrice3 = -1;
         public int m_PayPrice4 = -1;
+
+        public bool IsIncludedInSearch
+        {
+            get
+            {
+                return m_IsIncludedInSearch;
+            }
+            set
+            {
+                m_IsIncludedInSearch = value;
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
 
         public int PayPrice0
         {

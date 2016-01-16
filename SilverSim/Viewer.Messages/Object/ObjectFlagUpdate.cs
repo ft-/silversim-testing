@@ -2,7 +2,9 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Object
 {
@@ -20,6 +22,17 @@ namespace SilverSim.Viewer.Messages.Object
         public bool IsPhantom;
         public bool CastsShadows;
 
+        public struct ExtraPhysicsData
+        {
+            public PrimitivePhysicsShapeType PhysicsShapeType;
+            public double Density;
+            public double Friction;
+            public double Restitution;
+            public double GravityMultiplier;
+        }
+
+        public List<ExtraPhysicsData> ExtraPhysics = new List<ExtraPhysicsData>();
+
         public ObjectFlagUpdate()
         {
 
@@ -35,6 +48,18 @@ namespace SilverSim.Viewer.Messages.Object
             m.IsTemporary = p.ReadBoolean();
             m.IsPhantom = p.ReadBoolean();
             m.CastsShadows = p.ReadBoolean();
+
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                ExtraPhysicsData data = new ExtraPhysicsData();
+                data.PhysicsShapeType = (PrimitivePhysicsShapeType)p.ReadUInt8();
+                data.Density = p.ReadFloat();
+                data.Friction = p.ReadFloat();
+                data.Restitution = p.ReadFloat();
+                data.GravityMultiplier = p.ReadFloat();
+                m.ExtraPhysics.Add(data);
+            }
             return m;
         }
 
@@ -47,6 +72,15 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteBoolean(IsTemporary);
             p.WriteBoolean(IsPhantom);
             p.WriteBoolean(CastsShadows);
+            p.WriteUInt8((byte)ExtraPhysics.Count);
+            foreach(ExtraPhysicsData data in ExtraPhysics)
+            {
+                p.WriteUInt8((byte)data.PhysicsShapeType);
+                p.WriteFloat((float)data.Density);
+                p.WriteFloat((float)data.Friction);
+                p.WriteFloat((float)data.Restitution);
+                p.WriteFloat((float)data.GravityMultiplier);
+            }
         }
     }
 }

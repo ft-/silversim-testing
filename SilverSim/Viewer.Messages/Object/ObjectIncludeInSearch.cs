@@ -3,6 +3,7 @@
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Object
 {
@@ -13,8 +14,13 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public UUID AgentID;
         public UUID SessionID;
-        public UInt32 ObjectLocalID;
-        public bool IncludeInSearch;
+        public struct Data
+        {
+            public UInt32 ObjectLocalID;
+            public bool IncludeInSearch;
+        }
+
+        public List<Data> ObjectData = new List<Data>();
 
         public ObjectIncludeInSearch()
         {
@@ -26,8 +32,14 @@ namespace SilverSim.Viewer.Messages.Object
             ObjectIncludeInSearch m = new ObjectIncludeInSearch();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.ObjectLocalID = p.ReadUInt32();
-            m.IncludeInSearch = p.ReadBoolean();
+            uint n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                Data d = new Data();
+                d.ObjectLocalID = p.ReadUInt32();
+                d.IncludeInSearch = p.ReadBoolean();
+                m.ObjectData.Add(d);
+            }
 
             return m;
         }
@@ -36,8 +48,12 @@ namespace SilverSim.Viewer.Messages.Object
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
-            p.WriteUInt32(ObjectLocalID);
-            p.WriteBoolean(IncludeInSearch);
+            p.WriteUInt8((byte)ObjectData.Count);
+            foreach (Data d in ObjectData)
+            {
+                p.WriteUInt32(d.ObjectLocalID);
+                p.WriteBoolean(d.IncludeInSearch);
+            }
         }
     }
 }
