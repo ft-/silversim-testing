@@ -113,6 +113,9 @@ namespace SilverSim.Scene.Types.Transfer
                                 break;
                             }
                             break;
+
+                        default:
+                            break;
                     }
                 }
             }

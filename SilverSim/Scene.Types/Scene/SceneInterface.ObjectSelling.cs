@@ -180,6 +180,7 @@ namespace SilverSim.Scene.Types.Scene
                         switch (grp.SaleType)
                         {
                             case InventoryItem.SaleInfoData.SaleType.NoSale:
+                            default:
                                 continue;
 
                             case InventoryItem.SaleInfoData.SaleType.Original:
