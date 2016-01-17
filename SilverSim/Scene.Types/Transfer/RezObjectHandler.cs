@@ -89,7 +89,6 @@ namespace SilverSim.Scene.Types.Transfer
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void AssetTransferFailed(Exception e)
         {
             IAgent agent;
