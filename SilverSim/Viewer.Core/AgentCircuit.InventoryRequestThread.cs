@@ -983,7 +983,7 @@ namespace SilverSim.Viewer.Core
             AssetData asset = gesture;
             asset.Name = "New Gesture";
             asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
-            asset.ID = new UUID("cf83499a- 6547 - 4b07 - 8669 - ff1d567071d3");
+            asset.ID = new UUID("cf83499a-6547-4b07-8669-ff1d567071d3");
             try
             {
                 Agent.AssetService.Store(asset);
