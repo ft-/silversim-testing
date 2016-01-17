@@ -3,7 +3,6 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Asset
