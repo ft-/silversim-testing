@@ -230,6 +230,7 @@ namespace SilverSim.Scene.Types.Scene
                     item.InventoryType = InventoryType.Object;
                     item.Name = grp.Name;
                     item.Description = grp.Description;
+                    item.LastOwner = grp.Owner;
                     item.Owner = targetAgent;
                     item.Creator = grp.RootPart.Creator;
                     item.CreationDate = grp.RootPart.CreationDate;
