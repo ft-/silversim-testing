@@ -9,6 +9,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using SilverSim.Viewer.Messages.Inventory;
 using System;
 using System.Collections.Generic;
 
@@ -113,9 +114,17 @@ namespace SilverSim.Scene.Types.Scene
             public override void AssetTransferComplete()
             {
                 InventoryFolder folder;
-                if(m_DestinationFolder.Length == 0)
+                SceneInterface scene = null;
+                IAgent agent = null;
+                if (!TryGetScene(m_SceneID, out scene) ||
+                    !scene.Agents.TryGetValue(m_DestinationAgent.ID, out agent))
                 {
-                    if (!m_InventoryService.Folder.TryGetValue(m_DestinationAgent.ID, AssetType.Object, out folder))
+                    agent = null;
+                }
+
+                if (m_DestinationFolder.Length == 0)
+                {
+                    if (!m_InventoryService.Folder.TryGetValue(m_DestinationAgent.ID, m_DestinationFolderType, out folder))
                     {
                         return;
                     }
@@ -135,14 +144,33 @@ namespace SilverSim.Scene.Types.Scene
                     folder.Name = m_DestinationFolder;
                     folder.ID = UUID.Random;
                     m_InventoryService.Folder.Add(folder);
+
+                    if (agent != null)
+                    {
+                        BulkUpdateInventory msg = new BulkUpdateInventory();
+                        msg.AgentID = m_DestinationAgent.ID;
+                        msg.TransactionID = UUID.Zero;
+                        msg.AddInventoryFolder(folder);
+                        agent.SendMessageAlways(msg, m_SceneID);
+                    }
                 }
-                
-                foreach(ObjectPartInventoryItem sellItem in m_Items)
+
+                foreach(InventoryItem sellItem in m_Items)
                 {
                     InventoryItem item = new InventoryItem(sellItem);
+                    item.LastOwner = item.Owner;
                     item.Owner = m_DestinationAgent;
                     item.ParentFolderID = folder.ID;
+                    item.IsGroupOwned = false;
                     m_InventoryService.Item.Add(item);
+                    if (null != agent)
+                    {
+                        UpdateCreateInventoryItem msg = new UpdateCreateInventoryItem();
+                        msg.AgentID = m_DestinationAgent.ID;
+                        msg.AddItem(item, 0);
+                        msg.SimApproved = true;
+                        agent.SendMessageAlways(msg, m_SceneID);
+                    }
                 }
             }
 

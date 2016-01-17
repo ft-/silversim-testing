@@ -91,6 +91,16 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         }
 
+        public void AddInventoryFolder(InventoryFolder folder)
+        {
+            FolderDataEntry e = new FolderDataEntry();
+            e.FolderID = folder.ID;
+            e.ParentID = folder.ParentFolderID;
+            e.Type = folder.InventoryType;
+            e.Name = folder.Name;
+            FolderData.Add(e);
+        }
+
         public void AddInventoryItem(InventoryItem item, UInt32 callbackID)
         {
             ItemDataEntry e = new ItemDataEntry();

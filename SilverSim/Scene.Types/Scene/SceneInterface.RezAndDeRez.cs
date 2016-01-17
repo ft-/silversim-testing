@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.Transfer;
+using DeRezAction = SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -88,14 +89,14 @@ namespace SilverSim.Scene.Types.Scene
 
             switch (req.Destination)
             {
-                case Viewer.Messages.Object.DeRezObject.DeRezAction.GodTakeCopy:
+                case DeRezAction.GodTakeCopy:
                     if (!isActiveGod || !agent.IsInScene(this))
                     {
                         return;
                     }
                     break;
 
-                case Viewer.Messages.Object.DeRezObject.DeRezAction.Delete:
+                case DeRezAction.DeleteToTrash:
                     foreach (ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
@@ -110,7 +111,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     break;
 
-                case Viewer.Messages.Object.DeRezObject.DeRezAction.Return:
+                case DeRezAction.ReturnToOwner:
                     foreach (ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
@@ -129,14 +130,14 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     break;
 
-                case Viewer.Messages.Object.DeRezObject.DeRezAction.SaveToExistingUserInventoryItem:
+                case DeRezAction.SaveIntoAgentInventory:
                     ackres = new Viewer.Messages.Object.DeRezAck();
                     ackres.TransactionID = req.TransactionID;
                     ackres.Success = false;
                     agent.SendMessageAlways(ackres, ID);
                     return;
 
-                case Viewer.Messages.Object.DeRezObject.DeRezAction.Take:
+                case DeRezAction.Take:
                     foreach (ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
@@ -155,7 +156,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     break;
 
-                case Viewer.Messages.Object.DeRezObject.DeRezAction.TakeCopy:
+                case DeRezAction.TakeCopy:
                     foreach (ObjectGroup grp in objectgroups)
                     {
                         if (!CanTakeCopy(agent, grp, grp.Position))
@@ -180,13 +181,24 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             Dictionary<UUI, List<InventoryItem>> copyItems = new Dictionary<UUI, List<InventoryItem>>();
-            if (req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.Return)
+            if (req.Destination != DeRezAction.ReturnToOwner)
             {
                 foreach (ObjectGroup grp in objectgroups)
                 {
                     UUID assetID;
                     bool changePermissions = false;
-                    UUI targetAgent = req.Destination == Viewer.Messages.Object.DeRezObject.DeRezAction.Return ? grp.Owner : agent.Owner;
+                    UUI targetAgent;
+                    switch (req.Destination)
+                    {
+                        case DeRezAction.ReturnToOwner:
+                            targetAgent = grp.Owner;
+                            break;
+
+                        default:
+                            targetAgent = agent.Owner;
+                            break;
+                    }
+
                     if (!targetAgent.EqualsGrid(agent.Owner))
                     {
                         assetID = grp.NextOwnerAssetID;
@@ -245,7 +257,7 @@ namespace SilverSim.Scene.Types.Scene
                         this,
                         assetIDs, 
                         kvp.Value, 
-                        req.Destination == Viewer.Messages.Object.DeRezObject.DeRezAction.Delete ? AssetType.TrashFolder : AssetType.Object).QueueWorkItem();
+                        req.Destination == DeRezAction.DeleteToTrash ? AssetType.TrashFolder : AssetType.Object).QueueWorkItem();
                 }
                 else
                 {

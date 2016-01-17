@@ -14,12 +14,28 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public enum DeRezAction : byte
         {
-            SaveToExistingUserInventoryItem = 0,
+            /* Save into existing item in agent inventory */
+            SaveIntoAgentInventory = 0,
+            /* Take a copy of the item */
             TakeCopy = 1,
+            /* Save derezzed item into task inventory */
+            SaveIntoTaskInventory = 2,
+            /* Attachment */
+            Attachment = 3,
+            /* Take the original of the item into agent inventory */
             Take = 4,
+            /* Take a copy of the item being a god */
             GodTakeCopy = 5,
-            Delete = 6,
-            Return = 9
+            /* Delete an item and putting it into trash */
+            DeleteToTrash = 6,
+            /* Save Attachment to inventory */
+            AttachmentToInv = 7,
+            /* Save attachment to existing inventory */
+            AttachmentExists = 8,
+            /* Return to owner */
+            ReturnToOwner = 9,
+            /* Return to last owner */
+            ReturnToLastOwner = 10
         }
 
         public UUID AgentID;
