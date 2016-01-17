@@ -418,11 +418,6 @@ namespace SilverSim.Scene.Types.Object
                                 item.Permissions.NextOwner = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
-                            case "OwnerID":
-                                /* Do not trust this ever! */
-                                reader.ReadToEndElement();
-                                break;
-
                             case "CurrentPermissions":
                                 item.Permissions.Current = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
@@ -443,6 +438,7 @@ namespace SilverSim.Scene.Types.Object
                                 ownerChanged = reader.ReadElementValueAsBoolean();
                                 break;
 
+                            case "OwnerID": /* Do not trust this ever! */
                             default:
                                 reader.ReadToEndElement();
                                 break;
