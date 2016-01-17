@@ -301,8 +301,8 @@ namespace SilverSim.Viewer.Core
                 msg.ParamList.Add(StringToBytes(((int)((estate.SunPosition + 6) * 1024)).ToString()));
             }
             msg.ParamList.Add(StringToBytes(estate.ParentEstateID.ToString()));
-            msg.ParamList.Add(estate.CovenantID.ToString().ToUTF8Bytes());
-            msg.ParamList.Add(estate.CovenantTimestamp.AsULong.ToString().ToUTF8Bytes());
+            msg.ParamList.Add(StringToBytes(estate.CovenantID.ToString()));
+            msg.ParamList.Add(StringToBytes(estate.CovenantTimestamp.AsULong.ToString()));
             msg.ParamList.Add(StringToBytes(sendToAgentOnly?"1":"0"));
             msg.ParamList.Add(StringToBytes(estate.AbuseEmail));
 
