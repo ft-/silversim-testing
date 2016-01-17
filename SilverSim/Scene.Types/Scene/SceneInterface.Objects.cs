@@ -1132,6 +1132,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 ObjectGrab.Data grabdata = req.ObjectData[0];
                 detectdata.TouchBinormal = grabdata.Binormal;
+                detectdata.TouchNormal = grabdata.Normal;
                 detectdata.TouchFace = grabdata.FaceIndex;
                 detectdata.TouchPosition = grabdata.Position;
                 detectdata.TouchST = grabdata.STCoord;
@@ -1175,6 +1176,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 ObjectGrabUpdate.Data grabdata = req.ObjectData[0];
                 detectdata.TouchBinormal = grabdata.Binormal;
+                detectdata.TouchNormal = grabdata.Normal;
                 detectdata.TouchFace = grabdata.FaceIndex;
                 detectdata.TouchPosition = grabdata.Position;
                 detectdata.TouchST = grabdata.STCoord;
@@ -1218,6 +1220,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 ObjectDeGrab.Data grabdata = req.ObjectData[0];
                 detectdata.TouchBinormal = grabdata.Binormal;
+                detectdata.TouchNormal = grabdata.Normal;
                 detectdata.TouchFace = grabdata.FaceIndex;
                 detectdata.TouchPosition = grabdata.Position;
                 detectdata.TouchST = grabdata.STCoord;
