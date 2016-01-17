@@ -3,12 +3,14 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Transfer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -138,6 +140,13 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
+            /* make object buy handle outside of the UDP Receive */
+            ThreadPool.UnsafeQueueUserWorkItem(HandleObjectBuyWorkItem, req);
+        }
+
+        public void HandleObjectBuyWorkItem(object o)
+        {
+            ObjectBuy req = (ObjectBuy)o;
             IAgent agent;
             if (!Agents.TryGetValue(req.AgentID, out agent))
             {
@@ -169,7 +178,10 @@ namespace SilverSim.Scene.Types.Scene
                         UUID assetID;
                         bool foundNoTransfer = false;
                         AssetData newAsset;
-
+                        if (grp.NextOwnerAssetID == UUID.Zero && !grp.Owner.EqualsGrid(agent.Owner))
+                        {
+                            AssetService.GenerateNextOwnerAssets(grp);
+                        }
                         switch (grp.SaleType)
                         {
                             case InventoryItem.SaleInfoData.SaleType.NoSale:
@@ -195,7 +207,7 @@ namespace SilverSim.Scene.Types.Scene
                                     assetID = grp.NextOwnerAssetID;
                                     if (assetID == UUID.Zero)
                                     {
-                                        newAsset = grp.Asset(agent.Owner, XmlSerializationOptions.WriteXml2 | XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.AdjustForNextOwner);
+                                        newAsset = grp.Asset(UUI.Unknown, XmlSerializationOptions.WriteXml2 | XmlSerializationOptions.AdjustForNextOwner);
                                         assetID = UUID.Random;
                                         newAsset.ID = assetID;
                                         AssetService.Store(newAsset);
@@ -261,12 +273,19 @@ namespace SilverSim.Scene.Types.Scene
                                 foreach (ObjectPartInventoryItem item in part.Inventory.Values)
                                 {
                                     assetID = item.NextOwnerAssetID;
-                                    if(assetID == UUID.Zero)
+                                    if(assetID == UUID.Zero && !item.Owner.EqualsGrid(agent.Owner))
                                     {
                                         /* create next owner asset id */
+                                        item.NextOwnerAssetID = AssetService.GenerateNextOwnerAsset(assetID);
                                     }
-                                    assetids.Add(assetID);
-                                    items.Add(item);
+                                    InventoryItem newItem = new InventoryItem(item);
+                                    if(!item.Owner.EqualsGrid(agent.Owner))
+                                    {
+                                        newItem.AssetID = item.NextOwnerAssetID;
+                                    }
+                                    assetids.Add(newItem.AssetID);
+
+                                    items.Add(newItem);
                                     if(!item.CheckPermissions(item.Owner, item.Group, InventoryPermissionsMask.Copy))
                                     {
                                         part.Inventory.Remove(item.ID);

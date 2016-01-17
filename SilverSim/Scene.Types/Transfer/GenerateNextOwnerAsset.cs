@@ -1,0 +1,151 @@
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+
+using SilverSim.Scene.Types.Object;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
+using System;
+using System.Collections.Generic;
+
+namespace SilverSim.Scene.Types.Transfer
+{
+    public static class GenerateNextOwnerAssetFunctions
+    {
+        public static UUID GenerateNextOwnerAsset(this AssetServiceInterface assetService, UUID firstLevelAssetID)
+        {
+            List<UUID> assetIDs = new List<UUID>();
+            Dictionary<UUID, UUID> replaceAssets = new Dictionary<UUID, UUID>();
+            List<UUID> objectAssetIDs = new List<UUID>();
+            assetIDs.Add(firstLevelAssetID);
+            int pos = 0;
+            while (pos < assetIDs.Count)
+            {
+                UUID assetid = assetIDs[pos++];
+                AssetMetadata objmeta;
+                if (assetService.Metadata.TryGetValue(assetid, out objmeta))
+                {
+                    if (objmeta.Type == AssetType.Object)
+                    {
+                        if (!objectAssetIDs.Contains(assetid))
+                        {
+                            objectAssetIDs.Add(assetid);
+                        }
+                        assetIDs.AddRange(ObjectReferenceDecoder.GetReferences(assetService[assetid]));
+                        if (!replaceAssets.ContainsKey(assetid))
+                        {
+                            replaceAssets.Add(assetid, UUID.Random);
+                        }
+                    }
+                    else if (objmeta.Type == AssetType.Notecard)
+                    {
+                        if (!objectAssetIDs.Contains(assetid))
+                        {
+                            objectAssetIDs.Add(assetid);
+                        }
+                        Notecard nc = new Notecard(assetService[assetid]);
+                        foreach (NotecardInventoryItem item in nc.Inventory.Values)
+                        {
+                            if (item.AssetType == AssetType.Object || item.AssetType == AssetType.Notecard)
+                            {
+                                if (!objectAssetIDs.Contains(item.AssetID))
+                                {
+                                    objectAssetIDs.Add(item.AssetID);
+                                }
+                            }
+                        }
+                        assetIDs.InsertRange(0, nc.References);
+                        if (!replaceAssets.ContainsKey(assetid))
+                        {
+                            replaceAssets.Add(assetid, UUID.Random);
+                        }
+                    }
+                }
+            }
+
+            objectAssetIDs.Reverse();
+            foreach (UUID objectid in objectAssetIDs)
+            {
+                AssetData data;
+                AssetData newAsset;
+                if (assetService.TryGetValue(objectid, out data))
+                {
+                    switch (data.Type)
+                    {
+                        case AssetType.Object:
+                            List<ObjectGroup> grps = ObjectXML.FromAsset(data, UUI.Unknown);
+                            foreach (ObjectGroup grp in grps)
+                            {
+                                foreach (ObjectPart part in grp.Values)
+                                {
+                                    foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+                                    {
+                                        if (item.NextOwnerAssetID == UUID.Zero)
+                                        {
+                                            UUID replaceAssetID;
+                                            item.NextOwnerAssetID = replaceAssets.TryGetValue(item.AssetID, out replaceAssetID) ? replaceAssetID : item.AssetID;
+                                        }
+                                    }
+                                }
+                            }
+
+                            newAsset = (grps.Count == 1) ?
+                                grps.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2) :
+                                grps.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
+
+                            newAsset.ID = replaceAssets[objectid];
+                            newAsset.Creator = data.Creator;
+                            newAsset.CreateTime = data.CreateTime;
+                            assetService.Store(newAsset);
+                            break;
+
+                        case AssetType.Notecard:
+                            Notecard nc = new Notecard(data);
+                            foreach (NotecardInventoryItem item in nc.Inventory.Values)
+                            {
+                                UUID replace;
+                                if (replaceAssets.TryGetValue(item.AssetID, out replace))
+                                {
+                                    item.AssetID = replace;
+                                }
+                                break;
+                            }
+                            break;
+                    }
+                }
+            }
+
+            UUID finalAssetID;
+            return replaceAssets.TryGetValue(firstLevelAssetID, out finalAssetID) ? finalAssetID : firstLevelAssetID;
+        }
+
+        public static void GenerateNextOwnerAssets(this AssetServiceInterface assetService, ObjectGroup grp)
+        {
+            foreach(ObjectPart part in grp.Values)
+            {
+                foreach(ObjectPartInventoryItem item in part.Inventory.Values)
+                {
+                    if(item.NextOwnerAssetID == UUID.Zero)
+                    {
+                        switch(item.AssetType)
+                        {
+                            case AssetType.Object:
+                                item.NextOwnerAssetID = assetService.GenerateNextOwnerAsset(item.AssetID);
+                                break;
+
+                            default:
+                                item.NextOwnerAssetID = item.AssetID;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            AssetData data = grp.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
+            data.ID = UUID.Random;
+            assetService.Store(data);
+            grp.NextOwnerAssetID = data.ID;
+        }
+    }
+}
