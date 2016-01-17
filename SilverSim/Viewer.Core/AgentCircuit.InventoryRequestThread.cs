@@ -407,6 +407,12 @@ namespace SilverSim.Viewer.Core
                 folder.ParentFolderID = folder.ID;
                 folder.Version = 1;
                 Agent.InventoryService.Folder.Add(folder);
+
+                Messages.Inventory.BulkUpdateInventory res = new Messages.Inventory.BulkUpdateInventory();
+                res.AgentID = req.AgentID;
+                res.TransactionID = UUID.Zero;
+                res.AddInventoryFolder(folder);
+                Agent.SendMessageAlways(res, Scene.ID);
             }
             catch (Exception e)
             {
