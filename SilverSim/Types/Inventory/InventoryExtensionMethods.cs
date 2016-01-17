@@ -20,7 +20,7 @@ namespace SilverSim.Types.Inventory
             string o = string.Empty;
             foreach (char c in s)
             {
-                o += (c <= 32) ? c.ToString() : " ";
+                o += (c >= 32) ? c.ToString() : " ";
             }
             return o;
         }
