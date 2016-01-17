@@ -121,7 +121,7 @@ namespace SilverSim.Scene.Types.Transfer
             return replaceAssets.TryGetValue(firstLevelAssetID, out finalAssetID) ? finalAssetID : firstLevelAssetID;
         }
 
-        public static void GenerateNextOwnerAssets(this AssetServiceInterface assetService, ObjectGroup grp)
+        public static UUID GenerateNextOwnerAssets(this AssetServiceInterface assetService, ObjectGroup grp)
         {
             foreach(ObjectPart part in grp.Values)
             {
@@ -140,6 +140,7 @@ namespace SilverSim.Scene.Types.Transfer
             data.ID = UUID.Random;
             assetService.Store(data);
             grp.NextOwnerAssetID = data.ID;
+            return data.ID;
         }
     }
 }

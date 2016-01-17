@@ -204,7 +204,7 @@ namespace SilverSim.Scene.Types.Scene
                         assetID = grp.NextOwnerAssetID;
                         if (assetID == UUID.Zero)
                         {
-                            AssetService.GenerateNextOwnerAssets(grp);
+                            assetID = AssetService.GenerateNextOwnerAssets(grp);
                         }
                         changePermissions = true;
                     }
@@ -214,8 +214,10 @@ namespace SilverSim.Scene.Types.Scene
                         if(UUID.Zero == assetID)
                         {
                             AssetData asset = grp.Asset(XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.WriteXml2);
+                            asset.ID = UUID.Random;
                             AssetService.Store(asset);
                             grp.OriginalAssetID = asset.ID;
+                            assetID = asset.ID;
                         }
                     }
                     if(!copyItems.ContainsKey(targetAgent))
@@ -265,8 +267,8 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            if (req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.TakeCopy &&
-                req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.GodTakeCopy)
+            if (req.Destination != DeRezAction.TakeCopy &&
+                req.Destination != DeRezAction.GodTakeCopy)
             {
                 foreach (ObjectGroup grp in objectgroups)
                 {

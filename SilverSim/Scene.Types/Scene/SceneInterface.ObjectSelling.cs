@@ -175,13 +175,8 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         List<UUID> assetids = new List<UUID>();
                         List<InventoryItem> items = new List<InventoryItem>();
-                        UUID assetID;
                         bool foundNoTransfer = false;
                         AssetData newAsset;
-                        if (grp.NextOwnerAssetID == UUID.Zero && !grp.Owner.EqualsGrid(agent.Owner))
-                        {
-                            AssetService.GenerateNextOwnerAssets(grp);
-                        }
                         switch (grp.SaleType)
                         {
                             case InventoryItem.SaleInfoData.SaleType.NoSale:
@@ -189,6 +184,7 @@ namespace SilverSim.Scene.Types.Scene
 
                             case InventoryItem.SaleInfoData.SaleType.Original:
                             case InventoryItem.SaleInfoData.SaleType.Copy:
+                                UUID assetID;
                                 if (grp.Owner == agent.Owner)
                                 {
                                     assetID = grp.OriginalAssetID;
