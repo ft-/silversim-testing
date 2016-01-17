@@ -22,8 +22,9 @@ namespace SilverSim.Scene.Types.Scene
             readonly UUI m_DestinationAgent;
             readonly UUID m_SceneID;
             readonly List<InventoryItem> m_Items;
-            readonly string m_DestinationFolder;
+            readonly string m_DestinationFolder = string.Empty;
             readonly TryGetSceneDelegate TryGetScene;
+            readonly AssetType m_DestinationFolderType = AssetType.Object;
 
             public ObjectTransferItem(
                 IAgent agent, 
@@ -58,6 +59,22 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             public ObjectTransferItem(
+                IAgent agent,
+                SceneInterface scene,
+                List<UUID> assetids,
+                List<InventoryItem> items,
+                AssetType destinationFolderType)
+                : base(agent.AssetService, scene.AssetService, assetids, ReferenceSource.Source)
+            {
+                m_InventoryService = agent.InventoryService;
+                m_DestinationAgent = agent.Owner;
+                m_SceneID = scene.ID;
+                m_Items = items;
+                m_DestinationFolderType = destinationFolderType;
+                TryGetScene = scene.TryGetScene;
+            }
+
+            public ObjectTransferItem(
                 InventoryServiceInterface inventoryService,
                 AssetServiceInterface assetService,
                 UUI agentOwner,
@@ -75,6 +92,24 @@ namespace SilverSim.Scene.Types.Scene
                 TryGetScene = scene.TryGetScene;
             }
 
+            public ObjectTransferItem(
+                InventoryServiceInterface inventoryService,
+                AssetServiceInterface assetService,
+                UUI agentOwner,
+                SceneInterface scene,
+                List<UUID> assetids,
+                List<InventoryItem> items,
+                AssetType destinationFolderType)
+                : base(assetService, scene.AssetService, assetids, ReferenceSource.Source)
+            {
+                m_InventoryService = inventoryService;
+                m_DestinationAgent = agentOwner;
+                m_SceneID = scene.ID;
+                m_Items = items;
+                m_DestinationFolderType = destinationFolderType;
+                TryGetScene = scene.TryGetScene;
+            }
+
             public override void AssetTransferComplete()
             {
                 InventoryFolder folder;
@@ -87,7 +122,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 else
                 {
-                    if(!m_InventoryService.Folder.TryGetValue(m_DestinationAgent.ID, AssetType.RootFolder, out folder))
+                    if(!m_InventoryService.Folder.TryGetValue(m_DestinationAgent.ID, m_DestinationFolderType, out folder))
                     {
                         return;
                     }

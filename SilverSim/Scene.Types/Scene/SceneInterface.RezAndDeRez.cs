@@ -180,8 +180,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             Dictionary<UUI, List<InventoryItem>> copyItems = new Dictionary<UUI, List<InventoryItem>>();
-            if (req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.Delete &&
-                req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.Return)
+            if (req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.Return)
             {
                 foreach (ObjectGroup grp in objectgroups)
                 {
@@ -242,7 +241,11 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 if(Agents.TryGetValue(kvp.Key.ID, out toAgent))
                 {
-                    new ObjectTransferItem(agent, this, assetIDs, kvp.Value).QueueWorkItem();
+                    new ObjectTransferItem(agent,
+                        this,
+                        assetIDs, 
+                        kvp.Value, 
+                        req.Destination == Viewer.Messages.Object.DeRezObject.DeRezAction.Delete ? AssetType.TrashFolder : AssetType.Object).QueueWorkItem();
                 }
                 else
                 {
