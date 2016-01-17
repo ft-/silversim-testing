@@ -288,7 +288,7 @@ namespace SilverSim.Scene.Types.Scene
                 estateInfo = CheckEstateRights(agent);
 
                 #region Telehub logic
-                if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)
+                if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionSettings.AsFlags & RegionOptionFlags.AllowDirectTeleport) == 0)
                 {
                     IObject obj;
                     if (Objects.TryGetValue(RegionSettings.TelehubObject, out obj))
