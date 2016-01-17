@@ -46,12 +46,10 @@ namespace SilverSim.Scene.Types.Transfer
                         Notecard nc = new Notecard(assetService[assetid]);
                         foreach (NotecardInventoryItem item in nc.Inventory.Values)
                         {
-                            if (item.AssetType == AssetType.Object || item.AssetType == AssetType.Notecard)
+                            if ((item.AssetType == AssetType.Object || item.AssetType == AssetType.Notecard) &&
+                                !objectAssetIDs.Contains(item.AssetID))
                             {
-                                if (!objectAssetIDs.Contains(item.AssetID))
-                                {
-                                    objectAssetIDs.Add(item.AssetID);
-                                }
+                                objectAssetIDs.Add(item.AssetID);
                             }
                         }
                         assetIDs.InsertRange(0, nc.References);

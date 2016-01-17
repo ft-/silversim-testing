@@ -92,14 +92,10 @@ namespace SilverSim.Scene.Types.Transfer
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void AssetTransferFailed(Exception e)
         {
-            try
+            IAgent agent;
+            if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
             {
-                IAgent agent = m_Scene.Agents[m_RezzingAgent.ID];
                 agent.SendAlertMessage("ALERT: CantFindObject", m_Scene.ID);
-            }
-            catch
-            {
-                /* no action required */
             }
         }
     }
