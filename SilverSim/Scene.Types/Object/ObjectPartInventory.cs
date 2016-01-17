@@ -22,7 +22,8 @@ namespace SilverSim.Scene.Types.Object
         {
             Add,
             Change,
-            Remove
+            Remove,
+            NextOwnerAssetID
         }
 
         public event Action<ChangeAction /* change */, UUID /* primID */, UUID /* itemID */> OnChange;
@@ -164,6 +165,25 @@ namespace SilverSim.Scene.Types.Object
                 foreach (Action<ChangeAction, UUID, UUID> d in addDelegate.GetInvocationList())
                 {
                     d(ChangeAction.Add, PartID, item.ID);
+                }
+            }
+        }
+
+        public void SetNextOwnerAssetID(UUID key1, UUID assetID)
+        {
+            ObjectPartInventoryItem item;
+            if(TryGetValue(key1, out item))
+            {
+                item.NextOwnerAssetID = assetID;
+                Interlocked.Increment(ref InventorySerial);
+
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                    {
+                        d(ChangeAction.NextOwnerAssetID, PartID, item.ID);
+                    }
                 }
             }
         }

@@ -83,7 +83,9 @@ namespace SilverSim.Scene.Types.Transfer
                                         if (item.NextOwnerAssetID == UUID.Zero)
                                         {
                                             UUID replaceAssetID;
-                                            item.NextOwnerAssetID = replaceAssets.TryGetValue(item.AssetID, out replaceAssetID) ? replaceAssetID : item.AssetID;
+                                            part.Inventory.SetNextOwnerAssetID(
+                                                item.ID,
+                                                replaceAssets.TryGetValue(item.AssetID, out replaceAssetID) ? replaceAssetID : item.AssetID);
                                         }
                                     }
                                 }
@@ -127,16 +129,9 @@ namespace SilverSim.Scene.Types.Transfer
                 {
                     if(item.NextOwnerAssetID == UUID.Zero)
                     {
-                        switch(item.AssetType)
-                        {
-                            case AssetType.Object:
-                                item.NextOwnerAssetID = assetService.GenerateNextOwnerAsset(item.AssetID);
-                                break;
-
-                            default:
-                                item.NextOwnerAssetID = item.AssetID;
-                                break;
-                        }
+                        part.Inventory.SetNextOwnerAssetID(
+                            item.ID,
+                            assetService.GenerateNextOwnerAsset(item.AssetID));
                     }
                 }
             }

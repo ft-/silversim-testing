@@ -217,15 +217,28 @@ namespace SilverSim.Scene.Types.Object
 
         void OnInventoryChange(ObjectPartInventory.ChangeAction action, UUID primID, UUID itemID)
         {
-            IsChanged = m_IsChangedEnabled;
-            lock (m_UpdateDataLock)
+            if (action == ObjectPartInventory.ChangeAction.NextOwnerAssetID)
             {
-                int invSerial = Inventory.InventorySerial;
-                m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
-                m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
-                IsScripted = Inventory.CountScripts != 0;
+                lock (m_UpdateDataLock)
+                {
+                    int invSerial = Inventory.InventorySerial;
+                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
+                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
+                }
+                TriggerOnNextOwnerAssetIDChange();
             }
-            TriggerOnUpdate(UpdateChangedFlags.Inventory);
+            else
+            {
+                IsChanged = m_IsChangedEnabled;
+                lock (m_UpdateDataLock)
+                {
+                    int invSerial = Inventory.InventorySerial;
+                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
+                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
+                    IsScripted = Inventory.CountScripts != 0;
+                }
+                TriggerOnUpdate(UpdateChangedFlags.Inventory);
+            }
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -247,6 +260,37 @@ namespace SilverSim.Scene.Types.Object
                     try
                     {
                         del(this, flags);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
+                    }
+                }
+            }
+
+            UpdateData(UpdateDataFlags.All);
+            if (ObjectGroup.Scene != null)
+            {
+                ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            }
+        }
+
+        internal void TriggerOnNextOwnerAssetIDChange()
+        {
+            /* we have to check the ObjectGroup during setup process before using it here */
+            if (null == ObjectGroup)
+            {
+                return;
+            }
+
+            var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
+            if (ev != null)
+            {
+                foreach (Action<ObjectPart, UpdateChangedFlags> del in ev.GetInvocationList())
+                {
+                    try
+                    {
+                        del(this, 0);
                     }
                     catch (Exception e)
                     {
