@@ -313,7 +313,7 @@ namespace SilverSim.Viewer.Core
                                     null;
                                 p.SequenceNumber = NextSequenceNumber;
                                 int savedDataLength = p.DataLength;
-                                if (!p.IsZeroEncoded)
+                                if (!p.IsZeroEncoded && MAX_DATA_MTU > 1 + (uint)savedDataLength)
                                 {
                                     uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
                                     uint curacks = (uint)m_AckList.Count;
