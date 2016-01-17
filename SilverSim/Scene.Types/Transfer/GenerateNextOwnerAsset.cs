@@ -92,7 +92,7 @@ namespace SilverSim.Scene.Types.Transfer
                             }
 
                             newAsset = (grps.Count == 1) ?
-                                grps.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2) :
+                                grps[0].Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2) :
                                 grps.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
 
                             newAsset.ID = replaceAssets[objectid];
