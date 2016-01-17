@@ -7,10 +7,6 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Scene
 {
