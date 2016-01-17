@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace SilverSim.Main.Common.Transfer
+namespace SilverSim.Scene.Types.Transfer
 {
     public abstract class RezObjectHandler : AssetTransferWorkItem
     {

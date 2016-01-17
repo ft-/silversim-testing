@@ -1,10 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Main.Common.Transfer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -291,8 +291,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            RezAttachmentHandler rezAttachHandler = new RezAttachmentHandler(Circuits[SceneID].Scene, itemID, item.AssetID, AssetService, Owner, attachpointFlagged);
-            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezAttachHandler);
+            new RezAttachmentHandler(Circuits[SceneID].Scene, itemID, item.AssetID, AssetService, Owner, attachpointFlagged).QueueWorkItem();
         }
 
         void DetachAttachment(DetachEntry entry)

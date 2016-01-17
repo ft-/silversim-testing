@@ -4,8 +4,10 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
+using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -37,14 +39,85 @@ namespace SilverSim.Scene.Types.Scene
 #endif
 
                     ObjectPart prim;
+                    Object.ObjectGroup grp;
                     if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                     {
                         continue;
                     }
 
-                    if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                    grp = prim.ObjectGroup;
+                    if(grp == null)
                     {
                         continue;
+                    }
+
+                    if (!CanEdit(agent, grp, grp.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    if(d.SaleType == InventoryItem.SaleInfoData.SaleType.Original &&
+                        prim.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
+                    {
+                        agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoCopyItemAsACopy", "Unable to sell no copy item as a copy."), ID);
+                        continue;
+                    }
+
+                    if(d.SaleType == InventoryItem.SaleInfoData.SaleType.Copy || d.SaleType == InventoryItem.SaleInfoData.SaleType.Original)
+                    {
+                        bool foundNoTransfer = false;
+                        foreach (ObjectPart part in grp.Values)
+                        {
+                            if(!part.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Transfer))
+                            {
+                                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoTransferItem", "Unable to sell no transfer item."), ID);
+                                foundNoTransfer = true;
+                                break;
+                            }
+                            foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+                            {
+                                if (item.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Transfer))
+                                {
+                                    agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoTransferItem", "Unable to sell no transfer item."), ID);
+                                    foundNoTransfer = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (foundNoTransfer)
+                        {
+                            continue;
+                        }
+
+                    }
+
+                    if (d.SaleType != InventoryItem.SaleInfoData.SaleType.NoSale)
+                    {
+                        bool foundNoCopyInventory = false;
+                        bool foundNoTransfer = false;
+                        foreach(ObjectPartInventoryItem item in prim.Inventory.Values)
+                        {
+                            if(item.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Transfer))
+                            {
+                                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoTransferItem", "Unable to sell no transfer item."), ID);
+                                foundNoTransfer = true;
+                                break;
+                            }
+                            if (!item.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
+                            {
+                                foundNoCopyInventory = true;
+                            }
+                        }
+                        if (foundNoTransfer)
+                        {
+                            continue;
+                        }
+
+                        if (foundNoCopyInventory)
+                        {
+                            agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "WarningInventoryWillBeSoldAsOriginalAndNotAsCopy", "Warning! Object inventory will be sold as original and not as copy."), ID);
+                            continue;
+                        }
                     }
 
                     prim.ObjectGroup.SalePrice = d.SalePrice;
@@ -86,7 +159,106 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     else if(grp.SalePrice != 0 && EconomyService == null)
                     {
-                        agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "BuyingForAnythingOtherPriceThanZeroIsNotPossible", "Buying for anything other price than zero is not possible without economy system."), ID);
+                        agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "BuyingForAnyOtherPriceThanZeroIsNotPossible", "Buying for any other price than zero is not possible without economy system."), ID);
+                    }
+                    else
+                    {
+                        List<UUID> assetids = new List<UUID>();
+                        List<InventoryItem> items = new List<InventoryItem>();
+                        UUID assetID;
+                        bool foundNoTransfer = false;
+
+                        switch (grp.SaleType)
+                        {
+                            case InventoryItem.SaleInfoData.SaleType.NoSale:
+                                continue;
+
+                            case InventoryItem.SaleInfoData.SaleType.Original:
+                                Remove(grp);
+                                goto case InventoryItem.SaleInfoData.SaleType.Copy;
+
+                            case InventoryItem.SaleInfoData.SaleType.Copy:
+                                bool foundNoCopy = false;
+                                foreach (ObjectPart checkpart in grp.Values)
+                                {
+                                    if (!checkpart.CheckPermissions(checkpart.Owner, checkpart.Group, InventoryPermissionsMask.Transfer))
+                                    {
+                                        agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoTransferItem", "Unable to sell no transfer item."), ID);
+                                        foundNoTransfer = true;
+                                        break;
+                                    }
+                                    if (grp.SaleType == InventoryItem.SaleInfoData.SaleType.Copy &&
+                                        !checkpart.CheckPermissions(checkpart.Owner, checkpart.Group, InventoryPermissionsMask.Copy))
+                                    {
+                                        agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoCopyItemAsACopy", "Unable to sell no copy item as a copy."), ID);
+                                        foundNoCopy = true;
+                                        break;
+                                    }
+                                    foreach (ObjectPartInventoryItem item in checkpart.Inventory.Values)
+                                    {
+                                        if (item.CheckPermissions(item.Owner, item.Group, InventoryPermissionsMask.Transfer))
+                                        {
+                                            agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoTransferItem", "Unable to sell no transfer item."), ID);
+                                            foundNoTransfer = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (foundNoTransfer || foundNoCopy)
+                                {
+                                    continue;
+                                }
+
+                                assetID = grp.NextOwnerAssetID;
+                                if (assetID == UUID.Zero)
+                                {
+                                    /* create next owner asset id */
+                                }
+                                assetids.Add(assetID);
+                                break;
+
+                            case InventoryItem.SaleInfoData.SaleType.Content:
+                                foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+                                {
+                                    if (!item.CheckPermissions(item.Owner, item.Group, InventoryPermissionsMask.Transfer))
+                                    {
+                                        agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToSellNoTransferItem", "Unable to sell no transfer item."), ID);
+                                        foundNoTransfer = true;
+                                        break;
+                                    }
+                                }
+
+                                if(foundNoTransfer)
+                                {
+                                    continue;
+                                }
+
+                                foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+                                {
+                                    assetID = item.NextOwnerAssetID;
+                                    if(assetID == UUID.Zero)
+                                    {
+                                        /* create next owner asset id */
+                                    }
+                                    assetids.Add(assetID);
+                                    items.Add(item);
+                                    if(!item.CheckPermissions(item.Owner, item.Group, InventoryPermissionsMask.Copy))
+                                    {
+                                        part.Inventory.Remove(item.ID);
+                                    }
+                                }
+                                break;
+                        }
+
+                        if (grp.SalePrice == 0)
+                        {
+                            new ObjectNoMoneySellTransferItem(
+                                agent,
+                                this,
+                                assetids,
+                                items,
+                                grp.SaleType == InventoryItem.SaleInfoData.SaleType.Content ? part.Name : string.Empty).QueueWorkItem();
+                        }
                     }
                 }
             }

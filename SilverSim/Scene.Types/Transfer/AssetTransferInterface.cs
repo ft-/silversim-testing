@@ -6,8 +6,9 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
-namespace SilverSim.Main.Common.Transfer
+namespace SilverSim.Scene.Types.Transfer
 {
     public abstract class AssetTransferWorkItem
     {
@@ -98,5 +99,16 @@ namespace SilverSim.Main.Common.Transfer
 
         public abstract void AssetTransferComplete();
         public abstract void AssetTransferFailed(Exception e);
+
+        static void HandleWorkItem(object o)
+        {
+            AssetTransferWorkItem wi = (AssetTransferWorkItem)o;
+            wi.ProcessAssetTransfer();
+        }
+
+        public void QueueWorkItem()
+        {
+            ThreadPool.UnsafeQueueUserWorkItem(HandleWorkItem, this);
+        }
     }
 }

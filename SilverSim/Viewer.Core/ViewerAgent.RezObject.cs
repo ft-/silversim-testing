@@ -1,9 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Main.Common.Transfer;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;

@@ -3,9 +3,9 @@
 
 using log4net;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Main.Common.Transfer;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -15,9 +15,7 @@ using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 
 namespace SilverSim.Viewer.Core.Capabilities
