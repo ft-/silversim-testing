@@ -7,14 +7,46 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types.Script;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
+        [PacketHandler(MessageType.ScriptReset)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        internal void HandleScriptReset(Message m)
+        {
+            ScriptReset req = (ScriptReset)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            Script.ScriptInstance instance;
+            ObjectPart part;
+            ObjectPartInventoryItem item;
+            if (!Primitives.TryGetValue(req.ObjectID, out part) ||
+                !part.Inventory.TryGetValue(req.ItemID, out item) ||
+                !Agents.TryGetValue(req.AgentID, out agent) ||
+                !part.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify) ||
+                !item.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify))
+            {
+                return;
+            }
+            instance = item.ScriptInstance;
+            if (instance == null)
+            {
+                return;
+            }
+
+            instance.PostEvent(new ResetScriptEvent());
+        }
+
         [PacketHandler(MessageType.ScriptAnswerYes)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleScriptAnswerYes(Message m)
         {
             ScriptAnswerYes req = (ScriptAnswerYes)m;
@@ -25,16 +57,14 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             Script.ScriptInstance instance;
-            try
-            {
-                ObjectPart p = Primitives[req.TaskID];
-                ObjectPartInventoryItem item = p.Inventory[req.ItemID];
-                instance = item.ScriptInstance;
-            }
-            catch
+            ObjectPart part;
+            ObjectPartInventoryItem item;
+            if (!Primitives.TryGetValue(req.TaskID, out part) ||
+                !part.Inventory.TryGetValue(req.ItemID, out item))
             {
                 return;
             }
+            instance = item.ScriptInstance;
             if(instance == null)
             {
                 return;
@@ -49,7 +79,6 @@ namespace SilverSim.Scene.Types.Scene
 
         [PacketHandler(MessageType.RevokePermissions)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleRevokePermissions(Message m)
         {
             RevokePermissions req = (RevokePermissions)m;
@@ -59,9 +88,10 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            try
+            IObject iobj;
+            if(Objects.TryGetValue(req.ObjectID, out iobj))
             {
-                ObjectGroup o = Objects[req.ObjectID] as ObjectGroup;
+                ObjectGroup o = iobj as ObjectGroup;
                 if (o != null)
                 {
                     o.ForEach(delegate(ObjectPart p)
@@ -76,10 +106,6 @@ namespace SilverSim.Scene.Types.Scene
                         });
                     });
                 }
-            }
-            catch
-            {
-                return;
             }
         }
     }
