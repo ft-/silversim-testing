@@ -4,6 +4,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
@@ -167,6 +168,7 @@ namespace SilverSim.Scene.Types.Scene
                         List<InventoryItem> items = new List<InventoryItem>();
                         UUID assetID;
                         bool foundNoTransfer = false;
+                        AssetData newAsset;
 
                         switch (grp.SaleType)
                         {
@@ -174,10 +176,40 @@ namespace SilverSim.Scene.Types.Scene
                                 continue;
 
                             case InventoryItem.SaleInfoData.SaleType.Original:
-                                Remove(grp);
-                                goto case InventoryItem.SaleInfoData.SaleType.Copy;
-
                             case InventoryItem.SaleInfoData.SaleType.Copy:
+                                if (grp.Owner == agent.Owner)
+                                {
+                                    assetID = grp.OriginalAssetID;
+                                    if (assetID == UUID.Zero)
+                                    {
+                                        newAsset = grp.Asset(XmlSerializationOptions.WriteXml2 | XmlSerializationOptions.WriteOwnerInfo);
+                                        assetID = UUID.Random;
+                                        newAsset.ID = assetID;
+                                        AssetService.Store(newAsset);
+                                        assetID = newAsset.ID;
+                                        grp.OriginalAssetID = assetID;
+                                    }
+                                }
+                                else
+                                {
+                                    assetID = grp.NextOwnerAssetID;
+                                    if (assetID == UUID.Zero)
+                                    {
+                                        newAsset = grp.Asset(agent.Owner, XmlSerializationOptions.WriteXml2 | XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.AdjustForNextOwner);
+                                        assetID = UUID.Random;
+                                        newAsset.ID = assetID;
+                                        AssetService.Store(newAsset);
+                                        assetID = newAsset.ID;
+                                        grp.NextOwnerAssetID = assetID;
+                                    }
+                                }
+                                assetids.Add(assetID);
+
+                                if(grp.SaleType == InventoryItem.SaleInfoData.SaleType.Original)
+                                {
+                                    Remove(grp);
+                                }
+
                                 bool foundNoCopy = false;
                                 foreach (ObjectPart checkpart in grp.Values)
                                 {
@@ -208,13 +240,6 @@ namespace SilverSim.Scene.Types.Scene
                                 {
                                     continue;
                                 }
-
-                                assetID = grp.NextOwnerAssetID;
-                                if (assetID == UUID.Zero)
-                                {
-                                    /* create next owner asset id */
-                                }
-                                assetids.Add(assetID);
                                 break;
 
                             case InventoryItem.SaleInfoData.SaleType.Content:
