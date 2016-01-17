@@ -45,10 +45,11 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         }
         #endregion
 
-
-        #region Hashing
-
-        #endregion
+        public override bool IsSameServer(AssetServiceInterface other)
+        {
+            return other.GetType() == typeof(MySQLDedupAssetService) &&
+                (m_ConnectionString == ((MySQLDedupAssetService)other).m_ConnectionString);
+        }
 
         #region Exists methods
         public override bool Exists(UUID key)

@@ -3,6 +3,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Asset
@@ -52,6 +53,11 @@ namespace SilverSim.ServiceInterfaces.Asset
         #region Delete asset method
         public abstract void Delete(UUID id);
         #endregion
+
+        public virtual bool IsSameServer(AssetServiceInterface other)
+        {
+            return false;
+        }
 
         #region Constructors
         public AssetServiceInterface()

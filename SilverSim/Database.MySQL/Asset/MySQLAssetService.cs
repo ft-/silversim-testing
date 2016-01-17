@@ -128,6 +128,12 @@ namespace SilverSim.Database.MySQL.Asset
 
         #endregion
 
+        public override bool IsSameServer(AssetServiceInterface other)
+        {
+            return other.GetType() == typeof(MySQLAssetService) &&
+                (m_ConnectionString == ((MySQLAssetService)other).m_ConnectionString);
+        }
+
         #region Accessors
         public override bool TryGetValue(UUID key, out AssetData asset)
         {
