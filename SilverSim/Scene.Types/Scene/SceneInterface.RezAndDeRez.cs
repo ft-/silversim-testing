@@ -104,7 +104,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                         else if (!CanDelete(agent, grp, grp.Position))
                         {
-                            agent.SendAlertMessage("ALERT: ", ID);
+                            agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToDeleteObject", "No permission to delete object"), ID);
                             return;
                         }
                     }
@@ -119,7 +119,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                         else if (!CanReturn(agent, grp, grp.Position))
                         {
-                            agent.SendAlertMessage(string.Format("No permission to return object '{0}' to owners", grp.Name), ID);
+                            agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToReturnObjectToOwner", "No permission to return object '{0}' to owner"), grp.Name), ID);
                             ackres = new Viewer.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
@@ -145,7 +145,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                         else if (!CanTake(agent, grp, grp.Position))
                         {
-                            agent.SendAlertMessage(string.Format("No permission to take object '{0}'", grp.Name), ID);
+                            agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToTakeObject", "No permission to take object '{0}'"), grp.Name), ID);
                             ackres = new Viewer.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
@@ -160,7 +160,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         if (!CanTakeCopy(agent, grp, grp.Position))
                         {
-                            agent.SendAlertMessage(string.Format("No permission to copy object '{0}'", grp.Name), ID);
+                            agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToCopyObject", "No permission to copy object '{0}'"), grp.Name), ID);
                             ackres = new Viewer.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
@@ -171,7 +171,7 @@ namespace SilverSim.Scene.Types.Scene
                     break;
 
                 default:
-                    agent.SendAlertMessage("Invalid derez request by viewer", ID);
+                    agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "InvalidDerezRequestByViewer", "Invalid derez request by viewer"), ID);
                     ackres = new Viewer.Messages.Object.DeRezAck();
                     ackres.TransactionID = req.TransactionID;
                     ackres.Success = false;
