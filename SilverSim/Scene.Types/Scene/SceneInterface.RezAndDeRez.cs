@@ -11,6 +11,7 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.Transfer;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -50,7 +51,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             Viewer.Messages.Object.DeRezAck ackres;
             Viewer.Messages.Object.DeRezObject req = (Viewer.Messages.Object.DeRezObject)m;
-            if(req.AgentID != m.CircuitAgentID ||
+            if (req.AgentID != m.CircuitAgentID ||
                 req.SessionID != m.CircuitSessionID)
             {
                 return;
@@ -58,7 +59,7 @@ namespace SilverSim.Scene.Types.Scene
 
             IAgent agent;
             List<ObjectGroup> objectgroups = new List<ObjectGroup>();
-            if(!Agents.TryGetValue(req.AgentID, out agent))
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -88,20 +89,20 @@ namespace SilverSim.Scene.Types.Scene
             switch (req.Destination)
             {
                 case Viewer.Messages.Object.DeRezObject.DeRezAction.GodTakeCopy:
-                    if(!isActiveGod || !agent.IsInScene(this))
+                    if (!isActiveGod || !agent.IsInScene(this))
                     {
                         return;
                     }
                     break;
 
                 case Viewer.Messages.Object.DeRezObject.DeRezAction.Delete:
-                    foreach(ObjectGroup grp in objectgroups)
+                    foreach (ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
                         {
                             return;
                         }
-                        else if(!CanDelete(agent, grp, grp.Position))
+                        else if (!CanDelete(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage("ALERT: ", ID);
                             return;
@@ -110,13 +111,13 @@ namespace SilverSim.Scene.Types.Scene
                     break;
 
                 case Viewer.Messages.Object.DeRezObject.DeRezAction.Return:
-                    foreach(ObjectGroup grp in objectgroups)
+                    foreach (ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
                         {
                             return;
                         }
-                        else if(!CanReturn(agent, grp, grp.Position))
+                        else if (!CanReturn(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format("No permission to return object '{0}' to owners", grp.Name), ID);
                             ackres = new Viewer.Messages.Object.DeRezAck();
@@ -136,13 +137,13 @@ namespace SilverSim.Scene.Types.Scene
                     return;
 
                 case Viewer.Messages.Object.DeRezObject.DeRezAction.Take:
-                    foreach(ObjectGroup grp in objectgroups)
+                    foreach (ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
                         {
                             return;
                         }
-                        else if(!CanTake(agent, grp, grp.Position))
+                        else if (!CanTake(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format("No permission to take object '{0}'", grp.Name), ID);
                             ackres = new Viewer.Messages.Object.DeRezAck();
@@ -155,9 +156,9 @@ namespace SilverSim.Scene.Types.Scene
                     break;
 
                 case Viewer.Messages.Object.DeRezObject.DeRezAction.TakeCopy:
-                    foreach(ObjectGroup grp in objectgroups)
+                    foreach (ObjectGroup grp in objectgroups)
                     {
-                        if(!CanTakeCopy(agent, grp, grp.Position))
+                        if (!CanTakeCopy(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format("No permission to copy object '{0}'", grp.Name), ID);
                             ackres = new Viewer.Messages.Object.DeRezAck();
@@ -178,9 +179,84 @@ namespace SilverSim.Scene.Types.Scene
                     return;
             }
 
-            foreach(ObjectGroup grp in objectgroups)
+            Dictionary<UUI, List<InventoryItem>> copyItems = new Dictionary<UUI, List<InventoryItem>>();
+            if (req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.Delete &&
+                req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.Return)
             {
-                grp.Scene.Remove(grp);
+                foreach (ObjectGroup grp in objectgroups)
+                {
+                    UUID assetID;
+                    bool changePermissions = false;
+                    UUI targetAgent = req.Destination == Viewer.Messages.Object.DeRezObject.DeRezAction.Return ? grp.Owner : agent.Owner;
+                    if (!targetAgent.EqualsGrid(agent.Owner))
+                    {
+                        assetID = grp.NextOwnerAssetID;
+                        if (assetID == UUID.Zero)
+                        {
+                            AssetService.GenerateNextOwnerAssets(grp);
+                        }
+                        changePermissions = true;
+                    }
+                    else
+                    {
+                        assetID = grp.OriginalAssetID;
+                        if(UUID.Zero == assetID)
+                        {
+                            AssetData asset = grp.Asset(XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.WriteXml2);
+                            AssetService.Store(asset);
+                            grp.OriginalAssetID = asset.ID;
+                        }
+                    }
+                    if(!copyItems.ContainsKey(targetAgent))
+                    {
+                        copyItems.Add(targetAgent, new List<InventoryItem>());
+                    }
+                    InventoryItem item = new InventoryItem();
+                    item.AssetID = assetID;
+                    item.AssetType = AssetType.Object;
+                    item.InventoryType = InventoryType.Object;
+                    item.Name = grp.Name;
+                    item.Description = grp.Description;
+                    item.Owner = targetAgent;
+                    item.Creator = grp.RootPart.Creator;
+                    item.CreationDate = grp.RootPart.CreationDate;
+                    item.Permissions.Base = changePermissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
+                    item.Permissions.Current = item.Permissions.Base;
+                    item.Permissions.Group = InventoryPermissionsMask.None;
+                    item.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
+                    item.Permissions.EveryOne = InventoryPermissionsMask.None;
+                    copyItems[grp.Owner].Add(item);
+                }
+            }
+
+            foreach(KeyValuePair<UUI, List<InventoryItem>> kvp in copyItems)
+            {
+                List<UUID> assetIDs = new List<UUID>();
+                IAgent toAgent;
+                foreach (InventoryItem item in kvp.Value)
+                {
+                    if (!assetIDs.Contains(item.AssetID))
+                    {
+                        assetIDs.Add(item.AssetID);
+                    }
+                }
+                if(Agents.TryGetValue(kvp.Key.ID, out toAgent))
+                {
+                    new ObjectTransferItem(agent, this, assetIDs, kvp.Value).QueueWorkItem();
+                }
+                else
+                {
+#warning Implement handling for agents not on region
+                }
+            }
+
+            if (req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.TakeCopy &&
+                req.Destination != Viewer.Messages.Object.DeRezObject.DeRezAction.GodTakeCopy)
+            {
+                foreach (ObjectGroup grp in objectgroups)
+                {
+                    grp.Scene.Remove(grp);
+                }
             }
 
             ackres = new Viewer.Messages.Object.DeRezAck();

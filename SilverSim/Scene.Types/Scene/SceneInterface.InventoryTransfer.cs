@@ -4,6 +4,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Transfer;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -15,7 +16,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        sealed class ObjectNoMoneySellTransferItem : AssetTransferWorkItem
+        sealed class ObjectTransferItem : AssetTransferWorkItem
         {
             readonly InventoryServiceInterface m_InventoryService;
             readonly UUI m_DestinationAgent;
@@ -24,7 +25,7 @@ namespace SilverSim.Scene.Types.Scene
             readonly string m_DestinationFolder;
             readonly TryGetSceneDelegate TryGetScene;
 
-            public ObjectNoMoneySellTransferItem(
+            public ObjectTransferItem(
                 IAgent agent, 
                 SceneInterface scene, 
                 UUID assetid,
@@ -40,7 +41,7 @@ namespace SilverSim.Scene.Types.Scene
                 TryGetScene = scene.TryGetScene;
             }
 
-            public ObjectNoMoneySellTransferItem(
+            public ObjectTransferItem(
                 IAgent agent, 
                 SceneInterface scene, 
                 List<UUID> assetids, 
@@ -50,6 +51,24 @@ namespace SilverSim.Scene.Types.Scene
             {
                 m_InventoryService = agent.InventoryService;
                 m_DestinationAgent = agent.Owner;
+                m_SceneID = scene.ID;
+                m_Items = items;
+                m_DestinationFolder = destinationFolder;
+                TryGetScene = scene.TryGetScene;
+            }
+
+            public ObjectTransferItem(
+                InventoryServiceInterface inventoryService,
+                AssetServiceInterface assetService,
+                UUI agentOwner,
+                SceneInterface scene,
+                List<UUID> assetids,
+                List<InventoryItem> items,
+                string destinationFolder = "")
+                : base(assetService, scene.AssetService, assetids, ReferenceSource.Source)
+            {
+                m_InventoryService = inventoryService;
+                m_DestinationAgent = agentOwner;
                 m_SceneID = scene.ID;
                 m_Items = items;
                 m_DestinationFolder = destinationFolder;

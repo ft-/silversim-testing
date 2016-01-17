@@ -252,6 +252,13 @@ namespace SilverSim.Scene.Types.Scene
                                 {
                                     continue;
                                 }
+                                InventoryItem objectItem = new InventoryItem();
+                                objectItem.Permissions.Base = agent.Owner.EqualsGrid(grp.Owner) ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
+                                objectItem.Permissions.EveryOne = grp.RootPart.EveryoneMask;
+                                objectItem.Permissions.Group = InventoryPermissionsMask.None;
+                                objectItem.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
+                                objectItem.Permissions.Current = objectItem.Permissions.Base;
+                                items.Add(objectItem);
                                 break;
 
                             case InventoryItem.SaleInfoData.SaleType.Content:
@@ -282,7 +289,10 @@ namespace SilverSim.Scene.Types.Scene
                                     if(!item.Owner.EqualsGrid(agent.Owner))
                                     {
                                         newItem.AssetID = item.NextOwnerAssetID;
+                                        newItem.Owner = agent.Owner;
+                                        newItem.Permissions.Base = newItem.Permissions.NextOwner;
                                     }
+                                    newItem.Permissions.Group = InventoryPermissionsMask.None;
                                     assetids.Add(newItem.AssetID);
 
                                     items.Add(newItem);
@@ -296,7 +306,7 @@ namespace SilverSim.Scene.Types.Scene
 
                         if (grp.SalePrice == 0)
                         {
-                            new ObjectNoMoneySellTransferItem(
+                            new ObjectTransferItem(
                                 agent,
                                 this,
                                 assetids,
