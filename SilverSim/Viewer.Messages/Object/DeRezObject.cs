@@ -24,7 +24,7 @@ namespace SilverSim.Viewer.Messages.Object
             Attachment = 3,
             /* Take the original of the item into agent inventory */
             Take = 4,
-            /* Take a copy of the item being a god */
+            /* Take a copy of the item when being a god */
             GodTakeCopy = 5,
             /* Delete an item and putting it into trash */
             DeleteToTrash = 6,
