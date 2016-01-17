@@ -1,17 +1,16 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.Scene.Types.Transfer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using SilverSim.Scene.Types.Transfer;
 using DeRezAction = SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction;
 
 namespace SilverSim.Scene.Types.Scene
