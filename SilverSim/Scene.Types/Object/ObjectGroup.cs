@@ -148,6 +148,10 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_OriginalAssetID = value;
                 }
+                if (value != UUID.Zero)
+                {
+                    TriggerOnAssetIDChange();
+                }
             }
         }
 
@@ -165,6 +169,10 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_Lock)
                 {
                     m_NextOwnerAssetID = value;
+                }
+                if (value != UUID.Zero)
+                {
+                    TriggerOnAssetIDChange();
                 }
             }
         }
