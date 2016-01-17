@@ -743,14 +743,7 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             RegionInfo ri = GetRegionInfo();
             ri.Location = location;
-            try
-            {
-                GridService.RegisterRegion(ri);
-            }
-            catch
-            {
-                throw;
-            }
+            GridService.RegisterRegion(ri);
             GridPosition = location;
             
             GridServiceInterface regionStorage = RegionStorage;
