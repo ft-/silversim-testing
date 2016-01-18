@@ -619,6 +619,94 @@ namespace SilverSim.Main.Common
             }
         }
 
+        sealed class CFG_XmlResourceSource : ICFG_Source
+        {
+            readonly string m_Name;
+            readonly string m_Info;
+            readonly string m_Assembly = string.Empty;
+
+            public CFG_XmlResourceSource(string name)
+            {
+                m_Name = name;
+                m_Info = "Resource {0} not found";
+            }
+
+            public CFG_XmlResourceSource(string name, string info)
+            {
+                m_Name = name;
+                m_Info = info;
+            }
+
+            public CFG_XmlResourceSource(string name, string info, string assembly)
+            {
+                m_Name = name;
+                m_Info = info;
+                m_Assembly = assembly;
+            }
+
+            public string DirName
+            {
+                get
+                {
+                    return ".";
+                }
+            }
+
+            public string Message
+            {
+                get
+                {
+                    return m_Info;
+                }
+            }
+
+            public string Name
+            {
+                get
+                {
+                    return m_Name;
+                }
+            }
+
+            [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+            public IConfigSource ConfigSource
+            {
+                get
+                {
+                    Assembly assembly;
+                    if (m_Assembly.Length != 0)
+                    {
+                        try
+                        {
+                            assembly = Assembly.LoadFrom("plugins/" + m_Assembly + ".dll");
+                        }
+                        catch
+                        {
+                            throw new FileNotFoundException();
+                        }
+                    }
+                    else
+                    {
+                        assembly = GetType().Assembly;
+                    }
+
+                    string assemblyName = assembly.GetName().Name;
+                    Stream resource = assembly.GetManifestResourceStream(assemblyName + ".Resources." + m_Name);
+                    if (null == resource)
+                    {
+                        System.Console.Write(assemblyName + ".Resources." + m_Name);
+                        System.Console.WriteLine();
+                        throw new FileNotFoundException();
+                    }
+                    using (XmlReader r = new XmlTextReader(resource))
+                    {
+                        return new XmlConfigSource(r);
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Config Source Management
@@ -670,7 +758,18 @@ namespace SilverSim.Main.Common
             string[] nameparts = resourcereference.Split(new char[] { ':' }, 2, StringSplitOptions.None);
             if (nameparts.Length == 1)
             {
-                m_Sources.Enqueue(new CFG_IniResourceSource(nameparts[0], info));
+                if (nameparts[0].EndsWith(".xml"))
+                {
+                    m_Sources.Enqueue(new CFG_XmlResourceSource(nameparts[0], info));
+                }
+                else
+                {
+                    m_Sources.Enqueue(new CFG_IniResourceSource(nameparts[0], info));
+                }
+            }
+            else if(nameparts[0].EndsWith(".xml"))
+            {
+                m_Sources.Enqueue(new CFG_XmlResourceSource(nameparts[1], info, nameparts[0]));
             }
             else
             {
@@ -972,7 +1071,14 @@ namespace SilverSim.Main.Common
 
             if (defaultsIniName.Length != 0)
             {
-                m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
+                if (defaultsIniName.EndsWith(".xml"))
+                {
+                    m_Sources.Enqueue(new CFG_XmlResourceSource(defaultsIniName));
+                }
+                else
+                {
+                    m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
+                }
             }
             /* make the resource assets available for all users not just scene */
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
