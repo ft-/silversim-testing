@@ -501,7 +501,7 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    return "Could not load ini file {0}";
+                    return "Could not load xml file {0}";
                 }
             }
 
@@ -619,25 +619,25 @@ namespace SilverSim.Main.Common
             }
         }
 
-        sealed class CFG_XmlResourceSource : ICFG_Source
+        sealed class CFG_NiniXmlResourceSource : ICFG_Source
         {
             readonly string m_Name;
             readonly string m_Info;
             readonly string m_Assembly = string.Empty;
 
-            public CFG_XmlResourceSource(string name)
+            public CFG_NiniXmlResourceSource(string name)
             {
                 m_Name = name;
                 m_Info = "Resource {0} not found";
             }
 
-            public CFG_XmlResourceSource(string name, string info)
+            public CFG_NiniXmlResourceSource(string name, string info)
             {
                 m_Name = name;
                 m_Info = info;
             }
 
-            public CFG_XmlResourceSource(string name, string info, string assembly)
+            public CFG_NiniXmlResourceSource(string name, string info, string assembly)
             {
                 m_Name = name;
                 m_Info = info;
@@ -732,6 +732,10 @@ namespace SilverSim.Main.Common
             {
                 m_Sources.Enqueue(new CFG_NiniXmlUriSource(file));
             }
+            else if(file.EndsWith(".xml"))
+            {
+                m_Sources.Enqueue(new CFG_NiniXmlFileSource(file));
+            }
             else
             {
                 m_Sources.Enqueue(new CFG_IniFileSource(file));
@@ -760,7 +764,7 @@ namespace SilverSim.Main.Common
             {
                 if (nameparts[0].EndsWith(".xml"))
                 {
-                    m_Sources.Enqueue(new CFG_XmlResourceSource(nameparts[0], info));
+                    m_Sources.Enqueue(new CFG_NiniXmlResourceSource(nameparts[0], info));
                 }
                 else
                 {
@@ -769,7 +773,7 @@ namespace SilverSim.Main.Common
             }
             else if(nameparts[0].EndsWith(".xml"))
             {
-                m_Sources.Enqueue(new CFG_XmlResourceSource(nameparts[1], info, nameparts[0]));
+                m_Sources.Enqueue(new CFG_NiniXmlResourceSource(nameparts[1], info, nameparts[0]));
             }
             else
             {
@@ -1073,7 +1077,7 @@ namespace SilverSim.Main.Common
             {
                 if (defaultsIniName.EndsWith(".xml"))
                 {
-                    m_Sources.Enqueue(new CFG_XmlResourceSource(defaultsIniName));
+                    m_Sources.Enqueue(new CFG_NiniXmlResourceSource(defaultsIniName));
                 }
                 else
                 {
