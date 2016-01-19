@@ -48,6 +48,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
         public void Dispose()
         {
+            m_KeyframeTimer.Elapsed -= KeyframeTimer;
             m_KeyframeTimer.Dispose();
         }
 
