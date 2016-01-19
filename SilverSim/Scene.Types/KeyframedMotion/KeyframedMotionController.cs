@@ -64,7 +64,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             }
         }
 
-        public void PauseForData()
+        public void StopForShutdown()
         {
             lock (m_KeyframeLock)
             {

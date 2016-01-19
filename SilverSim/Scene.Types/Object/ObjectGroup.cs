@@ -3,6 +3,7 @@
 
 using log4net;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.KeyframedMotion;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
@@ -238,10 +239,90 @@ namespace SilverSim.Scene.Types.Object
             RootPart.TriggerOnUpdate(flags);
         }
 
+        #region KeyframedMotion
+        KeyframedMotionController m_KeyframedMotion;
+        object m_KeyframeMotionUpdateLock = new object();
+
+        public KeyframedMotion.KeyframedMotion KeyframedMotion
+        {
+            get
+            {
+                lock(m_KeyframeMotionUpdateLock)
+                {
+                    if(m_KeyframedMotion != null)
+                    {
+                        return m_KeyframedMotion.Program;
+                    }
+                }
+                return null;
+            }
+
+            set
+            {
+                lock(m_KeyframeMotionUpdateLock)
+                {
+                    m_KeyframedMotion.Stop();
+                    m_KeyframedMotion.Dispose();
+                    m_KeyframedMotion = null;
+                }
+                if (null != value)
+                {
+                    lock(m_KeyframeMotionUpdateLock)
+                    {
+                        if(m_KeyframedMotion == null)
+                        {
+                            KeyframedMotionController controller = new KeyframedMotionController(this);
+                            controller.Program = value;
+                            m_KeyframedMotion = controller;
+                        }
+                        else
+                        {
+                            m_KeyframedMotion.Program = value;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void PlayKeyframedMotion()
+        {
+            lock(m_KeyframeMotionUpdateLock)
+            {
+                if(null != m_KeyframedMotion)
+                {
+                    m_KeyframedMotion.Play();
+                }
+            }
+        }
+
+        public void PauseKeyframedMotion()
+        {
+            lock (m_KeyframeMotionUpdateLock)
+            {
+                if (null != m_KeyframedMotion)
+                {
+                    m_KeyframedMotion.Pause();
+                }
+            }
+        }
+
+        public void StopKeyframedMotion()
+        {
+            lock (m_KeyframeMotionUpdateLock)
+            {
+                if (null != m_KeyframedMotion)
+                {
+                    m_KeyframedMotion.Stop();
+                }
+            }
+        }
+
+        #endregion
+
         #region Properties
         public bool IsChanged { get; private set; }
 
-        public SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType m_SaleType;
+        public InventoryItem.SaleInfoData.SaleType m_SaleType;
         public int m_SalePrice;
         public int m_OwnershipCost;
         public UInt32 m_Category;
