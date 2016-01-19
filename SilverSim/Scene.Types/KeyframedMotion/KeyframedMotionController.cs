@@ -104,7 +104,6 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                 m_KeyframeTimer.Enabled = false;
                 /* reset program */
                 m_Program.CurrentFrame = -1;
-                m_Program.CurrentTimePosition = 0;
             }
         }
         #endregion
@@ -116,13 +115,11 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                 bool newKeyframe = false;
                 if(m_Program.CurrentFrame == -1)
                 {
-                    m_Program.CurrentFrame = 0;
                     m_Program.IsRunningReverse = false;
                     m_Program.CurrentTimePosition = 0;
-                    if(m_Program.PlayMode == KeyframedMotion.Mode.Reverse)
-                    {
-                        m_Program.CurrentFrame = m_Program.Count - 1;
-                    }
+                    m_Program.CurrentFrame = (m_Program.PlayMode == KeyframedMotion.Mode.Reverse) ?
+                        m_Program.Count - 1 :
+                        0;
                     newKeyframe = true;
                 }
                 else
@@ -145,6 +142,23 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                             {
                                 m_Program.IsRunningReverse = false;
                             }
+                            else
+                            {
+                                if ((flags & KeyframedMotion.DataFlags.Translation) != 0)
+                                {
+                                    Part.Velocity = Vector3.Zero;
+                                    Part.Position = curFrame.TargetPosition;
+                                }
+                                if ((flags & KeyframedMotion.DataFlags.Rotation) != 0)
+                                {
+                                    Part.AngularVelocity = Vector3.Zero;
+                                    Part.Rotation = curFrame.TargetRotation;
+                                }
+                                m_Program.CurrentFrame = -1;
+                                m_Program.IsRunning = false;
+                                m_KeyframeTimer.Enabled = false;
+                                return;
+                            }
                         }
                     }
                     else
@@ -154,8 +168,17 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                             switch(m_Program.PlayMode)
                             {
                                 case KeyframedMotion.Mode.Forward:
-                                    Part.Velocity = Vector3.Zero;
-                                    Part.AngularVelocity = Vector3.Zero;
+                                    if ((flags & KeyframedMotion.DataFlags.Translation) != 0)
+                                    {
+                                        Part.Velocity = Vector3.Zero;
+                                        Part.Position = curFrame.TargetPosition;
+                                    }
+                                    if ((flags & KeyframedMotion.DataFlags.Rotation) != 0)
+                                    {
+                                        Part.AngularVelocity = Vector3.Zero;
+                                        Part.Rotation = curFrame.TargetRotation;
+                                    }
+                                    m_Program.CurrentFrame = -1;
                                     m_Program.IsRunning = false;
                                     m_KeyframeTimer.Enabled = false;
                                     return;
@@ -172,7 +195,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                                     m_Program.IsRunningReverse = true;
                                     break;
 
-                                case KeyframedMotion.Mode.Reverse:
+                                default:
                                     break;
                             }
                         }
@@ -181,7 +204,8 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                     m_Program.CurrentTimePosition = 0f;
                 }
 
-                if(newKeyframe)
+                curFrame = m_Program[m_Program.CurrentFrame];
+                if (newKeyframe)
                 {
                     if((flags & KeyframedMotion.DataFlags.Translation) != 0)
                     {
