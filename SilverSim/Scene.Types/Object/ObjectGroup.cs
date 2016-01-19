@@ -247,12 +247,10 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_KeyframeMotionUpdateLock)
+                KeyframedMotionController controller = m_KeyframedMotion;
+                if(controller != null)
                 {
-                    if(m_KeyframedMotion != null)
-                    {
-                        return m_KeyframedMotion.Program;
-                    }
+                    return controller.Program;
                 }
                 return null;
             }
@@ -286,34 +284,28 @@ namespace SilverSim.Scene.Types.Object
 
         public void PlayKeyframedMotion()
         {
-            lock(m_KeyframeMotionUpdateLock)
+            KeyframedMotionController controller = m_KeyframedMotion;
+            if (controller != null)
             {
-                if(null != m_KeyframedMotion)
-                {
-                    m_KeyframedMotion.Play();
-                }
+                controller.Play();
             }
         }
 
         public void PauseKeyframedMotion()
         {
-            lock (m_KeyframeMotionUpdateLock)
+            KeyframedMotionController controller = m_KeyframedMotion;
+            if (controller != null)
             {
-                if (null != m_KeyframedMotion)
-                {
-                    m_KeyframedMotion.Pause();
-                }
+                controller.Pause();
             }
         }
 
         public void StopKeyframedMotion()
         {
-            lock (m_KeyframeMotionUpdateLock)
+            KeyframedMotionController controller = m_KeyframedMotion;
+            if (controller != null)
             {
-                if (null != m_KeyframedMotion)
-                {
-                    m_KeyframedMotion.Stop();
-                }
+                controller.Stop();
             }
         }
 
