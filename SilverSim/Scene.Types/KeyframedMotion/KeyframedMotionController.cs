@@ -209,13 +209,13 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                 {
                     if((flags & KeyframedMotion.DataFlags.Translation) != 0)
                     {
-                        Vector3 distance = curFrame.TargetPosition - ObjectGroup.Position;
+                        Vector3 distance = curFrame.TargetPosition;
                         ObjectGroup.Velocity = distance / curFrame.Duration;
                     }
 
                     if((flags & KeyframedMotion.DataFlags.Rotation) != 0)
                     {
-                        Vector3 angularDistance = (curFrame.TargetRotation / ObjectGroup.Rotation).GetEulerAngles();
+                        Vector3 angularDistance = curFrame.TargetRotation.GetEulerAngles();
                         ObjectGroup.AngularVelocity = angularDistance / curFrame.Duration;
                     }
                 }
