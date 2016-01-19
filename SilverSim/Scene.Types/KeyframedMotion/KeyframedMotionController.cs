@@ -10,7 +10,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 {
     public class KeyframedMotionController : IDisposable
     {
-        const double KEYFRAME_TIME_STEP = 1f / 10;
+        const double KEYFRAME_TIME_STEP = 1f / 45;
         Timer m_KeyframeTimer = new Timer(KEYFRAME_TIME_STEP);
         object m_KeyframeLock = new object();
         KeyframedMotion m_Program = new KeyframedMotion();
