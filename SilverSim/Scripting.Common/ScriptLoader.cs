@@ -70,6 +70,10 @@ namespace SilverSim.Scripting.Common
                 });
                 m_LoadedAssemblies[data.ID] = assembly;
                 instance = assembly.Instantiate(part, item);
+                if(!m_LoadedInstances.ContainsKey(data.ID))
+                {
+                    m_LoadedInstances.Add(data.ID, new RwLockedList<ScriptInstance>());
+                }
                 m_LoadedInstances[data.ID].Add(instance);
             }
             finally

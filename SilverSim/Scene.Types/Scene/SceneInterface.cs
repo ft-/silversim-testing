@@ -376,6 +376,8 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void TriggerLightShareSettingsChanged();
         public abstract void SendRegionInfo(IAgent agent);
 
+        public bool IsKeyframedMotionEnabled { get; set; }
+
         public void TriggerAgentChangedScene(IAgent agent)
         {
             foreach(IAgentListener aglistener in AgentListeners)

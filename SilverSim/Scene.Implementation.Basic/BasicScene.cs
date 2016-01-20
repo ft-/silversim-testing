@@ -582,7 +582,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
 
-            ScriptThreadPool = new ScriptWorkerThreadPool(50, 150);
+            ScriptThreadPool = new ScriptWorkerThreadPool(50, 150, ID);
             if(null != physicsFactory)
             {
                 PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);

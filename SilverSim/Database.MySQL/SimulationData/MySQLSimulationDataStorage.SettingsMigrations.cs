@@ -93,6 +93,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new PrimaryKeyInfo("RegionID", "PrimID", "ItemID"),
             new TableRevision(2),
             new ChangeEngine("MyISAM"),
+            new TableRevision(3),
+            new ChangeColumn<byte[]>("ScriptState") { IsLong = true },
             #endregion
 
             #region Table regionsettings

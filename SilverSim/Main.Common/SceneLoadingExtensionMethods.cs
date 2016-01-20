@@ -16,6 +16,9 @@ using System.Threading;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.WindLight;
+using SilverSim.Scripting.Common;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Types.Asset;
 
 namespace SilverSim.Main.Common
 {
@@ -325,6 +328,40 @@ namespace SilverSim.Main.Common
                 }
 
                 loadparams.Scene.UpdateEnvironmentSettings();
+
+                m_Log.InfoFormat("Starting scripts for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                int scriptcount = 0;
+                foreach(ObjectPart part in loadparams.Scene.Primitives)
+                {
+                    foreach(ObjectPartInventoryItem item in part.Inventory.Values)
+                    {
+                        if (item.AssetType == AssetType.LSLText)
+                        {
+                            AssetData assetData;
+                            if (loadparams.Scene.AssetService.TryGetValue(item.AssetID, out assetData))
+                            {
+                                item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData);
+                                if (++scriptcount % 50 == 0)
+                                {
+                                    m_Log.InfoFormat("Started {2} scripts for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID, scriptcount);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (scriptcount == 1)
+                {
+                    m_Log.InfoFormat("Started 1 script for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                }
+                else if(scriptcount % 50 != 0)
+                {
+                    m_Log.InfoFormat("Started {2} scripts for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID, scriptcount);
+                }
+                m_Log.InfoFormat("All scripts started for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+
+                loadparams.Scene.IsKeyframedMotionEnabled = true;
+
                 loadparams.Scene.LoginControl.Ready(SceneInterface.ReadyFlags.SceneObjects);
             }
             finally

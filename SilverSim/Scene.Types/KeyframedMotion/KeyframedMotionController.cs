@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
 using System.Timers;
@@ -36,6 +37,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                         throw new ArgumentException("KeyframedMotion has no keyframes");
                     }
                     m_Program = new KeyframedMotion(value);
+                    m_KeyframeTimer.Enabled = m_Program.IsRunning;
                 }
             }
         }
@@ -51,28 +53,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             m_KeyframeTimer.Elapsed -= KeyframeTimer;
             m_KeyframeTimer.Dispose();
         }
-
-        #region Serialization Helpers
-        public void PlayIfWasRunning()
-        {
-            lock(m_KeyframeLock)
-            {
-                if(m_Program.IsRunning)
-                {
-                    m_KeyframeTimer.Enabled = true;
-                }
-            }
-        }
-
-        public void StopForShutdown()
-        {
-            lock (m_KeyframeLock)
-            {
-                m_KeyframeTimer.Enabled = false;
-            }
-        }
-        #endregion
-
+        
         #region Normal controls
         public void Play()
         {
@@ -110,6 +91,12 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
         void KeyframeTimer(object o, ElapsedEventArgs args)
         {
+            SceneInterface scene = ObjectGroup.Scene;
+            if(!scene.IsKeyframedMotionEnabled)
+            {
+                return;
+            }
+
             lock(m_KeyframeLock)
             {
                 bool newKeyframe = false;

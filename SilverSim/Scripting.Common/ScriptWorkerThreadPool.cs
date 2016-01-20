@@ -1,9 +1,11 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
+using SilverSim.Types;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -12,9 +14,13 @@ namespace SilverSim.Scripting.Common
 {
     public sealed class ScriptWorkerThreadPool : IScriptWorkerThreadPool
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("SCRIPT WORKER THREAD POOL");
+
         readonly BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
+        readonly ManualResetEvent m_WaitShutdownEvent = new ManualResetEvent(false);
         private int m_MinimumThreads = 2;
         private int m_MaximumThreads = 150;
+        readonly UUID m_SceneID;
         bool m_ShutdownThreads;
         public class ScriptThreadContext
         {
@@ -61,16 +67,18 @@ namespace SilverSim.Scripting.Common
             }
         }
 
-        public ScriptWorkerThreadPool(int minimumThreads, int maximumThreads)
+        public ScriptWorkerThreadPool(int minimumThreads, int maximumThreads, UUID sceneID)
         {
             MinimumThreads = minimumThreads;
             MaximumThreads = maximumThreads;
+            m_SceneID = sceneID;
 
+            m_Log.InfoFormat("Starting {0} minimum threads for {1}", minimumThreads, m_SceneID.ToString());
             for (int threadCount = 0; threadCount < m_MinimumThreads; ++threadCount)
             {
                 ScriptThreadContext tc = new ScriptThreadContext();
                 tc.ScriptThread = new Thread(ThreadMain);
-                tc.ScriptThread.Name = "Script Worker";
+                tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
                 tc.ScriptThread.IsBackground = true;
                 tc.ThreadPool = this;
                 tc.ScriptThread.Start(tc);
@@ -97,7 +105,7 @@ namespace SilverSim.Scripting.Common
                         ScriptThreadContext tc = new ScriptThreadContext();
                         tc.ScriptThread = new Thread(ThreadMain);
                         tc.ThreadPool = this;
-                        tc.ScriptThread.Name = "Script Worker";
+                        tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
                         tc.ScriptThread.IsBackground = true;
                         tc.ScriptThread.Start(tc);
                         m_Threads.Add(tc);
@@ -132,6 +140,30 @@ namespace SilverSim.Scripting.Common
         public void Shutdown()
         {
             m_ShutdownThreads = true;
+            if (m_Threads.Count != 0)
+            {
+                m_Log.InfoFormat("Waiting for script shutdown of region {0}", m_SceneID.ToString());
+                if (!m_WaitShutdownEvent.WaitOne(30000))
+                {
+                    /* we have to abort threads */
+                    m_Log.InfoFormat("Killing blocked instances of region {0}", m_SceneID.ToString());
+                    foreach(ScriptThreadContext tc in m_Threads)
+                    {
+                        lock(tc)
+                        {
+                            ScriptInstance instance = tc.CurrentScriptInstance;
+                            if (null != instance)
+                            {
+                                lock (instance)
+                                {
+                                    tc.ScriptThread.Abort();
+                                }
+                            }
+                        }
+                    }
+                }
+                m_Log.InfoFormat("Completed script shutdown of region {0}", m_SceneID.ToString());
+            }
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -150,9 +182,13 @@ namespace SilverSim.Scripting.Common
                 {
                     lock (m_Threads)
                     {
-                        if (m_Threads.Count > m_MinimumThreads)
+                        if (m_Threads.Count > m_MinimumThreads || m_ShutdownThreads)
                         {
                             m_Threads.Remove(tc);
+                            if (m_ShutdownThreads && m_Threads.Count == 0)
+                            {
+                                m_WaitShutdownEvent.Set();
+                            }
                             return;
                         }
                     }
@@ -197,7 +233,15 @@ namespace SilverSim.Scripting.Common
                     pool.m_ScriptTriggerQueue.Enqueue(ev);
                 }
             }
-        }
 
+            lock (m_Threads)
+            {
+                m_Threads.Remove(tc);
+                if (m_Threads.Count == 0)
+                {
+                    m_WaitShutdownEvent.Set();
+                }
+            }
+        }
     }
 }

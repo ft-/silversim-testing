@@ -2,16 +2,10 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Types;
-using SilverSim.Types.Asset;
-using SilverSim.Types.Inventory;
-using SilverSim.Types.Primitive;
-using System;
-using System.Collections.Generic;
-using SilverSim.ServiceInterfaces.Database;
 using MySql.Data.MySqlClient;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Types;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
@@ -26,28 +20,41 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
         }
 
-        /* setting value to null will delete the entry */
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override string this[UUID regionID, UUID primID, UUID itemID] 
+        public override bool TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state)
         {
-            get
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                {
-                    connection.Open();
+                connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ScriptState FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
+                {
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return (string)dbReader["ScriptState"];
-                            }
+                            state = dbReader.GetBytes("ScriptState");
+                            return true;
                         }
                     }
                 }
-                throw new KeyNotFoundException();
+            }
+            state = null;
+            return false;
+        }
+
+        /* setting value to null will delete the entry */
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        public override byte[] this[UUID regionID, UUID primID, UUID itemID] 
+        {
+            get
+            {
+                byte[] state;
+                if(!TryGetValue(regionID, primID, itemID, out state))
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                return state;
             }
             set
             {
@@ -55,22 +62,24 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     connection.Open();
 
-                    if(String.IsNullOrEmpty(value))
-                    {
-                        using(MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
-                        {
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                    else
-                    {
-                        Dictionary<string, object> p = new Dictionary<string, object>();
-                        p["RegionID"] = regionID;
-                        p["PrimID"] = primID;
-                        p["ItemID"] = itemID;
-                        p["ScriptState"] = value;
-                        MySQLUtilities.ReplaceInto(connection, "scriptstates", p);
-                    }
+                    Dictionary<string, object> p = new Dictionary<string, object>();
+                    p["RegionID"] = regionID;
+                    p["PrimID"] = primID;
+                    p["ItemID"] = itemID;
+                    p["ScriptState"] = value;
+                    MySQLUtilities.ReplaceInto(connection, "scriptstates", p);
+                }
+            }
+        }
+
+        public override bool Remove(UUID regionID, UUID primID, UUID itemID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
+                {
+                    return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
