@@ -340,7 +340,17 @@ namespace SilverSim.Main.Common
                             AssetData assetData;
                             if (loadparams.Scene.AssetService.TryGetValue(item.AssetID, out assetData))
                             {
-                                item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData);
+                                byte[] serializedState;
+                                if (loadparams.SimulationDataStorage.ScriptStates.TryGetValue(loadparams.Scene.ID, part.ID, item.ID, out serializedState))
+                                {
+                                    item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, serializedState);
+                                }
+                                else
+                                {
+                                    item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData);
+                                    item.ScriptInstance.IsRunning = true;
+                                    item.ScriptInstance.Reset();
+                                }
                                 if (++scriptcount % 50 == 0)
                                 {
                                     m_Log.InfoFormat("Started {2} scripts for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID, scriptcount);

@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.Common
             m_LoadedDomains.Add(assetID, appDom);
         }
 
-        public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data)
+        public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data, byte[] serializedState = null)
         {
             ScriptInstance instance;
             m_CompilerLock.AcquireReaderLock(-1);
@@ -69,7 +69,7 @@ namespace SilverSim.Scripting.Common
                     }
                 });
                 m_LoadedAssemblies[data.ID] = assembly;
-                instance = assembly.Instantiate(part, item);
+                instance = assembly.Instantiate(part, item, serializedState);
                 if(!m_LoadedInstances.ContainsKey(data.ID))
                 {
                     m_LoadedInstances.Add(data.ID, new RwLockedList<ScriptInstance>());
