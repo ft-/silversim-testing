@@ -21,8 +21,6 @@ namespace SilverSim.Scene.Types.Script
         public abstract void Remove();
         public abstract void Reset();
 
-        public abstract byte[] ToDbSerializedState();
-
         public abstract void ProcessEvent();
         public abstract void ShoutError(string msg);
         public abstract bool HasEventsPending { get; }
