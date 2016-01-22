@@ -203,10 +203,6 @@ namespace SilverSim.Scripting.Common
                         tc.CurrentScriptInstance = ev;
                     }
                     ev.ProcessEvent();
-                    lock(tc)
-                    {
-                        tc.CurrentScriptInstance = null;
-                    }
                 }
                 catch(ThreadAbortException)
                 {
@@ -226,6 +222,14 @@ namespace SilverSim.Scripting.Common
                     instance.Remove();
                     item.ScriptInstance = null;
                     ScriptLoader.Remove(item.AssetID, instance);
+                }
+                finally
+                {
+                    lock (tc)
+                    {
+                        ev.ThreadPool = null;
+                        tc.CurrentScriptInstance = null;
+                    }
                 }
 
                 if (ev.HasEventsPending)

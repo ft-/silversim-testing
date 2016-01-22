@@ -1117,6 +1117,47 @@ namespace SilverSim.Main.Common
             ProcessParameterMap();
             ProcessUseTemplates();
 
+            /* inject config values from arguments */
+            foreach (string arg in args)
+            {
+                if (arg.StartsWith("-D:"))
+                {
+                    string vardef = arg.Substring(3);
+                    int varpos = vardef.IndexOf('=');
+                    if (varpos < 0)
+                    {
+                        continue;
+                    }
+                    string varname = vardef.Substring(0, varpos);
+                    string varvalue = vardef.Substring(varpos + 1);
+                    string[] parts = varname.Split(new char[] { ':' }, 2);
+                    IConfig cfg;
+                    switch (parts.Length)
+                    {
+                        case 1:
+                            cfg = m_Config.Configs["Startup"];
+                            if (null == cfg)
+                            {
+                                cfg = m_Config.AddConfig("Startup");
+                            }
+                            cfg.Set(parts[0], varvalue);
+                            break;
+
+                        case 2:
+                            cfg = m_Config.Configs[parts[0]];
+                            if (null == cfg)
+                            {
+                                cfg = m_Config.AddConfig(parts[0]);
+                            }
+                            cfg.Set(parts[1], varvalue);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+
             string logConfigFile = string.Empty;
             IConfig startupConfig = m_Config.Configs["Startup"];
             if(startupConfig != null)
