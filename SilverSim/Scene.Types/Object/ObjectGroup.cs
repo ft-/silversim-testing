@@ -910,6 +910,10 @@ namespace SilverSim.Scene.Types.Object
             {
                 linkTarget = LINK_ROOT;
             }
+            else if(linkTarget == LINK_THIS)
+            {
+                linkTarget = linkThis;
+            }
             else if(linkTarget < LINK_ROOT)
             {
                 throw new ArgumentException(String.Format("Invalid link target parameter for SetPrimitiveParams: {0}", linkTarget));
