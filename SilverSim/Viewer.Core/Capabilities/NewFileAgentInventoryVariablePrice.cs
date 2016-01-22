@@ -247,10 +247,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                                 texentry.DefaultTexture.TextureID = TextureEntry.WHITE_TEXTURE;
                                 Map inner_instance = (Map)instance_list[idx];
                                 AnArray face_list = (AnArray)(inner_instance["face_list"]);
-                                for (int faceidx = 0; faceidx < face_list.Count; ++faceidx)
+                                for (uint faceidx = 0; faceidx < face_list.Count; ++faceidx)
                                 {
-                                    Map faceMap = (Map)(face_list[faceidx]);
-                                    TextureEntryFace face = texentry.FaceTextures[faceidx];
+                                    Map faceMap = (Map)(face_list[(int)faceidx]);
+                                    TextureEntryFace face = texentry[faceidx];
                                     if (faceMap.ContainsKey("fullbright"))
                                     {
                                         face.FullBright = faceMap["fullbright"].AsBoolean;

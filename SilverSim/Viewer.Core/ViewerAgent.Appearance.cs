@@ -202,10 +202,11 @@ namespace SilverSim.Viewer.Core
             int tidx;
             if (te.DefaultTexture != null)
             {
-                for (tidx = 0; tidx < Math.Min(te.FaceTextures.Length, NUM_AVATAR_TEXTURES); ++tidx)
+                for (tidx = 0; tidx < Math.Min(TextureEntry.MAX_TEXTURE_FACES, NUM_AVATAR_TEXTURES); ++tidx)
                 {
-                    Textures[tidx] = (te.FaceTextures[tidx] != null) ?
-                        te.FaceTextures[tidx].TextureID :
+                    TextureEntryFace face;
+                    Textures[tidx] = te.TryGetValue((uint)tidx, out face) ?
+                        face.TextureID :
                         te.DefaultTexture.TextureID;
                 }
             }

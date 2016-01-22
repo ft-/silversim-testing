@@ -145,10 +145,9 @@ namespace SilverSim.Viewer.Core
                                 ObjectPart p = Scene.Primitives[primLocalID];
                                 if (faceDataMap.ContainsKey("Face"))
                                 {
-                                    int face = faceDataMap["Face"].AsInt;
-                                    TextureEntryFace te = p.TextureEntry.FaceTextures[face];
+                                    uint face = faceDataMap["Face"].AsUInt;
+                                    TextureEntryFace te = p.TextureEntry[face];
                                     te.MaterialID = matID;
-                                    p.TextureEntry.FaceTextures[face] = te;
                                 }
                                 else
                                 {
