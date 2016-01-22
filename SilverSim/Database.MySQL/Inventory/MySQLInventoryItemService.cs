@@ -184,7 +184,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                 }
             }
-            IncrementVersion(principalID, item.ID);
+            IncrementVersion(principalID, item.ParentFolderID);
         }
 
         public override void Move(UUID principalID, UUID id, UUID toFolderID)
