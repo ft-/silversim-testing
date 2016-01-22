@@ -133,6 +133,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             "terrains",
             "parcels",
             "environmentsettings",
+            "regionsettings",
             "lightshare",
             "spawnpoints"
         };
