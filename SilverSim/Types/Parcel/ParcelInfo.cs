@@ -457,5 +457,59 @@ namespace SilverSim.Types.Parcel
             m_BitmapHeight = bitmapHeight;
             LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock, this);
         }
+
+        public ParcelInfo(ParcelInfo src)
+        {
+            m_LandBitmap = new byte[src.m_BitmapHeight, src.m_BitmapHeight / 8];
+            m_BitmapWidth = src.m_BitmapWidth;
+            m_BitmapHeight = src.m_BitmapHeight;
+            LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock, this);
+            Area = src.Area;
+            AuctionID = src.AuctionID;
+            AuthBuyer = new UUI(src.AuthBuyer);
+            Category = src.Category;
+            ClaimDate = src.ClaimDate;
+            ClaimPrice = src.ClaimPrice;
+            ID = src.ID;
+            Group = new UGI(src.Group);
+            GroupOwned = src.GroupOwned;
+            Description = src.Description;
+            Flags = src.Flags;
+            LandingType = src.LandingType;
+            LandingPosition = src.LandingPosition;
+            LandingLookAt = src.LandingLookAt;
+            Name = src.Name;
+            Status = src.Status;
+            LocalID = src.LocalID;
+            MusicURI = src.MusicURI;
+            MediaURI = src.MediaURI;
+            MediaID = src.MediaID;
+            MediaType = src.MediaType;
+            Owner = new UUI(src.Owner);
+            SnapshotID = src.SnapshotID;
+            SalePrice = src.SalePrice;
+            OtherCleanTime = src.OtherCleanTime;
+            MediaAutoScale = src.MediaAutoScale;
+            MediaWidth = src.MediaWidth;
+            MediaHeight = src.MediaHeight;
+            MediaLoop = src.MediaLoop;
+            MediaDescription = src.MediaDescription;
+            RentPrice = src.RentPrice;
+            AABBMin = src.AABBMin;
+            AABBMax = src.AABBMax;
+            ParcelPrimBonus = src.ParcelPrimBonus;
+            PassPrice = src.PassPrice;
+            PassHours = src.PassHours;
+            ActualArea = src.ActualArea;
+            BillableArea = src.BillableArea;
+            Dwell = src.Dwell;
+            ObscureMedia = src.ObscureMedia;
+            ObscureMusic = src.ObscureMusic;
+            SeeAvatars = src.SeeAvatars;
+            AnyAvatarSounds = src.AnyAvatarSounds;
+            GroupAvatarSounds = src.GroupAvatarSounds;
+            IsPrivate = src.IsPrivate;
+            LandBitmap.DataNoAABBUpdate = src.LandBitmap.Data;
+        }
     }
 }
