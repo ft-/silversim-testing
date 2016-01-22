@@ -12,6 +12,52 @@ namespace SilverSim.Scene.Types.Scene
 {
     public class RegionSettings
     {
+        public RegionSettings()
+        {
+
+        }
+
+        public RegionSettings(RegionSettings src)
+        {
+            BlockTerraform = src.BlockTerraform;
+            BlockFly = src.BlockFly;
+            AllowDamage = src.AllowDamage;
+            BlockDwell = src.BlockDwell;
+            RestrictPushing = src.RestrictPushing;
+            AllowLandResell = src.AllowLandResell;
+            AllowLandJoinDivide = src.AllowLandJoinDivide;
+            BlockShowInSearch = src.BlockShowInSearch;
+            AgentLimit = src.AgentLimit;
+            ObjectBonus = src.ObjectBonus;
+            DisableScripts = src.DisableScripts;
+            DisableCollisions = src.DisableCollisions;
+            DisablePhysics = src.DisablePhysics;
+            BlockFlyOver = src.BlockFlyOver;
+            SunPosition = src.SunPosition;
+            IsSunFixed = src.IsSunFixed;
+            UseEstateSun = src.UseEstateSun;
+            ResetHomeOnTeleport = src.ResetHomeOnTeleport;
+            AllowLandmark = src.AllowLandmark;
+            AllowDirectTeleport = src.AllowDirectTeleport;
+            m_TerrainTexture1 = src.m_TerrainTexture1;
+            m_TerrainTexture2 = src.m_TerrainTexture2;
+            m_TerrainTexture3 = src.m_TerrainTexture3;
+            m_TerrainTexture4 = src.m_TerrainTexture4;
+            Elevation1NW = src.Elevation1NW;
+            Elevation2NW = src.Elevation2NW;
+            Elevation1NE = src.Elevation1NE;
+            Elevation2NE = src.Elevation2NE;
+            Elevation1SE = src.Elevation1SE;
+            Elevation2SE = src.Elevation2SE;
+            Elevation1SW = src.Elevation1SW;
+            Elevation2SW = src.Elevation2SW;
+            WaterHeight = src.WaterHeight;
+            TerrainRaiseLimit = src.TerrainRaiseLimit;
+            TerrainLowerLimit = src.TerrainLowerLimit;
+            Sandbox = src.Sandbox;
+            TelehubObject = src.TelehubObject;
+        }
+
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_1 = new UUID("b8d3965a-ad78-bf43-699b-bff8eca6c975");
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_2 = new UUID("abb783e6-3e93-26c0-248a-247666855da3");
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_3 = new UUID("179cdabd-398a-9b6b-1391-4dc333ba321f");
