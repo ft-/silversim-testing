@@ -71,7 +71,7 @@ namespace SilverSim.Types.Primitive
             {
                 if (index >= MAX_TEXTURE_FACES)
                 {
-                    throw new KeyNotFoundException();
+                    throw new KeyNotFoundException(index.ToString());
                 }
 
                 lock (m_Lock)

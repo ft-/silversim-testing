@@ -1102,9 +1102,9 @@ namespace SilverSim.Scene.Types.Object
             if (face == ALL_SIDES)
             {
                 List<TextureEntryFace> list = new List<TextureEntryFace>();
-                for (int i = 0; i < NumberOfSides; ++i)
+                for (uint i = 0; i < NumberOfSides; ++i)
                 {
-                    list.Add(m_TextureEntry[(uint)face]);
+                    list.Add(m_TextureEntry[i]);
                 }
                 return list;
             }
@@ -1381,7 +1381,7 @@ namespace SilverSim.Scene.Types.Object
                         foreach (TextureEntryFace face in faces)
                         {
                             enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.Texture, enumerator);
+                            SetTexPrimitiveParams(face, PrimitiveParamsType.Glow, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                     }

@@ -883,15 +883,16 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new ArgumentException(String.Format("Invalid link target {0}", linkTarget));
                                 }
+                                IObject obj;
                                 try
                                 {
-                                    IObject obj = GetObjectLink(linkTarget);
-                                    obj.GetPrimitiveParams(enumerator, paramList);
+                                    obj = GetObjectLink(linkTarget);
                                 }
                                 catch(KeyNotFoundException)
                                 {
                                     throw new ArgumentException(String.Format("Link target {0} does not exist", linkTarget));
                                 }
+                                obj.GetPrimitiveParams(enumerator, paramList);
                                 break;
                         }
                         break;
@@ -1007,15 +1008,16 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new ArgumentException(String.Format("Invalid link target {0}", linkTarget));
                                 }
+                                IObject linkobj;
                                 try
                                 {
-                                    IObject obj = GetObjectLink(linkTarget);
-                                    obj.SetPrimitiveParams(enumerator);
+                                    linkobj = GetObjectLink(linkTarget);
                                 }
                                 catch(KeyNotFoundException)
                                 {
                                     throw new ArgumentException(String.Format("Link target {0} does not exist", linkTarget));
                                 }
+                                linkobj.SetPrimitiveParams(enumerator);
                                 break;
                         }
                         break;
