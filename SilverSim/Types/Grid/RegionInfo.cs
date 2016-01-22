@@ -11,6 +11,30 @@ namespace SilverSim.Types.Grid
         {
 
         }
+
+        public RegionInfo(RegionInfo src)
+        {
+            ID = src.ID;
+            Location = src.Location;
+            Size = src.Size;
+            Name = src.Name;
+            ServerIP = src.ServerIP;
+            ServerHttpPort = src.ServerHttpPort;
+            ServerURI = src.ServerURI;
+            ServerPort = src.ServerPort;
+            RegionMapTexture = src.RegionMapTexture;
+            ParcelMapTexture = src.ParcelMapTexture;
+            Access = src.Access;
+            RegionSecret = src.RegionSecret;
+            Owner = new UUI(src.Owner);
+            Flags = src.Flags;
+            ProductName = src.ProductName;
+            ProtocolVariant = src.ProtocolVariant;
+            GridURI = src.GridURI;
+            AuthenticatingPrincipal = new UUI(src.AuthenticatingPrincipal);
+            AuthenticatingToken = src.AuthenticatingToken;
+            ScopeID = src.ScopeID;
+        }
         #endregion
 
         #region Region Information
