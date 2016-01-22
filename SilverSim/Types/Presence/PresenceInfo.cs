@@ -14,5 +14,13 @@ namespace SilverSim.Types.Presence
         {
 
         }
+
+        public PresenceInfo(PresenceInfo src)
+        {
+            UserID = new UUI(src.UserID);
+            RegionID = src.RegionID;
+            SessionID = src.SessionID;
+            SecureSessionID = src.SecureSessionID;
+        }
     }
 }
