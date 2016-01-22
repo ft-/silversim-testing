@@ -6,10 +6,7 @@ using SilverSim.Types;
 using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
