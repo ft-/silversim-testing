@@ -1046,7 +1046,21 @@ namespace SilverSim.Main.Common
 
             m_ShutdownTimer.Elapsed += ShutdownTimerEventHandler;
             m_ShutdownEvent = shutdownEvent;
-            ArgvConfigSource configSource = new ArgvConfigSource(args);
+            List<string> defineargs = new List<string>();
+            List<string> otherargs = new List<string>();
+            foreach(string arg in args)
+            {
+                if(arg.StartsWith("-D:"))
+                {
+                    defineargs.Add(arg);
+                }
+                else
+                {
+                    otherargs.Add(arg);
+                }
+            }
+
+            ArgvConfigSource configSource = new ArgvConfigSource(otherargs.ToArray());
             configSource.AddSwitch("Startup", "mode", "m");
             configSource.AddSwitch("Startup", "config", "c");
             IConfig startup = configSource.Configs["Startup"];
@@ -1118,43 +1132,40 @@ namespace SilverSim.Main.Common
             ProcessUseTemplates();
 
             /* inject config values from arguments */
-            foreach (string arg in args)
+            foreach (string arg in defineargs)
             {
-                if (arg.StartsWith("-D:"))
+                string vardef = arg.Substring(3);
+                int varpos = vardef.IndexOf('=');
+                if (varpos < 0)
                 {
-                    string vardef = arg.Substring(3);
-                    int varpos = vardef.IndexOf('=');
-                    if (varpos < 0)
-                    {
-                        continue;
-                    }
-                    string varname = vardef.Substring(0, varpos);
-                    string varvalue = vardef.Substring(varpos + 1);
-                    string[] parts = varname.Split(new char[] { ':' }, 2);
-                    IConfig cfg;
-                    switch (parts.Length)
-                    {
-                        case 1:
-                            cfg = m_Config.Configs["Startup"];
-                            if (null == cfg)
-                            {
-                                cfg = m_Config.AddConfig("Startup");
-                            }
-                            cfg.Set(parts[0], varvalue);
-                            break;
+                    continue;
+                }
+                string varname = vardef.Substring(0, varpos);
+                string varvalue = vardef.Substring(varpos + 1);
+                string[] parts = varname.Split(new char[] { ':' }, 2);
+                IConfig cfg;
+                switch (parts.Length)
+                {
+                    case 1:
+                        cfg = m_Config.Configs["Startup"];
+                        if (null == cfg)
+                        {
+                            cfg = m_Config.AddConfig("Startup");
+                        }
+                        cfg.Set(parts[0], varvalue);
+                        break;
 
-                        case 2:
-                            cfg = m_Config.Configs[parts[0]];
-                            if (null == cfg)
-                            {
-                                cfg = m_Config.AddConfig(parts[0]);
-                            }
-                            cfg.Set(parts[1], varvalue);
-                            break;
+                    case 2:
+                        cfg = m_Config.Configs[parts[0]];
+                        if (null == cfg)
+                        {
+                            cfg = m_Config.AddConfig(parts[0]);
+                        }
+                        cfg.Set(parts[1], varvalue);
+                        break;
 
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
             }
 
