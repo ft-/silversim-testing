@@ -14,5 +14,13 @@ namespace SilverSim.Types.Parcel
         {
 
         }
+
+        public ParcelAccessEntry(ParcelAccessEntry src)
+        {
+            RegionID = src.RegionID;
+            ParcelID = src.ParcelID;
+            Accessor = new UUI(src.Accessor);
+            ExpiresAt = new Date(src.ExpiresAt);
+        }
     }
 }
