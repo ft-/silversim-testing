@@ -141,7 +141,7 @@ namespace SilverSim.Types.Primitive
         {
             if(length < 16)
             {
-                DefaultTexture = null;
+                DefaultTexture = new TextureEntryFace(null);
                 return;
             }
             else

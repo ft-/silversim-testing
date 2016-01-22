@@ -631,6 +631,31 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             Environment.Stop();
             ScriptThreadPool.Shutdown();
+            int serializedcount = 0;
+            foreach(ObjectPart part in Primitives)
+            {
+                foreach(ObjectPartInventoryItem item in part.Inventory.Values)
+                {
+                    IScriptState state = item.ScriptState;
+                    if(null != state)
+                    {
+                        m_SimulationDataStorage.ScriptStates[ID, part.ID, item.ID] = state.ToDbSerializedState();
+                        if(++serializedcount % 50 == 0)
+                        {
+                            m_Log.InfoFormat("Serialized {0} script states", serializedcount);
+                        }
+                    }
+                }
+            }
+
+            if(serializedcount == 1)
+            {
+                m_Log.InfoFormat("Serialized {0} script state", serializedcount);
+            }
+            else if (serializedcount % 50 != 0)
+            {
+                m_Log.InfoFormat("Serialized {0} script states", serializedcount);
+            }
             m_RestartObject = null;
             if (null != m_NeighborService)
             {
