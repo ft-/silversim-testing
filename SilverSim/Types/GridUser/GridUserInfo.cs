@@ -20,5 +20,19 @@ namespace SilverSim.Types.GridUser
         public bool IsOnline;
         public Date LastLogin = new Date();
         public Date LastLogout = new Date();
+
+        public GridUserInfo(GridUserInfo src)
+        {
+            User = new UUI(src.User);
+            HomeRegionID = src.HomeRegionID;
+            HomePosition = src.HomePosition;
+            HomeLookAt = src.HomeLookAt;
+            LastRegionID = src.LastRegionID;
+            LastPosition = src.LastPosition;
+            LastLookAt = src.LastLookAt;
+            IsOnline = src.IsOnline;
+            LastLogin = new Date(src.LastLogin);
+            LastLogout = new Date(src.LastLogout);
+        }
     }
 }
