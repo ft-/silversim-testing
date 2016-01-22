@@ -26,5 +26,21 @@ namespace SilverSim.Types.Estate
         {
 
         }
+
+        public EstateInfo(EstateInfo src)
+        {
+            ID = src.ID;
+            ParentEstateID = src.ParentEstateID;
+            Name = src.Name;
+            Flags = src.Flags;
+            Owner = new UUI(src.Owner);
+            PricePerMeter = src.PricePerMeter;
+            BillableFactor = src.BillableFactor;
+            SunPosition = src.SunPosition;
+            AbuseEmail = src.AbuseEmail;
+            UseGlobalTime = src.UseGlobalTime;
+            CovenantID = src.CovenantID;
+            CovenantTimestamp = new Date(src.CovenantTimestamp);
+        }
     }
 }
