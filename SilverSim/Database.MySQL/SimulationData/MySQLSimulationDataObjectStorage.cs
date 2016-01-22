@@ -435,41 +435,5 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
         #endregion
-        
-        #region Storage Functions
-        private void UpdateObjectPartInventoryItem(MySqlConnection connection, UUID primID, ObjectPartInventoryItem item)
-        {
-            Dictionary<string, object> data = new Dictionary<string, object>();
-            data.Add("AssetId", item.AssetID);
-            data.Add("AssetType", item.AssetType);
-            data.Add("CreationDate", item.CreationDate);
-            data.Add("Creator", item.Creator);
-            data.Add("Description", item.Description);
-            data.Add("Flags", item.Flags);
-            data.Add("Group", item.Group);
-            data.Add("GroupOwned", item.IsGroupOwned);
-            data.Add("PrimID", primID);
-            data.Add("Name", item.Name);
-            data.Add("InventoryID", item.ID);
-            data.Add("InventoryType", item.InventoryType);
-            data.Add("LastOwner", item.LastOwner);
-            data.Add("Owner", item.Owner);
-            data.Add("ParentFolderID", item.ParentFolderID);
-            data.Add("BasePermissions", item.Permissions.Base);
-            data.Add("CurrentPermissions", item.Permissions.Current);
-            data.Add("EveryOnePermissions", item.Permissions.EveryOne);
-            data.Add("GroupPermissions", item.Permissions.Group);
-            data.Add("NextOwnerPermissions", item.Permissions.NextOwner);
-            data.Add("SaleType", item.SaleInfo.Type);
-            data.Add("SalePrice", item.SaleInfo.Price);
-            data.Add("SalePermMask", item.SaleInfo.PermMask);
-            ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
-            data.Add("PermsGranter", grantinfo.PermsGranter.ToString());
-            data.Add("PermsMask", grantinfo.PermsMask);
-            connection.ReplaceInto("primitems", data);
-        }
-        
-
-        #endregion
     }
 }
