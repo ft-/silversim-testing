@@ -12,27 +12,6 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-
-        void PostTouchEvent(ObjectPart part, TouchEvent e)
-        {
-            if ((part.Flags & SilverSim.Types.Primitive.PrimitiveFlags.Touch) != 0)
-            {
-                if (part.PassTouchMode == SilverSim.Types.Primitive.PassEventMode.IfNotHandled)
-                {
-                    part.PostEvent(e);
-                }
-            }
-            else if (part.LinkNumber != Object.ObjectGroup.LINK_ROOT)
-            {
-                ObjectPart rootPart = part.ObjectGroup.RootPart;
-                if ((rootPart.Flags & SilverSim.Types.Primitive.PrimitiveFlags.Touch) != 0 &&
-                    part.PassTouchMode != SilverSim.Types.Primitive.PassEventMode.Never)
-                {
-                    rootPart.PostEvent(e);
-                }
-            }
-        }
-
         void AddDetectAgentData(IAgent agent, DetectInfo detectdata)
         {
             detectdata.Key = agent.ID;
@@ -86,7 +65,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             e.Detected.Add(detectdata);
 
-            PostTouchEvent(part, e);
+            part.PostTouchEvent(e);
         }
 
         [PacketHandler(MessageType.ObjectGrabUpdate)]
@@ -130,7 +109,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             e.Detected.Add(detectdata);
 
-            PostTouchEvent(part, e);
+            part.PostTouchEvent(e);
         }
 
         [PacketHandler(MessageType.ObjectDeGrab)]
@@ -174,7 +153,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             e.Detected.Add(detectdata);
 
-            PostTouchEvent(part, e);
+            part.PostTouchEvent(e);
         }
     }
 }

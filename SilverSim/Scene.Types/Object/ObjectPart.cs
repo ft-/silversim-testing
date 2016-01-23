@@ -130,6 +130,28 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        #region Touch Handling
+        public void PostTouchEvent(TouchEvent e)
+        {
+            if ((Flags & PrimitiveFlags.Touch) != 0)
+            {
+                if (PassTouchMode == PassEventMode.IfNotHandled)
+                {
+                    PostEvent(e);
+                }
+            }
+            else if (LinkNumber != ObjectGroup.LINK_ROOT)
+            {
+                ObjectPart rootPart = ObjectGroup.RootPart;
+                if ((rootPart.Flags & PrimitiveFlags.Touch) != 0 &&
+                    PassTouchMode != PassEventMode.Never)
+                {
+                    rootPart.PostEvent(e);
+                }
+            }
+        }
+        #endregion
+
         #region Permissions
         public bool IsLocked
         {
