@@ -17,12 +17,16 @@ namespace SilverSim.Scene.Types.Scene
         {
             if ((part.Flags & SilverSim.Types.Primitive.PrimitiveFlags.Touch) != 0)
             {
-                part.PostEvent(e);
+                if (part.PassTouchMode == SilverSim.Types.Primitive.PassEventMode.IfNotHandled)
+                {
+                    part.PostEvent(e);
+                }
             }
             else if (part.LinkNumber != Object.ObjectGroup.LINK_ROOT)
             {
                 ObjectPart rootPart = part.ObjectGroup.RootPart;
-                if ((rootPart.Flags & SilverSim.Types.Primitive.PrimitiveFlags.Touch) != 0 || part.IsPassTouches)
+                if ((rootPart.Flags & SilverSim.Types.Primitive.PrimitiveFlags.Touch) != 0 &&
+                    part.PassTouchMode != SilverSim.Types.Primitive.PassEventMode.Never)
                 {
                     rootPart.PostEvent(e);
                 }

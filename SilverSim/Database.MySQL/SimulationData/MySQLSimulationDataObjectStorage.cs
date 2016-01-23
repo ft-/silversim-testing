@@ -177,8 +177,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
 
-            objpart.IsPassCollisions = dbReader.GetBool("IsPassCollisions");
-            objpart.IsPassTouches = dbReader.GetBool("IsPassTouches");
+            objpart.PassCollisionMode = dbReader.GetEnum<PassEventMode>("PassCollisionMode");
+            objpart.PassTouchMode = dbReader.GetEnum<PassEventMode>("PassTouchMode");
             objpart.Velocity = dbReader.GetVector3("Velocity");
             objpart.AngularVelocity = dbReader.GetVector3("AngularVelocity");
             objpart.IsSoundQueueing = dbReader.GetBool("IsSoundQueueing");

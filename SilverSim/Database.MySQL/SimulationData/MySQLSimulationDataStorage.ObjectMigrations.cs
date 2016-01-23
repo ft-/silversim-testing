@@ -123,6 +123,11 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<double>("PhysicsFriction") { IsNullAllowed = false, Default = (double)0 },
             new AddColumn<double>("PhysicsRestitution") { IsNullAllowed = false, Default = (double)0 },
             new AddColumn<double>("PhysicsGravityMultiplier") { IsNullAllowed = false, Default = (double)0 },
+            new TableRevision(10),
+            new DropColumn("IsPassTouches"),
+            new DropColumn("IsPassCollisions"),
+            new AddColumn<PassEventMode>("PassTouchMode") { IsNullAllowed = false, Default = PassEventMode.Always },
+            new AddColumn<PassEventMode>("PassCollisionMode") { IsNullAllowed = false, Default = PassEventMode.IfNotHandled },
             #endregion
 
             #region Table primitems

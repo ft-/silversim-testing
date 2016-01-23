@@ -187,7 +187,7 @@ namespace SilverSim.Database.MySQL._Migration
                         DropColumn columnInfo = (DropColumn)migration;
                         if (insideTransaction)
                         {
-                            ExecuteStatement(conn, columnInfo.Sql(table.Name), log);
+                            ExecuteStatement(conn, columnInfo.Sql(table.Name, tableFields[columnInfo.Name].FieldType), log);
                         }
                         tableFields.Remove(columnInfo.Name);
                     }

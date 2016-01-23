@@ -73,8 +73,8 @@ namespace SilverSim.Scene.Types.Object
         private Quaternion m_SitTargetOrientation = Quaternion.Identity;
         private bool m_IsAllowedDrop;
         private ClickActionType m_ClickAction;
-        private bool m_IsPassCollisions;
-        private bool m_IsPassTouches;
+        private PassEventMode m_PassCollisionMode;
+        private PassEventMode m_PassTouchMode = PassEventMode.Always;
         private Vector3 m_AngularVelocity = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
         private UUI m_Creator = UUI.Unknown;
@@ -743,29 +743,29 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public bool IsPassCollisions
+        public PassEventMode PassCollisionMode
         {
             get
             {
-                return m_IsPassCollisions;
+                return m_PassCollisionMode;
             }
             set
             {
-                m_IsPassCollisions = value;
+                m_PassCollisionMode = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
 
-        public bool IsPassTouches
+        public PassEventMode PassTouchMode
         {
             get
             {
-                return m_IsPassTouches;
+                return m_PassTouchMode;
             }
             set
             {
-                m_IsPassTouches = value;
+                m_PassTouchMode = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -1711,8 +1711,10 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("LocalId", LocalID);
                     writer.WriteNamedValue("Name", Name);
                     writer.WriteNamedValue("Material", (int)Material);
-                    writer.WriteNamedValue("PassTouch", IsPassTouches);
-                    writer.WriteNamedValue("PassCollisions", IsPassCollisions);
+                    writer.WriteNamedValue("PassTouch", PassTouchMode != PassEventMode.Never);
+                    writer.WriteNamedValue("PassTouchAlways", PassTouchMode == PassEventMode.Always);
+                    writer.WriteNamedValue("PassCollisions", PassCollisionMode != PassEventMode.Never);
+                    writer.WriteNamedValue("PassCollisionsAlways", PassCollisionMode != PassEventMode.Always);
                     writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene.GridPosition.RegionHandle);
                     writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
                     writer.WriteNamedValue("GroupPosition", GlobalPosition);
@@ -2204,6 +2206,10 @@ namespace SilverSim.Scene.Types.Object
             ObjectPart part = new ObjectPart();
             part.Owner = currentOwner;
             int InventorySerial = 1;
+            bool IsPassCollisionsAlways = false;
+            bool IsPassCollisions = true;
+            bool IsPassTouches = false;
+            bool IsPassTouchesAlways = true;
             if(reader.IsEmptyElement)
             {
                 throw new InvalidObjectXmlException();
@@ -2283,11 +2289,20 @@ namespace SilverSim.Scene.Types.Object
 
                             case "PassTouch":
                             case "PassTouches":
-                                part.IsPassTouches = reader.ReadElementValueAsBoolean();
+                                IsPassTouches = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "PassTouchAlways":
+                            case "PassTouchesAlways":
+                                IsPassTouchesAlways = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "PassCollisions":
-                                part.IsPassCollisions = reader.ReadElementValueAsBoolean();
+                                IsPassCollisions = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "PassCollisionsAlways":
+                                IsPassCollisionsAlways = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "RegionHandle":
@@ -2714,6 +2729,14 @@ namespace SilverSim.Scene.Types.Object
                                 rootGroup.IsTempOnRez = true;
                             }
                         }
+
+                        part.PassCollisionMode = !IsPassCollisions ?
+                            PassEventMode.Never :
+                            (IsPassCollisionsAlways ? PassEventMode.Always : PassEventMode.IfNotHandled);
+
+                        part.PassTouchMode = !IsPassTouches ?
+                            PassEventMode.Never :
+                            (IsPassTouchesAlways ? PassEventMode.Always : PassEventMode.IfNotHandled);
 
                         if(part.Inventory.CountScripts == 0)
                         {
