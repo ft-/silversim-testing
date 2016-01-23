@@ -313,6 +313,13 @@ namespace SilverSim.Scene.Physics.Common
                     linearForce += advLinear;
                     angularTorque += advAngular;
                 }
+                else
+                {
+                    lock(m_Lock)
+                    {
+                        m_CurrentInertia = m_AppliedInertia;
+                    }
+                }
 
                 m_Vehicle.Process(dt, m_StateData, m_Group.Scene, totalMass);
                 linearForce += m_Vehicle.LinearForce;
