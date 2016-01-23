@@ -155,49 +155,56 @@ namespace SilverSim.Scene.Types.Object
         public void UpdateScriptFlags()
         {
             ObjectPart rootPart = ObjectGroup.RootPart;
+            List<ObjectPart> updateList;
             if (rootPart == this)
             {
                 /* deal with root part and update all except us */
-                foreach (ObjectPart part in ObjectGroup.Values)
+                updateList = new List<ObjectPart>(ObjectGroup.Values);
+            }
+            else
+            {
+                updateList = new List<ObjectPart>();
+                updateList.Add(this);
+            }
+
+            foreach (ObjectPart updatePart in updateList)
+            {
+                bool hasTouchEvent = false;
+                bool hasMoneyEvent = false;
+
+                CheckInventoryScripts(updatePart, ref hasTouchEvent, ref hasMoneyEvent);
+
+                PassEventMode touchMode = updatePart.PassTouchMode;
+
+                if (touchMode != PassEventMode.Never && 
+                    (touchMode == PassEventMode.IfNotHandled && !hasTouchEvent))
                 {
-                    if (part != rootPart)
-                    {
-                        part.UpdateScriptFlags();
-                    }
+                    CheckInventoryScripts(rootPart, ref hasTouchEvent, ref hasMoneyEvent);
                 }
-            }
 
-            bool hasTouchEvent = false;
-            bool hasMoneyEvent = false;
+                PrimitiveFlags setMask = PrimitiveFlags.None;
+                PrimitiveFlags clrMask = PrimitiveFlags.None;
 
-            CheckInventoryScripts(this, ref hasTouchEvent, ref hasMoneyEvent);
-            if (PassTouchMode != PassEventMode.Never && (PassTouchMode == PassEventMode.IfNotHandled && !hasTouchEvent))
-            {
-                CheckInventoryScripts(rootPart, ref hasTouchEvent, ref hasMoneyEvent);
-            }
+                if (hasTouchEvent)
+                {
+                    setMask |= PrimitiveFlags.Touch;
+                }
+                else
+                {
+                    clrMask |= PrimitiveFlags.Touch;
+                }
 
-            PrimitiveFlags setMask = PrimitiveFlags.None;
-            PrimitiveFlags clrMask = PrimitiveFlags.None;
+                if (hasMoneyEvent)
+                {
+                    setMask |= PrimitiveFlags.TakesMoney;
+                }
+                else
+                {
+                    clrMask |= PrimitiveFlags.TakesMoney;
+                }
 
-            if (hasTouchEvent)
-            {
-                setMask |= PrimitiveFlags.Touch;
+                updatePart.SetClrFlagsMask(setMask, clrMask);
             }
-            else
-            {
-                clrMask |= PrimitiveFlags.Touch;
-            }
-
-            if (hasMoneyEvent)
-            {
-                setMask |= PrimitiveFlags.TakesMoney;
-            }
-            else
-            {
-                clrMask |= PrimitiveFlags.TakesMoney;
-            }
-
-            SetClrFlagsMask(setMask, clrMask);
         }
         #endregion
 
