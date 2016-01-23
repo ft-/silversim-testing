@@ -241,7 +241,7 @@ namespace SilverSim.Scene.Types.Object
 
         #region KeyframedMotion
         KeyframedMotionController m_KeyframedMotion;
-        object m_KeyframeMotionUpdateLock = new object();
+        readonly object m_KeyframeMotionUpdateLock = new object();
 
         public KeyframedMotion.KeyframedMotion KeyframedMotion
         {
@@ -1441,10 +1441,6 @@ namespace SilverSim.Scene.Types.Object
                                 FromXmlOtherParts(reader, group, currentOwner);
                                 break;
 
-                            case "KeyframeMotion":
-                                reader.ReadToEndElement();
-                                break;
-
                             case "GroupScriptStates":
                                 if (isEmptyElement)
                                 {
@@ -1453,6 +1449,8 @@ namespace SilverSim.Scene.Types.Object
                                 FromXmlGroupScriptStates(reader, group);
                                 break;
 
+                            case "KeyframeMotion":
+                                /* this should only be serialized when doing OAR and sim state save */
                             default:
                                 reader.ReadToEndElement();
                                 break;
