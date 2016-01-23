@@ -639,10 +639,18 @@ namespace SilverSim.Scene.Implementation.Basic
                     IScriptState state = item.ScriptState;
                     if(null != state)
                     {
-                        m_SimulationDataStorage.ScriptStates[ID, part.ID, item.ID] = state.ToDbSerializedState();
-                        if(++serializedcount % 50 == 0)
+                        try
                         {
-                            m_Log.InfoFormat("Serialized {0} script states", serializedcount);
+                            m_SimulationDataStorage.ScriptStates[ID, part.ID, item.ID] = state.ToDbSerializedState();
+                            if (++serializedcount % 50 == 0)
+                            {
+                                m_Log.InfoFormat("Serialized {0} script states", serializedcount);
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            m_Log.ErrorFormat("Script state serialization failed for {0} ({1}): prim {2} ({3}): item {4} ({5}): {6}: {7}\n{8}",
+                                Name, ID, part.Name, part.ID, item.Name, item.ID, e.GetType().FullName, e.Message, e.StackTrace);
                         }
                     }
                 }
