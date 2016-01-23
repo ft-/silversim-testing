@@ -134,6 +134,9 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        /* UUID references to PartID and Vector3 is the attaching force */
+        public RwLockedDictionary<UUID, Vector3> AttachedForces = new RwLockedDictionary<UUID, Vector3>();
+
         public UUID OriginalAssetID /* will be set to UUID.Zero when anything has been changed */
         {
             get

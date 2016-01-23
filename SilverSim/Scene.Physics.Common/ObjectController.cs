@@ -6,6 +6,8 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Physics.Common
@@ -102,13 +104,16 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        double m_Mass = 1;
 
         public double Mass
         {
             get
             {
-#warning Implement Mass
-                return 1;
+                lock(m_Lock)
+                {
+                    return m_Mass;
+                }
             }
         }
 
@@ -180,6 +185,107 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        Vector3 m_AppliedInertia = Vector3.One;
+        bool m_AppliedInertiaUpdate;
+        public Vector3 AppliedInertia
+        {
+            get
+            {
+                lock(m_Lock)
+                {
+                    return m_AppliedInertia;
+                }
+            }
+        }
+
+        public void UpdatePhysicsProperties()
+        {
+            Vector3 inertia = Vector3.One / 100000; /* introduce a very little mass to prevent 0 */
+            double totalLinearMass = 0.000001; /* introduce a very little mass to prevent 0 */
+            foreach(ObjectPart part in m_Group.Values)
+            {
+                Vector3 pos = part.LocalPosition;
+                double m = part.Mass;
+                totalLinearMass += m;
+                inertia += pos.ElementMultiply(pos) * m;
+            }
+
+            lock(m_Lock)
+            {
+                m_Mass = totalLinearMass;
+                m_AppliedInertia = inertia;
+                m_AppliedInertiaUpdate = true;
+            }
+        }
+
+        Vector3 m_CurrentInertia = Vector3.One;
+
+        void ProcessAdvancedPhysics(double dt, PhysicsStateData currentState, out Vector3 linearForce, out Vector3 angularForce)
+        {
+            Vector3 lThrusters = Vector3.Zero;
+            Vector3 hThrusters = Vector3.Zero;
+            Vector3 oldInertia = Vector3.Zero;
+            Vector3 newInertia = Vector3.Zero;
+            bool updateInertia;
+
+            angularForce = Vector3.Zero;
+
+            lock(m_Lock)
+            {
+                updateInertia = m_AppliedInertiaUpdate;
+                if (updateInertia)
+                {
+                    oldInertia = m_CurrentInertia;
+                    newInertia = m_AppliedInertia;
+                    m_CurrentInertia = newInertia;
+                }
+            }
+
+            /* Jold/Jnew*omega_old=omega_new */
+            if (updateInertia)
+            {
+                Vector3 newAngularVelocity = oldInertia.ElementDivide(newInertia).ElementMultiply(currentState.AngularVelocity);
+                /* we have to divide by dt to produce dt / dt later to have immediate effect */
+                angularForce += (newAngularVelocity - currentState.AngularVelocity) / dt;
+            }
+
+            foreach (KeyValuePair<UUID, Vector3> kvp in m_Group.AttachedForces)
+            {
+                ObjectPart part;
+                if (m_Group.TryGetValue(kvp.Key, out part))
+                {
+                    Vector3 pos = part.LocalPosition;
+                    Vector3 force = kvp.Value * part.LocalRotation;
+                    if (pos.X < 0)
+                    {
+                        lThrusters.X += force.X / Math.Abs(pos.X);
+                    }
+                    else if (pos.X > 0)
+                    {
+                        hThrusters.X += force.Y / pos.Y;
+                    }
+                    if (pos.Y < 0)
+                    {
+                        lThrusters.Y += force.Y / Math.Abs(pos.Y);
+                    }
+                    else if (pos.Y > 0)
+                    {
+                        hThrusters.Y += force.Y / pos.Y;
+                    }
+                    if (pos.Z < 0)
+                    {
+                        lThrusters.Z += force.Z / Math.Abs(pos.Z);
+                    }
+                    else if (pos.Z > 0)
+                    {
+                        hThrusters.Z += force.Z / pos.Z;
+                    }
+                }
+            }
+            angularForce += (hThrusters - lThrusters);
+            linearForce = hThrusters + lThrusters;
+        }
+
         public void Process(double dt)
         {
             if(IsPhysicsActive)
@@ -190,6 +296,8 @@ namespace SilverSim.Scene.Physics.Common
                     return;
                 }
 
+                double totalMass = Mass;
+
                 Vector3 linearForce = Vector3.Zero;
                 Vector3 angularTorque = Vector3.Zero;
 
@@ -197,11 +305,20 @@ namespace SilverSim.Scene.Physics.Common
                 linearForce += GravityMotor(m_Group, dt);
                 linearForce += HoverMotor(m_Group, dt);
 
-                m_Vehicle.Process(dt, m_StateData, m_Group.Scene);
+                if (m_Group.AttachedForces.Count != 0)
+                {
+                    Vector3 advLinear;
+                    Vector3 advAngular;
+                    ProcessAdvancedPhysics(dt, m_StateData, out advLinear, out advAngular);
+                    linearForce += advLinear;
+                    angularTorque += advAngular;
+                }
+
+                m_Vehicle.Process(dt, m_StateData, m_Group.Scene, totalMass);
                 linearForce += m_Vehicle.LinearForce;
                 angularTorque += m_Vehicle.AngularTorque;
 
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     linearForce += m_AppliedForce;
                     angularTorque += m_AppliedTorque;
@@ -212,9 +329,8 @@ namespace SilverSim.Scene.Physics.Common
                 }
 
                 /* process acceleration and velocity */
-                m_Group.Acceleration = linearForce / Mass;
-#warning implement inertia applied mass correctly
-                m_Group.AngularAcceleration = angularTorque / Mass;
+                m_Group.Acceleration = linearForce / totalMass;
+                m_Group.AngularAcceleration = angularTorque.ElementMultiply(AppliedInertia);
 
                 /* we need to scale the accelerations towards timescale */
                 DeltaLinearVelocity = m_Group.Acceleration * dt;

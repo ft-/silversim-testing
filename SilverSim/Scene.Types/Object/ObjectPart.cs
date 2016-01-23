@@ -1307,6 +1307,7 @@ namespace SilverSim.Scene.Types.Object
 
         #region Physics Properties
 
+        double m_Mass = 1;
         double m_PhysicsDensity = 1000f;
         double m_PhysicsFriction = 0.6f;
         double m_PhysicsRestitution = 0.5f;
@@ -1329,6 +1330,28 @@ namespace SilverSim.Scene.Types.Object
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
+            }
+        }
+
+        public double Mass
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_Mass;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    if(value < double.Epsilon)
+                    {
+                        value = double.Epsilon;
+                    }
+                    m_Mass = value;
+                }
             }
         }
 
