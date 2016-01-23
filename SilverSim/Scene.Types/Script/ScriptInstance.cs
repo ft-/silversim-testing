@@ -27,6 +27,7 @@ namespace SilverSim.Scene.Types.Script
         public IScriptWorkerThreadPool ThreadPool { get; set; }
         public event Action<ScriptInstance> OnStateChange;
         public event Action<ScriptInstance> OnScriptReset;
+        public abstract IScriptState ScriptState { get; }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectPartInventoryItem Item { get; }

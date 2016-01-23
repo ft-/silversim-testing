@@ -145,7 +145,8 @@ namespace SilverSim.Scene.Types.Object
                         instance.Abort();
                         instance.Remove();
                     }
-                    ScriptState = null;
+
+                    ScriptState = value != null ? value.ScriptState : null;
                     m_ScriptInstance = value;
                 }
             }
