@@ -130,6 +130,13 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        #region Update Script Flags
+        public void UpdateScriptFlags()
+        {
+
+        }
+        #endregion
+
         #region Touch Handling
         public void PostTouchEvent(TouchEvent e)
         {

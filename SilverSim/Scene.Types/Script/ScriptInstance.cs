@@ -29,6 +29,8 @@ namespace SilverSim.Scene.Types.Script
         public event Action<ScriptInstance> OnStateChange;
         public event Action<ScriptInstance> OnScriptReset;
         public abstract IScriptState ScriptState { get; }
+        public virtual bool HasTouchEvent { get { return false; } }
+        public virtual bool HasMoneyEvent { get { return false; } }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectPartInventoryItem Item { get; }
