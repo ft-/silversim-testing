@@ -39,6 +39,19 @@ namespace SilverSim.Threading
             }
         }
 
+        public new T[] ToArray()
+        {
+            lock(m_Lock)
+            {
+                return base.ToArray();
+            }
+        }
+
+        public new Enumerator GetEnumerator()
+        {
+            throw new InvalidOperationException();
+        }
+
         public bool Dequeue(out T e)
         {
             try
