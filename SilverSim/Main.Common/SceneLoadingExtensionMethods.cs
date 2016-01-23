@@ -19,6 +19,7 @@ using SilverSim.Scene.Types.WindLight;
 using SilverSim.Scripting.Common;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset;
+using SilverSim.Scene.Types.Script.Events;
 
 namespace SilverSim.Main.Common
 {
@@ -344,6 +345,7 @@ namespace SilverSim.Main.Common
                                 if (loadparams.SimulationDataStorage.ScriptStates.TryGetValue(loadparams.Scene.ID, part.ID, item.ID, out serializedState))
                                 {
                                     item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, serializedState);
+                                    item.ScriptInstance.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.RegionStart));
                                 }
                                 else
                                 {

@@ -28,5 +28,10 @@ namespace SilverSim.Scene.Types.Script.Events
         }
 
         public ChangedFlags Flags;
+
+        public ChangedEvent(ChangedFlags flags)
+        {
+            Flags = flags;
+        }
     }
 }
