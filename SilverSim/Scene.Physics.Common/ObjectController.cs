@@ -198,6 +198,8 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        Vector3 m_CenterOfGravityOffset = Vector3.Zero;
+
         public void UpdatePhysicsProperties()
         {
             Vector3 inertia = Vector3.One / 100000; /* introduce a very little mass to prevent 0 */
@@ -249,12 +251,17 @@ namespace SilverSim.Scene.Physics.Common
                 angularForce += (newAngularVelocity - currentState.AngularVelocity) / dt;
             }
 
+            Vector3 centerOfGravityOffset;
+            lock(m_Lock)
+            {
+                centerOfGravityOffset = m_CenterOfGravityOffset;
+            }
             foreach (KeyValuePair<UUID, Vector3> kvp in m_Group.AttachedForces)
             {
                 ObjectPart part;
                 if (m_Group.TryGetValue(kvp.Key, out part))
                 {
-                    Vector3 pos = part.LocalPosition;
+                    Vector3 pos = part.LocalPosition - centerOfGravityOffset;
                     Vector3 force = kvp.Value * part.LocalRotation;
                     if (pos.X < 0)
                     {
