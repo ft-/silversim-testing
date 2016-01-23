@@ -94,25 +94,38 @@ namespace SilverSim.Scripting.Common
             {
                 return;
             }
-            m_ScriptTriggerQueue.Enqueue(i);
-            int threadsCount = m_Threads.Count;
-            if(m_ScriptTriggerQueue.Count > threadsCount && threadsCount < m_MaximumThreads)
+
+            bool enqueued = false;
+            lock(i)
             {
-                lock (m_Threads)
+                if (i.ThreadPool == null)
                 {
-                    try
+                    m_ScriptTriggerQueue.Enqueue(i);
+                    enqueued = true;
+                }
+            }
+
+            if(enqueued)
+            { 
+                int threadsCount = m_Threads.Count;
+                if (m_ScriptTriggerQueue.Count > threadsCount && threadsCount < m_MaximumThreads)
+                {
+                    lock (m_Threads)
                     {
-                        ScriptThreadContext tc = new ScriptThreadContext();
-                        tc.ScriptThread = new Thread(ThreadMain);
-                        tc.ThreadPool = this;
-                        tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
-                        tc.ScriptThread.IsBackground = true;
-                        tc.ScriptThread.Start(tc);
-                        m_Threads.Add(tc);
-                    }
-                    catch
-                    {
-                        /* do not fail when we could not add a thread */
+                        try
+                        {
+                            ScriptThreadContext tc = new ScriptThreadContext();
+                            tc.ScriptThread = new Thread(ThreadMain);
+                            tc.ThreadPool = this;
+                            tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
+                            tc.ScriptThread.IsBackground = true;
+                            tc.ScriptThread.Start(tc);
+                            m_Threads.Add(tc);
+                        }
+                        catch
+                        {
+                            /* do not fail when we could not add a thread */
+                        }
                     }
                 }
             }
@@ -213,6 +226,7 @@ namespace SilverSim.Scripting.Common
                     item.ScriptInstance = null;
                     instance.Remove();
                     ScriptLoader.Remove(item.AssetID, instance);
+                    continue;
                 }
                 catch(ScriptAbortException)
                 {
@@ -222,19 +236,26 @@ namespace SilverSim.Scripting.Common
                     instance.Remove();
                     item.ScriptInstance = null;
                     ScriptLoader.Remove(item.AssetID, instance);
+                    continue;
                 }
                 finally
                 {
                     lock (tc)
                     {
-                        ev.ThreadPool = null;
                         tc.CurrentScriptInstance = null;
                     }
                 }
 
-                if (ev.HasEventsPending)
+                lock (ev)
                 {
-                    pool.m_ScriptTriggerQueue.Enqueue(ev);
+                    if (ev.HasEventsPending)
+                    {
+                        pool.m_ScriptTriggerQueue.Enqueue(ev);
+                    }
+                    else
+                    {
+                        ev.ThreadPool = null;
+                    }
                 }
             }
 
