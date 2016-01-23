@@ -174,14 +174,6 @@ namespace SilverSim.Scene.Types.Object
 
                 updatePart.CheckInventoryScripts(ref hasTouchEvent, ref hasMoneyEvent);
 
-                PassEventMode touchMode = updatePart.PassTouchMode;
-
-                if (touchMode != PassEventMode.Never && 
-                    (touchMode == PassEventMode.IfNotHandled && !hasTouchEvent))
-                {
-                    rootPart.CheckInventoryScripts(ref hasTouchEvent, ref hasMoneyEvent);
-                }
-
                 PrimitiveFlags setMask = PrimitiveFlags.None;
                 PrimitiveFlags clrMask = PrimitiveFlags.None;
 
