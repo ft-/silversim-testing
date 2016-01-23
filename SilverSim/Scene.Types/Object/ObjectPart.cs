@@ -133,9 +133,9 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Update Script Flags
-        static void CheckInventoryScripts(ObjectPart part, ref bool hasTouchEvent, ref bool hasMoneyEvent)
+        void CheckInventoryScripts(ref bool hasTouchEvent, ref bool hasMoneyEvent)
         {
-            foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+            foreach (ObjectPartInventoryItem item in Inventory.Values)
             {
                 ScriptInstance instance = item.ScriptInstance;
                 if (item.AssetType == AssetType.LSLText && instance != null && instance.IsRunning)
@@ -172,14 +172,14 @@ namespace SilverSim.Scene.Types.Object
                 bool hasTouchEvent = false;
                 bool hasMoneyEvent = false;
 
-                CheckInventoryScripts(updatePart, ref hasTouchEvent, ref hasMoneyEvent);
+                updatePart.CheckInventoryScripts(ref hasTouchEvent, ref hasMoneyEvent);
 
                 PassEventMode touchMode = updatePart.PassTouchMode;
 
                 if (touchMode != PassEventMode.Never && 
                     (touchMode == PassEventMode.IfNotHandled && !hasTouchEvent))
                 {
-                    CheckInventoryScripts(rootPart, ref hasTouchEvent, ref hasMoneyEvent);
+                    rootPart.CheckInventoryScripts(ref hasTouchEvent, ref hasMoneyEvent);
                 }
 
                 PrimitiveFlags setMask = PrimitiveFlags.None;
