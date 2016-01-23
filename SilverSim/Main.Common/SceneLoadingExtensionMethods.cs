@@ -350,6 +350,12 @@ namespace SilverSim.Main.Common
                                 else
                                 {
                                     item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData);
+                                    item.ScriptInstance.IsResetRequired = true;
+                                }
+
+                                if(item.ScriptInstance.IsResetRequired)
+                                {
+                                    item.ScriptInstance.IsResetRequired = false;
                                     item.ScriptInstance.IsRunning = true;
                                     item.ScriptInstance.Reset();
                                 }

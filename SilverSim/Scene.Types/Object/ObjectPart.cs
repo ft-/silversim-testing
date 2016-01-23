@@ -2255,10 +2255,6 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 break;
 
-                            case "FolderID":
-                                reader.ReadToEndElement();
-                                break;
-
                             case "InventorySerial":
                                 InventorySerial = reader.ReadElementValueAsInt();
                                 break;
@@ -2283,10 +2279,6 @@ namespace SilverSim.Scene.Types.Object
                                 part.Material = (PrimitiveMaterial)reader.ReadElementValueAsInt();
                                 break;
 
-                            case "UpdateFlag":
-                                reader.ReadToEndElement();
-                                break;
-
                             case "PassTouch":
                             case "PassTouches":
                                 IsPassTouches = reader.ReadElementValueAsBoolean();
@@ -2303,10 +2295,6 @@ namespace SilverSim.Scene.Types.Object
 
                             case "PassCollisionsAlways":
                                 IsPassCollisionsAlways = reader.ReadElementValueAsBoolean();
-                                break;
-
-                            case "RegionHandle":
-                                reader.ReadToEndElement(); /* why was this ever serialized, it breaks partly the deduplication attempt */
                                 break;
 
                             case "ScriptAccessPin":
@@ -2481,11 +2469,6 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 break;
 
-                            case "OwnerID":
-                                /* do not trust this thing ever! */
-                                reader.ReadToEndElement();
-                                break;
-
                             case "LastOwnerID":
                                 if (null != rootGroup)
                                 {
@@ -2657,14 +2640,6 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 break;
 
-                            case "SitTargetOrientationLL":
-                                reader.ReadToEndElement();
-                                break;
-
-                            case "SitTargetPositionLL":
-                                reader.ReadToEndElement();
-                                break;
-
                             case "Components":
                                 {
                                     string json = reader.ReadElementValueAsString();
@@ -2699,6 +2674,15 @@ namespace SilverSim.Scene.Types.Object
 
                                     }
                                 }
+                                break;
+
+                            case "RegionHandle": /* <= why was this ever serialized, it breaks partly the deduplication attempt */
+                            case "OwnerID": /* <= do not trust this thing ever! */
+                            case "FolderID":
+                            case "UpdateFlag":
+                            case "SitTargetOrientationLL":
+                            case "SitTargetPositionLL":
+                                reader.ReadToEndElement(); 
                                 break;
 
                             default:
