@@ -598,7 +598,7 @@ namespace SilverSim.Main.Common
                         }
                         catch
                         {
-                            throw new FileNotFoundException();
+                            throw new FileNotFoundException("plugins/" + m_Assembly + ".dll");
                         }
                     }
                     else
@@ -610,9 +610,7 @@ namespace SilverSim.Main.Common
                     Stream resource = assembly.GetManifestResourceStream(assemblyName + ".Resources." + m_Name);
                     if(null == resource)
                     {
-                        System.Console.Write(assemblyName + ".Resources." + m_Name);
-                        System.Console.WriteLine();
-                        throw new FileNotFoundException();
+                        throw new FileNotFoundException(assemblyName + ".Resources." + m_Name);
                     }
                     return new IniConfigSource(resource);
                 }
@@ -684,7 +682,7 @@ namespace SilverSim.Main.Common
                         }
                         catch
                         {
-                            throw new FileNotFoundException();
+                            throw new FileNotFoundException("plugins/" + m_Assembly + ".dll");
                         }
                     }
                     else
@@ -696,9 +694,7 @@ namespace SilverSim.Main.Common
                     Stream resource = assembly.GetManifestResourceStream(assemblyName + ".Resources." + m_Name);
                     if (null == resource)
                     {
-                        System.Console.Write(assemblyName + ".Resources." + m_Name);
-                        System.Console.WriteLine();
-                        throw new FileNotFoundException();
+                        throw new FileNotFoundException(assemblyName + ".Resources." + m_Name);
                     }
                     using (XmlReader r = new XmlTextReader(resource))
                     {

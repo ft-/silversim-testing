@@ -148,10 +148,25 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             {
                 rot = data["rotations"] as AnArray;
                 m.Flags |= DataFlags.Rotation;
-                if (pos.Count != pos.Count)
+                if (durations.Count != rot.Count)
                 {
                     throw new KeyframeFormatException("Rotations.Count does not match Durations.Count");
                 }
+            }
+
+            for(int i = 0; i < durations.Count; ++i)
+            {
+                Keyframe frame = new Keyframe();
+                frame.Duration = durations[i].AsReal;
+                if(rot != null)
+                {
+                    frame.TargetRotation = rot[i].AsQuaternion;
+                }
+                if(pos != null)
+                {
+                    frame.TargetPosition = pos[i].AsVector3;
+                }
+                m.Add(frame);
             }
 
             return m;
