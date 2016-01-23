@@ -214,7 +214,7 @@ namespace SilverSim.Scene.Types.Object
             if ((Flags & PrimitiveFlags.Touch) != 0)
             {
                 PostEvent(e);
-                if (PassTouchMode == PassEventMode.IfNotHandled)
+                if (PassTouchMode != PassEventMode.Always)
                 {
                     return;
                 }
