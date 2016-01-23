@@ -3,6 +3,7 @@
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
 using System.Timers;
@@ -57,34 +58,52 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         #region Normal controls
         public void Play()
         {
+            bool wasRunning;
             lock(m_KeyframeLock)
             {
+                wasRunning = m_Program.IsRunning;
                 m_Program.IsRunning = true;
                 m_KeyframeTimer.Enabled = true;
+            }
+            if(!wasRunning)
+            {
+                ObjectGroup.PostEvent(new MovingStartEvent());
             }
         }
 
         public void Pause()
         {
+            bool wasRunning;
             lock (m_KeyframeLock)
             {
                 ObjectGroup.Velocity = Vector3.Zero;
                 ObjectGroup.AngularVelocity = Vector3.Zero;
+                wasRunning = m_Program.IsRunning;
                 m_Program.IsRunning = false;
                 m_KeyframeTimer.Enabled = false;
+            }
+            if (!wasRunning)
+            {
+                ObjectGroup.PostEvent(new MovingStartEvent());
             }
         }
 
         public void Stop()
         {
+            bool wasRunning;
             lock (m_KeyframeLock)
             {
                 ObjectGroup.Velocity = Vector3.Zero;
                 ObjectGroup.AngularVelocity = Vector3.Zero;
+                wasRunning = m_Program.IsRunning;
                 m_Program.IsRunning = false;
                 m_KeyframeTimer.Enabled = false;
                 /* reset program */
                 m_Program.CurrentFrame = -1;
+            }
+            if (wasRunning)
+            {
+                ObjectGroup.PostEvent(new MovingEndEvent());
             }
         }
         #endregion
@@ -144,6 +163,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                                 m_Program.CurrentFrame = -1;
                                 m_Program.IsRunning = false;
                                 m_KeyframeTimer.Enabled = false;
+                                ObjectGroup.PostEvent(new MovingEndEvent());
                                 return;
                             }
                         }
@@ -168,6 +188,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                                     m_Program.CurrentFrame = -1;
                                     m_Program.IsRunning = false;
                                     m_KeyframeTimer.Enabled = false;
+                                    ObjectGroup.PostEvent(new MovingEndEvent());
                                     return;
 
                                 case KeyframedMotion.Mode.Loop:
