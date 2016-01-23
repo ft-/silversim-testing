@@ -213,16 +213,23 @@ namespace SilverSim.Scene.Types.Object
         {
             if ((Flags & PrimitiveFlags.Touch) != 0)
             {
+                PostEvent(e);
                 if (PassTouchMode == PassEventMode.IfNotHandled)
                 {
-                    PostEvent(e);
+                    return;
                 }
             }
-            else if (LinkNumber != ObjectGroup.LINK_ROOT)
+            else if(PassTouchMode == PassEventMode.Never)
             {
-                ObjectPart rootPart = ObjectGroup.RootPart;
-                if ((rootPart.Flags & PrimitiveFlags.Touch) != 0 &&
-                    PassTouchMode != PassEventMode.Never)
+                return;
+            }
+
+            ObjectGroup grp = ObjectGroup;
+            if (null != grp)
+            {
+                ObjectPart rootPart = grp.RootPart;
+                if (rootPart != this && rootPart != null &&
+                    (rootPart.Flags & PrimitiveFlags.Touch) != 0)
                 {
                     rootPart.PostEvent(e);
                 }
