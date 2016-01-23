@@ -4,11 +4,13 @@
 using log4net;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using SilverSim.Types.StructuredData.Json;
@@ -131,9 +133,71 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Update Script Flags
+        static void CheckInventoryScripts(ObjectPart part, ref bool hasTouchEvent, ref bool hasMoneyEvent)
+        {
+            foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+            {
+                ScriptInstance instance = item.ScriptInstance;
+                if (item.AssetType == AssetType.LSLText && instance != null && instance.IsRunning)
+                {
+                    if (instance.HasTouchEvent)
+                    {
+                        hasTouchEvent = true;
+                    }
+                    if (instance.HasMoneyEvent)
+                    {
+                        hasMoneyEvent = true;
+                    }
+                }
+            }
+        }
+
         public void UpdateScriptFlags()
         {
+            ObjectPart rootPart = ObjectGroup.RootPart;
+            if (rootPart == this)
+            {
+                /* deal with root part and update all except us */
+                foreach (ObjectPart part in ObjectGroup.Values)
+                {
+                    if (part != rootPart)
+                    {
+                        part.UpdateScriptFlags();
+                    }
+                }
+            }
 
+            bool hasTouchEvent = false;
+            bool hasMoneyEvent = false;
+
+            CheckInventoryScripts(this, ref hasTouchEvent, ref hasMoneyEvent);
+            if (PassTouchMode != PassEventMode.Never && (PassTouchMode == PassEventMode.IfNotHandled && !hasTouchEvent))
+            {
+                CheckInventoryScripts(rootPart, ref hasTouchEvent, ref hasMoneyEvent);
+            }
+
+            PrimitiveFlags setMask = PrimitiveFlags.None;
+            PrimitiveFlags clrMask = PrimitiveFlags.None;
+
+            if (hasTouchEvent)
+            {
+                setMask |= PrimitiveFlags.Touch;
+            }
+            else
+            {
+                clrMask |= PrimitiveFlags.Touch;
+            }
+
+            if (hasMoneyEvent)
+            {
+                setMask |= PrimitiveFlags.TakesMoney;
+            }
+            else
+            {
+                clrMask |= PrimitiveFlags.TakesMoney;
+            }
+
+            SetClrFlagsMask(setMask, clrMask);
         }
         #endregion
 
@@ -711,6 +775,16 @@ namespace SilverSim.Scene.Types.Object
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
+        }
+
+        public void SetClrFlagsMask(PrimitiveFlags setMask, PrimitiveFlags clrMask)
+        {
+            lock (m_DataLock)
+            {
+                m_PrimitiveFlags = (m_PrimitiveFlags  & ~clrMask) | setMask;
+            }
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(0);
         }
 
         public UUI Creator
