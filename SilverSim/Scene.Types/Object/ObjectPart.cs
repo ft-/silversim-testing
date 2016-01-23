@@ -158,7 +158,7 @@ namespace SilverSim.Scene.Types.Object
             List<ObjectPart> updateList;
             if (rootPart == this)
             {
-                /* deal with root part and update all except us */
+                /* update all when root part changes */
                 updateList = new List<ObjectPart>(ObjectGroup.Values);
             }
             else
