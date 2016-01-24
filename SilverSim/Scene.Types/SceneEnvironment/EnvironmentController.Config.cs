@@ -80,62 +80,54 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 lock(m_SerializationLock)
                 {
-                    try
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        m_InDeserialization = true;
-                        using (MemoryStream ms = new MemoryStream())
+                        using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
                         {
-                            using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
+                            writer.WriteStartElement("EnvironmentController");
                             {
-                                writer.WriteStartElement("EnvironmentController");
+                                writer.WriteStartElement("Wind");
                                 {
-                                    writer.WriteStartElement("Wind");
-                                    {
-                                        writer.WriteNamedValue("UpdateWindModelEveryMsecs", UpdateWindModelEveryMsecs);
-                                    }
-                                    writer.WriteEndElement();
-                                    writer.WriteStartElement("Sun");
-                                    {
-                                        writer.WriteNamedValue("SunUpdateEveryMsecs", SunUpdateEveryMsecs);
-                                        writer.WriteNamedValue("SendSimTimeEveryNthSunUpdate", SendSimTimeEveryNthSunUpdate);
-                                        writer.WriteNamedValue("AverageSunTilt", AverageSunTilt);
-                                        writer.WriteNamedValue("SeasonalSunTilt", SeasonalSunTilt);
-                                        writer.WriteNamedValue("NormalizedOffset", SunNormalizedOffset);
-                                        uint sun_secperday;
-                                        uint sun_daysperyear;
-                                        GetSunDurationParams(out sun_secperday, out sun_daysperyear);
-                                        writer.WriteNamedValue("SecondsPerDay", sun_secperday);
-                                        writer.WriteNamedValue("DaysPerYear", sun_daysperyear);
-                                    }
-                                    writer.WriteEndElement();
-                                    writer.WriteStartElement("Moon");
-                                    {
-                                        writer.WriteNamedValue("PhaseOffset", MoonPhaseOffset);
-                                        writer.WriteNamedValue("PeriodLengthInSeconds", MoonPeriodLengthInSecs);
-                                    }
-                                    writer.WriteEndElement();
-                                    writer.WriteStartElement("Water");
-                                    {
-                                        writer.WriteNamedValue("EnableTideControl", this[BooleanWaterParams.EnableTideControl]);
-                                        writer.WriteNamedValue("UpdateTidalModelEveryMsecs", UpdateTidalModelEveryMsecs);
-                                        writer.WriteNamedValue("MoonTidalAmplitude", this[FloatWaterParams.TidalMoonAmplitude]);
-                                        writer.WriteNamedValue("SunTidalAmplitude", this[FloatWaterParams.TidalSunAmplitude]);
-                                    }
-                                    writer.WriteEndElement();
-                                    writer.WriteStartElement("Weather");
-                                    {
-                                        writer.WriteNamedValue("EnableLightShare", this[BooleanWeatherParams.EnableLightShare]);
-                                    }
-                                    writer.WriteEndElement();
+                                    writer.WriteNamedValue("UpdateWindModelEveryMsecs", UpdateWindModelEveryMsecs);
+                                }
+                                writer.WriteEndElement();
+                                writer.WriteStartElement("Sun");
+                                {
+                                    writer.WriteNamedValue("SunUpdateEveryMsecs", SunUpdateEveryMsecs);
+                                    writer.WriteNamedValue("SendSimTimeEveryNthSunUpdate", SendSimTimeEveryNthSunUpdate);
+                                    writer.WriteNamedValue("AverageSunTilt", AverageSunTilt);
+                                    writer.WriteNamedValue("SeasonalSunTilt", SeasonalSunTilt);
+                                    writer.WriteNamedValue("NormalizedOffset", SunNormalizedOffset);
+                                    uint sun_secperday;
+                                    uint sun_daysperyear;
+                                    GetSunDurationParams(out sun_secperday, out sun_daysperyear);
+                                    writer.WriteNamedValue("SecondsPerDay", sun_secperday);
+                                    writer.WriteNamedValue("DaysPerYear", sun_daysperyear);
+                                }
+                                writer.WriteEndElement();
+                                writer.WriteStartElement("Moon");
+                                {
+                                    writer.WriteNamedValue("PhaseOffset", MoonPhaseOffset);
+                                    writer.WriteNamedValue("PeriodLengthInSeconds", MoonPeriodLengthInSecs);
+                                }
+                                writer.WriteEndElement();
+                                writer.WriteStartElement("Water");
+                                {
+                                    writer.WriteNamedValue("EnableTideControl", this[BooleanWaterParams.EnableTideControl]);
+                                    writer.WriteNamedValue("UpdateTidalModelEveryMsecs", UpdateTidalModelEveryMsecs);
+                                    writer.WriteNamedValue("MoonTidalAmplitude", this[FloatWaterParams.TidalMoonAmplitude]);
+                                    writer.WriteNamedValue("SunTidalAmplitude", this[FloatWaterParams.TidalSunAmplitude]);
+                                }
+                                writer.WriteEndElement();
+                                writer.WriteStartElement("Weather");
+                                {
+                                    writer.WriteNamedValue("EnableLightShare", this[BooleanWeatherParams.EnableLightShare]);
                                 }
                                 writer.WriteEndElement();
                             }
-                            return ms.GetBuffer();
+                            writer.WriteEndElement();
                         }
-                    }
-                    finally
-                    {
-                        m_InDeserialization = false;
+                        return ms.GetBuffer();
                     }
                 }
             }
@@ -143,12 +135,20 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 lock(m_SerializationLock)
                 {
-                    using (MemoryStream ms = new MemoryStream(value))
+                    m_InDeserialization = true;
+                    try
                     {
-                        using (XmlTextReader reader = new XmlTextReader(ms))
+                        using (MemoryStream ms = new MemoryStream(value))
                         {
-                            DeserializeRoot(reader);
+                            using (XmlTextReader reader = new XmlTextReader(ms))
+                            {
+                                DeserializeRoot(reader);
+                            }
                         }
+                    }
+                    finally
+                    {
+                        m_InDeserialization = false;
                     }
                 }
             }
