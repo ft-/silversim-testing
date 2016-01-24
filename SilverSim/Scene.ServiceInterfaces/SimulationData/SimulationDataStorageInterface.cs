@@ -21,6 +21,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
+        public abstract SimulationDataEnvControllerStorageInterface EnvironmentController
+        {
+            get;
+        }
+
         public abstract SimulationDataSpawnPointStorageInterface Spawnpoints
         {
             get;

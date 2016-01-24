@@ -593,8 +593,14 @@ namespace SilverSim.Scene.Implementation.Basic
                 LoginControl.Ready(ReadyFlags.PhysicsTerrain);
             }
             Environment.Start();
+            Environment.OnEnvironmentControllerChangeParams += StoreEnvironmentControllerData;
         }
         #endregion
+
+        void StoreEnvironmentControllerData(byte[] serializedData)
+        {
+            m_SimulationDataStorage.EnvironmentController[ID] = serializedData;
+        }
 
         #region Internal Delegates
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -629,8 +635,9 @@ namespace SilverSim.Scene.Implementation.Basic
 
         void RemoveScene(SceneInterface s)
         {
-            Environment.Stop();
             ScriptThreadPool.Shutdown();
+            Environment.OnEnvironmentControllerChangeParams -= StoreEnvironmentControllerData;
+            Environment.Stop();
             int serializedcount = 0;
             foreach(ObjectPart part in Primitives)
             {

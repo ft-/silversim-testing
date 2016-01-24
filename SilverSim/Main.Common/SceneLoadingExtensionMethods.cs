@@ -167,6 +167,16 @@ namespace SilverSim.Main.Common
                     }
                 }
 
+                lock(loadparams.Scene.m_LoaderThreadLock)
+                {
+                    byte[] serializedData;
+                    if(loadparams.SimulationDataStorage.EnvironmentController.TryGetValue(loadparams.Scene.ID, out serializedData))
+                    {
+                        loadparams.Scene.Environment.Serialization = serializedData;
+                        m_Log.InfoFormat("Loaded environment controller settings for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                    }
+                }
+
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
                     parcels = loadparams.SimulationDataStorage.Parcels.ParcelsInRegion(loadparams.Scene.ID);

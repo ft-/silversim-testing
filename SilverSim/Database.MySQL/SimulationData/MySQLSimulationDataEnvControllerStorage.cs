@@ -4,43 +4,41 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.WindLight;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataEnvSettingsStorage : SimulationDataEnvSettingsStorageInterface
+    public class MySQLSimulationDataEnvControllerStorage : SimulationDataEnvControllerStorageInterface
     {
 #if DEBUG
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ENVIRONMENT SETTINGS SERVICE");
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ENVIRONMENT CONTRLLER SETTINGS SERVICE");
 #endif
 
         readonly string m_ConnectionString;
 
-        public MySQLSimulationDataEnvSettingsStorage(string connectionString)
+        public MySQLSimulationDataEnvControllerStorage(string connectionString)
         {
             m_ConnectionString = connectionString;
         }
 
-        public override bool TryGetValue(UUID regionID, out EnvironmentSettings settings)
+        public override bool TryGetValue(UUID regionID, out byte[] settings)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT SerializedData FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            using (MemoryStream ms = new MemoryStream(reader.GetBytes("EnvironmentSettings")))
-                            {
-                                settings = EnvironmentSettings.Deserialize(ms);
-                                return true;
-                            }
+                            settings = reader.GetBytes("SerializedData");
+                            return true;
                         }
                     }
                 }
@@ -50,11 +48,11 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
 
         /* setting value to null will delete the entry */
-        public override EnvironmentSettings this[UUID regionID]
+        public override byte[] this[UUID regionID]
         {
             get
             {
-                EnvironmentSettings settings;
+                byte[] settings;
                 if (!TryGetValue(regionID, out settings))
                 {
                     throw new KeyNotFoundException();
@@ -63,15 +61,15 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             set
             {
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    if(value == null)
+                    if (value == null)
                     {
 #if DEBUG
-                        m_Log.DebugFormat("Removing environment settings for {0}", regionID.ToString());
+                        m_Log.DebugFormat("Removing environment controller settings for {0}", regionID.ToString());
 #endif
-                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
                         {
                             cmd.Parameters.AddParameter("?regionid", regionID);
                             cmd.ExecuteNonQuery();
@@ -80,16 +78,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                     else
                     {
 #if DEBUG
-                        m_Log.DebugFormat("Storing new environment settings for {0}", regionID.ToString());
+                        m_Log.DebugFormat("Storing new environment controller settings for {0}", regionID.ToString());
 #endif
-                        Dictionary<string, object> param = new Dictionary<string,object>();
+                        Dictionary<string, object> param = new Dictionary<string, object>();
                         param["RegionID"] = regionID;
-                        using(MemoryStream ms = new MemoryStream())
-                        {
-                            value.Serialize(ms, regionID);
-                            param["EnvironmentSettings"] = ms.GetBuffer();
-                        }
-                        conn.ReplaceInto("environmentsettings", param);
+                        param["SerializedData"] = value;
+                        conn.ReplaceInto("environmentcontroller", param);
                     }
                 }
             }
@@ -100,7 +94,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;

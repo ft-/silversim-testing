@@ -10,6 +10,7 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -28,6 +29,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         readonly MySQLSimulationDataRegionSettingsStorage m_RegionSettingsStorage;
         readonly MySQLSimulationDataSpawnPointStorage m_SpawnPointStorage;
         readonly MySQLSimulationDataLightShareStorage m_LightShareStorage;
+        readonly MySQLSimulationDataEnvControllerStorage m_EnvironmentControllerStorage;
 
         #region Constructor
         public MySQLSimulationDataStorage(string connectionString)
@@ -41,6 +43,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_RegionSettingsStorage = new MySQLSimulationDataRegionSettingsStorage(connectionString);
             m_SpawnPointStorage = new MySQLSimulationDataSpawnPointStorage(connectionString);
             m_LightShareStorage = new MySQLSimulationDataLightShareStorage(connectionString);
+            m_EnvironmentControllerStorage = new MySQLSimulationDataEnvControllerStorage(connectionString);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -50,6 +53,14 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Properties
+        public override SimulationDataEnvControllerStorageInterface EnvironmentController
+        {
+            get
+            {
+                return m_EnvironmentControllerStorage;
+            }
+        }
+
         public override SimulationDataLightShareStorageInterface LightShare
         {
             get
@@ -133,6 +144,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             "terrains",
             "parcels",
             "environmentsettings",
+            "environmentcontroller",
             "regionsettings",
             "lightshare",
             "spawnpoints"

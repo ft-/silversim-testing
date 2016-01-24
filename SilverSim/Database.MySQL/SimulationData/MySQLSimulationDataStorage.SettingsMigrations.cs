@@ -30,6 +30,13 @@ namespace SilverSim.Database.MySQL.SimulationData
             new ChangeEngine("MyISAM"),
             #endregion
 
+            #region Table environmentcontroller
+            new SqlTable("environmentcontroller") { Engine = "MyISAM" },
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<byte[]>("SerializedData") { IsLong = true },
+            new PrimaryKeyInfo("RegionID"),
+            #endregion
+
             #region Table lightshare
             new SqlTable("lightshare"),
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
