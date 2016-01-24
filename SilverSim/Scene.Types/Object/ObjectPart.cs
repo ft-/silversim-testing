@@ -1347,11 +1347,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(m_DataLock)
                 {
-                    if(value < double.Epsilon)
-                    {
-                        value = double.Epsilon;
-                    }
-                    m_Mass = value;
+                    m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
                 }
             }
         }
