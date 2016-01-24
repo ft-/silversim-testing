@@ -96,6 +96,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             m_Scene = scene;
             Wind = new NoWindModel();
             m_SunData.SunDirection = new Vector3();
+            ResetToDefaults();
         }
 
         #region Start/Stop
