@@ -25,6 +25,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
             public SunData()
             {
+                SecPerDay = 4 * 60 * 60;
+                SecPerYear = 11 * SecPerDay;
 
             }
         }

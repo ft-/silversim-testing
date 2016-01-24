@@ -33,6 +33,25 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
+        public void ResetToDefaults()
+        {
+            uint hoursInSec = 3600;
+            AverageSunTilt = -0.25 * Math.PI;
+            SeasonalSunTilt = 0.03 * Math.PI;
+            SunNormalizedOffset = 0.45;
+            SetSunDurationParams(4 * hoursInSec, 11);
+            MoonPhaseOffset = 0;
+            MoonPeriodLengthInSecs = 2.1 * hoursInSec;
+            this[BooleanWaterParams.EnableTideControl] = false;
+            this[FloatWaterParams.TidalBase] = 20;
+            this[FloatWaterParams.TidalMoonAmplitude] = 0.5;
+            this[FloatWaterParams.TidalSunAmplitude] = 0.1;
+            SunUpdateEveryMsecs = 10000;
+            SendSimTimeEveryNthSunUpdate = 10;
+            UpdateWindModelEveryMsecs = 10000;
+            UpdateTidalModelEveryMsecs = 60000;
+        }
+
         public byte[] Serialization
         {
             get

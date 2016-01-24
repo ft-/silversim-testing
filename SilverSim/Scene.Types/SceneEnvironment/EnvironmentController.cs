@@ -96,8 +96,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             m_Scene = scene;
             Wind = new NoWindModel();
             m_SunData.SunDirection = new Vector3();
-            m_SunData.SecPerDay = 4 * 60 * 60;
-            m_SunData.SecPerYear = 11 * m_SunData.SecPerDay;
         }
 
         #region Start/Stop
