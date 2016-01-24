@@ -1123,15 +1123,9 @@ namespace SilverSim.Scene.Types.Object
             if (writeOffsetPos)
             {
                 Vector3 opos = Position - offsetpos;
-                writer.WriteStartAttribute("x");
-                writer.WriteValue(opos.X);
-                writer.WriteEndAttribute();
-                writer.WriteStartAttribute("y");
-                writer.WriteValue(opos.Y);
-                writer.WriteEndAttribute();
-                writer.WriteStartAttribute("z");
-                writer.WriteValue(opos.Z);
-                writer.WriteEndAttribute();
+                writer.WriteAttributeString("x", opos.X.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("y", opos.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                writer.WriteAttributeString("z", opos.Z.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
             if ((options & XmlSerializationOptions.WriteXml2) == 0)
             {
@@ -1177,9 +1171,7 @@ namespace SilverSim.Scene.Types.Object
                         }
 
                         writer.WriteStartElement("SavedScriptState");
-                        writer.WriteStartAttribute("UUID");
-                        writer.WriteValue(i.ID);
-                        writer.WriteEndAttribute();
+                        writer.WriteAttributeString("UUID", i.ID.ToString());
 
                         scriptState.ToXml(writer);
 

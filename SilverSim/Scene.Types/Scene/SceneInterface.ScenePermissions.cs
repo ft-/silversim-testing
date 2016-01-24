@@ -141,6 +141,12 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
+            if (ServerParamService.GetBoolean(ID, "estate_owner_is_simconsole_user", false) &&
+                IsEstateOwner(agent))
+            {
+                return true;
+            }
+
             if (ServerParamService.GetBoolean(ID, "estate_manager_is_simconsole_user", false) && 
                 IsEstateManager(agent))
             {
