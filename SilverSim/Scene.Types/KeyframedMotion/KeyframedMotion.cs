@@ -128,7 +128,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             KeyframedMotion m = new KeyframedMotion();
             AnArray pos = null;
             AnArray rot = null;
-            AnArray durations = null;
+            AnArray durations;
             m.PlayMode = (Mode)data["mode"].AsInt;
             m.IsRunning = data["running"].AsBoolean;
             m.IsRunningReverse = data["runningreverse"].AsBoolean;
