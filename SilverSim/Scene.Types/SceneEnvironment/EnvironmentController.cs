@@ -26,25 +26,32 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         int m_SunUpdateEveryMsecs = 10000;
         uint m_SendSimTimeAfterNSunUpdates = 10 - 1;
         int m_UpdateWindModelEveryMsecs = 10000;
+        int m_UpdateTidalModelEveryMsecs = 10000;
 
         uint m_SunUpdatesUntilSendSimTime;
 
         #region Update Rate Control
+        public int UpdateTidalModelEveryMsecs
+        {
+            get
+            {
+                return m_UpdateTidalModelEveryMsecs;
+            }
+            set
+            {
+                m_UpdateTidalModelEveryMsecs = value;
+            }
+        }
+
         public int SunUpdateEveryMsecs
         {
             get
             {
-                lock (m_EnvironmentLock)
-                {
-                    return m_SunUpdateEveryMsecs;
-                }
+                return m_SunUpdateEveryMsecs;
             }
             set
             {
-                lock (m_EnvironmentLock)
-                {
-                    m_SunUpdateEveryMsecs = value;
-                }
+                m_SunUpdateEveryMsecs = value;
             }
         }
 
@@ -52,19 +59,13 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             get
             {
-                lock (m_EnvironmentLock)
-                {
-                    return m_SendSimTimeAfterNSunUpdates + 1;
-                }
+                return m_SendSimTimeAfterNSunUpdates + 1;
             }
             set
             {
-                lock (m_EnvironmentLock)
+                if (value >= 1)
                 {
-                    if (value >= 1)
-                    {
-                        m_SendSimTimeAfterNSunUpdates = value - 1;
-                    }
+                    m_SendSimTimeAfterNSunUpdates = value - 1;
                 }
             }
         }
@@ -73,19 +74,13 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             get
             {
-                lock (m_EnvironmentLock)
-                {
-                    return m_UpdateWindModelEveryMsecs;
-                }
+                return m_UpdateWindModelEveryMsecs;
             }
             set
             {
-                lock (m_EnvironmentLock)
+                if (value >= 1)
                 {
-                    if (value >= 1)
-                    {
-                        m_UpdateWindModelEveryMsecs = value;
-                    }
+                    m_UpdateWindModelEveryMsecs = value;
                 }
             }
         }
@@ -112,6 +107,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     m_LastFpsTickCount = System.Environment.TickCount;
                     m_LastWindModelUpdateTickCount = m_LastFpsTickCount;
                     m_LastSunUpdateTickCount = m_LastFpsTickCount;
+                    m_LastTidalModelUpdateTickCount = m_LastFpsTickCount;
                     m_CountedTicks = 0;
                     m_Timer.Start();
                 }
@@ -134,6 +130,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         int m_LastFpsTickCount;
         int m_LastWindModelUpdateTickCount;
         int m_LastSunUpdateTickCount;
+        int m_LastTidalModelUpdateTickCount;
         int m_CountedTicks;
         double m_EnvironmentFps;
 
@@ -181,8 +178,14 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
             if (null != Wind && newTickCount - m_LastWindModelUpdateTickCount >= m_UpdateWindModelEveryMsecs)
             {
-                m_LastWindModelUpdateTickCount = m_UpdateWindModelEveryMsecs;
+                m_LastWindModelUpdateTickCount = newTickCount;
                 Wind.UpdateModel(m_SunData);
+            }
+
+            if(newTickCount - m_LastTidalModelUpdateTickCount >= m_UpdateTidalModelEveryMsecs)
+            {
+                m_LastTidalModelUpdateTickCount = newTickCount;
+                TidalTimer();
             }
         }
 
