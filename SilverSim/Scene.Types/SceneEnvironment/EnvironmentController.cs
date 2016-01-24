@@ -26,7 +26,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         int m_SunUpdateEveryMsecs = 10000;
         uint m_SendSimTimeAfterNSunUpdates = 10 - 1;
         int m_UpdateWindModelEveryMsecs = 10000;
-        int m_UpdateTidalModelEveryMsecs = 10000;
+        int m_UpdateTidalModelEveryMsecs = 60000;
 
         uint m_SunUpdatesUntilSendSimTime;
 
