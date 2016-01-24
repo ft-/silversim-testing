@@ -94,12 +94,16 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.ShowCommands.Add("parcels", ShowParcelsCmd);
             Common.CmdIO.CommandRegistry.GetCommands.Add("sunparam", GetSunParamCmd);
             Common.CmdIO.CommandRegistry.SetCommands.Add("sunparam", SetSunParamCmd);
+            Common.CmdIO.CommandRegistry.ResetCommands.Add("sunparam", ResetSunParamCmd);
             Common.CmdIO.CommandRegistry.GetCommands.Add("moonparam", GetMoonParamCmd);
             Common.CmdIO.CommandRegistry.SetCommands.Add("moonparam", SetMoonParamCmd);
+            Common.CmdIO.CommandRegistry.ResetCommands.Add("moonparam", ResetMoonParamCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("tidal", EnableTidalParamCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("tidal", DisableTidalParamCmd);
             Common.CmdIO.CommandRegistry.GetCommands.Add("tidalparam", GetTidalParamCmd);
             Common.CmdIO.CommandRegistry.SetCommands.Add("tidalparam", SetTidalParamCmd);
+            Common.CmdIO.CommandRegistry.ResetCommands.Add("tidalparam", ResetTidalParamCmd);
+            Common.CmdIO.CommandRegistry.ResetCommands.Add("windparam", ResetWindParamCmd);
             Common.CmdIO.CommandRegistry.GetCommands.Add("waterheight", GetWaterheightCmd);
             Common.CmdIO.CommandRegistry.SetCommands.Add("waterheight", SetWaterheightCmd);
 
@@ -1327,6 +1331,24 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Sun Params
+        void ResetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("reset sunparam - reset sunparam to defaults");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                scene.Environment.ResetSunToDefaults();
+            }
+        }
+
         void SetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
@@ -1337,16 +1359,11 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("set sunparam durations <secsperday> <daysperyear>\n" +
                     "set sunparam averagetilt <value>\n" +
                     "set sunparam seasonaltilt <value>\n" +
-                    "set sunparam normalizedoffset <value>\n" +
-                    "set sunparam to defaults");
+                    "set sunparam normalizedoffset <value>");
             }
             else if(selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
-            }
-            else if(args[2] == "to" && args[3] == "defaults")
-            {
-                scene.Environment.ResetSunToDefaults();
             }
             else
             {
@@ -1455,6 +1472,24 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Moon Params
+        void ResetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("reset moonparam - reset moon parameters to defaults");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                scene.Environment.ResetMoonToDefaults();
+            }
+        }
+
         void SetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
@@ -1462,16 +1497,11 @@ namespace SilverSim.Main.Cmd.Region
             if (args[0] == "help" || args.Count < 4)
             {
                 io.Write("set moonparam period <seconds>\n" +
-                    "set moonparam phaseoffset <offset>\n" +
-                    "set moonparam to defaults");
+                    "set moonparam phaseoffset <offset>");
             }
             else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
-            }
-            else if (args[2] == "to" && args[3] == "defaults")
-            {
-                scene.Environment.ResetMoonToDefaults();
             }
             else
             {
@@ -1542,6 +1572,25 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Tidal Params
+        void ResetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("reset tidalparam - reset tidal parameters to defaults");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                scene.Environment.ResetTidalToDefaults();
+            }
+        }
+
+
         void EnableTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
@@ -1587,16 +1636,11 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("set tidalparam baseheight <baseheight>\n" + 
                     "set tidalparam moonamplitude <amplitude>\n" +
-                    "set tidalparam sunamplitude <amplitude>\n" +
-                    "set tidalparam to defaults");
+                    "set tidalparam sunamplitude <amplitude>");
             }
             else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
-            }
-            else if (args[2] == "to" && args[3] == "defaults")
-            {
-                scene.Environment.ResetTidalToDefaults();
             }
             else
             {
@@ -1685,6 +1729,27 @@ namespace SilverSim.Main.Cmd.Region
                 }
             }
         }
+        #endregion
+
+        #region Wind Params
+        void ResetWindParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("reset windparam - reset wind parameters to defaults");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                scene.Environment.ResetWindToDefaults();
+            }
+        }
+
         #endregion
 
         #region Waterheight
