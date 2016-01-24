@@ -1359,7 +1359,9 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("set sunparam durations <secsperday> <daysperyear>\n" +
                     "set sunparam averagetilt <value>\n" +
                     "set sunparam seasonaltilt <value>\n" +
-                    "set sunparam normalizedoffset <value>");
+                    "set sunparam normalizedoffset <value>\n" +
+                    "set sunparam updateeverymsecs <value>\n" +
+                    "set sunparam sendsimtimeeverynthupdate <value>");
             }
             else if(selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
             {
@@ -1368,8 +1370,32 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 double value;
+                int ivalue;
+                uint uvalue;
                 switch (args[2])
                 {
+                    case "updateeverymsecs":
+                        if(int.TryParse(args[3], out ivalue))
+                        {
+                            scene.Environment.SunUpdateEveryMsecs = ivalue;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    case "sendsimtimeeverynthupdate":
+                        if (uint.TryParse(args[3], out uvalue))
+                        {
+                            scene.Environment.SendSimTimeEveryNthSunUpdate = uvalue;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
                     case "durations":
                         uint secperday;
                         uint daysperyear;
@@ -1434,7 +1460,9 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("get sunparam durations\n" +
                     "get sunparam averagetilt\n" +
                     "get sunparam seasonaltilt\n" +
-                    "get sunparam normalizedoffset");
+                    "get sunparam normalizedoffset\n" +
+                    "get sunparam updateveryms\n" +
+                    "get sunparam sendsimtimeeverynthupdate");
             }
             else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
             {
@@ -1444,6 +1472,14 @@ namespace SilverSim.Main.Cmd.Region
             {
                 switch (args[2])
                 {
+                    case "updateeverymsecs":
+                        io.WriteFormatted("Update sun every {0} ms", scene.Environment.SunUpdateEveryMsecs);
+                        break;
+
+                    case "sendsimtimeeverynthupdate":
+                        io.WriteFormatted("Send sim time every {0} sun update", scene.Environment.SendSimTimeEveryNthSunUpdate);
+                        break;
+
                     case "durations":
                         uint secperday;
                         uint daysperyear;
@@ -1636,7 +1672,8 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("set tidalparam baseheight <baseheight>\n" + 
                     "set tidalparam moonamplitude <amplitude>\n" +
-                    "set tidalparam sunamplitude <amplitude>");
+                    "set tidalparam sunamplitude <amplitude>\n" + 
+                    "set tidalparam updateeverymsecs <millseconds>\n");
             }
             else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
             {
@@ -1645,9 +1682,21 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 double value;
+                int ivalue;
                 switch (args[2])
                 {
-                    case "base":
+                    case "updateeverymsecs":
+                        if(int.TryParse(args[3], out ivalue))
+                        {
+                            scene.Environment.UpdateTidalModelEveryMsecs = ivalue;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    case "baseheight":
                         if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
                         {
                             scene.Environment[EnvironmentController.FloatWaterParams.TidalBaseHeight] = value;
@@ -1697,7 +1746,8 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("get tidalparam baseheight\n" +
                     "get tidalparam sunamplitude\n" +
                     "get tidalparam moonamplitude\n" +
-                    "get tidalparam enabled");
+                    "get tidalparam enabled\n" + 
+                    "get tidalparam updateeverymsecs");
             }
             else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
             {
@@ -1707,8 +1757,12 @@ namespace SilverSim.Main.Cmd.Region
             {
                 switch (args[2])
                 {
+                    case "updateeverymsecs":
+                        io.WriteFormatted("Update tidal model every {0} msecs", scene.Environment.UpdateTidalModelEveryMsecs);
+                        break;
+
                     case "baseheight":
-                        io.WriteFormatted("Moon amplitude {0}", scene.Environment[EnvironmentController.FloatWaterParams.TidalBaseHeight]);
+                        io.WriteFormatted("Base height {0}", scene.Environment[EnvironmentController.FloatWaterParams.TidalBaseHeight]);
                         break;
 
                     case "sunamplitude":

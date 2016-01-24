@@ -8,6 +8,7 @@ using System.Xml;
 using System;
 using System.Runtime.Serialization;
 using System.Linq;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
 {
@@ -15,11 +16,11 @@ namespace SilverSim.Scene.Types.SceneEnvironment
     {
         public event Action<byte[]> OnEnvironmentControllerChangeParams;
         readonly object m_SerializationLock = new object();
-        bool m_InDeserialization;
+        int m_InDeserialization;
 
         public void TriggerOnEnvironmentControllerChange()
         {
-            if (!m_InDeserialization)
+            if (0 == m_InDeserialization)
             {
                 byte[] data = Serialization;
                 var ev = OnEnvironmentControllerChangeParams; /* events are not exactly thread-safe */
@@ -37,41 +38,51 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public void ResetSunToDefaults()
         {
+            Interlocked.Increment(ref m_InDeserialization);
             AverageSunTilt = -0.25 * Math.PI;
             SeasonalSunTilt = 0.03 * Math.PI;
             SunNormalizedOffset = 0.45;
             SetSunDurationParams(4 * HoursInSeconds, 11);
             SunUpdateEveryMsecs = 10000;
             SendSimTimeEveryNthSunUpdate = 10;
+            Interlocked.Decrement(ref m_InDeserialization);
         }
 
         public void ResetMoonToDefaults()
         {
+            Interlocked.Increment(ref m_InDeserialization);
             MoonPhaseOffset = 0;
             MoonPeriodLengthInSecs = 2.1 * HoursInSeconds;
+            Interlocked.Decrement(ref m_InDeserialization);
         }
 
         public void ResetTidalToDefaults()
         {
+            Interlocked.Increment(ref m_InDeserialization);
             this[BooleanWaterParams.EnableTideControl] = false;
             this[FloatWaterParams.TidalBaseHeight] = 20;
             this[FloatWaterParams.TidalMoonAmplitude] = 0.5;
             this[FloatWaterParams.TidalSunAmplitude] = 0.1;
             UpdateTidalModelEveryMsecs = 60000;
+            Interlocked.Decrement(ref m_InDeserialization);
         }
 
 
         public void ResetWindToDefaults()
         {
+            Interlocked.Increment(ref m_InDeserialization);
             UpdateWindModelEveryMsecs = 10000;
+            Interlocked.Decrement(ref m_InDeserialization);
         }
 
         public void ResetToDefaults()
         {
+            Interlocked.Increment(ref m_InDeserialization);
             ResetSunToDefaults();
             ResetMoonToDefaults();
             ResetTidalToDefaults();
             ResetWindToDefaults();
+            Interlocked.Decrement(ref m_InDeserialization);
         }
 
         public byte[] Serialization
@@ -135,7 +146,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 lock(m_SerializationLock)
                 {
-                    m_InDeserialization = true;
+                    Interlocked.Increment(ref m_InDeserialization);
                     try
                     {
                         using (MemoryStream ms = new MemoryStream(value))
@@ -148,7 +159,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     }
                     finally
                     {
-                        m_InDeserialization = false;
+                        Interlocked.Decrement(ref m_InDeserialization);
                     }
                 }
             }
