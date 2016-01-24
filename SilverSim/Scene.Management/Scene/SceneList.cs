@@ -88,6 +88,21 @@ namespace SilverSim.Scene.Management.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        public bool TryGetValue(string name, out SceneInterface scene)
+        {
+            try
+            {
+                scene = ((RwLockedDoubleDictionary<UUID, ulong, SceneInterface>)this)[m_RegionNames[name.ToLower()]];
+                return true;
+            }
+            catch
+            {
+                scene = default(SceneInterface);
+                return false;
+            }
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void Add(SceneInterface scene)
         {
             m_RegionNames.Add(scene.ID, scene.Name.ToLower());

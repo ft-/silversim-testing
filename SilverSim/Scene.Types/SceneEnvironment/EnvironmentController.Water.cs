@@ -29,7 +29,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public enum FloatWaterParams
         {
-            TidalBase,
+            TidalBaseHeight,
             TidalMoonAmplitude,
             TidalSunAmplitude,
         }
@@ -73,7 +73,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 switch (type)
                 {
-                    case FloatWaterParams.TidalBase:
+                    case FloatWaterParams.TidalBaseHeight:
                         lock(m_TidalLock)
                         {
                             return m_WaterConfig.TidalBase;
@@ -99,7 +99,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 switch (type)
                 {
-                    case FloatWaterParams.TidalBase:
+                    case FloatWaterParams.TidalBaseHeight:
                         lock(m_TidalLock)
                         {
                             m_WaterConfig.TidalBase = value;

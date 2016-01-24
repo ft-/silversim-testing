@@ -9,6 +9,7 @@ using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
@@ -91,6 +92,16 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.ClearCommands.Add("region", ClearRegionCmd);
             Common.CmdIO.CommandRegistry.SelectCommands.Add("region", SelectRegionCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("parcels", ShowParcelsCmd);
+            Common.CmdIO.CommandRegistry.GetCommands.Add("sunparam", GetSunParamCmd);
+            Common.CmdIO.CommandRegistry.SetCommands.Add("sunparam", SetSunParamCmd);
+            Common.CmdIO.CommandRegistry.GetCommands.Add("moonparam", GetMoonParamCmd);
+            Common.CmdIO.CommandRegistry.SetCommands.Add("moonparam", SetMoonParamCmd);
+            Common.CmdIO.CommandRegistry.EnableCommands.Add("tidal", EnableTidalParamCmd);
+            Common.CmdIO.CommandRegistry.DisableCommands.Add("tidal", DisableTidalParamCmd);
+            Common.CmdIO.CommandRegistry.GetCommands.Add("tidalparam", GetTidalParamCmd);
+            Common.CmdIO.CommandRegistry.SetCommands.Add("tidalparam", SetTidalParamCmd);
+            Common.CmdIO.CommandRegistry.GetCommands.Add("waterheight", GetWaterheightCmd);
+            Common.CmdIO.CommandRegistry.SetCommands.Add("waterheight", SetWaterheightCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -164,71 +175,7 @@ namespace SilverSim.Main.Cmd.Region
             return true;
         }
 
-        void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
-        {
-            IEnumerable<RegionInfo> regions;
-
-            if (args[0] == "help")
-            {
-                io.Write("show regions ([enabled|disabled|online|offline])");
-                return;
-            }
-            else if (args.Count < 3)
-            {
-                regions = m_RegionStorage.GetAllRegions(UUID.Zero);
-            }
-            else if (args[2] == "enabled")
-            {
-                regions = m_RegionStorage.GetOnlineRegions();
-            }
-            else if (args[2] == "disabled")
-            {
-                regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where (rInfo.Flags & RegionFlags.RegionOnline) == 0 select rInfo;
-            }
-            else if (args[2] == "online")
-            {
-                List<RegionInfo> regionList = new List<RegionInfo>();
-                foreach (SceneInterface scene in SceneManager.Scenes.Values)
-                {
-                    regionList.Add(scene.GetRegionInfo());
-                }
-                regions = regionList;
-            }
-            else if (args[2] == "offline")
-            {
-                List<UUID> onlineRegions = new List<UUID>();
-
-                foreach (SceneInterface scene in SceneManager.Scenes.Values)
-                {
-                    onlineRegions.Add(scene.ID);
-                }
-                regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where !onlineRegions.Contains(rInfo.ID) select rInfo;
-            }
-            else
-            {
-                io.WriteFormatted(string.Format("{0} is not a known token", args[2]));
-                return;
-            }
-
-            string output = "Scene List:\n----------------------------------------------";
-            foreach (RegionInfo rInfo in regions)
-            {
-                if (limitedToScene == UUID.Zero || rInfo.ID == limitedToScene)
-                {
-                    Vector3 gridcoord = rInfo.Location;
-                    output += string.Format("\nRegion {0} [{1}]: (Port {6})\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n  GatekeeperURI={7}\n", 
-                        rInfo.Name, rInfo.ID, 
-                        gridcoord.ToString(), 
-                        rInfo.Size.ToString(), 
-                        ResolveName(rInfo.Owner).FullName, 
-                        gridcoord.X_String + "," + gridcoord.Y_String, 
-                        rInfo.ServerPort,
-                        rInfo.GridURI);
-                }
-            }
-            io.Write(output);
-        }
-
+        #region Region control commands
         void ChangeRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
@@ -870,7 +817,9 @@ namespace SilverSim.Main.Cmd.Region
                 }
             }
         }
+        #endregion
 
+        #region Region and Simulator notice
         void AlertRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
@@ -932,7 +881,9 @@ namespace SilverSim.Main.Cmd.Region
                 }
             }
         }
+        #endregion
 
+        #region Agent control (Login/Messages/Kick)
         void AlertAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
@@ -1034,50 +985,6 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
-        {
-            UUID selectedScene;
-            if (args[0] == "help")
-            {
-                io.Write("show neighbors - Shows neighbors");
-                return;
-            }
-            else if (limitedToScene != UUID.Zero)
-            {
-                selectedScene = limitedToScene;
-            }
-            else if (io.SelectedScene == UUID.Zero)
-            {
-                io.Write("show neighbors needs a selected region before.");
-                return;
-            }
-            else
-            {
-                selectedScene = io.SelectedScene;
-            }
-
-            SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
-            {
-                io.Write("no scene selected");
-                return;
-            }
-
-            string output = "Neighbor List:\n----------------------------------------------";
-            foreach (SceneInterface.NeighborEntry neighborInfo in scene.Neighbors.Values)
-            {
-                Vector3 gridcoord = neighborInfo.RemoteRegionData.Location;
-                output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", 
-                    neighborInfo.RemoteRegionData.Name, 
-                    neighborInfo.RemoteRegionData.ID, gridcoord.ToString(), 
-                    neighborInfo.RemoteRegionData.Size.ToString(),
-                    ResolveName(neighborInfo.RemoteRegionData.Owner).FullName, 
-                    gridcoord.X_String + "," + gridcoord.Y_String);
-            }
-            io.Write(output);
-
-        }
-
         void EnableDisableLoginsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
@@ -1114,6 +1021,117 @@ namespace SilverSim.Main.Cmd.Region
             {
                 scene.LoginControl.NotReady(SceneInterface.ReadyFlags.LoginsEnable);
             }
+        }
+        #endregion
+
+        #region Show commands
+        void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            IEnumerable<RegionInfo> regions;
+
+            if (args[0] == "help")
+            {
+                io.Write("show regions ([enabled|disabled|online|offline])");
+                return;
+            }
+            else if (args.Count < 3)
+            {
+                regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+            }
+            else if (args[2] == "enabled")
+            {
+                regions = m_RegionStorage.GetOnlineRegions();
+            }
+            else if (args[2] == "disabled")
+            {
+                regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where (rInfo.Flags & RegionFlags.RegionOnline) == 0 select rInfo;
+            }
+            else if (args[2] == "online")
+            {
+                List<RegionInfo> regionList = new List<RegionInfo>();
+                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                {
+                    regionList.Add(scene.GetRegionInfo());
+                }
+                regions = regionList;
+            }
+            else if (args[2] == "offline")
+            {
+                List<UUID> onlineRegions = new List<UUID>();
+
+                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                {
+                    onlineRegions.Add(scene.ID);
+                }
+                regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where !onlineRegions.Contains(rInfo.ID) select rInfo;
+            }
+            else
+            {
+                io.WriteFormatted(string.Format("{0} is not a known token", args[2]));
+                return;
+            }
+
+            string output = "Scene List:\n----------------------------------------------";
+            foreach (RegionInfo rInfo in regions)
+            {
+                if (limitedToScene == UUID.Zero || rInfo.ID == limitedToScene)
+                {
+                    Vector3 gridcoord = rInfo.Location;
+                    output += string.Format("\nRegion {0} [{1}]: (Port {6})\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n  GatekeeperURI={7}\n",
+                        rInfo.Name, rInfo.ID,
+                        gridcoord.ToString(),
+                        rInfo.Size.ToString(),
+                        ResolveName(rInfo.Owner).FullName,
+                        gridcoord.X_String + "," + gridcoord.Y_String,
+                        rInfo.ServerPort,
+                        rInfo.GridURI);
+                }
+            }
+            io.Write(output);
+        }
+
+        void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("show neighbors - Shows neighbors");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("show neighbors needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            string output = "Neighbor List:\n----------------------------------------------";
+            foreach (SceneInterface.NeighborEntry neighborInfo in scene.Neighbors.Values)
+            {
+                Vector3 gridcoord = neighborInfo.RemoteRegionData.Location;
+                output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n",
+                    neighborInfo.RemoteRegionData.Name,
+                    neighborInfo.RemoteRegionData.ID, gridcoord.ToString(),
+                    neighborInfo.RemoteRegionData.Size.ToString(),
+                    ResolveName(neighborInfo.RemoteRegionData.Owner).FullName,
+                    gridcoord.X_String + "," + gridcoord.Y_String);
+            }
+            io.Write(output);
+
         }
 
         void ShowAgentsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -1165,6 +1183,30 @@ namespace SilverSim.Main.Cmd.Region
             io.Write(output);
         }
 
+        void ShowParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID sceneID = UUID.Zero != limitedToScene ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(sceneID, out scene))
+            {
+                io.Write("No region selected.");
+            }
+            else
+            {
+                string output = "Parcel List:\n--------------------------------------------------------------------------------";
+                foreach (ParcelInfo parcel in scene.Parcels)
+                {
+                    output += string.Format("\nParcel {0} ({1}):\n  Owner={2}\n",
+                        parcel.Name,
+                        parcel.ID,
+                        ResolveName(parcel.Owner).FullName);
+                }
+                io.Write(output);
+            }
+        }
+        #endregion
+
+        #region Clear commands
         void ClearObjectsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             SceneInterface scene;
@@ -1188,28 +1230,6 @@ namespace SilverSim.Main.Cmd.Region
             }
             scene.ClearObjects();
             io.Write("All objects deleted.");
-        }
-
-        void ShowParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
-        {
-            UUID sceneID = UUID.Zero != limitedToScene ? limitedToScene : io.SelectedScene;
-            SceneInterface scene;
-            if(!SceneManager.Scenes.TryGetValue(sceneID, out scene))
-            {
-                io.Write("No region selected.");
-            }
-            else
-            {
-                string output = "Parcel List:\n--------------------------------------------------------------------------------";
-                foreach(ParcelInfo parcel in scene.Parcels)
-                {
-                    output += string.Format("\nParcel {0} ({1}):\n  Owner={2}\n", 
-                        parcel.Name, 
-                        parcel.ID,
-                        ResolveName(parcel.Owner).FullName);
-                }
-                io.Write(output);
-            }
         }
 
         void ClearParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -1262,8 +1282,9 @@ namespace SilverSim.Main.Cmd.Region
             scene.ResetParcels();
             io.Write("Region cleared.");
         }
+        #endregion
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        #region Select region command
         void SelectRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
@@ -1287,13 +1308,13 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (args.Count == 3)
             {
-                try
+                SceneInterface scene;
+                if (SceneManager.Scenes.TryGetValue(args[2], out scene))
                 {
-                    SceneInterface scene = SceneManager.Scenes[args[2]];
                     io.SelectedScene = scene.ID;
                     io.WriteFormatted("region {0} selected", args[2]);
                 }
-                catch
+                else
                 {
                     io.WriteFormatted("region {0} does not exist or is not online", args[2]);
                 }
@@ -1303,6 +1324,415 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("invalid parameters for select region");
             }
         }
+        #endregion
+
+        #region Sun Params
+        void SetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help" || args.Count < 4 ||
+                (args[2] == "durations" && args.Count < 5))
+            {
+                io.Write("set sunparam durations <secsperday> <daysperyear>\n" +
+                    "set sunparam averagetilt <value>\n" +
+                    "set sunparam seasonaltilt <value>\n" +
+                    "set sunparam normalizedoffset <value>\n" +
+                    "set sunparam to defaults");
+            }
+            else if(selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else if(args[2] == "to" && args[3] == "defaults")
+            {
+                scene.Environment.ResetSunToDefaults();
+            }
+            else
+            {
+                double value;
+                switch (args[2])
+                {
+                    case "durations":
+                        uint secperday;
+                        uint daysperyear;
+                        if(uint.TryParse(args[3], out secperday) &&
+                            uint.TryParse(args[4], out daysperyear))
+                        {
+                            scene.Environment.SetSunDurationParams(secperday, daysperyear);
+                        }
+                        else
+                        {
+                            io.Write("Invalid values");
+                        }
+                        break;
+
+                    case "averagetilt":
+                        if(double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment.AverageSunTilt = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    case "seasonaltilt":
+                        if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment.SeasonalSunTilt = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    case "normalizedoffset":
+                        if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment.SunNormalizedOffset = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    default:
+                        io.WriteFormatted("Invalid parameter {0}", args[2]);
+                        break;
+                }
+            }
+        }
+
+
+        void GetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("get sunparam durations\n" +
+                    "get sunparam averagetilt\n" +
+                    "get sunparam seasonaltilt\n" +
+                    "get sunparam normalizedoffset");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                switch (args[2])
+                {
+                    case "durations":
+                        uint secperday;
+                        uint daysperyear;
+                        scene.Environment.GetSunDurationParams(out secperday, out daysperyear);
+                        io.WriteFormatted("Seconds per day {0}\nDays per year {1}", secperday, daysperyear);
+                        break;
+
+                    case "averagetilt":
+                        io.WriteFormatted("Average Tilt {0} rad", scene.Environment.AverageSunTilt);
+                        break;
+
+                    case "seasonaltilt":
+                        io.WriteFormatted("Seasonal Tilt {0} rad", scene.Environment.SeasonalSunTilt);
+                        break;
+
+                    case "normalizedoffset":
+                        io.WriteFormatted("Normalized Offset {0}", scene.Environment.SunNormalizedOffset);
+                        break;
+
+                    default:
+                        io.WriteFormatted("Invalid parameter {0}", args[2]);
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        #region Moon Params
+        void SetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help" || args.Count < 4)
+            {
+                io.Write("set moonparam period <seconds>\n" +
+                    "set moonparam phaseoffset <offset>\n" +
+                    "set moonparam to defaults");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else if (args[2] == "to" && args[3] == "defaults")
+            {
+                scene.Environment.ResetMoonToDefaults();
+            }
+            else
+            {
+                double value;
+                switch (args[2])
+                {
+                    case "period":
+                        if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment.MoonPeriodLengthInSecs = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    case "phaseoffset":
+                        if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment.MoonPhaseOffset = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    default:
+                        io.WriteFormatted("Invalid parameter {0}", args[2]);
+                        break;
+                }
+            }
+        }
+
+
+        void GetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("get moonparam period\n" +
+                    "get moonparam phaseoffset");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                switch (args[2])
+                {
+                    case "period":
+                        io.WriteFormatted("Period {0}", scene.Environment.MoonPeriodLengthInSecs);
+                        break;
+
+                    case "phaseoffset":
+                        io.WriteFormatted("Phase Offset {0} rad", scene.Environment.MoonPhaseOffset);
+                        break;
+
+                    default:
+                        io.WriteFormatted("Invalid parameter {0}", args[2]);
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        #region Tidal Params
+        void EnableTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("enable tidal");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                scene.Environment[EnvironmentController.BooleanWaterParams.EnableTideControl] = true;
+            }
+        }
+
+        void DisableTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("disable tidal");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                scene.Environment[EnvironmentController.BooleanWaterParams.EnableTideControl] = false;
+            }
+        }
+
+        void SetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help" || args.Count < 3 ||
+                (args.Count < 4))
+            {
+                io.Write("set tidalparam baseheight <baseheight>\n" + 
+                    "set tidalparam moonamplitude <amplitude>\n" +
+                    "set tidalparam sunamplitude <amplitude>\n" +
+                    "set tidalparam to defaults");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else if (args[2] == "to" && args[3] == "defaults")
+            {
+                scene.Environment.ResetTidalToDefaults();
+            }
+            else
+            {
+                double value;
+                switch (args[2])
+                {
+                    case "base":
+                        if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment[EnvironmentController.FloatWaterParams.TidalBaseHeight] = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    case "moonamplitude":
+                        if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment[EnvironmentController.FloatWaterParams.TidalMoonAmplitude] = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    case "sunamplitude":
+                        if (double.TryParse(args[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                        {
+                            scene.Environment[EnvironmentController.FloatWaterParams.TidalSunAmplitude] = value;
+                        }
+                        else
+                        {
+                            io.Write("Invalid value");
+                        }
+                        break;
+
+                    default:
+                        io.WriteFormatted("Invalid parameter {0}", args[2]);
+                        break;
+                }
+            }
+        }
+
+
+        void GetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("get tidalparam baseheight\n" +
+                    "get tidalparam sunamplitude\n" +
+                    "get tidalparam moonamplitude\n" +
+                    "get tidalparam enabled");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                switch (args[2])
+                {
+                    case "baseheight":
+                        io.WriteFormatted("Moon amplitude {0}", scene.Environment[EnvironmentController.FloatWaterParams.TidalBaseHeight]);
+                        break;
+
+                    case "sunamplitude":
+                        io.WriteFormatted("Sun amplitude {0}", scene.Environment[EnvironmentController.FloatWaterParams.TidalSunAmplitude]);
+                        break;
+
+                    case "moonamplitude":
+                        io.WriteFormatted("Moon amplitude {0}", scene.Environment[EnvironmentController.FloatWaterParams.TidalMoonAmplitude]);
+                        break;
+
+                    case "enabled":
+                        io.WriteFormatted("Enabled {0}", scene.Environment[EnvironmentController.BooleanWaterParams.EnableTideControl].ToString());
+                        break;
+
+                    default:
+                        io.WriteFormatted("Invalid parameter {0}", args[2]);
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        #region Waterheight
+        void SetWaterheightCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("set waterheight <waterheight>");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                double value;
+                if (double.TryParse(args[2], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out value))
+                {
+                    scene.RegionSettings.WaterHeight = value;
+                    scene.TriggerRegionSettingsChanged();
+                }
+                else
+                {
+                    io.Write("Invalid value");
+                }
+            }
+        }
+
+        void GetWaterheightCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("get waterheight");
+            }
+            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                io.WriteFormatted("Water Height {0}", scene.RegionSettings.WaterHeight);
+            }
+        }
+        #endregion
     }
     #endregion
 
