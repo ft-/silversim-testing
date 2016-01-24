@@ -156,7 +156,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             if (newTickCount - m_LastFpsTickCount >= 1000)
             {
                 int timeDiff = newTickCount - m_LastFpsTickCount;
-                m_LastFpsTickCount = System.Environment.TickCount;
+                m_LastFpsTickCount = newTickCount;
                 lock (m_EnvironmentLock)
                 {
                     m_EnvironmentFps = m_CountedTicks * 1000f / (double)timeDiff;

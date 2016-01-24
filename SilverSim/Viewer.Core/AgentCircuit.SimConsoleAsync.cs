@@ -48,6 +48,10 @@ namespace SilverSim.Viewer.Core
             else
             {
                 CommandRegistry.ExecuteCommand(tty.GetCmdLine(message), tty, Scene.ID);
+                if(!tty.HaveOutputSent)
+                {
+                    tty.Write("");
+                }
             }
 
             using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
@@ -63,6 +67,7 @@ namespace SilverSim.Viewer.Core
         sealed class SimConsoleAsyncTTY : TTY
         {
             readonly AgentCircuit m_Circuit;
+            public bool HaveOutputSent { get; private set; }
             public SimConsoleAsyncTTY(AgentCircuit c)
             {
                 m_Circuit = c;
@@ -73,6 +78,7 @@ namespace SilverSim.Viewer.Core
                 Messages.Console.SimConsoleResponse res = new Messages.Console.SimConsoleResponse();
                 res.Message = text;
                 m_Circuit.SendMessage(res);
+                HaveOutputSent = true;
             }
         }
     }
