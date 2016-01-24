@@ -10,7 +10,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         class WaterConfig
         {
             public bool EnableTideControl;
-            public double TidalBase = 20;
+            public double TidalBaseHeight = 20;
             public double TidalMoonAmplitude = 0.5;
             public double TidalSunAmplitude = 0.1;
 
@@ -76,7 +76,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     case FloatWaterParams.TidalBaseHeight:
                         lock(m_TidalLock)
                         {
-                            return m_WaterConfig.TidalBase;
+                            return m_WaterConfig.TidalBaseHeight;
                         }
 
                     case FloatWaterParams.TidalMoonAmplitude:
@@ -102,7 +102,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     case FloatWaterParams.TidalBaseHeight:
                         lock(m_TidalLock)
                         {
-                            m_WaterConfig.TidalBase = value;
+                            m_WaterConfig.TidalBaseHeight = value;
                         }
                         TriggerOnEnvironmentControllerChange();
                         break;
@@ -142,7 +142,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     return;
                 }
 
-                waterHeight = m_WaterConfig.TidalBase;
+                waterHeight = m_WaterConfig.TidalBaseHeight;
                 waterHeight += Math.Sin(moon_phase) * m_WaterConfig.TidalMoonAmplitude;
                 waterHeight += Math.Sin(sun_phase) * m_WaterConfig.TidalSunAmplitude;
             }

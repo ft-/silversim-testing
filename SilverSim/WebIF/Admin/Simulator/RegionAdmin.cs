@@ -10,6 +10,7 @@ using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
@@ -95,8 +96,12 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.agent.get", HandleAgentGet);
             webif.JsonMethods.Add("region.agent.kick", HandleAgentKick);
             webif.JsonMethods.Add("region.agent.teleporthome", HandleAgentTeleportHome);
+            webif.JsonMethods.Add("region.environment.set", HandleEnvironmentSet);
+            webif.JsonMethods.Add("region.environment.get", HandleEnvironmentGet);
+            webif.JsonMethods.Add("region.environment.resettodefaults", HandleEnvironmentResetToDefaults);
 
             webif.AutoGrantRights["regions.manage"].Add("regions.view");
+            webif.AutoGrantRights["regions.environmentcontrol"].Add("regions.view");
             webif.AutoGrantRights["regions.agents.kick"].Add("regions.view");
             webif.AutoGrantRights["regions.agents.kick"].Add("regions.agents.view");
             webif.AutoGrantRights["regions.agents.teleporthome"].Add("regions.view");
@@ -123,6 +128,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         }
 
+        #region Region View
         [AdminWebIF.RequiredRight("regions.manage")]
         void HandleGetEstates(HttpRequest req, Map jsondata)
         {
@@ -200,7 +206,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             res.Add("regions", regionsRes);
             AdminWebIF.SuccessResponse(req, res);
         }
+        #endregion
 
+        #region Region Online Changes
         [AdminWebIF.RequiredRight("regions.manage")]
         void HandleChangeAccess(HttpRequest req, Map jsondata)
         {
@@ -390,7 +398,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             AdminWebIF.SuccessResponse(req, new Map());
         }
+        #endregion
 
+        #region Agents View and Control
         bool TryGetRootAgent(HttpRequest req, Map jsondata, out SceneInterface scene, out IAgent agent)
         {
             agent = null;
@@ -510,7 +520,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.SuccessResponse(req, res);
             }
         }
+        #endregion
 
+        #region Manage regions
         [AdminWebIF.RequiredRight("regions.manage")]
         void HandleCreate(HttpRequest req, Map jsondata)
         {
@@ -850,7 +862,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
+        #endregion
 
+        #region Login Control
         [AdminWebIF.RequiredRight("regions.logincontrol")]
         void HandleLoginEnable(HttpRequest req, Map jsondata)
         {
@@ -888,7 +902,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
+        #endregion
 
+        #region Start/Stop Control
         [AdminWebIF.RequiredRight("regions.control")]
         void HandleRestart(HttpRequest req, Map jsondata)
         {
@@ -984,7 +1000,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
+        #endregion
 
+        #region Notices
         [AdminWebIF.RequiredRight("region.notice")]
         void HandleNotice(HttpRequest req, Map jsondata)
         {
@@ -1049,7 +1067,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
+        #endregion
 
+        #region Enable/Disable
         [AdminWebIF.RequiredRight("regions.manage")]
         void HandleEnable(HttpRequest req, Map jsondata)
         {
@@ -1101,6 +1121,244 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
             }
         }
+        #endregion
+
+        #region Environment Control
+        [AdminWebIF.RequiredRight("regions.environmentcontrol")]
+        public void HandleEnvironmentSet(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("parameter") || !jsondata.ContainsKey("value"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                uint secperday;
+                uint daysperyear;
+
+                switch (jsondata["parameter"].ToString())
+                {
+                    case "UpdateTidalModelEveryMsecs":
+                        scene.Environment.UpdateTidalModelEveryMsecs = jsondata["value"].AsInt;
+                        break;
+
+                    case "SunUpdateEveryMsecs":
+                        scene.Environment.SunUpdateEveryMsecs = jsondata["value"].AsInt;
+                        break;
+
+                    case "SendSimTimeEveryNthSunUpdate":
+                        scene.Environment.SendSimTimeEveryNthSunUpdate = jsondata["value"].AsUInt;
+                        break;
+
+                    case "UpdateWindModelEveryMsecs":
+                        scene.Environment.UpdateWindModelEveryMsecs = jsondata["value"].AsInt;
+                        break;
+
+                    case "MoonPhaseOffset":
+                        scene.Environment.MoonPhaseOffset = jsondata["value"].AsReal;
+                        break;
+
+                    case "MoonPeriodLengthInSecs":
+                        scene.Environment.MoonPeriodLengthInSecs = jsondata["value"].AsReal;
+                        break;
+
+                    case "AverageSunTilt":
+                        scene.Environment.AverageSunTilt = jsondata["value"].AsReal;
+                        break;
+
+                    case "SeasonalSunTilt":
+                        scene.Environment.SeasonalSunTilt = jsondata["value"].AsReal;
+                        break;
+
+                    case "SunNormalizedOffset":
+                        scene.Environment.SunNormalizedOffset = jsondata["value"].AsReal;
+                        break;
+
+                    case "SecondsPerDay":
+                        scene.Environment.GetSunDurationParams(out secperday, out daysperyear);
+                        secperday = jsondata["value"].AsUInt;
+                        scene.Environment.SetSunDurationParams(secperday, daysperyear);
+                        break;
+
+                    case "DaysPerYear":
+                        scene.Environment.GetSunDurationParams(out secperday, out daysperyear);
+                        daysperyear = jsondata["value"].AsUInt;
+                        scene.Environment.SetSunDurationParams(secperday, daysperyear);
+                        break;
+
+                    case "EnableTideControl":
+                        scene.Environment[EnvironmentController.BooleanWaterParams.EnableTideControl] = jsondata["value"].AsBoolean;
+                        break;
+
+                    case "TidalBaseHeight":
+                        scene.Environment[EnvironmentController.FloatWaterParams.TidalBaseHeight] = jsondata["value"].AsReal;
+                        break;
+
+                    case "TidalMoonAmplitude":
+                        scene.Environment[EnvironmentController.FloatWaterParams.TidalMoonAmplitude] = jsondata["value"].AsReal;
+                        break;
+
+                    case "TidalSunAmplitude":
+                        scene.Environment[EnvironmentController.FloatWaterParams.TidalSunAmplitude] = jsondata["value"].AsReal;
+                        break;
+
+                    case "EnableWeatherLightShare":
+                        scene.Environment[EnvironmentController.BooleanWeatherParams.EnableLightShare] = jsondata["value"].AsBoolean;
+                        break;
+
+                    default:
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                }
+
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.environmentcontrol")]
+        public void HandleEnvironmentGet(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("parameter"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                Map res = new Map();
+                uint secperday;
+                uint daysperyear;
+
+                switch(jsondata["parameter"].ToString())
+                {
+                    case "UpdateTidalModelEveryMsecs":
+                        res.Add("value", scene.Environment.UpdateTidalModelEveryMsecs);
+                        break;
+
+                    case "SunUpdateEveryMsecs":
+                        res.Add("value", scene.Environment.SunUpdateEveryMsecs);
+                        break;
+
+                    case "SendSimTimeEveryNthSunUpdate":
+                        res.Add("value", (int)scene.Environment.SendSimTimeEveryNthSunUpdate);
+                        break;
+
+                    case "UpdateWindModelEveryMsecs":
+                        res.Add("value", scene.Environment.UpdateWindModelEveryMsecs);
+                        break;
+
+                    case "MoonPhaseOffset":
+                        res.Add("value", scene.Environment.MoonPhaseOffset);
+                        break;
+
+                    case "MoonPeriodLengthInSecs":
+                        res.Add("value", scene.Environment.MoonPeriodLengthInSecs);
+                        break;
+
+                    case "AverageSunTilt":
+                        res.Add("value", scene.Environment.AverageSunTilt);
+                        break;
+
+                    case "SeasonalSunTilt":
+                        res.Add("value", scene.Environment.SeasonalSunTilt);
+                        break;
+
+                    case "SunNormalizedOffset":
+                        res.Add("value", scene.Environment.SunNormalizedOffset);
+                        break;
+
+                    case "SecondsPerDay":
+                        scene.Environment.GetSunDurationParams(out secperday, out daysperyear);
+                        res.Add("value", (int)secperday);
+                        break;
+
+                    case "DaysPerYear":
+                        scene.Environment.GetSunDurationParams(out secperday, out daysperyear);
+                        res.Add("value", (int)daysperyear);
+                        break;
+
+                    case "EnableTideControl":
+                        res.Add("value", scene.Environment[EnvironmentController.BooleanWaterParams.EnableTideControl]);
+                        break;
+
+                    case "TidalBaseHeight":
+                        res.Add("value", scene.Environment[EnvironmentController.FloatWaterParams.TidalBaseHeight]);
+                        break;
+
+                    case "TidalMoonAmplitude":
+                        res.Add("value", scene.Environment[EnvironmentController.FloatWaterParams.TidalMoonAmplitude]);
+                        break;
+
+                    case "TidalSunAmplitude":
+                        res.Add("value", scene.Environment[EnvironmentController.FloatWaterParams.TidalSunAmplitude]);
+                        break;
+
+                    case "EnableWeatherLightShare":
+                        res.Add("value", scene.Environment[EnvironmentController.BooleanWeatherParams.EnableLightShare]);
+                        break;
+
+                    default:
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                }
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.environmentcontrol")]
+        public void HandleEnvironmentResetToDefaults(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("which"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                switch (jsondata["which"].ToString())
+                {
+                    case "all":
+                        scene.Environment.ResetToDefaults();
+                        break;
+
+                    case "sun":
+                        scene.Environment.ResetSunToDefaults();
+                        break;
+
+                    case "moon":
+                        scene.Environment.ResetMoonToDefaults();
+                        break;
+
+                    case "tidal":
+                        scene.Environment.ResetTidalToDefaults();
+                        break;
+
+                    case "wind":
+                        scene.Environment.ResetWindToDefaults();
+                        break;
+
+                    default:
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                }
+
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+        #endregion
     }
     #endregion
 
