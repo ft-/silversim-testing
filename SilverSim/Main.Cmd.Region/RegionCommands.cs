@@ -72,6 +72,7 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.CreateCommands.Add("region", CreateRegionCmd);
             Common.CmdIO.CommandRegistry.CreateCommands.Add("regions", CreateRegionsCmd);
             Common.CmdIO.CommandRegistry.DeleteCommands.Add("region", DeleteRegionCmd);
+            Common.CmdIO.CommandRegistry.ShowCommands.Add("regionstats", ShowRegionStatsCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("region", EnableRegionCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("region", DisableRegionCmd);
@@ -1029,6 +1030,42 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Show commands
+        void ShowRegionStatsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("show regionstats - Shows region statistics");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("show regionstats needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            string output = string.Empty;
+            output += string.Format("Environment FPS: {0}\n", scene.Environment.EnvironmentFps);
+            output += string.Format("Physics FPS: {0}\n", scene.PhysicsScene.PhysicsFPS);
+            output += string.Format("Root Agents: {0}", scene.RootAgents.Count);
+            io.Write(output);
+        }
+
         void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             IEnumerable<RegionInfo> regions;
