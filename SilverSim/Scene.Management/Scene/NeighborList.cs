@@ -6,6 +6,7 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.Scene.Management.Scene
 {
@@ -86,7 +87,7 @@ namespace SilverSim.Scene.Management.Scene
             var ev = OnNeighborAddOrUpdate;
             if(ev != null)
             {
-                foreach (Action<RegionInfo> del in ev.GetInvocationList())
+                foreach (Action<RegionInfo> del in ev.GetInvocationList().OfType<Action<RegionInfo>>())
                 {
                     del(region);
                 }
@@ -99,7 +100,7 @@ namespace SilverSim.Scene.Management.Scene
             var ev = OnNeighborRemove;
             if(ev != null)
             {
-                foreach (Action<RegionInfo> del in ev.GetInvocationList())
+                foreach (Action<RegionInfo> del in ev.GetInvocationList().OfType<Action<RegionInfo>>())
                 {
                     del(region);
                 }

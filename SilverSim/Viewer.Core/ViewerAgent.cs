@@ -37,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 
 namespace SilverSim.Viewer.Core
@@ -225,7 +226,7 @@ namespace SilverSim.Viewer.Core
             var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
             if (e != null)
             {
-                foreach (Action<IObject> del in e.GetInvocationList())
+                foreach (Action<IObject> del in e.GetInvocationList().OfType<Action<IObject>>())
                 {
                     del(this);
                 }

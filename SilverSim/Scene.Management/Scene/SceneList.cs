@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -105,7 +106,7 @@ namespace SilverSim.Scene.Management.Scene
                 var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
                 if (null != ev)
                 {
-                    foreach (Action<SceneInterface> del in ev.GetInvocationList())
+                    foreach (Action<SceneInterface> del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                     {
                         try
                         {
@@ -153,7 +154,7 @@ namespace SilverSim.Scene.Management.Scene
                 var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
                 if (null != ev)
                 {
-                    foreach (Action<SceneInterface> del in ev.GetInvocationList())
+                    foreach (Action<SceneInterface> del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                     {
                         try
                         {

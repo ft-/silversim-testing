@@ -7,6 +7,7 @@ using SilverSim.Types;
 using System.Xml;
 using System;
 using System.Runtime.Serialization;
+using System.Linq;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
 {
@@ -24,7 +25,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 var ev = OnEnvironmentControllerChangeParams; /* events are not exactly thread-safe */
                 if (ev != null)
                 {
-                    foreach (Action<byte[]> del in ev.GetInvocationList())
+                    foreach (Action<byte[]> del in ev.GetInvocationList().OfType<Action<byte[]>>())
                     {
                         del(data);
                     }

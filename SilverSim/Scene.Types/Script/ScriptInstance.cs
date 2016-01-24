@@ -8,6 +8,7 @@ using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.Script
@@ -72,7 +73,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (Action<ScriptInstance> del in ev.GetInvocationList())
+                foreach (Action<ScriptInstance> del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
                 {
                     try
                     {
@@ -92,7 +93,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (Action<ScriptInstance> del in ev.GetInvocationList())
+                foreach (Action<ScriptInstance> del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
                 {
                     try
                     {

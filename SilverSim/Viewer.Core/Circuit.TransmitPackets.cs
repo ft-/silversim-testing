@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Core
             var ev = OnTerminateCircuit;
             if (null != ev)
             {
-                foreach (Action d in ev.GetInvocationList())
+                foreach (Action d in ev.GetInvocationList().OfType<Action>())
                 {
                     d.Invoke();
                 }

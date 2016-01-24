@@ -16,6 +16,7 @@ using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Object
@@ -194,7 +195,7 @@ namespace SilverSim.Scene.Types.Object
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList())
+                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList().OfType<Action<ObjectGroup, UpdateChangedFlags>>())
                 {
                     try
                     {
@@ -226,7 +227,7 @@ namespace SilverSim.Scene.Types.Object
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList())
+                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList().OfType<Action<ObjectGroup, UpdateChangedFlags>>())
                 {
                     try
                     {
@@ -818,7 +819,7 @@ namespace SilverSim.Scene.Types.Object
             var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
             if (e != null)
             {
-                foreach (Action<IObject> del in e.GetInvocationList())
+                foreach (Action<IObject> del in e.GetInvocationList().OfType<Action<IObject>>())
                 {
                     del(this);
                 }

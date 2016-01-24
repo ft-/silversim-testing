@@ -5,6 +5,7 @@ using System;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using System.Text;
+using System.Linq;
 
 namespace SilverSim.Viewer.Messages
 {
@@ -183,7 +184,7 @@ namespace SilverSim.Viewer.Messages
             var ev = OnSendCompletion;
             if (null != ev)
             {
-                foreach (Action<bool> del in ev.GetInvocationList())
+                foreach (Action<bool> del in ev.GetInvocationList().OfType<Action<bool>>())
                 {
                     del(flag);
                 }

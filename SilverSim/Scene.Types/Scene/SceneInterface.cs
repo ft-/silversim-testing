@@ -23,6 +23,7 @@ using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -354,7 +355,7 @@ namespace SilverSim.Scene.Types.Scene
             var ev = OnRemove;
             if (null != ev)
             {
-                foreach (Action<SceneInterface> del in ev.GetInvocationList())
+                foreach (Action<SceneInterface> del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                 {
                     try
                     {
@@ -402,7 +403,7 @@ namespace SilverSim.Scene.Types.Scene
             var ev = OnIPChanged;
             if (ev != null)
             {
-                foreach (Action<SceneInterface, IPAddress> del in ev.GetInvocationList())
+                foreach (Action<SceneInterface, IPAddress> del in ev.GetInvocationList().OfType<Action<SceneInterface, IPAddress>>())
                 {
                     try
                     {

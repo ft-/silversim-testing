@@ -10,6 +10,7 @@ using SilverSim.Types.Script;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Xml;
 
@@ -162,7 +163,7 @@ namespace SilverSim.Scene.Types.Object
             var addDelegate = OnChange;
             if(addDelegate != null)
             {
-                foreach (Action<ChangeAction, UUID, UUID> d in addDelegate.GetInvocationList())
+                foreach (Action<ChangeAction, UUID, UUID> d in addDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                 {
                     d(ChangeAction.Add, PartID, item.ID);
                 }
@@ -180,7 +181,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.NextOwnerAssetID, PartID, item.ID);
                     }
@@ -201,7 +202,7 @@ namespace SilverSim.Scene.Types.Object
             var updateDelegate = OnChange;
             if(updateDelegate != null)
             {
-                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                 {
                     d(ChangeAction.Change, PartID, item.ID);
                 }
@@ -232,7 +233,7 @@ namespace SilverSim.Scene.Types.Object
             var updateDelegate = OnChange;
             if (updateDelegate != null)
             {
-                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                 {
                     d(ChangeAction.Add, PartID, newItem.ID);
                 }
@@ -253,7 +254,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, key1);
                     }
@@ -277,7 +278,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -300,7 +301,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -323,7 +324,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -342,7 +343,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, key1);
                     }
