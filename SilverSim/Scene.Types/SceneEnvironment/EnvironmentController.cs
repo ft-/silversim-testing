@@ -6,6 +6,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
+using System;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
 {
@@ -40,6 +41,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             set
             {
                 m_UpdateTidalModelEveryMsecs = value;
+                TriggerOnEnvironmentControllerChange();
             }
         }
 
@@ -52,6 +54,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             set
             {
                 m_SunUpdateEveryMsecs = value;
+                TriggerOnEnvironmentControllerChange();
             }
         }
 
@@ -67,6 +70,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_SendSimTimeAfterNSunUpdates = value - 1;
                 }
+                TriggerOnEnvironmentControllerChange();
             }
         }
 
@@ -82,6 +86,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_UpdateWindModelEveryMsecs = value;
                 }
+                TriggerOnEnvironmentControllerChange();
             }
         }
         #endregion
@@ -182,7 +187,9 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 Wind.UpdateModel(m_SunData);
             }
 
-            if(newTickCount - m_LastTidalModelUpdateTickCount >= m_UpdateTidalModelEveryMsecs)
+            UpdateMoonPhase();
+
+            if (newTickCount - m_LastTidalModelUpdateTickCount >= m_UpdateTidalModelEveryMsecs)
             {
                 m_LastTidalModelUpdateTickCount = newTickCount;
                 TidalTimer();

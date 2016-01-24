@@ -1,11 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
 {
@@ -15,9 +11,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             public bool EnableTideControl;
             public double TidalBase = 20;
-            public double TidalAmplitude = 0.5;
-            public double TidalPhaseOffset;
-            public double TidalPeriodLengthInSecs = 2.1 * 3600; /* alittle difference for having it move through time */
+            public double TidalMoonAmplitude = 0.5;
+            public double TidalSunAmplitude = 0.1;
 
             public WaterConfig()
             {
@@ -35,9 +30,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         public enum FloatWaterParams
         {
             TidalBase,
-            TidalAmplitude,
-            TidalPhaseOffset,
-            TidalPeriodLengthInSecs
+            TidalMoonAmplitude,
+            TidalSunAmplitude,
         }
 
         readonly object m_TidalLock = new object();
@@ -64,6 +58,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                         {
                             m_WaterConfig.EnableTideControl = value;
                         }
+                        TriggerOnEnvironmentControllerChange();
                         break;
 
                     default:
@@ -84,22 +79,16 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                             return m_WaterConfig.TidalBase;
                         }
 
-                    case FloatWaterParams.TidalAmplitude:
+                    case FloatWaterParams.TidalMoonAmplitude:
                         lock (m_TidalLock)
                         {
-                            return m_WaterConfig.TidalAmplitude;
+                            return m_WaterConfig.TidalMoonAmplitude;
                         }
 
-                    case FloatWaterParams.TidalPhaseOffset:
-                        lock (m_TidalLock)
-                        {
-                            return m_WaterConfig.TidalPhaseOffset;
-                        }
-
-                    case FloatWaterParams.TidalPeriodLengthInSecs:
+                    case FloatWaterParams.TidalSunAmplitude:
                         lock(m_TidalLock)
                         {
-                            return m_WaterConfig.TidalPeriodLengthInSecs;
+                            return m_WaterConfig.TidalSunAmplitude;
                         }
 
                     default:
@@ -115,31 +104,23 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                         {
                             m_WaterConfig.TidalBase = value;
                         }
+                        TriggerOnEnvironmentControllerChange();
                         break;
 
-                    case FloatWaterParams.TidalAmplitude:
+                    case FloatWaterParams.TidalMoonAmplitude:
                         lock (m_TidalLock)
                         {
-                            m_WaterConfig.TidalAmplitude = value;
+                            m_WaterConfig.TidalMoonAmplitude = value;
                         }
+                        TriggerOnEnvironmentControllerChange();
                         break;
 
-                    case FloatWaterParams.TidalPhaseOffset:
-                        lock (m_TidalLock)
-                        {
-                            m_WaterConfig.TidalPhaseOffset = value % (2 * Math.PI);
-                        }
-                        break;
-
-                    case FloatWaterParams.TidalPeriodLengthInSecs:
-                        if(value < 1)
-                        {
-                            value = 1;
-                        }
+                    case FloatWaterParams.TidalSunAmplitude:
                         lock(m_TidalLock)
                         {
-                            m_WaterConfig.TidalPeriodLengthInSecs = value;
+                            m_WaterConfig.TidalSunAmplitude = value;
                         }
+                        TriggerOnEnvironmentControllerChange();
                         break;
 
                     default:
@@ -151,17 +132,19 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         void TidalTimer()
         {
             double waterHeight;
-            lock(m_TidalLock)
+            double sun_phase = SunPhase;
+            double moon_phase = MoonPhase;
+
+            lock (m_TidalLock)
             {
                 if(!m_WaterConfig.EnableTideControl)
                 {
                     return;
                 }
-                ulong utctime = Date.GetUnixTime();
-                double DailyOmega = 2f / m_WaterConfig.TidalPeriodLengthInSecs;
-                double daily_phase = DailyOmega * utctime + m_WaterConfig.TidalPhaseOffset;
-                double moon_phase = daily_phase % (2 * Math.PI);
-                waterHeight = Math.Sin(moon_phase) * m_WaterConfig.TidalAmplitude + m_WaterConfig.TidalBase;
+
+                waterHeight = m_WaterConfig.TidalBase;
+                waterHeight += Math.Sin(moon_phase) * m_WaterConfig.TidalMoonAmplitude;
+                waterHeight += Math.Sin(sun_phase) * m_WaterConfig.TidalSunAmplitude;
             }
 
             m_Scene.RegionSettings.WaterHeight = waterHeight;

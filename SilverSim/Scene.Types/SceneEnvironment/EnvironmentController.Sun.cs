@@ -46,6 +46,18 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_SunData.SunDirection = value;
                 }
+                TriggerOnEnvironmentControllerChange();
+            }
+        }
+
+        public double SunPhase
+        {
+            get
+            {
+                lock(m_EnvironmentLock)
+                {
+                    return m_SunData.SunPhase;
+                }
             }
         }
 
@@ -71,6 +83,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_AverageSunTilt = value.Clamp(-Math.PI, Math.PI);
                 }
+                TriggerOnEnvironmentControllerChange();
             }
         }
 
@@ -89,6 +102,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_SeasonalSunTilt = value.Clamp(-Math.PI, Math.PI);
                 }
+                TriggerOnEnvironmentControllerChange();
             }
         }
 
@@ -107,6 +121,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_SunNormalizedOffset = value.Clamp(-1, 1);
                 }
+                TriggerOnEnvironmentControllerChange();
             }
         }
 
@@ -117,6 +132,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 m_SunData.SecPerDay = secperday;
                 m_SunData.SecPerYear = secperday * daysperyear;
             }
+            TriggerOnEnvironmentControllerChange();
         }
 
         public void GetSunDurationParams(out uint secperday, out uint daysperyear)
