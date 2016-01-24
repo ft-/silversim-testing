@@ -268,19 +268,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #endregion
 
         #region Viewer time message update
-        private void SendSimulatorTimeMessageToAllClients()
-        {
-            SimulatorViewerTimeMessage m = new SimulatorViewerTimeMessage();
-            m.SunPhase = m_SunData.SunPhase;
-            m.UsecSinceStart = m_SunData.UsecSinceStart;
-            m.SunDirection = m_SunData.SunDirection;
-            m.SunAngVelocity = m_SunData.SunAngVelocity;
-            m.SecPerYear = m_SunData.SecPerYear;
-            m.SecPerDay = m_SunData.SecPerDay;
-            SendToAllClients(m);
-        }
-
-        public void SendSimulatorTimeMessageToClient(IAgent agent)
+        SimulatorViewerTimeMessage BuildTimeMessage()
         {
             SimulatorViewerTimeMessage m = new SimulatorViewerTimeMessage();
             m.SunPhase = m_SunData.SunPhase;
@@ -289,7 +277,17 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             m.SunAngVelocity = m_SunData.SunAngVelocity;
             m.SecPerYear = m_SunData.SecPerYear;
             m.SecPerDay = m_SunData.SecPerDay;
-            agent.SendMessageAlways(m, m_Scene.ID);
+            return m;
+        }
+
+        private void SendSimulatorTimeMessageToAllClients()
+        {
+            SendToAllClients(BuildTimeMessage());
+        }
+
+        public void SendSimulatorTimeMessageToClient(IAgent agent)
+        {
+            agent.SendMessageAlways(BuildTimeMessage(), m_Scene.ID);
         }
         #endregion
     }
