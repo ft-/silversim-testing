@@ -14,6 +14,7 @@ using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
@@ -36,6 +37,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         GridServiceInterface m_RegionStorage;
         SceneFactoryInterface m_SceneFactory;
         EstateServiceInterface m_EstateService;
+        ServerParamServiceInterface m_ServerParams;
         SimulationDataStorageInterface m_SimulationData;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         uint m_HttpPort;
@@ -68,6 +70,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_SimulationData = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataName);
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
+            m_ServerParams = loader.GetServerParamStorage();
 
             AdminWebIF webif = loader.GetAdminWebIF();
             m_WebIF = webif;
@@ -83,6 +86,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.change.estate", HandleChangeEstate);
             webif.JsonMethods.Add("region.change.access", HandleChangeAccess);
             webif.JsonMethods.Add("region.change.owner", HandleChangeOwner);
+            webif.JsonMethods.Add("region.simconsole.regionowner", HandleEnableRegionOwnerSimConsole);
+            webif.JsonMethods.Add("region.simconsole.estatemanager", HandleEnableEstateManagerSimConsole);
+            webif.JsonMethods.Add("region.simconsole.estateowner", HandleEnableEstateOwnerSimConsole);
             webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.restart", HandleRestart);
@@ -173,6 +179,22 @@ namespace SilverSim.WebIF.Admin.Simulator
                     estateData.Add("Name", estateInfo.Name);
                     res.Add("estate", estateData);
                 }
+
+                Map permissions = new Map();
+                m = new Map();
+                m.Add("effective", m_ServerParams.GetBoolean(rInfo.ID, RegionOwnerIsSimConsoleUser, false));
+                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, RegionOwnerIsSimConsoleUser, false));
+                permissions.Add("region_owner", m);
+                m = new Map();
+                m.Add("effective", m_ServerParams.GetBoolean(rInfo.ID, EstateOwnerIsSimConsoleUser, false));
+                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateOwnerIsSimConsoleUser, false));
+                permissions.Add("estate_owner", m);
+                m = new Map();
+                m.Add("effective", m_ServerParams.GetBoolean(rInfo.ID, EstateManagerIsSimConsoleUser, false));
+                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateManagerIsSimConsoleUser, false));
+                permissions.Add("estate_manager", m);
+                res.Add("simconsole", permissions);
+
                 AdminWebIF.SuccessResponse(req, res);
             }
             else
@@ -1121,6 +1143,133 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
             }
         }
+        #endregion
+
+        #region Sim Console Control
+        const string EstateOwnerIsSimConsoleUser = "estate_owner_is_simconsole_user";
+        const string EstateManagerIsSimConsoleUser = "estate_manager_is_simconsole_user";
+        const string RegionOwnerIsSimConsoleUser = "region_owner_is_simconsole_user";
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleEnableEstateOwnerSimConsole(HttpRequest req, Map jsondata)
+        {
+            RegionInfo region;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                switch (jsondata["value"].ToString())
+                {
+                    case "enable":
+                        m_ServerParams[region.ID, EstateOwnerIsSimConsoleUser] = "true";
+                        break;
+
+                    case "disable":
+                        m_ServerParams[region.ID, EstateOwnerIsSimConsoleUser] = "false";
+                        break;
+
+                    case "global":
+                        m_ServerParams.Remove(region.ID, EstateOwnerIsSimConsoleUser);
+                        break;
+
+                    default:
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                }
+
+                Map m = new Map();
+                m.Add("effective", m_ServerParams.GetBoolean(region.ID, EstateOwnerIsSimConsoleUser, false));
+                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateOwnerIsSimConsoleUser, false));
+                AdminWebIF.SuccessResponse(req, m);
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleEnableEstateManagerSimConsole(HttpRequest req, Map jsondata)
+        {
+            RegionInfo region;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                switch (jsondata["value"].ToString())
+                {
+                    case "enable":
+                        m_ServerParams[region.ID, EstateManagerIsSimConsoleUser] = "true";
+                        break;
+
+                    case "disable":
+                        m_ServerParams[region.ID, EstateManagerIsSimConsoleUser] = "false";
+                        break;
+
+                    case "global":
+                        m_ServerParams.Remove(region.ID, EstateManagerIsSimConsoleUser);
+                        break;
+
+                    default:
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                }
+
+                Map m = new Map();
+                m.Add("effective", m_ServerParams.GetBoolean(region.ID, EstateManagerIsSimConsoleUser, false));
+                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateManagerIsSimConsoleUser, false));
+                AdminWebIF.SuccessResponse(req, m);
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleEnableRegionOwnerSimConsole(HttpRequest req, Map jsondata)
+        {
+            RegionInfo region;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                switch (jsondata["value"].ToString())
+                {
+                    case "enable":
+                        m_ServerParams[region.ID, RegionOwnerIsSimConsoleUser] = "true";
+                        break;
+
+                    case "disable":
+                        m_ServerParams[region.ID, RegionOwnerIsSimConsoleUser] = "false";
+                        break;
+
+                    case "global":
+                        m_ServerParams.Remove(region.ID, RegionOwnerIsSimConsoleUser);
+                        break;
+
+                    default:
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                }
+
+                Map m = new Map();
+                m.Add("effective", m_ServerParams.GetBoolean(region.ID, RegionOwnerIsSimConsoleUser, false));
+                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, RegionOwnerIsSimConsoleUser, false));
+                AdminWebIF.SuccessResponse(req, m);
+            }
+        }
+
         #endregion
 
         #region Environment Control
