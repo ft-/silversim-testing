@@ -28,7 +28,7 @@ namespace SilverSim.Types.Inventory
         public InventoryFolder(InventoryFolder src)
         {
             ID = src.ID;
-            ParentFolderID = src.ID;
+            ParentFolderID = src.ParentFolderID;
             Name = src.Name;
             InventoryType = src.InventoryType;
             Owner = new UUI(src.Owner);
