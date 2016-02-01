@@ -79,11 +79,9 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 req = null;
             }
-            if(req == null)
-            {
-                res = FaultResponse(-32700, "Invalid JSON20 RPC Request", string.Empty);
-            }
-            else if(null != (reqmap = (req as Map)))
+
+
+            if(null != (reqmap = (req as Map)))
             {
                 res = ProcessJsonRequest(reqmap);
             }
@@ -104,6 +102,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 res = FaultResponse(-32700, "Invalid JSON20 RPC Request", string.Empty);
             }
+
             using (HttpResponse httpres = httpreq.BeginResponse("application/json-rpc"))
             {
                 using (Stream o = httpres.GetOutputStream())
