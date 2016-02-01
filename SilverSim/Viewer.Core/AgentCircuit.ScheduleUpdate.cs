@@ -3,7 +3,6 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
@@ -80,14 +79,10 @@ namespace SilverSim.Viewer.Core
             m_TxObjectQueue.Enqueue(info);
         }
 
-        public void AddScheduleUpdate(ObjectUpdateInfo info)
-        {
-            m_TxObjectQueue.Enqueue(info);
-        }
-
         public void ScheduleFirstUpdate()
         {
             m_TriggerFirstUpdate = true;
+            m_EnableObjectUpdates = true;
             m_TxObjectQueue.Enqueue(null);
         }
 
@@ -277,6 +272,11 @@ namespace SilverSim.Viewer.Core
                     {
                         continue;
                     }
+
+                    if(!m_EnableObjectUpdates)
+                    {
+                        continue;
+                    }
                     try
                     {
                         if (objinfo.Part.ObjectGroup.IsAttachedToPrivate && objinfo.Part.ObjectGroup.Owner != Agent.Owner)
@@ -335,7 +335,7 @@ namespace SilverSim.Viewer.Core
                     }
                     foreach (ObjectUpdateInfo ui in Scene.UpdateInfos)
                     {
-                        AddScheduleUpdate(ui);
+                        ScheduleUpdate(ui);
                     }
                     m_TriggerFirstUpdate = false;
                 }

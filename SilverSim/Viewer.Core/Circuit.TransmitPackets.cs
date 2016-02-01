@@ -11,11 +11,18 @@ namespace SilverSim.Viewer.Core
     public abstract partial class Circuit
     {
         protected abstract void SendViaEventQueueGet(Message m);
+        protected bool m_EnableObjectUpdates;
 
         [IgnoreMethod]
         public void SendMessage(Message m)
         {
             if (m.IsReliable && m_CircuitIsClosing)
+            {
+                m.OnSendComplete(false);
+                return;
+            }
+
+            if(m.Number == MessageType.ObjectUpdate && !m_EnableObjectUpdates)
             {
                 m.OnSendComplete(false);
                 return;
