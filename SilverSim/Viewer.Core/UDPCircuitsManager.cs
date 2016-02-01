@@ -43,7 +43,6 @@ namespace SilverSim.Viewer.Core
         readonly IPAddress m_BindAddress;
         readonly int m_BindPort;
         readonly Socket m_UdpSocket;
-        readonly NonblockingQueue<UDPReceivePacket> m_InboundBufferQueue = new NonblockingQueue<UDPReceivePacket>();
         readonly RwLockedDoubleDictionary<EndPoint, uint, Circuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, Circuit>();
         bool m_InboundRunning;
         readonly IMServiceInterface m_IMService;
@@ -67,11 +66,6 @@ namespace SilverSim.Viewer.Core
             IPEndPoint ep = new IPEndPoint(m_BindAddress, m_BindPort);
             m_UdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             
-            for (int i = 0; i < 100; ++i)
-            {
-                m_InboundBufferQueue.Enqueue(new UDPReceivePacket());
-            }
-
             try
             {
                 if (m_UdpSocket.Ttl < 128)
@@ -189,15 +183,7 @@ namespace SilverSim.Viewer.Core
         {
             UDPReceivePacket pck;
 
-            try
-            {
-                pck = m_InboundBufferQueue.Dequeue();
-                pck.Reset();
-            }
-            catch
-            {
-                pck = new UDPReceivePacket();
-            }
+            pck = new UDPReceivePacket();
             
             m_UdpSocket.BeginReceiveFrom(pck.Data, 0, pck.Data.Length, SocketFlags.None, ref pck.RemoteEndPoint,
                 UdpReceiveEndHandler, pck);
@@ -324,8 +310,6 @@ namespace SilverSim.Viewer.Core
                     /* no action required */
                 }
 
-                /* back to pool with that packet. Packet holds nothing of interest. */
-                m_InboundBufferQueue.Enqueue(pck);
                 return;
             }
 
@@ -333,7 +317,6 @@ namespace SilverSim.Viewer.Core
             if(pck.IsUndersized)
             {
                 /* packet is undersized so we throw it away as well */
-                m_InboundBufferQueue.Enqueue(pck);
                 return;
             }
 
@@ -353,7 +336,6 @@ namespace SilverSim.Viewer.Core
                 catch
                 {
                     /* packet is undersized so we throw it away as well */
-                    m_InboundBufferQueue.Enqueue(pck);
                     return;
                 }
             }
@@ -368,7 +350,6 @@ namespace SilverSim.Viewer.Core
                 m_Log.ErrorFormat("Exception {0} => {1} at {2}", e.GetType().Name, e.ToString(), e.StackTrace);
             }
             /* return the buffer to the pool */
-            m_InboundBufferQueue.Enqueue(pck);
         }
         #endregion
 
