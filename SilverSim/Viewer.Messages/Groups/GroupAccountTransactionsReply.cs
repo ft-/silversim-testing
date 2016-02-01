@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Groups
 {
-    [UDPMessage(MessageType.GroupAccountDetailsReply)]
+    [UDPMessage(MessageType.GroupAccountTransactionsReply)]
     [Reliable]
     [Zerocoded]
     [Trusted]
