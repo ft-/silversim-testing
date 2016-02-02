@@ -132,24 +132,30 @@ namespace SilverSim.Scene.Types.WindLight
                 throw new EnvironmentSettingsSerializationException();
             }
 
-            AnArray dayCycleArray = (AnArray)a[1];
-            Map skyArray = (Map)a[2];
-            Map waterSettings = (Map)a[3];
+            AnArray dayCycleArray = a[1] as AnArray;
+            Map skyArray = a[2] as Map;
+            Map waterSettings = a[3] as Map;
 
-            for (int i = 0; i < dayCycleArray.Count - 1; i += 2 )
+            if (dayCycleArray != null && skyArray != null)
             {
-                env.DayCycle.Add(new KeyValuePair<double, string>(dayCycleArray[i + 0].AsReal, dayCycleArray[i + 1].ToString()));
-            }
-
-            foreach (KeyValuePair<string, IValue> kvp in skyArray)
-            {
-                if (kvp.Value is Map)
+                for (int i = 0; i < dayCycleArray.Count - 1; i += 2)
                 {
-                    env.SkySettings.Add(kvp.Key, new SkyEntry((Map)kvp.Value));
+                    env.DayCycle.Add(new KeyValuePair<double, string>(dayCycleArray[i + 0].AsReal, dayCycleArray[i + 1].ToString()));
+                }
+
+                foreach (KeyValuePair<string, IValue> kvp in skyArray)
+                {
+                    if (kvp.Value is Map)
+                    {
+                        env.SkySettings.Add(kvp.Key, new SkyEntry((Map)kvp.Value));
+                    }
                 }
             }
 
-            env.WaterSettings = new WaterEntry(waterSettings);
+            if (waterSettings != null)
+            {
+                env.WaterSettings = new WaterEntry(waterSettings);
+            }
 
             return env;
         }
