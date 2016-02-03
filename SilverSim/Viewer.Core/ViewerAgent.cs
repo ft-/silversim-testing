@@ -112,6 +112,13 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
+                /*
+                 * when reporting Vector4.UnitW, the viewer assumes to be on ground.
+                 * This will enable the feet to land logic
+                 * Collision plane is actually signaling whether the AV is standing on ground or somewhere else
+                 * Collision Plane contains a directional vector component for giving the feet a direction
+                 * and a height to define the distance of feet towards avatar.
+                 */
                 return Vector4.UnitW;
             }
             set
