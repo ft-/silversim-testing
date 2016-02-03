@@ -118,8 +118,10 @@ namespace SilverSim.Viewer.Core
                  * Collision plane is actually signaling whether the AV is standing on ground or somewhere else
                  * Collision Plane contains a directional vector component for giving the feet a direction
                  * and a height to define the distance of feet towards avatar.
+                 * X,Y,Z => Normal Vector Vector3.UnitZ => no angle
+                 * W => distance of feet toward avatar
                  */
-                return Vector4.UnitW;
+                return new Vector4(0, 0, 1, -1);
             }
             set
             {
