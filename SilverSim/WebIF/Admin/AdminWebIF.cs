@@ -633,6 +633,10 @@ namespace SilverSim.WebIF.Admin
                     {
                         contentType = "text/javascript";
                     }
+                    else if (filepath.EndsWith(".css"))
+                    {
+                        contentType = "text/css";
+                    }
                     else if (filepath.EndsWith(".jpg") || filepath.EndsWith(".jpeg"))
                     {
                         contentType = "image/jpeg";

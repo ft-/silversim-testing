@@ -146,6 +146,10 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         return;
                     }
+                    catch(ObjectDisposedException)
+                    {
+                        return;
+                    }
                     catch (Exception e)
                     {
                         m_Log.WarnFormat("Unexpected exception: {0}\n{1}", e.GetType().FullName, e.StackTrace);

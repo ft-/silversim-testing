@@ -496,11 +496,16 @@ namespace SilverSim.Main.Cmd.Region
 
                 try
                 {
-                    rInfo.Location = new GridVector(args[4], 256);
+                    rInfo.Location = new GridVector(args[4], 1);
                 }
                 catch (Exception e)
                 {
                     io.Write(e.ToString());
+                    return;
+                }
+                if (rInfo.Size.X % 256 != 0 || rInfo.Size.Y % 256 != 0)
+                {
+                    io.Write("Invalid region size " + rInfo.ToString());
                     return;
                 }
 

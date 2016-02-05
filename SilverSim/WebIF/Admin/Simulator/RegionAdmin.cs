@@ -621,15 +621,20 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     try
                     {
-                        rInfo.Size = new GridVector(jsondata["size"].ToString(), 256);
+                        rInfo.Size = new GridVector(jsondata["size"].ToString(), 1);
                     }
                     catch
                     {
                         AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
                         return;
                     }
+                    if (rInfo.Size.X % 256 != 0 || rInfo.Size.Y % 256 != 0)
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
                 }
-                if(jsondata.ContainsKey("productname"))
+                if (jsondata.ContainsKey("productname"))
                 {
                     rInfo.ProductName = jsondata["productname"].ToString();
                 }
