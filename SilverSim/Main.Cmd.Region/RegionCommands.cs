@@ -140,7 +140,7 @@ namespace SilverSim.Main.Cmd.Region
             if (arg.Contains(","))
             {
                 bool found = false;
-                string[] names = arg.Split(new char[] { ',' }, 2);
+                string[] names = arg.Split(new char[] { '.' }, 2);
                 if (names.Length == 1)
                 {
                     names = new string[] { names[0], string.Empty };
@@ -195,7 +195,7 @@ namespace SilverSim.Main.Cmd.Region
                     "port <port>\n" +
                     "scopeid <uuid>\n" +
                     "productname <regiontype>\n" +
-                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
+                    "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
                     "estate <name>\n" +
                     "externalhostname <hostname>\n" +
                     "access pg|mature|adult\n" +
@@ -455,7 +455,7 @@ namespace SilverSim.Main.Cmd.Region
                     "scopeid <uuid>\n" +
                     "size <x>,<y> - region size\n" +
                     "productname <regiontype>\n" +
-                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
+                    "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
                     "estate <name> - sets region owner to estate owner\n" +
                     "externalhostname <hostname>\n" +
                     "access pg|mature|adult\n" +

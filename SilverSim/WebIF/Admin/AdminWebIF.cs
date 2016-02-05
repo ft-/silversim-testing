@@ -159,10 +159,10 @@ namespace SilverSim.WebIF.Admin
         public bool TranslateToUUI(string arg, out UUI uui)
         {
             uui = UUI.Unknown;
-            if (arg.Contains(","))
+            if (arg.Contains("."))
             {
                 bool found = false;
-                string[] names = arg.Split(new char[] { ',' }, 2);
+                string[] names = arg.Split(new char[] { '.' }, 2);
                 if (names.Length == 1)
                 {
                     names = new string[] { names[0], string.Empty };

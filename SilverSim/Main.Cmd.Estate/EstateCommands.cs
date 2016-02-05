@@ -78,7 +78,7 @@ namespace SilverSim.Main.Cmd.Estate
             if (arg.Contains(","))
             {
                 bool found = false;
-                string[] names = arg.Split(new char[] { ',' }, 2);
+                string[] names = arg.Split(new char[] { '.' }, 2);
                 if(names.Length == 1)
                 {
                     names = new string[] { names[0], string.Empty };
@@ -152,7 +152,7 @@ namespace SilverSim.Main.Cmd.Estate
                     "Parameters:\n" +
                     "name <name>\n" +
                     "parentestateid <id>\n" +
-                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
+                    "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
                     "pricepermeter <value>\n" +
                     "billablefactor <factor>\n" +
                     "abuseemail <email>");
@@ -262,7 +262,7 @@ namespace SilverSim.Main.Cmd.Estate
             {
                 io.Write("create estate <estatename> <estateid> parameters...\n\n" +
                     "Parameters:\n" +
-                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
+                    "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
                     "parentestateid <parentestateid>\n" +
                     "pricepermeter <value>\n" +
                     "billablefactor <factor>\n" +
