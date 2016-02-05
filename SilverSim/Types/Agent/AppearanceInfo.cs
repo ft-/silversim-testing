@@ -260,7 +260,10 @@ namespace SilverSim.Types.Agent
                 {
                     appearanceInfo.AvatarTextures[i] = textures[i].AsUUID;
                 }
-                appearanceInfo.Serial = (uint)m["serial"].AsInt;
+                if (m.ContainsKey("serial"))
+                {
+                    appearanceInfo.Serial = (uint)m["serial"].AsInt;
+                }
                 return appearanceInfo;
             }
         }
