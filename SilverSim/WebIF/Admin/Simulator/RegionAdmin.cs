@@ -39,7 +39,6 @@ namespace SilverSim.WebIF.Admin.Simulator
         EstateServiceInterface m_EstateService;
         ServerParamServiceInterface m_ServerParams;
         SimulationDataStorageInterface m_SimulationData;
-        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         uint m_HttpPort;
         string m_ExternalHostName = string.Empty;
         string m_Scheme = Uri.UriSchemeHttp;
@@ -118,20 +117,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.AutoGrantRights["regions.control"].Add("regions.view");
             webif.AutoGrantRights["regions.logincontrol"].Add("regions.view");
             webif.AutoGrantRights["region.notice"].Add("regions.view");
-
-            IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
-            if (null != sceneConfig)
-            {
-                string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
-                if (!string.IsNullOrEmpty(avatarNameServices))
-                {
-                    foreach (string p in avatarNameServices.Split(','))
-                    {
-                        m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
-                    }
-                }
-            }
-
         }
 
         #region Region View
