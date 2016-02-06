@@ -246,6 +246,17 @@ namespace SilverSim.Scene.Types.Scene
             return reg;
         }
 
+        public uint ParentEstateID
+        {
+            get
+            {
+                lock (m_EstateDataUpdateLock)
+                {
+                    return m_EstateData.ID;
+                }
+            }
+        }
+
         public RegionAccess Access
         {
             get;

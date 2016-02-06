@@ -6,6 +6,7 @@ using SilverSim.Main.Common;
 using SilverSim.Threading;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Friend;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -16,6 +17,9 @@ namespace SilverSim.Viewer.Friends
     [Description("Viewer Friends Handler")]
     public class ViewerFriendsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
+        /* even though some one may look out here for loading friends list,
+         * it is not here since it is part of the login protocol.
+         */
         [PacketHandler(MessageType.AcceptFriendship)]
         [PacketHandler(MessageType.DeclineFriendship)]
         [PacketHandler(MessageType.TerminateFriendship)]
@@ -52,7 +56,70 @@ namespace SilverSim.Viewer.Friends
                 }
 
                 Message m = req.Value;
+
+                switch(m.Number)
+                {
+                    case MessageType.AcceptFriendship:
+                        HandleAcceptFriendship(m);
+                        break;
+
+                    case MessageType.DeclineFriendship:
+                        HandleDeclineFriendship(m);
+                        break;
+
+                    case MessageType.TerminateFriendship:
+                        HandleTerminateFriendship(m);
+                        break;
+
+                    case MessageType.GrantUserRights:
+                        HandleGrantUserRights(m);
+                        break;
+
+                    default:
+                        break;
+                }
             }
+        }
+
+        void HandleAcceptFriendship(Message m)
+        {
+            AcceptFriendship req = (AcceptFriendship)m;
+            if(req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleDeclineFriendship(Message m)
+        {
+            AcceptFriendship req = (AcceptFriendship)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleTerminateFriendship(Message m)
+        {
+            TerminateFriendship req = (TerminateFriendship)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGrantUserRights(Message m)
+        {
+            GrantUserRights req = (GrantUserRights)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
         }
 
         public ShutdownOrder ShutdownOrder
