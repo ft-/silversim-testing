@@ -61,6 +61,8 @@ namespace SilverSim.ServiceInterfaces.Friends
 
         public abstract void StoreRights(FriendInfo fi);
 
+        public abstract void StoreOffer(FriendInfo fi);
+
         public abstract void Delete(FriendInfo fi);
     }
 }
