@@ -59,6 +59,8 @@ namespace SilverSim.ServiceInterfaces.Friends
 
         public abstract void Store(FriendInfo fi);
 
+        public abstract void StoreRights(UUI user, UUI friend, FriendRightFlags flags);
+
         public abstract void Delete(FriendInfo fi);
     }
 }
