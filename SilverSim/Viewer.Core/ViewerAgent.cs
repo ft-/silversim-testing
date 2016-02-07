@@ -24,6 +24,7 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
@@ -964,6 +965,41 @@ namespace SilverSim.Viewer.Core
         public string DisplayName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        readonly RwLockedDictionary<UUID, FriendInfo> m_KnownFriends = new RwLockedDictionary<UUID, FriendInfo>();
+        bool m_KnownFriendsCached = false;
+        object m_KnownFriendsCacheLock = new object();
+
+        void CacheFriends()
+        {
+            lock (m_KnownFriendsCacheLock)
+            {
+                if (!m_KnownFriendsCached)
+                {
+                    if (FriendsService != null)
+                    {
+                        foreach (FriendInfo fi in FriendsService[Owner])
+                        {
+                            m_KnownFriends.Add(fi.Friend.ID, fi);
+                        }
+                    }
+                    m_KnownFriendsCached = true;
+                }
+            }
+        }
+
+        public RwLockedDictionary<UUID, FriendInfo> KnownFriends
+        {
+            get
+            {
+                /* on-demand caching */
+                if (!m_KnownFriendsCached)
+                {
+                    CacheFriends();
+                }
+                return m_KnownFriends;
+            }
+        }
 
         public double Health
         {
