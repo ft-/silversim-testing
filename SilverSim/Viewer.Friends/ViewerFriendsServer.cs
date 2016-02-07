@@ -7,7 +7,10 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces;
+using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Friends;
@@ -41,6 +44,8 @@ namespace SilverSim.Viewer.Friends
 
         IMServiceInterface m_IMService = null;
         readonly string m_IMServiceName;
+        List<IFriendsServicePlugin> m_FriendsPlugins;
+        List<IUserAgentServicePlugin> m_UserAgentPlugins;
 
         bool m_ShutdownFriends;
 
@@ -52,6 +57,8 @@ namespace SilverSim.Viewer.Friends
         public void Startup(ConfigurationLoader loader)
         {
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
+            m_FriendsPlugins = loader.GetServicesByValue<IFriendsServicePlugin>();
+            m_UserAgentPlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
             new Thread(HandlerThread).Start();
         }
 
@@ -161,27 +168,34 @@ namespace SilverSim.Viewer.Friends
                 return;
             }
 
-            if((otherAgent.HomeURI == null && thisAgent.HomeURI == null) ||
+            FriendsServiceInterface otherFriendsService;
+
+            if ((otherAgent.HomeURI == null && thisAgent.HomeURI == null) ||
                 otherAgent.HomeURI.Equals(thisAgent.HomeURI))
             {
                 /* same user service including friends */
-                FriendInfo fi = new FriendInfo();
-                fi.User = thisAgent;
-                fi.Friend = otherAgent;
-                fi.FriendGivenFlags = 0;
-                fi.UserGivenFlags = 0;
-                fi.Secret = string.Empty;
-                fi.User.HomeURI = null;
-                fi.Friend.HomeURI = null;
-                agent.FriendsService.StoreOffer(fi);
-
-                GridInstantMessage gim = (GridInstantMessage)m;
-                gim.FromAgent = thisAgent;
-                gim.ToAgent = otherAgent;
-                gim.IMSessionID = thisAgent.ID;
-
-                m_IMService.Send(gim);
+                otherFriendsService = agent.FriendsService;
             }
+            else if(!TryGetFriendsService(otherAgent, out otherFriendsService))
+            {
+                return;
+            }
+            FriendInfo fi = new FriendInfo();
+            fi.User = thisAgent;
+            fi.Friend = otherAgent;
+            fi.FriendGivenFlags = 0;
+            fi.UserGivenFlags = 0;
+            fi.Secret = string.Empty;
+            fi.User.HomeURI = null;
+            fi.Friend.HomeURI = null;
+            agent.FriendsService.StoreOffer(fi);
+
+            GridInstantMessage gim = (GridInstantMessage)m;
+            gim.FromAgent = thisAgent;
+            gim.ToAgent = otherAgent;
+            gim.IMSessionID = thisAgent.ID;
+
+            m_IMService.Send(gim);
         }
 
         void HandleAcceptFriendship(Message m)
@@ -290,6 +304,78 @@ namespace SilverSim.Viewer.Friends
         public void Shutdown()
         {
             m_ShutdownFriends = true;
+        }
+
+        public bool TryGetFriendsService(UUI agent, out FriendsServiceInterface friendsService)
+        {
+            friendsService = null;
+            if(null == agent.HomeURI)
+            {
+                return false;
+            }
+
+            string handlerType;
+            string homeURI = agent.HomeURI.ToString();
+            try
+            {
+                handlerType = ServicePluginHelo.HeloRequest_HandleType(homeURI);
+            }
+            catch
+            {
+                return false;
+            }
+
+            UserAgentServiceInterface userAgentService = null;
+
+            foreach(IUserAgentServicePlugin service in m_UserAgentPlugins)
+            {
+                if(service.Name == handlerType)
+                {
+                    userAgentService = service.Instantiate(homeURI);
+                    break;
+                }
+            }
+
+            if(null == userAgentService)
+            {
+                return false;
+            }
+
+            string friendsUri;
+            Dictionary<string, string> serviceurls;
+            try
+            {
+                serviceurls = userAgentService.GetServerURLs(agent);
+            }
+            catch
+            {
+                return false;
+            }
+
+            if(!serviceurls.TryGetValue("FriendsServerURI", out friendsUri))
+            {
+                return false;
+            }
+
+            try
+            {
+                handlerType = ServicePluginHelo.HeloRequest_HandleType(friendsUri);
+            }
+            catch
+            {
+                return false;
+            }
+
+            foreach (IFriendsServicePlugin service in m_FriendsPlugins)
+            {
+                if (service.Name == handlerType)
+                {
+                    friendsService = service.Instantiate(friendsUri);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 

@@ -15,8 +15,7 @@ namespace SilverSim.ServiceInterfaces
 
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        string HeloRequester(string uri)
+        public static Dictionary<string, string> HeloRequest(string uri)
         {
             if (!uri.EndsWith("="))
             {
@@ -32,7 +31,7 @@ namespace SilverSim.ServiceInterfaces
                 uri = uri.TrimEnd('/') + "/helo/";
             }
 
-            Dictionary<string, string> headers = new Dictionary<string,string>();
+            Dictionary<string, string> headers = new Dictionary<string, string>();
             try
             {
                 using (Stream responseStream = HttpRequestHandler.DoStreamRequest("HEAD", uri, null, string.Empty, string.Empty, false, 20000, headers))
@@ -42,24 +41,30 @@ namespace SilverSim.ServiceInterfaces
                         reader.ReadToEnd();
                     }
                 }
-
-                if (!headers.ContainsKey("X-Handlers-Provided"))
-                {
-                    return "opensim-robust"; /* let us assume Robust API */
-                }
-                return headers["X-Handlers-Provided"];
             }
             catch
             {
+                headers.Clear();
+            }
+            return headers;
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        public static string HeloRequest_HandleType(string uri)
+        {
+            Dictionary<string, string> headers = HeloRequest(uri);
+            if (!headers.ContainsKey("X-Handlers-Provided"))
+            {
                 return "opensim-robust"; /* let us assume Robust API */
             }
+            return headers["X-Handlers-Provided"];
         }
 
         public abstract string Name { get; }
 
         public bool IsProtocolSupported(string url)
         {
-            return HeloRequester(url) == Name;
+            return HeloRequest_HandleType(url) == Name;
         }
     }
 }
