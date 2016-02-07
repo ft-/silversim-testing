@@ -3,7 +3,7 @@
 
 namespace SilverSim.ServiceInterfaces.Friends
 {
-    public interface IFriendServicePlugin
+    public interface IFriendsServicePlugin
     {
         FriendsServiceInterface Instantiate(string url);
         string Name { get; }
