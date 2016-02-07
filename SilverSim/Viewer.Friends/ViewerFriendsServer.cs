@@ -161,6 +161,7 @@ namespace SilverSim.Viewer.Friends
 
             UUI thisAgent = agent.Owner;
             UUI otherAgent;
+            bool foreignagent = true;
 
             if(!scene.AvatarNameService.TryGetValue(m.ToAgentID, out otherAgent))
             {
@@ -175,6 +176,7 @@ namespace SilverSim.Viewer.Friends
             {
                 /* same user service including friends */
                 otherFriendsService = agent.FriendsService;
+                foreignagent = false;
             }
             else if(!TryGetFriendsService(otherAgent, out otherFriendsService))
             {
@@ -188,6 +190,10 @@ namespace SilverSim.Viewer.Friends
             fi.Secret = string.Empty;
             fi.User.HomeURI = null;
             fi.Friend.HomeURI = null;
+            if(foreignagent)
+            {
+                otherFriendsService.StoreOffer(fi);
+            }
             agent.FriendsService.StoreOffer(fi);
 
             GridInstantMessage gim = (GridInstantMessage)m;
@@ -228,7 +234,7 @@ namespace SilverSim.Viewer.Friends
 
         void HandleDeclineFriendship(Message m)
         {
-            AcceptFriendship req = (AcceptFriendship)m;
+            DeclineFriendship req = (DeclineFriendship)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -252,6 +258,54 @@ namespace SilverSim.Viewer.Friends
                 agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "FriendsServiceNotAccessible", "The friends service is not accessible."), m.CircuitSceneID);
                 return;
             }
+
+            FriendsServiceInterface otherFriendsService;
+            UUI thisAgent = agent.Owner;
+            UUI otherAgent;
+            bool foreignagent = true;
+
+            /* the transaction id is re-used for storing the agent */
+            if (!scene.AvatarNameService.TryGetValue(req.TransactionID, out otherAgent))
+            {
+                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "OtherPersonIdentityIsNotKnown", "Other person's identity is not known."), m.CircuitSceneID);
+                return;
+            }
+
+            if ((otherAgent.HomeURI == null && thisAgent.HomeURI == null) ||
+                otherAgent.HomeURI.Equals(thisAgent.HomeURI))
+            {
+                /* same user service including friends */
+                otherFriendsService = agent.FriendsService;
+                foreignagent = false;
+            }
+            else if (!TryGetFriendsService(otherAgent, out otherFriendsService))
+            {
+                return;
+            }
+            FriendInfo fi = new FriendInfo();
+            fi.User = thisAgent;
+            fi.Friend = otherAgent;
+            fi.FriendGivenFlags = 0;
+            fi.UserGivenFlags = 0;
+            fi.Secret = string.Empty;
+            fi.User.HomeURI = null;
+            fi.Friend.HomeURI = null;
+            if (foreignagent)
+            {
+                otherFriendsService.Delete(fi);
+            }
+            agent.FriendsService.Delete(fi);
+
+            GridInstantMessage gim = new GridInstantMessage();
+            gim.FromAgent = thisAgent;
+            gim.ToAgent = otherAgent;
+            gim.Dialog = GridInstantMessageDialog.FriendshipDeclined;
+            gim.Message = "Friendship declined";
+            gim.IMSessionID = otherAgent.ID;
+            gim.ParentEstateID = scene.ParentEstateID;
+            gim.RegionID = scene.ID;
+
+            m_IMService.Send(gim);
         }
 
         void HandleTerminateFriendship(Message m)
@@ -280,6 +334,45 @@ namespace SilverSim.Viewer.Friends
                 agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "FriendsServiceNotAccessible", "The friends service is not accessible."), m.CircuitSceneID);
                 return;
             }
+
+            FriendsServiceInterface otherFriendsService;
+            UUI thisAgent = agent.Owner;
+            UUI otherAgent;
+            bool foreignagent = true;
+
+            /* the transaction id is re-used for storing the agent */
+            if (!scene.AvatarNameService.TryGetValue(req.OtherID, out otherAgent))
+            {
+                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "OtherPersonIdentityIsNotKnown", "Other person's identity is not known."), m.CircuitSceneID);
+                return;
+            }
+
+            if ((otherAgent.HomeURI == null && thisAgent.HomeURI == null) ||
+                otherAgent.HomeURI.Equals(thisAgent.HomeURI))
+            {
+                /* same user service including friends */
+                otherFriendsService = agent.FriendsService;
+                foreignagent = false;
+            }
+            else if (!TryGetFriendsService(otherAgent, out otherFriendsService))
+            {
+                return;
+            }
+            FriendInfo fi = new FriendInfo();
+            fi.User = thisAgent;
+            fi.Friend = otherAgent;
+            fi.FriendGivenFlags = 0;
+            fi.UserGivenFlags = 0;
+            fi.Secret = string.Empty;
+            fi.User.HomeURI = null;
+            fi.Friend.HomeURI = null;
+            if (foreignagent)
+            {
+                otherFriendsService.Delete(fi);
+            }
+            agent.FriendsService.Delete(fi);
+
+#warning Implement Terminate remote message
         }
 
         void HandleGrantUserRights(Message m)
