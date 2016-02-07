@@ -1001,6 +1001,15 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        public void ClearKnownFriends()
+        {
+            lock(m_KnownFriendsCacheLock)
+            {
+                m_KnownFriendsCached = false;
+            }
+        }
+
+
         public double Health
         {
             get

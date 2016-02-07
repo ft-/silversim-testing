@@ -56,6 +56,8 @@ namespace SilverSim.Scene.Types.Agent
 
         RwLockedDictionary<UUID, FriendInfo> KnownFriends { get; }
 
+        void ClearKnownFriends();
+
         void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);
         void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID);
 
