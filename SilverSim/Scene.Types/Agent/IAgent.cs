@@ -54,7 +54,7 @@ namespace SilverSim.Scene.Types.Agent
 
         RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; }
 
-        RwLockedDictionary<UUID, FriendInfo> KnownFriends { get; }
+        RwLockedDictionary<UUID, FriendStatus> KnownFriends { get; }
 
         void ClearKnownFriends();
 

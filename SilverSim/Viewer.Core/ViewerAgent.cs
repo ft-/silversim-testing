@@ -966,7 +966,7 @@ namespace SilverSim.Viewer.Core
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        readonly RwLockedDictionary<UUID, FriendInfo> m_KnownFriends = new RwLockedDictionary<UUID, FriendInfo>();
+        readonly RwLockedDictionary<UUID, FriendStatus> m_KnownFriends = new RwLockedDictionary<UUID, FriendStatus>();
         bool m_KnownFriendsCached = false;
         object m_KnownFriendsCacheLock = new object();
 
@@ -978,9 +978,36 @@ namespace SilverSim.Viewer.Core
                 {
                     if (FriendsService != null)
                     {
+                        if (m_KnownFriends.Count == 0)
+                        {
+                            foreach (FriendInfo fi in FriendsService[Owner])
+                            {
+                                m_KnownFriends.Add(fi.Friend.ID, new FriendStatus(fi));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        /* if we have already some entries, we keep the ones that are still valid */
+                        List<UUID> haveIDs = new List<UUID>(m_KnownFriends.Keys);
                         foreach (FriendInfo fi in FriendsService[Owner])
                         {
-                            m_KnownFriends.Add(fi.Friend.ID, fi);
+                            FriendStatus fStat;
+                            if (m_KnownFriends.TryGetValue(fi.Friend.ID, out fStat))
+                            {
+                                fStat.FriendGivenFlags = fi.FriendGivenFlags;
+                                fStat.UserGivenFlags = fi.UserGivenFlags;
+                            }
+                            else
+                            {
+                                m_KnownFriends.Add(fi.Friend.ID, new FriendStatus(fi));
+                            }
+                            haveIDs.Remove(fi.Friend.ID);
+                        }
+
+                        foreach(UUID id in haveIDs)
+                        {
+                            m_KnownFriends.Remove(id);
                         }
                     }
                     m_KnownFriendsCached = true;
@@ -988,7 +1015,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public RwLockedDictionary<UUID, FriendInfo> KnownFriends
+        public RwLockedDictionary<UUID, FriendStatus> KnownFriends
         {
             get
             {
