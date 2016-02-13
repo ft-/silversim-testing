@@ -1,0 +1,3 @@
+RegionIsShuttingDown=Region wird heruntergefahren
+SimulatorIsShuttingDownInXSeconds=Simulator wird in {0} Sekunden runtergefahren.
+SimulatorShutdownIsAborted=Herunterfahren des Simulators wurde abgebrochen.

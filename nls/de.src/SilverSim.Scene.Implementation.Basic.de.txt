@@ -1,0 +1,3 @@
+RegionIsRestartingInXSeconds=Region startet in {0} Sekunden neu.
+RegionIsNowRestarting=Region wird neugestartet.
+RegionRestartIsAborted=Neustart der Region wurde abgebrochen.

@@ -1,0 +1,2 @@
+﻿YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome=Du wurdest rausgeworfen, da es nicht möglich war dich nach Hause zu teleportieren.
+YouHaveBeenKicked=Du wurdest rausgeworfen.

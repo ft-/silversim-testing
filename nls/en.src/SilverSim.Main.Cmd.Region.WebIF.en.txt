@@ -1,0 +1,2 @@
+YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome=You have been kicked since you could not be teleported home.
+YouHaveBeenKicked=You have been kicked.

@@ -1,0 +1,3 @@
+﻿AlreadyYourFriend=This person is already your friend.
+FriendsServiceNotAccessible=Friends service is not accessible.
+OtherPersonIdentityIsNotKnown=Other person's identity is not known.

@@ -1,0 +1,3 @@
+RegionIsShuttingDown=Region is shutting down
+SimulatorIsShuttingDownInXSeconds=Simulator is shutting down in {0} seconds.
+SimulatorShutdownIsAborted=Simulator shutdown is aborted.

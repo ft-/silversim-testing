@@ -1,0 +1,3 @@
+RegionIsRestartingInXSeconds=Region is restarting in {0} seconds.
+RegionIsNowRestarting=Region is now restarting.
+RegionRestartIsAborted=Region restart is aborted.
