@@ -432,6 +432,71 @@ namespace SilverSim.Viewer.Friends
                 return;
             }
 
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(m.CircuitSceneID, out scene))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!scene.Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            if (agent.FriendsService == null)
+            {
+                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "FriendsServiceNotAccessible", "The friends service is not accessible."), m.CircuitSceneID);
+                return;
+            }
+
+            FriendsServiceInterface otherFriendsService;
+            UUI thisAgent = agent.Owner;
+            UUI otherAgent;
+            bool foreignagent = true;
+            GrantUserRights.RightsEntry rightsEntry;
+
+            if(req.Rights.Count == 0)
+            {
+                return;
+            }
+            rightsEntry = req.Rights[0];
+
+            /* the transaction id is re-used for storing the agent */
+            if (!scene.AvatarNameService.TryGetValue(rightsEntry.AgentRelated, out otherAgent))
+            {
+                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "OtherPersonIdentityIsNotKnown", "Other person's identity is not known."), m.CircuitSceneID);
+                return;
+            }
+
+            if ((otherAgent.HomeURI == null && thisAgent.HomeURI == null) ||
+                otherAgent.HomeURI.Equals(thisAgent.HomeURI))
+            {
+                /* same user service including friends */
+                otherFriendsService = agent.FriendsService;
+                foreignagent = false;
+            }
+            else if (!TryGetFriendsService(otherAgent, out otherFriendsService))
+            {
+                return;
+            }
+            FriendInfo fi = new FriendInfo();
+            fi.User = thisAgent;
+            fi.Friend = otherAgent;
+            fi.FriendGivenFlags = (FriendRightFlags)rightsEntry.RelatedRights;
+            FriendStatus fs;
+            if(agent.KnownFriends.TryGetValue(otherAgent.ID, out fs))
+            {
+                fi.Secret = fs.Secret;
+            }
+            if (foreignagent)
+            {
+                otherFriendsService.StoreRights(fi);
+            }
+            agent.FriendsService.StoreRights(fi);
+
+#warning Implement GrantUserRights message
         }
 
         public ShutdownOrder ShutdownOrder
