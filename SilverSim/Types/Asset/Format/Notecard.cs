@@ -543,9 +543,9 @@ namespace SilverSim.Types.Asset.Format
 
         public static implicit operator AssetData(Notecard v)
         {
-            string notecard = "Linden text 2\n{\n";
+            string notecard = "Linden text version 2\n{\n";
             NotecardInventory inventory = v.Inventory;
-            notecard += String.Format("LLEmbeddedItems\n{{\ncount {0}\n", v.Inventory.Count);
+            notecard += String.Format("LLEmbeddedItems version 1\n{{\ncount {0}\n", inventory != null ? v.Inventory.Count : 0);
 
             if (inventory != null)
             {
