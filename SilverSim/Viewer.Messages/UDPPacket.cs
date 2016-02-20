@@ -116,7 +116,7 @@ namespace SilverSim.Viewer.Messages
             set
             {
                 byte v = Data[0];
-                v &= 0x7F;
+                v &= 0xEF;
                 if (value)
                 {
                     v |= 0x10;
@@ -173,11 +173,7 @@ namespace SilverSim.Viewer.Messages
                 /* singleton method, it will adjust the data length afterwards */
                 if(HasAckFlag)
                 {
-                    if(IsZeroEncoded)
-                    {
-                        DecodeZLE();
-                    }
-
+                    /* acks are appended uncompressed */
                     numacks = Data[DataLength - 1];
                     int AckStartPos = DataLength - 1 - 4 * (int)numacks;
 
