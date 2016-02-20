@@ -1003,7 +1003,7 @@ namespace SilverSim.Viewer.Core
             AssetData asset = nc;
             asset.Name = "New Note";
             asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
-            asset.ID = new UUID("2f9ccdf4-5968-40c2-9ab6-b1259140d1c4");
+            asset.ID = new UUID("a4bcf94e-a19c-4cf1-971f-6eef1d797bfd");
             try
             {
                 Agent.AssetService.Store(asset);

@@ -545,17 +545,17 @@ namespace SilverSim.Types.Asset.Format
         {
             string notecard = "Linden text 2\n{\n";
             NotecardInventory inventory = v.Inventory;
-            if(inventory != null)
-            {
-                notecard += String.Format("LLEmbeddedItems\n{{\ncount {0}\n", v.Inventory.Count);
+            notecard += String.Format("LLEmbeddedItems\n{{\ncount {0}\n", v.Inventory.Count);
 
-                foreach(NotecardInventoryItem item in inventory.Values)
+            if (inventory != null)
+            {
+                foreach (NotecardInventoryItem item in inventory.Values)
                 {
                     notecard += ItemToString(item);
                 }
-
-                notecard += "}\n";
             }
+
+            notecard += "}\n";
             byte[] TextData = v.Text.ToUTF8Bytes();
             notecard += String.Format("Text length {0}\n", TextData.Length);
             byte[] NotecardHeader = notecard.ToUTF8Bytes();
