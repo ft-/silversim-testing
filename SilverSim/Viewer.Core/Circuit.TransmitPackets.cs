@@ -319,8 +319,9 @@ namespace SilverSim.Viewer.Core
                                     m : 
                                     null;
                                 p.SequenceNumber = NextSequenceNumber;
+                                p.FinishZLE();
                                 int savedDataLength = p.DataLength;
-                                if (!p.IsZeroEncoded && MAX_DATA_MTU > 1 + (uint)savedDataLength)
+                                if (MAX_DATA_MTU > 1 + (uint)savedDataLength)
                                 {
                                     uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
                                     uint curacks = (uint)m_AckList.Count;
@@ -330,7 +331,7 @@ namespace SilverSim.Viewer.Core
                                         uint cnt = 0;
                                         while (cnt < appendableAcks && cnt < curacks && cnt < 255)
                                         {
-                                            p.WriteUInt32BE(m_AckList.Dequeue());
+                                            p.WriteUInt32BE_NoZLE(m_AckList.Dequeue());
                                             ++cnt;
                                         }
                                         p.WriteUInt8((byte)cnt);

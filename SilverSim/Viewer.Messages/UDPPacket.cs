@@ -1164,5 +1164,35 @@ namespace SilverSim.Viewer.Messages
             WriteFloat((float)qo.Z);
         }
         #endregion
+
+        #region Ack Append
+        public void FinishZLE()
+        {
+            if (zleCount != 0)
+            {
+                Data[DataPos++] = 0;
+                Data[DataPos++] = zleCount;
+                zleCount = 0;
+            }
+        }
+
+        public void WriteUInt32BE_NoZLE(UInt32 val)
+        {
+            if (zleCount != 0)
+            {
+                Data[DataPos++] = 0;
+                Data[DataPos++] = zleCount;
+                zleCount = 0;
+            }
+            byte[] buf = BitConverter.GetBytes(val);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(buf);
+            }
+            Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+            DataPos += 4;
+            DataLength = DataPos;
+        }
+        #endregion
     }
 }
