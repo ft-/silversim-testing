@@ -321,31 +321,28 @@ namespace SilverSim.Viewer.Core
                                 p.SequenceNumber = NextSequenceNumber;
                                 p.FinishZLE();
                                 int savedDataLength = p.DataLength;
-                                if (MAX_DATA_MTU > 1 + (uint)savedDataLength)
-                                {
-                                    uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
-                                    uint curacks = (uint)m_AckList.Count;
-                                    if (appendableAcks != 0 && curacks != 0)
-                                    {
-                                        p.HasAckFlag = true;
-                                        uint cnt = 0;
-                                        while (cnt < appendableAcks && cnt < curacks && cnt < 255)
-                                        {
-                                            p.WriteUInt32BE_NoZLE(m_AckList.Dequeue());
-                                            ++cnt;
-                                        }
-                                        p.WriteUInt8((byte)cnt);
-                                    }
-                                }
-
                                 if (p.IsReliable)
                                 {
+                                    if (MAX_DATA_MTU > 1 + (uint)savedDataLength)
+                                    {
+                                        uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
+                                        uint curacks = (uint)m_AckList.Count;
+                                        if (appendableAcks != 0 && curacks != 0)
+                                        {
+                                            p.HasAckFlag = true;
+                                            uint cnt = 0;
+                                            while (cnt < appendableAcks && cnt < curacks && cnt < 255)
+                                            {
+                                                p.WriteUInt32BE_NoZLE(m_AckList.Dequeue());
+                                                ++cnt;
+                                            }
+                                            p.WriteUInt8((byte)cnt);
+                                        }
+                                    }
+
                                     Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
                                 }
                                 m_Server.SendPacketTo(p, RemoteEndPoint);
-
-                                p.HasAckFlag = false;
-                                p.DataLength = savedDataLength;
 
                                 Interlocked.Increment(ref m_PacketsSent);
                                 p.EnqueuedAtTime = Environment.TickCount;

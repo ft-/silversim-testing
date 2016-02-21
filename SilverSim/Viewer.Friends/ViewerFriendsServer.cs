@@ -497,6 +497,11 @@ namespace SilverSim.Viewer.Friends
             agent.FriendsService.StoreRights(fi);
 
 #warning Implement GrantUserRights message
+            GrantUserRights res = new GrantUserRights();
+            res.AgentID = req.AgentID;
+            res.SessionID = req.SessionID;
+            res.Rights.Add(rightsEntry);
+            agent.SendMessageAlways(res, scene.ID);
         }
 
         public ShutdownOrder ShutdownOrder
