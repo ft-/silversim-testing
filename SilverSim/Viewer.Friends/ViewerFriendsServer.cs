@@ -495,6 +495,8 @@ namespace SilverSim.Viewer.Friends
                 otherFriendsService.StoreRights(fi);
             }
             agent.FriendsService.StoreRights(fi);
+
+#warning TODO: send GrantUserRights to friend
         }
 
         public ShutdownOrder ShutdownOrder
