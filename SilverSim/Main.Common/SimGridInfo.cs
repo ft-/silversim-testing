@@ -2,14 +2,10 @@
 // GNU Affero General Public License v3
 
 using Nini.Config;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using SilverSim.Types;
+using System;
+using System.IO;
 using System.Xml;
-using SilverSim.Http.Client;
 
 namespace SilverSim.Main.Common
 {
