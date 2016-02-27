@@ -822,7 +822,7 @@ namespace SilverSim.Main.Common
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadModules()
         {
-            Types.Assembly.InterfaceVersionAttribute ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
+            InterfaceVersionAttribute ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
             foreach (IConfig config in m_Config.Configs)
             {
                 if (config.Contains("IsTemplate"))
@@ -852,7 +852,7 @@ namespace SilverSim.Main.Common
                             throw new ConfigurationErrorException();
                         }
 
-                        Types.Assembly.InterfaceVersionAttribute loadedVersion = GetInterfaceVersion(assembly);
+                        InterfaceVersionAttribute loadedVersion = GetInterfaceVersion(assembly);
                         if(loadedVersion.Version != ownVersion.Version)
                         {
                             m_Log.FatalFormat("Failed to load module {0}: interface version mismatch: {2} != {1}", assemblyname, ownVersion, loadedVersion);
@@ -1025,6 +1025,32 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        #region Load from grids xml
+        IConfigSource m_GridsXmlConfig = null;
+        public void LoadGridsXml()
+        {
+            if (null == m_GridsXmlConfig)
+            {
+                IConfig gridMap = m_Config.Configs["Grid"];
+                if (gridMap == null)
+                {
+                    return;
+                }
+
+                if (gridMap.Contains("Id"))
+                {
+                    m_GridsXmlConfig = new IniConfigSource();
+                    SimGridInfo.LoadFromGridsXml(m_GridsXmlConfig, gridMap.GetString("Id"));
+                    m_Config.Merge(m_GridsXmlConfig);
+                }
+            }
+            else
+            {
+                m_Config.Merge(m_GridsXmlConfig);
+            }
+        }
+        #endregion
+
         #region Constructor and Main
         public enum LocalConsole
         {
@@ -1119,11 +1145,13 @@ namespace SilverSim.Main.Common
                     System.Console.WriteLine();
                     throw new ConfigurationErrorException();
                 }
+                LoadGridsXml();
                 AddIncludes(source);
                 ProcessImportResources();
                 ProcessParameterMap();
                 ProcessResourceMap();
             }
+            LoadGridsXml();
             ProcessParameterMap();
             ProcessUseTemplates();
 
