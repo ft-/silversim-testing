@@ -14,7 +14,7 @@ namespace SilverSim.Types.Asset.Format
 {
     public class Notecard : IReferencesAccessor
     {
-        public NotecardInventory Inventory;
+        public NotecardInventory Inventory = new NotecardInventory();
         public string Text = string.Empty;
 
         #region Constructors
