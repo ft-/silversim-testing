@@ -10,6 +10,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -609,6 +610,25 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            List<UUID> primids = new List<UUID>();
+            foreach (uint id in req.ObjectList)
+            {
+                ObjectPart part;
+                if (Primitives.TryGetValue(id, out part) &&
+                    CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                {
+                    primids.Add(part.ID);
+                }
+            }
+
+            LinkObjects(primids);
         }
 
         [PacketHandler(MessageType.ObjectDelink)]
@@ -620,6 +640,25 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            List<UUID> primids = new List<UUID>();
+            foreach(uint id in req.ObjectList)
+            {
+                ObjectPart part;
+                if(Primitives.TryGetValue(id, out part) &&
+                    CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                {
+                    primids.Add(part.ID);
+                }
+            }
+
+            UnlinkObjects(primids);
         }
 
         [PacketHandler(MessageType.ObjectGroup)]

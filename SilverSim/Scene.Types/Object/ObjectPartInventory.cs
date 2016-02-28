@@ -34,6 +34,23 @@ namespace SilverSim.Scene.Types.Object
         public UUID PartID { get; internal set; }
         readonly object m_DataLock = new object();
 
+
+        int m_SuspendCount;
+        public void SuspendScripts()
+        {
+            Interlocked.Increment(ref m_SuspendCount);
+        }
+
+        public void ResumeScripts()
+        {
+            Interlocked.Decrement(ref m_SuspendCount);
+        }
+
+        protected bool AreScriptsSuspended()
+        {
+            return m_SuspendCount > 0;
+        }
+
         public ObjectPartInventory()
         {
             PartID = UUID.Zero;
