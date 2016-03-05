@@ -29,12 +29,9 @@ namespace SilverSim.Main.Common
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        if (reader.IsEmptyElement)
+                        if(reader.Name == "parameter")
                         {
-                            break;
-                        }
-                        else if(reader.Name == "parameter")
-                        {
+                            bool isEmptyElement = reader.IsEmptyElement;
                             string section = reader.GetAttribute("section");
                             string name = reader.GetAttribute("name");
                             string value = reader.GetAttribute("value");
@@ -42,15 +39,18 @@ namespace SilverSim.Main.Common
                             {
                                 throw new SimGridInfoXmlException();
                             }
-                            if(!config.Configs.Contains(section))
+                            if(config.Configs[section] == null)
                             {
                                 config.Configs.Add(section);
                             }
                             IConfig cfg = config.Configs[section];
                             cfg.Set(name, value);
-                            reader.ReadToEndElement("parameter");
+                            if (!isEmptyElement)
+                            {
+                                reader.ReadToEndElement("parameter");
+                            }
                         }
-                        else
+                        else if(!reader.IsEmptyElement)
                         {
                             reader.ReadToEndElement();
                         }
@@ -61,7 +61,7 @@ namespace SilverSim.Main.Common
                         {
                             throw new SimGridInfoXmlException();
                         }
-                        break;
+                        return;
 
                     default:
                         break;

@@ -1044,10 +1044,6 @@ namespace SilverSim.Main.Common
                     m_Config.Merge(m_GridsXmlConfig);
                 }
             }
-            else
-            {
-                m_Config.Merge(m_GridsXmlConfig);
-            }
         }
         #endregion
 
