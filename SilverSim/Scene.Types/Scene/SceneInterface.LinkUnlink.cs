@@ -38,14 +38,12 @@ namespace SilverSim.Scene.Types.Scene
             foreach(UUID objectid in objectids)
             {
                 ObjectPart part;
-                if(Primitives.TryGetValue(objectid, out part))
-                {
-                    if (!groups.Contains(part.ObjectGroup) &&
+                if(Primitives.TryGetValue(objectid, out part) &&
+                    (!groups.Contains(part.ObjectGroup) &&
                         (groups.Count == 0 || groups[0].Owner.EqualsGrid(part.ObjectGroup.Owner)) &&
-                        part.ObjectGroup.m_SittingAgents.Count == 0)
-                    {
-                        groups.Add(part.ObjectGroup);
-                    }
+                        part.ObjectGroup.m_SittingAgents.Count == 0))
+                {
+                    groups.Add(part.ObjectGroup);
                 }
             }
 
@@ -66,7 +64,6 @@ namespace SilverSim.Scene.Types.Scene
             for(int groupidx = 1; groupidx < groups.Count; ++groupidx)
             {
                 ObjectGroup srcGrp = groups[groupidx];
-                List<ObjectPart> parts = new List<ObjectPart>();
                 foreach(ObjectPart part in srcGrp.Values)
                 {
                     part.Inventory.SuspendScripts();

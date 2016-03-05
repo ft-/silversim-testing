@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Friends
         [IMMessageHandler(GridInstantMessageDialog.FriendshipOffered)]
         readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        IMServiceInterface m_IMService = null;
+        IMServiceInterface m_IMService;
         readonly string m_IMServiceName;
         List<IFriendsServicePlugin> m_FriendsPlugins;
         List<IUserAgentServicePlugin> m_UserAgentPlugins;

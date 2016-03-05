@@ -1026,7 +1026,7 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Load from grids xml
-        IConfigSource m_GridsXmlConfig = null;
+        IConfigSource m_GridsXmlConfig;
         public void LoadGridsXml()
         {
             if (null == m_GridsXmlConfig)

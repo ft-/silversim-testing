@@ -966,8 +966,8 @@ namespace SilverSim.Viewer.Core
         public string LastName { get; set; }
 
         readonly RwLockedDictionary<UUID, FriendStatus> m_KnownFriends = new RwLockedDictionary<UUID, FriendStatus>();
-        bool m_KnownFriendsCached = false;
-        object m_KnownFriendsCacheLock = new object();
+        bool m_KnownFriendsCached;
+        readonly object m_KnownFriendsCacheLock = new object();
 
         void CacheFriends()
         {

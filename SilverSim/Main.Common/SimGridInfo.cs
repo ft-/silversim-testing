@@ -62,6 +62,9 @@ namespace SilverSim.Main.Common
                             throw new SimGridInfoXmlException();
                         }
                         break;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -99,6 +102,9 @@ namespace SilverSim.Main.Common
                             throw new SimGridInfoXmlException();
                         }
                         return false;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -138,6 +144,9 @@ namespace SilverSim.Main.Common
 
                             case XmlNodeType.EndElement:
                                 throw new SimGridInfoXmlException();
+
+                            default:
+                                break;
                         }
                     }
                 }
