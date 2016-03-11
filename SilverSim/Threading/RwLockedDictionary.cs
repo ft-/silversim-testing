@@ -11,7 +11,7 @@ namespace SilverSim.Threading
 {
     public class RwLockedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-		protected ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        protected ReaderWriterLock m_RwLock = new ReaderWriterLock();
         protected Dictionary<TKey, TValue> m_Dictionary;
 
         [Serializable]
@@ -70,51 +70,51 @@ namespace SilverSim.Threading
             m_Dictionary = new Dictionary<TKey,TValue>(capacity, comparer);
         }
 
-		public bool IsReadOnly
+        public bool IsReadOnly
         {
-			get
+            get
             {
                 return false;
             }
         }
-		public int Count 
+        public int Count 
         {
-			get
+            get
             {
                 m_RwLock.AcquireReaderLock(-1);
-				try
+                try
                 {
                     return m_Dictionary.Count;
                 }
-				finally
+                finally
                 {
                     m_RwLock.ReleaseReaderLock();
                 }
-			}
-		}
+            }
+        }
 
-		public TValue this[TKey key]
+        public TValue this[TKey key]
         {
-			get
+            get
             {
                 m_RwLock.AcquireReaderLock(-1);
                 try
                 {
                     return m_Dictionary[key];
                 }
-				finally
+                finally
                 {
                     m_RwLock.ReleaseReaderLock();
                 }
             }
-			set
+            set
             {
                 m_RwLock.AcquireWriterLock(-1);
                 try
                 {
                     m_Dictionary[key] = value;
                 }
-				finally
+                finally
                 {
                     m_RwLock.ReleaseWriterLock();
                 }
@@ -177,33 +177,33 @@ namespace SilverSim.Threading
             {
                 m_Dictionary.Add(key, value);
             }
-			finally
+            finally
             {
                 m_RwLock.ReleaseWriterLock();
             }
         }
 
-		public void Add(KeyValuePair<TKey, TValue> kvp)
+        public void Add(KeyValuePair<TKey, TValue> kvp)
         {
             m_RwLock.AcquireWriterLock(-1);
             try
             {
                 m_Dictionary.Add(kvp.Key, kvp.Value);
             }
-			finally
+            finally
             {
                 m_RwLock.ReleaseWriterLock();
             }
         }
 
-		public void Clear()
+        public void Clear()
         {
             m_RwLock.AcquireWriterLock(-1);
             try
             {
                 m_Dictionary.Clear();
             }
-			finally
+            finally
             {
                 m_RwLock.ReleaseWriterLock();
             }
@@ -238,11 +238,11 @@ namespace SilverSim.Threading
         public bool ContainsKey(TKey key)
         {
             m_RwLock.AcquireReaderLock(-1);
-			try
+            try
             {
                 return m_Dictionary.ContainsKey(key);
             }
-			finally
+            finally
             {
                 m_RwLock.ReleaseReaderLock();
             }
@@ -284,11 +284,11 @@ namespace SilverSim.Threading
         public bool Remove(TKey key)
         {
             m_RwLock.AcquireWriterLock(-1);
-			try
+            try
             {
                 return m_Dictionary.Remove(key);
             }
-			finally
+            finally
             {
                 m_RwLock.ReleaseWriterLock();
             }
@@ -314,32 +314,32 @@ namespace SilverSim.Threading
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-			m_RwLock.AcquireReaderLock(-1);
-			try
+            m_RwLock.AcquireReaderLock(-1);
+            try
             {
-				return m_Dictionary.TryGetValue(key, out value);
-			}
-			finally
+                return m_Dictionary.TryGetValue(key, out value);
+            }
+            finally
             {
                 m_RwLock.ReleaseReaderLock();
             }
-		}
+        }
 
-		public ICollection<TKey> Keys
+        public ICollection<TKey> Keys
         {
-			get
+            get
             {
                 m_RwLock.AcquireReaderLock(-1);
-				try
+                try
                 {
                     return new List<TKey>(m_Dictionary.Keys);
                 }
-				finally
+                finally
                 {
                     m_RwLock.ReleaseReaderLock();
                 }
-			}
-		}
+            }
+        }
 
         public ICollection<TValue> Values
         {
@@ -357,22 +357,22 @@ namespace SilverSim.Threading
             }
         }
 
-		public void CopyTo(KeyValuePair<TKey, TValue>[] array,
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array,
             int arrayIndex)
         {
-			m_RwLock.AcquireReaderLock(-1);
-			try
+            m_RwLock.AcquireReaderLock(-1);
+            try
             {
                 foreach(KeyValuePair<TKey, TValue> kvp in m_Dictionary)
                 {
                     array[arrayIndex++] = kvp;
                 } 
             }
-			finally
+            finally
             {
-				m_RwLock.ReleaseReaderLock();
-			}
-		}
+                m_RwLock.ReleaseReaderLock();
+            }
+        }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
@@ -576,7 +576,7 @@ namespace SilverSim.Threading
             {
                 TValue checkval;
                 if(m_Dictionary.TryGetValue(key, out checkval) && 
-				    !del(checkval))
+                    !del(checkval))
                 {
                     return false;
                 }

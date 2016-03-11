@@ -192,7 +192,7 @@ namespace SilverSim.Http
 
         public override bool CanSeek
         {
-	        get 
+            get 
             {
                 return false;
             }
@@ -200,7 +200,7 @@ namespace SilverSim.Http
 
         public override bool CanWrite
         {
-	        get
+            get
             {
                 return true;
             }
@@ -212,7 +212,7 @@ namespace SilverSim.Http
 
         public override long Length
         {
-	        get 
+            get 
             { 
                 throw new NotSupportedException();
             }
