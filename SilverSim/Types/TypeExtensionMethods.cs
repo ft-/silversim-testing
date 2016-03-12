@@ -163,5 +163,44 @@ namespace SilverSim.Types
                 ) : 
                 s;
         }
+
+        public static bool EndsWith(this StringBuilder s, string m)
+        {
+            int n = m.Length;
+            int ofs;
+            if(s.Length < n)
+            {
+                return false;
+            }
+            ofs = s.Length - m.Length;
+            for(int i = 0; i < n; ++i)
+            {
+                if(s[ofs + i] != m[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool StartsWith(this StringBuilder s, string m)
+        {
+            int n = m.Length;
+            if (s.Length < n)
+            {
+                return false;
+            }
+
+            for(int i = 0; i < n; ++i)
+            {
+                if(s[i] != m[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
