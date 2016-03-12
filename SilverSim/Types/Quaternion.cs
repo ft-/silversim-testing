@@ -129,7 +129,10 @@ namespace SilverSim.Types
             Quaternion t = new Quaternion(this.X * this.X, this.Y * this.Y, this.Z * this.Z, this.W * this.W);
 
             double m = (t.X + t.Y + t.Z + t.W);
-            if (Math.Abs(m) < 0.001d) return;
+            if (Math.Abs(m) < 0.001d)
+            {
+                return;
+            }
             double n = 2 * (this.Y * this.W + this.X * this.Z);
             double p = m * m - n * n;
 
@@ -240,7 +243,9 @@ namespace SilverSim.Types
         public static Quaternion CreateFromEulers(double roll, double pitch, double yaw)
         {
             if (roll > Math.PI * 2 || pitch > Math.PI * 2 || yaw > Math.PI * 2)
+            {
                 throw new ArgumentException("Euler angles must be in radians");
+            }
 
             double atCos = Math.Cos(roll / 2f);
             double atSin = Math.Sin(roll / 2f);

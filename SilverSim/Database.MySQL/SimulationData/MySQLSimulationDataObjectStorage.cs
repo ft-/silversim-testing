@@ -270,7 +270,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                     objgroupID = MySQLUtilities.GetUUID(dbReader, "id");
                                     originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
                                     nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
-                                    ObjectGroup objgroup = ObjectGroupFromDbReader(dbReader); ;
+                                    ObjectGroup objgroup = ObjectGroupFromDbReader(dbReader);
                                     objGroups[objgroupID] = objgroup;
                                 }
                                 catch(Exception e)

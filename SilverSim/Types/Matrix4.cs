@@ -244,9 +244,18 @@ namespace SilverSim.Types
             }
 
             // Return only positive angles in [0,360]
-            if (angleX < 0) angleX += 360d;
-            if (angleY < 0) angleY += 360d;
-            if (angleZ < 0) angleZ += 360d;
+            if (angleX < 0)
+            {
+                angleX += 360d;
+            }
+            if (angleY < 0)
+            {
+                angleY += 360d;
+            }
+            if (angleZ < 0)
+            {
+                angleZ += 360d;
+            }
 
             roll = angleX;
             pitch = angleY;

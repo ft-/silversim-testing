@@ -53,7 +53,9 @@ namespace SilverSim.Types.Primitive
         {
             byte[] bytes = BitConverter.GetBytes(value);
             if (!BitConverter.IsLittleEndian)
+            {
                 Array.Reverse(bytes);
+            }
             return bytes;
         }
 

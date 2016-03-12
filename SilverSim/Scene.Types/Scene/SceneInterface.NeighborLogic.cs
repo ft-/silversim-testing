@@ -75,7 +75,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 if(null != kvp.Value.RemoteCircuit)
                 {
-                    Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;;
+                    Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;
                     if (newPosition.X >= -le.Distance && 
                         newPosition.Y >= -le.Distance &&
                         newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&
@@ -95,7 +95,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 else if (null != m_TryGetScene && m_TryGetScene(kvp.Key, out remoteScene))
                 {
-                    Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;;
+                    Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;
                     if (newPosition.X >= -le.Distance &&
                         newPosition.Y >= -le.Distance &&
                         newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&

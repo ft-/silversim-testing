@@ -90,7 +90,9 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         {
             Dictionary<UUID,bool> res = new Dictionary<UUID,bool>();
             if (assets.Count == 0)
+            {
                 return res;
+            }
 
             foreach(UUID id in assets)
             {

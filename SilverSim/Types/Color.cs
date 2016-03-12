@@ -18,32 +18,16 @@ namespace SilverSim.Types
 
         public Color(double r, double g, double b)
         {
-            if (r < 0f) R = 0f;
-            else if (r > 1f) R = 1f;
-            else R = r;
-
-            if (g < 0f) G = 0f;
-            else if (g > 1f) G = 1f;
-            else G = g;
-
-            if (b < 0f) B = 0f;
-            else if (b > 1f) B = 1f;
-            else B = b;
+            R = r.Clamp(0f, 1f);
+            G = g.Clamp(0f, 1f);
+            B = b.Clamp(0f, 1f);
         }
 
         public Color(Vector3 v)
         {
-            if (v.X < 0f) R = 0f;
-            else if (v.X > 1f) R = 1f;
-            else R = v.X;
-
-            if (v.Y < 0f) G = 0f;
-            else if (v.Y > 1f) G = 1f;
-            else G = v.Y;
-
-            if (v.Z < 0f) B = 0f;
-            else if (v.Z > 1f) B = 1f;
-            else B = v.Z;
+            R = v.X.Clamp(0f, 1f);
+            G = v.Y.Clamp(0f, 1f);
+            B = v.Z.Clamp(0f, 1f);
         }
 
         public Color(Color v)
@@ -184,25 +168,19 @@ namespace SilverSim.Types
         public ColorAlpha(double r, double g, double b, double alpha)
             : base(r, g, b)
         {
-            if (alpha < 0f) A = 0f;
-            else if (alpha > 1f) A = 1f;
-            else A = alpha;
+            A = alpha.Clamp(0f, 1f);
         }
 
         public ColorAlpha(Vector3 v, double alpha)
             : base(v)
         {
-            if (alpha < 0f) A = 0f;
-            else if (alpha > 1f) A = 1f;
-            else A = alpha;
+            A = alpha.Clamp(0f, 1f);
         }
 
         public ColorAlpha(Color v, double alpha)
             : base(v)
         {
-            if (alpha < 0f) A = 0f;
-            else if (alpha > 1f) A = 1f;
-            else A = alpha;
+            A = alpha.Clamp(0f, 1f);
         }
 
         public ColorAlpha(ColorAlpha v)

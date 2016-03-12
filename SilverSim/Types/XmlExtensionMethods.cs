@@ -176,7 +176,9 @@ namespace SilverSim.Types
         {
             string value = reader.ReadElementValueAsString();
             if (value.Contains(" ") && !value.Contains(","))
+            {
                 value = value.Replace(" ", ", ");
+            }
 
             return (T)Enum.Parse(typeof(T), value);
         }

@@ -375,19 +375,25 @@ namespace SilverSim.Types.StructuredData.Llsd
 
                 db = BitConverter.GetBytes(i.X);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, db.Length);
 
                 output.WriteByte((byte)'r');
                 db = BitConverter.GetBytes(i.Y);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, db.Length);
 
                 output.WriteByte((byte)'r');
                 db = BitConverter.GetBytes(i.Z);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, db.Length);
 
                 output.WriteByte((byte)']');

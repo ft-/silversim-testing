@@ -221,7 +221,9 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
             byte[] resultbytes = BitConverter.GetBytes(localID);
             if (BitConverter.IsLittleEndian)
+            {
                 Array.Reverse(resultbytes);
+            }
 
             using (HttpResponse res = httpreq.BeginResponse("application/xml"))
             {

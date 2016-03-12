@@ -261,7 +261,10 @@ namespace SilverSim.Types.Primitive
             else if (size > LegacyDataBlockSize && size <= MaxDataBlockSize)
             {
                 int sysSize = pack.UnpackSignedBits(32);
-                if (sysSize != SysDataSize) return; // unkown particle system data size
+                if (sysSize != SysDataSize)
+                {
+                    return; // unkown particle system data size
+                }
                 UnpackSystem(ref pack);
                 /*int dataSize = */pack.UnpackSignedBits(32);
                 UnpackLegacyData(ref pack);
@@ -269,7 +272,10 @@ namespace SilverSim.Types.Primitive
 
                 if ((PartDataFlags & ParticleDataFlags.DataGlow) == ParticleDataFlags.DataGlow)
                 {
-                    if (pack.Data.Length - pack.BytePos < 2) return;
+                    if (pack.Data.Length - pack.BytePos < 2)
+                    {
+                        return;
+                    }
                     uint glow = pack.UnpackUnsignedBits(8);
                     PartStartGlow = glow / 255f;
                     glow = pack.UnpackUnsignedBits(8);
@@ -278,7 +284,10 @@ namespace SilverSim.Types.Primitive
 
                 if ((PartDataFlags & ParticleDataFlags.DataBlend) == ParticleDataFlags.DataBlend)
                 {
-                    if (pack.Data.Length - pack.BytePos < 2) return;
+                    if (pack.Data.Length - pack.BytePos < 2)
+                    {
+                        return;
+                    }
                     BlendFuncSource = (BlendFunc)pack.UnpackUnsignedBits(8);
                     BlendFuncDest = (BlendFunc)pack.UnpackUnsignedBits(8);
                 }
@@ -345,14 +354,26 @@ namespace SilverSim.Types.Primitive
             }
             else
             {
-                if (HasGlow()) PartDataFlags |= ParticleDataFlags.DataGlow;
-                if (HasBlendFunc()) PartDataFlags |= ParticleDataFlags.DataBlend;
+                if (HasGlow())
+                {
+                    PartDataFlags |= ParticleDataFlags.DataGlow;
+                }
+                if (HasBlendFunc())
+                {
+                    PartDataFlags |= ParticleDataFlags.DataBlend;
+                }
 
                 pack.PackBits(SysDataSize, 32);
                 PackSystemBytes(ref pack);
                 int partSize = PartDataSize;
-                if (HasGlow()) partSize += 2; // two bytes for start and end glow
-                if (HasBlendFunc()) partSize += 2; // two bytes for start end end blend function
+                if (HasGlow())
+                {
+                    partSize += 2; // two bytes for start and end glow
+                }
+                if (HasBlendFunc())
+                {
+                    partSize += 2; // two bytes for start end end blend function
+                }
                 pack.PackBits(partSize, 32);
                 PackLegacyData(ref pack);
 

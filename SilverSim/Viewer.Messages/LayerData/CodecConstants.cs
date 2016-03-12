@@ -80,16 +80,28 @@ namespace SilverSim.Viewer.Messages.LayerData
                     {
                         if (right)
                         {
-                            if (i < LAYER_PATCH_NUM_XY_ENTRIES - 1) i++;
-                            else j++;
+                            if (i < LAYER_PATCH_NUM_XY_ENTRIES - 1)
+                            {
+                                i++;
+                            }
+                            else
+                            {
+                                j++;
+                            }
 
                             right = false;
                             diag = true;
                         }
                         else
                         {
-                            if (j < LAYER_PATCH_NUM_XY_ENTRIES - 1) j++;
-                            else i++;
+                            if (j < LAYER_PATCH_NUM_XY_ENTRIES - 1)
+                            {
+                                j++;
+                            }
+                            else
+                            {
+                                i++;
+                            }
 
                             right = true;
                             diag = true;
@@ -101,13 +113,19 @@ namespace SilverSim.Viewer.Messages.LayerData
                         {
                             i++;
                             j--;
-                            if (i == LAYER_PATCH_NUM_XY_ENTRIES - 1 || j == 0) diag = false;
+                            if (i == LAYER_PATCH_NUM_XY_ENTRIES - 1 || j == 0)
+                            {
+                                diag = false;
+                            }
                         }
                         else
                         {
                             i--;
                             j++;
-                            if (j == LAYER_PATCH_NUM_XY_ENTRIES - 1 || i == 0) diag = false;
+                            if (j == LAYER_PATCH_NUM_XY_ENTRIES - 1 || i == 0)
+                            {
+                                diag = false;
+                            }
                         }
                     }
                 }

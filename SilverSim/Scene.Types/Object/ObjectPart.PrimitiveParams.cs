@@ -1522,42 +1522,48 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(PRIM_ALPHA_MODE_BLEND);
                         paramList.Add(0);
                     }
-                    else try
+                    else
                     {
-                        Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        paramList.Add(mat.DiffuseAlphaMode);
-                        paramList.Add(mat.AlphaMaskCutoff);
-                    }
-                    catch
-                    {
-                        paramList.Add(PRIM_ALPHA_MODE_BLEND);
-                        paramList.Add(0);
+                        try
+                        {
+                            Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                            paramList.Add(mat.DiffuseAlphaMode);
+                            paramList.Add(mat.AlphaMaskCutoff);
+                        }
+                        catch
+                        {
+                            paramList.Add(PRIM_ALPHA_MODE_BLEND);
+                            paramList.Add(0);
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.Normal:
                     /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
-                    if(face.MaterialID == UUID.Zero)
+                    if (face.MaterialID == UUID.Zero)
                     {
                         paramList.Add(UUID.Zero);
                         paramList.Add(new Vector3(1, 1, 0));
                         paramList.Add(Vector3.Zero);
                         paramList.Add(0f);
                     }
-                    else try
+                    else
                     {
-                        Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        paramList.Add(GetTextureInventoryItem(mat.NormMap));
-                        paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                        paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                        paramList.Add(mat.NormRotation);
-                    }
-                    catch 
-                    {
-                        paramList.Add(UUID.Zero);
-                        paramList.Add(new Vector3(1, 1, 0));
-                        paramList.Add(Vector3.Zero);
-                        paramList.Add(0f);
+                        try
+                        {
+                            Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                            paramList.Add(GetTextureInventoryItem(mat.NormMap));
+                            paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(mat.NormRotation);
+                        }
+                        catch
+                        {
+                            paramList.Add(UUID.Zero);
+                            paramList.Add(new Vector3(1, 1, 0));
+                            paramList.Add(Vector3.Zero);
+                            paramList.Add(0f);
+                        }
                     }
                     break;
 
@@ -1573,26 +1579,29 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(0);
                         paramList.Add(0);
                     }
-                    else try
+                    else
                     {
-                        Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        paramList.Add(GetTextureInventoryItem(mat.SpecMap));
-                        paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                        paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                        paramList.Add(mat.SpecRotation / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                        paramList.Add(mat.SpecColor.AsVector3);
-                        paramList.Add(mat.SpecExp);
-                        paramList.Add(mat.EnvIntensity);
-                    }
-                    catch
-                    {
-                        paramList.Add(UUID.Zero);
-                        paramList.Add(new Vector3(1, 1, 0));
-                        paramList.Add(Vector3.Zero);
-                        paramList.Add(0f);
-                        paramList.Add(Vector3.One);
-                        paramList.Add(0);
-                        paramList.Add(0);
+                        try
+                        {
+                            Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                            paramList.Add(GetTextureInventoryItem(mat.SpecMap));
+                            paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(mat.SpecRotation / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(mat.SpecColor.AsVector3);
+                            paramList.Add(mat.SpecExp);
+                            paramList.Add(mat.EnvIntensity);
+                        }
+                        catch
+                        {
+                            paramList.Add(UUID.Zero);
+                            paramList.Add(new Vector3(1, 1, 0));
+                            paramList.Add(Vector3.Zero);
+                            paramList.Add(0f);
+                            paramList.Add(Vector3.One);
+                            paramList.Add(0);
+                            paramList.Add(0);
+                        }
                     }
                     break;
 

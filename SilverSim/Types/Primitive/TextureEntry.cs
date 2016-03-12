@@ -401,7 +401,9 @@ namespace SilverSim.Types.Primitive
         public byte[] GetBytes()
         {
             if (DefaultTexture == null)
+            {
                 return new byte[0];
+            }
 
             using (MemoryStream memStream = new MemoryStream())
             {
@@ -434,7 +436,10 @@ namespace SilverSim.Types.Primitive
 
                     for (int i = 0; i < m_FaceTextures.Length; i++)
                     {
-                        if (m_FaceTextures[i] == null) continue;
+                        if (m_FaceTextures[i] == null)
+                        {
+                            continue;
+                        }
 
                         if (m_FaceTextures[i].TextureID != DefaultTexture.TextureID)
                         {
@@ -518,7 +523,10 @@ namespace SilverSim.Types.Primitive
                         }
                         if (m_FaceTextures[i].MaterialID != DefaultTexture.MaterialID)
                         {
-                            if (materialIDs[i] == UInt32.MaxValue) materialIDs[i] = 0;
+                            if (materialIDs[i] == UInt32.MaxValue)
+                            {
+                                materialIDs[i] = 0;
+                            }
                             materialIDs[i] |= (uint)(1 << i);
                         }
                     }
