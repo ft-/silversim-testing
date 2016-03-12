@@ -97,6 +97,9 @@ namespace SilverSim.Types.StructuredData.Llsd
                             case "encoding":
                                 encoding = reader.Value;
                                 break;
+
+                            default:
+                                break;
                         }
                         break;
 

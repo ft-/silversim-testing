@@ -340,7 +340,7 @@ namespace SilverSim.Types.Asset.Format
                     fmt.AppendFormat("{0}\t{1}\n", kvp.Key, kvp.Value);
                 }
 
-                return Encoding.UTF8.GetBytes(fmt.ToString());
+                return fmt.ToString().ToUTF8Bytes();
             }
         }
 
