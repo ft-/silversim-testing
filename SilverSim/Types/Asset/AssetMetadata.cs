@@ -188,25 +188,62 @@ namespace SilverSim.Types.Asset
             {
                 switch(value)
                 {
-                    case "image/x-j2c": Type = AssetType.Texture; break;
-                    case "image/tga": Type = AssetType.TextureTGA; break;
-                    case "image/jpeg": Type = AssetType.ImageJPEG; break;
-                    case "audio/ogg": Type = AssetType.Sound; break;
-                    case "audio/x-wav": Type = AssetType.SoundWAV; break;
-                    case "application/vnd.ll.callingcard": Type = AssetType.CallingCard; break;
-                    case "application/vnd.ll.landmark": Type = AssetType.Landmark; break;
-                    case "application/vnd.ll.clothing": Type = AssetType.Clothing; break;
-                    case "application/vnd.ll.primitive": Type = AssetType.Object; break;
-                    case "application/vnd.ll.notecard": Type = AssetType.Notecard; break;
-                    case "application/vnd.ll.lsltext": Type = AssetType.LSLText; break;
-                    case "application/vnd.ll.lslbyte": Type = AssetType.LSLBytecode; break;
-                    case "application/vnd.ll.bodypart": Type = AssetType.Bodypart; break;
-                    case "application/vnd.ll.animation": Type = AssetType.Animation; break;
-                    case "application/vnd.ll.gesture": Type = AssetType.Gesture; break;
-                    case "application/x-metaverse-simstate": Type = AssetType.Simstate; break;
-                    case "application/vnd.ll.mesh": Type = AssetType.Mesh; break;
-                    case "application/llsd+xml": Type = AssetType.Material; break;
-                    default: throw new InvalidOperationException();
+                    case "image/x-j2c":
+                        Type = AssetType.Texture;
+                        break;
+                    case "image/tga":
+                        Type = AssetType.TextureTGA;
+                        break;
+                    case "image/jpeg":
+                        Type = AssetType.ImageJPEG;
+                        break;
+                    case "audio/ogg":
+                        Type = AssetType.Sound;
+                        break;
+                    case "audio/x-wav":
+                        Type = AssetType.SoundWAV;
+                        break;
+                    case "application/vnd.ll.callingcard":
+                        Type = AssetType.CallingCard;
+                        break;
+                    case "application/vnd.ll.landmark":
+                        Type = AssetType.Landmark;
+                        break;
+                    case "application/vnd.ll.clothing":
+                        Type = AssetType.Clothing;
+                        break;
+                    case "application/vnd.ll.primitive":
+                        Type = AssetType.Object;
+                        break;
+                    case "application/vnd.ll.notecard":
+                        Type = AssetType.Notecard;
+                        break;
+                    case "application/vnd.ll.lsltext":
+                        Type = AssetType.LSLText;
+                        break;
+                    case "application/vnd.ll.lslbyte":
+                        Type = AssetType.LSLBytecode;
+                        break;
+                    case "application/vnd.ll.bodypart":
+                        Type = AssetType.Bodypart;
+                        break;
+                    case "application/vnd.ll.animation":
+                        Type = AssetType.Animation;
+                        break;
+                    case "application/vnd.ll.gesture":
+                        Type = AssetType.Gesture;
+                        break;
+                    case "application/x-metaverse-simstate":
+                        Type = AssetType.Simstate;
+                        break;
+                    case "application/vnd.ll.mesh":
+                        Type = AssetType.Mesh;
+                        break;
+                    case "application/llsd+xml":
+                        Type = AssetType.Material;
+                        break;
+                    default:
+                        throw new InvalidOperationException();
                 }
             }
         }

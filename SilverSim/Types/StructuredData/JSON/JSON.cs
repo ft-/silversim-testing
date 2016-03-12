@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace SilverSim.Types.StructuredData.Json
 {
@@ -42,7 +43,7 @@ namespace SilverSim.Types.StructuredData.Json
         private static string ReadString(StreamReader io, char eos)
         {
             char c;
-            string s = string.Empty;
+            StringBuilder s = new StringBuilder();
             while(eos != (c = (char) io.Read()))
             {
                 if(c == '\\')
@@ -57,14 +58,14 @@ namespace SilverSim.Types.StructuredData.Json
                     {
                         c = '\n';
                     }
-                    s += c.ToString();
+                    s.Append(c);
                 }
                 else
                 {
-                    s += c.ToString();
+                    s.Append(c);
                 }
             }
-            return s;
+            return s.ToString();
         }
 
         private static IValue ParseValue(StreamReader io)
@@ -101,7 +102,7 @@ namespace SilverSim.Types.StructuredData.Json
                     return ParseMap(io);
 
                 default:
-                    string input = string.Empty;
+                    StringBuilder inputs = new StringBuilder();
                     for (; ;)
                     {
                         c = (char) io.Peek();
@@ -110,10 +111,11 @@ namespace SilverSim.Types.StructuredData.Json
                             break;
                         }
                         c = (char)io.Read();
-                        input += c.ToString();
+                        inputs.Append(c);
                     }
 
-                    if(input == "true")
+                    string input = inputs.ToString();
+                    if (input == "true")
                     {
                         return new ABoolean(true);
                     }
@@ -270,20 +272,32 @@ namespace SilverSim.Types.StructuredData.Json
         #region Main JSON Serialization
         public static string SerializeString(string s)
         {
-            string o = string.Empty;
+            StringBuilder o = new StringBuilder();
             for(int i = 0; i < s.Length; ++i)
             {
                 switch(s[i])
                 {
-                    case '\\': o += "\\\\"; break;
-                    case '\n': o += "\\n"; break;
-                    case '\r': o += "\\r"; break;
-                    case '\"': o += "\\\""; break;
-                    case '\'': o += "\\'"; break;
-                    default: o += s[i].ToString(); break;
+                    case '\\':
+                        o.Append("\\\\");
+                        break;
+                    case '\n':
+                        o.Append("\\n");
+                        break;
+                    case '\r':
+                        o.Append("\\r");
+                        break;
+                    case '\"':
+                        o.Append("\\\"");
+                        break;
+                    case '\'':
+                        o.Append("\\'");
+                        break;
+                    default:
+                        o.Append(s[i]);
+                        break;
                 }
             }
-            return o;
+            return o.ToString();
         }
 
         private static void SerializeStruct(TextWriter io, Map map)

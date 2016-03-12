@@ -340,9 +340,18 @@ namespace SilverSim.Types.Primitive
         public byte[] GetBytes()
         {
             int size = LegacyDataBlockSize;
-            if (!IsLegacyCompatible()) size += 8; // two new ints for size
-            if (HasGlow()) size += 2; // two bytes for start and end glow
-            if (HasBlendFunc()) size += 2; // two bytes for start end end blend function
+            if (!IsLegacyCompatible())
+            {
+                size += 8; // two new ints for size
+            }
+            if (HasGlow())
+            {
+                size += 2; // two bytes for start and end glow
+            }
+            if (HasBlendFunc())
+            {
+                size += 2; // two bytes for start end end blend function
+            }
 
             byte[] bytes = new byte[size];
             BitPacker pack = new BitPacker(bytes, 0);

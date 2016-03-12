@@ -48,9 +48,6 @@ namespace SilverSim.Types.Asset
 
                     case AssetType.Object:
                         return Format.ObjectReferenceDecoder.GetReferences(this);
-
-                    default:
-                        break;
                 }
 
                 return new List<UUID>();

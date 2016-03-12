@@ -124,9 +124,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -164,9 +161,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
-
-                    default:
-                        break;
                 }
             }
 
@@ -204,9 +198,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -244,9 +235,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -364,9 +352,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -403,9 +388,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return array;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -447,9 +429,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return req;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -487,9 +466,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return DeserializeRequestInner(reader);
-
-                    default:
-                        break;
                 }
             }
         }
@@ -535,9 +511,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return DeserializeResponseInner(reader);
-
-                    default:
-                        break;
                 }
             }
         }
@@ -575,9 +548,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -615,9 +585,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -655,9 +622,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -720,9 +684,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                             throw new InvalidXmlRpcSerializationException();
                         }
                         return res;
-
-                    default:
-                        break;
                 }
             }
         }

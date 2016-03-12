@@ -72,9 +72,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                         {
                             return data;
                         }
-
-                    default:
-                        break;
                 }
             }
         }
@@ -101,9 +98,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                             default:
                                 break;
                         }
-                        break;
-
-                    default:
                         break;
                 }
             }
@@ -137,9 +131,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                         {
                             return new BinaryData();
                         }
-
-                    default:
-                        break;
                 }
             }
 
@@ -177,9 +168,6 @@ namespace SilverSim.Types.StructuredData.Llsd
 
                             case XmlNodeType.Element:
                                 array.Add(DeserializeInternal(input));
-                                break;
-
-                            default:
                                 break;
                         }
                     }
@@ -268,9 +256,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                                     in_entity = true;
                                 }
                                 break;
-
-                            default:
-                                break;
                         }
                     }
 
@@ -349,9 +334,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                             throw new InvalidLlsdXmlSerializationException();
                         }
                         return value;
-
-                    default:
-                        break;
                 }
             }
         }
@@ -385,9 +367,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                         {
                             throw new InvalidLlsdXmlSerializationException();
                         }
-
-                    default:
-                        break;
                 }
             }
         }

@@ -92,10 +92,18 @@ namespace SilverSim.Types.Inventory
                 {
                     switch(value)
                     {
-                        case "not": Type = SaleType.NoSale; break;
-                        case "orig": Type = SaleType.Original; break;
-                        case "copy": Type = SaleType.Copy; break;
-                        case "cntn": Type = SaleType.Content; break;
+                        case "not":
+                            Type = SaleType.NoSale;
+                            break;
+                        case "orig":
+                            Type = SaleType.Original;
+                            break;
+                        case "copy":
+                            Type = SaleType.Copy;
+                            break;
+                        case "cntn":
+                            Type = SaleType.Content;
+                            break;
                         default:
                             throw new ArgumentException("invalid type name " + value);
                     }
@@ -217,24 +225,60 @@ namespace SilverSim.Types.Inventory
             {
                 switch(value)
                 {
-                    case "texture": AssetType = AssetType.Texture; break;
-                    case "sound": AssetType = AssetType.Sound; break;
-                    case "callcard": AssetType = AssetType.CallingCard; break;
-                    case "landmark": AssetType = AssetType.Landmark; break;
-                    case "clothing": AssetType = AssetType.Clothing; break;
-                    case "object": AssetType = AssetType.Object; break;
-                    case "notecard": AssetType = AssetType.Notecard; break;
-                    case "lsltext": AssetType = AssetType.LSLText; break;
-                    case "lslbyte": AssetType = AssetType.LSLBytecode; break;
-                    case "txtr_tga": AssetType = AssetType.TextureTGA; break;
-                    case "bodypart": AssetType = AssetType.Bodypart; break;
-                    case "snd_wav": AssetType = AssetType.SoundWAV; break;
-                    case "img_tga": AssetType = AssetType.ImageTGA; break;
-                    case "jpeg": AssetType = AssetType.ImageJPEG; break;
-                    case "animatn": AssetType = AssetType.Animation; break;
-                    case "gesture": AssetType = AssetType.Gesture; break;
-                    case "simstate": AssetType = AssetType.Simstate; break;
-                    default: AssetType = AssetType.Unknown; break;
+                    case "texture":
+                        AssetType = AssetType.Texture;
+                        break;
+                    case "sound":
+                        AssetType = AssetType.Sound;
+                        break;
+                    case "callcard":
+                        AssetType = AssetType.CallingCard;
+                        break;
+                    case "landmark":
+                        AssetType = AssetType.Landmark;
+                        break;
+                    case "clothing":
+                        AssetType = AssetType.Clothing;
+                        break;
+                    case "object":
+                        AssetType = AssetType.Object;
+                        break;
+                    case "notecard":
+                        AssetType = AssetType.Notecard;
+                        break;
+                    case "lsltext":
+                        AssetType = AssetType.LSLText;
+                        break;
+                    case "lslbyte":
+                        AssetType = AssetType.LSLBytecode;
+                        break;
+                    case "txtr_tga":
+                        AssetType = AssetType.TextureTGA;
+                        break;
+                    case "bodypart":
+                        AssetType = AssetType.Bodypart;
+                        break;
+                    case "snd_wav":
+                        AssetType = AssetType.SoundWAV;
+                        break;
+                    case "img_tga":
+                        AssetType = AssetType.ImageTGA;
+                        break;
+                    case "jpeg":
+                        AssetType = AssetType.ImageJPEG;
+                        break;
+                    case "animatn":
+                        AssetType = AssetType.Animation;
+                        break;
+                    case "gesture":
+                        AssetType = AssetType.Gesture;
+                        break;
+                    case "simstate":
+                        AssetType = AssetType.Simstate;
+                        break;
+                    default:
+                        AssetType = AssetType.Unknown;
+                        break;
                 }
             }
         }
@@ -249,24 +293,60 @@ namespace SilverSim.Types.Inventory
             {
                 switch (value)
                 {
-                    case "texture": InventoryType = InventoryType.Texture; break;
-                    case "sound": InventoryType = InventoryType.Sound; break;
-                    case "callcard": InventoryType = InventoryType.CallingCard; break;
-                    case "landmark": InventoryType = InventoryType.Landmark; break;
-                    case "clothing": InventoryType = InventoryType.Clothing; break;
-                    case "object": InventoryType = InventoryType.Object; break;
-                    case "notecard": InventoryType = InventoryType.Notecard; break;
-                    case "lsltext": InventoryType = InventoryType.LSLText; break;
-                    case "lslbyte": InventoryType = InventoryType.LSLBytecode; break;
-                    case "txtr_tga": InventoryType = InventoryType.TextureTGA; break;
-                    case "bodypart": InventoryType = InventoryType.Bodypart; break;
-                    case "animatn": InventoryType = InventoryType.Animation; break;
-                    case "gesture": InventoryType = InventoryType.Gesture; break;
-                    case "simstate": InventoryType = InventoryType.Simstate; break;
-                    case "snapshot": InventoryType = InventoryType.Snapshot; break;
-                    case "attach": InventoryType = InventoryType.Attachable; break;
-                    case "wearable": InventoryType = InventoryType.Wearable; break;
-                    default: AssetType = AssetType.Unknown; break;
+                    case "texture":
+                        InventoryType = InventoryType.Texture;
+                        break;
+                    case "sound":
+                        InventoryType = InventoryType.Sound;
+                        break;
+                    case "callcard":
+                        InventoryType = InventoryType.CallingCard;
+                        break;
+                    case "landmark":
+                        InventoryType = InventoryType.Landmark;
+                        break;
+                    case "clothing":
+                        InventoryType = InventoryType.Clothing;
+                        break;
+                    case "object":
+                        InventoryType = InventoryType.Object;
+                        break;
+                    case "notecard":
+                        InventoryType = InventoryType.Notecard;
+                        break;
+                    case "lsltext":
+                        InventoryType = InventoryType.LSLText;
+                        break;
+                    case "lslbyte":
+                        InventoryType = InventoryType.LSLBytecode;
+                        break;
+                    case "txtr_tga":
+                        InventoryType = InventoryType.TextureTGA;
+                        break;
+                    case "bodypart":
+                        InventoryType = InventoryType.Bodypart;
+                        break;
+                    case "animatn":
+                        InventoryType = InventoryType.Animation;
+                        break;
+                    case "gesture":
+                        InventoryType = InventoryType.Gesture;
+                        break;
+                    case "simstate":
+                        InventoryType = InventoryType.Simstate;
+                        break;
+                    case "snapshot":
+                        InventoryType = InventoryType.Snapshot;
+                        break;
+                    case "attach":
+                        InventoryType = InventoryType.Attachable;
+                        break;
+                    case "wearable":
+                        InventoryType = InventoryType.Wearable;
+                        break;
+                    default:
+                        AssetType = AssetType.Unknown;
+                        break;
                 }
             }
         }

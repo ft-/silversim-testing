@@ -143,15 +143,14 @@ namespace SilverSim.Types.Asset.Format
         string ReadLine(Stream stream)
         {
             int c;
-            string data = string.Empty;
+            StringBuilder data = new StringBuilder();
 
             while('\n' != (c = stream.ReadByte()) && c != -1)
             {
-                data += ((char)c).ToString();
+                data.Append(c);
             }
 
-            data = data.Trim();
-            return data;
+            return data.ToString().Trim();
         }
 
         private void ReadInventoryPermissions(Stream assetdata, ref NotecardInventoryItem item)
@@ -543,22 +542,22 @@ namespace SilverSim.Types.Asset.Format
 
         public static implicit operator AssetData(Notecard v)
         {
-            string notecard = "Linden text version 2\n{\n";
+            StringBuilder notecard = new StringBuilder("Linden text version 2\n{\n");
             NotecardInventory inventory = v.Inventory;
-            notecard += String.Format("LLEmbeddedItems version 1\n{{\ncount {0}\n", inventory != null ? v.Inventory.Count : 0);
+            notecard.AppendFormat("LLEmbeddedItems version 1\n{{\ncount {0}\n", inventory != null ? v.Inventory.Count : 0);
 
             if (inventory != null)
             {
                 foreach (NotecardInventoryItem item in inventory.Values)
                 {
-                    notecard += ItemToString(item);
+                    notecard.Append(ItemToString(item));
                 }
             }
 
-            notecard += "}\n";
+            notecard.Append("}\n");
             byte[] TextData = v.Text.ToUTF8Bytes();
-            notecard += String.Format("Text length {0}\n", TextData.Length);
-            byte[] NotecardHeader = notecard.ToUTF8Bytes();
+            notecard.Append(String.Format("Text length {0}\n", TextData.Length));
+            byte[] NotecardHeader = notecard.ToString().ToUTF8Bytes();
 
             AssetData asset = new AssetData();
             asset.Data = new byte[TextData.Length + NotecardHeader.Length + 2];

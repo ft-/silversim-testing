@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace SilverSim.Types
 {
@@ -53,12 +54,12 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            string s = string.Empty;
+            StringBuilder s = new StringBuilder();
             foreach(IValue iv in this)
             {
-                s += iv.ToString();
+                s.Append(iv.ToString());
             }
-            return s;
+            return s.ToString();
         }
 
         #region Add methods

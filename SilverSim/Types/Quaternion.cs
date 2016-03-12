@@ -918,11 +918,15 @@ namespace SilverSim.Types
                 double x, y, z;
                 if (W >= 0f)
                 {
-                    x = X; y = Y; z = Z;
+                    x = X;
+                    y = Y;
+                    z = Z;
                 }
                 else
                 {
-                    x = -X; y = -Y; z = -Z;
+                    x = -X;
+                    y = -Y;
+                    z = -Z;
                 }
 
                 Buffer.BlockCopy(BitConverter.GetBytes((float)(norm * x)), 0, dest, pos + 0, 4);

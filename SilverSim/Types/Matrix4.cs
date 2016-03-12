@@ -1131,58 +1131,78 @@ namespace SilverSim.Types
                         switch (column)
                         {
                             case 0:
-                                M11 = value; return;
+                                M11 = value;
+                                break;
                             case 1:
-                                M12 = value; return;
+                                M12 = value;
+                                break;
                             case 2:
-                                M13 = value; return;
+                                M13 = value;
+                                break;
                             case 3:
-                                M14 = value; return;
+                                M14 = value;
+                                break;
                             default:
                                 throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
+                        break;
                     case 1:
                         switch (column)
                         {
                             case 0:
-                                M21 = value; return;
+                                M21 = value;
+                                break;
                             case 1:
-                                M22 = value; return;
+                                M22 = value;
+                                break;
                             case 2:
-                                M23 = value; return;
+                                M23 = value;
+                                break;
                             case 3:
-                                M24 = value; return;
+                                M24 = value;
+                                break;
                             default:
                                 throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
+                        break;
                     case 2:
                         switch (column)
                         {
                             case 0:
-                                M31 = value; return;
+                                M31 = value; 
+                                break;
                             case 1:
-                                M32 = value; return;
+                                M32 = value; 
+                                break;
                             case 2:
-                                M33 = value; return;
+                                M33 = value;
+                                break;
                             case 3:
-                                M34 = value; return;
+                                M34 = value;
+                                break;
                             default:
                                 throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
+                        break;
                     case 3:
                         switch (column)
                         {
                             case 0:
-                                M41 = value; return;
+                                M41 = value;
+                                break;
                             case 1:
-                                M42 = value; return;
+                                M42 = value; 
+                                break;
                             case 2:
-                                M43 = value; return;
+                                M43 = value; 
+                                break;
                             case 3:
-                                M44 = value; return;
+                                M44 = value;
+                                break;
                             default:
                                 throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
+                        break;
                     default:
                         throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                 }

@@ -190,13 +190,13 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         public static IValue Deserialize(Stream input)
         {
-            string a = string.Empty;
+            StringBuilder a = new StringBuilder();
             int b;
             while(0xa != (b = input.ReadByte()))
             {
-                a += ((char)b).ToString();
+                a.Append((char)b);
             }
-            if(a != "<? LLSD/Binary ?>")
+            if(a.ToString() != "<? LLSD/Binary ?>")
             {
                 throw new InvalidLlsdBinarySerializationException();
             }
@@ -278,7 +278,10 @@ namespace SilverSim.Types.StructuredData.Llsd
                 Quaternion i = (Quaternion) input;
                 byte[] db = new byte[8];
                 db[0] = (byte)'[';
-                db[1] = 0; db[2] = 0; db[3] = 0; db[4] = 4;
+                db[1] = 0;
+                db[2] = 0;
+                db[3] = 0;
+                db[4] = 4;
                 db[5] = (byte)'r';
                 output.Write(db, 0, 6);
 
@@ -369,7 +372,10 @@ namespace SilverSim.Types.StructuredData.Llsd
                 Vector3 i = (Vector3)input;
                 byte[] db = new byte[6];
                 db[0] = (byte)'[';
-                db[1] = 0; db[2] = 0; db[3] = 0; db[4] = 3;
+                db[1] = 0;
+                db[2] = 0;
+                db[3] = 0;
+                db[4] = 3;
                 db[5] = (byte)'r';
                 output.Write(db, 0, db.Length);
 

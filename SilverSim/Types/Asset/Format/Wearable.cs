@@ -313,10 +313,10 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                string fmt = "LLWearable version 22\n";
-                fmt += Name + "\n";
-                fmt += Description + "\n";
-                fmt += String.Format(WearableFormat,
+                StringBuilder fmt = new StringBuilder("LLWearable version 22\n");
+                fmt.Append(Name + "\n");
+                fmt.Append(Description + "\n");
+                fmt.AppendFormat(WearableFormat,
                     (uint)Permissions.Base,
                     (uint)Permissions.Current,
                     (uint)Permissions.Group,
@@ -329,18 +329,18 @@ namespace SilverSim.Types.Asset.Format
                     SaleInfo.TypeName,
                     SaleInfo.Price,
                     (uint)Type);
-                fmt += String.Format("parameters {0}\n", Params.Count);
+                fmt.AppendFormat("parameters {0}\n", Params.Count);
                 foreach(KeyValuePair<uint, double> kvp in Params)
                 {
-                    fmt += String.Format("{0}\t{1}\n", kvp.Key, kvp.Value);
+                    fmt.AppendFormat("{0}\t{1}\n", kvp.Key, kvp.Value);
                 }
-                fmt += String.Format("textures {0}\n", Textures.Count);
+                fmt.AppendFormat("textures {0}\n", Textures.Count);
                 foreach(KeyValuePair<uint, UUID> kvp in Textures)
                 {
-                    fmt += String.Format("{0}\t{1}\n", kvp.Key, kvp.Value);
+                    fmt.AppendFormat("{0}\t{1}\n", kvp.Key, kvp.Value);
                 }
 
-                return Encoding.UTF8.GetBytes(fmt);
+                return Encoding.UTF8.GetBytes(fmt.ToString());
             }
         }
 

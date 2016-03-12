@@ -140,9 +140,6 @@ namespace SilverSim.Types.Asset.Format
                                             }
                                             pos += 28;
                                             break;
-
-                                        default:
-                                            break;
                                     }
                                 }
                             }
@@ -155,9 +152,6 @@ namespace SilverSim.Types.Asset.Format
 
                     case XmlNodeType.EndElement:
                         return;
-
-                    default:
-                        break;
                 }
             }
         }
