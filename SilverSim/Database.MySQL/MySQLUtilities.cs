@@ -14,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace SilverSim.Database.MySQL
 {
@@ -316,21 +317,31 @@ namespace SilverSim.Database.MySQL
                 }
             }
 
-            string q1 = string.Empty;
-            string q2 = string.Empty;
+            StringBuilder q1 = new StringBuilder();
+            StringBuilder q2 = new StringBuilder();
+            q1.Append(cmd);
+            q1.Append(" INTO `");
+            q1.Append(tablename);
+            q1.Append("` (");
+            q2.Append(") VALUES (");
+            bool first = true;
             foreach(string p in q)
             {
-                if(q1.Length != 0)
+                if(!first)
                 {
-                    q1 += ",";
-                    q2 += ",";
+                    q1.Append(",");
+                    q2.Append(",");
                 }
-                q1 += "`" + p + "`";
-                q2 += "?v_" + p;
+                first = false;
+                q1.Append("`");
+                q1.Append(p);
+                q1.Append("`");
+                q2.Append("?v_");
+                q2.Append(p);
             }
-
-            string query = cmd + " INTO `" + tablename + "` (" + q1 + ") VALUES (" + q2 + ")";
-            using (MySqlCommand command = new MySqlCommand(query, connection))
+            q1.Append(q2);
+            q1.Append(")");
+            using (MySqlCommand command = new MySqlCommand(q1.ToString(), connection))
             {
                 AddParameters(command.Parameters, vals);
                 if (command.ExecuteNonQuery() < 1)
@@ -396,16 +407,18 @@ namespace SilverSim.Database.MySQL
                 }
             }
 
-            string q1 = string.Empty;
+            StringBuilder q1 = new StringBuilder();
             foreach (string p in q)
             {
                 if (q1.Length != 0)
                 {
-                    q1 += ",";
+                    q1.Append(",");
                 }
-                q1 += "`" + p + "`";
+                q1.Append("`");
+                q1.Append(p);
+                q1.Append("`");
             }
-            return q1;
+            return q1.ToString();
         }
 
         public static string GenerateValues(Dictionary<string, object> vals)
@@ -615,14 +628,14 @@ namespace SilverSim.Database.MySQL
 
             q1 += string.Join(",", UpdateSetFromVals(vals));
 
-            string wherestr = string.Empty;
+            StringBuilder wherestr = new StringBuilder();
             foreach(KeyValuePair<string, object> w in where)
             {
                 if(wherestr.Length != 0)
                 {
-                    wherestr += " AND ";
+                    wherestr.Append(" AND ");
                 }
-                wherestr += string.Format("{0} LIKE ?w_{0}", w.Key);
+                wherestr.AppendFormat("{0} LIKE ?w_{0}", w.Key);
             }
 
             using (MySqlCommand command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))

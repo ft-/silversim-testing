@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using System.Text;
 using System.Timers;
 
 namespace SilverSim.WebIF.Admin
@@ -725,18 +726,18 @@ namespace SilverSim.WebIF.Admin
                             {
                                 case "users":
                                     {
-                                        string output = "User List: --------------------";
+                                        StringBuilder output = new StringBuilder("User List: --------------------");
                                         foreach (string name in m_ServerParams[UUID.Zero])
                                         {
                                             if (name.StartsWith("WebIF.Admin.User.") &&
                                                 name.EndsWith(".PassCode"))
                                             {
                                                 string username = name.Substring(17, name.Length - 17 - 9);
-                                                output += "\n";
-                                                output += username;
+                                                output.Append("\n");
+                                                output.Append(username);
                                             }
                                         }
-                                        io.Write(output);
+                                        io.Write(output.ToString());
                                     }
                                     break;
 
@@ -751,12 +752,13 @@ namespace SilverSim.WebIF.Admin
                                         string rights;
                                         if(m_ServerParams.TryGetValue(UUID.Zero, userRef + ".Rights", out rights))
                                         {
-                                            string output = "Rights: --------------------";
+                                            StringBuilder output = new StringBuilder("Rights: --------------------");
                                             foreach(string right in rights.Split(','))
                                             {
-                                                output += "\n" + right.Trim();
+                                                output.Append("\n");
+                                                output.Append(right.Trim());
                                             }
-                                            io.Write(output);
+                                            io.Write(output.ToString());
                                         }
                                         else
                                         {

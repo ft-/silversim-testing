@@ -43,6 +43,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
 using System.Timers;
 using System.Xml;
@@ -1624,15 +1625,16 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                string output = "Module List:\n----------------------------------------------";
+                StringBuilder output = new StringBuilder("Module List:\n----------------------------------------------");
                 foreach (KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
                 {
                     DescriptionAttribute desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
 
-                    string features = string.Empty;
+                    output.AppendFormat("\nModule {0}:", moduledesc.Key);
                     if (null != desc)
                     {
-                        features += "\n   Description: " + desc.Description;
+                        output.Append("\n   Description: ");
+                        output.Append(desc.Description);
                     }
                     foreach (KeyValuePair<Type, string> kvp in FeaturesTable)
                     {
@@ -1640,17 +1642,19 @@ namespace SilverSim.Main.Common
                         {
                             if (moduledesc.Value.GetType().GetInterfaces().Contains(kvp.Key))
                             {
-                                features += "\n  - " + kvp.Value;
+                                output.Append("\n  - ");
+                                output.Append(kvp.Value);
                             }
                         }
                         else if (kvp.Key.IsAssignableFrom(moduledesc.Value.GetType()))
                         {
-                            features += "\n  - " + kvp.Value;
+                            output.Append("\n  - ");
+                            output.Append(kvp.Value);
                         }
                     }
-                    output += string.Format("\nModule {0}:{1}\n", moduledesc.Key, features);
+                    output.Append("\n");
                 }
-                io.Write(output);
+                io.Write(output.ToString());
             }
         }
 

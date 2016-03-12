@@ -92,7 +92,7 @@ namespace SilverSim.Http
 
         public override string ReadHeaderLine()
         {
-            string s = string.Empty;
+            StringBuilder s = new StringBuilder();
             for (; ;)
             {
                 if (m_BufferFill == m_BufferPos)
@@ -101,7 +101,7 @@ namespace SilverSim.Http
                     m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
                     if (m_BufferFill == 0)
                     {
-                        return s;
+                        return s.ToString();
                     }
                 }
 
@@ -109,16 +109,16 @@ namespace SilverSim.Http
                 {
                     if (m_Buffer[i] == (byte)'\r')
                     {
-                        s += Encoding.ASCII.GetString(m_Buffer, m_BufferPos, i - m_BufferPos);
+                        s.Append(Encoding.ASCII.GetString(m_Buffer, m_BufferPos, i - m_BufferPos));
                         m_BufferPos = i + 1;
                         if (ReadByte() != '\n')
                         {
                             throw new HttpHeaderFormatException();
                         }
-                        return s;
+                        return s.ToString();
                     }
                 }
-                s += Encoding.ASCII.GetString(m_Buffer, m_BufferPos, m_BufferFill - m_BufferPos);
+                s.Append(Encoding.ASCII.GetString(m_Buffer, m_BufferPos, m_BufferFill - m_BufferPos));
                 m_BufferPos = m_BufferFill;
             }
         }

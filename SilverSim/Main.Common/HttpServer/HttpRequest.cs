@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Text;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -101,7 +102,7 @@ namespace SilverSim.Main.Common.HttpServer
         private string ReadHeaderLine()
         {
             int c;
-            string headerLine = string.Empty;
+            StringBuilder headerLine = new StringBuilder();
             while((c = m_HttpStream.ReadByte()) != '\r')
             {
                 if(c == -1)
@@ -112,7 +113,7 @@ namespace SilverSim.Main.Common.HttpServer
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     throw new InvalidDataException();
                 }
-                headerLine += ((char)c).ToString();
+                headerLine.Append((char)c);
             }
 
             if(m_HttpStream.ReadByte() != '\n')
@@ -124,7 +125,7 @@ namespace SilverSim.Main.Common.HttpServer
                 throw new InvalidDataException();
             }
 
-            return headerLine;
+            return headerLine.ToString();
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

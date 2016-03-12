@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Web;
 
 namespace SilverSim.Http.Client
@@ -12,19 +13,21 @@ namespace SilverSim.Http.Client
     {
         private static string BuildQueryString(IDictionary<string, string> parameters)
         {
-            string outStr = string.Empty;
+            StringBuilder outStr = new StringBuilder();
             foreach(KeyValuePair<string, string> kvp in parameters)
             {
-                if(!string.IsNullOrEmpty(outStr))
+                if(outStr.Length != 0)
                 {
-                    outStr += "&";
+                    outStr.Append("&");
                 }
 
                 string[] names = kvp.Key.Split('?');
-                outStr += HttpUtility.UrlEncode(names[0]) + "=" + HttpUtility.UrlEncode(kvp.Value);
+                outStr.Append(HttpUtility.UrlEncode(names[0]));
+                outStr.Append("=");
+                outStr.Append(HttpUtility.UrlEncode(kvp.Value));
             }
 
-            return outStr;
+            return outStr.ToString();
         }
 
         #region Synchronous calls

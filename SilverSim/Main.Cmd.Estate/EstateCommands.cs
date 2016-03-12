@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Text;
 
 namespace SilverSim.Main.Cmd.Estate
 {
@@ -130,12 +131,12 @@ namespace SilverSim.Main.Cmd.Estate
             estates = m_EstateService.All;
 
 
-            string output = "Estate List:\n----------------------------------------------";
+            StringBuilder output = new StringBuilder("Estate List:\n----------------------------------------------");
             foreach (EstateInfo estateInfo in estates)
             {
-                output += string.Format("\nEstate {0} [{1}]:\n  Owner={2}\n", estateInfo.Name, estateInfo.ID, ResolveName(estateInfo.Owner).FullName);
+                output.AppendFormat("\nEstate {0} [{1}]:\n  Owner={2}\n", estateInfo.Name, estateInfo.ID, ResolveName(estateInfo.Owner).FullName);
             }
-            io.Write(output);
+            io.Write(output.ToString());
         }
 
         public void ChangeEstateCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -371,17 +372,17 @@ namespace SilverSim.Main.Cmd.Estate
                 regions = m_EstateService.RegionMap[estateID];
                 if (m_EstateService.RegionMap[estateID].Count != 0)
                 {
-                    string output = "Please unlink regions from estate first.\n\nLinked Scene List:\n----------------------------------------------";
+                    StringBuilder output = new StringBuilder("Please unlink regions from estate first.\n\nLinked Scene List:\n----------------------------------------------");
                     foreach (UUID rID in regions)
                     {
                         Types.Grid.RegionInfo rInfo;
                         if (m_RegionStorage.TryGetValue(UUID.Zero, rID, out rInfo))
                         {
                             Vector3 gridcoord = rInfo.Location;
-                            output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), rInfo.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
+                            output.AppendFormat("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), rInfo.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
                         }
                     }
-                    io.Write(output);
+                    io.Write(output.ToString());
                 }
                 else
                 {

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Xml;
 
 namespace SilverSim.Viewer.Core
@@ -49,22 +50,23 @@ namespace SilverSim.Viewer.Core
         bool GetCustomCapsUri(string capType, out string uri)
         {
             string capsUriStr;
-            uri = string.Empty;
             if(capType == "EventQueueGet")
             {
+                uri = string.Empty;
             }
             else if (m_ServiceURLCapabilities.TryGetValue(capType, out uri))
             {
                 return true;
             }
-            else if (Scene.CapabilitiesConfig.TryGetValue(capType, out capsUriStr) && uri != "localhost")
+            else if (Scene.CapabilitiesConfig.TryGetValue(capType, out capsUriStr) && capsUriStr != "localhost")
             {
-                if (0 == uri.Length)
+                if (0 == capsUriStr.Length)
                 {
                     return true;
                 }
                 else
                 {
+                    StringBuilder buildUri = new StringBuilder();
                     char l = (char)0;
                     foreach(char c in capsUriStr)
                     {
@@ -74,31 +76,31 @@ namespace SilverSim.Viewer.Core
                             switch(c)
                             {
                                 case '$':
-                                    uri += "$";
+                                    buildUri.Append("$");
                                     break;
 
                                 case 'h':
-                                    uri += System.Uri.EscapeUriString(Agent.HomeURI.ToString());
+                                    buildUri.Append(Uri.EscapeUriString(Agent.HomeURI.ToString()));
                                     break;
 
                                 case 'i':
-                                    uri += System.Uri.EscapeUriString(Agent.ServiceURLs["InventoryServerURI"]);
+                                    buildUri.Append(Uri.EscapeUriString(Agent.ServiceURLs["InventoryServerURI"]));
                                     break;
 
                                 case 'a':
-                                    uri += System.Uri.EscapeUriString(Agent.ServiceURLs["AssetServerURI"]);
+                                    buildUri.Append(Uri.EscapeUriString(Agent.ServiceURLs["AssetServerURI"]));
                                     break;
 
                                 case 'r':
-                                    uri += System.Uri.EscapeUriString((string)Scene.ID);
+                                    buildUri.Append(Uri.EscapeUriString((string)Scene.ID));
                                     break;
 
                                 case 's':
-                                    uri += System.Uri.EscapeUriString((string)SessionID);
+                                    buildUri.Append(Uri.EscapeUriString((string)SessionID));
                                     break;
 
                                 case 'u':
-                                    uri += System.Uri.EscapeUriString((string)AgentID);
+                                    buildUri.Append(Uri.EscapeUriString((string)AgentID));
                                     break;
 
                                 default:
@@ -111,9 +113,10 @@ namespace SilverSim.Viewer.Core
                         }
                         else
                         {
-                            uri += c.ToString();
+                            buildUri.Append(c);
                         }
                     }
+                    uri = buildUri.ToString();
                     return true;
                 }
             }

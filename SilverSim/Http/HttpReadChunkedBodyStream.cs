@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace SilverSim.Http
 {
@@ -16,14 +17,14 @@ namespace SilverSim.Http
         private string ReadHeaderLine()
         {
             int c;
-            string headerLine = string.Empty;
+            StringBuilder headerLine = new StringBuilder();
             while ((c = m_Input.ReadByte()) != '\r')
             {
                 if (c == -1)
                 {
                     throw new EndOfStreamException();
                 }
-                headerLine += ((char)c).ToString();
+                headerLine.Append((char)c);
             }
 
             if (m_Input.ReadByte() != '\n')
@@ -31,7 +32,7 @@ namespace SilverSim.Http
                 throw new InvalidDataException();
             }
 
-            return headerLine;
+            return headerLine.ToString();
         }
 
         public HttpReadChunkedBodyStream(Stream input)

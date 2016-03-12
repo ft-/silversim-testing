@@ -6,6 +6,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace SilverSim.Main.Common.CmdIO
 {
@@ -76,12 +77,12 @@ namespace SilverSim.Main.Common.CmdIO
                 {
                     if (args[0] == "help")
                     {
-                        string commands = m_Command + " command list:\n";
+                        StringBuilder commands = new StringBuilder(m_Command + " command list:\n");
                         foreach(string cmd in m_Dict.Keys)
                         {
-                            commands += string.Format("{0} {1}\n", m_Command, cmd);
+                            commands.AppendFormat("{0} {1}\n", m_Command, cmd);
                         }
-                        io.Write(commands);
+                        io.Write(commands.ToString());
                     }
                     else
                     {
@@ -128,12 +129,12 @@ namespace SilverSim.Main.Common.CmdIO
             {
                 if (args.Count == 1)
                 {
-                    string commands = "Command list:\n";
+                    StringBuilder commands = new StringBuilder("Command list:\n");
                     foreach (string cmd in Commands.Keys)
                     {
-                        commands += string.Format("{0}\n", cmd);
+                        commands.AppendFormat("{0}\n", cmd);
                     }
-                    io.Write(commands);
+                    io.Write(commands.ToString());
                     return;
                 }
                 else

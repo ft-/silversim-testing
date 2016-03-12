@@ -4,6 +4,7 @@
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SilverSim.Main.Common.CmdIO
 {
@@ -82,7 +83,7 @@ namespace SilverSim.Main.Common.CmdIO
             bool insinglequotes = false;
             bool inargument = false;
             bool hasescape = false;
-            string argument = string.Empty;
+            StringBuilder argument = new StringBuilder();
 
             foreach (char c in cmdline)
             {
@@ -91,7 +92,7 @@ namespace SilverSim.Main.Common.CmdIO
                     if (hasescape)
                     {
                         hasescape = false;
-                        argument += c.ToString();
+                        argument.Append(c);
                     }
                     else
                     {
@@ -103,12 +104,12 @@ namespace SilverSim.Main.Common.CmdIO
 
                             case '\"':
                                 indoublequotes = false;
-                                cmdargs.Add(argument);
-                                argument = string.Empty;
+                                cmdargs.Add(argument.ToString());
+                                argument.Clear();
                                 break;
 
                             default:
-                                argument += c.ToString();
+                                argument.Append(c);
                                 break;
                         }
                     }
@@ -118,7 +119,7 @@ namespace SilverSim.Main.Common.CmdIO
                     if (hasescape)
                     {
                         hasescape = false;
-                        argument += c.ToString();
+                        argument.Append(c);
                     }
                     else
                     {
@@ -130,12 +131,12 @@ namespace SilverSim.Main.Common.CmdIO
 
                             case '\"':
                                 insinglequotes = false;
-                                cmdargs.Add(argument);
-                                argument = string.Empty;
+                                cmdargs.Add(argument.ToString());
+                                argument.Clear();
                                 break;
 
                             default:
-                                argument += c.ToString();
+                                argument.Append(c);
                                 break;
                         }
                     }
@@ -144,8 +145,8 @@ namespace SilverSim.Main.Common.CmdIO
                 {
                     if (inargument)
                     {
-                        cmdargs.Add(argument);
-                        argument = string.Empty;
+                        cmdargs.Add(argument.ToString());
+                        argument.Clear();
                     }
                     inargument = false;
                 }
@@ -153,8 +154,8 @@ namespace SilverSim.Main.Common.CmdIO
                 {
                     if(inargument)
                     {
-                        cmdargs.Add(argument);
-                        argument = string.Empty;
+                        cmdargs.Add(argument.ToString());
+                        argument.Clear();
                     }
                     indoublequotes = true;
                 }
@@ -162,21 +163,21 @@ namespace SilverSim.Main.Common.CmdIO
                 {
                     if (inargument)
                     {
-                        cmdargs.Add(argument);
-                        argument = string.Empty;
+                        cmdargs.Add(argument.ToString());
+                        argument.Clear();
                     }
                     insinglequotes = true;
                 }
                 else
                 {
-                    argument += c.ToString();
+                    argument.Append(c);
                     inargument = true;
                 }
             }
 
             if (indoublequotes || insinglequotes || inargument)
             {
-                cmdargs.Add(argument);
+                cmdargs.Add(argument.ToString());
             }
 
             return cmdargs;
