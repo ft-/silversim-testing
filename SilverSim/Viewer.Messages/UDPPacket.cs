@@ -280,16 +280,16 @@ namespace SilverSim.Viewer.Messages
 
         public override string ToString()
         {
-            string dmp = string.Empty;
+            StringBuilder dmp = new StringBuilder();
             for(int i = 0; i < DataLength; ++i)
             {
                 if(i != 0)
                 {
-                    dmp += " ";
+                    dmp.Append(" ");
                 }
-                dmp += string.Format("{0:x2}", (uint)Data[i]);
+                dmp.AppendFormat("{0:x2}", (uint)Data[i]);
             }
-            return dmp;
+            return dmp.ToString();
         }
 
         public void Reset()
