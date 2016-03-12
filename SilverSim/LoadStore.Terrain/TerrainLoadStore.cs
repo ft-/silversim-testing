@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
+using System.Text;
 
 namespace SilverSim.LoadStore.Terrain
 {
@@ -73,18 +74,18 @@ namespace SilverSim.LoadStore.Terrain
             ITerrainFileStorage loader;
             if(args[0] == "help")
             {
-                string outp = "Available commands:\n";
-                outp += "load terrain <format> <filename>\n";
-                outp += "load terrain <format> <filename> x,y w,h\n";
-                outp += "\nAvailable Formats:\n";
+                StringBuilder outp = new StringBuilder("Available commands:\n" +
+                    "load terrain <format> <filename>\n" +
+                    "load terrain <format> <filename> x,y w,h\n" +
+                    "\nAvailable Formats:\n");
                 foreach (KeyValuePair<string, ITerrainFileStorage> kvp in m_TerrainFileStorages)
                 {
                     if (kvp.Value.SupportsLoading)
                     {
-                        outp += string.Format("{0}\n", kvp.Key);
+                        outp.AppendFormat("{0}\n", kvp.Key);
                     }
                 }
-                io.Write(outp);
+                io.Write(outp.ToString());
             }
             else if(args.Count < 4 || args.Count > 6)
             {
@@ -192,18 +193,18 @@ namespace SilverSim.LoadStore.Terrain
             ITerrainFileStorage storer;
             if (args[0] == "help")
             {
-                string outp = "Available commands:\n";
-                outp += "save terrain <format> <filename>\n";
-                outp += "save terrain <format> <filename> x,y w,h\n";
-                outp += "\nAvailable formats:\n";
+                StringBuilder outp = new StringBuilder("Available commands:\n" +
+                    "save terrain <format> <filename>\n" +
+                    "save terrain <format> <filename> x,y w,h\n" +
+                    "\nAvailable formats:\n");
                 foreach (KeyValuePair<string, ITerrainFileStorage> kvp in m_TerrainFileStorages)
                 {
                     if (kvp.Value.SupportsSaving)
                     {
-                        outp += string.Format("{0}\n", kvp.Key);
+                        outp.AppendFormat("{0}\n", kvp.Key);
                     }
                 }
-                io.Write(outp);
+                io.Write(outp.ToString());
             }
             else if (args.Count != 4 && args.Count != 6)
             {

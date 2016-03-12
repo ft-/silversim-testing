@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Script
@@ -55,16 +56,16 @@ namespace SilverSim.Scene.Types.Script
         {
             get
             {
-                string o = string.Empty;
+                StringBuilder o = new StringBuilder();
                 foreach(KeyValuePair<int, string> m in Messages)
                 {
                     if(o.Length != 0)
                     {
-                        o += "\n";
+                        o.Append("\n");
                     }
-                    o += string.Format("{0}:{1}", m.Key, m.Value);
+                    o.AppendFormat("{0}:{1}", m.Key, m.Value);
                 }
-                return o;
+                return o.ToString();
             }
         }
     }

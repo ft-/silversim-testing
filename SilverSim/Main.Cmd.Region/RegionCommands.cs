@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 
 namespace SilverSim.Main.Cmd.Region
@@ -371,7 +372,7 @@ namespace SilverSim.Main.Cmd.Region
                     return;
                 }
 
-                string msg = string.Empty;
+                StringBuilder msg = new StringBuilder();
 
                 foreach (IConfig regionEntry in cfg.Configs)
                 {
@@ -411,9 +412,9 @@ namespace SilverSim.Main.Cmd.Region
                     {
                         if (msg.Length != 0)
                         {
-                            msg += "\n";
+                            msg.Append("\n");
                         }
-                        msg += string.Format("Region {0} is already used by region id {1}. Skipping.", rInfoCheck.Name, rInfoCheck.ID);
+                        msg.AppendFormat("Region {0} is already used by region id {1}. Skipping.", rInfoCheck.Name, rInfoCheck.ID);
                     }
                     else
                     {
@@ -423,14 +424,20 @@ namespace SilverSim.Main.Cmd.Region
                         if (ownerEstates.Count != 0)
                         {
                             m_EstateService.RegionMap[r.ID] = ownerEstates[0].ID;
-                            io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
                         }
                         else if (allEstates.Count != 0)
                         {
                             m_EstateService.RegionMap[r.ID] = allEstates[0].ID;
-                            io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
                         }
                     }
+                }
+
+                if(msg.Length != 0)
+                {
+                    msg.Append("\n");
+                    io.Write(msg.ToString());
                 }
             }
             else
@@ -1063,11 +1070,11 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            string output = string.Empty;
-            output += string.Format("Environment FPS: {0}\n", scene.Environment.EnvironmentFps);
-            output += string.Format("Physics FPS: {0}\n", scene.PhysicsScene.PhysicsFPS);
-            output += string.Format("Root Agents: {0}", scene.RootAgents.Count);
-            io.Write(output);
+            StringBuilder output = new StringBuilder();
+            output.AppendFormat("Environment FPS: {0}\n", scene.Environment.EnvironmentFps);
+            output.AppendFormat("Physics FPS: {0}\n", scene.PhysicsScene.PhysicsFPS);
+            output.AppendFormat("Root Agents: {0}", scene.RootAgents.Count);
+            io.Write(output.ToString());
         }
 
         void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -1116,13 +1123,13 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            string output = "Scene List:\n----------------------------------------------";
+            StringBuilder output = new StringBuilder("Scene List:\n----------------------------------------------");
             foreach (RegionInfo rInfo in regions)
             {
                 if (limitedToScene == UUID.Zero || rInfo.ID == limitedToScene)
                 {
                     Vector3 gridcoord = rInfo.Location;
-                    output += string.Format("\nRegion {0} [{1}]: (Port {6})\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n  GatekeeperURI={7}\n",
+                    output.AppendFormat("\nRegion {0} [{1}]: (Port {6})\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n  GatekeeperURI={7}\n",
                         rInfo.Name, rInfo.ID,
                         gridcoord.ToString(),
                         rInfo.Size.ToString(),
@@ -1132,7 +1139,7 @@ namespace SilverSim.Main.Cmd.Region
                         rInfo.GridURI);
                 }
             }
-            io.Write(output);
+            io.Write(output.ToString());
         }
 
         void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -1164,18 +1171,18 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            string output = "Neighbor List:\n----------------------------------------------";
+            StringBuilder output = new StringBuilder("Neighbor List:\n----------------------------------------------");
             foreach (SceneInterface.NeighborEntry neighborInfo in scene.Neighbors.Values)
             {
                 Vector3 gridcoord = neighborInfo.RemoteRegionData.Location;
-                output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n",
+                output.AppendFormat("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n",
                     neighborInfo.RemoteRegionData.Name,
                     neighborInfo.RemoteRegionData.ID, gridcoord.ToString(),
                     neighborInfo.RemoteRegionData.Size.ToString(),
                     ResolveName(neighborInfo.RemoteRegionData.Owner).FullName,
                     gridcoord.X_String + "," + gridcoord.Y_String);
             }
-            io.Write(output);
+            io.Write(output.ToString());
 
         }
 
@@ -1209,23 +1216,23 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             IEnumerable<IAgent> agents;
-            string output;
+            StringBuilder output = new StringBuilder();
             if (args.Count == 3 && args[2] == "full")
             {
                 agents = scene.Agents;
-                output = "All Agents: -----------------\n";
+                output.Append("All Agents: -----------------\n");
             }
             else
             {
                 agents = scene.RootAgents;
-                output = "Root Agents: -----------------\n";
+                output.Append("Root Agents: -----------------\n");
             }
 
             foreach(IAgent agent in agents)
             {
-                output += string.Format("\n{0}\n    id={1}  Type={2}\n", agent.Owner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child");
+                output.AppendFormat("\n{0}\n    id={1}  Type={2}\n", agent.Owner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child");
             }
-            io.Write(output);
+            io.Write(output.ToString());
         }
 
         void ShowParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -1238,15 +1245,15 @@ namespace SilverSim.Main.Cmd.Region
             }
             else
             {
-                string output = "Parcel List:\n--------------------------------------------------------------------------------";
+                StringBuilder output = new StringBuilder("Parcel List:\n--------------------------------------------------------------------------------");
                 foreach (ParcelInfo parcel in scene.Parcels)
                 {
-                    output += string.Format("\nParcel {0} ({1}):\n  Owner={2}\n",
+                    output.AppendFormat("\nParcel {0} ({1}):\n  Owner={2}\n",
                         parcel.Name,
                         parcel.ID,
                         ResolveName(parcel.Owner).FullName);
                 }
-                io.Write(output);
+                io.Write(output.ToString());
             }
         }
         #endregion

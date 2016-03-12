@@ -34,16 +34,16 @@ namespace SilverSim.Main.Common.Tar
                 return;
             }
             string[] dirparts = dirname.Split('/');
-            string dirpath = string.Empty;
+            StringBuilder dirpath = new StringBuilder();
 
             foreach(string dirpart in dirparts)
             {
                 if(dirpath.Length != 0)
                 {
-                    dirpath += "/";
+                    dirpath.Append("/");
                 }
-                dirpath += dirpart;
-                if(!m_Directories.Contains(dirpath))
+                dirpath.Append(dirpart);
+                if(!m_Directories.Contains(dirpath.ToString()))
                 {
                     WriteHeader(dirpath + "/", TarFileType.Directory, 0);
                 }
