@@ -1462,11 +1462,20 @@ namespace SilverSim.Main.Common
             {
                 switch(s.ShutdownOrder)
                 {
-                    case ShutdownOrder.Any: shutdownAnyList.Add(s); break;
-                    case ShutdownOrder.LogoutAgents: shutdownLogoutAgentsList.Add(s); break;
-                    case ShutdownOrder.LogoutRegion: shutdownLogoutRegionsList.Add(s); break;
-                    case ShutdownOrder.LogoutDatabase: shutdownLogoutDatabaseList.Add(s); break;
-                    default: break;
+                    case ShutdownOrder.Any:
+                        shutdownAnyList.Add(s);
+                        break;
+                    case ShutdownOrder.LogoutAgents:
+                        shutdownLogoutAgentsList.Add(s);
+                        break;
+                    case ShutdownOrder.LogoutRegion:
+                        shutdownLogoutRegionsList.Add(s);
+                        break;
+                    case ShutdownOrder.LogoutDatabase:
+                        shutdownLogoutDatabaseList.Add(s);
+                        break;
+                    default:
+                        break;
                 }
             }
 

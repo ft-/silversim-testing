@@ -30,22 +30,50 @@ namespace SilverSim.Scene.Types.Object
             ID = UUID.Random;
             switch(AssetType)
             {
-                case AssetType.Animation: InventoryType = InventoryType.Animation; break;
-                case AssetType.Bodypart: InventoryType = InventoryType.Bodypart; break;
-                case AssetType.CallingCard: InventoryType = InventoryType.CallingCard; break;
-                case AssetType.Clothing: InventoryType = InventoryType.Clothing; break;
-                case AssetType.Gesture: InventoryType = InventoryType.Gesture; break;
+                case AssetType.Animation:
+                    InventoryType = InventoryType.Animation;
+                    break;
+                case AssetType.Bodypart:
+                    InventoryType = InventoryType.Bodypart;
+                    break;
+                case AssetType.CallingCard:
+                    InventoryType = InventoryType.CallingCard;
+                    break;
+                case AssetType.Clothing:
+                    InventoryType = InventoryType.Clothing;
+                    break;
+                case AssetType.Gesture:
+                    InventoryType = InventoryType.Gesture;
+                    break;
                 case AssetType.ImageJPEG: 
-                case AssetType.ImageTGA: InventoryType = InventoryType.Snapshot; break;
-                case AssetType.Landmark: InventoryType = InventoryType.Landmark; break;
-                case AssetType.LSLBytecode: InventoryType = InventoryType.LSLBytecode; break;
-                case AssetType.LSLText: InventoryType = InventoryType.LSLText; break;
-                case AssetType.Notecard: InventoryType = InventoryType.Notecard; break;
+                case AssetType.ImageTGA:
+                    InventoryType = InventoryType.Snapshot;
+                    break;
+                case AssetType.Landmark:
+                    InventoryType = InventoryType.Landmark;
+                    break;
+                case AssetType.LSLBytecode:
+                    InventoryType = InventoryType.LSLBytecode;
+                    break;
+                case AssetType.LSLText:
+                    InventoryType = InventoryType.LSLText;
+                    break;
+                case AssetType.Notecard:
+                    InventoryType = InventoryType.Notecard;
+                    break;
                 case AssetType.Sound: 
-                case AssetType.SoundWAV: InventoryType = InventoryType.Sound; break;
-                case AssetType.Texture: InventoryType = InventoryType.Texture; break;
-                case AssetType.TextureTGA: InventoryType = InventoryType.TextureTGA; break;
-                default: InventoryType = InventoryType.Unknown; break;
+                case AssetType.SoundWAV:
+                    InventoryType = InventoryType.Sound;
+                    break;
+                case AssetType.Texture:
+                    InventoryType = InventoryType.Texture;
+                    break;
+                case AssetType.TextureTGA:
+                    InventoryType = InventoryType.TextureTGA;
+                    break;
+                default:
+                    InventoryType = InventoryType.Unknown;
+                    break;
             }
             Owner = asset.Creator;
             Permissions.Base = InventoryPermissionsMask.Every;
