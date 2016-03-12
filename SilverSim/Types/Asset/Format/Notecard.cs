@@ -147,7 +147,7 @@ namespace SilverSim.Types.Asset.Format
 
             while('\n' != (c = stream.ReadByte()) && c != -1)
             {
-                data.Append(c);
+                data.Append((char)c);
             }
 
             return data.ToString().Trim();
@@ -556,7 +556,7 @@ namespace SilverSim.Types.Asset.Format
 
             notecard.Append("}\n");
             byte[] TextData = v.Text.ToUTF8Bytes();
-            notecard.Append(String.Format("Text length {0}\n", TextData.Length));
+            notecard.AppendFormat("Text length {0}\n", TextData.Length);
             byte[] NotecardHeader = notecard.ToString().ToUTF8Bytes();
 
             AssetData asset = new AssetData();
