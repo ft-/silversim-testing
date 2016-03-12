@@ -384,6 +384,9 @@ namespace SilverSim.Types
                         }
 
                         return v;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -435,6 +438,9 @@ namespace SilverSim.Types
                         }
 
                         return v;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -490,6 +496,9 @@ namespace SilverSim.Types
                         }
 
                         return v.Normalize();
+
+                    default:
+                        break;
                 }
             }
         }
@@ -523,6 +532,9 @@ namespace SilverSim.Types
                             throw new XmlException("closing tag does not match");
                         }
                         return string.Empty;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -550,6 +562,9 @@ namespace SilverSim.Types
                             throw new XmlException("closing tag does not match");
                         }
                         return string.Empty;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -602,6 +617,9 @@ namespace SilverSim.Types
                             throw new XmlException("closing tag does not match");
                         }
                         return false;
+
+                    default:
+                        break;
                 }
             }
         }

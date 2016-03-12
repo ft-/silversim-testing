@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 
 namespace SilverSim.Scripting.Common
 {
@@ -231,18 +232,18 @@ namespace SilverSim.Scripting.Common
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
-                string header = string.Empty;
+                StringBuilder header = new StringBuilder();
                 while (reader.Peek() == '/')
                 {
                     string shbang = reader.ReadLine();
-                    header += shbang + "\n";
+                    header.AppendLine(shbang);
                     if (shbang.StartsWith("//#!"))
                     {
                         shbangs.Add(linenumber, shbang);
                     }
                 }
 
-                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header, reader))
+                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
                     return Compile(user, shbangs, assetID, headReader, linenumber);
                 }
@@ -252,17 +253,17 @@ namespace SilverSim.Scripting.Common
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
-                string header = string.Empty;
+                StringBuilder header = new StringBuilder();
                 while (reader.Peek() == '/')
                 {
                     string shbang = reader.ReadLine();
-                    header += shbang + "\n";
+                    header.AppendLine(shbang);
                     if (shbang.StartsWith("//#!"))
                     {
                         shbangs.Add(linenumber, shbang);
                     }
                 }
-                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header, reader))
+                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
                     Compile(user, shbangs, assetID, headReader, linenumber);
                 }
@@ -272,18 +273,18 @@ namespace SilverSim.Scripting.Common
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
-                string header = string.Empty;
+                StringBuilder header = new StringBuilder();
                 while (reader.Peek() == '/')
                 {
                     string shbang = reader.ReadLine();
-                    header += shbang + "\n";
+                    header.AppendLine(shbang);
                     if (shbang.StartsWith("//#!"))
                     {
                         shbangs.Add(linenumber, shbang);
                     }
                     ++linenumber;
                 }
-                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header, reader))
+                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
                     SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, linenumber);
                 }
