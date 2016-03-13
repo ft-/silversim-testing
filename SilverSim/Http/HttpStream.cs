@@ -208,6 +208,7 @@ namespace SilverSim.Http
 
         public override void Flush()
         {
+            /* intentionally left empty */
         }
 
         public override long Length

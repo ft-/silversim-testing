@@ -28,7 +28,7 @@ namespace SilverSim.Main.Common.Console
             }
             catch
             {
-
+                /* intentionally left empty */
             }
             m_LogThread = new Thread(LogThread);
             m_LogThread.Start();
@@ -42,7 +42,7 @@ namespace SilverSim.Main.Common.Console
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            /* intentionally left empty */
         }
 
         public ShutdownOrder ShutdownOrder
@@ -66,10 +66,12 @@ namespace SilverSim.Main.Common.Console
         #region Output logic
         public override void LockOutput()
         {
+            /* intentionally left empty */
         }
 
         public override void UnlockOutput()
         {
+            /* intentionally left empty */
         }
 
         private void WriteColorText(ConsoleColor color, string sender)

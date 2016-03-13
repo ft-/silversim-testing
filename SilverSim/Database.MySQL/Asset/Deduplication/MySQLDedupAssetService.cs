@@ -41,7 +41,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            /* intentionally left empty */
         }
         #endregion
 

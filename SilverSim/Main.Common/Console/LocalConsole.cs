@@ -50,7 +50,7 @@ namespace SilverSim.Main.Common.Console
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            /* intentionally left empty */
         }
 
         public ShutdownOrder ShutdownOrder

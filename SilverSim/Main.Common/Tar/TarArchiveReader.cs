@@ -147,6 +147,7 @@ namespace SilverSim.Main.Common.Tar
 
         public override void Flush()
         {
+            throw new NotSupportedException();
         }
 
         public override long Length

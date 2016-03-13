@@ -52,7 +52,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
 
         public void AllRegionsLoaded()
         {
-
+            /* intentionally left empty */
         }
 
         public void LoadRegions()

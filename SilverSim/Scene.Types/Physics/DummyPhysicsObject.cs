@@ -15,10 +15,12 @@ namespace SilverSim.Scene.Types.Physics
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
         {
+            /* intentionally left empty */
         }
 
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
+            /* intentionally left empty */
         }
 
         #region Injecting parameters properties

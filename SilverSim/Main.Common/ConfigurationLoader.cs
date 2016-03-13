@@ -64,7 +64,7 @@ namespace SilverSim.Main.Common
 
             public void Startup(ConfigurationLoader loader)
             {
-
+                /* intentionally left empty */
             }
         }
         #endregion

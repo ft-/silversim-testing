@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Chat
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            /* intentionally left empty */
         }
     }
     #endregion

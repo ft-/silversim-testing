@@ -31,6 +31,7 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
         #endregion
 

@@ -18,7 +18,7 @@ namespace SilverSim.Scene.Registration
 {
     #region Service Implementation
     [Description("Grid Registration Handler")]
-    public class SceneRegistrar : IPlugin, IPluginShutdown
+    public class SceneRegistrar : IPlugin
     {
         readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
         private BaseHttpServer m_HttpServer;
@@ -80,19 +80,6 @@ namespace SilverSim.Scene.Registration
         {
             scene.GridService.UnregisterRegion(UUID.Zero, scene.ID);
             m_RegisteredScenes.Remove(scene);
-        }
-
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
-
-        public void Shutdown()
-        {
-
         }
     }
     #endregion

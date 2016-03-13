@@ -19,6 +19,7 @@ namespace SilverSim.Viewer.Teleport
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
 
         [PacketHandler(MessageType.TeleportRequest)]

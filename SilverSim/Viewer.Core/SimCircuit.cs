@@ -49,21 +49,22 @@ namespace SilverSim.Viewer.Core
 
         protected override void CheckForNewDataToSend()
         {
+            /* intentionally left empty */
         }
 
         protected override void LogMsgLogoutReply()
         {
-            
+            /* intentionally left empty */
         }
 
         protected override void LogMsgOnLogoutCompletion()
         {
-            
+            /* intentionally left empty */
         }
 
         protected override void LogMsgOnTimeout()
         {
-            
+            /* intentionally left empty */
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]

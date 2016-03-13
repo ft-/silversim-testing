@@ -46,6 +46,7 @@ namespace SilverSim.Database.MySQL.Estate
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
         #endregion
 

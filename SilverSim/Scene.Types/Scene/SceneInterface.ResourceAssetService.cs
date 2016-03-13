@@ -186,6 +186,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public override void Delete(UUID id)
             {
+                /* intentionally left empty */
             }
 
             public override Dictionary<UUID, bool> Exists(List<UUID> assets)
@@ -205,6 +206,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public override void Store(AssetData asset)
             {
+                /* intentionally left empty */
             }
         }
 

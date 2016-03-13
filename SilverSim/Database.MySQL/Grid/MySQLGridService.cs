@@ -59,6 +59,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
         #endregion
 

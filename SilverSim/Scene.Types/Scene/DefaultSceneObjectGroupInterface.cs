@@ -80,6 +80,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Dispose()
             {
+                /* intentionally left empty */
             }
 
             public ObjectGroup Current

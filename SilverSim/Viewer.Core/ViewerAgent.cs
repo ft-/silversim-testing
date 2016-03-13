@@ -937,7 +937,7 @@ namespace SilverSim.Viewer.Core
 
         public void PostEvent(IScriptEvent ev)
         {
-
+            /* intentionally left empty */
         }
         #endregion
 

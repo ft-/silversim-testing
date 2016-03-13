@@ -31,6 +31,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
         #endregion
 

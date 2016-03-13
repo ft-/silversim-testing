@@ -31,6 +31,7 @@ namespace SilverSim.Database.MySQL.Avatar
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
 
         public override Dictionary<string, string> this[UUID avatarID]

@@ -50,6 +50,7 @@ namespace SilverSim.Types.Asset.Format
 
         public override void Flush()
         {
+            throw new NotSupportedException();
         }
 
         public override long Length

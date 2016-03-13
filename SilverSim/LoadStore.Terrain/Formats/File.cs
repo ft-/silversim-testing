@@ -73,6 +73,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
     }
 }

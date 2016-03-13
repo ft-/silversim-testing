@@ -25,6 +25,7 @@ namespace SilverSim.Viewer.TerrainEdit
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
 
         [PacketHandler(MessageType.ModifyLand)]

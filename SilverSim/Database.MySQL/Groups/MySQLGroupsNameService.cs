@@ -30,6 +30,7 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
         #endregion
 

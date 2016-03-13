@@ -40,6 +40,7 @@ namespace SilverSim.Database.MySQL.Profile
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
 
         public void Remove(UUID scopeID, UUID userAccount)
