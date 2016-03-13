@@ -1123,7 +1123,10 @@ namespace SilverSim.Viewer.Messages
         #region Quaternion
         public Quaternion ReadLLQuaternion()
         {
-            float x, y, z;
+            float x;
+            float y;
+            float z;
+
             x = ReadFloat();
             y = ReadFloat();
             z = ReadFloat();
