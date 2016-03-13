@@ -205,7 +205,11 @@ namespace SilverSim.Types
             {
                 return false;
             }
-            double x, y, z;
+
+            double x;
+            double y;
+            double z;
+
             if(!Double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
                 !Double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
                 !Double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z))

@@ -33,9 +33,9 @@ namespace SilverSim.Viewer.Messages.Teleport
             m.SessionID = p.ReadUUID();
             m.LureType = p.ReadUInt8();
             m.Message = p.ReadStringLen8();
-            uint count, i;
+            uint count;
             count = p.ReadUInt8();
-            for (i = 0; i < count; ++i)
+            for (uint i = 0; i < count; ++i)
             {
                 m.TargetData.Add(p.ReadUUID());
             }

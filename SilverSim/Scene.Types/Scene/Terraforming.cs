@@ -261,8 +261,6 @@ namespace SilverSim.Scene.Types.Scene
 
             double strength = MetersToSphericalStrength(data.BrushSize);
 
-            int x, y;
-
             int xFrom = (int)(data.West - data.BrushSize + 0.5);
             int xTo = (int)(data.West + data.BrushSize + 0.5);
             int yFrom = (int)(data.South - data.BrushSize + 0.5);
@@ -288,9 +286,9 @@ namespace SilverSim.Scene.Types.Scene
                 yTo = (int)scene.SizeY - 1;
             }
 
-            for (x = xFrom; x <= xTo; x++)
+            for (int x = xFrom; x <= xTo; x++)
             {
-                for (y = yFrom; y <= yTo; y++)
+                for (int y = yFrom; y <= yTo; y++)
                 {
                     Vector3 pos = new Vector3(x, y, 0);
                     if (!scene.CanTerraform(agentOwner, pos))

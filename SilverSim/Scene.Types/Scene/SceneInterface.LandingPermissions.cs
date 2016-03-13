@@ -173,7 +173,11 @@ namespace SilverSim.Scene.Types.Scene
 
                 if (null != selectedParcel)
                 {
-                    Vector3 a, b, c, d;
+                    Vector3 a;
+                    Vector3 b;
+                    Vector3 c;
+                    Vector3 d;
+
                     a = selectedParcel.AABBMin;
                     b = a;
                     c = selectedParcel.AABBMax;

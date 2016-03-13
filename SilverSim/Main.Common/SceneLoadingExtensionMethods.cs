@@ -314,11 +314,10 @@ namespace SilverSim.Main.Common
                 loadparams.Scene.StartStorage();
 
                 {
-                    uint px, py;
                     int count = 0;
-                    for (py = 0; py < loadparams.Scene.SizeY / 16; ++py)
+                    for (uint py = 0; py < loadparams.Scene.SizeY / 16; ++py)
                     {
-                        for (px = 0; px < loadparams.Scene.SizeX / 16; ++px)
+                        for (uint px = 0; px < loadparams.Scene.SizeX / 16; ++px)
                         {
                             if (valid[px, py] == 0)
                             {

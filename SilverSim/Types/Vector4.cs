@@ -331,11 +331,17 @@ namespace SilverSim.Types
             result = default(Vector4);
             char[] splitChar = { ',' };
             string[] split = val.Replace("<", String.Empty).Replace(">", String.Empty).Split(splitChar);
-            if(split.Length != 4)
+
+            if (split.Length != 4)
             {
                 return false;
             }
-            double x, y, z, w;
+
+            double x;
+            double y;
+            double z;
+            double w;
+
             if(!double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
                 !double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
                 !double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z) ||

@@ -132,7 +132,8 @@ namespace SilverSim.LoadStore.Terrain
 
                 if(args.Count == 6)
                 {
-                    uint nw, nh;
+                    uint nw;
+                    uint nh;
                     try
                     {
                         ParseLocation(args[5], out nw, out nh);
@@ -251,7 +252,8 @@ namespace SilverSim.LoadStore.Terrain
 
                 if (args.Count == 6)
                 {
-                    uint nw, nh;
+                    uint nw;
+                    uint nh;
                     try
                     {
                         ParseLocation(args[5], out nw, out nh);

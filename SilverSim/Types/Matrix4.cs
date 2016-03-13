@@ -203,9 +203,19 @@ namespace SilverSim.Types
         /// <param name="yaw">Z euler angle</param>
         public void GetEulerAngles(out double roll, out double pitch, out double yaw)
         {
-            double angleX, angleY, angleZ;
-            double cx, cy, cz; // cosines
-            double sx, sz; // sines
+            double angleX;
+            double angleY;
+            double angleZ;
+
+            // cosines
+            double cx;
+            double cy;
+            double cz;
+
+            // sines
+            double sx;
+            double sz; 
+
             double M13_a = M13;
             if (M13_a < -1f)
             {
@@ -393,8 +403,14 @@ namespace SilverSim.Types
         {
             Matrix4 m;
 
-            double a, b, c, d, e, f;
-            double ad, bd;
+            double a;
+            double b;
+            double c;
+            double d;
+            double e;
+            double f;
+            double ad;
+            double bd;
 
             a = Math.Cos(roll);
             b = Math.Sin(roll);
@@ -982,7 +998,8 @@ namespace SilverSim.Types
         public static Matrix4 Minor(Matrix4 matrix, int row, int col)
         {
             Matrix4 minor = new Matrix4();
-            int m = 0, n = 0;
+            int m = 0;
+            int n = 0;
 
             for (int i = 0; i < 4; i++)
             {

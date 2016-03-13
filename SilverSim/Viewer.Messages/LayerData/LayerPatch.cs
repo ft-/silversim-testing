@@ -69,10 +69,10 @@ namespace SilverSim.Viewer.Messages.LayerData
         public LayerPatch(double defaultHeight)
         {
             PackedData = new BitPacker(PackedDataBytes);
-            int x, y;
-            for (y = 0; y < 16; ++y)
+
+            for (int y = 0; y < 16; ++y)
             {
-                for (x = 0; x < 16; ++x)
+                for (int x = 0; x < 16; ++x)
                 {
                     Data[y, x] = (float)defaultHeight;
                 }
@@ -84,13 +84,13 @@ namespace SilverSim.Viewer.Messages.LayerData
             PackedData = new BitPacker(PackedDataBytes);
             X = p.X;
             Y = p.Y;
-            int x, y;
+
             lock (m_Lock)
             {
                 Serial = p.Serial;
-                for (y = 0; y < 16; ++y)
+                for (int y = 0; y < 16; ++y)
                 {
-                    for (x = 0; x < 16; ++x)
+                    for (int x = 0; x < 16; ++x)
                     {
                         Data[y, x] = p.Data[y, x];
                     }
@@ -104,12 +104,12 @@ namespace SilverSim.Viewer.Messages.LayerData
             {
                 throw new ArgumentException("p does not match in its parameters X and Y.");
             }
-            int x, y;
+
             lock (m_Lock)
             {
-                for (y = 0; y < 16; ++y)
+                for (int y = 0; y < 16; ++y)
                 {
-                    for (x = 0; x < 16; ++x)
+                    for (int x = 0; x < 16; ++x)
                     {
                         Data[y, x] = p.Data[y, x];
                     }
@@ -127,12 +127,12 @@ namespace SilverSim.Viewer.Messages.LayerData
             {
                 throw new ArgumentException("p does not match in its parameters X and Y.");
             }
-            int x, y;
+
             lock (m_Lock)
             {
-                for (y = 0; y < 16; ++y)
+                for (int y = 0; y < 16; ++y)
                 {
-                    for (x = 0; x < 16; ++x)
+                    for (int x = 0; x < 16; ++x)
                     {
                         Data[y, x] = p.Data[y, x];
                     }
@@ -192,10 +192,10 @@ namespace SilverSim.Viewer.Messages.LayerData
                 }
                 Buffer.BlockCopy(src, 0, dst, 0, src.Length);
 
-                int x, y, pos = 4;
-                for (y = 0; y < 16; ++y)
+                int pos = 4;
+                for (int y = 0; y < 16; ++y)
                 {
-                    for (x = 0; x < 16; ++x)
+                    for (int x = 0; x < 16; ++x)
                     {
                         src = BitConverter.GetBytes(copy.Data[y, x]);
                         if (!BitConverter.IsLittleEndian)
@@ -218,11 +218,10 @@ namespace SilverSim.Viewer.Messages.LayerData
                 }
                 if (!BitConverter.IsLittleEndian)
                 {
-                    int pos; 
                     src = new byte[src.Length];
                     Buffer.BlockCopy(value, 0, src, 0, src.Length);
 
-                    for (pos = 0; pos < 16 * 16 + 4; ++pos)
+                    for (int pos = 0; pos < 16 * 16 + 4; ++pos)
                     {
                         Array.Reverse(src, pos, 4);
                     }
@@ -230,10 +229,10 @@ namespace SilverSim.Viewer.Messages.LayerData
                 lock (m_Lock)
                 {
                     Serial = BitConverter.ToUInt32(src, 0);
-                    int x, y, pos = 4;
-                    for (y = 0; y < 16; ++y)
+                    int pos = 4;
+                    for (int y = 0; y < 16; ++y)
                     {
-                        for (x = 0; x < 16; ++x)
+                        for (int x = 0; x < 16; ++x)
                         {
                             Data[y, x] = BitConverter.ToSingle(src, pos);
                             pos += 4;

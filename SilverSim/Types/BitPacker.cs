@@ -248,7 +248,8 @@ namespace SilverSim.Types
         {
             int unsignedBits = intBits + fracBits;
             int totalBits = unsignedBits;
-            int min, max;
+            int min;
+            int max;
 
             if (isSigned)
             {

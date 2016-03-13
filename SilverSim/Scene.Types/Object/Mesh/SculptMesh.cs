@@ -66,7 +66,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 for (int x = 0; x <= bitmap.Width; ++x)
                 {
-                    int ax, ay;
+                    int ax;
+                    int ay;
+
                     ay = y;
                     ax = reverse_horizontal ?
                         bitmap.Width - 1 - x :

@@ -514,7 +514,10 @@ namespace SilverSim.Types
             {
                 return false;
             }
-            double x, y, z, w;
+            double x;
+            double y;
+            double z;
+            double w;
             if(!double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
                !double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
                 !double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z))
@@ -596,7 +599,9 @@ namespace SilverSim.Types
         {
             get
             {
-                double x, y, z;
+                double x;
+                double y;
+                double z;
 
                 Normalize();
 
@@ -611,7 +616,9 @@ namespace SilverSim.Types
         {
             get
             {
-                double x, y, z;
+                double x;
+                double y;
+                double z;
 
                 Normalize();
 
@@ -626,7 +633,9 @@ namespace SilverSim.Types
         {
             get
             {
-                double x, y, z;
+                double x;
+                double y;
+                double z;
 
                 Normalize();
 
@@ -691,14 +700,14 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            return System.String.Format(EnUsCulture, "<{0},{1},{2},{3}>", X, Y, Z, W);
+            return string.Format(EnUsCulture, "<{0},{1},{2},{3}>", X, Y, Z, W);
         }
 
         public string X_String
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0}", X);
+                return string.Format(EnUsCulture, "{0}", X);
             }
         }
 
@@ -706,7 +715,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0}", Y);
+                return string.Format(EnUsCulture, "{0}", Y);
             }
         }
 
@@ -714,7 +723,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0}", Z);
+                return string.Format(EnUsCulture, "{0}", Z);
             }
         }
 
@@ -722,7 +731,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0}", W);
+                return string.Format(EnUsCulture, "{0}", W);
             }
         }
 
@@ -915,7 +924,10 @@ namespace SilverSim.Types
             {
                 norm = 1f / norm;
 
-                double x, y, z;
+                double x;
+                double y;
+                double z;
+
                 if (W >= 0f)
                 {
                     x = X;

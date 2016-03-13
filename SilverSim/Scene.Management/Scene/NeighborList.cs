@@ -64,7 +64,9 @@ namespace SilverSim.Scene.Management.Scene
                     }
                     else
                     {
-                        GridVector aa, bb;
+                        GridVector aa;
+                        GridVector bb;
+
                         aa = otherRegion.Location;
                         bb = otherExtentPos;
                         aa.Y = otherExtentPos.Y;

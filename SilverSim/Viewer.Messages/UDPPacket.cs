@@ -1081,7 +1081,10 @@ namespace SilverSim.Viewer.Messages
         #region Vector
         public Vector3 ReadVector3f()
         {
-            float x, y, z;
+            float x;
+            float y;
+            float z;
+
             x = ReadFloat();
             y = ReadFloat();
             z = ReadFloat();
@@ -1091,7 +1094,10 @@ namespace SilverSim.Viewer.Messages
 
         public Vector3 ReadVector3d()
         {
-            double x, y, z;
+            double x;
+            double y;
+            double z;
+
             x = ReadDouble();
             y = ReadDouble();
             z = ReadDouble();

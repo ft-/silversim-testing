@@ -43,7 +43,10 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(para.Length == 4 && para[0] == "local_pos")
                 {
-                    double x, y, z;
+                    double x;
+                    double y;
+                    double z;
+
                     if(!double.TryParse(para[1], NumberStyles.Float, CultureInfo.InvariantCulture, out x) ||
                         !double.TryParse(para[2], NumberStyles.Float, CultureInfo.InvariantCulture, out y) ||
                         !double.TryParse(para[3], NumberStyles.Float, CultureInfo.InvariantCulture, out z))
