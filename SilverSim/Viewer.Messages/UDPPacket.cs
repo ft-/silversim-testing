@@ -134,37 +134,6 @@ namespace SilverSim.Viewer.Messages
             }
         }
 
-        private void DecodeZLE()
-        {
-            if(!IsZeroEncoded)
-            {
-                return;
-            }
-            byte[] oldData = new byte[DataLength];
-            int extralen = (int)(uint)Data[5];
-            int srcpos = 6 + extralen;
-            int dstpos = 6 + extralen;
-            Buffer.BlockCopy(Data, 0, oldData, 0, DataLength);
-
-            for(;srcpos < DataLength; ++srcpos)
-            {
-                if(oldData[srcpos] == 0)
-                {
-                    uint cnt = oldData[++srcpos];
-                    for (uint i = 0; i < cnt; ++i)
-                    {
-                        Data[dstpos++] = 0;
-                    }
-                }
-                else
-                {
-                    Data[dstpos++] = oldData[srcpos];
-                }
-            }
-            DataLength = dstpos;
-            IsZeroEncoded = false;
-        }
-
         public List<UInt32> Acks
         {
             get
