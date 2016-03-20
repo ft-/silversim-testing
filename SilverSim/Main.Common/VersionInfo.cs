@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text;
 
 namespace SilverSim.Main.Common
 {
@@ -82,6 +83,19 @@ namespace SilverSim.Main.Common
                 }
 
                 return ru;
+            }
+        }
+
+        public static string ArchSpecificId
+        {
+            get
+            {
+                StringBuilder ru = new StringBuilder();
+                ru.Append(Environment.OSVersion.Platform.ToString());
+                ru.Append('-');
+                ru.Append(Environment.Is64BitProcess ? "64" : "32");
+                return ru.ToString();
+
             }
         }
 

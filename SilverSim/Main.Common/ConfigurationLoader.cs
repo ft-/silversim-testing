@@ -165,6 +165,7 @@ namespace SilverSim.Main.Common
         static public readonly Dictionary<Type, string> FeaturesTable = new Dictionary<Type, string>();
         readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
         public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
+        static readonly RwLockedDictionary<string, Assembly> PreloadPlatformAssemblies = new RwLockedDictionary<string, Assembly>();
 
         #region Simulator Shutdown Handler
         readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
@@ -321,6 +322,8 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
             FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
             FeaturesTable[typeof(IServerParamListener)] = "Server Params";
+
+            AppDomain.CurrentDomain.AssemblyResolve += ArchSpecificResolveEventHandler;
         }
 
         public IConfigSource Config
@@ -793,15 +796,14 @@ namespace SilverSim.Main.Common
             return result;
         }
 
-        InterfaceVersionAttribute GetInterfaceVersion(Assembly assembly)
+        static InterfaceVersionAttribute GetInterfaceVersion(Assembly assembly)
         {
             InterfaceVersionAttribute attr = Attribute.GetCustomAttribute(assembly, typeof(InterfaceVersionAttribute)) as InterfaceVersionAttribute;
             if(null != attr)
             {
                 return attr;
             }
-            m_Log.FatalFormat("Assembly {0} misses InterfaceVersion information", assembly.FullName);
-            throw new ConfigurationErrorException();
+            throw new ConfigurationErrorException(string.Format("Assembly {0} misses InterfaceVersion information", assembly.FullName));
         }
  
         private Type FindPluginInAssembly(Assembly assembly, string pluginName)
@@ -819,11 +821,132 @@ namespace SilverSim.Main.Common
             throw new KeyNotFoundException();
         }
 
+        static Assembly ArchSpecificResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            AssemblyName aName = new AssemblyName(args.Name);
+            string assemblyFileName;
+            Assembly assembly;
+            if(PreloadPlatformAssemblies.TryGetValue(aName.Name, out assembly))
+            {
+                return assembly;
+            }
+
+            switch(Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.WinCE:
+                    if (Environment.Is64BitProcess)
+                    {
+                        assemblyFileName = "platform-libs/windows/64/" + aName.Name + ".dll";
+                    }
+                    else
+                    {
+                        assemblyFileName = "platform-libs/windows/32/" + aName.Name + ".dll";
+                    }
+                    break;
+
+                case PlatformID.MacOSX:
+                    if (Environment.Is64BitProcess)
+                    {
+                        assemblyFileName = "platform-libs/macosx/64/" + aName.Name + ".dll";
+                    }
+                    else
+                    {
+                        assemblyFileName = "platform-libs/macosx/32/" + aName.Name + ".dll";
+                    }
+                    break;
+
+                case PlatformID.Unix:
+                    if (Environment.Is64BitProcess)
+                    {
+                        assemblyFileName = "platform-libs/linux/64/" + aName.Name + ".dll";
+                    }
+                    else
+                    {
+                        assemblyFileName = "platform-libs/linux/32/" + aName.Name + ".dll";
+                    }
+                    break;
+
+                default:
+                    return null;
+            }
+
+            if(!File.Exists(assemblyFileName))
+            {
+                return null;
+            }
+            assembly = Assembly.LoadFrom(assemblyFileName);
+            PreloadPlatformAssemblies[aName.Name] = assembly;
+            return assembly;
+        }
+
+        InterfaceVersionAttribute m_OwnInterfaceVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
+
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        private void LoadModule(IConfig config, string modulename)
+        {
+            string[] modulenameparts = modulename.Split(new char[] { ':' }, 2, StringSplitOptions.None);
+            if (modulenameparts.Length < 2)
+            {
+                m_Log.FatalFormat("Invalid Module in section {0}: {1}", config.Name, modulename);
+                throw new ConfigurationErrorException();
+            }
+            string assemblyname = "plugins/" + modulenameparts[0] + ".dll";
+            Assembly assembly;
+            try
+            {
+                assembly = Assembly.LoadFrom(assemblyname);
+            }
+            catch
+            {
+                m_Log.FatalFormat("Failed to load module {0}", assemblyname);
+                throw new ConfigurationErrorException();
+            }
+
+            InterfaceVersionAttribute loadedVersion = GetInterfaceVersion(assembly);
+            if (loadedVersion.Version != m_OwnInterfaceVersion.Version)
+            {
+                m_Log.FatalFormat("Failed to load module {0}: interface version mismatch: {2} != {1}", assemblyname, m_OwnInterfaceVersion, loadedVersion);
+                throw new ConfigurationErrorException();
+            }
+
+            /* try to load class from assembly */
+            Type t;
+            try
+            {
+                t = FindPluginInAssembly(assembly, modulenameparts[1]);
+            }
+            catch (Exception e)
+            {
+                m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}", assemblyname, modulenameparts[1], e.Message);
+                throw new ConfigurationErrorException();
+            }
+
+            if (t == null)
+            {
+                m_Log.FatalFormat("Failed to load factory for {1} in module {0}: factory not found", assemblyname, modulenameparts[1]);
+                throw new ConfigurationErrorException();
+            }
+
+            /* check type inheritance first */
+            if (!t.GetInterfaces().Contains(typeof(IPluginFactory)))
+            {
+                m_Log.FatalFormat("Failed to load factory for {1} in module {0}: not a factory", assemblyname, modulenameparts[1]);
+                throw new ConfigurationErrorException();
+            }
+
+            IPluginFactory module = (IPluginFactory)assembly.CreateInstance(t.FullName);
+            PluginInstances.Add(config.Name, module.Initialize(this, config));
+        }
+
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadModules()
         {
-            InterfaceVersionAttribute ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
+            string archModule = "Module-" + VersionInfo.ArchSpecificId;
             foreach (IConfig config in m_Config.Configs)
             {
                 if (config.Contains("IsTemplate"))
@@ -832,61 +955,13 @@ namespace SilverSim.Main.Common
                 }
                 foreach (string key in config.GetKeys())
                 {
-                    if (key.Equals("Module"))
+                    if(key.Equals(archModule))
                     {
-                        string modulename = config.GetString(key);
-                        string[] modulenameparts = modulename.Split(new char[] {':'}, 2, StringSplitOptions.None);
-                        if(modulenameparts.Length < 2)
-                        {
-                            m_Log.FatalFormat("Invalid Module in section {0}: {1}", config.Name, modulename);
-                            throw new ConfigurationErrorException();
-                        }
-                        string assemblyname = "plugins/" + modulenameparts[0] + ".dll";
-                        Assembly assembly;
-                        try
-                        {
-                            assembly = Assembly.LoadFrom(assemblyname);
-                        }
-                        catch
-                        {
-                            m_Log.FatalFormat("Failed to load module {0}", assemblyname);
-                            throw new ConfigurationErrorException();
-                        }
-
-                        InterfaceVersionAttribute loadedVersion = GetInterfaceVersion(assembly);
-                        if(loadedVersion.Version != ownVersion.Version)
-                        {
-                            m_Log.FatalFormat("Failed to load module {0}: interface version mismatch: {2} != {1}", assemblyname, ownVersion, loadedVersion);
-                            throw new ConfigurationErrorException();
-                        }
-
-                        /* try to load class from assembly */
-                        Type t;
-                        try
-                        {
-                            t = FindPluginInAssembly(assembly, modulenameparts[1]);
-                        }
-                        catch(Exception e)
-                        {
-                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}", assemblyname, modulenameparts[1], e.Message);
-                            throw new ConfigurationErrorException();
-                        }
-
-                        if(t == null)
-                        {
-                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: factory not found", assemblyname, modulenameparts[1]);
-                            throw new ConfigurationErrorException();
-                        }
-
-                        /* check type inheritance first */
-                        if (!t.GetInterfaces().Contains(typeof(IPluginFactory)))
-                        {
-                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: not a factory", assemblyname, modulenameparts[1]);
-                            throw new ConfigurationErrorException();
-                        }
-
-                        IPluginFactory module = (IPluginFactory)assembly.CreateInstance(t.FullName);
-                        PluginInstances.Add(config.Name, module.Initialize(this, config));
+                        LoadModule(config, config.GetString(key));
+                    }
+                    else if (key.Equals("Module"))
+                    {
+                        LoadModule(config, config.GetString(key));
                     }
                 }
             }
@@ -1258,6 +1333,11 @@ namespace SilverSim.Main.Common
             KnownConfigurationIssues.Add(pleaseUseReleaseMsg);
             m_Log.Error(pleaseUseReleaseMsg);
 #endif
+
+            if(Environment.Is64BitOperatingSystem && !Environment.Is64BitProcess)
+            {
+                KnownConfigurationIssues.Add("Please run as 64-bit process on a 64-bit operating system");
+            }
 
             m_Log.Info("Loading specified modules");
             LoadModules();
