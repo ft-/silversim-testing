@@ -940,11 +940,7 @@ namespace SilverSim.Main.Common
                 }
                 foreach (string key in config.GetKeys())
                 {
-                    if(key.Equals(archModule))
-                    {
-                        LoadModule(config, config.GetString(key));
-                    }
-                    else if (key.Equals("Module"))
+                    if(key.Equals(archModule) || key.Equals("Module"))
                     {
                         LoadModule(config, config.GetString(key));
                     }
