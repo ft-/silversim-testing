@@ -837,36 +837,21 @@ namespace SilverSim.Main.Common
                 case PlatformID.Win32S:
                 case PlatformID.Win32Windows:
                 case PlatformID.WinCE:
-                    if (Environment.Is64BitProcess)
-                    {
-                        assemblyFileName = "platform-libs/windows/64/" + aName.Name + ".dll";
-                    }
-                    else
-                    {
-                        assemblyFileName = "platform-libs/windows/32/" + aName.Name + ".dll";
-                    }
+                    assemblyFileName = Environment.Is64BitProcess ? 
+                        "platform-libs/windows/64/" + aName.Name + ".dll" :
+                        "platform-libs/windows/32/" + aName.Name + ".dll";
                     break;
 
                 case PlatformID.MacOSX:
-                    if (Environment.Is64BitProcess)
-                    {
-                        assemblyFileName = "platform-libs/macosx/64/" + aName.Name + ".dll";
-                    }
-                    else
-                    {
-                        assemblyFileName = "platform-libs/macosx/32/" + aName.Name + ".dll";
-                    }
+                    assemblyFileName = Environment.Is64BitProcess ?
+                        "platform-libs/macosx/64/" + aName.Name + ".dll" :
+                        "platform-libs/macosx/32/" + aName.Name + ".dll";
                     break;
 
                 case PlatformID.Unix:
-                    if (Environment.Is64BitProcess)
-                    {
-                        assemblyFileName = "platform-libs/linux/64/" + aName.Name + ".dll";
-                    }
-                    else
-                    {
-                        assemblyFileName = "platform-libs/linux/32/" + aName.Name + ".dll";
-                    }
+                    assemblyFileName = Environment.Is64BitProcess ? 
+                        "platform-libs/linux/64/" + aName.Name + ".dll" :
+                        "platform-libs/linux/32/" + aName.Name + ".dll";
                     break;
 
                 default:
@@ -882,7 +867,7 @@ namespace SilverSim.Main.Common
             return assembly;
         }
 
-        InterfaceVersionAttribute m_OwnInterfaceVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
+        readonly InterfaceVersionAttribute m_OwnInterfaceVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
