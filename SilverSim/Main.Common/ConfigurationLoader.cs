@@ -42,6 +42,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
@@ -949,6 +950,46 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        #region Preload Arch Specific Libraries
+        [DllImport("kernel32.dll")]
+        static extern IntPtr LoadLibrary(string dllToLoad);
+        [DllImport("libdl.so")]
+        static extern IntPtr dlopen(string filename, int flags);
+
+        void LoadArchDlls()
+        {
+            string archModule = "UnmanagedModule-" + VersionInfo.ArchSpecificId;
+            foreach (IConfig config in m_Config.Configs)
+            {
+                if (config.Contains("IsTemplate"))
+                {
+                    continue;
+                }
+                foreach (string key in config.GetKeys())
+                {
+                    if (key.StartsWith(archModule))
+                    {
+                        string fName = config.GetString(key);
+                        if(Environment.OSVersion.Platform == PlatformID.Win32NT)
+                        {
+                            if(LoadLibrary(Path.GetFullPath(fName)) == IntPtr.Zero)
+                            {
+                                throw new ConfigurationLoader.ConfigurationErrorException("unmanaged module " + fName + " not found");
+                            }
+                        }
+                        else
+                        {
+                            if (dlopen(Path.GetFullPath(fName), 0) == IntPtr.Zero)
+                            {
+                                throw new ConfigurationLoader.ConfigurationErrorException("unmanaged module " + fName + " not found");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region Process [ParameterMap] section
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void ProcessParameterMap()
@@ -1319,6 +1360,9 @@ namespace SilverSim.Main.Common
             {
                 KnownConfigurationIssues.Add("Please run as 64-bit process on a 64-bit operating system");
             }
+
+            m_Log.Info("Loading platform modules");
+            LoadArchDlls();
 
             m_Log.Info("Loading specified modules");
             LoadModules();

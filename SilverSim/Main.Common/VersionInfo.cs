@@ -99,6 +99,31 @@ namespace SilverSim.Main.Common
             }
         }
 
+        public static string PlatformLibPath
+        {
+            get
+            {
+                StringBuilder ru = new StringBuilder("platform-libs/");
+                switch(Environment.OSVersion.Platform)
+                {
+                    case PlatformID.Win32NT:
+                        ru.Append("windows/");
+                        break;
+
+                    case PlatformID.MacOSX:
+                        ru.Append("macosx/");
+                        break;
+
+                    case PlatformID.Unix:
+                        ru.Append("unix/");
+                        break;
+                }
+
+                ru.Append(Environment.Is64BitProcess ? "64" : "32");
+                return ru.ToString();
+            }
+        }
+
         public static string SimulatorVersion
         {
             get
