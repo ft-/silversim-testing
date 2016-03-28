@@ -6,7 +6,6 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
-using System;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
 {

@@ -55,6 +55,13 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        public string PhysicsEngineName
+        {
+            get
+            {
+                return "Dummy";
+            }
+        }
 
         public double PhysicsDilationTime
         {

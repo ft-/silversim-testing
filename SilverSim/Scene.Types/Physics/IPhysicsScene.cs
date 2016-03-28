@@ -20,5 +20,7 @@ namespace SilverSim.Scene.Types.Physics
         double PhysicsExecutionTime { get; } /* in seconds */
 
         uint PhysicsFrameNumber { get; }
+
+        string PhysicsEngineName { get; }
     }
 }

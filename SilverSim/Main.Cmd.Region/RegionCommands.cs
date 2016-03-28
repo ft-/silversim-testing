@@ -1072,7 +1072,7 @@ namespace SilverSim.Main.Cmd.Region
 
             StringBuilder output = new StringBuilder();
             output.AppendFormat("Environment FPS: {0}\n", scene.Environment.EnvironmentFps);
-            output.AppendFormat("Physics FPS: {0}\n", scene.PhysicsScene.PhysicsFPS);
+            output.AppendFormat("Physics FPS: {0} (Engine: {1})\n", scene.PhysicsScene.PhysicsFPS, scene.PhysicsScene.PhysicsEngineName);
             output.AppendFormat("Root Agents: {0}", scene.RootAgents.Count);
             io.Write(output.ToString());
         }
