@@ -23,11 +23,7 @@ namespace SilverSim.Main
             {
                 m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent);
             }
-            catch(ConfigurationLoader.ConfigurationErrorException
-#if DEBUG
-                        e
-#endif
-                )
+            catch(ConfigurationLoader.ConfigurationErrorException e)
             {
                 Console.WriteLine(e.Message);
 #if DEBUG
@@ -39,8 +35,7 @@ namespace SilverSim.Main
             {
                 Environment.Exit(1);
             }
-            catch
-                (Exception e)
+            catch(Exception e)
             {
                 Console.WriteLine(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message));
 #if DEBUG
