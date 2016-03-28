@@ -585,7 +585,18 @@ namespace SilverSim.Scene.Implementation.Basic
             ScriptThreadPool = new ScriptWorkerThreadPool(50, 150, ID);
             if(null != physicsFactory)
             {
-                PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);
+                try
+                {
+                    PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);
+                }
+                catch
+                {
+                    ScriptThreadPool.Shutdown();
+                    m_UDPServer.Stop();
+                    IMRouter.SceneIM.Remove(IMSend);
+                    OnRemove -= RemoveScene;
+                    throw;
+                }
             }
             else
             {
