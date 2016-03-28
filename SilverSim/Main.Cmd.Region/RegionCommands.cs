@@ -1053,27 +1053,35 @@ namespace SilverSim.Main.Cmd.Region
             {
                 selectedScene = limitedToScene;
             }
-            else if (io.SelectedScene == UUID.Zero)
-            {
-                io.Write("show regionstats needs a selected region before.");
-                return;
-            }
             else
             {
                 selectedScene = io.SelectedScene;
             }
 
-            SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
-            {
-                io.Write("no scene selected");
-                return;
-            }
-
             StringBuilder output = new StringBuilder();
-            output.AppendFormat("Environment FPS: {0}\n", scene.Environment.EnvironmentFps);
-            output.AppendFormat("Physics FPS: {0} (Engine: {1})\n", scene.PhysicsScene.PhysicsFPS, scene.PhysicsScene.PhysicsEngineName);
-            output.AppendFormat("Root Agents: {0}", scene.RootAgents.Count);
+            if (selectedScene == UUID.Zero)
+            {
+                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                {
+                    output.AppendFormat("Region {0}\n  Env FPS: {1:F2}  Phys FPS: {2:F2}  Phys Engine: {3}\n",
+                        scene.Name,
+                        scene.Environment.EnvironmentFps,
+                        scene.PhysicsScene.PhysicsFPS,
+                        scene.PhysicsScene.PhysicsEngineName);
+                }
+            }
+            else
+            {
+                SceneInterface scene;
+                if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+                {
+                    io.Write("no scene selected");
+                    return;
+                }
+                output.AppendFormat("Environment FPS: {0:F2}\n", scene.Environment.EnvironmentFps);
+                output.AppendFormat("Physics FPS: {0:F2} (Engine: {1})\n", scene.PhysicsScene.PhysicsFPS, scene.PhysicsScene.PhysicsEngineName);
+                output.AppendFormat("Root Agents: {0}", scene.RootAgents.Count);
+            }
             io.Write(output.ToString());
         }
 
