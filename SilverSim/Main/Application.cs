@@ -4,7 +4,6 @@
 using SilverSim.Main.Common;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Threading;
 
 namespace SilverSim.Main
@@ -30,9 +29,9 @@ namespace SilverSim.Main
 #endif
                 )
             {
+                Console.WriteLine(e.Message);
 #if DEBUG
-                System.Console.Write(e.StackTrace);
-                System.Console.WriteLine();
+                Console.WriteLine(e.StackTrace);
 #endif
                 Environment.Exit(1);
             }
@@ -41,14 +40,11 @@ namespace SilverSim.Main
                 Environment.Exit(1);
             }
             catch
-#if DEBUG
                 (Exception e)
-#endif
             {
+                Console.WriteLine(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message));
 #if DEBUG
-                System.Console.Write(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message));
-                System.Console.Write(e.StackTrace);
-                System.Console.WriteLine();
+                Console.WriteLine(e.StackTrace);
 #endif
                 Environment.Exit(1);
             }
