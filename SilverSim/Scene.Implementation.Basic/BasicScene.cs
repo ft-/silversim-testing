@@ -591,10 +591,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
                 catch
                 {
-                    ScriptThreadPool.Shutdown();
-                    m_UDPServer.Stop();
-                    IMRouter.SceneIM.Remove(IMSend);
-                    OnRemove -= RemoveScene;
+                    RemoveScene(this);
                     throw;
                 }
             }
