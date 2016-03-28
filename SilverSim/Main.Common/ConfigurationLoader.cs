@@ -953,8 +953,6 @@ namespace SilverSim.Main.Common
         #region Preload Arch Specific Libraries
         [DllImport("kernel32.dll")]
         static extern IntPtr LoadLibrary(string dllToLoad);
-        [DllImport("libdl.so")]
-        static extern IntPtr dlopen(string filename, int flags);
 
         void LoadArchDlls()
         {
@@ -973,13 +971,6 @@ namespace SilverSim.Main.Common
                         if(Environment.OSVersion.Platform == PlatformID.Win32NT)
                         {
                             if(LoadLibrary(Path.GetFullPath(fName)) == IntPtr.Zero)
-                            {
-                                throw new ConfigurationLoader.ConfigurationErrorException("unmanaged module " + fName + " not found");
-                            }
-                        }
-                        else
-                        {
-                            if (dlopen(Path.GetFullPath(fName), 0) == IntPtr.Zero)
                             {
                                 throw new ConfigurationLoader.ConfigurationErrorException("unmanaged module " + fName + " not found");
                             }
