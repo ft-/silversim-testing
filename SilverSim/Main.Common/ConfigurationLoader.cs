@@ -968,12 +968,10 @@ namespace SilverSim.Main.Common
                     if (key.StartsWith(archModule))
                     {
                         string fName = config.GetString(key);
-                        if(Environment.OSVersion.Platform == PlatformID.Win32NT)
+                        if(Environment.OSVersion.Platform == PlatformID.Win32NT &&
+                            LoadLibrary(Path.GetFullPath(fName)) == IntPtr.Zero)
                         {
-                            if(LoadLibrary(Path.GetFullPath(fName)) == IntPtr.Zero)
-                            {
-                                throw new ConfigurationLoader.ConfigurationErrorException("unmanaged module " + fName + " not found");
-                            }
+                            throw new ConfigurationLoader.ConfigurationErrorException("unmanaged module " + fName + " not found");
                         }
                     }
                 }

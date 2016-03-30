@@ -117,6 +117,10 @@ namespace SilverSim.Main.Common
                     case PlatformID.Unix:
                         ru.Append("unix/");
                         break;
+
+                    default:
+                        ru.Append("unknown/");
+                        break;
                 }
 
                 ru.Append(Environment.Is64BitProcess ? "64" : "32");
