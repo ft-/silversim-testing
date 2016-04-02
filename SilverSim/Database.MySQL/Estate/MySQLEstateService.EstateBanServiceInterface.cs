@@ -9,53 +9,34 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    public class MySQLEstateBanServiceInterface : EstateBanServiceInterface
+    public partial class MySQLEstateService : IEstateBanServiceInterface, IEstateBanServiceListAccessInterface
     {
-        public sealed class MySQLListAccess : IListAccess
+        List<UUI> IEstateBanServiceListAccessInterface.this[uint estateID]
         {
-            readonly string m_ConnectionString;
-            public MySQLListAccess(string connectionString)
+            get
             {
-                m_ConnectionString = connectionString;
-            }
-
-
-            public List<UUI> this[uint estateID]
-            {
-                get
+                List<UUI> estateusers = new List<UUI>();
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
-                    List<UUI> estateusers = new List<UUI>();
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_bans WHERE EstateID = ?estateid", conn))
                     {
-                        conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_bans WHERE EstateID = ?estateid", conn))
+                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            cmd.Parameters.AddParameter("?estateid", estateID);
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
-                                {
-                                    estateusers.Add(reader.GetUUI("UserID"));
-                                }
+                                estateusers.Add(reader.GetUUI("UserID"));
                             }
                         }
                     }
-                    return estateusers;
                 }
+                return estateusers;
             }
         }
 
-        readonly MySQLListAccess m_ListAccess;
-        readonly string m_ConnectionString;
-
-        public MySQLEstateBanServiceInterface(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-            m_ListAccess = new MySQLListAccess(connectionString);
-        }
-
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override bool this[uint estateID, UUI agent]
+        bool IEstateBanServiceInterface.this[uint estateID, UUI agent]
         {
             get
             {
@@ -105,11 +86,11 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override IListAccess All
+        IEstateBanServiceListAccessInterface IEstateBanServiceInterface.All
         {
             get
             {
-                return m_ListAccess;
+                return this;
             }
         }
     }

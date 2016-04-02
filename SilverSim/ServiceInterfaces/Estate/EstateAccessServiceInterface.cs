@@ -7,22 +7,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Estate
 {
-    public abstract class EstateAccessServiceInterface
+    public interface IEstateAccessServiceListAccessInterface
     {
-        [SuppressMessage("Gendarme.Rules.Design", "ConsiderAddingInterfaceRule")]
-        public interface IListAccess
-        {
-            List<UUI> this[uint estateID] { get; }
-        }
+        List<UUI> this[uint estateID] { get; }
+    }
 
-        public EstateAccessServiceInterface()
-        {
-
-        }
-
+    public interface IEstateAccessServiceInterface
+    {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract bool this[uint estateID, UUI agent] { get; set; }
+        bool this[uint estateID, UUI agent] { get; set; }
 
-        public abstract IListAccess All { get; }
+        IEstateAccessServiceListAccessInterface All { get; }
     }
 }

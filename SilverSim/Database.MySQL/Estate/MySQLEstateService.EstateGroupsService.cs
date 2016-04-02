@@ -4,63 +4,41 @@
 using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    public sealed class MySQLEstateGroupsService : EstateGroupsServiceInterface
+    public partial class MySQLEstateService : IEstateGroupsServiceInterface, IEstateGroupsServiceListAccessInterface
     {
-        readonly string m_ConnectionString;
-        readonly MySQLListAccess m_ListAccess;
-
-        public sealed class MySQLListAccess : IListAccess
+        List<UGI> IEstateGroupsServiceListAccessInterface.this[uint estateID]
         {
-            readonly string m_ConnectionString;
-
-            public MySQLListAccess(string connectionString)
+            get
             {
-                m_ConnectionString = connectionString;
-            }
-
-            public List<UGI> this[uint estateID]
-            {
-                get
+                List<UGI> estategroups = new List<UGI>();
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
-                    List<UGI> estategroups = new List<UGI>();
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid", conn))
                     {
-                        conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid", conn))
+                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            cmd.Parameters.AddParameter("?estateid", estateID);
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
+                            while (reader.Read())
                             {
-                                while (reader.Read())
-                                {
-                                    UGI ugi = new UGI();
-                                    ugi.ID = reader.GetUUID("GroupID");
-                                    estategroups.Add(ugi);
-                                }
+                                UGI ugi = new UGI();
+                                ugi.ID = reader.GetUUID("GroupID");
+                                estategroups.Add(ugi);
                             }
                         }
                     }
-                    return estategroups;
                 }
+                return estategroups;
             }
         }
 
-        public MySQLEstateGroupsService(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-            m_ListAccess = new MySQLListAccess(connectionString);
-        }
-
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override bool this[uint estateID, UGI group]
+        bool IEstateGroupsServiceInterface.this[uint estateID, UGI group]
         {
             get
             {
@@ -100,11 +78,11 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override IListAccess All
+        IEstateGroupsServiceListAccessInterface IEstateGroupsServiceInterface.All
         {
             get 
             {
-                return m_ListAccess;
+                return this;
             }
         }
     }

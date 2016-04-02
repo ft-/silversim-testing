@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using MySql.Data.MySqlClient;
+using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System.Collections.Generic;
@@ -9,86 +10,76 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
-    public sealed partial class MySQLProfileService
+    public sealed partial class MySQLProfileService : ProfileServiceInterface.INotesInterface
     {
-        public sealed class MySQLNotes : INotesInterface
+        bool INotesInterface.ContainsKey(UUI user, UUI target)
         {
-            readonly string m_ConnectionString;
-
-            public MySQLNotes(string connectionString)
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
-                m_ConnectionString = connectionString;
-            }
-
-            public bool ContainsKey(UUI user, UUI target)
-            {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT useruuid FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT useruuid FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
+                    cmd.Parameters.AddParameter("?user", user.ID);
+                    cmd.Parameters.AddParameter("?target", target.ID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddParameter("?user", user.ID);
-                        cmd.Parameters.AddParameter("?target", target.ID);
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        if (reader.Read())
                         {
-                            if (reader.Read())
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }
-
-                return false;
             }
 
-            public bool TryGetValue(UUI user, UUI target, out string notes)
+            return false;
+        }
+
+        bool INotesInterface.TryGetValue(UUI user, UUI target, out string notes)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
+                    cmd.Parameters.AddParameter("?user", user.ID);
+                    cmd.Parameters.AddParameter("?target", target.ID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddParameter("?user", user.ID);
-                        cmd.Parameters.AddParameter("?target", target.ID);
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        if (reader.Read())
                         {
-                            if (reader.Read())
-                            {
-                                notes = (string)reader["notes"];
-                                return true;
-                            }
+                            notes = (string)reader["notes"];
+                            return true;
                         }
                     }
                 }
-
-                notes = string.Empty;
-                return false;
             }
 
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            public string this[UUI user, UUI target]
+            notes = string.Empty;
+            return false;
+        }
+
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        string INotesInterface.this[UUI user, UUI target]
+        {
+            get
             {
-                get
+                string notes;
+                if(!Notes.TryGetValue(user, target, out notes))
                 {
-                    string notes;
-                    if(!TryGetValue(user, target, out notes))
-                    {
-                        throw new KeyNotFoundException();
-                    }
-                    return notes;
+                    throw new KeyNotFoundException();
                 }
-                set
+                return notes;
+            }
+            set
+            {
+                Dictionary<string, object> replaceVals = new Dictionary<string, object>();
+                replaceVals["user"] = user.ID;
+                replaceVals["target"] = target.ID;
+                replaceVals["notes"] = value;
+                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
-                    Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                    replaceVals["user"] = user.ID;
-                    replaceVals["target"] = target.ID;
-                    replaceVals["notes"] = value;
-                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        conn.ReplaceInto("usernotes", replaceVals);
-                    }
+                    conn.Open();
+                    conn.ReplaceInto("usernotes", replaceVals);
                 }
             }
         }

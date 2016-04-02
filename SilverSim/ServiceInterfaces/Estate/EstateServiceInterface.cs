@@ -33,11 +33,11 @@ namespace SilverSim.ServiceInterfaces.Estate
 
         public abstract List<uint> AllIDs { get; }
 
-        public abstract EstateManagerServiceInterface EstateManager { get; }
+        public abstract IEstateManagerServiceInterface EstateManager { get; }
         public abstract IEstateOwnerServiceInterface EstateOwner { get; }
-        public abstract EstateAccessServiceInterface EstateAccess { get; }
-        public abstract EstateBanServiceInterface EstateBans { get; }
-        public abstract EstateGroupsServiceInterface EstateGroup { get; }
+        public abstract IEstateAccessServiceInterface EstateAccess { get; }
+        public abstract IEstateBanServiceInterface EstateBans { get; }
+        public abstract IEstateGroupsServiceInterface EstateGroup { get; }
         public abstract IEstateRegionMapServiceInterface RegionMap { get; }
     }
 }

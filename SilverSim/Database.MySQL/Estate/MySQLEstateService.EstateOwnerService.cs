@@ -8,16 +8,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    public sealed class MySQLEstateOwnerService : IEstateOwnerServiceInterface
+    public partial class MySQLEstateService : IEstateOwnerServiceInterface
     {
-        readonly string m_ConnectionString;
-
-        public MySQLEstateOwnerService(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public bool TryGetValue(uint estateID, out UUI uui)
+        bool IEstateOwnerServiceInterface.TryGetValue(uint estateID, out UUI uui)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -39,7 +32,7 @@ namespace SilverSim.Database.MySQL.Estate
             return false;
         }
 
-        public List<uint> this[UUI owner]
+        List<uint> IEstateOwnerServiceInterface.this[UUI owner]
         {
             get
             {
@@ -68,12 +61,12 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public UUI this[uint estateID]
+        UUI IEstateOwnerServiceInterface.this[uint estateID]
         {
             get
             {
                 UUI uui;
-                if(!TryGetValue(estateID, out uui))
+                if(!EstateOwner.TryGetValue(estateID, out uui))
                 {
                     throw new KeyNotFoundException();
                 }

@@ -8,16 +8,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    public sealed class MySQLEstateRegionMapInterface : IEstateRegionMapServiceInterface
+    public partial class MySQLEstateService : IEstateRegionMapServiceInterface
     {
-        readonly string m_ConnectionString;
-
-        public MySQLEstateRegionMapInterface(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public List<UUID> this[uint estateID]
+        List<UUID> IEstateRegionMapServiceInterface.this[uint estateID]
         {
             get 
             {
@@ -41,7 +34,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public bool TryGetValue(UUID regionID, out uint estateID)
+        bool IEstateRegionMapServiceInterface.TryGetValue(UUID regionID, out uint estateID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -64,7 +57,7 @@ namespace SilverSim.Database.MySQL.Estate
             return false;
         }
 
-        public bool Remove(UUID regionID)
+        bool IEstateRegionMapServiceInterface.Remove(UUID regionID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -84,12 +77,12 @@ namespace SilverSim.Database.MySQL.Estate
             return false;
         }
 
-        public uint this[UUID regionID]
+        uint IEstateRegionMapServiceInterface.this[UUID regionID]
         {
             get
             {
                 uint estateID;
-                if(!TryGetValue(regionID, out estateID))
+                if(!RegionMap.TryGetValue(regionID, out estateID))
                 {
                     throw new KeyNotFoundException();
                 }

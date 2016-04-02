@@ -21,7 +21,7 @@ namespace SilverSim.Database.MySQL.Asset
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Asset Backend")]
-    public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, AssetDataServiceInterface, AssetMetadataServiceInterface
+    public sealed class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, AssetDataServiceInterface, AssetMetadataServiceInterface
     {
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
 

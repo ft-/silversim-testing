@@ -20,28 +20,15 @@ namespace SilverSim.Database.MySQL.Estate
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Estate Backend")]
-    public sealed class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
+    public sealed partial class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
-
-        readonly MySQLEstateOwnerService m_EstateOwnerService;
-        readonly MySQLEstateManagerService m_EstateManagerService;
-        readonly MySQLEstateAccessInterface m_EstateAccessService;
-        readonly MySQLEstateBanServiceInterface m_EstateBanService;
-        readonly MySQLEstateGroupsService m_EstateGroupsService;
-        readonly MySQLEstateRegionMapInterface m_EstateRegionMapService;
 
         #region Constructor
         public MySQLEstateService(string connectionString)
         {
             m_ConnectionString = connectionString;
-            m_EstateOwnerService = new MySQLEstateOwnerService(connectionString);
-            m_EstateManagerService = new MySQLEstateManagerService(connectionString);
-            m_EstateAccessService = new MySQLEstateAccessInterface(connectionString);
-            m_EstateBanService = new MySQLEstateBanServiceInterface(connectionString);
-            m_EstateGroupsService = new MySQLEstateGroupsService(connectionString);
-            m_EstateRegionMapService = new MySQLEstateRegionMapInterface(connectionString);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -364,11 +351,11 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override EstateManagerServiceInterface EstateManager
+        public override IEstateManagerServiceInterface EstateManager
         {
             get
             {
-                return m_EstateManagerService;
+                return this;
             }
         }
 
@@ -376,31 +363,31 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get 
             {
-                return m_EstateOwnerService;
+                return this;
             }
         }
 
-        public override EstateAccessServiceInterface EstateAccess
+        public override IEstateAccessServiceInterface EstateAccess
         {
             get 
             {
-                return m_EstateAccessService;
+                return this;
             }
         }
 
-        public override EstateBanServiceInterface EstateBans
+        public override IEstateBanServiceInterface EstateBans
         {
             get
             {
-                return m_EstateBanService;
+                return this;
             }
         }
 
-        public override EstateGroupsServiceInterface EstateGroup
+        public override IEstateGroupsServiceInterface EstateGroup
         {
             get 
             {
-                return m_EstateGroupsService;
+                return this;
             }
         }
 
@@ -408,7 +395,7 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get 
             {
-                return m_EstateRegionMapService;
+                return this;
             }
         }
     }

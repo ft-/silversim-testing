@@ -22,20 +22,10 @@ namespace SilverSim.Database.MySQL.Profile
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");
 
         readonly string m_ConnectionString;
-        readonly IClassifiedsInterface m_Classifieds;
-        readonly IPicksInterface m_Picks;
-        readonly INotesInterface m_Notes;
-        readonly IUserPreferencesInterface m_UserPreferences;
-        readonly IPropertiesInterface m_Properties;
 
         public MySQLProfileService(string connectionString)
         {
             m_ConnectionString = connectionString;
-            m_Classifieds = new MySQLClassifieds(connectionString);
-            m_Picks = new MySQLPicks(connectionString);
-            m_Notes = new MySQLNotes(connectionString);
-            m_UserPreferences = new MySQLUserPreferences(connectionString);
-            m_Properties = new MySQLProperties(connectionString);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -88,7 +78,7 @@ namespace SilverSim.Database.MySQL.Profile
         {
             get
             {
-                return m_Classifieds;
+                return this;
             }
         }
 
@@ -96,7 +86,7 @@ namespace SilverSim.Database.MySQL.Profile
         {
             get
             {
-                return m_Picks;
+                return this;
             }
         }
 
@@ -104,7 +94,7 @@ namespace SilverSim.Database.MySQL.Profile
         {
             get 
             {
-                return m_Notes;
+                return this;
             }
         }
 
@@ -112,7 +102,7 @@ namespace SilverSim.Database.MySQL.Profile
         {
             get 
             {
-                return m_UserPreferences;
+                return this;
             }
         }
 
@@ -120,7 +110,7 @@ namespace SilverSim.Database.MySQL.Profile
         {
             get
             {
-                return m_Properties;
+                return this;
             }
         }
 

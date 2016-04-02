@@ -22,7 +22,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Deduplication Asset Backend")]
-    public class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, AssetMetadataServiceInterface, AssetDataServiceInterface
+    public sealed class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, AssetMetadataServiceInterface, AssetDataServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
 

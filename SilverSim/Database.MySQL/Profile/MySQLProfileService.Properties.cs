@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using MySql.Data.MySqlClient;
+using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System.Collections.Generic;
@@ -9,100 +10,90 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
-    public sealed partial class MySQLProfileService
+    public sealed partial class MySQLProfileService : ProfileServiceInterface.IPropertiesInterface
     {
-        public sealed class MySQLProperties : IPropertiesInterface
+        ProfileProperties IPropertiesInterface.this[UUI user]
         {
-            readonly string m_ConnectionString;
-
-            public MySQLProperties(string connectionString)
+            get
             {
-                m_ConnectionString = connectionString;
-            }
-
-            public ProfileProperties this[UUI user]
-            {
-                get
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE ?uuid", conn))
                     {
-                        conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE ?uuid", conn))
+                        cmd.Parameters.AddParameter("?uuid", user.ID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            cmd.Parameters.AddParameter("?uuid", user.ID);
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
+                            if (reader.Read())
                             {
-                                if (reader.Read())
-                                {
-                                    ProfileProperties props = new ProfileProperties();
-                                    props.User = user;
-                                    props.Partner.ID = reader.GetUUID("profilePartner");
-                                    props.PublishProfile = reader.GetBool("profileAllowPublish");
-                                    props.PublishMature = reader.GetBool("profileMaturePublish");
-                                    props.WebUrl = reader.GetString("profileURL");
-                                    props.WantToMask = reader.GetUInt32("profileWantToMask");
-                                    props.WantToText = reader.GetString("profileWantToText");
-                                    props.SkillsMask = reader.GetUInt32("profileSkillsMask");
-                                    props.SkillsText = reader.GetString("profileSkillsText");
-                                    props.Language = reader.GetString("profileLanguages");
-                                    props.ImageID = reader.GetUUID("profileImage");
-                                    props.AboutText = reader.GetString("profileAboutText");
-                                    props.FirstLifeImageID = reader.GetString("profileFirstImage");
-                                    props.FirstLifeText = reader.GetString("profileFirstText");
-                                    return props;
-                                }
-                                else
-                                {
-                                    ProfileProperties props = new ProfileProperties();
-                                    props.User = user;
-                                    return props;
-                                }
+                                ProfileProperties props = new ProfileProperties();
+                                props.User = user;
+                                props.Partner.ID = reader.GetUUID("profilePartner");
+                                props.PublishProfile = reader.GetBool("profileAllowPublish");
+                                props.PublishMature = reader.GetBool("profileMaturePublish");
+                                props.WebUrl = reader.GetString("profileURL");
+                                props.WantToMask = reader.GetUInt32("profileWantToMask");
+                                props.WantToText = reader.GetString("profileWantToText");
+                                props.SkillsMask = reader.GetUInt32("profileSkillsMask");
+                                props.SkillsText = reader.GetString("profileSkillsText");
+                                props.Language = reader.GetString("profileLanguages");
+                                props.ImageID = reader.GetUUID("profileImage");
+                                props.AboutText = reader.GetString("profileAboutText");
+                                props.FirstLifeImageID = reader.GetString("profileFirstImage");
+                                props.FirstLifeText = reader.GetString("profileFirstText");
+                                return props;
+                            }
+                            else
+                            {
+                                ProfileProperties props = new ProfileProperties();
+                                props.User = user;
+                                return props;
                             }
                         }
                     }
                 }
             }
+        }
 
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        ProfileProperties IPropertiesInterface.this[UUI user, PropertiesUpdateFlags flags]
+        {
+            set
             {
-                set
+                Dictionary<string, object> replaceVals = new Dictionary<string, object>();
+                replaceVals["useruuid"] = user.ID;
+                if ((flags & PropertiesUpdateFlags.Properties) != 0)
                 {
-                    Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                    replaceVals["useruuid"] = user.ID;
-                    if ((flags & PropertiesUpdateFlags.Properties) != 0)
-                    {
-                        replaceVals["profileAllowPublish"] = value.PublishProfile;
-                        replaceVals["profileMaturePublish"] = value.PublishMature;
-                        replaceVals["profileURL"] = value.WebUrl;
-                        replaceVals["profileImage"] = value.ImageID;
-                        replaceVals["profileAboutText"] = value.AboutText;
-                        replaceVals["profileFirstImage"] = value.FirstLifeImageID;
-                        replaceVals["profileFirstText"] = value.FirstLifeText;
-                    }
-                    if((flags & PropertiesUpdateFlags.Interests) != 0)
-                    {
-                        replaceVals["profileWantToMask"] = value.WantToMask;
-                        replaceVals["profileWantToText"] = value.WantToText;
-                        replaceVals["profileSkillsMask"] = value.SkillsMask;
-                        replaceVals["profileSkillsText"] = value.SkillsText;
-                        replaceVals["profileLanguages"] = value.Language;
-                    }
+                    replaceVals["profileAllowPublish"] = value.PublishProfile;
+                    replaceVals["profileMaturePublish"] = value.PublishMature;
+                    replaceVals["profileURL"] = value.WebUrl;
+                    replaceVals["profileImage"] = value.ImageID;
+                    replaceVals["profileAboutText"] = value.AboutText;
+                    replaceVals["profileFirstImage"] = value.FirstLifeImageID;
+                    replaceVals["profileFirstText"] = value.FirstLifeText;
+                }
+                if((flags & PropertiesUpdateFlags.Interests) != 0)
+                {
+                    replaceVals["profileWantToMask"] = value.WantToMask;
+                    replaceVals["profileWantToText"] = value.WantToText;
+                    replaceVals["profileSkillsMask"] = value.SkillsMask;
+                    replaceVals["profileSkillsText"] = value.SkillsText;
+                    replaceVals["profileLanguages"] = value.Language;
+                }
 
-                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    try
                     {
-                        conn.Open();
-                        try
-                        {
-                            conn.InsertInto("userprofile", replaceVals);
-                        }
-                        catch
-                        {
-                            replaceVals.Remove("useruuid");
-                            conn.UpdateSet("userprofile", replaceVals, "useruuid LIKE '" + user.ID.ToString() + "'");
-                        }
+                        conn.InsertInto("userprofile", replaceVals);
+                    }
+                    catch
+                    {
+                        replaceVals.Remove("useruuid");
+                        conn.UpdateSet("userprofile", replaceVals, "useruuid LIKE '" + user.ID.ToString() + "'");
                     }
                 }
             }
