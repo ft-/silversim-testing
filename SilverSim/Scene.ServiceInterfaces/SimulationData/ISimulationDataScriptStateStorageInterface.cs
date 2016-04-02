@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
-    public interface IISimulationDataScriptStateStorageInterface
+    public interface ISimulationDataScriptStateStorageInterface
     {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         byte[] this[UUID regionID, UUID primID, UUID itemID] { get; set; }
