@@ -7,113 +7,11 @@ using SilverSim.Types.Asset;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        public class DefaultAssetMetadataService : AssetMetadataServiceInterface
-        {
-            readonly SceneInterface m_Scene;
-
-            internal DefaultAssetMetadataService(SceneInterface scene)
-            {
-                m_Scene = scene;
-            }
-
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            public override AssetMetadata this[UUID key] 
-            { 
-                get
-                {
-                    try
-                    {
-                        return m_Scene.TemporaryAssetService.Metadata[key];
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            return m_Scene.PersistentAssetService.Metadata[key];
-                        }
-                        catch
-                        {
-                            AssetMetadata md = ResourceAssets.Metadata[key];
-                            md.Temporary = false;
-                            return md;
-                        }
-                    }
-                }
-            }
-
-            public override bool TryGetValue(UUID key, out AssetMetadata metadata)
-            {
-                if(m_Scene.TemporaryAssetService.Metadata.TryGetValue(key, out metadata))
-                {
-                    return true;
-                }
-
-                if(m_Scene.PersistentAssetService.Metadata.TryGetValue(key, out metadata))
-                {
-                    return true;
-                }
-                
-                if(ResourceAssets.Metadata.TryGetValue(key, out metadata))
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        public class DefaultAssetDataService : AssetDataServiceInterface
-        {
-            readonly SceneInterface m_Scene;
-
-            internal DefaultAssetDataService(SceneInterface scene)
-            {
-                m_Scene = scene;
-            }
-
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            public override Stream this[UUID key]
-            {
-                get
-                {
-                    Stream s;
-                    if(!TryGetValue(key, out s))
-                    {
-                        throw new AssetNotFoundException(key);
-                    }
-                    return s;
-                }
-            }
-
-            public override bool TryGetValue(UUID key, out Stream s)
-            {
-                if(m_Scene.TemporaryAssetService.Data.TryGetValue(key, out s))
-                {
-                    return true;
-                }
-                if (m_Scene.PersistentAssetService.Data.TryGetValue(key, out s))
-                {
-                    return true;
-                }
-                AssetData ad;
-                if(ResourceAssets.TryGetValue(key, out ad))
-                {
-                    ad.Local = false;
-                    ad.Temporary = false;
-                    m_Scene.PersistentAssetService.Store(ad);
-                    s = new MemoryStream(ad.Data);
-                    return true;
-                }
-                return false;
-            }
-        }
-
         public class DefaultAssetReferencesService : AssetReferencesServiceInterface
         {
             readonly SceneInterface m_Scene;
@@ -147,18 +45,14 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public class DefaultAssetService : AssetServiceInterface
+        public class DefaultAssetService : AssetServiceInterface, AssetMetadataServiceInterface, AssetDataServiceInterface
         {
             readonly SceneInterface m_Scene;
-            readonly DefaultAssetMetadataService m_MetadataService;
-            readonly DefaultAssetDataService m_DataService;
             readonly DefaultAssetReferencesService m_ReferencesService;
 
             internal DefaultAssetService(SceneInterface si)
             {
                 m_Scene = si;
-                m_MetadataService = new DefaultAssetMetadataService(si);
-                m_DataService = new DefaultAssetDataService(si);
                 m_ReferencesService = new DefaultAssetReferencesService(si);
             }
 
@@ -166,10 +60,53 @@ namespace SilverSim.Scene.Types.Scene
             { 
                 get
                 {
-                    return m_MetadataService;
+                    return this;
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+            AssetMetadata AssetMetadataServiceInterface.this[UUID key]
+            {
+                get
+                {
+                    try
+                    {
+                        return m_Scene.TemporaryAssetService.Metadata[key];
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            return m_Scene.PersistentAssetService.Metadata[key];
+                        }
+                        catch
+                        {
+                            AssetMetadata md = ResourceAssets.Metadata[key];
+                            md.Temporary = false;
+                            return md;
+                        }
+                    }
+                }
+            }
+
+            bool AssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
+            {
+                if (m_Scene.TemporaryAssetService.Metadata.TryGetValue(key, out metadata))
+                {
+                    return true;
+                }
+
+                if (m_Scene.PersistentAssetService.Metadata.TryGetValue(key, out metadata))
+                {
+                    return true;
+                }
+
+                if (ResourceAssets.Metadata.TryGetValue(key, out metadata))
+                {
+                    return true;
+                }
+                return false;
+            }
             public override AssetReferencesServiceInterface References 
             { 
                 get
@@ -182,10 +119,46 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    return m_DataService;
+                    return this;
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+            Stream AssetDataServiceInterface.this[UUID key]
+            {
+                get
+                {
+                    Stream s;
+                    if (!Data.TryGetValue(key, out s))
+                    {
+                        throw new AssetNotFoundException(key);
+                    }
+                    return s;
+                }
+            }
+
+            bool AssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+            {
+                if (m_Scene.TemporaryAssetService.Data.TryGetValue(key, out s))
+                {
+                    return true;
+                }
+                if (m_Scene.PersistentAssetService.Data.TryGetValue(key, out s))
+                {
+                    return true;
+                }
+                AssetData ad;
+                if (ResourceAssets.TryGetValue(key, out ad))
+                {
+                    ad.Local = false;
+                    ad.Temporary = false;
+                    m_Scene.PersistentAssetService.Store(ad);
+                    s = new MemoryStream(ad.Data);
+                    return true;
+                }
+                return false;
+            }
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override AssetData this[UUID key]
             {

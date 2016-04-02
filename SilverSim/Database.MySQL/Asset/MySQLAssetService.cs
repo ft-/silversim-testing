@@ -14,27 +14,24 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace SilverSim.Database.MySQL.Asset
 {
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Asset Backend")]
-    public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin
+    public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, AssetDataServiceInterface, AssetMetadataServiceInterface
     {
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
 
         readonly string m_ConnectionString;
-        readonly MySQLAssetMetadataService m_MetadataService;
         readonly DefaultAssetReferencesService m_ReferencesService;
-        readonly MySQLAssetDataService m_DataService;
 
         #region Constructor
         public MySQLAssetService(string connectionString)
         {
             m_ConnectionString = connectionString;
-            m_MetadataService = new MySQLAssetMetadataService(connectionString);
-            m_DataService = new MySQLAssetDataService(connectionString);
             m_ReferencesService = new DefaultAssetReferencesService(this);
         }
 
@@ -203,8 +200,51 @@ namespace SilverSim.Database.MySQL.Asset
         {
             get
             {
-                return m_MetadataService;
+                return this;
             }
+        }
+
+        AssetMetadata AssetMetadataServiceInterface.this[UUID key]
+        {
+            get
+            {
+                AssetMetadata metadata;
+                if (!Metadata.TryGetValue(key, out metadata))
+                {
+                    throw new AssetNotFoundException(key);
+                }
+                return metadata;
+            }
+        }
+
+        bool AssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id=?id", conn))
+                {
+                    cmd.Parameters.AddParameter("?id", key);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            metadata = new AssetMetadata();
+                            metadata.ID = dbReader.GetUUID("id");
+                            metadata.Type = dbReader.GetEnum<AssetType>("assetType");
+                            metadata.Name = dbReader.GetString("name");
+                            metadata.Creator = dbReader.GetUUI("CreatorID");
+                            metadata.CreateTime = dbReader.GetDate("create_time");
+                            metadata.AccessTime = dbReader.GetDate("access_time");
+                            metadata.Flags = dbReader.GetEnum<AssetFlags>("asset_flags");
+                            metadata.Temporary = dbReader.GetBoolean("temporary");
+                            return true;
+                        }
+                    }
+                }
+            }
+            metadata = null;
+            return false;
         }
         #endregion
 
@@ -223,8 +263,45 @@ namespace SilverSim.Database.MySQL.Asset
         {
             get
             {
-                return m_DataService;
+                return this;
             }
+        }
+
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+        Stream AssetDataServiceInterface.this[UUID key]
+        {
+            get
+            {
+                Stream s;
+                if (!Data.TryGetValue(key, out s))
+                {
+                    throw new AssetNotFoundException(key);
+                }
+                return s;
+            }
+        }
+
+        bool AssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT data FROM assets WHERE id=?id", conn))
+                {
+                    cmd.Parameters.AddParameter("?id", key);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            s = new MemoryStream(dbReader.GetBytes("data"));
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            s = null;
+            return false;
         }
         #endregion
 

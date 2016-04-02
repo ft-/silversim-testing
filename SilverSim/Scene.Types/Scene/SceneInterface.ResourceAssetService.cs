@@ -55,16 +55,26 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public class ResourceAssetMetadataService : AssetMetadataServiceInterface
+        public class ResourceAssetService : AssetServiceInterface, AssetDataServiceInterface, AssetMetadataServiceInterface
         {
             readonly ResourceAssetAccessor m_ResourceAssets;
+            readonly ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
 
-            internal ResourceAssetMetadataService(ResourceAssetAccessor resourceAssets)
+            public ResourceAssetService()
             {
-                m_ResourceAssets = resourceAssets;
+                m_ResourceAssets = new ResourceAssetAccessor();
+                m_ReferencesService = new SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
             }
 
-            public override AssetMetadata this[UUID key]
+            public override AssetMetadataServiceInterface Metadata
+            {
+                get
+                {
+                    return this;
+                }
+            }
+
+            AssetMetadata AssetMetadataServiceInterface.this[UUID key]
             {
                 get
                 {
@@ -83,7 +93,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            public override bool TryGetValue(UUID key, out AssetMetadata metadata)
+            bool AssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
             {
                 if (!m_ResourceAssets.ContainsAsset(key))
                 {
@@ -93,62 +103,6 @@ namespace SilverSim.Scene.Types.Scene
                 metadata = this[key];
                 return true;
             }
-        }
-
-        public class ResourceAssetDataService : AssetDataServiceInterface
-        {
-            readonly ResourceAssetAccessor m_ResourceAssets;
-
-            internal ResourceAssetDataService(ResourceAssetAccessor resourceAssets)
-            {
-                m_ResourceAssets = resourceAssets;
-            }
-
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            public override Stream this[UUID key]
-            {
-                get
-                {
-                    AssetData ad = m_ResourceAssets.GetAsset(key);
-                    return new MemoryStream(ad.Data);
-                }
-            }
-
-            public override bool TryGetValue(UUID key, out Stream s)
-            {
-                if(!m_ResourceAssets.ContainsAsset(key))
-                {
-                    s = null;
-                    return false;
-                }
-                s = this[key];
-                return true;
-            }
-        }
-
-        public class ResourceAssetService : AssetServiceInterface
-        {
-            readonly ResourceAssetAccessor m_ResourceAssets;
-            readonly ResourceAssetMetadataService m_MetadataService;
-            readonly ResourceAssetDataService m_DataService;
-            readonly SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
-
-            public ResourceAssetService()
-            {
-                m_ResourceAssets = new ResourceAssetAccessor();
-                m_DataService = new ResourceAssetDataService(m_ResourceAssets);
-                m_MetadataService = new ResourceAssetMetadataService(m_ResourceAssets);
-                m_ReferencesService = new SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
-            }
-
-            public override AssetMetadataServiceInterface Metadata
-            {
-                get
-                {
-                    return m_MetadataService;
-                }
-            }
-
             public override AssetReferencesServiceInterface References
             {
                 get
@@ -161,8 +115,29 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    return m_DataService;
+                    return this;
                 }
+            }
+
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+            Stream AssetDataServiceInterface.this[UUID key]
+            {
+                get
+                {
+                    AssetData ad = m_ResourceAssets.GetAsset(key);
+                    return new MemoryStream(ad.Data);
+                }
+            }
+
+            bool AssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+            {
+                if (!m_ResourceAssets.ContainsAsset(key))
+                {
+                    s = null;
+                    return false;
+                }
+                s = Data[key];
+                return true;
             }
 
             public override AssetData this[UUID key]

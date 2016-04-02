@@ -6,22 +6,15 @@ using SilverSim.Types.Asset;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public abstract class AssetMetadataServiceInterface
+    public interface AssetMetadataServiceInterface
     {
         #region Metadata accessors
-        public abstract AssetMetadata this[UUID key]
+        AssetMetadata this[UUID key]
         {
             get;
         }
 
-        public abstract bool TryGetValue(UUID key, out AssetMetadata metadata);
-        #endregion
-
-        #region Constructor
-        public AssetMetadataServiceInterface()
-        {
-
-        }
+        bool TryGetValue(UUID key, out AssetMetadata metadata);
         #endregion
     }
 }

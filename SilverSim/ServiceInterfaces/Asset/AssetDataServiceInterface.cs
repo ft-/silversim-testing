@@ -7,22 +7,15 @@ using System.IO;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public abstract class AssetDataServiceInterface
+    public interface AssetDataServiceInterface
     {
         #region Data accessors
-        public abstract Stream this[UUID key]
+        Stream this[UUID key]
         {
             get;
         }
 
-        public abstract bool TryGetValue(UUID key, out Stream s);
-        #endregion
-
-        #region Constructor
-        public AssetDataServiceInterface()
-        {
-
-        }
+        bool TryGetValue(UUID key, out Stream s);
         #endregion
     }
 }
