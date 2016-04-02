@@ -22,7 +22,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Deduplication Asset Backend")]
-    public sealed class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, AssetMetadataServiceInterface, AssetDataServiceInterface
+    public sealed class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
 
@@ -197,7 +197,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region Metadata interface
-        public override AssetMetadataServiceInterface Metadata
+        public override IAssetMetadataServiceInterface Metadata
         {
             get
             {
@@ -205,7 +205,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             }
         }
 
-        AssetMetadata AssetMetadataServiceInterface.this[UUID key]
+        AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
         {
             get
             {
@@ -218,7 +218,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             }
         }
 
-        bool AssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
+        bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -260,7 +260,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region Data interface
-        public override AssetDataServiceInterface Data
+        public override IAssetDataServiceInterface Data
         {
             get
             {
@@ -269,7 +269,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        Stream AssetDataServiceInterface.this[UUID key]
+        Stream IAssetDataServiceInterface.this[UUID key]
         {
             get
             {
@@ -282,7 +282,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             }
         }
 
-        bool AssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+        bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

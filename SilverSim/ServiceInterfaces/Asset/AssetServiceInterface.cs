@@ -25,7 +25,7 @@ namespace SilverSim.ServiceInterfaces.Asset
         #endregion
 
         #region Metadata interface
-        public abstract AssetMetadataServiceInterface Metadata
+        public abstract IAssetMetadataServiceInterface Metadata
         {
             get;
         }
@@ -39,7 +39,7 @@ namespace SilverSim.ServiceInterfaces.Asset
         #endregion
 
         #region Data interface
-        public abstract AssetDataServiceInterface Data
+        public abstract IAssetDataServiceInterface Data
         {
             get;
         }

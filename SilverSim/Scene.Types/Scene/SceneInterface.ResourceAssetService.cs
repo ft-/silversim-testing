@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public class ResourceAssetService : AssetServiceInterface, AssetDataServiceInterface, AssetMetadataServiceInterface
+        public class ResourceAssetService : AssetServiceInterface, IAssetDataServiceInterface, IAssetMetadataServiceInterface
         {
             readonly ResourceAssetAccessor m_ResourceAssets;
             readonly ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
@@ -66,7 +66,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_ReferencesService = new SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
             }
 
-            public override AssetMetadataServiceInterface Metadata
+            public override IAssetMetadataServiceInterface Metadata
             {
                 get
                 {
@@ -74,7 +74,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            AssetMetadata AssetMetadataServiceInterface.this[UUID key]
+            AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
             {
                 get
                 {
@@ -93,7 +93,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            bool AssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
+            bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
             {
                 if (!m_ResourceAssets.ContainsAsset(key))
                 {
@@ -111,7 +111,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            public override AssetDataServiceInterface Data
+            public override IAssetDataServiceInterface Data
             {
                 get
                 {
@@ -120,7 +120,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            Stream AssetDataServiceInterface.this[UUID key]
+            Stream IAssetDataServiceInterface.this[UUID key]
             {
                 get
                 {
@@ -129,7 +129,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            bool AssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+            bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
             {
                 if (!m_ResourceAssets.ContainsAsset(key))
                 {

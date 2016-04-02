@@ -21,7 +21,7 @@ namespace SilverSim.Database.MySQL.Asset
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Asset Backend")]
-    public sealed class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, AssetDataServiceInterface, AssetMetadataServiceInterface
+    public sealed class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetDataServiceInterface, IAssetMetadataServiceInterface
     {
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
 
@@ -196,7 +196,7 @@ namespace SilverSim.Database.MySQL.Asset
         #endregion
 
         #region Metadata interface
-        public override AssetMetadataServiceInterface Metadata
+        public override IAssetMetadataServiceInterface Metadata
         {
             get
             {
@@ -204,7 +204,7 @@ namespace SilverSim.Database.MySQL.Asset
             }
         }
 
-        AssetMetadata AssetMetadataServiceInterface.this[UUID key]
+        AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
         {
             get
             {
@@ -217,7 +217,7 @@ namespace SilverSim.Database.MySQL.Asset
             }
         }
 
-        bool AssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
+        bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -259,7 +259,7 @@ namespace SilverSim.Database.MySQL.Asset
         #endregion
 
         #region Data interface
-        public override AssetDataServiceInterface Data
+        public override IAssetDataServiceInterface Data
         {
             get
             {
@@ -268,7 +268,7 @@ namespace SilverSim.Database.MySQL.Asset
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        Stream AssetDataServiceInterface.this[UUID key]
+        Stream IAssetDataServiceInterface.this[UUID key]
         {
             get
             {
@@ -281,7 +281,7 @@ namespace SilverSim.Database.MySQL.Asset
             }
         }
 
-        bool AssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+        bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

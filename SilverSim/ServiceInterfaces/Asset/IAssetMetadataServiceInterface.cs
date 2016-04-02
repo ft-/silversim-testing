@@ -3,19 +3,18 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using System.IO;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public interface AssetDataServiceInterface
+    public interface IAssetMetadataServiceInterface
     {
-        #region Data accessors
-        Stream this[UUID key]
+        #region Metadata accessors
+        AssetMetadata this[UUID key]
         {
             get;
         }
 
-        bool TryGetValue(UUID key, out Stream s);
+        bool TryGetValue(UUID key, out AssetMetadata metadata);
         #endregion
     }
 }

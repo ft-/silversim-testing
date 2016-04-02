@@ -45,7 +45,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public class DefaultAssetService : AssetServiceInterface, AssetMetadataServiceInterface, AssetDataServiceInterface
+        public class DefaultAssetService : AssetServiceInterface, IAssetMetadataServiceInterface, IAssetDataServiceInterface
         {
             readonly SceneInterface m_Scene;
             readonly DefaultAssetReferencesService m_ReferencesService;
@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_ReferencesService = new DefaultAssetReferencesService(si);
             }
 
-            public override AssetMetadataServiceInterface Metadata 
+            public override IAssetMetadataServiceInterface Metadata 
             { 
                 get
                 {
@@ -65,7 +65,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            AssetMetadata AssetMetadataServiceInterface.this[UUID key]
+            AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
             {
                 get
                 {
@@ -89,7 +89,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            bool AssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
+            bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
             {
                 if (m_Scene.TemporaryAssetService.Metadata.TryGetValue(key, out metadata))
                 {
@@ -115,7 +115,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            public override AssetDataServiceInterface Data
+            public override IAssetDataServiceInterface Data
             {
                 get
                 {
@@ -125,7 +125,7 @@ namespace SilverSim.Scene.Types.Scene
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            Stream AssetDataServiceInterface.this[UUID key]
+            Stream IAssetDataServiceInterface.this[UUID key]
             {
                 get
                 {
@@ -138,7 +138,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            bool AssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+            bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
             {
                 if (m_Scene.TemporaryAssetService.Data.TryGetValue(key, out s))
                 {
