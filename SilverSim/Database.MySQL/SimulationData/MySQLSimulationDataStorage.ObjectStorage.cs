@@ -21,18 +21,10 @@ using System.IO;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataObjectStorage : SimulationDataObjectStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataObjectStorageInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
-
-        readonly string m_ConnectionString;
-        public MySQLSimulationDataObjectStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
         #region Objects and Prims within a region by UUID
-        public override List<UUID> ObjectsInRegion(UUID key)
+        List<UUID> ISimulationDataObjectStorageInterface.ObjectsInRegion(UUID key)
         {
             List<UUID> objects = new List<UUID>();
 
@@ -53,7 +45,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             return objects;
         }
 
-        public override List<UUID> PrimitivesInRegion(UUID key)
+        List<UUID> ISimulationDataObjectStorageInterface.PrimitivesInRegion(UUID key)
         {
             List<UUID> objects = new List<UUID>();
 
@@ -238,7 +230,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         #region Load all object groups of a single region
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public override List<ObjectGroup> this[UUID regionID]
+        List<ObjectGroup> ISimulationDataObjectStorageInterface.this[UUID regionID]
         {
             get
             {

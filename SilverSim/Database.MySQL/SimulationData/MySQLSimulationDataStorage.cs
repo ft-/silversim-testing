@@ -10,7 +10,6 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -21,29 +20,13 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         readonly string m_ConnectionString;
-        readonly MySQLSimulationDataObjectStorage m_ObjectStorage;
-        readonly MySQLSimulationDataParcelStorage m_ParcelStorage;
-        readonly MySQLSimulationDataScriptStateStorage m_ScriptStateStorage;
-        readonly MySQLSimulationDataTerrainStorage m_TerrainStorage;
-        readonly MySQLSimulationDataEnvSettingsStorage m_EnvironmentStorage;
-        readonly MySQLSimulationDataRegionSettingsStorage m_RegionSettingsStorage;
-        readonly MySQLSimulationDataSpawnPointStorage m_SpawnPointStorage;
-        readonly MySQLSimulationDataLightShareStorage m_LightShareStorage;
-        readonly MySQLSimulationDataEnvControllerStorage m_EnvironmentControllerStorage;
 
         #region Constructor
         public MySQLSimulationDataStorage(string connectionString)
         {
             m_ConnectionString = connectionString;
-            m_ObjectStorage = new MySQLSimulationDataObjectStorage(connectionString);
-            m_ParcelStorage = new MySQLSimulationDataParcelStorage(connectionString);
-            m_TerrainStorage = new MySQLSimulationDataTerrainStorage(connectionString);
-            m_ScriptStateStorage = new MySQLSimulationDataScriptStateStorage(connectionString);
-            m_EnvironmentStorage = new MySQLSimulationDataEnvSettingsStorage(connectionString);
-            m_RegionSettingsStorage = new MySQLSimulationDataRegionSettingsStorage(connectionString);
-            m_SpawnPointStorage = new MySQLSimulationDataSpawnPointStorage(connectionString);
-            m_LightShareStorage = new MySQLSimulationDataLightShareStorage(connectionString);
-            m_EnvironmentControllerStorage = new MySQLSimulationDataEnvControllerStorage(connectionString);
+            m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccesswhitelist");
+            m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccessblacklist");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -53,74 +36,74 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Properties
-        public override SimulationDataEnvControllerStorageInterface EnvironmentController
+        public override ISimulationDataEnvControllerStorageInterface EnvironmentController
         {
             get
             {
-                return m_EnvironmentControllerStorage;
+                return this;
             }
         }
 
-        public override SimulationDataLightShareStorageInterface LightShare
+        public override ISimulationDataLightShareStorageInterface LightShare
         {
             get
             {
-                return m_LightShareStorage;
+                return this;
             }
         }
 
-        public override SimulationDataSpawnPointStorageInterface Spawnpoints
+        public override ISimulationDataSpawnPointStorageInterface Spawnpoints
         {
             get
             {
-                return m_SpawnPointStorage;
+                return this;
             }
         }
 
-        public override SimulationDataEnvSettingsStorageInterface EnvironmentSettings
+        public override ISimulationDataEnvSettingsStorageInterface EnvironmentSettings
         {
             get 
             {
-                return m_EnvironmentStorage;
+                return this;
             }
         }
 
-        public override SimulationDataObjectStorageInterface Objects
+        public override ISimulationDataObjectStorageInterface Objects
         {
             get
             {
-                return m_ObjectStorage;
+                return this;
             }
         }
 
-        public override SimulationDataParcelStorageInterface Parcels
+        public override ISimulationDataParcelStorageInterface Parcels
         {
             get
             {
-                return m_ParcelStorage;
+                return this;
             }
         }
-        public override SimulationDataScriptStateStorageInterface ScriptStates
+        public override IISimulationDataScriptStateStorageInterface ScriptStates
         {
             get 
             {
-                return m_ScriptStateStorage;
+                return this;
             }
         }
 
-        public override SimulationDataTerrainStorageInterface Terrains
+        public override ISimulationDataTerrainStorageInterface Terrains
         {
             get 
             {
-                return m_TerrainStorage;
+                return this;
             }
         }
 
-        public override SimulationDataRegionSettingsStorageInterface RegionSettings
+        public override ISimulationDataRegionSettingsStorageInterface RegionSettings
         {
             get
             {
-                return m_RegionSettingsStorage;
+                return this;
             }
         }
         #endregion

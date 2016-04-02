@@ -1,33 +1,23 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataParcelStorage : SimulationDataParcelStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataParcelStorageInterface
     {
-        readonly string m_ConnectionString;
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         readonly MySQLSimulationDataParcelAccessListStorage m_WhiteListStorage;
         readonly MySQLSimulationDataParcelAccessListStorage m_BlackListStorage;
 
-        public MySQLSimulationDataParcelStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-            m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccesswhitelist");
-            m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccessblacklist");
-        }
-
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override ParcelInfo this[UUID regionID, UUID parcelID]
+        ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
         {
             get
             {
@@ -104,7 +94,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID, UUID parcelID)
+        bool ISimulationDataParcelStorageInterface.Remove(UUID regionID, UUID parcelID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -116,7 +106,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override List<UUID> ParcelsInRegion(UUID key)
+        List<UUID> ISimulationDataParcelStorageInterface.ParcelsInRegion(UUID key)
         {
             List<UUID> parcels = new List<UUID>();
             using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -136,7 +126,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             return parcels;
         }
 
-        public override void Store(UUID regionID, ParcelInfo parcel)
+        void ISimulationDataParcelStorageInterface.Store(UUID regionID, ParcelInfo parcel)
         {
             Dictionary<string, object> p = new Dictionary<string, object>();
             p["RegionID"] = regionID;
@@ -194,7 +184,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override SimulationDataParcelAccessListStorageInterface WhiteList
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList
         {
             get
             {
@@ -202,7 +192,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override SimulationDataParcelAccessListStorageInterface BlackList
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList
         {
             get
             {

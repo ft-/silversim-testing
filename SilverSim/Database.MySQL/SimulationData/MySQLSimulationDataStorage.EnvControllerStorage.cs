@@ -1,7 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
@@ -9,20 +8,10 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataEnvControllerStorage : SimulationDataEnvControllerStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataEnvControllerStorageInterface
     {
-#if DEBUG
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ENVIRONMENT CONTRLLER SETTINGS SERVICE");
-#endif
 
-        readonly string m_ConnectionString;
-
-        public MySQLSimulationDataEnvControllerStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override bool TryGetValue(UUID regionID, out byte[] settings)
+        bool ISimulationDataEnvControllerStorageInterface.TryGetValue(UUID regionID, out byte[] settings)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -45,12 +34,12 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
 
         /* setting value to null will delete the entry */
-        public override byte[] this[UUID regionID]
+        byte[] ISimulationDataEnvControllerStorageInterface.this[UUID regionID]
         {
             get
             {
                 byte[] settings;
-                if (!TryGetValue(regionID, out settings))
+                if (!EnvironmentController.TryGetValue(regionID, out settings))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -86,7 +75,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID)
+        bool ISimulationDataEnvControllerStorageInterface.Remove(UUID regionID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

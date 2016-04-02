@@ -1,7 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
@@ -10,17 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataScriptStateStorage : SimulationDataScriptStateStorageInterface
+    public partial class MySQLSimulationDataStorage : IISimulationDataScriptStateStorageInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SCRIPT STATE SERVICE");
-
-        readonly string m_ConnectionString;
-        public MySQLSimulationDataScriptStateStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override bool TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state)
+        bool IISimulationDataScriptStateStorageInterface.TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -44,12 +35,12 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         /* setting value to null will delete the entry */
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override byte[] this[UUID regionID, UUID primID, UUID itemID] 
+        byte[] IISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID] 
         {
             get
             {
                 byte[] state;
-                if(!TryGetValue(regionID, primID, itemID, out state))
+                if(!ScriptStates.TryGetValue(regionID, primID, itemID, out state))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -72,7 +63,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID, UUID primID, UUID itemID)
+        bool IISimulationDataScriptStateStorageInterface.Remove(UUID regionID, UUID primID, UUID itemID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {

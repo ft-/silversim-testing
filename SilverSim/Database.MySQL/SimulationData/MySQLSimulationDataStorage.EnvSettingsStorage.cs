@@ -4,27 +4,16 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.WindLight;
+using WindLightSettings = SilverSim.Scene.Types.WindLight.EnvironmentSettings;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.IO;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataEnvSettingsStorage : SimulationDataEnvSettingsStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataEnvSettingsStorageInterface
     {
-#if DEBUG
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ENVIRONMENT SETTINGS SERVICE");
-#endif
-
-        readonly string m_ConnectionString;
-
-        public MySQLSimulationDataEnvSettingsStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override bool TryGetValue(UUID regionID, out EnvironmentSettings settings)
+        bool ISimulationDataEnvSettingsStorageInterface.TryGetValue(UUID regionID, out WindLightSettings settings)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -38,7 +27,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             using (MemoryStream ms = new MemoryStream(reader.GetBytes("EnvironmentSettings")))
                             {
-                                settings = EnvironmentSettings.Deserialize(ms);
+                                settings = WindLightSettings.Deserialize(ms);
                                 return true;
                             }
                         }
@@ -50,12 +39,12 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
 
         /* setting value to null will delete the entry */
-        public override EnvironmentSettings this[UUID regionID]
+        WindLightSettings ISimulationDataEnvSettingsStorageInterface.this[UUID regionID]
         {
             get
             {
-                EnvironmentSettings settings;
-                if (!TryGetValue(regionID, out settings))
+                WindLightSettings settings;
+                if (!EnvironmentSettings.TryGetValue(regionID, out settings))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -95,7 +84,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID)
+        bool ISimulationDataEnvSettingsStorageInterface.Remove(UUID regionID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

@@ -10,17 +10,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataTerrainStorage : SimulationDataTerrainStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataTerrainStorageInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
-
-        readonly string m_ConnectionString;
-        public MySQLSimulationDataTerrainStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override List<LayerPatch> this[UUID regionID]
+        List<LayerPatch> ISimulationDataTerrainStorageInterface.this[UUID regionID]
         {
             get
             {

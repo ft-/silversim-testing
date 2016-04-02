@@ -1,27 +1,17 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
+using EnvController = SilverSim.Scene.Types.SceneEnvironment.EnvironmentController;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataLightShareStorage : SimulationDataLightShareStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataLightShareStorageInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL LIGHTSHARE SETTINGS SERVICE");
-        readonly string m_ConnectionString;
-
-        public MySQLSimulationDataLightShareStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override bool TryGetValue(UUID regionID, out EnvironmentController.WindlightSkyData skyData, out EnvironmentController.WindlightWaterData waterData)
+        bool ISimulationDataLightShareStorageInterface.TryGetValue(UUID regionID, out EnvController.WindlightSkyData skyData, out EnvController.WindlightWaterData waterData)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -33,12 +23,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                     {
                         if(!reader.Read())
                         {
-                            skyData = EnvironmentController.WindlightSkyData.Defaults;
-                            waterData = EnvironmentController.WindlightWaterData.Defaults;
+                            skyData = EnvController.WindlightSkyData.Defaults;
+                            waterData = EnvController.WindlightWaterData.Defaults;
                             return false;
                         }
 
-                        skyData = new EnvironmentController.WindlightSkyData();
+                        skyData = new EnvController.WindlightSkyData();
                         skyData.Ambient = reader.GetWLVector4("Ambient");
                         skyData.CloudColor = reader.GetWLVector4("CloudColor");
                         skyData.CloudCoverage = reader.GetDouble("CloudCoverage");
@@ -63,7 +53,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         skyData.SunMoonColor = reader.GetWLVector4("SunMoonColor");
                         skyData.SunMoonPosition = reader.GetDouble("SunMoonPosition");
 
-                        waterData = new EnvironmentController.WindlightWaterData();
+                        waterData = new EnvController.WindlightWaterData();
                         waterData.BigWaveDirection = reader.GetWLVector2("BigWaveDirection");
                         waterData.LittleWaveDirection = reader.GetWLVector2("LittleWaveDirection");
                         waterData.BlurMultiplier = reader.GetDouble("BlurMultiplier");
@@ -82,7 +72,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override void Store(UUID regionID, EnvironmentController.WindlightSkyData skyData, EnvironmentController.WindlightWaterData waterData)
+        void ISimulationDataLightShareStorageInterface.Store(UUID regionID, EnvController.WindlightSkyData skyData, EnvController.WindlightWaterData waterData)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -132,7 +122,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID)
+        bool ISimulationDataLightShareStorageInterface.Remove(UUID regionID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

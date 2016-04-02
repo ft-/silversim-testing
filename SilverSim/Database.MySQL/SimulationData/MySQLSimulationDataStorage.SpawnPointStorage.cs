@@ -1,30 +1,16 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using MySql.Data.MySqlClient;
-using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataSpawnPointStorage : SimulationDataSpawnPointStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataSpawnPointStorageInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
-
-        readonly string m_ConnectionString;
-        public MySQLSimulationDataSpawnPointStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override List<Vector3> this[UUID regionID]
+        List<Vector3> ISimulationDataSpawnPointStorageInterface.this[UUID regionID]
         {
             get
             {
@@ -70,7 +56,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID)
+        bool ISimulationDataSpawnPointStorageInterface.Remove(UUID regionID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

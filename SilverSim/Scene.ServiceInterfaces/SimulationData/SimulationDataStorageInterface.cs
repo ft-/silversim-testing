@@ -5,11 +5,8 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 using SilverSim.Viewer.Messages.LayerData;
-using System;
+using System.Threading;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
@@ -21,47 +18,47 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
-        public abstract SimulationDataEnvControllerStorageInterface EnvironmentController
+        public abstract ISimulationDataEnvControllerStorageInterface EnvironmentController
         {
             get;
         }
 
-        public abstract SimulationDataSpawnPointStorageInterface Spawnpoints
+        public abstract ISimulationDataSpawnPointStorageInterface Spawnpoints
         {
             get;
         }
 
-        public abstract SimulationDataLightShareStorageInterface LightShare
+        public abstract ISimulationDataLightShareStorageInterface LightShare
         {
             get;
         }
 
-        public abstract SimulationDataObjectStorageInterface Objects
+        public abstract ISimulationDataObjectStorageInterface Objects
         {
             get;
         }
 
-        public abstract SimulationDataParcelStorageInterface Parcels
+        public abstract ISimulationDataParcelStorageInterface Parcels
         {
             get;
         }
 
-        public abstract SimulationDataScriptStateStorageInterface ScriptStates
+        public abstract IISimulationDataScriptStateStorageInterface ScriptStates
         {
             get;
         }
 
-        public abstract SimulationDataTerrainStorageInterface Terrains
+        public abstract ISimulationDataTerrainStorageInterface Terrains
         {
             get;
         }
 
-        public abstract SimulationDataRegionSettingsStorageInterface RegionSettings
+        public abstract ISimulationDataRegionSettingsStorageInterface RegionSettings
         {
             get;
         }
 
-        public abstract SimulationDataEnvSettingsStorageInterface EnvironmentSettings
+        public abstract ISimulationDataEnvSettingsStorageInterface EnvironmentSettings
         {
             get;
         }

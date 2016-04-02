@@ -7,9 +7,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
-    public abstract class SimulationDataTerrainStorageInterface
+    public interface ISimulationDataTerrainStorageInterface
     {
-        public abstract List<LayerPatch> this[UUID key]
+        List<LayerPatch> this[UUID key]
         {
             get;
         }

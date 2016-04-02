@@ -10,16 +10,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataRegionSettingsStorage : SimulationDataRegionSettingsStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataRegionSettingsStorageInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL REGION SETTINGS SERVICE");
-
-        readonly string m_ConnectionString;
-        public MySQLSimulationDataRegionSettingsStorage(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
         RegionSettings ToRegionSettings(MySqlDataReader reader)
         {
             RegionSettings settings = new RegionSettings();
@@ -63,12 +55,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             return settings;
         }
 
-        public override RegionSettings this[UUID regionID]
+        RegionSettings ISimulationDataRegionSettingsStorageInterface.this[UUID regionID]
         {
             get
             {
                 RegionSettings settings;
-                if (!TryGetValue(regionID, out settings))
+                if (!RegionSettings.TryGetValue(regionID, out settings))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -123,7 +115,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool TryGetValue(UUID regionID, out RegionSettings settings)
+        bool ISimulationDataRegionSettingsStorageInterface.TryGetValue(UUID regionID, out RegionSettings settings)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -144,7 +136,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             return false;
         }
 
-        public override bool ContainsKey(UUID regionID)
+        bool ISimulationDataRegionSettingsStorageInterface.ContainsKey(UUID regionID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -159,7 +151,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID)
+        bool ISimulationDataRegionSettingsStorageInterface.Remove(UUID regionID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

@@ -3,14 +3,6 @@
 
 using MySql.Data.MySqlClient;
 using SilverSim.Database.MySQL._Migration;
-using SilverSim.Scene.Types.SceneEnvironment;
-using SilverSim.Types;
-using SilverSim.Types.Agent;
-using SilverSim.Types.Asset;
-using SilverSim.Types.Inventory;
-using SilverSim.Types.Parcel;
-using SilverSim.Types.Primitive;
-using SilverSim.Types.Script;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {

@@ -3,29 +3,20 @@
 
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
-    public abstract class SimulationDataLightShareStorageInterface
+    public interface ISimulationDataLightShareStorageInterface
     {
-        protected SimulationDataLightShareStorageInterface()
-        {
-
-        }
-
-        public abstract bool TryGetValue(
+        bool TryGetValue(
             UUID regionID,
             out EnvironmentController.WindlightSkyData skyData,
             out EnvironmentController.WindlightWaterData waterData);
 
-        public abstract void Store(UUID regionID,
+        void Store(UUID regionID,
             EnvironmentController.WindlightSkyData skyData,
             EnvironmentController.WindlightWaterData waterData);
 
-        public abstract bool Remove(UUID regionID);
+        bool Remove(UUID regionID);
     }
 }

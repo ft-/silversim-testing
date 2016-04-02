@@ -4,7 +4,6 @@
 using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ using System.Linq;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataParcelAccessListStorage : SimulationDataParcelAccessListStorageInterface
+    public class MySQLSimulationDataParcelAccessListStorage : ISimulationDataParcelAccessListStorageInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PARCEL ACCESS LIST STORAGE");
         readonly string m_ConnectionString;
@@ -24,7 +23,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_TableName = tableName;
         }
 
-        public override bool this[UUID regionID, UUID parcelID, UUI accessor]
+        public bool this[UUID regionID, UUID parcelID, UUI accessor]
         {
             get
             {
@@ -62,7 +61,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override List<ParcelAccessEntry> this[UUID regionID, UUID parcelID]
+        public List<ParcelAccessEntry> this[UUID regionID, UUID parcelID]
         {
             get
             {
@@ -99,7 +98,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override void Store(ParcelAccessEntry entry)
+        public void Store(ParcelAccessEntry entry)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -118,7 +117,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool RemoveAllFromRegion(UUID regionID)
+        public bool RemoveAllFromRegion(UUID regionID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -130,7 +129,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID, UUID parcelID)
+        public bool Remove(UUID regionID, UUID parcelID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -142,7 +141,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override bool Remove(UUID regionID, UUID parcelID, UUI accessor)
+        public bool Remove(UUID regionID, UUID parcelID, UUI accessor)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
