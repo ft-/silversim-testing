@@ -14,13 +14,13 @@ namespace SilverSim.ServiceInterfaces.Inventory
     {
         #region Accessors
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract InventoryFolderServiceInterface Folder
+        public abstract IInventoryFolderServiceInterface Folder
         {
             get;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract InventoryItemServiceInterface Item
+        public abstract IInventoryItemServiceInterface Item
         {
             get;
         }
@@ -45,6 +45,11 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 folder.Version = 1;
                 Folder.Add(folder);
             }
+        }
+
+        public virtual List<InventoryFolder> GetInventorySkeleton(UUID principalID)
+        {
+            throw new NotSupportedException("InventoryServiceInterface.GetInventorySkeleton");
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

@@ -11,16 +11,9 @@ using System;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
-    sealed class MySQLInventoryItemService : InventoryItemServiceInterface
+    public partial class MySQLInventoryService : IInventoryItemServiceInterface
     {
-        readonly string m_ConnectionString;
-
-        public MySQLInventoryItemService(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override bool ContainsKey(UUID key)
+        bool IInventoryItemServiceInterface.ContainsKey(UUID key)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -41,7 +34,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override bool TryGetValue(UUID key, out InventoryItem item)
+        bool IInventoryItemServiceInterface.TryGetValue(UUID key, out InventoryItem item)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -64,12 +57,12 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override InventoryItem this[UUID key]
+        InventoryItem IInventoryItemServiceInterface.this[UUID key]
         {
             get
             {
                 InventoryItem item;
-                if(!TryGetValue(key, out item))
+                if(!Item.TryGetValue(key, out item))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -77,7 +70,43 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override bool ContainsKey(UUID principalID, UUID key)
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        List<InventoryItem> IInventoryItemServiceInterface.this[UUID principalID, List<UUID> itemids]
+        {
+            get
+            {
+                if(null == itemids || itemids.Count == 0)
+                {
+                    throw new ArgumentOutOfRangeException("itemids");
+                }
+                List<InventoryItem> items = new List<InventoryItem>();
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+                    List<string> matchStrings = new List<string>();
+                    foreach(UUID itemid in itemids)
+                    {
+                        matchStrings.Add(string.Format("\"{0}\"", itemid.ToString()));
+                    }
+                    string qStr = string.Join(",", matchStrings);
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID IN (" + qStr + ")", connection))
+                    {
+                        cmd.Parameters.AddParameter("?ownerid", principalID);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            while (dbReader.Read())
+                            {
+                                items.Add(dbReader.ToItem());
+                            }
+                        }
+                    }
+                }
+
+                return items;
+            }
+        }
+
+        bool IInventoryItemServiceInterface.ContainsKey(UUID principalID, UUID key)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -99,7 +128,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override bool TryGetValue(UUID principalID, UUID key, out InventoryItem item)
+        bool IInventoryItemServiceInterface.TryGetValue(UUID principalID, UUID key, out InventoryItem item)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -124,12 +153,12 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override InventoryItem this[UUID principalID, UUID key]
+        InventoryItem IInventoryItemServiceInterface.this[UUID principalID, UUID key]
         {
             get 
             {
                 InventoryItem item;
-                if(!TryGetValue(principalID, key, out item))
+                if(!Item.TryGetValue(principalID, key, out item))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -137,7 +166,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override void Add(InventoryItem item)
+        void IInventoryItemServiceInterface.Add(InventoryItem item)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -147,7 +176,7 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
 
-        public override void Update(InventoryItem item)
+        void IInventoryItemServiceInterface.Update(InventoryItem item)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -168,9 +197,9 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
 
-        public override void Delete(UUID principalID, UUID id)
+        void IInventoryItemServiceInterface.Delete(UUID principalID, UUID id)
         {
-            InventoryItem item = this[principalID, id];
+            InventoryItem item = Item[principalID, id];
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
@@ -187,9 +216,28 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersion(principalID, item.ParentFolderID);
         }
 
-        public override void Move(UUID principalID, UUID id, UUID toFolderID)
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        List<UUID> IInventoryItemServiceInterface.Delete(UUID principalID, List<UUID> itemids)
         {
-            InventoryItem item = this[principalID, id];
+            List<UUID> deleted = new List<UUID>();
+            foreach(UUID id in itemids)
+            {
+                try
+                {
+                    Item.Delete(principalID, id);
+                    deleted.Add(id);
+                }
+                catch
+                {
+                    /* nothing else to do */
+                }
+            }
+            return deleted;
+        }
+
+        void IInventoryItemServiceInterface.Move(UUID principalID, UUID id, UUID toFolderID)
+        {
+            InventoryItem item = Item[principalID, id];
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();

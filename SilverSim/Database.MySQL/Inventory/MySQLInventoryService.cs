@@ -20,35 +20,41 @@ namespace SilverSim.Database.MySQL.Inventory
 {
     #region Service Implementation
     [Description("MySQL Inventory Backend")]
-    public sealed class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    public sealed partial class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
-        readonly MySQLInventoryItemService m_InventoryItemService;
-        readonly MySQLInventoryFolderService m_InventoryFolderService;
+        readonly DefaultInventoryFolderContentService m_ContentService;
 
         public MySQLInventoryService(string connectionString)
         {
             m_ConnectionString = connectionString;
-            m_InventoryItemService = new MySQLInventoryItemService(connectionString);
-            m_InventoryFolderService = new MySQLInventoryFolderService(connectionString);
+            m_ContentService = new DefaultInventoryFolderContentService(this);
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override InventoryFolderServiceInterface Folder
+        public override IInventoryFolderServiceInterface Folder
         {
             get
             {
-                return m_InventoryFolderService;
+                return this;
             }
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override InventoryItemServiceInterface Item
+        public override IInventoryItemServiceInterface Item
         {
             get 
             {
-                return m_InventoryItemService;
+                return this;
+            }
+        }
+
+        IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content
+        {
+            get
+            {
+                return m_ContentService;
             }
         }
 
@@ -73,6 +79,28 @@ namespace SilverSim.Database.MySQL.Inventory
             }
 
             return items;
+        }
+
+        public override List<InventoryFolder> GetInventorySkeleton(UUID principalID)
+        {
+            List<InventoryFolder> folders = new List<InventoryFolder>();
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
+                {
+                    cmd.Parameters.AddParameter("?ownerid", principalID);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            folders.Add(dbReader.ToFolder());
+                        }
+                    }
+                }
+            }
+
+            return folders;
         }
 
         public void VerifyConnection()

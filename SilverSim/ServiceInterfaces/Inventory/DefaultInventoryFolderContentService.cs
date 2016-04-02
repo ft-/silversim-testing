@@ -8,16 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
-    public class DefaultInventoryFolderContentService : InventoryFolderContentServiceInterface
+    public class DefaultInventoryFolderContentService : IInventoryFolderContentServiceInterface
     {
-        readonly InventoryFolderServiceInterface m_Service;
+        readonly IInventoryFolderServiceInterface m_Service;
 
-        public DefaultInventoryFolderContentService(InventoryFolderServiceInterface service)
+        public DefaultInventoryFolderContentService(IInventoryFolderServiceInterface service)
         {
             m_Service = service;
         }
 
-        public override bool TryGetValue(UUID principalID, UUID folderID, out InventoryFolderContent inventoryFolderContent)
+        public bool TryGetValue(UUID principalID, UUID folderID, out InventoryFolderContent inventoryFolderContent)
         {
             try
             {
@@ -31,14 +31,37 @@ namespace SilverSim.ServiceInterfaces.Inventory
             }
         }
 
-        public override bool ContainsKey(UUID principalID, UUID folderID)
+        public bool ContainsKey(UUID principalID, UUID folderID)
         {
             return m_Service.ContainsKey(principalID, folderID);
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public override InventoryFolderContent this[UUID principalID, UUID folderID]
+        public List<InventoryFolderContent> this[UUID principalID, UUID[] folderIDs]
+        {
+            get
+            {
+                List<InventoryFolderContent> res = new List<InventoryFolderContent>();
+                foreach(UUID folder in folderIDs)
+                {
+                    try
+                    {
+                        res.Add(this[principalID, folder]);
+                    }
+                    catch
+                    {
+                        /* nothing that we should do here */
+                    }
+                }
+
+                return res;
+            }
+        }
+
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        public InventoryFolderContent this[UUID principalID, UUID folderID]
         {
             get 
             {

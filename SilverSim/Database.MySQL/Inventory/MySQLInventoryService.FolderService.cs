@@ -12,16 +12,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
-    public class MySQLInventoryFolderService : InventoryFolderServiceInterface
+    public partial class MySQLInventoryService : IInventoryFolderServiceInterface
     {
-        readonly string m_ConnectionString;
-
-        public MySQLInventoryFolderService(string connectionString)
-        {
-            m_ConnectionString = connectionString;
-        }
-
-        public override bool TryGetValue(UUID key, out InventoryFolder folder)
+        bool IInventoryFolderServiceInterface.TryGetValue(UUID key, out InventoryFolder folder)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -44,7 +37,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override bool ContainsKey(UUID key)
+        bool IInventoryFolderServiceInterface.ContainsKey(UUID key)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -65,12 +58,12 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override InventoryFolder this[UUID key]
+        InventoryFolder IInventoryFolderServiceInterface.this[UUID key]
         {
             get
             {
                 InventoryFolder folder;
-                if(!TryGetValue(key, out folder))
+                if(!Folder.TryGetValue(key, out folder))
                 {
                     throw new InventoryFolderNotFoundException(key);
                 }
@@ -78,7 +71,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override bool TryGetValue(UUID principalID, UUID key, out InventoryFolder folder)
+        bool IInventoryFolderServiceInterface.TryGetValue(UUID principalID, UUID key, out InventoryFolder folder)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -102,7 +95,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override bool ContainsKey(UUID principalID, UUID key)
+        bool IInventoryFolderServiceInterface.ContainsKey(UUID principalID, UUID key)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -125,12 +118,12 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override InventoryFolder this[UUID principalID, UUID key]
+        InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, UUID key]
         {
             get 
             {
                 InventoryFolder folder;
-                if(!TryGetValue(principalID, key, out folder))
+                if(!Folder.TryGetValue(principalID, key, out folder))
                 {
                     throw new InventoryFolderNotFoundException(key);
                 }
@@ -138,7 +131,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override bool ContainsKey(UUID principalID, AssetType type)
+        bool IInventoryFolderServiceInterface.ContainsKey(UUID principalID, AssetType type)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -178,7 +171,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override bool TryGetValue(UUID principalID, AssetType type, out InventoryFolder folder)
+        bool IInventoryFolderServiceInterface.TryGetValue(UUID principalID, AssetType type, out InventoryFolder folder)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -222,7 +215,7 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override InventoryFolder this[UUID principalID, AssetType type]
+        InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, AssetType type]
         {
             get 
             {
@@ -265,7 +258,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override List<InventoryFolder> GetFolders(UUID principalID, UUID key)
+        List<InventoryFolder> IInventoryFolderServiceInterface.GetFolders(UUID principalID, UUID key)
         {
             List<InventoryFolder> folders = new List<InventoryFolder>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -288,29 +281,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
-        public override List<InventoryFolder> GetInventorySkeleton(UUID principalID)
-        {
-            List<InventoryFolder> folders = new List<InventoryFolder>();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
-                {
-                    cmd.Parameters.AddParameter("?ownerid", principalID);
-                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                    {
-                        while (dbReader.Read())
-                        {
-                            folders.Add(dbReader.ToFolder());
-                        }
-                    }
-                }
-            }
-
-            return folders;
-        }
-
-        public override List<InventoryItem> GetItems(UUID principalID, UUID key)
+        List<InventoryItem> IInventoryFolderServiceInterface.GetItems(UUID principalID, UUID key)
         {
             List<InventoryItem> items = new List<InventoryItem>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -334,7 +305,7 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public override void Add(InventoryFolder folder)
+        void IInventoryFolderServiceInterface.Add(InventoryFolder folder)
         {
             Dictionary<string, object> newVals = new Dictionary<string, object>();
             newVals["ID"] = folder.ID;
@@ -364,7 +335,7 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public override void Update(InventoryFolder folder)
+        void IInventoryFolderServiceInterface.Update(InventoryFolder folder)
         {
             Dictionary<string, object> newVals = new Dictionary<string, object>();
             newVals["Version"] = folder.Version;
@@ -384,9 +355,9 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersionNoExcept(folder.Owner.ID, folder.ParentFolderID);
         }
 
-        public override void Move(UUID principalID, UUID folderID, UUID toFolderID)
+        void IInventoryFolderServiceInterface.Move(UUID principalID, UUID folderID, UUID toFolderID)
         {
-            InventoryFolder thisfolder = this[principalID, folderID];
+            InventoryFolder thisfolder = Folder[principalID, folderID];
             if(folderID == toFolderID)
             {
                 throw new ArgumentException("folderID != toFolderID");
@@ -409,7 +380,7 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         #region Delete and Purge
-        public override void Delete(UUID principalID, UUID folderID)
+        void IInventoryFolderServiceInterface.Delete(UUID principalID, UUID folderID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -418,7 +389,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override void Purge(UUID principalID, UUID folderID)
+        void IInventoryFolderServiceInterface.Purge(UUID principalID, UUID folderID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -427,17 +398,17 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override void Purge(UUID folderID)
+        void IInventoryFolderServiceInterface.Purge(UUID folderID)
         {
-            InventoryFolder folder = this[folderID];
-            Purge(folder.Owner.ID, folderID);
+            InventoryFolder folder = Folder[folderID];
+            Folder.Purge(folder.Owner.ID, folderID);
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void PurgeOrDelete(UUID principalID, UUID folderID, MySqlConnection connection, bool deleteFolder)
         {
             List<UUID> folders;
-            InventoryFolder thisfolder = this[principalID, folderID];
+            InventoryFolder thisfolder = Folder[principalID, folderID];
 
             using (MySqlCommand cmd = new MySqlCommand("BEGIN", connection))
             {
@@ -544,7 +515,7 @@ namespace SilverSim.Database.MySQL.Inventory
 
         #endregion
 
-        public override void IncrementVersion(UUID principalID, UUID folderID)
+        void IInventoryFolderServiceInterface.IncrementVersion(UUID principalID, UUID folderID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -570,8 +541,28 @@ namespace SilverSim.Database.MySQL.Inventory
             }
             catch
             {
-
+                /* nothing to do here */
             }
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        List<UUID> IInventoryFolderServiceInterface.Delete(UUID principalID, List<UUID> folderIDs)
+        {
+            List<UUID> deleted = new List<UUID>();
+            foreach(UUID id in folderIDs)
+            {
+                try
+                {
+                    Folder.Delete(principalID, id);
+                    deleted.Add(id);
+                }
+                catch
+                {
+                    /* nothing to do here */
+                }
+            }
+
+            return deleted;
         }
     }
 }
