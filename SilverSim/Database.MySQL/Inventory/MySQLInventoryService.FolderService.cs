@@ -450,6 +450,7 @@ namespace SilverSim.Database.MySQL.Inventory
                         }
                         catch
                         {
+                            /* nothing to do here */
                         }
                     }
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ParentFolderID LIKE ?folderid", connection))
@@ -462,6 +463,7 @@ namespace SilverSim.Database.MySQL.Inventory
                         }
                         catch
                         {
+                            /* nothing to do here */
                         }
                     }
                 }

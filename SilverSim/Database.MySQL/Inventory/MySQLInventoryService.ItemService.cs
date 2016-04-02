@@ -276,7 +276,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
             catch
             {
-
+                /* nothing to do here */
             }
         }
 
