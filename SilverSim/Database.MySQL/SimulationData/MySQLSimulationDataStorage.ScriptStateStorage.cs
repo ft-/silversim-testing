@@ -9,9 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public partial class MySQLSimulationDataStorage : IISimulationDataScriptStateStorageInterface
+    public partial class MySQLSimulationDataStorage : ISimulationDataScriptStateStorageInterface
     {
-        bool IISimulationDataScriptStateStorageInterface.TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state)
+        bool ISimulationDataScriptStateStorageInterface.TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -35,7 +35,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         /* setting value to null will delete the entry */
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        byte[] IISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID] 
+        byte[] ISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID] 
         {
             get
             {
@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        bool IISimulationDataScriptStateStorageInterface.Remove(UUID regionID, UUID primID, UUID itemID)
+        bool ISimulationDataScriptStateStorageInterface.Remove(UUID regionID, UUID primID, UUID itemID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {

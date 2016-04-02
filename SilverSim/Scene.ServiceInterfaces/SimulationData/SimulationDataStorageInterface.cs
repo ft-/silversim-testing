@@ -43,7 +43,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
-        public abstract IISimulationDataScriptStateStorageInterface ScriptStates
+        public abstract ISimulationDataScriptStateStorageInterface ScriptStates
         {
             get;
         }

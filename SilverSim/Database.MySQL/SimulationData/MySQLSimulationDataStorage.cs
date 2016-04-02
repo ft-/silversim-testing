@@ -83,7 +83,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return this;
             }
         }
-        public override IISimulationDataScriptStateStorageInterface ScriptStates
+        public override ISimulationDataScriptStateStorageInterface ScriptStates
         {
             get 
             {
