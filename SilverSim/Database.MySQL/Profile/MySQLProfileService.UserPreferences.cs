@@ -21,14 +21,7 @@ namespace SilverSim.Database.MySQL.Profile
                     cmd.Parameters.AddParameter("?uuid", user.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return true;
-                        }
+                        return reader.Read();
                     }
                 }
             }
