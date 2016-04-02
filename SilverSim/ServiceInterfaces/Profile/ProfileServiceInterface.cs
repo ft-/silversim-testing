@@ -45,6 +45,7 @@ namespace SilverSim.ServiceInterfaces.Profile
         {
             ProfilePreferences this[UUI user] { get; set; }
             bool TryGetValue(UUI user, out ProfilePreferences profilePrefs);
+            bool ContainsKey(UUI user);
         }
 
         [Flags]

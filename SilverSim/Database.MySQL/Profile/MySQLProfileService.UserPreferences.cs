@@ -11,6 +11,29 @@ namespace SilverSim.Database.MySQL.Profile
 {
     public sealed partial class MySQLProfileService : ProfileServiceInterface.IUserPreferencesInterface
     {
+        bool IUserPreferencesInterface.ContainsKey(UUI user)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT useruuid FROM usersettings where useruuid LIKE ?uuid", conn))
+                {
+                    cmd.Parameters.AddParameter("?uuid", user.ID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
         bool IUserPreferencesInterface.TryGetValue(UUI user, out ProfilePreferences prefs)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
