@@ -5,7 +5,9 @@
 
 using SilverSim.Threading;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
@@ -66,6 +68,26 @@ namespace SilverSim.Http.Client
             {
                 /* just ensure that the caller does not get exceptioned */
             }
+
+            try
+            {
+                List<string> removeList = new List<string>();
+                foreach(KeyValuePair<string, KeyValuePair<IPAddress[], int>> kvp in m_DnsCache)
+                {
+                    if(kvp.Value.Value + MAX_DNS_CACHE_TIME_IN_MILLISECONDS < Environment.TickCount)
+                    {
+                        removeList.Add(kvp.Key);
+                    }
+                }
+                foreach(string remove in removeList)
+                {
+                    m_DnsCache.Remove(remove);
+                }
+            }
+            catch
+            {
+                /* just ensure that the caller does not get exceptioned */
+            }
         }
 
         static HttpRequestHandler()
@@ -74,6 +96,45 @@ namespace SilverSim.Http.Client
             m_Timer.Elapsed += CleanUpTimer;
             m_Timer.Start();
         }
+
+        #region Connect Handling
+        /* yes, we need our own DNS cache. Mono bypasses anything that caches on Linux */
+        static RwLockedDictionary<string, KeyValuePair<IPAddress[], int>> m_DnsCache = new RwLockedDictionary<string, KeyValuePair<IPAddress[], int>>();
+        const int MAX_DNS_CACHE_TIME_IN_MILLISECONDS = 60 * 1000;
+
+        static Socket ConnectToTcp(string host, int port)
+        {
+            KeyValuePair<IPAddress[], int> kvp;
+            IPAddress[] addresses;
+            if (!m_DnsCache.TryGetValue(host, out kvp) || kvp.Value + MAX_DNS_CACHE_TIME_IN_MILLISECONDS < Environment.TickCount)
+            {
+                addresses = Dns.GetHostAddresses(host);
+                m_DnsCache[host] = new KeyValuePair<IPAddress[], int>(addresses, Environment.TickCount);
+            }
+            else
+            {
+                addresses = kvp.Key;
+            }
+
+            if (addresses.Length == 0)
+            {
+                throw new SocketException((int)SocketError.HostNotFound);
+            }
+            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(addresses, port);
+            return socket;
+        }
+
+        public static ICollection<string> GetCachedDnsEntries()
+        {
+            return m_DnsCache.Keys;
+        }
+
+        public static bool RemoveCachedDnsEntry(string hostname)
+        {
+            return m_DnsCache.Remove(hostname);
+        }
+        #endregion
 
         #region Stream pipeling handling
         static AbstractHttpStream OpenStream(string scheme, string host, int port)
@@ -118,11 +179,11 @@ namespace SilverSim.Http.Client
 
             if (scheme == Uri.UriSchemeHttp)
             {
-                return new HttpStream(new TcpClient(host, port).Client);
+                return new HttpStream(ConnectToTcp(host, port));
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                SslStream sslstream = new SslStream(new TcpClient(host, port).GetStream());
+                SslStream sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
                 sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
                 if(!sslstream.IsEncrypted)
                 {

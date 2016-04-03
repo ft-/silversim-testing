@@ -1214,6 +1214,8 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
             CmdIO.CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("issues", ShowIssuesCommand);
+            CmdIO.CommandRegistry.ShowCommands.Add("cacheddns", ShowCachedDnsCommand);
+            CmdIO.CommandRegistry.DeleteCommands.Add("cacheddns", RemoveCachedDnsCommand);
 
             while(m_Sources.Count != 0)
             {
@@ -1707,6 +1709,43 @@ namespace SilverSim.Main.Common
                 catch (Exception e)
                 {
                     io.Write(e.Message);
+                }
+            }
+        }
+
+        void ShowCachedDnsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(args[0] == "help")
+            {
+                io.Write("Shows currently cached DNS entries");
+            }
+            else
+            {
+                StringBuilder output = new StringBuilder("Cached DNS entries:\n----------------------------------------------");
+                foreach(string dns in HttpRequestHandler.GetCachedDnsEntries())
+                {
+                    output.Append("\n");
+                    output.Append(dns);
+                }
+                io.Write(output.ToString());
+            }
+        }
+
+        void RemoveCachedDnsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(args[0] == "help" || args.Count < 3)
+            {
+                io.Write("delete cacheddns <host>\nRemoves a DNS cache entry");
+            }
+            else
+            {
+                if(HttpRequestHandler.RemoveCachedDnsEntry(args[2]))
+                {
+                    io.WriteFormatted("DNS Entry {0} removed", args[2]);
+                }
+                else
+                {
+                    io.WriteFormatted("DNS Entry {0} not found", args[2]);
                 }
             }
         }
