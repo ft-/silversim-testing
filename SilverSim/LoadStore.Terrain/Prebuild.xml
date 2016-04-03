@@ -15,6 +15,7 @@
   <Reference name="System"/>
   <Reference name="System.Data"/>
   <Reference name="System.Drawing"/>
+  <Reference name="Paloma.TargaImage" localCopy="false"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
   <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
   <Reference name="SilverSim.Scene.Types" localCopy="false"/>
