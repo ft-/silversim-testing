@@ -74,7 +74,8 @@ namespace SilverSim.Http.Client
                 List<string> removeList = new List<string>();
                 foreach(KeyValuePair<string, KeyValuePair<IPAddress[], int>> kvp in m_DnsCache)
                 {
-                    if(kvp.Value.Value + MAX_DNS_CACHE_TIME_IN_MILLISECONDS < Environment.TickCount)
+                    int diffTime = kvp.Value.Value - Environment.TickCount;
+                    if(diffTime < 0)
                     {
                         removeList.Add(kvp.Key);
                     }
@@ -106,10 +107,10 @@ namespace SilverSim.Http.Client
         {
             KeyValuePair<IPAddress[], int> kvp;
             IPAddress[] addresses;
-            if (!m_DnsCache.TryGetValue(host, out kvp) || kvp.Value + MAX_DNS_CACHE_TIME_IN_MILLISECONDS < Environment.TickCount)
+            if (!m_DnsCache.TryGetValue(host, out kvp) || 0 > (kvp.Value - Environment.TickCount))
             {
                 addresses = Dns.GetHostAddresses(host);
-                m_DnsCache[host] = new KeyValuePair<IPAddress[], int>(addresses, Environment.TickCount);
+                m_DnsCache[host] = new KeyValuePair<IPAddress[], int>(addresses, Environment.TickCount + MAX_DNS_CACHE_TIME_IN_MILLISECONDS);
             }
             else
             {
