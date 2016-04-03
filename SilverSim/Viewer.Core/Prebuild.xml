@@ -14,6 +14,8 @@
   <Reference name="System"/>
   <Reference name="System.Core"/>
   <Reference name="System.Xml"/>
+  <Reference name="System.Drawing"/>
+  <Reference name="Paloma.TargaImage" localCopy="false"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
   <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
@@ -25,8 +27,10 @@
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="log4net" path="../../bin/" localCopy="false"/>
   <Reference name="C5" path="../../bin/" localCopy="false"/>
+  <Reference name="CSJ2K" path="../../bin/" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true"/>
+    <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
     <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
     <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
     <Match pattern="Product.licenseheader" path=".." recurse="false" buildAction="None"/>
