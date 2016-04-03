@@ -3,6 +3,7 @@
 
 using log4net;
 using Nini.Config;
+using SilverSim.Http.Client;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
@@ -134,6 +135,8 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("issues.get", IssuesView);
             JsonMethods.Add("modules.list", ModulesList);
             JsonMethods.Add("module.get", ModuleGet);
+            JsonMethods.Add("dnscache.list", DnsCacheList);
+            JsonMethods.Add("dnscache.delete", DnsCacheRemove);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -896,6 +899,39 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
+
+        [RequiredRight("dnscache.manage")]
+        void DnsCacheList(HttpRequest req, Map jsondata)
+        {
+            AnArray res = new AnArray();
+            foreach (string host in HttpRequestHandler.GetCachedDnsEntries())
+            {
+                res.Add(host);
+            }
+            Map m = new Map();
+            m.Add("entries", res);
+            SuccessResponse(req, m);
+        }
+
+        [RequiredRight("dnscache.manage")]
+        void DnsCacheRemove(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("host"))
+            {
+                ErrorResponse(req, ErrorResult.InvalidRequest);
+                return;
+            }
+
+            if(HttpRequestHandler.RemoveCachedDnsEntry(jsondata["host"].ToString()))
+            {
+                SuccessResponse(req, new Map());
+            }
+            else
+            {
+                ErrorResponse(req, ErrorResult.NotFound);
+            }
+        }
+
         [RequiredRight("modules.view")]
         void ModulesList(HttpRequest req, Map jsondata)
         {
