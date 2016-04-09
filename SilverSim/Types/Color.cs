@@ -16,6 +16,11 @@ namespace SilverSim.Types
 
         }
 
+        public static Color FromRgb(uint r, uint g, uint b)
+        {
+            return new Color(r / 255.0, g / 255.0, b / 255.0);
+        }
+
         public Color(double r, double g, double b)
         {
             R = r.Clamp(0f, 1f);
@@ -42,6 +47,38 @@ namespace SilverSim.Types
         public static implicit operator Vector3(Color v)
         {
             return new Vector3(v.R, v.G, v.B);
+        }
+
+        public static Color operator+(Color a, Color b)
+        {
+            return new Color(
+                (a.R + b.R).Clamp(0, 1),
+                (a.G + b.G).Clamp(0, 1),
+                (a.B + b.B).Clamp(0, 1));
+        }
+
+        public Color Lerp(Color b, double mix)
+        {
+            return new Color(
+                R.Lerp(b.R, mix),
+                G.Lerp(b.G, mix),
+                B.Lerp(b.B, mix));
+        }
+
+        public static Color operator*(Color a, Color b)
+        {
+            return new Color(
+                (a.R * b.R).Clamp(0, 1),
+                (a.G * b.G).Clamp(0, 1),
+                (a.B * b.B).Clamp(0, 1));
+        }
+
+        public static Color operator*(Color a, double b)
+        {
+            return new Color(
+                (a.R * b).Clamp(0, 1),
+                (a.G * b).Clamp(0, 1),
+                (a.B * b).Clamp(0, 1));
         }
         #endregion
 

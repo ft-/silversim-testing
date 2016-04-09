@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace SilverSim.Types.Asset.Format
         public string Description = string.Empty;
         public WearableType Type = WearableType.Invalid;
         public Dictionary<uint, double> Params = new Dictionary<uint,double>();
-        public Dictionary<uint, UUID> Textures = new Dictionary<uint, UUID>();
+        public Dictionary<AvatarTextureIndex, UUID> Textures = new Dictionary<AvatarTextureIndex, UUID>();
         public UUI Creator = new UUI();
         public UUI LastOwner = new UUI();
         public UUI Owner = new UUI();
@@ -131,7 +132,7 @@ namespace SilverSim.Types.Asset.Format
                                 throw new NotAWearableFormatException();
                             }
 
-                            Textures[index] = para[1];
+                            Textures[(AvatarTextureIndex)index] = para[1];
                         }
                     }
                 }
@@ -335,7 +336,7 @@ namespace SilverSim.Types.Asset.Format
                     fmt.AppendFormat("{0}\t{1}\n", kvp.Key, kvp.Value);
                 }
                 fmt.AppendFormat("textures {0}\n", Textures.Count);
-                foreach(KeyValuePair<uint, UUID> kvp in Textures)
+                foreach(KeyValuePair<AvatarTextureIndex, UUID> kvp in Textures)
                 {
                     fmt.AppendFormat("{0}\t{1}\n", kvp.Key, kvp.Value);
                 }
@@ -372,6 +373,318 @@ namespace SilverSim.Types.Asset.Format
 
             return asset;
         }
+        #endregion
+
+        #region Support functions
+        static readonly Color[] EyeColors =
+        {
+            Color.FromRgb(50, 25, 5),
+            Color.FromRgb(109, 55, 15),
+            Color.FromRgb(150, 93, 49),
+            Color.FromRgb(152, 118, 25),
+            Color.FromRgb(95, 179, 107),
+            Color.FromRgb(87, 192, 191),
+            Color.FromRgb(95, 172, 179),
+            Color.FromRgb(128, 128, 128),
+            Color.FromRgb(0, 0, 0),
+            Color.FromRgb(255, 255, 0),
+            Color.FromRgb(0, 255, 0),
+            Color.FromRgb(0, 255, 255),
+            Color.FromRgb(0, 0, 255),
+            Color.FromRgb(255, 0, 255),
+            Color.FromRgb(255, 0, 0)
+        };
+
+        static readonly Color[] SkinColors =
+        {
+            Color.FromRgb(0, 0, 0),
+            Color.FromRgb(255, 0, 255),
+            Color.FromRgb(255, 0, 0),
+            Color.FromRgb(255, 255, 0),
+            Color.FromRgb(0, 255, 0),
+            Color.FromRgb(0, 255, 255),
+            Color.FromRgb(0, 0, 255),
+            Color.FromRgb(255, 0, 255)
+        };
+
+        static readonly Color[] PigmentColors =
+        {
+            Color.FromRgb(252, 215, 200),
+            Color.FromRgb(240, 177, 112),
+            Color.FromRgb(90, 40, 16),
+            Color.FromRgb(29, 9, 6)
+        };
+
+        /*
+            Params[112] = new VisualParam(112, "Rainbow Color", 0, "hair", String.Empty, "None", "Wild", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(255, 0, 255, 255), new Color4(255, 0, 0, 255), new Color4(255, 255, 0, 255), new Color4(0, 255, 0, 255), new Color4(0, 255, 255, 255), new Color4(0, 0, 255, 255), new Color4(255, 0, 255, 255) }));
+            Params[113] = new VisualParam(113, "Red Hair", 0, "hair", String.Empty, "No Red", "Very Red", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(118, 47, 19, 255) }));
+            Params[114] = new VisualParam(114, "Blonde Hair", 0, "hair", String.Empty, "Black", "Blonde", 0.5f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(22, 6, 6, 255), new Color4(29, 9, 6, 255), new Color4(45, 21, 11, 255), new Color4(78, 39, 11, 255), new Color4(90, 53, 16, 255), new Color4(136, 92, 21, 255), new Color4(150, 106, 33, 255), new Color4(198, 156, 74, 255), new Color4(233, 192, 103, 255), new Color4(238, 205, 136, 255) }));
+            Params[115] = new VisualParam(115, "White Hair", 0, "hair", String.Empty, "No White", "All White", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(255, 255, 255, 255) }));
+        */
+
+        static readonly Color[] RainbowHairColors =
+        {
+            Color.FromRgb(0, 0, 0),
+            Color.FromRgb(255, 0, 255),
+            Color.FromRgb(255, 0, 0),
+            Color.FromRgb(255, 255, 0),
+            Color.FromRgb(0, 255, 0),
+            Color.FromRgb(0, 255, 255),
+            Color.FromRgb(0, 0, 255),
+            Color.FromRgb(255, 0, 255)
+        };
+
+        static readonly Color[] RedHairColors =
+        {
+            Color.FromRgb(0, 0, 0),
+            Color.FromRgb(118, 47, 19)
+        };
+
+        static readonly Color[] BlondeHairColors =
+        {
+            Color.FromRgb(0, 0, 0),
+            Color.FromRgb(22, 6, 6),
+            Color.FromRgb(29, 9, 6),
+            Color.FromRgb(45, 21, 11),
+            Color.FromRgb(78, 39, 11),
+            Color.FromRgb(90, 53, 16),
+            Color.FromRgb(136, 92, 21),
+            Color.FromRgb(150, 106, 33),
+            Color.FromRgb(198, 156, 74),
+            Color.FromRgb(233, 192, 103),
+            Color.FromRgb(238, 205, 136)
+        };
+
+        static Color CalcColor(double val, Color[] table)
+        {
+            Color paramColor = new Color(0, 0, 0);
+
+            if(table.Length == 1)
+            {
+                paramColor = table[0];
+            }
+            else
+            {
+                int tableLen = table.Length;
+                val = val.Clamp(0, 1);
+                double step = 1 / ((double)tableLen - 1);
+
+                int indexa = Math.Max((int)(val / step), tableLen - 1);
+                int indexb = Math.Max(indexa + 1, tableLen - 1);
+
+                double distance = val - indexa * step;
+
+                if(distance < Double.Epsilon || indexa == indexb)
+                {
+                    paramColor = table[indexa];
+                }
+                else
+                {
+                    Color ca = table[indexa];
+                    Color cb = table[indexb];
+                    double mix = distance / step;
+                    paramColor.R = ca.R.Lerp(cb.R, mix);
+                    paramColor.G = ca.R.Lerp(cb.G, mix);
+                    paramColor.B = ca.R.Lerp(cb.B, mix);
+                }
+            }
+
+            return paramColor;
+        }
+
+        public Color GetTint()
+        {
+            Color col = new Color(1, 1, 1);
+            double val;
+
+            switch (Type)
+            {
+                case WearableType.Eyes:
+                    col = new Color(0, 0, 0);
+                    if (Params.TryGetValue(99, out val))
+                    {
+                        col = col + CalcColor(val, EyeColors);
+                    }
+                    if(Params.TryGetValue(98, out val))
+                    {
+                        col = col + new Color(val, val, val);
+                    }
+                    break;
+
+                case WearableType.Skin:
+                    col = new Color(0, 0, 0);
+                    if (Params.TryGetValue(108, out val))
+                    {
+                        col = col + CalcColor(val, SkinColors);
+                    }
+                    if(Params.TryGetValue(110, out val))
+                    {
+                        col = col.Lerp(new Color(218, 41, 37), val);
+                    }
+                    if(Params.TryGetValue(111, out val))
+                    {
+                        col = col + CalcColor(val, PigmentColors);
+                    }
+                    /*
+            Params[108] = new VisualParam(108, "Rainbow Color", 0, "skin", String.Empty, "None", "Wild", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(255, 0, 255, 255), new Color4(255, 0, 0, 255), new Color4(255, 255, 0, 255), new Color4(0, 255, 0, 255), new Color4(0, 255, 255, 255), new Color4(0, 0, 255, 255), new Color4(255, 0, 255, 255) }));
+            Params[110] = new VisualParam(110, "Red Skin", 0, "skin", "Ruddiness", "Pale", "Ruddy", 0f, 0f, 0.1f, false, null, null, new VisualColorParam(VisualColorOperation.Blend, new Color4[] { new Color4(218, 41, 37, 255) }));
+            Params[111] = new VisualParam(111, "Pigment", 0, "skin", String.Empty, "Light", "Dark", 0.5f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(252, 215, 200, 255), new Color4(240, 177, 112, 255), new Color4(90, 40, 16, 255), new Color4(29, 9, 6, 255) }));
+
+            Params[116] = new VisualParam(116, "Rosy Complexion", 0, "skin", String.Empty, "Less Rosy", "More Rosy", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(198, 71, 71, 0), new Color4(198, 71, 71, 255) }));
+            Params[117] = new VisualParam(117, "Lip Pinkness", 0, "skin", String.Empty, "Darker", "Pinker", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(220, 115, 115, 0), new Color4(220, 115, 115, 128) }));
+                    */
+                    break;
+
+                case WearableType.Hair:
+                    col = new Color(0, 0, 0);
+                    if(Params.TryGetValue(112, out val))
+                    {
+                        col = col + CalcColor(val, RainbowHairColors);
+                    }
+
+                    if(Params.TryGetValue(113, out val))
+                    {
+                        col = col + CalcColor(val, RedHairColors);
+                    }
+
+                    if(Params.TryGetValue(114, out val))
+                    {
+                        col = col + CalcColor(val, BlondeHairColors);
+                    }
+
+                    if(Params.TryGetValue(115, out val))
+                    {
+                        col = col + new Color(val, val, val);
+                    }
+                    break;
+
+                case WearableType.Shirt:
+                    if (Params.TryGetValue(803, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(804, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(805, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                case WearableType.Pants:
+                    if (Params.TryGetValue(806, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(807, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(808, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                case WearableType.Shoes:
+                    if (Params.TryGetValue(812, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(813, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(817, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                case WearableType.Socks:
+                    if (Params.TryGetValue(818, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(819, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(820, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                case WearableType.Undershirt:
+                    if (Params.TryGetValue(821, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(822, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(823, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                case WearableType.Underpants:
+                    if (Params.TryGetValue(824, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(825, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(826, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                case WearableType.Gloves:
+                    if (Params.TryGetValue(827, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(829, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(830, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                case WearableType.Skirt:
+                    if (Params.TryGetValue(921, out val))
+                    {
+                        col.R = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(922, out val))
+                    {
+                        col.G = val.Clamp(0, 1);
+                    }
+                    if (Params.TryGetValue(923, out val))
+                    {
+                        col.B = val.Clamp(0, 1);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            return col;
+        }
+
         #endregion
     }
 }

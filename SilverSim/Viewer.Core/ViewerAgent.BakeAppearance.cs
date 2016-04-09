@@ -1,5 +1,8 @@
 ﻿using log4net;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
@@ -33,25 +36,12 @@ namespace SilverSim.Viewer.Core
 
         class OutfitItem
         {
-            public InventoryItem LinkItem;
             public InventoryItem ActualItem;
             public Wearable WearableData;
 
             public OutfitItem(InventoryItem linkItem)
             {
-                LinkItem = linkItem;
-            }
-        }
-
-        class TextureLayer
-        {
-            public UUID TextureID;
-            public int TextureIndex;
-
-            public TextureLayer(UUID textureID, int index)
-            {
-                TextureID = textureID;
-                TextureIndex = index;
+                ActualItem = linkItem;
             }
         }
 
@@ -145,44 +135,78 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        #region Actual Baking Code
-        public void BakeAppearance(bool rebake = false)
+        #region Get Current Outfit
+        public void BakeAppearanceFromCurrentOutfit(bool rebake = false)
         {
-            if(m_CurrentOutfitFolder == UUID.Zero)
+            if (m_CurrentOutfitFolder == UUID.Zero)
             {
                 InventoryFolder currentOutfitFolder = InventoryService.Folder[Owner.ID, AssetType.CurrentOutfitFolder];
                 m_CurrentOutfitFolder = currentOutfitFolder.ID;
             }
 
             InventoryFolderContent currentOutfit = InventoryService.Folder.Content[Owner.ID, m_CurrentOutfitFolder];
-            if(currentOutfit.Version == Appearance.Serial || rebake)
+            if (currentOutfit.Version == Appearance.Serial || rebake)
             {
                 return;
             }
 
+#if PREMATURE
+            foreach (InventoryItem item in currentOutfit.Items)
+            {
+                if (item.AssetType == AssetType.Link)
+                {
+                    bakeStatus.OutfitItems.Add(item.AssetID, new OutfitItem(item));
+                }
+            }
+#endif
+        }
+        #endregion
+
+        #region Actual Baking Code
+        const int MAX_WEARABLES_PER_TYPE = 5;
+
+        public void BakeAppearanceFromWearablesInfo()
+        {
+            Dictionary<WearableType, List<AgentWearables.WearableInfo>> wearables = Wearables.All;
             using (BakeStatus bakeStatus = new BakeStatus())
             {
-                foreach (InventoryItem item in currentOutfit.Items)
+                List<UUID> wearablesItemIds = new List<UUID>();
+                for (int wearableIndex = 0; wearableIndex < MAX_WEARABLES_PER_TYPE; ++wearableIndex)
                 {
-                    if (item.AssetType == AssetType.Link)
+                    for(int wearableType = 0; wearableType < (int)WearableType.NumWearables; ++wearableType)
                     {
-                        bakeStatus.OutfitItems.Add(item.AssetID, new OutfitItem(item));
+                        List<AgentWearables.WearableInfo> wearablesList;
+                        if(wearables.TryGetValue((WearableType)wearableType, out wearablesList))
+                        {
+                            if (wearablesList.Count > wearableIndex)
+                            {
+                                wearablesItemIds.Add(wearablesList[wearableIndex].ItemID);
+                            }
+                        }
                     }
                 }
 
-                List<InventoryItem> actualItems = InventoryService.Item[Owner.ID, new List<UUID>(bakeStatus.OutfitItems.Keys)];
-                foreach (InventoryItem actualItem in actualItems)
+                List<InventoryItem> actualItems = InventoryService.Item[Owner.ID, new List<UUID>(wearablesItemIds)];
+                Dictionary<UUID, InventoryItem> actualItemsInDict = new Dictionary<UUID, InventoryItem>();
+                foreach(InventoryItem item in actualItems)
+                {
+                    actualItemsInDict.Add(item.ID, item);
+                }
+
+                foreach(UUID itemId in wearablesItemIds)
                 {
                     OutfitItem outfitItem;
                     AssetData outfitData;
-                    if (bakeStatus.OutfitItems.TryGetValue(actualItem.ID, out outfitItem))
+                    InventoryItem inventoryItem;
+                    if(actualItemsInDict.TryGetValue(itemId, out inventoryItem))
                     {
-                        outfitItem.ActualItem = actualItem;
-                        switch (actualItem.AssetType)
+                        outfitItem = new OutfitItem(inventoryItem);
+                        outfitItem.ActualItem = inventoryItem;
+                        switch (inventoryItem.AssetType)
                         {
                             case AssetType.Bodypart:
                             case AssetType.Clothing:
-                                if (AssetService.TryGetValue(actualItem.AssetID, out outfitData))
+                                if (AssetService.TryGetValue(inventoryItem.AssetID, out outfitData))
                                 {
                                     try
                                     {
@@ -190,10 +214,12 @@ namespace SilverSim.Viewer.Core
                                     }
                                     catch (Exception e)
                                     {
-                                        string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, Owner.FullName, Owner.ID);
+                                        string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", inventoryItem.AssetID, Owner.FullName, Owner.ID);
                                         m_BakeLog.ErrorFormat(info, e);
                                         throw new BakingErrorException(info, e);
                                     }
+
+                                    /* load textures beforehand and do not load unnecessarily */
                                     foreach (UUID textureID in outfitItem.WearableData.Textures.Values)
                                     {
                                         if (bakeStatus.Textures.ContainsKey(textureID))
@@ -204,14 +230,14 @@ namespace SilverSim.Viewer.Core
                                         AssetData textureData;
                                         if (!AssetService.TryGetValue(textureID, out textureData))
                                         {
-                                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to be retrieved", actualItem.AssetID, Owner.FullName, Owner.ID);
+                                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to be retrieved", inventoryItem.AssetID, Owner.FullName, Owner.ID);
                                             m_BakeLog.ErrorFormat(info);
                                             throw new BakingErrorException(info);
                                         }
 
                                         if (textureData.Type != AssetType.Texture)
                                         {
-                                            string info = string.Format("Asset {0} for agent {1} ({2}) is not a texture (got {3})", actualItem.AssetID, Owner.FullName, Owner.ID, textureData.Type.ToString());
+                                            string info = string.Format("Asset {0} for agent {1} ({2}) is not a texture (got {3})", inventoryItem.AssetID, Owner.FullName, Owner.ID, textureData.Type.ToString());
                                             m_BakeLog.ErrorFormat(info);
                                             throw new BakingErrorException(info);
                                         }
@@ -222,10 +248,16 @@ namespace SilverSim.Viewer.Core
                                         }
                                         catch (Exception e)
                                         {
-                                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as a texture", actualItem.AssetID, Owner.FullName, Owner.ID);
+                                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as a texture", inventoryItem.AssetID, Owner.FullName, Owner.ID);
                                             m_BakeLog.ErrorFormat(info, e);
                                             throw new BakingErrorException(info, e);
                                         }
+                                    }
+
+                                    if(bakeStatus.Layer0TextureID == UUID.Zero &&
+                                        !outfitItem.WearableData.Textures.TryGetValue(AvatarTextureIndex.HeadBodypaint, out bakeStatus.Layer0TextureID))
+                                    {
+                                        bakeStatus.Layer0TextureID = UUID.Zero;
                                     }
                                 }
                                 break;
@@ -234,9 +266,9 @@ namespace SilverSim.Viewer.Core
                                 break;
                         }
                     }
-
-                    CoreBakeLogic(bakeStatus);
                 }
+
+                CoreBakeLogic(bakeStatus);
             }
         }
 
@@ -320,7 +352,133 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void ApplyTint(Bitmap bmp, System.Drawing.Color col)
+        System.Drawing.Color GetTint(Wearable w, BakeType bType)
+        {
+            Types.Color wColor = new Types.Color(1, 1, 1);
+            double val;
+            switch (w.Type)
+            {
+                case WearableType.Tattoo:
+                    if (w.Params.TryGetValue(1071, out val))
+                    {
+                        wColor.R = val.Clamp(0, 1);
+                    }
+                    if (w.Params.TryGetValue(1072, out val))
+                    {
+                        wColor.G = val.Clamp(0, 1);
+                    }
+                    if (w.Params.TryGetValue(1073, out val))
+                    {
+                        wColor.B = val.Clamp(0, 1);
+                    }
+                    switch (bType)
+                    {
+                        case BakeType.Head:
+                            if(w.Params.TryGetValue(1062, out val))
+                            {
+                                wColor.R = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(1063, out val))
+                            {
+                                wColor.G = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(1064, out val))
+                            {
+                                wColor.B = val.Clamp(0, 1);
+                            }
+                            break;
+                        case BakeType.UpperBody:
+                            if (w.Params.TryGetValue(1065, out val))
+                            {
+                                wColor.R = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(1066, out val))
+                            {
+                                wColor.G = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(1067, out val))
+                            {
+                                wColor.B = val.Clamp(0, 1);
+                            }
+                            break;
+                        case BakeType.LowerBody:
+                            if (w.Params.TryGetValue(1068, out val))
+                            {
+                                wColor.R = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(1069, out val))
+                            {
+                                wColor.G = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(1070, out val))
+                            {
+                                wColor.B = val.Clamp(0, 1);
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                case WearableType.Jacket:
+                    if (w.Params.TryGetValue(834, out val))
+                    {
+                        wColor.R = val.Clamp(0, 1);
+                    }
+                    if (w.Params.TryGetValue(835, out val))
+                    {
+                        wColor.G = val.Clamp(0, 1);
+                    }
+                    if (w.Params.TryGetValue(836, out val))
+                    {
+                        wColor.B = val.Clamp(0, 1);
+                    }
+                    switch (bType)
+                    {
+                        case BakeType.UpperBody:
+                            if (w.Params.TryGetValue(831, out val))
+                            {
+                                wColor.R = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(832, out val))
+                            {
+                                wColor.G = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(833, out val))
+                            {
+                                wColor.B = val.Clamp(0, 1);
+                            }
+                            break;
+                        case BakeType.LowerBody:
+                            if (w.Params.TryGetValue(809, out val))
+                            {
+                                wColor.R = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(810, out val))
+                            {
+                                wColor.G = val.Clamp(0, 1);
+                            }
+                            if (w.Params.TryGetValue(811, out val))
+                            {
+                                wColor.B = val.Clamp(0, 1);
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    wColor = w.GetTint();
+                    break;
+            }
+
+            return System.Drawing.Color.FromArgb(wColor.R_AsByte, wColor.G_AsByte, wColor.B_AsByte);
+        }
+
+        void ApplyTint(Bitmap bmp, Types.Color col)
         {
             int x;
             int y;
@@ -331,9 +489,9 @@ namespace SilverSim.Viewer.Core
                     System.Drawing.Color inp = bmp.GetPixel(x, y);
                     bmp.SetPixel(x, y, System.Drawing.Color.FromArgb(
                         inp.A,
-                        (byte)((inp.R * col.R) / 255),
-                        (byte)((inp.G * col.G) / 255),
-                        (byte)((inp.B * col.G) / 255)));
+                        (byte)(inp.R * col.R).Clamp(0, 255),
+                        (byte)(inp.G * col.G).Clamp(0, 255),
+                        (byte)(inp.B * col.B).Clamp(0, 255)));
                 }
             }
         }
@@ -343,6 +501,47 @@ namespace SilverSim.Viewer.Core
             int bakeDimensions = (bake == BakeType.Eyes) ? 128 : 512;
             Image srcimg;
             AssetData data = new AssetData();
+            data.Type = AssetType.Texture;
+            data.Local = true;
+            data.Temporary = true;
+            data.Flags = AssetFlags.Collectable | AssetFlags.Rewritable;
+            AvatarTextureIndex[] bakeProcessTable;
+            switch(bake)
+            {
+                case BakeType.Head:
+                    bakeProcessTable = IndexesForBakeHead;
+                    data.Name = "Baked Head Texture";
+                    break;
+
+                case BakeType.Eyes:
+                    bakeProcessTable = IndexesForBakeEyes;
+                    data.Name = "Baked Eyes Texture";
+                    break;
+
+                case BakeType.Hair:
+                    bakeProcessTable = IndexesForBakeHair;
+                    data.Name = "Baked Hair Texture";
+                    break;
+
+                case BakeType.LowerBody:
+                    bakeProcessTable = IndexesForBakeLowerBody;
+                    data.Name = "Baked Lower Body Texture";
+                    break;
+
+                case BakeType.UpperBody:
+                    bakeProcessTable = IndexesForBakeUpperBody;
+                    data.Name = "Baked Upper Body Texture";
+                    break;
+
+                case BakeType.Skirt:
+                    bakeProcessTable = IndexesForBakeSkirt;
+                    data.Name = "Baked Skirt Texture";
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("bake");
+            }
+
             using (Bitmap bitmap = new Bitmap(bakeDimensions, bakeDimensions, PixelFormat.Format32bppArgb))
             {
                 using (Graphics gfx = Graphics.FromImage(bitmap))
@@ -386,66 +585,137 @@ namespace SilverSim.Viewer.Core
 
                     /* alpha blending is enabled by changing the compositing mode of the graphics object */
                     gfx.CompositingMode = CompositingMode.SourceOver;
-                }
 
-                foreach(OutfitItem item in status.OutfitItems.Values)
-                {
-                    if(null != item.WearableData)
+                    foreach (AvatarTextureIndex texIndex in bakeProcessTable)
                     {
+                        foreach (OutfitItem item in status.OutfitItems.Values)
+                        {
+                            UUID texture;
+                            Image img;
+                            if (null != item.WearableData && item.WearableData.Textures.TryGetValue(texIndex, out texture))
+                            {
+                                if (status.TryGetTexture(bake, texture, out img))
+                                {
+                                    /* duplicate texture */
+                                    using (Bitmap bmp = new Bitmap(img))
+                                    {
+                                        switch (texIndex)
+                                        {
+                                            case AvatarTextureIndex.HeadBodypaint:
+                                            case AvatarTextureIndex.UpperBodypaint:
+                                            case AvatarTextureIndex.LowerBodypaint:
+                                                /* no tinting here */
+                                                break;
 
+                                            default:
+                                                ApplyTint(bmp, item.WearableData.GetTint());
+                                                break;
+                                        }
+
+                                        gfx.DrawImage(bmp, 0, 0, bakeDimensions, bakeDimensions);
+                                        AddAlpha(bitmap, bmp);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
+
+                data.Data = CSJ2K.J2KEncoder.EncodeJPEG(bitmap);
             }
 
             return data;
         }
 
+        static readonly AvatarTextureIndex[] IndexesForBakeHead = new AvatarTextureIndex[]
+        {
+            AvatarTextureIndex.HeadAlpha,
+            AvatarTextureIndex.HeadBodypaint,
+            AvatarTextureIndex.HeadTattoo
+        };
+
+        static readonly AvatarTextureIndex[] IndexesForBakeUpperBody = new AvatarTextureIndex[]
+        {
+            AvatarTextureIndex.UpperBodypaint,
+            AvatarTextureIndex.UpperGloves,
+            AvatarTextureIndex.UpperUndershirt,
+            AvatarTextureIndex.UpperShirt,
+            AvatarTextureIndex.UpperJacket,
+            AvatarTextureIndex.UpperAlpha
+        };
+
+        static readonly AvatarTextureIndex[] IndexesForBakeLowerBody = new AvatarTextureIndex[]
+        {
+            AvatarTextureIndex.LowerBodypaint,
+            AvatarTextureIndex.LowerUnderpants,
+            AvatarTextureIndex.LowerSocks,
+            AvatarTextureIndex.LowerShoes,
+            AvatarTextureIndex.LowerPants,
+            AvatarTextureIndex.LowerJacket,
+            AvatarTextureIndex.LowerAlpha
+        };
+
+        static readonly AvatarTextureIndex[] IndexesForBakeEyes = new AvatarTextureIndex[]
+        {
+            AvatarTextureIndex.EyesIris,
+            AvatarTextureIndex.EyesAlpha
+        };
+
+        static readonly AvatarTextureIndex[] IndexesForBakeHair = new AvatarTextureIndex[]
+        {
+            AvatarTextureIndex.Hair,
+            AvatarTextureIndex.HairAlpha
+        };
+
+        static readonly AvatarTextureIndex[] IndexesForBakeSkirt = new AvatarTextureIndex[]
+        {
+            AvatarTextureIndex.Skirt
+        };
+
         void CoreBakeLogic(BakeStatus bakeStatus)
         {
-            Bitmap bakeHead = null;
-            Bitmap bakeUpperBody = null;
-            Bitmap bakeLowerBody = null;
-            Bitmap bakeEyes = null;
-            Bitmap bakeSkirt = null;
-            Bitmap bakeHair = null;
+            AssetData bakeHead = BakeTexture(bakeStatus, BakeType.Head);
+            AssetData bakeUpperBody = BakeTexture(bakeStatus, BakeType.UpperBody);
+            AssetData bakeLowerBody = BakeTexture(bakeStatus, BakeType.LowerBody);
+            AssetData bakeEyes = BakeTexture(bakeStatus, BakeType.Eyes);
+            AssetData bakeHair = BakeTexture(bakeStatus, BakeType.Hair);
+            AssetData bakeSkirt = null;
 
-            try
+            bool haveSkirt = false;
+            foreach(OutfitItem item in bakeStatus.OutfitItems.Values)
             {
-                bakeHead = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
-                bakeUpperBody = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
-                bakeLowerBody = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
-                bakeEyes = new Bitmap(128, 128, PixelFormat.Format32bppArgb);
-                bakeHair = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
-
-
-            }
-            finally
-            {
-                if(null != bakeHead)
+                if(item.WearableData != null && item.WearableData.Type == WearableType.Skirt)
                 {
-                    bakeHead.Dispose();
-                }
-                if(null != bakeUpperBody)
-                {
-                    bakeUpperBody.Dispose();
-                }
-                if(null != bakeLowerBody)
-                {
-                    bakeLowerBody.Dispose();
-                }
-                if(null != bakeEyes)
-                {
-                    bakeEyes.Dispose();
-                }
-                if(null != bakeSkirt)
-                {
-                    bakeSkirt.Dispose();
-                }
-                if(null != bakeHair)
-                {
-                    bakeHair.Dispose();
+                    haveSkirt = true;
+                    break;
                 }
             }
+
+            if (haveSkirt)
+            {
+                bakeSkirt = BakeTexture(bakeStatus, BakeType.Skirt);
+            }
+
+            AgentCircuit circuit = Circuits[m_CurrentSceneID];
+            SceneInterface scene = circuit.Scene;
+            AssetServiceInterface assetService = scene.AssetService;
+
+            assetService.Store(bakeEyes);
+            assetService.Store(bakeHead);
+            assetService.Store(bakeUpperBody);
+            assetService.Store(bakeLowerBody);
+            assetService.Store(bakeHair);
+            if(null != bakeSkirt)
+            {
+                assetService.Store(bakeSkirt);
+            }
+
+            Textures[(int)AvatarTextureIndex.EyesBaked] = bakeEyes.ID;
+            Textures[(int)AvatarTextureIndex.HeadBaked] = bakeHead.ID;
+            Textures[(int)AvatarTextureIndex.UpperBaked] = bakeUpperBody.ID;
+            Textures[(int)AvatarTextureIndex.LowerBaked] = bakeLowerBody.ID;
+            Textures[(int)AvatarTextureIndex.HairBaked] = bakeHair.ID;
+            Textures[(int)AvatarTextureIndex.Skirt] = bakeSkirt != null ? bakeSkirt.ID : UUID.Zero;
         }
 
         #endregion
