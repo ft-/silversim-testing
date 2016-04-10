@@ -338,7 +338,7 @@ namespace SilverSim.Types.Asset.Format
                 fmt.AppendFormat("textures {0}\n", Textures.Count);
                 foreach(KeyValuePair<AvatarTextureIndex, UUID> kvp in Textures)
                 {
-                    fmt.AppendFormat("{0}\t{1}\n", kvp.Key, kvp.Value);
+                    fmt.AppendFormat("{0}\t{1}\n", (int)kvp.Key, kvp.Value);
                 }
 
                 return fmt.ToString().ToUTF8Bytes();
