@@ -156,14 +156,14 @@ namespace SilverSim.Scene.Types.Object
 
         public void SetVehicleFlags(VehicleFlags value)
         { 
-            VehicleParams.SetFlags = value;
+            VehicleParams.SetFlags(value);
             IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(UpdateChangedFlags.Physics);
         }
 
         public void ClearVehicleFlags(VehicleFlags value) 
         {
-            VehicleParams.ClearFlags = value;
+            VehicleParams.ClearFlags(value);
             IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(UpdateChangedFlags.Physics);
         }

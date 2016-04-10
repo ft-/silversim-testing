@@ -507,27 +507,20 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public VehicleFlags SetFlags
+
+        public void SetFlags(VehicleFlags value)
         {
-            set
+            lock (m_VehicleParamLock)
             {
-                lock (m_VehicleParamLock)
-                {
-                    m_Flags |= value;
-                }
+                m_Flags |= value;
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public VehicleFlags ClearFlags
+        public void ClearFlags(VehicleFlags value)
         {
-            set
+            lock (m_VehicleParamLock)
             {
-                lock (m_VehicleParamLock)
-                {
-                    m_Flags &= (~value);
-                }
+                m_Flags &= (~value);
             }
         }
 
