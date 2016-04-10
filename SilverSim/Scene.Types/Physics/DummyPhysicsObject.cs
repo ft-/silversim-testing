@@ -24,33 +24,39 @@ namespace SilverSim.Scene.Types.Physics
         }
 
         #region Injecting parameters properties
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 DeltaLinearVelocity 
-        { 
-            set 
-            { 
-            }
-        }
-
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 DeltaAngularVelocity 
+        public void SetDeltaLinearVelocity(Vector3 value)
         {
-            set 
-            { 
-            } 
+            /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AppliedForce { set { } }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AppliedTorque { set { } }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 LinearImpulse { set { } }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AngularImpulse { set { } }
+        public void SetDeltaAngularVelocity(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 ControlTargetVelocity { set { } }
+        public void SetAppliedForce(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
+        public void SetAppliedTorque(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
+
+        public void SetLinearImpulse(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
+
+        public void SetAngularImpulse(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
+
+        public void SetControlTargetVelocity(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
         #endregion
 
         public double Mass 

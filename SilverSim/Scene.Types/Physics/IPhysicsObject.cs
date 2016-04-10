@@ -9,20 +9,13 @@ namespace SilverSim.Scene.Types.Physics
     public interface IPhysicsObject
     {
         /* position, acceleration, velocity (angular and linear) is pushed to target object when IsPhysicsActive equals true */
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 DeltaLinearVelocity { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 DeltaAngularVelocity { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 AppliedForce { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 AppliedTorque { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 LinearImpulse { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 AngularImpulse { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 ControlTargetVelocity { set; }
+        void SetDeltaLinearVelocity(Vector3 value);
+        void SetDeltaAngularVelocity(Vector3 value);
+        void SetAppliedForce(Vector3 value);
+        void SetAppliedTorque(Vector3 value);
+        void SetLinearImpulse(Vector3 value);
+        void SetAngularImpulse(Vector3 value);
+        void SetControlTargetVelocity(Vector3 value);
 
         bool IsPhysicsActive { get; set; } /* disables updates of object */
         bool IsPhantom { get; set; }

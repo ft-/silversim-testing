@@ -88,68 +88,46 @@ namespace SilverSim.Scene.Types.Physics
                 if (agent != null)
                 {
                     m_StateData.Rotation = agent.BodyRotation;
-                    agent.PhysicsUpdate = m_StateData;
+                    agent.PhysicsUpdate(m_StateData);
                 }
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 DeltaLinearVelocity
+        public void SetDeltaLinearVelocity(Vector3 value)
         {
-            set 
-            {
-            }
+            /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 DeltaAngularVelocity
+        public void SetDeltaAngularVelocity(Vector3 value)
         {
-            set 
-            {
-            }
+            /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AppliedForce
+        public void SetAppliedForce(Vector3 value)
         {
-            set 
-            {
-            }
+            /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AppliedTorque
+        public void SetAppliedTorque(Vector3 value)
         {
-            set 
-            {
-            }
+            /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 LinearImpulse
+        public void SetLinearImpulse(Vector3 value)
         {
-            set 
-            {
-            }
+            /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AngularImpulse
+        public void SetAngularImpulse(Vector3 value)
         {
-            set 
-            {
-            }
+            /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 ControlTargetVelocity
+        public void SetControlTargetVelocity(Vector3 value)
         {
-            set 
+            lock (m_Lock)
             {
-                lock (m_Lock)
-                {
-                    m_ControlTargetVelocity = value;
-                }
+                m_ControlTargetVelocity = value;
             }
         }
 

@@ -58,12 +58,9 @@ namespace SilverSim.Scene.Physics.Common
 
         public abstract void UpdateCollisionInfo();
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public abstract Vector3 DeltaLinearVelocity { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public abstract Vector3 DeltaAngularVelocity { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public abstract Vector3 ControlTargetVelocity { set; }
+        public abstract void SetDeltaLinearVelocity(Vector3 value);
+        public abstract void SetDeltaAngularVelocity(Vector3 value);
+        public abstract void SetControlTargetVelocity(Vector3 value);
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
         public bool IsPhantom
         {
@@ -135,53 +132,37 @@ namespace SilverSim.Scene.Physics.Common
         Vector3 m_AppliedForce = Vector3.Zero;
         Vector3 m_AppliedTorque = Vector3.Zero;
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AppliedForce 
+        public void SetAppliedForce(Vector3 value)
         { 
-            set
+            lock (m_Lock)
             {
-                lock (m_Lock)
-                {
-                    m_AppliedForce = value;
-                }
+                m_AppliedForce = value;
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AppliedTorque 
+        public void SetAppliedTorque(Vector3 value)
         { 
-            set
+            lock (m_Lock)
             {
-                lock (m_Lock)
-                {
-                    m_AppliedTorque = value;
-                }
+                m_AppliedTorque = value;
             }
         }
 
         Vector3 m_LinearImpulse = Vector3.Zero;
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 LinearImpulse 
+        public void SetLinearImpulse(Vector3 value)
         { 
-            set
+            lock(m_Lock)
             {
-                lock(m_Lock)
-                {
-                    m_LinearImpulse = value;
-                }
+                m_LinearImpulse = value;
             }
         }
 
         Vector3 m_AngularImpulse = Vector3.Zero;
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public Vector3 AngularImpulse 
+        public void SetAngularImpulse(Vector3 value)
         {
-            set
+            lock(m_Lock)
             {
-                lock(m_Lock)
-                {
-                    m_AngularImpulse = value;
-                }
+                m_AngularImpulse = value;
             }
         }
 
@@ -191,7 +172,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             get
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     return m_AppliedInertia;
                 }
@@ -347,8 +328,8 @@ namespace SilverSim.Scene.Physics.Common
                 m_Group.AngularAcceleration = angularTorque.ElementMultiply(AppliedInertia);
 
                 /* we need to scale the accelerations towards timescale */
-                DeltaLinearVelocity = m_Group.Acceleration * dt;
-                DeltaAngularVelocity = m_Group.AngularAcceleration * dt;
+                SetDeltaLinearVelocity(m_Group.Acceleration * dt);
+                SetDeltaAngularVelocity(m_Group.AngularAcceleration * dt);
             }
         }
 

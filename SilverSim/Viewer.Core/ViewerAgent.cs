@@ -1437,29 +1437,26 @@ namespace SilverSim.Viewer.Core
 
         /* property here instead of a method. A lot more clear that we update something. */
         [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public PhysicsStateData PhysicsUpdate
+        public void PhysicsUpdate(PhysicsStateData value)
         {
-            set
+            bool updateProcessed = false;
+            lock (m_DataLock)
             {
-                bool updateProcessed = false;
-                lock (m_DataLock)
+                if (SceneID == value.SceneID && null == m_SittingOnObject)
                 {
-                    if (SceneID == value.SceneID && null == m_SittingOnObject)
-                    {
-                        m_GlobalPosition = value.Position;
-                        m_GlobalRotation = value.Rotation;
-                        m_Velocity = value.Velocity;
-                        m_AngularVelocity = value.AngularVelocity;
-                        m_Acceleration = value.Acceleration;
-                        m_AngularAcceleration = value.AngularAcceleration;
-                        m_CollisionPlane = value.CollisionPlane;
-                        updateProcessed = true;
-                    }
+                    m_GlobalPosition = value.Position;
+                    m_GlobalRotation = value.Rotation;
+                    m_Velocity = value.Velocity;
+                    m_AngularVelocity = value.AngularVelocity;
+                    m_Acceleration = value.Acceleration;
+                    m_AngularAcceleration = value.AngularAcceleration;
+                    m_CollisionPlane = value.CollisionPlane;
+                    updateProcessed = true;
                 }
-                if (updateProcessed)
-                {
-                    InvokeOnPositionUpdate();
-                }
+            }
+            if (updateProcessed)
+            {
+                InvokeOnPositionUpdate();
             }
         }
         #endregion

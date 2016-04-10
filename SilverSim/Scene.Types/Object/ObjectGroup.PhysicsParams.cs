@@ -40,24 +40,19 @@ namespace SilverSim.Scene.Types.Object
         }
 
 
-        /* property here instead of a method. A lot more clear that we update something. */
         readonly object m_PhysicsUpdateLock = new object();
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public PhysicsStateData PhysicsUpdate
+        public void PhysicsUpdate(PhysicsStateData value)
         {
-            set
+            lock (m_PhysicsUpdateLock)
             {
-                lock (m_PhysicsUpdateLock)
+                if (Scene.ID == value.SceneID)
                 {
-                    if (Scene.ID == value.SceneID)
-                    {
-                        Position = value.Position;
-                        Rotation = value.Rotation;
-                        Velocity = value.Velocity;
-                        AngularVelocity = value.AngularVelocity;
-                        Acceleration = value.Acceleration;
-                        AngularAcceleration = value.AngularAcceleration;
-                    }
+                    Position = value.Position;
+                    Rotation = value.Rotation;
+                    Velocity = value.Velocity;
+                    AngularVelocity = value.AngularVelocity;
+                    Acceleration = value.Acceleration;
+                    AngularAcceleration = value.AngularAcceleration;
                 }
             }
         }
@@ -158,26 +153,19 @@ namespace SilverSim.Scene.Types.Object
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public VehicleFlags SetVehicleFlags
+
+        public void SetVehicleFlags(VehicleFlags value)
         { 
-            set
-            {
-                VehicleParams.SetFlags = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
-            }
+            VehicleParams.SetFlags = value;
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(UpdateChangedFlags.Physics);
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public VehicleFlags ClearVehicleFlags 
+        public void ClearVehicleFlags(VehicleFlags value) 
         {
-            set
-            {
-                VehicleParams.ClearFlags = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
-            }
+            VehicleParams.ClearFlags = value;
+            IsChanged = m_IsChangedEnabled;
+            TriggerOnUpdate(UpdateChangedFlags.Physics);
         }
 
         public Quaternion this[VehicleRotationParamId id]

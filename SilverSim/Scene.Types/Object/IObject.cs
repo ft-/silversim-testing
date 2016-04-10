@@ -177,12 +177,7 @@ namespace SilverSim.Scene.Types.Object
             get;
         }
 
-        /* property here instead of a method. A lot more clear that we update something. */
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        PhysicsStateData PhysicsUpdate
-        {
-            set;
-        }
+        void PhysicsUpdate(PhysicsStateData data);
         #endregion
 
         #region Methods

@@ -263,13 +263,9 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public PhysicsStateData PhysicsUpdate
+        public void PhysicsUpdate(PhysicsStateData data)
         {
-            set
-            {
-
-            }
+            /* intentionally left empty */
         }
         #endregion
 

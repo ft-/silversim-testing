@@ -214,7 +214,7 @@ namespace SilverSim.Viewer.Core
             {
                 agentMovementDirection *= 1.5f;
             }
-            ((IAgentPhysicsObject)PhysicsActor).ControlTargetVelocity = agentMovementDirection;
+            ((IAgentPhysicsObject)PhysicsActor).SetControlTargetVelocity(agentMovementDirection);
         }
 
         [PacketHandler(MessageType.SetAlwaysRun)]
