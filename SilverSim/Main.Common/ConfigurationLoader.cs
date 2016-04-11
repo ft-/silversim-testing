@@ -1127,7 +1127,11 @@ namespace SilverSim.Main.Common
                 if (gridMap.Contains("Id"))
                 {
                     m_GridsXmlConfig = new IniConfigSource();
-                    SimGridInfo.LoadFromGridsXml(m_GridsXmlConfig, gridMap.GetString("Id"));
+                    string gridid = gridMap.GetString("Id");
+                    if (!SimGridInfo.LoadFromGridsXml(m_GridsXmlConfig, gridid))
+                    {
+                        throw new ConfigurationErrorException(string.Format("Unknown grid id {0}", gridid));
+                    }
                     m_Config.Merge(m_GridsXmlConfig);
                 }
             }
