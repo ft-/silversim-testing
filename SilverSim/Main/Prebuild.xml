@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_0" name="SilverSim.Main" path="SilverSim/Main" type="Exe">
+<Project frameworkVersion="v4_5" name="SilverSim.Main" path="SilverSim/Main" type="Exe">
   <Configuration name="Release">
     <Options>
       <OutputPath>../../bin/</OutputPath>

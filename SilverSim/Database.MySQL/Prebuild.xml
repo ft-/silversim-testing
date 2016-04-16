@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_0" name="SilverSim.Database.MySQL" path="SilverSim/Database.MySQL" type="Library">
+<Project frameworkVersion="v4_5" name="SilverSim.Database.MySQL" path="SilverSim/Database.MySQL" type="Library">
   <Configuration name="Release">
     <Options>
       <OutputPath>../../bin/plugins/</OutputPath>
