@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Core
 
         private Thread m_ObjectUpdateThread;
         private bool m_ObjectUpdateThreadRunning;
-        CommandRegistry m_Commands;
+        readonly CommandRegistry m_Commands;
 
         int m_AgentUpdatesReceived;
 

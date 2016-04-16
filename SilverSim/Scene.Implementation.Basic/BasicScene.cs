@@ -53,7 +53,7 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
         private UDPCircuitsManager m_UDPServer;
-        SceneList m_Scenes;
+        readonly SceneList m_Scenes;
         #endregion
 
         #region Interface wrappers
@@ -836,7 +836,7 @@ namespace SilverSim.Scene.Implementation.Basic
             public readonly System.Timers.Timer RestartTimer = new System.Timers.Timer(1000);
             int m_SecondsToRestart;
             public bool FirstTrigger;
-            SceneList m_Scenes;
+            readonly SceneList m_Scenes;
             readonly object m_ActionLock = new object();
             public bool Abort()
             {

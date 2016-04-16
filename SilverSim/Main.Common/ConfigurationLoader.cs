@@ -1514,7 +1514,7 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Sim Establish
-        Action<HttpRequest, ConfigurationLoader> m_SimCircuitRequest;
+        readonly Action<HttpRequest, ConfigurationLoader> m_SimCircuitRequest;
         void SimCircuitRequest(HttpRequest req)
         {
             m_SimCircuitRequest(req, this);

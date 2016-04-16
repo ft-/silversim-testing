@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Core
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
         public event Action<IObject> OnPositionChange;
         readonly object m_DataLock = new object();
-        SceneList m_Scenes;
+        readonly SceneList m_Scenes;
 
         #region Agent fields
         readonly UUID m_AgentID;
