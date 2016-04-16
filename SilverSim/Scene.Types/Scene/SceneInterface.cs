@@ -221,6 +221,11 @@ namespace SilverSim.Scene.Types.Scene
         }
         #endregion
 
+        public virtual void TriggerParameterUpdated(UUID regionID, string parametername, string value)
+        {
+
+        }
+
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
 

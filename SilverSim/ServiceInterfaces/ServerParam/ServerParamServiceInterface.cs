@@ -3,7 +3,6 @@
 
 using SilverSim.Threading;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -13,6 +12,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
     public abstract class ServerParamServiceInterface
     {
         public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamListener>> ServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamListener>>(delegate() { return new RwLockedList<IServerParamListener>(); });
+        public readonly RwLockedList<IServerParamListener> AnyServerParamListeners = new RwLockedList<IServerParamListener>();
         public ServerParamServiceInterface()
         {
 
@@ -57,6 +57,10 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                             listener.TriggerParameterUpdated(regionID, parameter, value);
                         }
                     }
+                    foreach(IServerParamListener listener in AnyServerParamListeners)
+                    {
+                        listener.TriggerParameterUpdated(regionID, parameter, value);
+                    }
                 }
             }
         }
@@ -64,6 +68,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         protected abstract void Store(UUID regionID, string parameter, string value);
 
         public abstract bool TryGetValue(UUID regionID, string parameter, out string value);
+        public abstract bool Contains(UUID regionID, string parameter);
 
         public abstract List<string> this[UUID regionID]
         {

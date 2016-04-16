@@ -12,13 +12,13 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Database.MySQL.ServerParam
 {
     #region Service Implementation
     [Description("MySQL ServerParam Backend")]
-    public sealed class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin
+    public sealed class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin, IPluginShutdown
     {
         readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");
@@ -163,6 +163,43 @@ namespace SilverSim.Database.MySQL.ServerParam
             return false;
         }
 
+        public override bool Contains(UUID regionID, string parameter)
+        {
+            RwLockedDictionary<string, string> regParams;
+            if (m_Cache.TryGetValue(regionID, out regParams) &&
+                regParams.ContainsKey(parameter))
+            {
+                return true;
+            }
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
+                {
+                    cmd.Parameters.AddParameter("?regionid", regionID);
+                    cmd.Parameters.AddParameter("?parametername", parameter);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            m_Cache[regionID][parameter] = dbReader.GetString("parametervalue");
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (UUID.Zero != regionID &&
+                Contains(UUID.Zero, parameter))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         protected override void Store(UUID regionID, string parameter, string value)
         {
             using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -204,6 +241,11 @@ namespace SilverSim.Database.MySQL.ServerParam
             return result;
         }
 
+        public void Shutdown()
+        {
+            AnyServerParamListeners.Clear();
+        }
+
         static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("serverparams"),
@@ -215,6 +257,14 @@ namespace SilverSim.Database.MySQL.ServerParam
             new NamedKeyInfo("regionid", "regionid"),
             new NamedKeyInfo("parametername", "parametername")
         };
+
+        public ShutdownOrder ShutdownOrder
+        {
+            get
+            {
+                return ShutdownOrder.LogoutDatabase;
+            }
+        }
     }
     #endregion
 

@@ -52,7 +52,7 @@ using System.Xml;
 namespace SilverSim.Main.Common
 {
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
-    public sealed class ConfigurationLoader
+    public sealed class ConfigurationLoader : IServerParamListener
     {
         #region Resource Assets support
         [Description("Resource Asset Backend")]
@@ -1478,6 +1478,8 @@ namespace SilverSim.Main.Common
                         }
                     }
                 }
+
+                serverParams.AnyServerParamListeners.Add(this);
             }
 
             ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
@@ -1816,6 +1818,45 @@ namespace SilverSim.Main.Common
             else
             {
                 io.WriteFormatted("Threads: {0}", Process.GetCurrentProcess().Threads.Count);
+            }
+        }
+        #endregion
+
+        #region Distribute server params
+        public void TriggerParameterUpdated(UUID regionID, string parametername, string value)
+        {
+            ServerParamServiceInterface serverParams = GetServerParamStorage();
+            if(regionID == UUID.Zero)
+            {
+                foreach(SceneInterface scene in Scenes.Values)
+                {
+                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(scene.GetType(), typeof(ServerParamAttribute));
+                    foreach(ServerParamAttribute attr in attrs)
+                    {
+                        if(attr.ParameterName == parametername &&
+                            !serverParams.Contains(regionID, parametername))
+                        {
+                            scene.TriggerParameterUpdated(regionID, parametername, value);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                SceneInterface scene;
+                if (Scenes.TryGetValue(regionID, out scene))
+                {
+                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(scene.GetType(), typeof(ServerParamAttribute));
+                    foreach (ServerParamAttribute attr in attrs)
+                    {
+                        if (attr.ParameterName == parametername)
+                        {
+                            scene.TriggerParameterUpdated(regionID, parametername, value);
+                            break;
+                        }
+                    }
+                }
             }
         }
         #endregion
