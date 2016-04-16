@@ -3,6 +3,7 @@
 
 using log4net;
 using SilverSim.Main.Common.Caps;
+using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Agent;
@@ -55,6 +56,7 @@ namespace SilverSim.Viewer.Core
 
         private Thread m_ObjectUpdateThread;
         private bool m_ObjectUpdateThreadRunning;
+        CommandRegistry m_Commands;
 
         int m_AgentUpdatesReceived;
 
@@ -655,6 +657,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         public AgentCircuit(
+            CommandRegistry commands,
             ViewerAgent agent, 
             UDPCircuitsManager server,
             UInt32 circuitcode,
@@ -665,6 +668,7 @@ namespace SilverSim.Viewer.Core
             List<IProtocolExtender> extenders)
             : base(server, circuitcode)
         {
+            m_Commands = commands;
             InitSimStats();
 
             Agent = agent;

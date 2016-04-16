@@ -53,6 +53,7 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
         private UDPCircuitsManager m_UDPServer;
+        SceneList m_Scenes;
         #endregion
 
         #region Interface wrappers
@@ -458,6 +459,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #region Constructor
         internal BasicScene(
+            SceneList scenes,
             ChatServiceInterface chatService, 
             IMServiceInterface imService,
             GroupsNameServiceInterface groupsNameService,
@@ -477,6 +479,7 @@ namespace SilverSim.Scene.Implementation.Basic
             SceneFactory myFactory)
         : base(ri.Size.X, ri.Size.Y)
         {
+            m_Scenes = scenes;
             if(persistentAssetService == null)
             {
                 throw new ArgumentNullException("persistentAssetService");
@@ -526,7 +529,7 @@ namespace SilverSim.Scene.Implementation.Basic
             GridService = gridService;
             EstateService = estateService;
             /* next line is there to break the circular dependencies */
-            TryGetScene = SceneManager.Scenes.TryGetValue;
+            TryGetScene = m_Scenes.TryGetValue;
             #endregion
 
             #region Setup Region Data
@@ -559,7 +562,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 throw new ArgumentException("Could not load estate data");
             }
 
-            m_RestartObject = new RestartObject(this, myFactory, regionStorage);
+            m_RestartObject = new RestartObject(scenes, this, myFactory, regionStorage);
 
             m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
             m_SceneObjects = new BasicSceneObjectsCollection(this);
@@ -833,6 +836,7 @@ namespace SilverSim.Scene.Implementation.Basic
             public readonly System.Timers.Timer RestartTimer = new System.Timers.Timer(1000);
             int m_SecondsToRestart;
             public bool FirstTrigger;
+            SceneList m_Scenes;
             readonly object m_ActionLock = new object();
             public bool Abort()
             {
@@ -871,8 +875,9 @@ namespace SilverSim.Scene.Implementation.Basic
                 RestartTimer.Dispose();
             }
 
-            public RestartObject(SceneInterface scene, SceneFactory sceneFactory, GridServiceInterface regionStorage)
+            public RestartObject(SceneList scenes, SceneInterface scene, SceneFactory sceneFactory, GridServiceInterface regionStorage)
             {
+                m_Scenes = scenes;
                 m_WeakScene = new WeakReference(scene);
                 m_SceneFactory = sceneFactory;
                 m_RegionStorage = regionStorage;
@@ -922,7 +927,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     if (m_RegionStorage.TryGetValue(scopeID, sceneID, out rInfo))
                     {
                         m_Log.InfoFormat("Restarting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
-                        SceneManager.Scenes.Remove(scene,
+                        m_Scenes.Remove(scene,
                             delegate(System.Globalization.CultureInfo culture)
                             {
                                 return this.GetLanguageString(culture, "RegionIsNowRestarting", "Region is now restarting.");
@@ -939,7 +944,7 @@ namespace SilverSim.Scene.Implementation.Basic
                             m_Log.InfoFormat("Failed to start region: {0}", e.Message);
                             return;
                         }
-                        SceneManager.Scenes.Add(scene);
+                        m_Scenes.Add(scene);
                         scene.LoadSceneAsync();
                     }
                     RestartTimer.Stop();

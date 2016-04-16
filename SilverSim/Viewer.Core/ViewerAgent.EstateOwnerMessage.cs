@@ -511,7 +511,7 @@ namespace SilverSim.Viewer.Core
                 foreach(UUID regionID in estateService.RegionMap[estateID])
                 {
                     SceneInterface estateScene;
-                    if(SceneManager.Scenes.TryGetValue(regionID, out estateScene))
+                    if(m_Scenes.TryGetValue(regionID, out estateScene))
                     {
                         estateScene.TriggerEstateUpdate();
                     }
@@ -698,7 +698,7 @@ namespace SilverSim.Viewer.Core
                 List<UUID> allRegions = estateService.RegionMap[estateId];
                 foreach(UUID regionId in allRegions)
                 {
-                    if(SceneManager.Scenes.TryGetValue(regionId, out scene))
+                    if(m_Scenes.TryGetValue(regionId, out scene))
                     {
                         foreach(IAgent agent in scene.RootAgents)
                         {
@@ -839,7 +839,7 @@ namespace SilverSim.Viewer.Core
                 foreach (UUID regionID in estateService.RegionMap[estateID])
                 {
                     SceneInterface estateScene;
-                    if (SceneManager.Scenes.TryGetValue(regionID, out estateScene))
+                    if (m_Scenes.TryGetValue(regionID, out estateScene))
                     {
                         estateScene.TriggerEstateUpdate();
                     }

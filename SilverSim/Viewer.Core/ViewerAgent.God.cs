@@ -1,14 +1,8 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
-using SilverSim.Viewer;
-using SilverSim.Scene.Types;
+
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Management.Scene;
+using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.God;
 using System.Diagnostics.CodeAnalysis;
@@ -68,8 +62,8 @@ namespace SilverSim.Viewer.Core
                 return false;
             }
 
-            Scene.Types.Scene.SceneInterface scene;
-            if(!SceneManager.Scenes.TryGetValue(sceneID, out scene))
+            SceneInterface scene;
+            if(!m_Scenes.TryGetValue(sceneID, out scene))
             {
                 return false;
             }

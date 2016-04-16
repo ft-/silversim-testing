@@ -42,6 +42,7 @@ namespace SilverSim.Main.Cmd.Region
         private string m_ExternalHostName = string.Empty;
         private uint m_HttpPort;
         private string m_Scheme = Uri.UriSchemeHttp;
+        SceneList m_Scenes;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
         public RegionCommands(string regionStorageName, string estateServiceName, string simulationStorageName)
@@ -53,6 +54,7 @@ namespace SilverSim.Main.Cmd.Region
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             IConfig config = loader.Config.Configs["Network"];
             if (config != null)
             {
@@ -69,44 +71,44 @@ namespace SilverSim.Main.Cmd.Region
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_SimulationData = loader.GetService<SimulationDataStorageInterface>(m_SimulationStorageName);
-            Common.CmdIO.CommandRegistry.CreateCommands.Add("region", CreateRegionCmd);
-            Common.CmdIO.CommandRegistry.CreateCommands.Add("regions", CreateRegionsCmd);
-            Common.CmdIO.CommandRegistry.DeleteCommands.Add("region", DeleteRegionCmd);
-            Common.CmdIO.CommandRegistry.ShowCommands.Add("regionstats", ShowRegionStatsCmd);
-            Common.CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCmd);
-            Common.CmdIO.CommandRegistry.EnableCommands.Add("region", EnableRegionCmd);
-            Common.CmdIO.CommandRegistry.DisableCommands.Add("region", DisableRegionCmd);
-            Common.CmdIO.CommandRegistry.StartCommands.Add("region", StartRegionCmd);
-            Common.CmdIO.CommandRegistry.StopCommands.Add("region", StopRegionCmd);
-            Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
-            Common.CmdIO.CommandRegistry.AlertCommands.Add("region", AlertRegionCmd);
-            Common.CmdIO.CommandRegistry.RestartCommands.Add("region", RestartRegionCmd);
-            Common.CmdIO.CommandRegistry.AlertCommands.Add("regions", AlertRegionsCmd);
-            Common.CmdIO.CommandRegistry.AlertCommands.Add("agent", AlertAgentCmd);
-            Common.CmdIO.CommandRegistry.KickCommands.Add("agent", KickAgentCmd);
-            Common.CmdIO.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
-            Common.CmdIO.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
-            Common.CmdIO.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
-            Common.CmdIO.CommandRegistry.ShowCommands.Add("neighbors", ShowNeighborsCmd);
-            Common.CmdIO.CommandRegistry.ClearCommands.Add("objects", ClearObjectsCmd);
-            Common.CmdIO.CommandRegistry.ClearCommands.Add("parcels", ClearParcelsCmd);
-            Common.CmdIO.CommandRegistry.ClearCommands.Add("region", ClearRegionCmd);
-            Common.CmdIO.CommandRegistry.SelectCommands.Add("region", SelectRegionCmd);
-            Common.CmdIO.CommandRegistry.ShowCommands.Add("parcels", ShowParcelsCmd);
-            Common.CmdIO.CommandRegistry.GetCommands.Add("sunparam", GetSunParamCmd);
-            Common.CmdIO.CommandRegistry.SetCommands.Add("sunparam", SetSunParamCmd);
-            Common.CmdIO.CommandRegistry.ResetCommands.Add("sunparam", ResetSunParamCmd);
-            Common.CmdIO.CommandRegistry.GetCommands.Add("moonparam", GetMoonParamCmd);
-            Common.CmdIO.CommandRegistry.SetCommands.Add("moonparam", SetMoonParamCmd);
-            Common.CmdIO.CommandRegistry.ResetCommands.Add("moonparam", ResetMoonParamCmd);
-            Common.CmdIO.CommandRegistry.EnableCommands.Add("tidal", EnableTidalParamCmd);
-            Common.CmdIO.CommandRegistry.DisableCommands.Add("tidal", DisableTidalParamCmd);
-            Common.CmdIO.CommandRegistry.GetCommands.Add("tidalparam", GetTidalParamCmd);
-            Common.CmdIO.CommandRegistry.SetCommands.Add("tidalparam", SetTidalParamCmd);
-            Common.CmdIO.CommandRegistry.ResetCommands.Add("tidalparam", ResetTidalParamCmd);
-            Common.CmdIO.CommandRegistry.ResetCommands.Add("windparam", ResetWindParamCmd);
-            Common.CmdIO.CommandRegistry.GetCommands.Add("waterheight", GetWaterheightCmd);
-            Common.CmdIO.CommandRegistry.SetCommands.Add("waterheight", SetWaterheightCmd);
+            loader.CommandRegistry.CreateCommands.Add("region", CreateRegionCmd);
+            loader.CommandRegistry.CreateCommands.Add("regions", CreateRegionsCmd);
+            loader.CommandRegistry.DeleteCommands.Add("region", DeleteRegionCmd);
+            loader.CommandRegistry.ShowCommands.Add("regionstats", ShowRegionStatsCmd);
+            loader.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCmd);
+            loader.CommandRegistry.EnableCommands.Add("region", EnableRegionCmd);
+            loader.CommandRegistry.DisableCommands.Add("region", DisableRegionCmd);
+            loader.CommandRegistry.StartCommands.Add("region", StartRegionCmd);
+            loader.CommandRegistry.StopCommands.Add("region", StopRegionCmd);
+            loader.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
+            loader.CommandRegistry.AlertCommands.Add("region", AlertRegionCmd);
+            loader.CommandRegistry.RestartCommands.Add("region", RestartRegionCmd);
+            loader.CommandRegistry.AlertCommands.Add("regions", AlertRegionsCmd);
+            loader.CommandRegistry.AlertCommands.Add("agent", AlertAgentCmd);
+            loader.CommandRegistry.KickCommands.Add("agent", KickAgentCmd);
+            loader.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
+            loader.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
+            loader.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
+            loader.CommandRegistry.ShowCommands.Add("neighbors", ShowNeighborsCmd);
+            loader.CommandRegistry.ClearCommands.Add("objects", ClearObjectsCmd);
+            loader.CommandRegistry.ClearCommands.Add("parcels", ClearParcelsCmd);
+            loader.CommandRegistry.ClearCommands.Add("region", ClearRegionCmd);
+            loader.CommandRegistry.SelectCommands.Add("region", SelectRegionCmd);
+            loader.CommandRegistry.ShowCommands.Add("parcels", ShowParcelsCmd);
+            loader.CommandRegistry.GetCommands.Add("sunparam", GetSunParamCmd);
+            loader.CommandRegistry.SetCommands.Add("sunparam", SetSunParamCmd);
+            loader.CommandRegistry.ResetCommands.Add("sunparam", ResetSunParamCmd);
+            loader.CommandRegistry.GetCommands.Add("moonparam", GetMoonParamCmd);
+            loader.CommandRegistry.SetCommands.Add("moonparam", SetMoonParamCmd);
+            loader.CommandRegistry.ResetCommands.Add("moonparam", ResetMoonParamCmd);
+            loader.CommandRegistry.EnableCommands.Add("tidal", EnableTidalParamCmd);
+            loader.CommandRegistry.DisableCommands.Add("tidal", DisableTidalParamCmd);
+            loader.CommandRegistry.GetCommands.Add("tidalparam", GetTidalParamCmd);
+            loader.CommandRegistry.SetCommands.Add("tidalparam", SetTidalParamCmd);
+            loader.CommandRegistry.ResetCommands.Add("tidalparam", ResetTidalParamCmd);
+            loader.CommandRegistry.ResetCommands.Add("windparam", ResetWindParamCmd);
+            loader.CommandRegistry.GetCommands.Add("waterheight", GetWaterheightCmd);
+            loader.CommandRegistry.SetCommands.Add("waterheight", SetWaterheightCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -308,7 +310,7 @@ namespace SilverSim.Main.Cmd.Region
                 }
 
                 SceneInterface si;
-                if (SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
+                if (m_Scenes.TryGetValue(rInfo.ID, out si))
                 {
                     io.WriteFormatted("Please stop region first.");
                     return;
@@ -667,7 +669,7 @@ namespace SilverSim.Main.Cmd.Region
                 {
                     io.WriteFormatted("Region '{0}' not found", args[2]);
                 }
-                else if(SceneManager.Scenes.ContainsKey(rInfo.ID))
+                else if(m_Scenes.ContainsKey(rInfo.ID))
                 {
                     io.WriteFormatted("Region '{0}' is running.", args[2]);
                 }
@@ -701,7 +703,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 SceneInterface scene;
                 int timeToRestart;
-                if(!SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+                if(!m_Scenes.TryGetValue(rInfo.ID, out scene))
                 {
                     io.Write("region not started");
                 }
@@ -786,7 +788,7 @@ namespace SilverSim.Main.Cmd.Region
             else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {
                 SceneInterface si;
-                if (SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
+                if (m_Scenes.TryGetValue(rInfo.ID, out si))
                 {
                     io.Write(string.Format("Region '{0}' ({1}) is already started", rInfo.Name, rInfo.ID.ToString()));
                 }
@@ -803,7 +805,7 @@ namespace SilverSim.Main.Cmd.Region
                         io.WriteFormatted("Failed to start region: {0}", e.Message);
                         return;
                     }
-                    SceneManager.Scenes.Add(si);
+                    m_Scenes.Add(si);
                     si.LoadSceneAsync();
                 }
             }
@@ -823,13 +825,13 @@ namespace SilverSim.Main.Cmd.Region
             else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {
                 SceneInterface si;
-                if (!SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
+                if (!m_Scenes.TryGetValue(rInfo.ID, out si))
                 {
                     io.Write(string.Format("Region '{0}' ({1}) is not started", rInfo.Name, rInfo.ID.ToString()));
                 }
                 else
                 {
-                    SceneManager.Scenes.Remove(si);
+                    m_Scenes.Remove(si);
                 }
             }
         }
@@ -859,7 +861,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("no scene selected");
                 return;
@@ -889,7 +891,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             string msg = string.Join(" ", args.GetRange(2, args.Count - 2));
-            foreach (SceneInterface scene in SceneManager.Scenes.Values)
+            foreach (SceneInterface scene in m_Scenes.Values)
             {
                 foreach (IAgent agent in scene.RootAgents)
                 {
@@ -923,7 +925,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("no scene selected");
                 return;
@@ -970,7 +972,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("no scene selected");
                 return;
@@ -1024,7 +1026,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("no scene selected");
                 return;
@@ -1061,7 +1063,7 @@ namespace SilverSim.Main.Cmd.Region
             StringBuilder output = new StringBuilder();
             if (selectedScene == UUID.Zero)
             {
-                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                foreach (SceneInterface scene in m_Scenes.Values)
                 {
                     output.AppendFormat("Region {0}\n  Env FPS: {1:F2}  Phys FPS: {2:F2}  Phys Engine: {3}\n",
                         scene.Name,
@@ -1073,7 +1075,7 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 SceneInterface scene;
-                if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+                if (!m_Scenes.TryGetValue(selectedScene, out scene))
                 {
                     io.Write("no scene selected");
                     return;
@@ -1109,7 +1111,7 @@ namespace SilverSim.Main.Cmd.Region
             else if (args[2] == "online")
             {
                 List<RegionInfo> regionList = new List<RegionInfo>();
-                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                foreach (SceneInterface scene in m_Scenes.Values)
                 {
                     regionList.Add(scene.GetRegionInfo());
                 }
@@ -1119,7 +1121,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 List<UUID> onlineRegions = new List<UUID>();
 
-                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                foreach (SceneInterface scene in m_Scenes.Values)
                 {
                     onlineRegions.Add(scene.ID);
                 }
@@ -1173,7 +1175,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("no scene selected");
                 return;
@@ -1217,7 +1219,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("no scene selected");
                 return;
@@ -1247,7 +1249,7 @@ namespace SilverSim.Main.Cmd.Region
         {
             UUID sceneID = UUID.Zero != limitedToScene ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(sceneID, out scene))
+            if (!m_Scenes.TryGetValue(sceneID, out scene))
             {
                 io.Write("No region selected.");
             }
@@ -1277,11 +1279,11 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (UUID.Zero != limitedToScene)
             {
-                scene = SceneManager.Scenes[limitedToScene];
+                scene = m_Scenes[limitedToScene];
             }
             else if (UUID.Zero != io.SelectedScene)
             {
-                scene = SceneManager.Scenes[io.SelectedScene];
+                scene = m_Scenes[io.SelectedScene];
             }
             else
             {
@@ -1302,11 +1304,11 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (UUID.Zero != limitedToScene)
             {
-                scene = SceneManager.Scenes[limitedToScene];
+                scene = m_Scenes[limitedToScene];
             }
             else if (UUID.Zero != io.SelectedScene)
             {
-                scene = SceneManager.Scenes[io.SelectedScene];
+                scene = m_Scenes[io.SelectedScene];
             }
             else
             {
@@ -1327,11 +1329,11 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (UUID.Zero != limitedToScene)
             {
-                scene = SceneManager.Scenes[limitedToScene];
+                scene = m_Scenes[limitedToScene];
             }
             else if (UUID.Zero != io.SelectedScene)
             {
-                scene = SceneManager.Scenes[io.SelectedScene];
+                scene = m_Scenes[io.SelectedScene];
             }
             else
             {
@@ -1369,7 +1371,7 @@ namespace SilverSim.Main.Cmd.Region
             else if (args.Count == 3)
             {
                 SceneInterface scene;
-                if (SceneManager.Scenes.TryGetValue(args[2], out scene))
+                if (m_Scenes.TryGetValue(args[2], out scene))
                 {
                     io.SelectedScene = scene.ID;
                     io.WriteFormatted("region {0} selected", args[2]);
@@ -1395,7 +1397,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("reset sunparam - reset sunparam to defaults");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1419,7 +1421,7 @@ namespace SilverSim.Main.Cmd.Region
                     "set sunparam updateeverymsecs <value>\n" +
                     "set sunparam sendsimtimeeverynthupdate <value>");
             }
-            else if(selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if(selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1520,7 +1522,7 @@ namespace SilverSim.Main.Cmd.Region
                     "get sunparam updateveryms\n" +
                     "get sunparam sendsimtimeeverynthupdate");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1572,7 +1574,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("reset moonparam - reset moon parameters to defaults");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1591,7 +1593,7 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("set moonparam period <seconds>\n" +
                     "set moonparam phaseoffset <offset>");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1639,7 +1641,7 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("get moonparam period\n" +
                     "get moonparam phaseoffset");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1672,7 +1674,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("reset tidalparam - reset tidal parameters to defaults");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1691,7 +1693,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("enable tidal");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1709,7 +1711,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("disable tidal");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1731,7 +1733,7 @@ namespace SilverSim.Main.Cmd.Region
                     "set tidalparam sunamplitude <amplitude>\n" + 
                     "set tidalparam updateeverymsecs <millseconds>\n");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1805,7 +1807,7 @@ namespace SilverSim.Main.Cmd.Region
                     "get tidalparam enabled\n" + 
                     "get tidalparam updateeverymsecs");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1850,7 +1852,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("reset windparam - reset wind parameters to defaults");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1871,7 +1873,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("set waterheight <waterheight>");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }
@@ -1898,7 +1900,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("get waterheight");
             }
-            else if (selectedScene == UUID.Zero || !SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("No region selected");
             }

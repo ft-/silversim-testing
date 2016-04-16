@@ -54,7 +54,7 @@ namespace SilverSim.Main.Common
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public sealed class ConfigurationLoader
     {
-        #region Rsource Assets support
+        #region Resource Assets support
         [Description("Resource Asset Backend")]
         sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
         {
@@ -167,6 +167,8 @@ namespace SilverSim.Main.Common
         readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
         public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
         static readonly RwLockedDictionary<string, Assembly> PreloadPlatformAssemblies = new RwLockedDictionary<string, Assembly>();
+        public readonly SceneList Scenes = new SceneList();
+        public readonly CmdIO.CommandRegistry CommandRegistry = new CmdIO.CommandRegistry();
 
         #region Simulator Shutdown Handler
         readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
@@ -278,7 +280,7 @@ namespace SilverSim.Main.Common
                 {
                     res.Headers.Add(kvp.Key, kvp.Value);
                 }
-                if (SceneManager.Scenes.Count != 0)
+                if (Scenes.Count != 0)
                 {
                     res.Headers["X-UDP-InterSim"] = "supported";
                 }
@@ -1211,15 +1213,15 @@ namespace SilverSim.Main.Common
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
             AddSource(mainConfig);
 
-            CmdIO.CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
-            CmdIO.CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
-            CmdIO.CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
-            CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
-            CmdIO.CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
-            CmdIO.CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
-            CmdIO.CommandRegistry.ShowCommands.Add("issues", ShowIssuesCommand);
-            CmdIO.CommandRegistry.ShowCommands.Add("cacheddns", ShowCachedDnsCommand);
-            CmdIO.CommandRegistry.DeleteCommands.Add("cacheddns", RemoveCachedDnsCommand);
+            CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
+            CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
+            CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
+            CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
+            CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
+            CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
+            CommandRegistry.ShowCommands.Add("issues", ShowIssuesCommand);
+            CommandRegistry.ShowCommands.Add("cacheddns", ShowCachedDnsCommand);
+            CommandRegistry.DeleteCommands.Add("cacheddns", RemoveCachedDnsCommand);
 
             while(m_Sources.Count != 0)
             {
@@ -1323,7 +1325,7 @@ namespace SilverSim.Main.Common
             consoleTitle += ": " + VersionInfo.ProductName + " (" + VersionInfo.Version + ")";
             if (null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true) && localConsoleControl == LocalConsole.Allowed)
             {
-                PluginInstances.Add("LocalConsole", new Console.LocalConsole(consoleTitle));
+                PluginInstances.Add("LocalConsole", new Console.LocalConsole(consoleTitle, Scenes, CommandRegistry));
             }
             else if (null == consoleConfig || consoleConfig.GetBoolean("EnableLogConsole", false) && localConsoleControl == LocalConsole.Allowed)
             {
@@ -1485,7 +1487,8 @@ namespace SilverSim.Main.Common
                 Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
                 Type t = assembly.GetType("SilverSim.Viewer.Core.SimCircuitEstablishService");
                 MethodInfo m = t.GetMethod("HandleSimCircuitRequest");
-                httpServer.StartsWithUriHandlers.Add("/circuit", (Action<HttpRequest>)System.Delegate.CreateDelegate(typeof(Action<HttpRequest>), m));
+                m_SimCircuitRequest = (Action<HttpRequest, ConfigurationLoader>)Delegate.CreateDelegate(typeof(Action<HttpRequest, ConfigurationLoader>), m);
+                httpServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
 
                 m_Log.Info("Loading regions");
                 foreach (IRegionLoaderInterface regionLoader in regionLoaders)
@@ -1507,6 +1510,14 @@ namespace SilverSim.Main.Common
                     postLoadStep.PostLoad();
                 }
             }
+        }
+        #endregion
+
+        #region Sim Establish
+        Action<HttpRequest, ConfigurationLoader> m_SimCircuitRequest;
+        void SimCircuitRequest(HttpRequest req)
+        {
+            m_SimCircuitRequest(req, this);
         }
         #endregion
 
@@ -1585,7 +1596,7 @@ namespace SilverSim.Main.Common
                 s.Shutdown();
             }
 
-            SceneManager.Scenes.RemoveAll();
+            Scenes.RemoveAll();
 
             foreach (IPluginShutdown s in shutdownLogoutRegionsList)
             {

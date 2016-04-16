@@ -43,6 +43,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         string m_ExternalHostName = string.Empty;
         string m_Scheme = Uri.UriSchemeHttp;
         AdminWebIF m_WebIF;
+        SceneList m_Scenes;
 
         public RegionAdmin(string regionStorageName, string simulationDataName, string estateServiceName)
         {
@@ -53,6 +54,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             IConfig config = loader.Config.Configs["Network"];
             if (config != null)
             {
@@ -191,7 +193,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         void GetRegionDetails(UUID regionid, Map m)
         {
             SceneInterface scene;
-            bool isOnline = SceneManager.Scenes.TryGetValue(regionid, out scene);
+            bool isOnline = m_Scenes.TryGetValue(regionid, out scene);
             m.Add("IsOnline", isOnline);
             m.Add("IsLoginsEnabled", isOnline && scene.LoginControl.IsLoginEnabled);
         }
@@ -265,7 +267,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
 
             SceneInterface scene;
-            if(SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            if(m_Scenes.TryGetValue(rInfo.ID, out scene))
             {
                 scene.Access = access;
                 scene.TriggerRegionDataChanged();
@@ -309,7 +311,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
 
             SceneInterface scene;
-            if (SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            if (m_Scenes.TryGetValue(rInfo.ID, out scene))
             {
                 scene.Owner = rInfo.Owner;
             }
@@ -345,7 +347,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
 
-            if(SceneManager.Scenes.ContainsKey(rInfo.ID))
+            if(m_Scenes.ContainsKey(rInfo.ID))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
                 return;
@@ -362,7 +364,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
 
             SceneInterface scene;
-            if (SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            if (m_Scenes.TryGetValue(rInfo.ID, out scene))
             {
                 scene.Owner = rInfo.Owner;
             }
@@ -399,7 +401,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
             SceneInterface scene;
-            if(SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            if(m_Scenes.TryGetValue(rInfo.ID, out scene))
             {
                 scene.TriggerEstateUpdate();
             }
@@ -416,7 +418,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
             }
@@ -477,7 +479,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
             }
@@ -501,7 +503,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
             }
@@ -819,7 +821,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
 
                 SceneInterface si;
-                if (SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
+                if (m_Scenes.TryGetValue(rInfo.ID, out si))
                 {
                     AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
                     return;
@@ -855,7 +857,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
-            else if (SceneManager.Scenes.ContainsKey(region.ID))
+            else if (m_Scenes.ContainsKey(region.ID))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
             }
@@ -885,7 +887,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
@@ -904,7 +906,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
@@ -926,7 +928,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
 
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
@@ -946,7 +948,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
 
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
@@ -969,7 +971,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
-            else if (SceneManager.Scenes.ContainsKey(region.ID))
+            else if (m_Scenes.ContainsKey(region.ID))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.AlreadyStarted);
             }
@@ -987,7 +989,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.FailedToStart);
                     return;
                 }
-                SceneManager.Scenes.Add(si);
+                m_Scenes.Add(si);
                 si.LoadSceneAsync();
                 AdminWebIF.SuccessResponse(req, new Map());
             }
@@ -1002,13 +1004,13 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
 
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
             else
             {
-                SceneManager.Scenes.Remove(scene);
+                m_Scenes.Remove(scene);
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
@@ -1023,7 +1025,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
@@ -1048,7 +1050,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene) ||
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene) ||
                 !scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
@@ -1069,7 +1071,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                foreach (SceneInterface scene in m_Scenes.Values)
                 {
                     foreach (IAgent agent in scene.RootAgents)
                     {
@@ -1271,7 +1273,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
@@ -1367,7 +1369,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
@@ -1461,7 +1463,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }

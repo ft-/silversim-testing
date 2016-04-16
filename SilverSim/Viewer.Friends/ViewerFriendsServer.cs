@@ -46,6 +46,7 @@ namespace SilverSim.Viewer.Friends
         readonly string m_IMServiceName;
         List<IFriendsServicePlugin> m_FriendsPlugins;
         List<IUserAgentServicePlugin> m_UserAgentPlugins;
+        SceneList m_Scenes;
 
         bool m_ShutdownFriends;
 
@@ -55,7 +56,8 @@ namespace SilverSim.Viewer.Friends
         }
 
         public void Startup(ConfigurationLoader loader)
-        {
+        { 
+            m_Scenes = loader.Scenes;
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_FriendsPlugins = loader.GetServicesByValue<IFriendsServicePlugin>();
             m_UserAgentPlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
@@ -136,7 +138,7 @@ namespace SilverSim.Viewer.Friends
             }
 
             SceneInterface scene;
-            if(!SceneManager.Scenes.TryGetValue(m.CircuitSceneID, out scene))
+            if(!m_Scenes.TryGetValue(m.CircuitSceneID, out scene))
             {
                 return;
             }
@@ -214,7 +216,7 @@ namespace SilverSim.Viewer.Friends
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(m.CircuitSceneID, out scene))
+            if (!m_Scenes.TryGetValue(m.CircuitSceneID, out scene))
             {
                 return;
             }
@@ -290,7 +292,7 @@ namespace SilverSim.Viewer.Friends
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(m.CircuitSceneID, out scene))
+            if (!m_Scenes.TryGetValue(m.CircuitSceneID, out scene))
             {
                 return;
             }
@@ -366,7 +368,7 @@ namespace SilverSim.Viewer.Friends
             }
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(m.CircuitSceneID, out scene))
+            if (!m_Scenes.TryGetValue(m.CircuitSceneID, out scene))
             {
                 return;
             }
@@ -434,7 +436,7 @@ namespace SilverSim.Viewer.Friends
 
 
             SceneInterface scene;
-            if (!SceneManager.Scenes.TryGetValue(m.CircuitSceneID, out scene))
+            if (!m_Scenes.TryGetValue(m.CircuitSceneID, out scene))
             {
                 return;
             }

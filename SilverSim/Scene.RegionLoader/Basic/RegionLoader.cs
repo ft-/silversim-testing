@@ -25,6 +25,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private uint m_HttpPort;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
         private string m_Scheme = Uri.UriSchemeHttp;
+        SceneList m_Scenes;
 
         #region Constructor
         internal RegionLoaderService(string regionStorage)
@@ -34,6 +35,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             IConfig config = loader.Config.Configs["Network"];
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
@@ -61,7 +63,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
             {
                 m_Log.InfoFormat("Starting Region {0}", ri.Name);
                 SceneInterface si = m_SceneFactory.Instantiate(ri);
-                SceneManager.Scenes.Add(si);
+                m_Scenes.Add(si);
                 si.LoadSceneAsync();
             }
         }

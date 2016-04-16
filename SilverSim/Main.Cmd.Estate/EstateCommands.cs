@@ -29,6 +29,7 @@ namespace SilverSim.Main.Cmd.Estate
         EstateServiceInterface m_EstateService;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         private static readonly ILog m_Log = LogManager.GetLogger("ESTATE COMMANDS");
+        SceneList m_Scenes;
 
         public EstateCommands(string regionStorageName, string estateServiceName)
         {
@@ -38,13 +39,14 @@ namespace SilverSim.Main.Cmd.Estate
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
-            Common.CmdIO.CommandRegistry.ShowCommands.Add("estates", ShowEstatesCmd);
-            Common.CmdIO.CommandRegistry.ChangeCommands.Add("estate", ChangeEstateCmd);
-            Common.CmdIO.CommandRegistry.CreateCommands.Add("estate", CreateEstateCmd);
-            Common.CmdIO.CommandRegistry.DeleteCommands.Add("estate", DeleteEstateCmd);
-            Common.CmdIO.CommandRegistry.AlertCommands.Add("estate", AlertEstateCmd);
+            loader.CommandRegistry.ShowCommands.Add("estates", ShowEstatesCmd);
+            loader.CommandRegistry.ChangeCommands.Add("estate", ChangeEstateCmd);
+            loader.CommandRegistry.CreateCommands.Add("estate", CreateEstateCmd);
+            loader.CommandRegistry.DeleteCommands.Add("estate", DeleteEstateCmd);
+            loader.CommandRegistry.AlertCommands.Add("estate", AlertEstateCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if(null != sceneConfig)
@@ -242,7 +244,7 @@ namespace SilverSim.Main.Cmd.Estate
                     foreach (UUID regionid in regionids)
                     {
                         SceneInterface scene;
-                        if (SceneManager.Scenes.TryGetValue(regionid, out scene))
+                        if (m_Scenes.TryGetValue(regionid, out scene))
                         {
                             scene.TriggerEstateUpdate();
                         }
@@ -421,7 +423,7 @@ namespace SilverSim.Main.Cmd.Estate
             foreach (UUID regionID in m_EstateService.RegionMap[estateID])
             {
                 SceneInterface scene;
-                if (SceneManager.Scenes.TryGetValue(regionID, out scene))
+                if (m_Scenes.TryGetValue(regionID, out scene))
                 {
                     foreach (IAgent agent in scene.RootAgents)
                     {

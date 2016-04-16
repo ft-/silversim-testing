@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Management.Scene
 
         void HandleSimulatorShutdownInNotice(int timeLeft)
         {
-            foreach (SceneInterface scene in SceneManager.Scenes.Values)
+            foreach (SceneInterface scene in Values)
             {
                 foreach (IAgent agent in scene.RootAgents)
                 {
@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Management.Scene
 
         void HandleSimulatorShutdownAbortNotice()
         {
-            foreach (SceneInterface scene in SceneManager.Scenes.Values)
+            foreach (SceneInterface scene in Values)
             {
                 foreach (IAgent agent in scene.RootAgents)
                 {

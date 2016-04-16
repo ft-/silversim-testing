@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Map
         readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         List<IForeignGridConnectorPlugin> m_ForeignGridConnectorPlugins;
-
+        SceneList m_Scenes;
         bool m_ShutdownMap;
 
         public ViewerMap()
@@ -48,6 +48,7 @@ namespace SilverSim.Viewer.Map
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             m_ForeignGridConnectorPlugins = loader.GetServicesByValue<IForeignGridConnectorPlugin>();
 
             new Thread(HandlerThread).Start(MapBlocksRequestQueue);
@@ -388,7 +389,7 @@ namespace SilverSim.Viewer.Map
             {
                 try
                 {
-                    accessScene = SceneManager.Scenes[req.Location];
+                    accessScene = m_Scenes[req.Location];
                 }
                 catch
                 {

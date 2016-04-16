@@ -260,7 +260,7 @@ namespace SilverSim.WebIF.Admin
             {
                 m_HttpsServer.StartsWithUriHandlers.Add("/admin", HandleHttp);
             }
-            CommandRegistry.Commands.Add("admin-webif", AdminWebIFCmd);
+            loader.CommandRegistry.Commands.Add("admin-webif", AdminWebIFCmd);
         }
 
         public void PostLoad()

@@ -10,33 +10,33 @@ using System.Text;
 
 namespace SilverSim.Main.Common.CmdIO
 {
-    public static class CommandRegistry 
+    public class CommandRegistry 
     {
         // for documentation:
         //public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
 
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CreateCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DeleteCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> LoadCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SaveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ShowCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ResetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> GetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ChangeCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ClearCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EmptyCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> StartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> RestartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> StopCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SelectCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EnableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DisableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> AlertCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> KickCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CreateCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DeleteCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> LoadCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SaveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ShowCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ResetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> GetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ChangeCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ClearCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EmptyCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> StartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> RestartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> StopCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SelectCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EnableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DisableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> AlertCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> KickCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
 
-        static CommandRegistry()
+        public CommandRegistry()
         {
             Commands.Add("load", new CommandType("load", LoadCommands).Command_Handler);
             Commands.Add("save", new CommandType("save", SaveCommands).Command_Handler);
@@ -112,13 +112,13 @@ namespace SilverSim.Main.Common.CmdIO
             }
         }
 
-        public static void ExecuteCommand(List<string> args, TTY io)
+        public void ExecuteCommand(List<string> args, TTY io)
         {
             ExecuteCommand(args, io, UUID.Zero);
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public static void ExecuteCommand(List<string> args, TTY io, UUID limitedToScene)
+        public void ExecuteCommand(List<string> args, TTY io, UUID limitedToScene)
         {
             Action<List<string>, TTY, UUID> del;
             if(args.Count == 0)

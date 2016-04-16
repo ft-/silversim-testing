@@ -29,9 +29,13 @@ namespace SilverSim.Main.Common.Console
         readonly object m_InputThreadLock = new object();
         private bool m_Shutdown;
         readonly string m_ConsoleTitle;
+        readonly SceneList m_Scenes;
+        readonly CmdIO.CommandRegistry m_Commands;
 
-        public LocalConsole(string consoleTitle)
+        public LocalConsole(string consoleTitle, SceneList scenes, CmdIO.CommandRegistry commands)
         {
+            m_Commands = commands;
+            m_Scenes = scenes;
             m_ConsoleTitle = consoleTitle;
             System.Console.Title = consoleTitle;
             CmdPrompt = "# ";
@@ -536,7 +540,7 @@ namespace SilverSim.Main.Common.Console
                 else
                 {
                     SceneInterface scene;
-                    if (SceneManager.Scenes.TryGetValue(SelectedScene, out scene))
+                    if (m_Scenes.TryGetValue(SelectedScene, out scene))
                     {
                         CmdPrompt = scene.Name + " # ";
                         consoleTitle = m_ConsoleTitle + " # " + scene.Name;
@@ -578,7 +582,7 @@ namespace SilverSim.Main.Common.Console
                 m_CmdHistory.Add(cmd);
                 lock (m_InputThreadLock)
                 {
-                    CmdIO.CommandRegistry.ExecuteCommand(GetCmdLine(cmd), this);
+                    m_Commands.ExecuteCommand(GetCmdLine(cmd), this);
                 }
             }
         }

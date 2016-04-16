@@ -12,6 +12,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Main.Common;
 
 namespace SilverSim.Viewer.Core
 {
@@ -34,7 +35,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        public static void HandleSimCircuitRequest(HttpRequest req)
+        public static void HandleSimCircuitRequest(HttpRequest req, ConfigurationLoader loader)
         {
             if (req.ContainsHeader("X-SecondLife-Shard"))
             {
@@ -71,7 +72,7 @@ namespace SilverSim.Viewer.Core
             SceneInterface scene;
             try
             {
-                scene = SceneManager.Scenes[regionID];
+                scene = loader.Scenes[regionID];
             }
             catch
             {

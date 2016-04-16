@@ -22,6 +22,7 @@ namespace SilverSim.Scene.Registration
     {
         readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
         private BaseHttpServer m_HttpServer;
+        SceneList m_Scenes;
 
         public SceneRegistrar(IConfig ownSection)
         {
@@ -29,12 +30,13 @@ namespace SilverSim.Scene.Registration
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             m_HttpServer = loader.HttpServer;
-            SceneManager.Scenes.OnRegionAdd += RegionAdded;
-            SceneManager.Scenes.OnRegionRemove += RegionRemoved;
+            m_Scenes.OnRegionAdd += RegionAdded;
+            m_Scenes.OnRegionRemove += RegionRemoved;
 
             /* register missing scenes */
-            foreach(SceneInterface si in SceneManager.Scenes.Values)
+            foreach(SceneInterface si in m_Scenes.Values)
             {
                 if(!m_RegisteredScenes.Contains(si))
                 {

@@ -3,6 +3,7 @@
 
 using log4net;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
 using SilverSim.Scene.Types.Object;
@@ -48,6 +49,7 @@ namespace SilverSim.Viewer.Core
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
         public event Action<IObject> OnPositionChange;
         readonly object m_DataLock = new object();
+        SceneList m_Scenes;
 
         #region Agent fields
         readonly UUID m_AgentID;
@@ -1344,7 +1346,9 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public ViewerAgent(UUID agentID,
+        public ViewerAgent(
+            SceneList scenes,
+            UUID agentID,
             string firstName,
             string lastName,
             Uri homeURI,
@@ -1355,6 +1359,7 @@ namespace SilverSim.Viewer.Core
             UserAccount untrustedAccountInfo,
             AgentServiceList serviceList)
         {
+            m_Scenes = scenes;
             m_TeleportServices = serviceList.GetAll<IAgentTeleportServiceInterface>();
             CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;

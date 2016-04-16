@@ -17,6 +17,8 @@ namespace SilverSim.WebIF.Admin
     public class ConsoleAdmin : IPlugin, IPluginShutdown
     {
         AdminWebIF m_WebIF;
+        CommandRegistry m_Commands;
+
         public ConsoleAdmin()
         {
 
@@ -24,7 +26,7 @@ namespace SilverSim.WebIF.Admin
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            m_Commands = loader.CommandRegistry;
             m_WebIF = loader.GetAdminWebIF();
             m_WebIF.JsonMethods.Add("console.command", ConsoleCommand);
         }
@@ -75,7 +77,7 @@ namespace SilverSim.WebIF.Admin
                         {
                             ConsoleAdminTty tty = new ConsoleAdminTty(w);
                             tty.SelectedScene = webif.GetSelectedRegion(req, jsondata);
-                            CommandRegistry.ExecuteCommand(tty.GetCmdLine(cmd), tty);
+                            m_Commands.ExecuteCommand(tty.GetCmdLine(cmd), tty);
                             webif.SetSelectedRegion(req, jsondata, tty.SelectedScene);
                         }
                     }

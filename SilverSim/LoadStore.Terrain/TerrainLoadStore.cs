@@ -21,6 +21,7 @@ namespace SilverSim.LoadStore.Terrain
     public class TerrainLoadStore : IPlugin
     {
         private readonly Dictionary<string, ITerrainFileStorage> m_TerrainFileStorages = new Dictionary<string, ITerrainFileStorage>();
+        SceneList m_Scenes;
 
         public TerrainLoadStore(ConfigurationLoader loader)
         {
@@ -38,8 +39,9 @@ namespace SilverSim.LoadStore.Terrain
 
         public void Startup(ConfigurationLoader loader)
         {
-            CommandRegistry.LoadCommands.Add("terrain", LoadTerrainCommand);
-            CommandRegistry.SaveCommands.Add("terrain", SaveTerrainCommand);
+            m_Scenes = loader.Scenes;
+            loader.CommandRegistry.LoadCommands.Add("terrain", LoadTerrainCommand);
+            loader.CommandRegistry.SaveCommands.Add("terrain", SaveTerrainCommand);
 
             foreach(ITerrainFileStorage iface in loader.GetServicesByValue<ITerrainFileStorage>())
             {
@@ -99,7 +101,7 @@ namespace SilverSim.LoadStore.Terrain
             {
                 io.Write("No region selected.\n");
             }
-            else if(!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if(!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("Selected region does not exist anymore.\n");
             }
@@ -219,7 +221,7 @@ namespace SilverSim.LoadStore.Terrain
             {
                 io.Write("No region selected.\n");
             }
-            else if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            else if (!m_Scenes.TryGetValue(selectedScene, out scene))
             {
                 io.Write("Selected region does not exist anymore.\n");
             }

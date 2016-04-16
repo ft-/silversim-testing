@@ -26,6 +26,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         EstateServiceInterface m_EstateService;
         GridServiceInterface m_RegionStorageService;
         AdminWebIF m_WebIF;
+        SceneList m_Scenes;
 
         public EstateAdmin(string estateServiceName, string regionStorageName)
         {
@@ -35,6 +36,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_RegionStorageService = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             AdminWebIF webif = loader.GetAdminWebIF();
@@ -179,7 +181,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             foreach(UUID regionid in regionids)
             {
                 SceneInterface scene;
-                if(SceneManager.Scenes.TryGetValue(regionid, out scene))
+                if(m_Scenes.TryGetValue(regionid, out scene))
                 {
                     scene.TriggerEstateUpdate();
                 }
@@ -305,7 +307,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     foreach(UUID regionId in regionIds)
                     {
                         SceneInterface si;
-                        if(SceneManager.Scenes.TryGetValue(regionId, out si))
+                        if(m_Scenes.TryGetValue(regionId, out si))
                         {
                             regions.Add(regionId);
                             UUI regionOwner = si.Owner;
