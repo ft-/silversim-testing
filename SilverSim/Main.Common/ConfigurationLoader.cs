@@ -1480,6 +1480,7 @@ namespace SilverSim.Main.Common
                 }
 
                 serverParams.AnyServerParamListeners.Add(this);
+                Scenes.OnRegionAdd += LoadParamsOnAddedScene;
             }
 
             ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
@@ -1520,6 +1521,32 @@ namespace SilverSim.Main.Common
         void SimCircuitRequest(HttpRequest req)
         {
             m_SimCircuitRequest(req, this);
+        }
+        #endregion
+
+        #region Load region scene params
+        void LoadParamsOnAddedScene(SceneInterface scene)
+        {
+            ServerParamServiceInterface serverParams = GetServerParamStorage();
+            Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
+
+            ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(scene.GetType(), typeof(ServerParamAttribute)) as ServerParamAttribute[];
+            foreach (ServerParamAttribute attr in attrs)
+            {
+                string parameterName = attr.ParameterName;
+                List<KeyValuePair<UUID, string>> result;
+                if (!cachedResults.TryGetValue(parameterName, out result))
+                {
+                    result = serverParams[parameterName];
+                    cachedResults.Add(parameterName, result);
+                }
+
+                foreach (KeyValuePair<UUID, string> kvp in result)
+                {
+                    IServerParamListener listener = (IServerParamListener)scene;
+                    listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
+                }
+            }
         }
         #endregion
 
@@ -1567,6 +1594,8 @@ namespace SilverSim.Main.Common
 
         public void Shutdown()
         {
+            Scenes.OnRegionAdd -= LoadParamsOnAddedScene;
+
             List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownLogoutDatabaseList = new List<IPluginShutdown>();

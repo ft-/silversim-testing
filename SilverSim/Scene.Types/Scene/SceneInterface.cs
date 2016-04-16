@@ -89,7 +89,7 @@ namespace SilverSim.Scene.Types.Scene
         IParcelAccessList BlackList { get; }
     }
 
-    public abstract partial class SceneInterface
+    public abstract partial class SceneInterface : IServerParamListener
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SCENE");
 
