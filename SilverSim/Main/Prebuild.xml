@@ -14,6 +14,7 @@
   <Reference name="System"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
+  <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true"/>
     <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
