@@ -3,6 +3,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
 using SilverSim.Types;
@@ -201,7 +202,12 @@ namespace SilverSim.Viewer.Core
         {
             /* 500ms should be sufficient for resend */
             System.Threading.Thread.Sleep(500);
-            Scene.SendRegionInfo(Agent);
+            SceneInterface scene = Scene;
+            ViewerAgent agent = Agent;
+            if (scene != null && agent != null)
+            {
+                Scene.SendRegionInfo(agent);
+            }
         }
         #endregion
 
