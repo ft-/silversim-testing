@@ -172,29 +172,34 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            using (HttpResponse res = httpreq.BeginResponse())
+            try
             {
-                res.ContentType = "application/llsd+xml";
-                using (Stream tw = res.GetOutputStream())
+                using (HttpResponse res = httpreq.BeginResponse())
                 {
-                    using (XmlTextWriter text = tw.UTF8XmlTextWriter())
+                    res.ContentType = "application/llsd+xml";
+                    using (Stream tw = res.GetOutputStream())
                     {
-                        text.WriteStartElement("llsd");
-                        text.WriteStartElement("map");
-                        foreach (KeyValuePair<string, string> kvp in capsUri)
+                        using (XmlTextWriter text = tw.UTF8XmlTextWriter())
                         {
-                            text.WriteKeyValuePair(kvp.Key, kvp.Value);
+                            text.WriteStartElement("llsd");
+                            text.WriteStartElement("map");
+                            foreach (KeyValuePair<string, string> kvp in capsUri)
+                            {
+                                text.WriteKeyValuePair(kvp.Key, kvp.Value);
+                            }
+                            text.WriteEndElement();
+                            text.WriteEndElement();
+                            text.Flush();
                         }
-                        text.WriteEndElement();
-                        text.WriteEndElement();
-                        text.Flush();
                     }
                 }
             }
-
-            /* we need to retrigger the information */
-            Action d = DelayedRetriggerRegionSettings;
-            d.BeginInvoke(d.EndInvoke, null);
+            finally
+            {
+                /* we need to retrigger the information */
+                Action d = DelayedRetriggerRegionSettings;
+                d.BeginInvoke(d.EndInvoke, null);
+            }
         }
 
         void DelayedRetriggerRegionSettings()
