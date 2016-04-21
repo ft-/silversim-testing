@@ -1,4 +1,5 @@
-﻿// SilverSim is distributed under the terms of the
+﻿
+// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common.HttpServer;
@@ -190,6 +191,17 @@ namespace SilverSim.Viewer.Core
                     }
                 }
             }
+
+            /* we need to retrigger the information */
+            Action d = DelayedRetriggerRegionSettings;
+            d.BeginInvoke(d.EndInvoke, null);
+        }
+
+        void DelayedRetriggerRegionSettings()
+        {
+            /* 500ms should be sufficient for resend */
+            System.Threading.Thread.Sleep(500);
+            Scene.SendRegionInfo(Agent);
         }
         #endregion
 
