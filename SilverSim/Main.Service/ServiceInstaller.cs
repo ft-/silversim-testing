@@ -25,8 +25,8 @@ namespace SilverSim.Main.Service
             serviceInstaller.StartType = ServiceStartMode.Automatic;
             serviceInstaller.ServiceName = MainService.SERVICE_NAME;
 
-            this.Installers.Add(serviceProcessInstaller);
-            this.Installers.Add(serviceInstaller);
+            Installers.Add(serviceProcessInstaller);
+            Installers.Add(serviceInstaller);
         }
     }
 }

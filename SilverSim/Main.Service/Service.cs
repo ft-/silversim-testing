@@ -36,12 +36,12 @@ namespace SilverSim.Main.Service
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         static void Main()
         {
-            ServiceBase.Run(new MainService());
+            Run(new MainService());
         }
 
         protected override void OnStart(string[] args)
         {
-            new System.Threading.Thread(ServiceMain).Start(args);
+            new Thread(ServiceMain).Start(args);
             base.OnStart(args);
         }
 
@@ -84,11 +84,11 @@ namespace SilverSim.Main.Service
             }
             catch (ConfigurationLoader.ConfigurationErrorException e)
             {
-                eventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
+                eventLog.WriteEntry(string.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
             }
             catch (Exception e)
             {
-                eventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
+                eventLog.WriteEntry(string.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
             }
 
             m_ShutdownEvent.WaitOne();
