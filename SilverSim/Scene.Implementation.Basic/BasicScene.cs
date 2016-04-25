@@ -54,6 +54,7 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
         private UDPCircuitsManager m_UDPServer;
         readonly SceneList m_Scenes;
+        readonly IMRouter m_IMRouter;
         #endregion
 
         #region Interface wrappers
@@ -460,6 +461,7 @@ namespace SilverSim.Scene.Implementation.Basic
         #region Constructor
         internal BasicScene(
             SceneList scenes,
+            IMRouter imrouter,
             ChatServiceInterface chatService, 
             IMServiceInterface imService,
             GroupsNameServiceInterface groupsNameService,
@@ -580,7 +582,8 @@ namespace SilverSim.Scene.Implementation.Basic
             Terrain = new TerrainController(this);
             Environment = new EnvironmentController(this);
 
-            IMRouter.SceneIM.Add(IMSend);
+            m_IMRouter = imrouter;
+            m_IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
@@ -684,24 +687,30 @@ namespace SilverSim.Scene.Implementation.Basic
             }
 
             m_RestartObject = null;
+
             if (null != m_NeighborService)
             {
                 RegionInfo rInfo = s.GetRegionInfo();
                 rInfo.Flags &= (~RegionFlags.RegionOnline);
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
+
             if (null != m_SceneListener)
             {
                 m_SceneListener.StopStorageThread();
                 SceneListeners.Remove(m_SceneListener);
             }
+
             if (null != m_TerrainListener)
             {
                 m_TerrainListener.StopStorageThread();
                 Terrain.TerrainListeners.Remove(m_TerrainListener);
             }
 
-            IMRouter.SceneIM.Remove(IMSend);
+            if (null != m_IMRouter)
+            {
+                m_IMRouter.SceneIM.Remove(IMSend);
+            }
             UDPCircuitsManager udpServer = m_UDPServer;
             if (udpServer != null)
             {

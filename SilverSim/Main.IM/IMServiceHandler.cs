@@ -22,6 +22,7 @@ namespace SilverSim.Main.IM
         protected internal RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
         readonly uint m_MaxThreads;
         readonly object m_Lock = new object();
+        IMRouter m_IMRouter;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IMSendThread(object s)
@@ -37,7 +38,7 @@ namespace SilverSim.Main.IM
                     GridInstantMessage im = m_Queue.Dequeue(1000);
                     try
                     {
-                        IMRouter.SendWithResultDelegate(im);
+                        m_IMRouter.SendWithResultDelegate(im);
                     }
                     catch
                     {
@@ -59,7 +60,7 @@ namespace SilverSim.Main.IM
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_IMRouter = loader.IMRouter;
         }
         #endregion
 

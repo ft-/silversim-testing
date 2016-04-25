@@ -8,25 +8,25 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Management.IM
 {
-    public static class IMRouter
+    public class IMRouter
     {
         #region Fields
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
-        public static readonly RwLockedList<Func<GridInstantMessage, bool>> OfflineIM = new RwLockedList<Func<GridInstantMessage, bool>>();
+        public readonly RwLockedList<Func<GridInstantMessage, bool>> OfflineIM = new RwLockedList<Func<GridInstantMessage, bool>>();
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
-        public static readonly RwLockedList<Func<GridInstantMessage, bool>> GridIM = new RwLockedList<Func<GridInstantMessage, bool>>();
+        public readonly RwLockedList<Func<GridInstantMessage, bool>> GridIM = new RwLockedList<Func<GridInstantMessage, bool>>();
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
-        public static readonly RwLockedList<Func<GridInstantMessage, bool>> SceneIM = new RwLockedList<Func<GridInstantMessage, bool>>();
+        public readonly RwLockedList<Func<GridInstantMessage, bool>> SceneIM = new RwLockedList<Func<GridInstantMessage, bool>>();
         #endregion
 
         #region Methods
-        public static void SendWithResultDelegate(GridInstantMessage im)
+        public void SendWithResultDelegate(GridInstantMessage im)
         {
             im.OnResult(im, SendSync(im));
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        public static bool SendSync(GridInstantMessage im)
+        public bool SendSync(GridInstantMessage im)
         {
             bool success = false;
             foreach (Func<GridInstantMessage, bool> del in SceneIM)

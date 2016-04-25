@@ -3,6 +3,7 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.Scene;
@@ -56,6 +57,7 @@ namespace SilverSim.Scene.Implementation.Basic
         NeighborServiceInterface m_NeighborService;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         SceneList m_Scenes;
+        IMRouter m_IMRouter;
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -93,6 +95,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public void Startup(ConfigurationLoader loader)
         {
             m_Scenes = loader.Scenes;
+            m_IMRouter = loader.IMRouter;
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
             if (m_GroupsNameServiceName.Length != 0)
@@ -128,6 +131,7 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             BasicScene scene = new BasicScene(
                 m_Scenes,
+                m_IMRouter,
                 m_ChatFactory.Instantiate(), 
                 m_IMService, 
                 m_GroupsNameService, 

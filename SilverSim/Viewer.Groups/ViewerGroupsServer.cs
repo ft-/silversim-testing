@@ -71,6 +71,7 @@ namespace SilverSim.Viewer.Groups
         readonly BlockingQueue<KeyValuePair<UUID, SceneInterface>> AgentGroupDataUpdateQueue = new BlockingQueue<KeyValuePair<UUID, SceneInterface>>();
 
         readonly BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
+        IMRouter m_IMRouter;
 
         bool m_ShutdownGroups;
 
@@ -81,6 +82,7 @@ namespace SilverSim.Viewer.Groups
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_IMRouter = loader.IMRouter;
             new Thread(HandlerThread).Start();
             new Thread(IMThread).Start();
             new Thread(AgentGroupDataUpdateQueueThread).Start();
@@ -205,7 +207,7 @@ namespace SilverSim.Viewer.Groups
                     GridInstantMessage ngim = gim.Clone();
                     try
                     {
-                        IMRouter.SendSync(ngim);
+                        m_IMRouter.SendSync(ngim);
                     }
                     catch
                     {

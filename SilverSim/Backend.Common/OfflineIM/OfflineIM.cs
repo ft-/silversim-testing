@@ -27,6 +27,7 @@ namespace SilverSim.Backend.Common.OfflineIM
 
         AvatarNameServiceInterface m_AvatarNameService;
         OfflineIMServiceInterface m_OfflineIMService;
+        IMRouter m_IMRouter;
 
         public OfflineIM(string avatarNameServiceName, string offlineIMServiceName)
         {
@@ -99,7 +100,7 @@ namespace SilverSim.Backend.Common.OfflineIM
                     response_im.IsOffline = false;
                     response_im.NoOfflineIMStore = true;
                     response_im.IsSystemMessage = true;
-                    IMRouter.SendWithResultDelegate(response_im);
+                    m_IMRouter.SendWithResultDelegate(response_im);
                 }
                 catch
                 {
@@ -111,9 +112,10 @@ namespace SilverSim.Backend.Common.OfflineIM
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_IMRouter = loader.IMRouter;
             m_AvatarNameService = loader.GetService<AvatarNameServiceInterface>(m_AvatarNameServiceName);
             m_OfflineIMService = loader.GetService<OfflineIMServiceInterface>(m_OfflineIMServiceName);
-            IMRouter.OfflineIM.Add(Send);
+            m_IMRouter.OfflineIM.Add(Send);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -126,7 +128,7 @@ namespace SilverSim.Backend.Common.OfflineIM
 
         public void Shutdown()
         {
-            IMRouter.OfflineIM.Remove(Send);
+            m_IMRouter.OfflineIM.Remove(Send);
         }
     }
     #endregion

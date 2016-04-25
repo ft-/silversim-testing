@@ -7,6 +7,7 @@ using Nini.Config;
 using SilverSim.Http.Client;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
@@ -168,6 +169,7 @@ namespace SilverSim.Main.Common
         public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
         static readonly RwLockedDictionary<string, Assembly> PreloadPlatformAssemblies = new RwLockedDictionary<string, Assembly>();
         public readonly SceneList Scenes = new SceneList();
+        public readonly IMRouter IMRouter = new IMRouter();
         public readonly CmdIO.CommandRegistry CommandRegistry = new CmdIO.CommandRegistry();
 
         #region Simulator Shutdown Handler
