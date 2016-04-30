@@ -17,14 +17,14 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        sealed class ObjectTransferItem : AssetTransferWorkItem
+        public class ObjectTransferItem : AssetTransferWorkItem
         {
             readonly InventoryServiceInterface m_InventoryService;
-            readonly UUI m_DestinationAgent;
-            readonly UUID m_SceneID;
+            protected readonly UUI m_DestinationAgent;
+            protected readonly UUID m_SceneID;
             readonly List<InventoryItem> m_Items;
             readonly string m_DestinationFolder = string.Empty;
-            readonly TryGetSceneDelegate TryGetScene;
+            protected readonly TryGetSceneDelegate TryGetScene;
             readonly AssetType m_DestinationFolderType = AssetType.Object;
 
             public ObjectTransferItem(

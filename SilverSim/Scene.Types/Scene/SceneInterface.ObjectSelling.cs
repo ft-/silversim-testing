@@ -3,12 +3,16 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Transfer;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -127,6 +131,54 @@ namespace SilverSim.Scene.Types.Scene
                     prim.ObjectGroup.SaleType = d.SaleType;
                     propHandler.Send(prim);
                 }
+            }
+        }
+
+        struct ObjectBuyListen
+        {
+            public UUID PrimitiveID;
+            public UUID ItemID;
+
+            public string Key
+            {
+                get
+                {
+                    return GetKey(PrimitiveID, ItemID);
+                }
+            }
+
+            public static string GetKey(UUID primID, UUID itemID)
+            {
+                return primID.ToString() + "-" + itemID.ToString();
+            }
+        }
+
+        RwLockedDictionary<string, ObjectBuyListen> m_ObjectBuyListeners = new RwLockedDictionary<string, ObjectBuyListen>();
+
+        public void AddObjectBuyListen(ScriptInstance instance)
+        {
+            ObjectPart part = instance.Part;
+            ObjectPartInventoryItem item = instance.Item;
+            if(part != null && item != null)
+            {
+                UUID partID = part.ID;
+                UUID itemID = item.ID;
+                ObjectBuyListen listen = new ObjectBuyListen();
+                listen.PrimitiveID = partID;
+                listen.ItemID = itemID;
+                m_ObjectBuyListeners.Add(listen.Key, listen);
+            }
+        }
+
+        public void RemoveObjectBuyListen(ScriptInstance instance)
+        {
+            ObjectPart part = instance.Part;
+            ObjectPartInventoryItem item = instance.Item;
+            if (part != null && item != null)
+            {
+                UUID partID = part.ID;
+                UUID itemID = item.ID;
+                m_ObjectBuyListeners.Remove(ObjectBuyListen.GetKey(partID, itemID));
             }
         }
 
@@ -311,12 +363,63 @@ namespace SilverSim.Scene.Types.Scene
 
                         if (grp.SalePrice == 0)
                         {
-                            new ObjectTransferItem(
+                            new ObjectBuyTransferItem(
                                 agent,
                                 this,
                                 assetids,
                                 items,
-                                grp.SaleType == InventoryItem.SaleInfoData.SaleType.Content ? part.Name : string.Empty).QueueWorkItem();
+                                grp.SaleType == InventoryItem.SaleInfoData.SaleType.Content ? part.Name : string.Empty,
+                                part.ID).QueueWorkItem();
+                        }
+                    }
+                }
+            }
+        }
+
+        public class ObjectBuyTransferItem : ObjectTransferItem
+        {
+            UUID m_SellingPrimitiveID;
+
+            public ObjectBuyTransferItem(
+                IAgent agent,
+                SceneInterface scene,
+                List<UUID> assetids,
+                List<InventoryItem> items,
+                string destinationFolder,
+                UUID sellingPrimitiveID)
+                : base(agent, scene, assetids, items, destinationFolder)
+            {
+                m_SellingPrimitiveID = sellingPrimitiveID;
+            }
+
+            public override void AssetTransferComplete()
+            {
+                base.AssetTransferComplete();
+
+                ObjectPart part;
+                SceneInterface scene;
+                UUI sellOwner;
+
+                if (TryGetScene(m_SceneID, out scene) &&
+                    scene.Primitives.TryGetValue(m_SellingPrimitiveID, out part))
+                {
+                    sellOwner = part.Owner;
+                    foreach(ObjectBuyListen lt in scene.m_ObjectBuyListeners.Values)
+                    {
+                        ObjectPartInventoryItem item;
+                        if(scene.Primitives.TryGetValue(lt.PrimitiveID, out part) &&
+                            part.Inventory.TryGetValue(lt.ItemID, out item) &&
+                            part.Owner.EqualsGrid(sellOwner))
+                        {
+                            ScriptInstance script = item.ScriptInstance;
+                            if (script != null)
+                            {
+                                ItemSoldEvent ev = new ItemSoldEvent();
+                                ev.Agent = m_DestinationAgent;
+                                ev.ObjectID = m_SellingPrimitiveID;
+                                ev.ObjectName = part.Name;
+                                script.PostEvent(ev);
+                            }
                         }
                     }
                 }
