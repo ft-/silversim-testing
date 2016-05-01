@@ -279,7 +279,7 @@ namespace SilverSim.Viewer.Core
             SendEstateUpdateInfo(req.Invoice, req.TransactionID, estateInfo, req.CircuitSceneID);
         }
 
-        internal void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true)
+        public void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true)
         {
             EstateOwnerMessage msg = new EstateOwnerMessage();
             msg.AgentID = Owner.ID;

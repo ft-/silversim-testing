@@ -172,45 +172,24 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            try
+            using (HttpResponse res = httpreq.BeginResponse())
             {
-                using (HttpResponse res = httpreq.BeginResponse())
+                res.ContentType = "application/llsd+xml";
+                using (Stream tw = res.GetOutputStream())
                 {
-                    res.ContentType = "application/llsd+xml";
-                    using (Stream tw = res.GetOutputStream())
+                    using (XmlTextWriter text = tw.UTF8XmlTextWriter())
                     {
-                        using (XmlTextWriter text = tw.UTF8XmlTextWriter())
+                        text.WriteStartElement("llsd");
+                        text.WriteStartElement("map");
+                        foreach (KeyValuePair<string, string> kvp in capsUri)
                         {
-                            text.WriteStartElement("llsd");
-                            text.WriteStartElement("map");
-                            foreach (KeyValuePair<string, string> kvp in capsUri)
-                            {
-                                text.WriteKeyValuePair(kvp.Key, kvp.Value);
-                            }
-                            text.WriteEndElement();
-                            text.WriteEndElement();
-                            text.Flush();
+                            text.WriteKeyValuePair(kvp.Key, kvp.Value);
                         }
+                        text.WriteEndElement();
+                        text.WriteEndElement();
+                        text.Flush();
                     }
                 }
-            }
-            finally
-            {
-                /* we need to retrigger the information */
-                Action d = DelayedRetriggerRegionSettings;
-                d.BeginInvoke(d.EndInvoke, null);
-            }
-        }
-
-        void DelayedRetriggerRegionSettings()
-        {
-            /* 500ms should be sufficient for resend */
-            System.Threading.Thread.Sleep(500);
-            SceneInterface scene = Scene;
-            ViewerAgent agent = Agent;
-            if (scene != null && agent != null)
-            {
-                Scene.SendRegionInfo(agent);
             }
         }
         #endregion

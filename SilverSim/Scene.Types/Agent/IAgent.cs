@@ -20,6 +20,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
+using SilverSim.Types.Estate;
 using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
@@ -60,6 +61,7 @@ namespace SilverSim.Scene.Types.Agent
 
         void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);
         void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID);
+        void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true);
 
         IAgentTeleportServiceInterface ActiveTeleportService
         {

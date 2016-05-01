@@ -392,6 +392,13 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void RequestRegionRestart(int seconds);
         public abstract void TriggerLightShareSettingsChanged();
         public abstract void SendRegionInfo(IAgent agent);
+        public void SendEstateInfo(IAgent agent)
+        {
+            lock (m_EstateDataUpdateLock)
+            {
+                agent.SendEstateUpdateInfo(UUID.Zero, UUID.Zero, m_EstateData, ID, true);
+            }
+        }
 
         public bool IsKeyframedMotionEnabled { get; set; }
 
