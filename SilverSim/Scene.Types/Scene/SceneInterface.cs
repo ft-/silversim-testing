@@ -394,10 +394,12 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void SendRegionInfo(IAgent agent);
         public void SendEstateInfo(IAgent agent)
         {
+            EstateInfo info;
             lock (m_EstateDataUpdateLock)
             {
-                agent.SendEstateUpdateInfo(UUID.Zero, UUID.Zero, m_EstateData, ID, true);
+                info = new EstateInfo(m_EstateData);
             }
+            agent.SendEstateUpdateInfo(UUID.Zero, UUID.Zero, info, ID, true);
         }
 
         public bool IsKeyframedMotionEnabled { get; set; }
