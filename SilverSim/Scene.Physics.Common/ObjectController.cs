@@ -114,19 +114,6 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public bool ContributesToCollisionSurfaceAsChild
-        {
-            get
-            {
-                return m_ContributesToCollisionSurfaceAsChild;
-            }
-            set
-            {
-                m_ContributesToCollisionSurfaceAsChild = value;
-                UpdateCollisionInfo();
-            }
-        }
-
         #region Vehicle Calculation
 
         Vector3 m_AppliedForce = Vector3.Zero;

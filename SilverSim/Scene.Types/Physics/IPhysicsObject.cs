@@ -20,7 +20,6 @@ namespace SilverSim.Scene.Types.Physics
         bool IsPhysicsActive { get; set; } /* disables updates of object */
         bool IsPhantom { get; set; }
         bool IsVolumeDetect { get; set; }
-        bool ContributesToCollisionSurfaceAsChild { get; set; } /* set to true when physics object contributes to collision surface in link sets as child prim */
         double Mass { get; }
 
         double Buoyancy { get; set; }
