@@ -33,6 +33,7 @@ namespace SilverSim.Main.Common.HttpServer
         public string Scheme { get; private set; }
 
         readonly bool m_IsBehindProxy;
+        bool m_StoppingListeners;
 
         readonly X509Certificate m_ServerCertificate;
 
@@ -77,6 +78,7 @@ namespace SilverSim.Main.Common.HttpServer
         public void Shutdown()
         {
             m_Log.InfoFormat("Stopping HTTP Server");
+            m_StoppingListeners = true;
             m_Listener.Stop();
             StartsWithUriHandlers.Clear();
             UriHandlers.Clear();
@@ -102,7 +104,10 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 return;
             }
-            m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
+            if (!m_StoppingListeners)
+            {
+                m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
+            }
             try
             {
                 Stream httpstream;
