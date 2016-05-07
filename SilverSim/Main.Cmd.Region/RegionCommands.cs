@@ -42,6 +42,7 @@ namespace SilverSim.Main.Cmd.Region
         private string m_ExternalHostName = string.Empty;
         private uint m_HttpPort;
         private string m_Scheme = Uri.UriSchemeHttp;
+        string m_GatekeeperURI;
         SceneList m_Scenes;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
@@ -64,6 +65,16 @@ namespace SilverSim.Main.Cmd.Region
                 if (config.Contains("ServerCertificate"))
                 {
                     m_Scheme = Uri.UriSchemeHttps;
+                }
+            }
+
+            config = loader.Config.Configs["Startup"];
+            if(config != null)
+            {
+                m_GatekeeperURI = config.GetString("GatekeeperURI", "");
+                if(m_GatekeeperURI.Length != 0 && !m_GatekeeperURI.EndsWith("/"))
+                {
+                    m_GatekeeperURI += "/";
                 }
             }
 
@@ -794,6 +805,7 @@ namespace SilverSim.Main.Cmd.Region
                 }
                 else
                 {
+                    rInfo.GridURI = m_GatekeeperURI;
                     io.Write(string.Format("Starting region {0} ({1})", rInfo.Name, rInfo.ID.ToString()));
                     m_Log.InfoFormat("Starting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
                     try
@@ -1146,7 +1158,7 @@ namespace SilverSim.Main.Cmd.Region
                         ResolveName(rInfo.Owner).FullName,
                         gridcoord.X_String + "," + gridcoord.Y_String,
                         rInfo.ServerPort,
-                        rInfo.GridURI);
+                        m_GatekeeperURI);
                 }
             }
             io.Write(output.ToString());

@@ -26,6 +26,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
         private string m_Scheme = Uri.UriSchemeHttp;
         SceneList m_Scenes;
+        string m_GatekeeperURI;
 
         #region Constructor
         internal RegionLoaderService(string regionStorage)
@@ -49,6 +50,16 @@ namespace SilverSim.Scene.RegionLoader.Basic
                     m_Scheme = Uri.UriSchemeHttps;
                 }
             }
+
+            config = loader.Config.Configs["Startup"];
+            if (config != null)
+            {
+                m_GatekeeperURI = config.GetString("GatekeeperURI", "");
+                if (m_GatekeeperURI.Length != 0 && !m_GatekeeperURI.EndsWith("/"))
+                {
+                    m_GatekeeperURI += "/";
+                }
+            }
         }
         #endregion
 
@@ -62,6 +73,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
             foreach(RegionInfo ri in m_RegionService.GetOnlineRegions())
             {
                 m_Log.InfoFormat("Starting Region {0}", ri.Name);
+                ri.GridURI = m_GatekeeperURI;
                 SceneInterface si = m_SceneFactory.Instantiate(ri);
                 m_Scenes.Add(si);
                 si.LoadSceneAsync();
