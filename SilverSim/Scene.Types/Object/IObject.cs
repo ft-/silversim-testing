@@ -43,7 +43,10 @@ namespace SilverSim.Scene.Types.Object
         BodyShapeType = 26,
         LastOwner = 27,
         ClickAction = 28,
-        Omega = 29
+        Omega = 29,
+        PrimCount = 30,
+        TotalInventoryCount = 31,
+        RezzerKey = 32
     }
 
     public interface IPrimitiveParamsInterface

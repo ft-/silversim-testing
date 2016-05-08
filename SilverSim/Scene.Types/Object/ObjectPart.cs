@@ -1710,6 +1710,25 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(AngularVelocity);
                         break;
 
+                    case ObjectDetailsType.PrimCount:
+                        if(ObjectGroup.IsAttached)
+                        {
+                            paramList.Add(0);
+                        }
+                        else
+                        {
+                            paramList.Add(ObjectGroup.Count);
+                        }
+                        break;
+
+                    case ObjectDetailsType.TotalInventoryCount:
+                        paramList.Add(Inventory.Count);
+                        break;
+
+                    case ObjectDetailsType.RezzerKey:
+                        paramList.Add(ObjectGroup.RezzingObjectID);
+                        break;
+
                     case ObjectDetailsType.BodyShapeType:
                     default:
                         paramList.Add(-1);
