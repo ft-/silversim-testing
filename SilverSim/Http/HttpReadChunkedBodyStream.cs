@@ -187,6 +187,7 @@ namespace SilverSim.Http
                             m_EndOfChunked = true;
                             while ((chunkHeader = ReadHeaderLine()).Length != 0)
                             {
+                                /* ReadHeaderLine() is all we have to do */
                             }
                         }
                     }

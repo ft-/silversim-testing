@@ -196,8 +196,8 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static internal Action<int> SimulatorShutdownDelegate; /* used for Scene.Management registration */
-        static internal Action SimulatorShutdownAbortDelegate; /* used for Scene.Management registration */
+        static Action<int> SimulatorShutdownDelegate; /* used for Scene.Management registration */
+        static Action SimulatorShutdownAbortDelegate; /* used for Scene.Management registration */
 
         void ShutdownTimerEventHandler(object o, ElapsedEventArgs evargs)
         {
@@ -216,11 +216,7 @@ namespace SilverSim.Main.Common
             if(timeLeft % 15 == 0 || m_FirstShutdownNotice)
             {
                 m_FirstShutdownNotice = false;
-                Action<int> del = SimulatorShutdownDelegate;
-                if (del != null)
-                {
-                    del(timeLeft);
-                }
+                SimulatorShutdownDelegate?.Invoke(timeLeft);
 
                 m_Log.InfoFormat("Simulator shutdown in {0} seconds", timeLeft);
             }

@@ -249,6 +249,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             catch (HttpResponse.ConnectionCloseException)
             {
+                /* simply a closed connection */
             }
             catch (IOException)
             {

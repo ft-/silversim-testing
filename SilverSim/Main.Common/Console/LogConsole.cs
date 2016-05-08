@@ -95,6 +95,7 @@ namespace SilverSim.Main.Common.Console
             }
             catch (ObjectDisposedException)
             {
+                /* do not expose ObjectDisposedException to caller */
             }
         }
 

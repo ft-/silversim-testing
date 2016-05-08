@@ -88,7 +88,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 using(BeginResponse(HttpStatusCode.InternalServerError, "Internal Server Error"))
                 {
-
+                    /* nothing additional to do here */
                 }
             }
             Response.Close();
@@ -305,10 +305,10 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     Body = new GZipStream(Body, CompressionMode.Decompress);
                 }
-                /* following word is a synomyn for no-encoding so we use it for code simplification */
                 else if(contentEncoding == "identity")
                 {
-
+                    /* word is a synomyn for no-encoding so we use it for code simplification */
+                    /* no additional action required, identity is simply transfer as-is */
                 }
                 else
                 {

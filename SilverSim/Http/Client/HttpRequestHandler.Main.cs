@@ -222,7 +222,7 @@ namespace SilverSim.Http.Client
 
                     while (s.ReadHeaderLine().Length != 0)
                     {
-
+                        /* ReadHeaderLine() is all we have to do */
                     }
                     s.ReadTimeout = timeoutms;
                 }

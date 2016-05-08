@@ -111,7 +111,7 @@ namespace SilverSim.Main.Common.Tar
                     int fnameLen;
                     for(fnameLen = 0; fnameLen < 100 && buf[fnameLen] != 0; ++fnameLen)
                     {
-
+                        /* nothing additional we can do besides what fnameLen counts */
                     }
                     hdr.FileName = ascii.GetString(buf, 0, fnameLen);
                 }
