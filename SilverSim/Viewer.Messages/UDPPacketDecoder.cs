@@ -32,6 +32,7 @@ namespace SilverSim.Viewer.Messages
                         MethodInfo mi = t.GetMethod("Decode", new Type[] { typeof(UDPPacket) });
                         if(mi == null)
                         {
+                            /* packet does not have Decode method */
                         }
                         else if((mi.Attributes & MethodAttributes.Static) == 0 ||
                             (mi.ReturnType != typeof(Message) && !mi.ReturnType.IsSubclassOf(typeof(Message))))

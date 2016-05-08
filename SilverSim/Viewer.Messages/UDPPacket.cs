@@ -1013,7 +1013,7 @@ namespace SilverSim.Viewer.Messages
         {
             if(buf.Length == 0)
             {
-
+                /* nothing to do */
             }
             else if(IsZeroEncoded)
             {
