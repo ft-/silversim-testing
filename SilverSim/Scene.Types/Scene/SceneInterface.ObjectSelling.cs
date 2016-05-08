@@ -153,7 +153,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        RwLockedDictionary<string, ObjectBuyListen> m_ObjectBuyListeners = new RwLockedDictionary<string, ObjectBuyListen>();
+        readonly RwLockedDictionary<string, ObjectBuyListen> m_ObjectBuyListeners = new RwLockedDictionary<string, ObjectBuyListen>();
 
         public void AddObjectBuyListen(ScriptInstance instance)
         {
@@ -378,7 +378,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public class ObjectBuyTransferItem : ObjectTransferItem
         {
-            UUID m_SellingPrimitiveID;
+            readonly UUID m_SellingPrimitiveID;
 
             public ObjectBuyTransferItem(
                 IAgent agent,

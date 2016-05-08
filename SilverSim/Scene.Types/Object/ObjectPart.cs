@@ -2815,7 +2815,7 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     catch
                                     {
-
+                                        /* do not pass exceptions to caller */
                                     }
                                 }
                                 break;
