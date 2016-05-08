@@ -417,13 +417,6 @@ namespace SilverSim.Types.Asset.Format
             Color.FromRgb(29, 9, 6)
         };
 
-        /*
-            Params[112] = new VisualParam(112, "Rainbow Color", 0, "hair", String.Empty, "None", "Wild", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(255, 0, 255, 255), new Color4(255, 0, 0, 255), new Color4(255, 255, 0, 255), new Color4(0, 255, 0, 255), new Color4(0, 255, 255, 255), new Color4(0, 0, 255, 255), new Color4(255, 0, 255, 255) }));
-            Params[113] = new VisualParam(113, "Red Hair", 0, "hair", String.Empty, "No Red", "Very Red", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(118, 47, 19, 255) }));
-            Params[114] = new VisualParam(114, "Blonde Hair", 0, "hair", String.Empty, "Black", "Blonde", 0.5f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(22, 6, 6, 255), new Color4(29, 9, 6, 255), new Color4(45, 21, 11, 255), new Color4(78, 39, 11, 255), new Color4(90, 53, 16, 255), new Color4(136, 92, 21, 255), new Color4(150, 106, 33, 255), new Color4(198, 156, 74, 255), new Color4(233, 192, 103, 255), new Color4(238, 205, 136, 255) }));
-            Params[115] = new VisualParam(115, "White Hair", 0, "hair", String.Empty, "No White", "All White", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(255, 255, 255, 255) }));
-        */
-
         static readonly Color[] RainbowHairColors =
         {
             Color.FromRgb(0, 0, 0),
