@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Chat
                     case ListenEvent.ChatType.StopTyping:
                         if(!listener.IsAgent)
                         {
-
+                            /* listener is not an agent, so no typing messages */
                         }
                         else if (ev.TargetID.Equals(UUID.Zero))
                         {

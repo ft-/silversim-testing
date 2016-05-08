@@ -149,7 +149,7 @@ namespace SilverSim.Scene.Chat
             {
                 if(m_ID.Equals(UUID.Zero))
                 {
-
+                    /* expected ID matches UUID.Zero, so we want to receive every possible UUID */
                 }
                 else if(!m_ID.Equals(ev.ID))
                 {

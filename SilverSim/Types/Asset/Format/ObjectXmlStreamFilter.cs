@@ -129,7 +129,7 @@ namespace SilverSim.Types.Asset.Format
                                 int cpos = pos;
                                 for(; cpos < test.Length && test[cpos] != '='; ++cpos)
                                 {
-
+                                    /* nothing to do besides cpos counting */
                                 }
                                 if(cpos == test.Length)
                                 {

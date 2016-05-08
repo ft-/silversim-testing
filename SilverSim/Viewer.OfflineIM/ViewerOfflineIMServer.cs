@@ -75,13 +75,13 @@ namespace SilverSim.Viewer.OfflineIM
                             }
                             catch
                             {
-
+                                /* do not pass exceptions to caller */
                             }
                         }
                     }
                     catch
                     {
-
+                        /* do not pass exceptions to caller */
                     }
                 }
             }

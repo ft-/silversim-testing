@@ -151,6 +151,7 @@ namespace SilverSim.Types.Asset.Format
                         para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
                         if(para.Length < 2)
                         {
+                            /* less than two parameters is not valid */
                         }
                         else if(para[0] == "base_mask")
                         {
@@ -235,6 +236,7 @@ namespace SilverSim.Types.Asset.Format
                         para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
                         if(para.Length < 2)
                         {
+                            /* less than two parameters is not valid */
                         }
                         else if(para[0] == "sale_type")
                         {
