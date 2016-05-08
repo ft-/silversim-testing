@@ -469,7 +469,7 @@ namespace SilverSim.Viewer.Profile
             }
             catch
             {
-
+                /* do not expose exceptions to caller */
             }
         }
 
@@ -754,7 +754,7 @@ namespace SilverSim.Viewer.Profile
             }
             catch
             {
-
+                /* do not expose exceptions to caller */
             }
         }
 
@@ -1015,6 +1015,7 @@ namespace SilverSim.Viewer.Profile
                     (Exception e)
 #endif
                 {
+                    /* do not expose exceptions to caller */
 #if DEBUG
                     m_Log.Debug("Exception at groups request", e);
 #endif

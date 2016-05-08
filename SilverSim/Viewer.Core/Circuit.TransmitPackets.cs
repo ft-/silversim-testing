@@ -219,7 +219,7 @@ namespace SilverSim.Viewer.Core
 
                     if (m is AcksReceived)
                     {
-
+                        /* nothing additional to do here with AcksReceived */
                     }
                     else if (m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
                     {

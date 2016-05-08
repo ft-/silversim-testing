@@ -588,9 +588,10 @@ namespace SilverSim.Scene.Types.Scene
             if (agentOwner.EqualsGrid(groupOwner))
             {
             }
-            else if (group.IsAttached)
+
+            if (group.IsAttached)
             {
-                /* others should not be able to edit attachments */
+                /* should not be able to take attachments */
                 return false;
             }
 

@@ -158,7 +158,7 @@ namespace SilverSim.Viewer.Core
                 string capsUriStr = string.Empty;
                 if (v.ToString() == "SEED")
                 {
-
+                    /* SEED capability has no additional handling */
                 }
                 else if(GetCustomCapsUri(v.ToString(), out capsUriStr))
                 {

@@ -97,7 +97,7 @@ namespace SilverSim.Scene.Physics.Common
 
             set
             {
-
+                /* nothing to do for objects */
             }
         }
 

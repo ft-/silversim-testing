@@ -107,16 +107,17 @@ namespace SilverSim.Viewer.Core.Capabilities
                 entry = part.Media[textureIndex];
                 if(null == entry)
                 {
+                    /* nothing to do */
                 }
                 else if(0 != (entry.InteractPermissions & PrimitiveMediaPermission.Anyone))
                 {
-
+                    /* permission is okay when anyone is enabled */
                 }
                 else if(0 != (entry.InteractPermissions & PrimitiveMediaPermission.Owner) && 
                     part.ObjectGroup.Owner.EqualsGrid(m_Agent) && 
                     !part.ObjectGroup.IsGroupOwned)
                 {
-
+                    /* permission is okay when group is allowed and agent is group member */
                 }
                 else if(0 == (entry.InteractPermissions & PrimitiveMediaPermission.Group))
                 {

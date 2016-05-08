@@ -22,7 +22,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
-
+                /* intentionally left empty */
             }
         }
 
@@ -102,7 +102,7 @@ namespace SilverSim.Scene.Types.Physics
             }
             set
             {
-
+                /* intentionally left empty */
             }
         }
 
@@ -114,7 +114,7 @@ namespace SilverSim.Scene.Types.Physics
             }
             set
             {
-
+                /* intentionally left empty */
             }
         }
 
@@ -126,17 +126,7 @@ namespace SilverSim.Scene.Types.Physics
             }
             set
             {
-            }
-        }
-
-        public bool ContributesToCollisionSurfaceAsChild
-        {
-            get
-            {
-                return false;
-            }
-            set
-            {
+                /* intentionally left empty */
             }
         }
 

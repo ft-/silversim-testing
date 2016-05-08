@@ -58,7 +58,7 @@ namespace SilverSim.Scene.Physics.Common
             }
             set
             {
-
+                /* nothing to do for agents */
             }
         }
 
@@ -95,17 +95,6 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public bool ContributesToCollisionSurfaceAsChild 
-        {
-            get
-            {
-                return false;
-            }
-            set
-            {
-            }
-        }
-
         public VehicleType VehicleType 
         {
             get
@@ -114,6 +103,7 @@ namespace SilverSim.Scene.Physics.Common
             }
             set
             {
+                /* nothing to do for agents */
             }
         }
 
@@ -125,18 +115,18 @@ namespace SilverSim.Scene.Physics.Common
             }
             set
             {
-
+                /* nothing to do for agents */
             }
         }
 
         public void SetVehicleFlags(VehicleFlags value)
         {
-            /* intentionally left empty */
+            /* nothing to do for agents */
         }
 
         public void ClearVehicleFlags(VehicleFlags value)
         {
-            /* intentionally left empty */
+            /* nothing to do for agents */
         }
 
         public Quaternion this[VehicleRotationParamId id]
@@ -147,7 +137,7 @@ namespace SilverSim.Scene.Physics.Common
             }
             set
             {
-
+                /* nothing to do for agents */
             }
         }
 
@@ -159,6 +149,7 @@ namespace SilverSim.Scene.Physics.Common
             }
             set
             {
+                /* nothing to do for agents */
             }
         }
 
@@ -170,6 +161,7 @@ namespace SilverSim.Scene.Physics.Common
             }
             set
             {
+                /* nothing to do for agents */
             }
         }
 

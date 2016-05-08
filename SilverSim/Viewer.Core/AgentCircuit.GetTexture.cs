@@ -178,7 +178,7 @@ namespace SilverSim.Viewer.Core
                     {
                         using(HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c"))
                         {
-
+                            /* no additional action needed */
                         }
                         return;
                     }

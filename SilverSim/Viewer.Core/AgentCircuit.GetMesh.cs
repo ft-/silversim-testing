@@ -155,7 +155,7 @@ namespace SilverSim.Viewer.Core
                     {
                         using(HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
                         {
-
+                            /* no additional action needed here */
                         }
                         return;
                     }

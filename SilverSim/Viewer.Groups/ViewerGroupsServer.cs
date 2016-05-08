@@ -422,6 +422,7 @@ namespace SilverSim.Viewer.Groups
                 (Exception e)
 #endif
             {
+                /* do not expose exceptions to caller */
 #if DEBUG
                 m_Log.Debug("Exception when sending AgentGroupDataUpdate", e);
 #endif
@@ -472,7 +473,7 @@ namespace SilverSim.Viewer.Groups
                 }
                 catch
                 {
-
+                    /* do not expose exceptions to caller */
                 }
             }
 
@@ -504,6 +505,7 @@ namespace SilverSim.Viewer.Groups
             }
             catch
             {
+                /* do not expose exceptions to caller */
             }
         }
 
@@ -1532,9 +1534,9 @@ namespace SilverSim.Viewer.Groups
                 }
                 catch
                 {
-
+                    /* do not expose exceptions to caller */
                 }
-                if(null != reply && d.SizeInMessage + messageFill > 1400)
+                if (null != reply && d.SizeInMessage + messageFill > 1400)
                 {
                     agent.SendMessageAlways(reply, scene.ID);
                     reply = null;
@@ -1667,7 +1669,7 @@ namespace SilverSim.Viewer.Groups
                 }
                 catch
                 {
-
+                    /* do not expose exceptions to caller */
                 }
             }
             res.Add("members", membersmap);

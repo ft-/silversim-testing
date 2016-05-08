@@ -153,6 +153,7 @@ namespace SilverSim.Viewer.Core
 
             if (SittingOnObject != null)
             {
+                /* agent is sitting on object */
             }
             else if (agentControlFlags.HasStop())
             {

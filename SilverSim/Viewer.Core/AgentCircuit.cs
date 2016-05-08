@@ -616,7 +616,7 @@ namespace SilverSim.Viewer.Core
                     CapabilityHandlerAttribute ca = (CapabilityHandlerAttribute)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandlerAttribute));
                     if (null == ca)
                     {
-
+                        /* not a capability handler */
                     }
                     else if (m_RegisteredCapabilities.ContainsKey(ca.Name))
                     {
@@ -780,7 +780,7 @@ namespace SilverSim.Viewer.Core
                     if(!p.ReadUUID().Equals(AgentID) ||
                         !p.ReadUUID().Equals(SessionID))
                     {
-
+                        /* ScriptDialogReply is not for us */
                     }
                     else
                     {
@@ -801,7 +801,7 @@ namespace SilverSim.Viewer.Core
                     if(!p.ReadUUID().Equals(AgentID) ||
                         !p.ReadUUID().Equals(SessionID))
                     {
-
+                        /* ChatFromViewer is not for us */
                     }
                     else
                     {
