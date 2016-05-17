@@ -216,7 +216,10 @@ namespace SilverSim.Main.Common
             if(timeLeft % 15 == 0 || m_FirstShutdownNotice)
             {
                 m_FirstShutdownNotice = false;
-                SimulatorShutdownDelegate?.Invoke(timeLeft);
+                if (null != SimulatorShutdownDelegate)
+                {
+                    SimulatorShutdownDelegate.Invoke(timeLeft);
+                }
 
                 m_Log.InfoFormat("Simulator shutdown in {0} seconds", timeLeft);
             }
