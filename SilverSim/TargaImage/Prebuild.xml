@@ -15,7 +15,9 @@
   <Reference name="System.Core"/>
   <Reference name="System.Drawing"/>
   <Files>
-    <Match pattern="*.cs" recurse="true"/>
+    <Match pattern="*.cs" recurse="true">
+        <Exclude pattern="^obj/.*$"/>
+    </Match>
     <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
   </Files>
 </Project>
