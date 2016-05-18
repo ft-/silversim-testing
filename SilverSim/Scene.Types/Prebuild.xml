@@ -16,6 +16,7 @@
   <Reference name="System.Core"/>
   <Reference name="System.Xml"/>
   <Reference name="System.Drawing"/>
+  <Reference name="Paloma.TargaImage" localCopy="false"/>
   <Reference name="CSJ2K" path="../../bin/" localCopy="false"/>
   <Reference name="SilverSim.Viewer.Messages" localCopy="false"/>
   <Reference name="SilverSim.Types" localCopy="false"/>

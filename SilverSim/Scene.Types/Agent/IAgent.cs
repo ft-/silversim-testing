@@ -59,6 +59,8 @@ namespace SilverSim.Scene.Types.Agent
 
         void ClearKnownFriends();
 
+        UUID CurrentOutfitFolder { get; set; }
+
         void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);
         void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID);
         void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true);
