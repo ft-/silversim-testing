@@ -140,6 +140,16 @@ namespace SilverSim.Scene.Types.Agent
         }
 
         #region Get Current Outfit
+        static int LinkDescriptionToInt(string desc)
+        {
+            int res = 0;
+            if(desc.StartsWith("@") && int.TryParse(desc.Substring(1), out res))
+            {
+                return res;
+            }
+            return 0;
+        }
+
         public static void LoadAppearanceFromCurrentOutfit(this IAgent agent, AssetServiceInterface sceneAssetService, bool rebake = false)
         {
             UUI agentOwner = agent.Owner;
@@ -170,7 +180,7 @@ namespace SilverSim.Scene.Types.Agent
                     itemlinks.Add(item.AssetID);
                 }
             }
-            items.Sort((item1, item2) => item1.Description.CompareTo(item2.Description));
+            items.Sort((item1, item2) => LinkDescriptionToInt(item1.Description).CompareTo(LinkDescriptionToInt(item2.Description)));
 
             Dictionary<WearableType, List<AgentWearables.WearableInfo>> wearables = new Dictionary<WearableType, List<AgentWearables.WearableInfo>>();
 
