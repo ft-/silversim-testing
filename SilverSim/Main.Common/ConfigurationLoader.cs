@@ -1215,6 +1215,7 @@ namespace SilverSim.Main.Common
             AddSource(mainConfig);
 
             CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
+            CommandRegistry.Commands.Add("execute", ExecuteCommand);
             CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
             CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
             CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
@@ -1648,6 +1649,25 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Common Commands
+        public void ExecuteCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(args[0] == "help" || args.Count < 2)
+            {
+                io.Write("execute <commandlist file>");
+            }
+            else
+            {
+                using (StreamReader reader = new StreamReader(args[1]))
+                {
+                    string line;
+                    while (null != (line = reader.ReadLine()))
+                    {
+                        CommandRegistry.ExecuteCommand(io.GetCmdLine(line), io, limitedToScene);
+                    }
+                }
+            }
+        }
+
         public void ShowIssuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (UUID.Zero != limitedToScene)
