@@ -60,6 +60,10 @@ namespace SilverSim.Viewer.Core
 
         int m_AgentUpdatesReceived;
 
+        #region Wait For Root
+        internal readonly RwLockedList<KeyValuePair<Action<object, bool>, object>> WaitForRootList = new RwLockedList<KeyValuePair<Action<object, bool>, object>>();
+        #endregion
+
         #region Scene Changing Property
         public SceneInterface Scene
         {

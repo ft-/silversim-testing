@@ -57,6 +57,22 @@ namespace SilverSim.Threading
             }
         }
 
+        public IList<T> GetAndClear()
+        {
+            IList<T> res;
+            m_RwLock.AcquireWriterLock(-1);
+            try
+            {
+                res = new List<T>(m_List);
+                m_List.Clear();
+            }
+            finally
+            {
+                m_RwLock.ReleaseWriterLock();
+            }
+            return res;
+        }
+
         public bool Contains(T value)
         {
             m_RwLock.AcquireReaderLock(-1);

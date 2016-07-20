@@ -64,6 +64,7 @@ namespace SilverSim.Scene.Types.Agent
         void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);
         void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID);
         void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true);
+        void AddWaitForRoot(SceneInterface scene, Action<object, bool> del, object o);
 
         IAgentTeleportServiceInterface ActiveTeleportService
         {

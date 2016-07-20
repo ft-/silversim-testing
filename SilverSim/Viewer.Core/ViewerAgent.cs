@@ -582,10 +582,41 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
+                IList<KeyValuePair<Action<object, bool>, object>> waitForRootList;
+                AgentCircuit circuit;
+                if(!Circuits.TryGetValue(value, out circuit))
+                {
+                    circuit = null;
+                }
                 lock (m_DataLock)
                 {
                     m_CurrentSceneID = value;
                 }
+                waitForRootList = circuit.WaitForRootList.GetAndClear();
+                foreach(KeyValuePair<Action<object, bool>, object> kvp in waitForRootList)
+                {
+                    kvp.Key(kvp.Value, true);
+                }
+            }
+        }
+
+        public void AddWaitForRoot(SceneInterface scene, Action<object, bool> del, object o)
+        {
+            AgentCircuit circuit;
+            if (Circuits.TryGetValue(scene.ID, out circuit))
+            {
+                if (IsInScene(scene))
+                {
+                    del(o, true);
+                }
+                else
+                {
+                    circuit.WaitForRootList.Add(new KeyValuePair<Action<object, bool>, object>(del, o));
+                }
+            }
+            else
+            {
+                del(o, false);
             }
         }
         #endregion
@@ -1695,6 +1726,7 @@ namespace SilverSim.Viewer.Core
 
         public void HandleMessage(ChildAgentUpdate m)
         {
+            /* this message switches from child to root */
 
         }
 
@@ -1702,7 +1734,6 @@ namespace SilverSim.Viewer.Core
         {
 
         }
-
 
         public void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
         {
