@@ -1611,9 +1611,7 @@ namespace SilverSim.Viewer.Core
         {
             Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
             AgentCircuit circuit;
-            if ((this.TeleportFlags & TeleportFlags.ViaLogin) != 0 && 
-                (this.TeleportFlags & TeleportFlags.ViaHGLogin) == 0 &&
-                Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+            if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
             {
                 /* switch agent region */
                 if (m_IsActiveGod && !circuit.Scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI)))
