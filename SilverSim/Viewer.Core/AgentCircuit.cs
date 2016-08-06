@@ -27,7 +27,7 @@ namespace SilverSim.Viewer.Core
     {
         internal readonly RwLockedList<UUID> SelectedObjects = new RwLockedList<UUID>();
         private static readonly ILog m_Log = LogManager.GetLogger("LL AGENT CIRCUIT");
-        private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
+        internal static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
         public ViewerAgent Agent;

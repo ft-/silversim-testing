@@ -53,5 +53,10 @@ namespace SilverSim.Viewer.Messages
             }
             m_Log.InfoFormat("Initialized {0} packet decoders", numpackettypes);
         }
+
+        public void CheckInit()
+        {
+            m_Log.InfoFormat("Early initialization of packet decoder: {0} message types", PacketTypes.Count);
+        }
     }
 }

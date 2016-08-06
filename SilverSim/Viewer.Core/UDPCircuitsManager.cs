@@ -64,6 +64,8 @@ namespace SilverSim.Viewer.Core
             m_BindAddress = bindAddress;
             m_BindPort = port;
             IPEndPoint ep = new IPEndPoint(m_BindAddress, m_BindPort);
+            /* trigger early init of UDPPacketDecoder. We do not want this to happen on first teleport */
+            AgentCircuit.m_PacketDecoder.CheckInit();
             m_UdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             
             try

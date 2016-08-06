@@ -11,8 +11,8 @@ namespace SilverSim.Viewer.Messages.Circuit
     [NotTrusted]
     public class CompleteAgentMovement : Message
     {
-        public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
         public UInt32 CircuitCode;
 
         public CompleteAgentMovement()
@@ -22,16 +22,16 @@ namespace SilverSim.Viewer.Messages.Circuit
         public static Message Decode(UDPPacket p)
         {
             CompleteAgentMovement m = new CompleteAgentMovement();
-            m.SessionID = p.ReadUUID();
             m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
             m.CircuitCode = p.ReadUInt32();
             return m;
         }
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteUUID(SessionID);
             p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
             p.WriteUInt32(CircuitCode);
         }
     }

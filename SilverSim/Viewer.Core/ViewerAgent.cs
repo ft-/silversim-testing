@@ -1611,10 +1611,21 @@ namespace SilverSim.Viewer.Core
         {
             Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
             AgentCircuit circuit;
-            if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+            if(cam.SessionID != cam.CircuitSessionID ||
+                cam.AgentID != cam.CircuitAgentID)
             {
+                m_Log.InfoFormat("Unexpected CompleteAgentMovement with invalid details");
+            }
+            else if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+            {
+                SceneInterface scene = circuit.Scene;
+                if(null == scene)
+                {
+                    return;
+                }
+
                 /* switch agent region */
-                if (m_IsActiveGod && !circuit.Scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI)))
+                if (m_IsActiveGod && !scene.IsPossibleGod(Owner))
                 {
                     /* revoke god powers when changing region and new region has a different owner */
                     Messages.God.GrantGodlikePowers gm = new Messages.God.GrantGodlikePowers();
@@ -1625,8 +1636,8 @@ namespace SilverSim.Viewer.Core
                     SendMessageIfRootAgent(gm, SceneID);
                     m_IsActiveGod = false;
                 }
-                SceneID = circuit.Scene.ID;
-                circuit.Scene.TriggerAgentChangedScene(this);
+                SceneID = scene.ID;
+                scene.TriggerAgentChangedScene(this);
 
                 Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
                 amc.AgentID = cam.AgentID;
@@ -1635,8 +1646,17 @@ namespace SilverSim.Viewer.Core
                 amc.Position = GlobalPosition;
                 amc.SessionID = cam.SessionID;
                 amc.GridPosition = circuit.Scene.GridPosition;
+                amc.Timestamp = (uint)Date.GetUnixTime();
+
+#if DEBUG
+                m_Log.DebugFormat("sending AgentMovementComplete at {0} / {1} for {2}", amc.Position.ToString(), amc.LookAt.ToString(), Owner.FullName);
+#endif
 
                 circuit.SendMessage(amc);
+
+                SendAgentDataUpdate(circuit);
+
+                scene.SendAgentObjectToAllAgents(this);
 
                 CoarseLocationUpdate clu = new CoarseLocationUpdate();
                 clu.You = 0;
@@ -1649,16 +1669,12 @@ namespace SilverSim.Viewer.Core
                 clu.AgentData.Add(ad);
                 circuit.SendMessage(clu);
 
-                SceneInterface scene = circuit.Scene;
-                if (scene != null)
-                {
-                    scene.Environment.UpdateWindlightProfileToClientNoReset(this);
-                    scene.Environment.SendSimulatorTimeMessageToClient(this);
+                scene.Environment.UpdateWindlightProfileToClientNoReset(this);
+                scene.Environment.SendSimulatorTimeMessageToClient(this);
 
-                    foreach (ITriggerOnRootAgentActions action in circuit.m_TriggerOnRootAgentActions)
-                    {
-                        action.TriggerOnRootAgent(ID, scene);
-                    }
+                foreach (ITriggerOnRootAgentActions action in circuit.m_TriggerOnRootAgentActions)
+                {
+                    action.TriggerOnRootAgent(ID, scene);
                 }
             }
         }
