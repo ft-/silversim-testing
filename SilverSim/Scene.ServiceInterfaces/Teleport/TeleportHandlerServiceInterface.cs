@@ -6,6 +6,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using System;
 using System.ComponentModel;
 
 namespace SilverSim.ServiceInterfaces.Teleport
@@ -29,7 +30,6 @@ namespace SilverSim.ServiceInterfaces.Teleport
         public abstract void ReleaseAgent(UUID fromSceneID, IAgent agent, RegionInfo regionInfo);
         public abstract GridType GridType { get; }
 
-        /* following five functions return true if they accept a teleport request or if they want to distribute more specific error messages except region not found */
         public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             return false;
@@ -37,7 +37,7 @@ namespace SilverSim.ServiceInterfaces.Teleport
 
         public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
-            return false;
+            return TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, location, position, lookAt, flags);
         }
 
         public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
@@ -47,7 +47,7 @@ namespace SilverSim.ServiceInterfaces.Teleport
 
         public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
-            return false;
+            return TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, regionID, position, lookAt, flags);
         }
 
         public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)

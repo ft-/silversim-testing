@@ -5,10 +5,19 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using System;
 using System.ComponentModel;
 
 namespace SilverSim.Scene.Types.Agent
 {
+    public enum AgentTeleportState
+    {
+        Start,
+        InProgress,
+        Finish,
+        Failed
+    }
+
     /* this interface is needed so we can resolve a cyclic reference */
     public interface IAgentTeleportServiceInterface
     {

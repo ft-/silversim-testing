@@ -71,6 +71,7 @@ namespace SilverSim.Scene.Types.Agent
             get;
             set;
         }
+        void RemoveActiveTeleportService(IAgentTeleportServiceInterface service);
 
         int NextParcelSequenceId
         {
@@ -206,11 +207,6 @@ namespace SilverSim.Scene.Types.Agent
         }
 
         GridUserServiceInterface GridUserService
-        {
-            get;
-        }
-
-        GridServiceInterface GridService
         {
             get;
         }

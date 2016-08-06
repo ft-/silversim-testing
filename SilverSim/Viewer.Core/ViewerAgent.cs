@@ -147,6 +147,17 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        public void RemoveActiveTeleportService(IAgentTeleportServiceInterface service)
+        {
+            lock(m_DataLock)
+            {
+                if(m_ActiveTeleportService == service)
+                {
+                    m_ActiveTeleportService = null;
+                }
+            }
+        }
+
         #region ViewerAgent Properties
         public UInt32 LocalID { get; set; }
         public Uri HomeURI { get; private set; }
@@ -1198,14 +1209,6 @@ namespace SilverSim.Viewer.Core
             get
             {
                 return m_GridUserService;
-            }
-        }
-
-        public GridServiceInterface GridService
-        {
-            get
-            {
-                return m_GridService;
             }
         }
 
