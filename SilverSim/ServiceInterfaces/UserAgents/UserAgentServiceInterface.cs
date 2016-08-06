@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,8 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         public abstract string LocateUser(UUI user);
 
         public abstract UUI GetUUI(UUI user, UUI targetUserID);
+
+        public abstract DestinationInfo GetHomeRegion(UUI user);
 
         [Serializable]
         public class RequestFailedException : Exception

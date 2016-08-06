@@ -3,6 +3,7 @@
 
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,11 @@ namespace SilverSim.Viewer.Profile
         }
 
         public override List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override DestinationInfo GetHomeRegion(UUI user)
         {
             throw new NotSupportedException();
         }
