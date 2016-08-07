@@ -57,9 +57,10 @@ namespace SilverSim.Viewer.Core
         double m_Health = 100f;
         #endregion
 
-        readonly Dictionary<UUID, AgentChildInfo> m_ActiveChilds = new Dictionary<UUID, AgentChildInfo>();
+        readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
 
-        public Dictionary<UUID, AgentChildInfo> ActiveChilds
+        /** <summary>Key is region ID</summary> */
+        public RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds
         {
             get
             {

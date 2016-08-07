@@ -49,7 +49,8 @@ namespace SilverSim.Scene.Types.Agent
 
         List<GridType> SupportedGridTypes { get; }
 
-        Dictionary<UUID, AgentChildInfo> ActiveChilds { get; }
+        /** <summary>Key is region ID</summary> */
+        RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds { get; }
 
         bool IMSend(GridInstantMessage im);
 
