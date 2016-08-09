@@ -1643,6 +1643,20 @@ namespace SilverSim.Viewer.Core
                 SceneID = scene.ID;
                 scene.TriggerAgentChangedScene(this);
 
+                if(circuit.LastTeleportFlags.NeedsInitialPosition())
+                {
+                    try
+                    {
+                        scene.DetermineInitialAgentLocation(this, circuit.LastTeleportFlags, GlobalPosition, LookAt);
+                    }
+                    catch (Exception e)
+                    {
+                        /* TODO: how to do this? */
+                        return;
+                    }
+
+                }
+
                 Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
                 amc.AgentID = cam.AgentID;
                 amc.ChannelVersion = VersionInfo.SimulatorVersion;

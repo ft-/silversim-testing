@@ -45,6 +45,11 @@ namespace SilverSim.Types.Grid
 
     public static class TeleportFlagsExtensionMethods
     {
+        public static bool NeedsInitialPosition(this TeleportFlags flags)
+        {
+            return (flags & (TeleportFlags.ViaLogin | TeleportFlags.ViaHGLogin | TeleportFlags.ViaLocation | TeleportFlags.ViaLandmark)) != 0;
+        }
+
         public static bool IsLogin(this TeleportFlags flags)
         {
             return (flags & (TeleportFlags.ViaLogin | TeleportFlags.ViaHGLogin)) != 0;

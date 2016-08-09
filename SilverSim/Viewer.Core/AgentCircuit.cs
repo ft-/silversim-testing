@@ -11,6 +11,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.IM;
@@ -59,6 +60,9 @@ namespace SilverSim.Viewer.Core
         readonly CommandRegistry m_Commands;
 
         int m_AgentUpdatesReceived;
+
+        /* storage for last teleport flags */
+        public TeleportFlags LastTeleportFlags { get; set; }
 
         #region Wait For Root
         internal readonly RwLockedList<KeyValuePair<Action<object, bool>, object>> WaitForRootList = new RwLockedList<KeyValuePair<Action<object, bool>, object>>();
