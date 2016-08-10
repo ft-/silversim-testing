@@ -21,3 +21,4 @@ SettingHomeIsNotAllowedHere=Setzen des Startpunkts ist hier nicht erlaubt.
 YouAreNotPermittedToRelocateRegion=Du hast keine Berechtigung zum Verschieben der Region.
 ItHasNotBeenPossibleToRelocateRegion=Es war nicht möglich, die Region zu verlegen.
 SimConsoleNotAllowedForAgent=SimConsole nicht erlaubt.
+TeleportNotPossibleToRegion=Teleport zur Region nicht möglich.

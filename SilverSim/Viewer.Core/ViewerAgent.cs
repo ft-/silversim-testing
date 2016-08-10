@@ -1312,7 +1312,11 @@ namespace SilverSim.Viewer.Core
         {
             foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if(service.TeleportTo(sceneInterface, this, regionName, position, lookAt, TeleportFlags))
+#if DEBUG
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
+#endif
+
+                if (service.TeleportTo(sceneInterface, this, regionName, position, lookAt, TeleportFlags))
                 {
                     return true;
                 }
@@ -1324,6 +1328,9 @@ namespace SilverSim.Viewer.Core
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
+#if DEBUG
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
+#endif
                 if (service.TeleportTo(sceneInterface, this, location, position, lookAt, TeleportFlags))
                 {
                     return true;
@@ -1336,6 +1343,9 @@ namespace SilverSim.Viewer.Core
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
+#if DEBUG
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
+#endif
                 if (service.TeleportTo(sceneInterface, this, gatekeeperURI, location, position, lookAt, TeleportFlags))
                 {
                     return true;
@@ -1348,6 +1358,9 @@ namespace SilverSim.Viewer.Core
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
+#if DEBUG
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
+#endif
                 if (service.TeleportTo(sceneInterface, this, regionID, position, lookAt, TeleportFlags))
                 {
                     return true;
@@ -1360,6 +1373,9 @@ namespace SilverSim.Viewer.Core
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
+#if DEBUG
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
+#endif
                 if (service.TeleportTo(sceneInterface, this, gatekeeperURI, regionID, position, lookAt, TeleportFlags))
                 {
                     return true;
@@ -1373,7 +1389,10 @@ namespace SilverSim.Viewer.Core
         {
             foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if(service.TeleportHome(sceneInterface, this))
+#if DEBUG
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
+#endif
+                if (service.TeleportHome(sceneInterface, this))
                 {
                     return true;
                 }

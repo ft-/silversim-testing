@@ -30,36 +30,23 @@ namespace SilverSim.ServiceInterfaces.Teleport
         public abstract void ReleaseAgent(UUID fromSceneID, IAgent agent, RegionInfo regionInfo);
         public abstract GridType GridType { get; }
 
-        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
-        {
-            return false;
-        }
+        public abstract bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags);
 
         public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             return TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, location, position, lookAt, flags);
         }
 
-        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
-        {
-            return false;
-        }
+        public abstract bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags);
 
         public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             return TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, regionID, position, lookAt, flags);
         }
 
-        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
-        {
-            return false;
-        }
+        public abstract bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags);
 
         /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
-        public virtual bool TeleportHome(SceneInterface sceneInterface, IAgent agent)
-        {
-            return false;
-        }
-
+        public abstract bool TeleportHome(SceneInterface sceneInterface, IAgent agent);
     }
 }
