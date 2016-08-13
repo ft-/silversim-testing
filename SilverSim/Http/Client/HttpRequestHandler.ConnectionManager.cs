@@ -68,27 +68,6 @@ namespace SilverSim.Http.Client
             {
                 /* just ensure that the caller does not get exceptioned */
             }
-
-            try
-            {
-                List<string> removeList = new List<string>();
-                foreach(KeyValuePair<string, KeyValuePair<IPAddress[], int>> kvp in m_DnsCache)
-                {
-                    int diffTime = kvp.Value.Value - Environment.TickCount;
-                    if(diffTime < 0)
-                    {
-                        removeList.Add(kvp.Key);
-                    }
-                }
-                foreach(string remove in removeList)
-                {
-                    m_DnsCache.Remove(remove);
-                }
-            }
-            catch
-            {
-                /* just ensure that the caller does not get exceptioned */
-            }
         }
 
         static HttpRequestHandler()
@@ -100,22 +79,11 @@ namespace SilverSim.Http.Client
 
         #region Connect Handling
         /* yes, we need our own DNS cache. Mono bypasses anything that caches on Linux */
-        static RwLockedDictionary<string, KeyValuePair<IPAddress[], int>> m_DnsCache = new RwLockedDictionary<string, KeyValuePair<IPAddress[], int>>();
-        const int MAX_DNS_CACHE_TIME_IN_MILLISECONDS = 60 * 1000;
 
         static Socket ConnectToTcp(string host, int port)
         {
-            KeyValuePair<IPAddress[], int> kvp;
             IPAddress[] addresses;
-            if (!m_DnsCache.TryGetValue(host, out kvp) || 0 > (kvp.Value - Environment.TickCount))
-            {
-                addresses = Dns.GetHostAddresses(host);
-                m_DnsCache[host] = new KeyValuePair<IPAddress[], int>(addresses, Environment.TickCount + MAX_DNS_CACHE_TIME_IN_MILLISECONDS);
-            }
-            else
-            {
-                addresses = kvp.Key;
-            }
+            addresses = DnsNameCache.GetHostAddresses(host);
 
             if (addresses.Length == 0)
             {
@@ -124,16 +92,6 @@ namespace SilverSim.Http.Client
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.Connect(addresses, port);
             return socket;
-        }
-
-        public static ICollection<string> GetCachedDnsEntries()
-        {
-            return m_DnsCache.Keys;
-        }
-
-        public static bool RemoveCachedDnsEntry(string hostname)
-        {
-            return m_DnsCache.Remove(hostname);
         }
         #endregion
 

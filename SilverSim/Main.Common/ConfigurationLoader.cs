@@ -1789,7 +1789,7 @@ namespace SilverSim.Main.Common
             else
             {
                 StringBuilder output = new StringBuilder("Cached DNS entries:\n----------------------------------------------");
-                foreach(string dns in HttpRequestHandler.GetCachedDnsEntries())
+                foreach(string dns in DnsNameCache.GetCachedDnsEntries())
                 {
                     output.Append("\n");
                     output.Append(dns);
@@ -1806,7 +1806,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                if(HttpRequestHandler.RemoveCachedDnsEntry(args[2]))
+                if(DnsNameCache.RemoveCachedDnsEntry(args[2]))
                 {
                     io.WriteFormatted("DNS Entry {0} removed", args[2]);
                 }

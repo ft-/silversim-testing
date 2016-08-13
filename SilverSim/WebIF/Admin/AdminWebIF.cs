@@ -904,7 +904,7 @@ namespace SilverSim.WebIF.Admin
         void DnsCacheList(HttpRequest req, Map jsondata)
         {
             AnArray res = new AnArray();
-            foreach (string host in HttpRequestHandler.GetCachedDnsEntries())
+            foreach (string host in DnsNameCache.GetCachedDnsEntries())
             {
                 res.Add(host);
             }
@@ -922,7 +922,7 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
 
-            if(HttpRequestHandler.RemoveCachedDnsEntry(jsondata["host"].ToString()))
+            if(DnsNameCache.RemoveCachedDnsEntry(jsondata["host"].ToString()))
             {
                 SuccessResponse(req, new Map());
             }
