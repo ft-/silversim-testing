@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 
@@ -977,6 +978,22 @@ namespace SilverSim.Viewer.Core
                         break;
                 }
             }
+        }
+        #endregion
+
+        #region Log Incoming Agent
+        public void LogIncomingAgent(ILog log, bool isChild)
+        {
+            m_Log.InfoFormat("Incoming agent {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Type {6} Region {7} ({8})",
+                Agent.Owner.FirstName,
+                Agent.Owner.LastName,
+                Agent.Owner.HomeURI,
+                Agent.Owner.ID.ToString(),
+                LastTeleportFlags,
+                ((IPEndPoint)RemoteEndPoint).Address.ToString(),
+                isChild ? "Child" : "Root",
+                Scene.Name,
+                Scene.ID.ToString());
         }
         #endregion
 
