@@ -1,7 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Threading;
 using System.Net;
+using System;
 
 namespace SilverSim.Types.Grid
 {
@@ -34,12 +36,34 @@ namespace SilverSim.Types.Grid
 
         #region Fields
         public string GatekeeperURI = string.Empty;
-        public EndPoint SimIP;
         public Vector3 Position = Vector3.Zero;
         public Vector3 LookAt = Vector3.Zero;
         public TeleportFlags TeleportFlags;
         public string StartLocation = string.Empty;
         public bool LocalToGrid;
         #endregion
+
+        public EndPoint SimIP
+        {
+            get
+            {
+                if(null == m_SimIP)
+                {
+                    IPAddress[] addresses = DnsNameCache.GetHostAddresses(ServerIP);
+                    if(addresses.Length == 0)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    m_SimIP = new IPEndPoint(addresses[0], (int)ServerPort);
+                }
+                return m_SimIP;
+            }
+            set
+            {
+                m_SimIP = value;
+            }
+        }
+
+        EndPoint m_SimIP;
     }
 }
