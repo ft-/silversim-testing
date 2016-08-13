@@ -100,14 +100,14 @@ namespace SilverSim.Types
         {
             get
             {
-                ulong val = (ulong)Y;
+                ulong val = (ulong)X;
                 val <<= 32;
-                return val | (ulong)X;
+                return val | (ulong)Y;
             }
             set
             {
-                X = (uint)(value & 0xFFFFFFFF);
-                Y = (uint)(value >> 32);
+                Y = (uint)(value & 0xFFFFFFFF);
+                X = (uint)(value >> 32);
             }
         }
 
