@@ -59,18 +59,39 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public override IValue SerializeEQG()
         {
+            Types.Map om = new Types.Map();
             Types.Map m = new Types.Map();
+            AnArray array = new AnArray();
+            array.Add(m);
+            om.Add("Info", array);
             m.Add("AgentID", AgentID);
-            m.Add("LocationID", LocationID);
+            m.Add("LocationID", (int)LocationID);
             m.Add("RegionHandle", new BinaryData(GridPosition.AsBytes));
             m.Add("SeedCapability", SeedCapability);
             m.Add("SimAccess", (byte)SimAccess);
             m.Add("SimIP", new BinaryData(SimIP.GetAddressBytes()));
             m.Add("SimPort", SimPort);
-            m.Add("TeleportFlags", (uint)TeleportFlags);
-            m.Add("RegionSizeX", RegionSize.X);
-            m.Add("RegionSizeY", RegionSize.Y);
-            return m;
+            byte[] b = BitConverter.GetBytes((ulong)TeleportFlags);
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(b);
+            }
+            m.Add("TeleportFlags", new BinaryData(b));
+
+            b = BitConverter.GetBytes(RegionSize.X);
+            if(!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(b);
+            }
+            m.Add("RegionSizeX", new BinaryData(b));
+
+            b = BitConverter.GetBytes(RegionSize.Y);
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(b);
+            }
+            m.Add("RegionSizeY", new BinaryData(b));
+            return om;
         }
     }
 }
