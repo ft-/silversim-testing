@@ -20,7 +20,7 @@ namespace SilverSim.Types.Primitive
         private byte m_Material;
         private byte m_MediaByte;
         private TextureAttributes m_AttributeFlags /* = TextureAttributes.None */;
-        private UUID m_TextureID = DEFAULT_TEXTURE;
+        private UUID m_TextureID = TextureConstant.Blank;
         private UUID m_MaterialID = UUID.Zero;
 
         readonly TextureEntryFace m_DefaultTexture;
@@ -270,7 +270,6 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        private static readonly UUID DEFAULT_TEXTURE = new UUID("5748decc-f629-461c-9a36-a35a221fe21f");
         public UUID TextureID
         {
             get
@@ -333,7 +332,7 @@ namespace SilverSim.Types.Primitive
             if (defaultTexture == null)
             {
                 m_AttributeFlags = TextureAttributes.All;
-                m_TextureID = DEFAULT_TEXTURE;
+                m_TextureID = TextureConstant.Blank;
             }
             else
             {

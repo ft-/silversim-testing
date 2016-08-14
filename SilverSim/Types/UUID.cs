@@ -226,4 +226,13 @@ namespace SilverSim.Types
         public static readonly UUID Zero = new UUID("00000000-0000-0000-0000-000000000000");
         #endregion
     }
+
+    public static class TextureConstant
+    {
+        public static readonly UUID DefaultTerrainTexture1 = new UUID("b8d3965a-ad78-bf43-699b-bff8eca6c975");
+        public static readonly UUID DefaultTerrainTexture2 = new UUID("abb783e6-3e93-26c0-248a-247666855da3");
+        public static readonly UUID DefaultTerrainTexture3 = new UUID("179cdabd-398a-9b6b-1391-4dc333ba321f");
+        public static readonly UUID DefaultTerrainTexture4 = new UUID("beb169c7-11ea-fff2-efe5-0f24dc881df2");
+        public static readonly UUID Blank = new UUID("5748decc-f629-461c-9a36-a35a221fe21f");
+    }
 }

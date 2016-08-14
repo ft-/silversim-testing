@@ -348,6 +348,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {
+            RegionMapTexture = TextureConstant.DefaultTerrainTexture2; /* set Default terrain Texture 2 as initial RegionMapTexture */
             SizeX = sizeX;
             SizeY = sizeY;
             Owner = UUI.Unknown;

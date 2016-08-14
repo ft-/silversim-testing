@@ -58,11 +58,6 @@ namespace SilverSim.Scene.Types.Scene
             TelehubObject = src.TelehubObject;
         }
 
-        public static readonly UUID DEFAULT_TERRAIN_TEXTURE_1 = new UUID("b8d3965a-ad78-bf43-699b-bff8eca6c975");
-        public static readonly UUID DEFAULT_TERRAIN_TEXTURE_2 = new UUID("abb783e6-3e93-26c0-248a-247666855da3");
-        public static readonly UUID DEFAULT_TERRAIN_TEXTURE_3 = new UUID("179cdabd-398a-9b6b-1391-4dc333ba321f");
-        public static readonly UUID DEFAULT_TERRAIN_TEXTURE_4 = new UUID("beb169c7-11ea-fff2-efe5-0f24dc881df2");
-
         public bool BlockTerraform;
         public bool BlockFly;
         public bool AllowDamage;
@@ -84,7 +79,7 @@ namespace SilverSim.Scene.Types.Scene
         public bool AllowLandmark;
         public bool AllowDirectTeleport;
 
-        private UUID m_TerrainTexture1 = DEFAULT_TERRAIN_TEXTURE_1;
+        private UUID m_TerrainTexture1 = TextureConstant.DefaultTerrainTexture1;
         public UUID TerrainTexture1
         {
             get
@@ -94,12 +89,12 @@ namespace SilverSim.Scene.Types.Scene
             set
             {
                 m_TerrainTexture1 = (value == UUID.Zero) ?
-                    DEFAULT_TERRAIN_TEXTURE_1 :
+                    TextureConstant.DefaultTerrainTexture1 :
                     value;
             }
         }
 
-        private UUID m_TerrainTexture2 = DEFAULT_TERRAIN_TEXTURE_2;
+        private UUID m_TerrainTexture2 = TextureConstant.DefaultTerrainTexture2;
         public UUID TerrainTexture2
         {
             get
@@ -109,12 +104,12 @@ namespace SilverSim.Scene.Types.Scene
             set
             {
                 m_TerrainTexture2 = (value == UUID.Zero) ?
-                    DEFAULT_TERRAIN_TEXTURE_2 :
+                    TextureConstant.DefaultTerrainTexture2 :
                     value;
             }
         }
 
-        private UUID m_TerrainTexture3 = DEFAULT_TERRAIN_TEXTURE_3;
+        private UUID m_TerrainTexture3 = TextureConstant.DefaultTerrainTexture3;
         public UUID TerrainTexture3
         {
             get
@@ -124,12 +119,12 @@ namespace SilverSim.Scene.Types.Scene
             set
             {
                 m_TerrainTexture3 = (value == UUID.Zero) ?
-                    DEFAULT_TERRAIN_TEXTURE_3 :
+                    TextureConstant.DefaultTerrainTexture3 :
                     value;
             }
         }
 
-        private UUID m_TerrainTexture4 = DEFAULT_TERRAIN_TEXTURE_4;
+        private UUID m_TerrainTexture4 = TextureConstant.DefaultTerrainTexture4;
         public UUID TerrainTexture4
         {
             get
@@ -139,7 +134,7 @@ namespace SilverSim.Scene.Types.Scene
             set
             {
                 m_TerrainTexture4 = (value == UUID.Zero) ?
-                    DEFAULT_TERRAIN_TEXTURE_4 :
+                    TextureConstant.DefaultTerrainTexture4 :
                     value;
             }
         }
