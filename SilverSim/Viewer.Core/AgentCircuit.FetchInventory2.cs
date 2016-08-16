@@ -16,6 +16,7 @@ namespace SilverSim.Viewer.Core
     {
         void WriteInventoryItem(InventoryItem item, XmlTextWriter writer)
         {
+            writer.WriteKeyValuePair("agent_id", item.Owner.ID);
             writer.WriteKeyValuePair("asset_id", item.AssetID);
             writer.WriteKeyValuePair("created_at", (uint)item.CreationDate.DateTimeToUnixTime());
             writer.WriteKeyValuePair("desc", item.Description);
@@ -133,7 +134,9 @@ namespace SilverSim.Viewer.Core
                             text.WriteNamedValue("key", "items");
                             text.WriteStartElement("array");
                         }
+                        text.WriteStartElement("map");
                         WriteInventoryItem(item, text);
+                        text.WriteEndElement();
                     }
                     if (wroteheader)
                     {
