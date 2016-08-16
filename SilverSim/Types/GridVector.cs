@@ -54,8 +54,8 @@ namespace SilverSim.Types
 
         public GridVector(ulong regionHandle)
         {
-            X = (uint)(regionHandle & 0xFFFFFFFF);
-            Y = (uint)(regionHandle >> 32);
+            X = (uint)(regionHandle >> 32);
+            Y = (uint)(regionHandle & 0xFFFFFFFF);
         }
         #endregion
 
