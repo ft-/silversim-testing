@@ -203,8 +203,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public TeleportFlags TeleportFlags;
-
         static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
         public CultureInfo CurrentCulture
         {
@@ -1316,7 +1314,7 @@ namespace SilverSim.Viewer.Core
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
 #endif
 
-                if (service.TeleportTo(sceneInterface, this, regionName, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, regionName, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -1331,7 +1329,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
 #endif
-                if (service.TeleportTo(sceneInterface, this, location, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, location, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -1346,7 +1344,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
 #endif
-                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, location, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, location, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -1361,7 +1359,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
 #endif
-                if (service.TeleportTo(sceneInterface, this, regionID, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, regionID, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -1376,7 +1374,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName.ToString());
 #endif
-                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, regionID, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, regionID, position, lookAt, flags))
                 {
                     return true;
                 }
