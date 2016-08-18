@@ -341,7 +341,7 @@ namespace SilverSim.Types.Agent
                 }
                 
                 Notecard nc = new Notecard();
-                nc.Text = ms.GetBuffer().FromUTF8Bytes();
+                nc.Text = ms.ToArray().FromUTF8Bytes();
                 return nc;
             }
         }

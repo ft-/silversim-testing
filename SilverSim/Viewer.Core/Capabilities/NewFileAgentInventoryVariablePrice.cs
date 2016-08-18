@@ -238,7 +238,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                                     meshassetid = newasset.ID;
                                     newasset.Type = AssetType.Mesh;
                                     newasset.Creator = m_Creator;
-                                    newasset.Data = meshstream.GetBuffer();
+                                    newasset.Data = meshstream.ToArray();
                                     newasset.Name = data.Name + " - Mesh " + (idx + 1).ToString();
                                     m_AssetService.Store(newasset);
                                 }
@@ -296,7 +296,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     writer.WriteEndElement();
                     writer.Flush();
                     objectms.Flush();
-                    data.Data = objectms.GetBuffer();
+                    data.Data = objectms.ToArray();
                     data.Type = AssetType.Object;
                 }
             }

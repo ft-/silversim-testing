@@ -130,7 +130,8 @@ namespace SilverSim.Main.Common.HttpServer
                     }
                     w.Write("\r\n");
                     w.Flush();
-                    m_Output.Write(ms.GetBuffer(), 0, (int)ms.Length);
+                    byte[] b = ms.ToArray();
+                    m_Output.Write(b, 0, b.Length);
                     m_Output.Flush();
                 }
             }

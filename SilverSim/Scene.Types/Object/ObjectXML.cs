@@ -35,7 +35,7 @@ namespace SilverSim.Scene.Types.Object
 
                 AssetData asset = new AssetData();
                 asset.Type = AssetType.Object;
-                asset.Data = ms.GetBuffer();
+                asset.Data = ms.ToArray();
                 return asset;
             }
         }
@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.Object
 
                 AssetData asset = new AssetData();
                 asset.Type = AssetType.Object;
-                asset.Data = ms.GetBuffer();
+                asset.Data = ms.ToArray();
                 return asset;
             }
         }

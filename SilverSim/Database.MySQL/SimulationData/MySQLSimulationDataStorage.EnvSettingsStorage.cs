@@ -76,7 +76,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         using(MemoryStream ms = new MemoryStream())
                         {
                             value.Serialize(ms, regionID);
-                            param["EnvironmentSettings"] = ms.GetBuffer();
+                            param["EnvironmentSettings"] = ms.ToArray();
                         }
                         conn.ReplaceInto("environmentsettings", param);
                     }

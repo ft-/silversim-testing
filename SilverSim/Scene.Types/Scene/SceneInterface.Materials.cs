@@ -227,7 +227,7 @@ namespace SilverSim.Scene.Types.Scene
                         writer.WriteEndElement();
                     }
                 }
-                buf = ms.GetBuffer();
+                buf = ms.ToArray();
             }
             using(MemoryStream ms = new MemoryStream())
             {
@@ -238,7 +238,7 @@ namespace SilverSim.Scene.Types.Scene
                     writer.WriteNamedValue("binary", buf);
                     writer.WriteEndElement();
                 }
-                m_MaterialsData = ms.GetBuffer();
+                m_MaterialsData = ms.ToArray();
             }
         }
     }

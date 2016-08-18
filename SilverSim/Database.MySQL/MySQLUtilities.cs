@@ -229,7 +229,7 @@ namespace SilverSim.Database.MySQL
                 using (MemoryStream stream = new MemoryStream())
                 {
                     LlsdBinary.Serialize((AnArray)value, stream);
-                    mysqlparam.AddWithValue(key, stream.GetBuffer());
+                    mysqlparam.AddWithValue(key, stream.ToArray());
                 }
             }
             else if (t == typeof(Date))
@@ -491,7 +491,7 @@ namespace SilverSim.Database.MySQL
                     using (MemoryStream stream = new MemoryStream())
                     {
                         LlsdBinary.Serialize((AnArray)value, stream);
-                        byte[] b = stream.GetBuffer();
+                        byte[] b = stream.ToArray();
                         resvals.Add(b.Length == 0 ? "''" : "0x" + b.ToHexString());
                     }
                 }

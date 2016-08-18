@@ -138,7 +138,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                             }
                             writer.WriteEndElement();
                         }
-                        return ms.GetBuffer();
+                        return ms.ToArray();
                     }
                 }
             }

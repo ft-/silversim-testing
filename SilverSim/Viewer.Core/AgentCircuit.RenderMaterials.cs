@@ -187,7 +187,7 @@ namespace SilverSim.Viewer.Core
                         writer.WriteEndElement();
                     }
                 }
-                buf = ms.GetBuffer();
+                buf = ms.ToArray();
             }
 
             using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))

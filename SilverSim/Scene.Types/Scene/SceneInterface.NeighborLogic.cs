@@ -195,7 +195,7 @@ namespace SilverSim.Scene.Types.Scene
             using(MemoryStream ms = new MemoryStream())
             {
                 LlsdXml.Serialize(reqmap, ms);
-                reqdata = ms.GetBuffer();
+                reqdata = ms.ToArray();
             }
 
             /* try DNS lookup before triggering add circuit code */

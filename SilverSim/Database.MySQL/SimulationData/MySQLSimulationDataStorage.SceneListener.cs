@@ -438,7 +438,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MemoryStream ms = new MemoryStream())
                 {
                     LlsdBinary.Serialize(objpart.DynAttrs, ms);
-                    data.Add("DynAttrs", ms.GetBuffer());
+                    data.Add("DynAttrs", ms.ToArray());
                 }
 
                 data.Add("PassCollisionMode", objpart.PassCollisionMode);

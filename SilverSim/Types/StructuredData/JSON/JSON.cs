@@ -393,7 +393,7 @@ namespace SilverSim.Types.StructuredData.Json
             using(MemoryStream m = new MemoryStream())
             {
                 Serialize(val, m);
-                return System.Text.Encoding.UTF8.GetString(m.GetBuffer());
+                return Encoding.UTF8.GetString(m.ToArray());
             }
         }
     }

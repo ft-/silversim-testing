@@ -861,7 +861,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 using (MemoryStream ms = new MemoryStream())
                 {
                     Serialize(ms);
-                    return ms.GetBuffer();
+                    return ms.ToArray();
                 }
             }
         }
@@ -894,7 +894,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 using(MemoryStream ms = new MemoryStream())
                 {
                     Serialize(ms);
-                    return ms.GetBuffer();
+                    return ms.ToArray();
                 }
             }
         }
@@ -949,7 +949,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 using (MemoryStream ms = new MemoryStream())
                 {
                     Serialize(ms);
-                    return ms.GetBuffer();
+                    return ms.ToArray();
                 }
             }
         }
