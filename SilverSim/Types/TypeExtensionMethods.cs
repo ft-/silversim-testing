@@ -140,6 +140,11 @@ namespace SilverSim.Types
             return new StreamWriter(s, m_UTF8NoBOM);
         }
 
+        public static StreamWriter UTF8StreamWriterLeaveOpen(this Stream s)
+        {
+            return new StreamWriter(s, m_UTF8NoBOM, 16384, true);
+        }
+
         public static byte[] FromHexStringToByteArray(this string hex)
         {
             return Enumerable.Range(0, hex.Length)

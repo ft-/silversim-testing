@@ -1,7 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -382,7 +381,7 @@ namespace SilverSim.Types.StructuredData.Json
 
         public static void Serialize(IValue val, Stream output)
         {
-            using(TextWriter tw = new StreamWriter(output))
+            using(TextWriter tw = output.UTF8StreamWriterLeaveOpen())
             {
                 SerializeData(tw, val);
             }
