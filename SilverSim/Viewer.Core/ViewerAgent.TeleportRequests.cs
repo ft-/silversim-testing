@@ -51,7 +51,7 @@ namespace SilverSim.Viewer.Core
             }
 
             AgentCircuit circuit;
-            if(Circuits.TryGetValue(req.ReceivedOnCircuitCode, out circuit))
+            if(Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 /* TODO: we need the specific local list for HG destinations */
                 if(!TeleportTo(circuit.Scene, req.GridPosition, req.Position, req.LookAt, Types.Grid.TeleportFlags.ViaLocation))
@@ -76,7 +76,7 @@ namespace SilverSim.Viewer.Core
             }
 
             AgentCircuit circuit;
-            if (Circuits.TryGetValue(req.ReceivedOnCircuitCode, out circuit))
+            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 /* TODO: we need the specific local list for HG destinations */
                 if (!TeleportTo(circuit.Scene, req.RegionID, req.Position, req.LookAt, Types.Grid.TeleportFlags.ViaLocation))

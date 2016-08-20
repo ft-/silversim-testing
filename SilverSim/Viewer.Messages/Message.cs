@@ -145,7 +145,6 @@ namespace SilverSim.Viewer.Messages
 
         public QueueOutType OutQueue = QueueOutType.Low;
 
-        public UInt32 ReceivedOnCircuitCode;
         public UUID CircuitSessionID = UUID.Zero;
         public UUID CircuitAgentID = UUID.Zero;
         public UUID CircuitSceneID = UUID.Zero;

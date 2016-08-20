@@ -750,7 +750,7 @@ namespace SilverSim.Viewer.Core
                 m_Log.DebugFormat("Removing agent {0} from scene {1}", Agent.Owner.FullName, Scene.Name);
 #endif
                 Scene.Remove(Agent);
-                Agent.Circuits.Remove(CircuitCode, Scene.ID);
+                Agent.Circuits.Remove(Scene.ID);
             }
             m_UploadCapabilities.Clear();
             Agent = null;
@@ -874,7 +874,6 @@ namespace SilverSim.Viewer.Core
                     {
                         Message m = del(p);
                         /* we got a decoder, so we can make use of it */
-                        m.ReceivedOnCircuitCode = CircuitCode;
                         m.CircuitAgentID = new UUID(AgentID);
                         try
                         {

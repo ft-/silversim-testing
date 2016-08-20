@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Core
             rezparams.NextOwnerMask = req.RezData.NextOwnerMask;
 
             AgentRezObjectHandler rezHandler = new AgentRezObjectHandler(
-                Circuits[m.ReceivedOnCircuitCode].Scene, 
+                Circuits[m.CircuitSceneID].Scene, 
                 rezparams.RayEnd, 
                 item.AssetID, 
                 AssetService, 

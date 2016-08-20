@@ -224,7 +224,7 @@ namespace SilverSim.Viewer.Core
         }
 
         /* Circuits: UUID is SceneID */
-        public readonly RwLockedDoubleDictionary<UInt32, UUID, AgentCircuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, AgentCircuit>();
+        public readonly RwLockedDictionary<UUID, AgentCircuit> Circuits = new RwLockedDictionary<UUID, AgentCircuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
 
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate() { return new RwLockedDictionary<uint, uint>(); });
@@ -1596,7 +1596,7 @@ namespace SilverSim.Viewer.Core
         {
             Messages.Region.RegionHandshakeReply rhr = (Messages.Region.RegionHandshakeReply)m;
             AgentCircuit circuit;
-            if (Circuits.TryGetValue(rhr.ReceivedOnCircuitCode, out circuit))
+            if (Circuits.TryGetValue(rhr.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
                 /* Add our agent to scene */
@@ -1637,7 +1637,7 @@ namespace SilverSim.Viewer.Core
             {
                 m_Log.InfoFormat("Unexpected CompleteAgentMovement with invalid details");
             }
-            else if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+            else if (Circuits.TryGetValue(cam.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
                 if(null == scene)
@@ -1727,7 +1727,7 @@ namespace SilverSim.Viewer.Core
                 if (c.Scene.ID != lr.CircuitSceneID)
                 {
                     c.Stop();
-                    Circuits.Remove(c.CircuitCode, c.Scene.ID);
+                    Circuits.Remove(c.Scene.ID);
                     ((UDPCircuitsManager)c.Scene.UDPServer).RemoveCircuit(c);
                 }
                 else

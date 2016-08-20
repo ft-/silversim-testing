@@ -59,7 +59,7 @@ namespace SilverSim.Viewer.Core
             if (adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)
             {
                 AgentCircuit circuit;
-                if (Circuits.TryGetValue(adur.ReceivedOnCircuitCode, out circuit))
+                if (Circuits.TryGetValue(adur.CircuitSceneID, out circuit))
                 {
                     SendAgentDataUpdate(circuit);
                 }

@@ -113,7 +113,6 @@ namespace SilverSim.Viewer.Core
                     {
                         Message m = del(p);
                         /* we got a decoder, so we can make use of it */
-                        m.ReceivedOnCircuitCode = CircuitCode;
                         m.CircuitAgentID = new UUID(RemoteSceneID);
                         try
                         {
