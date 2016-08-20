@@ -1723,12 +1723,17 @@ namespace SilverSim.Viewer.Core
             m_Log.InfoFormat("Agent {0} {1} ({0}) wants to logout", FirstName, LastName, ID);
             foreach (AgentCircuit c in Circuits.Values)
             {
-                c.Scene.Remove(this);
-                if (c.Scene.ID != lr.CircuitSceneID)
+                SceneInterface scene = c.Scene;
+                if(scene == null)
+                {
+                    continue;
+                }
+                scene.Remove(this);
+                if (scene.ID != lr.CircuitSceneID)
                 {
                     c.Stop();
-                    Circuits.Remove(c.Scene.ID);
-                    ((UDPCircuitsManager)c.Scene.UDPServer).RemoveCircuit(c);
+                    Circuits.Remove(scene.ID);
+                    ((UDPCircuitsManager)scene.UDPServer).RemoveCircuit(c);
                 }
                 else
                 {
