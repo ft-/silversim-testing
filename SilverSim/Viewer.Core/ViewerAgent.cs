@@ -602,10 +602,14 @@ namespace SilverSim.Viewer.Core
                 {
                     m_CurrentSceneID = value;
                 }
-                waitForRootList = circuit.WaitForRootList.GetAndClear();
-                foreach(KeyValuePair<Action<object, bool>, object> kvp in waitForRootList)
+
+                if (circuit != null)
                 {
-                    kvp.Key(kvp.Value, true);
+                    waitForRootList = circuit.WaitForRootList.GetAndClear();
+                    foreach (KeyValuePair<Action<object, bool>, object> kvp in waitForRootList)
+                    {
+                        kvp.Key(kvp.Value, true);
+                    }
                 }
             }
         }
