@@ -79,14 +79,14 @@ namespace SilverSim.Viewer.Messages.Teleport
             m.Add("TeleportFlags", new BinaryData(b));
 
             b = BitConverter.GetBytes(RegionSize.X);
-            if(!BitConverter.IsLittleEndian)
+            if(BitConverter.IsLittleEndian)
             {
                 Array.Reverse(b);
             }
             m.Add("RegionSizeX", new BinaryData(b));
 
             b = BitConverter.GetBytes(RegionSize.Y);
-            if (!BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(b);
             }
