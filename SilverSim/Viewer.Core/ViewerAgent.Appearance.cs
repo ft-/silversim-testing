@@ -219,6 +219,10 @@ namespace SilverSim.Viewer.Core
             res.IsTrial = false;
             res.VisualParams = VisualParams;
             res.TextureEntry = m_TextureEntry;
+            Messages.Appearance.AvatarAppearance.AppearanceDataEntry appearanceData = new Messages.Appearance.AvatarAppearance.AppearanceDataEntry();
+            appearanceData.CofVersion = 0;
+            appearanceData.AppearanceVersion = 1;
+            res.AppearanceData.Add(appearanceData);
 
             SendMessageAlways(res, SceneID);
         }
