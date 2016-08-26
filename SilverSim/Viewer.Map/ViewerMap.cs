@@ -262,14 +262,11 @@ namespace SilverSim.Viewer.Map
                 }
                 else if(ri != null)
                 {
+                    GridVector hgLoc = agent.CacheHgDestination(ri);
                     MapBlockReply.DataEntry d = new MapBlockReply.DataEntry();
-                    d.X = 0;
-                    d.Y = ri.Location.GridY;
                     /* we map foreign grid locations in specific agent only */
-                    if(ri.Location.GridX > d.Y)
-                    {
-                        d.Y = ri.Location.GridX;
-                    }
+                    d.X = hgLoc.GridX;
+                    d.Y = hgLoc.GridY;
 
                     d.Name = ri.Name;
                     d.Access = ri.Access;
