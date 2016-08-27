@@ -2,9 +2,12 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -111,79 +114,5 @@ namespace SilverSim.Scene.Types.Script
         {
             Thread.Sleep(TimeSpan.FromSeconds(secs));
         }
-
-        public class Permissions
-        {
-            public RwLockedList<UUI> Creators = new RwLockedList<UUI>();
-            public RwLockedList<UUI> Owners = new RwLockedList<UUI>();
-            public bool IsAllowedForParcelOwner;
-            public bool IsAllowedForParcelMember;
-            public bool IsAllowedForEstateOwner;
-            public bool IsAllowedForEstateManager;
-
-            public Permissions()
-            {
-
-            }
-        }
-
-        #region Threat Level System
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-        public enum ThreatLevelType : uint
-        {
-            None = 0,
-            Nuisance = 1,
-            VeryLow = 2,
-            Low = 3,
-            Moderate = 4,
-            High = 5,
-            VeryHigh = 6,
-            Severe = 7
-        }
-
-        public ThreatLevelType ThreatLevel { get; protected set; }
-
-        public static readonly RwLockedDictionary<string, Permissions> OSSLPermissions = new RwLockedDictionary<string, Permissions>();
-
-        public void CheckThreatLevel(string name, ThreatLevelType level)
-        {
-            if ((int)level >= (int)ThreatLevel)
-            {
-                return;
-            }
-
-            Permissions perms;
-            ObjectPart part = Part;
-            ObjectGroup objgroup = part.ObjectGroup;
-            ObjectPart rootPart = objgroup.RootPart;
-            UUI creator = rootPart.Creator;
-            UUI owner = objgroup.Owner;
-
-            if (OSSLPermissions.TryGetValue(name, out perms))
-            {
-                if (perms.Creators.Contains(creator))
-                {
-                    return;
-                }
-                if (perms.Owners.Contains(owner))
-                {
-                    return;
-                }
-                /* TODO: implement parcel rights */
-
-                if (perms.IsAllowedForEstateOwner &&
-                    objgroup.Scene.Owner == owner)
-                {
-                    return;
-                }
-
-                if (perms.IsAllowedForEstateManager)
-                {
-                    /* TODO: implement estate managers */
-                }
-            }
-            throw new InvalidOperationException(string.Format("Function {0} not allowed", name));
-        }
-        #endregion
     }
 }

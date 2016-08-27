@@ -16,6 +16,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> GenericServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(delegate() { return new RwLockedList<IServerParamAnyListener>(); });
         public readonly RwLockedList<IServerParamAnyListener> AnyServerParamListeners = new RwLockedList<IServerParamAnyListener>();
         public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>> SpecificParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>>(delegate () { return new RwLockedList<Action<UUID, string>>(); });
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> StartsWithServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(delegate() { return new RwLockedList<IServerParamAnyListener>(); });
 
         private static readonly ILog m_ServerParamUpdateLog = LogManager.GetLogger("SERVER PARAM UPDATE");
 
@@ -103,6 +104,27 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                         catch (Exception e)
                         {
                             m_ServerParamUpdateLog.WarnFormat("Failed to update {0} with parameter {1}/{2}: {3}: {4}\n{5}", listener.GetType().FullName, regionID.ToString(), parameter, e.GetType().FullName, e.Message, e.StackTrace);
+                        }
+                    }
+
+                    foreach(KeyValuePair<string, RwLockedList<IServerParamAnyListener>> kvp in StartsWithServerParamListeners)
+                    {
+                        if(parameter.StartsWith(kvp.Key))
+                        {
+                            foreach (IServerParamAnyListener listener in kvp.Value)
+                            {
+#if DEBUG
+                                m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", listener.GetType().FullName, regionID.ToString(), parameter);
+#endif
+                                try
+                                {
+                                    listener.TriggerParameterUpdated(regionID, parameter, value);
+                                }
+                                catch (Exception e)
+                                {
+                                    m_ServerParamUpdateLog.WarnFormat("Failed to update {0} with parameter {1}/{2}: {3}: {4}\n{5}", listener.GetType().FullName, regionID.ToString(), parameter, e.GetType().FullName, e.Message, e.StackTrace);
+                                }
+                            }
                         }
                     }
                 }

@@ -15,4 +15,15 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             ParameterName = name;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [Serializable]
+    public class ServerParamStartsWithAttribute : Attribute
+    {
+        public string ParameterNameStartsWith { get; private set; }
+        public ServerParamStartsWithAttribute(string namestartswith)
+        {
+            ParameterNameStartsWith = namestartswith;
+        }
+    }
 }
