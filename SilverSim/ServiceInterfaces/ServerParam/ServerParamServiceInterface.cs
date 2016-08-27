@@ -1,8 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -11,8 +13,12 @@ namespace SilverSim.ServiceInterfaces.ServerParam
 {
     public abstract class ServerParamServiceInterface
     {
-        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamListener>> ServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamListener>>(delegate() { return new RwLockedList<IServerParamListener>(); });
-        public readonly RwLockedList<IServerParamListener> AnyServerParamListeners = new RwLockedList<IServerParamListener>();
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> GenericServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(delegate() { return new RwLockedList<IServerParamAnyListener>(); });
+        public readonly RwLockedList<IServerParamAnyListener> AnyServerParamListeners = new RwLockedList<IServerParamAnyListener>();
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>> SpecificParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>>(delegate () { return new RwLockedList<Action<UUID, string>>(); });
+
+        private static readonly ILog m_ServerParamUpdateLog = LogManager.GetLogger("SERVER PARAM UPDATE");
+
         public ServerParamServiceInterface()
         {
 
@@ -49,17 +55,46 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                 lock(m_UpdateSequenceLock)
                 {
                     Store(regionID, parameter, value);
-                    RwLockedList<IServerParamListener> listenerList;
-                    if (ServerParamListeners.TryGetValue(parameter, out listenerList))
+                    RwLockedList<IServerParamAnyListener> listenerList;
+                    RwLockedList<Action<UUID, string>> specificList;
+                    if(SpecificParamListeners.TryGetValue(parameter, out specificList))
                     {
-                        foreach (IServerParamListener listener in listenerList)
+                        foreach(Action<UUID, string> del in specificList)
+                        {
+                            try
+                            {
+                                del(regionID, value);
+                            }
+                            catch(Exception e)
+                            {
+                                m_ServerParamUpdateLog.WarnFormat("Failed to update {0} with parameter {1}/{2}: {3}: {4}\n{5}", del.GetType().FullName, regionID.ToString(), parameter, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
+                        }
+                    }
+                    if (GenericServerParamListeners.TryGetValue(parameter, out listenerList))
+                    {
+                        foreach (IServerParamAnyListener listener in listenerList)
+                        {
+                            try
+                            {
+                                listener.TriggerParameterUpdated(regionID, parameter, value);
+                            }
+                            catch (Exception e)
+                            {
+                                m_ServerParamUpdateLog.WarnFormat("Failed to update {0} with parameter {1}/{2}: {3}: {4}\n{5}", listener.GetType().FullName, regionID.ToString(), parameter, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
+                        }
+                    }
+                    foreach(IServerParamAnyListener listener in AnyServerParamListeners)
+                    {
+                        try
                         {
                             listener.TriggerParameterUpdated(regionID, parameter, value);
                         }
-                    }
-                    foreach(IServerParamListener listener in AnyServerParamListeners)
-                    {
-                        listener.TriggerParameterUpdated(regionID, parameter, value);
+                        catch (Exception e)
+                        {
+                            m_ServerParamUpdateLog.WarnFormat("Failed to update {0} with parameter {1}/{2}: {3}: {4}\n{5}", listener.GetType().FullName, regionID.ToString(), parameter, e.GetType().FullName, e.Message, e.StackTrace);
+                        }
                     }
                 }
             }

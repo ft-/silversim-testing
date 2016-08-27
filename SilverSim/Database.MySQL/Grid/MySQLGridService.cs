@@ -29,25 +29,24 @@ namespace SilverSim.Database.MySQL.Grid
         private bool IsDeleteOnUnregister;
         private bool AllowDuplicateRegionNames;
 
-        public void TriggerParameterUpdated(UUID regionid, string parameter, string value)
+        [ServerParam("DeleteOnUnregister")]
+        public void DeleteOnUnregisterUpdated(UUID regionid, string value)
         {
             if(regionid == UUID.Zero)
             {
-                switch(parameter)
-                {
-                    case "DeleteOnUnregister":
-                        IsDeleteOnUnregister = bool.Parse(value);
-                        break;
-
-                    case "AllowDuplicateRegionNames":
-                        AllowDuplicateRegionNames = bool.Parse(value);
-                        break;
-
-                    default:
-                        break;
-                }
+                IsDeleteOnUnregister = bool.Parse(value);
             }
             
+        }
+
+        [ServerParam("AllowDuplicateRegionNames")]
+        public void AllowDuplicateRegionNamesUpdated(UUID regionid, string value)
+        {
+            if (regionid == UUID.Zero)
+            {
+                AllowDuplicateRegionNames = bool.Parse(value);
+            }
+
         }
 
         #region Constructor

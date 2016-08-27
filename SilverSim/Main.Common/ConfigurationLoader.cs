@@ -53,7 +53,7 @@ using System.Xml;
 namespace SilverSim.Main.Common
 {
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
-    public sealed class ConfigurationLoader : IServerParamListener
+    public sealed class ConfigurationLoader : IServerParamAnyListener
     {
         #region Resource Assets support
         [Description("Resource Asset Backend")]
@@ -339,9 +339,15 @@ namespace SilverSim.Main.Common
         }
 
         #region Plugin Registry
+        bool m_ServerParamInitialLoadProcessed;
+
         public void AddPlugin(string name, IPlugin plugin)
         {
             PluginInstances.Add("$" + name, plugin);
+            if(m_ServerParamInitialLoadProcessed)
+            {
+                LoadServerParamsForPlugin(name, plugin, new Dictionary<string, List<KeyValuePair<UUID, string>>>());
+            }
         }
 
         public ServerParamServiceInterface GetServerParamStorage()
@@ -1456,30 +1462,12 @@ namespace SilverSim.Main.Common
                 Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
 
                 m_Log.Info("Distribute Server Params");
-                foreach (IPlugin instance in PluginInstances.Values)
+                foreach (KeyValuePair<string, IPlugin> kvp in PluginInstances)
                 {
-                    Type instanceType = instance.GetType();
-                    if (instanceType.GetInterfaces().Contains(typeof(IServerParamListener)))
-                    {
-                        ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
-                        foreach (ServerParamAttribute attr in attrs)
-                        {
-                            string parameterName = attr.ParameterName;
-                            List<KeyValuePair<UUID, string>> result;
-                            if (!cachedResults.TryGetValue(parameterName, out result))
-                            {
-                                result = serverParams[parameterName];
-                                cachedResults.Add(parameterName, result);
-                            }
-
-                            foreach(KeyValuePair<UUID, string> kvp in result)
-                            {
-                                IServerParamListener listener = (IServerParamListener)instance;
-                                listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
-                            }
-                        }
-                    }
+                    LoadServerParamsForPlugin(kvp.Key, kvp.Value, cachedResults);
                 }
+
+                m_ServerParamInitialLoadProcessed = true;
 
                 serverParams.AnyServerParamListeners.Add(this);
                 Scenes.OnRegionAdd += LoadParamsOnAddedScene;
@@ -1518,6 +1506,86 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        #region Load Server Params
+        void LoadServerParamsForPlugin(string name, IPlugin instance, Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults)
+        {
+            ServerParamServiceInterface serverParams = GetServerParamStorage();
+            Type instanceType = instance.GetType();
+            if (instanceType.GetInterfaces().Contains(typeof(IServerParamListener)))
+            {
+                ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                foreach (ServerParamAttribute attr in attrs)
+                {
+                    string parameterName = attr.ParameterName;
+                    List<KeyValuePair<UUID, string>> result;
+                    if (!cachedResults.TryGetValue(parameterName, out result))
+                    {
+                        result = serverParams[parameterName];
+                        cachedResults.Add(parameterName, result);
+                    }
+
+                    bool foundSpecific = false;
+                    MethodInfo[] mis = instanceType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                    foreach (MethodInfo mi in mis)
+                    {
+                        ServerParamAttribute[] mi_attrs = Attribute.GetCustomAttributes(mi, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                        foreach (ServerParamAttribute mi_attr in mi_attrs)
+                        {
+                            if (mi_attr.ParameterName == parameterName)
+                            {
+                                Action<UUID, string> del;
+                                try
+                                {
+                                    del = Delegate.CreateDelegate(typeof(Action<UUID, string>), mi) as Action<UUID, string>;
+                                }
+                                catch
+                                {
+                                    /* could not create so skip it */
+                                    continue;
+                                }
+                                foundSpecific = true;
+                                foreach (KeyValuePair<UUID, string> kvp in result)
+                                {
+                                    try
+                                    {
+                                        del(kvp.Key, kvp.Value);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                                    }
+                                }
+                                serverParams.SpecificParamListeners[parameterName].Add(del);
+                            }
+                        }
+                    }
+                    
+                    if(foundSpecific)
+                    {
+                        continue;
+                    }
+
+                    if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
+                    {
+                        IServerParamAnyListener listener = (IServerParamAnyListener)instance;
+                        foreach (KeyValuePair<UUID, string> kvp in result)
+                        {
+                            try
+                            {
+                                listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
+                        }
+                        serverParams.GenericServerParamListeners[parameterName].Add(listener);
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region Sim Establish
         readonly Action<HttpRequest, ConfigurationLoader> m_SimCircuitRequest;
         void SimCircuitRequest(HttpRequest req)
@@ -1531,8 +1599,9 @@ namespace SilverSim.Main.Common
         {
             ServerParamServiceInterface serverParams = GetServerParamStorage();
             Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
+            Type instanceType = scene.GetType();
 
-            ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(scene.GetType(), typeof(ServerParamAttribute)) as ServerParamAttribute[];
+            ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
             foreach (ServerParamAttribute attr in attrs)
             {
                 string parameterName = attr.ParameterName;
@@ -1543,10 +1612,60 @@ namespace SilverSim.Main.Common
                     cachedResults.Add(parameterName, result);
                 }
 
-                foreach (KeyValuePair<UUID, string> kvp in result)
+                bool foundSpecific = false;
+                MethodInfo[] mis = instanceType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                foreach (MethodInfo mi in mis)
                 {
-                    IServerParamListener listener = (IServerParamListener)scene;
-                    listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
+                    ServerParamAttribute[] mi_attrs = Attribute.GetCustomAttributes(mi, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                    foreach (ServerParamAttribute mi_attr in mi_attrs)
+                    {
+                        if (mi_attr.ParameterName == parameterName)
+                        {
+                            Action<UUID, string> del;
+                            try
+                            {
+                                del = Delegate.CreateDelegate(typeof(Action<UUID, string>), mi) as Action<UUID, string>;
+                            }
+                            catch
+                            {
+                                /* could not create so skip it */
+                                continue;
+                            }
+                            foundSpecific = true;
+                            foreach (KeyValuePair<UUID, string> kvp in result)
+                            {
+                                try
+                                {
+                                    del(kvp.Key, kvp.Value);
+                                }
+                                catch (Exception e)
+                                {
+                                    m_Log.WarnFormat("Failed to configure scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (foundSpecific)
+                {
+                    continue;
+                }
+
+                if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
+                {
+                    IServerParamAnyListener listener = (IServerParamAnyListener)scene;
+                    foreach (KeyValuePair<UUID, string> kvp in result)
+                    {
+                        try
+                        {
+                            listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.WarnFormat("Failed to configure scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                        }
+                    }
                 }
             }
         }
@@ -1880,13 +1999,58 @@ namespace SilverSim.Main.Common
             {
                 foreach(SceneInterface scene in Scenes.Values)
                 {
-                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(scene.GetType(), typeof(ServerParamAttribute));
+                    Type instanceType = scene.GetType();
+                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
                     foreach(ServerParamAttribute attr in attrs)
                     {
                         if(attr.ParameterName == parametername &&
                             !serverParams.Contains(regionID, parametername))
                         {
-                            scene.TriggerParameterUpdated(regionID, parametername, value);
+                            bool foundSpecific = false;
+                            MethodInfo[] mis = instanceType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                            foreach (MethodInfo mi in mis)
+                            {
+                                ServerParamAttribute[] mi_attrs = Attribute.GetCustomAttributes(mi, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                                foreach (ServerParamAttribute mi_attr in mi_attrs)
+                                {
+                                    if (mi_attr.ParameterName == parametername)
+                                    {
+                                        Action<UUID, string> del;
+                                        try
+                                        {
+                                            del = Delegate.CreateDelegate(typeof(Action<UUID, string>), mi) as Action<UUID, string>;
+                                        }
+                                        catch
+                                        {
+                                            /* could not create so skip it */
+                                            continue;
+                                        }
+                                        foundSpecific = true;
+                                        try
+                                        {
+                                            del(regionID, value);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            m_Log.WarnFormat("Failed to update scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, regionID.ToString(), value, e.GetType().FullName, e.Message, e.StackTrace);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (foundSpecific)
+                            {
+                                continue;
+                            }
+
+                            try
+                            {
+                                scene.TriggerParameterUpdated(regionID, parametername, value);
+                            }
+                            catch(Exception e)
+                            {
+                                m_Log.WarnFormat("Failed to update scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, regionID.ToString(), value, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
                             break;
                         }
                     }
@@ -1897,12 +2061,57 @@ namespace SilverSim.Main.Common
                 SceneInterface scene;
                 if (Scenes.TryGetValue(regionID, out scene))
                 {
-                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(scene.GetType(), typeof(ServerParamAttribute));
+                    Type instanceType = scene.GetType();
+                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
                     foreach (ServerParamAttribute attr in attrs)
                     {
                         if (attr.ParameterName == parametername)
                         {
-                            scene.TriggerParameterUpdated(regionID, parametername, value);
+                            bool foundSpecific = false;
+                            MethodInfo[] mis = instanceType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                            foreach (MethodInfo mi in mis)
+                            {
+                                ServerParamAttribute[] mi_attrs = Attribute.GetCustomAttributes(mi, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                                foreach (ServerParamAttribute mi_attr in mi_attrs)
+                                {
+                                    if (mi_attr.ParameterName == parametername)
+                                    {
+                                        Action<UUID, string> del;
+                                        try
+                                        {
+                                            del = Delegate.CreateDelegate(typeof(Action<UUID, string>), mi) as Action<UUID, string>;
+                                        }
+                                        catch
+                                        {
+                                            /* could not create so skip it */
+                                            continue;
+                                        }
+                                        foundSpecific = true;
+                                        try
+                                        {
+                                            del(regionID, value);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            m_Log.WarnFormat("Failed to update scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, regionID.ToString(), value, e.GetType().FullName, e.Message, e.StackTrace);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (foundSpecific)
+                            {
+                                continue;
+                            }
+
+                            try
+                            {
+                                scene.TriggerParameterUpdated(regionID, parametername, value);
+                            }
+                            catch(Exception e)
+                            {
+                                m_Log.WarnFormat("Failed to update scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, regionID.ToString(), value, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
                             break;
                         }
                     }
