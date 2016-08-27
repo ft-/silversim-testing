@@ -61,6 +61,9 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                     {
                         foreach(Action<UUID, string> del in specificList)
                         {
+#if DEBUG
+                            m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", del.GetType().FullName, regionID.ToString(), parameter);
+#endif
                             try
                             {
                                 del(regionID, value);
@@ -75,6 +78,9 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                     {
                         foreach (IServerParamAnyListener listener in listenerList)
                         {
+#if DEBUG
+                            m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", listener.GetType().FullName, regionID.ToString(), parameter);
+#endif
                             try
                             {
                                 listener.TriggerParameterUpdated(regionID, parameter, value);
@@ -87,6 +93,9 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                     }
                     foreach(IServerParamAnyListener listener in AnyServerParamListeners)
                     {
+#if DEBUG
+                        m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", listener.GetType().FullName, regionID.ToString(), parameter);
+#endif
                         try
                         {
                             listener.TriggerParameterUpdated(regionID, parameter, value);

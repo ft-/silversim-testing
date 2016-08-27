@@ -1462,12 +1462,14 @@ namespace SilverSim.Main.Common
                 Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
 
                 m_Log.Info("Distribute Server Params");
-                foreach (KeyValuePair<string, IPlugin> kvp in PluginInstances)
+                Dictionary<string, IPlugin> plugins = new Dictionary<string, IPlugin>(PluginInstances);
+
+                m_ServerParamInitialLoadProcessed = true;
+
+                foreach (KeyValuePair<string, IPlugin> kvp in plugins)
                 {
                     LoadServerParamsForPlugin(kvp.Key, kvp.Value, cachedResults);
                 }
-
-                m_ServerParamInitialLoadProcessed = true;
 
                 serverParams.AnyServerParamListeners.Add(this);
                 Scenes.OnRegionAdd += LoadParamsOnAddedScene;
@@ -1513,6 +1515,9 @@ namespace SilverSim.Main.Common
             Type instanceType = instance.GetType();
             if (instanceType.GetInterfaces().Contains(typeof(IServerParamListener)))
             {
+#if DEBUG
+                m_Log.DebugFormat("Processing {0} for server params", name);
+#endif
                 ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
                 foreach (ServerParamAttribute attr in attrs)
                 {
@@ -1536,25 +1541,32 @@ namespace SilverSim.Main.Common
                                 Action<UUID, string> del;
                                 try
                                 {
-                                    del = Delegate.CreateDelegate(typeof(Action<UUID, string>), mi) as Action<UUID, string>;
+                                    del = Delegate.CreateDelegate(typeof(Action<UUID, string>), instance, mi) as Action<UUID, string>;
                                 }
-                                catch
+                                catch(Exception e)
                                 {
+                                    m_Log.WarnFormat("Failed to initialize {0} for parameter {1}: {2}: {3}\n{4}", name, parameterName, e.GetType().FullName, e.Message, e.StackTrace);
                                     /* could not create so skip it */
                                     continue;
                                 }
                                 foundSpecific = true;
                                 foreach (KeyValuePair<UUID, string> kvp in result)
                                 {
+#if DEBUG
+                                    m_Log.DebugFormat("sending update to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
+#endif
                                     try
                                     {
                                         del(kvp.Key, kvp.Value);
                                     }
                                     catch (Exception e)
                                     {
-                                        m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                                        m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), parameterName, e.GetType().FullName, e.Message, e.StackTrace);
                                     }
                                 }
+#if DEBUG
+                                m_Log.DebugFormat("adding update listener for {0} with parameter {1}", name, parameterName);
+#endif
                                 serverParams.SpecificParamListeners[parameterName].Add(del);
                             }
                         }
@@ -1570,15 +1582,21 @@ namespace SilverSim.Main.Common
                         IServerParamAnyListener listener = (IServerParamAnyListener)instance;
                         foreach (KeyValuePair<UUID, string> kvp in result)
                         {
+#if DEBUG
+                            m_Log.DebugFormat("sending update to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
+#endif
                             try
                             {
                                 listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
                             }
                             catch (Exception e)
                             {
-                                m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                                m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), parameterName, e.GetType().FullName, e.Message, e.StackTrace);
                             }
                         }
+#if DEBUG
+                        m_Log.DebugFormat("adding update listener for {0} with parameter {1}", name, parameterName);
+#endif
                         serverParams.GenericServerParamListeners[parameterName].Add(listener);
                     }
                 }
@@ -1624,23 +1642,27 @@ namespace SilverSim.Main.Common
                             Action<UUID, string> del;
                             try
                             {
-                                del = Delegate.CreateDelegate(typeof(Action<UUID, string>), mi) as Action<UUID, string>;
+                                del = Delegate.CreateDelegate(typeof(Action<UUID, string>), scene, mi) as Action<UUID, string>;
                             }
-                            catch
+                            catch(Exception e)
                             {
                                 /* could not create so skip it */
+                                m_Log.WarnFormat("Failed to initialize scene {0} for parameter {1}: {2}: {3}\n{4}", scene.Name, parameterName, e.GetType().FullName, e.Message, e.StackTrace);
                                 continue;
                             }
                             foundSpecific = true;
                             foreach (KeyValuePair<UUID, string> kvp in result)
                             {
+#if DEBUG
+                                m_Log.DebugFormat("sending update to scene {0} with parameter {1}/{2}", scene.Name, kvp.Key.ToString(), parameterName);
+#endif
                                 try
                                 {
                                     del(kvp.Key, kvp.Value);
                                 }
                                 catch (Exception e)
                                 {
-                                    m_Log.WarnFormat("Failed to configure scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                                    m_Log.WarnFormat("Failed to configure scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, kvp.Key.ToString(), parameterName, e.GetType().FullName, e.Message, e.StackTrace);
                                 }
                             }
                         }
@@ -1657,13 +1679,16 @@ namespace SilverSim.Main.Common
                     IServerParamAnyListener listener = (IServerParamAnyListener)scene;
                     foreach (KeyValuePair<UUID, string> kvp in result)
                     {
+#if DEBUG
+                        m_Log.DebugFormat("sending update to {0} with parameter {1}/{2}", scene.Name, kvp.Key.ToString(), parameterName);
+#endif
                         try
                         {
                             listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Failed to configure scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                            m_Log.WarnFormat("Failed to configure scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, kvp.Key.ToString(), parameterName, e.GetType().FullName, e.Message, e.StackTrace);
                         }
                     }
                 }
