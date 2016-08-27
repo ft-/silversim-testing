@@ -147,6 +147,11 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             get;
         }
 
+        public abstract List<KeyValuePair<UUID, string>> KnownParameters
+        {
+            get;
+        }
+
         public abstract bool Remove(UUID regionID, string parameter);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]

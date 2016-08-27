@@ -217,6 +217,32 @@ namespace SilverSim.Database.MySQL.ServerParam
             }
         }
 
+        public override List<KeyValuePair<UUID, string>> KnownParameters
+        {
+            get
+            {
+                List<KeyValuePair<UUID, string>> result = new List<KeyValuePair<UUID, string>>();
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+                    connection.InsideTransaction(delegate ()
+                    {
+                        using (MySqlCommand cmd = new MySqlCommand("SELECT regionid, parametername FROM serverparams", connection))
+                        {
+                            using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                            {
+                                while (dbReader.Read())
+                                {
+                                    result.Add(new KeyValuePair<UUID, string>(dbReader.GetUUID("regionid"), dbReader.GetString("parametername")));
+                                }
+                            }
+                        }
+                    });
+                }
+                return result;
+            }
+        }
+
         public override bool Remove(UUID regionID, string parameter)
         {
             bool result = false;

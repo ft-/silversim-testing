@@ -1513,10 +1513,45 @@ namespace SilverSim.Main.Common
         {
             ServerParamServiceInterface serverParams = GetServerParamStorage();
             Type instanceType = instance.GetType();
+            ServerParamStartsWithAttribute[] startswithattrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamStartsWithAttribute)) as ServerParamStartsWithAttribute[];
+            if(instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)) && startswithattrs.Length != 0)
+            {
+                IServerParamAnyListener listener = (IServerParamAnyListener)instance;
+#if DEBUG
+                m_Log.DebugFormat("Processing {0} for start with server params", name);
+#endif
+                foreach(ServerParamStartsWithAttribute attr in startswithattrs)
+                {
+                    foreach(KeyValuePair<UUID, string> kvp in serverParams.KnownParameters)
+                    {
+                        if(kvp.Value.StartsWith(attr.ParameterNameStartsWith))
+                        {
+#if DEBUG
+                            m_Log.DebugFormat("sending config value to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), kvp.Value);
+#endif
+                            try
+                            {
+                                listener.TriggerParameterUpdated(kvp.Key, kvp.Value, serverParams.GetString(kvp.Key, kvp.Value));
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
+                        }
+                    }
+
+#if DEBUG
+                    m_Log.DebugFormat("adding update listener for {0} with start with parameter {1}", name, attr.ParameterNameStartsWith);
+#endif
+                    serverParams.StartsWithServerParamListeners[attr.ParameterNameStartsWith].Add((IServerParamAnyListener)instance);
+                }
+
+            }
+
             if (instanceType.GetInterfaces().Contains(typeof(IServerParamListener)))
             {
 #if DEBUG
-                m_Log.DebugFormat("Processing {0} for server params", name);
+                m_Log.DebugFormat("Processing {0} for specific server param", name);
 #endif
                 ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
                 foreach (ServerParamAttribute attr in attrs)
@@ -1553,7 +1588,7 @@ namespace SilverSim.Main.Common
                                 foreach (KeyValuePair<UUID, string> kvp in result)
                                 {
 #if DEBUG
-                                    m_Log.DebugFormat("sending update to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
+                                    m_Log.DebugFormat("sending config value to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
 #endif
                                     try
                                     {
@@ -1583,7 +1618,7 @@ namespace SilverSim.Main.Common
                         foreach (KeyValuePair<UUID, string> kvp in result)
                         {
 #if DEBUG
-                            m_Log.DebugFormat("sending update to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
+                            m_Log.DebugFormat("sending config value to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
 #endif
                             try
                             {
