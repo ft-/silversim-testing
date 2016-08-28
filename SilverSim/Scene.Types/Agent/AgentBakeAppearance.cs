@@ -17,10 +17,42 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Agent
 {
+    class J2kEncoder
+    {
+        public J2kEncoder()
+        {
+
+        }
+    }
+
+    static class GetJ2KEncoder
+    {
+        [DllImport("kernel32.dll")]
+        static extern IntPtr LoadLibrary(string dllToLoad);
+
+        public static J2kEncoder GetEncoder()
+        {
+            if(Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                if(Environment.Is64BitProcess)
+                {
+                    LoadLibrary(Path.GetFullPath("platform-libs/windows/64/openjp2.dll"));
+                }
+                else
+                {
+                    LoadLibrary(Path.GetFullPath("platform-libs/windows/32/openjp2.dll"));
+                }
+            }
+
+            return new J2kEncoder();
+        }
+    }
+
     public static class AgentBakeAppearance
     {
         private static readonly ILog m_BakeLog = LogManager.GetLogger("AVATAR BAKING");
@@ -440,18 +472,27 @@ namespace SilverSim.Scene.Types.Agent
             InventoryServiceInterface inventoryService = agent.InventoryService;
             AssetServiceInterface assetService = agent.AssetService;
 
-            logOutput?.Invoke(string.Format("Baking agent {0}", agent.Owner.FullName));
+            if (null != logOutput)
+            {
+                logOutput.Invoke(string.Format("Baking agent {0}", agent.Owner.FullName));
+            }
             if (agent.CurrentOutfitFolder == UUID.Zero)
             {
                 InventoryFolder currentOutfitFolder = inventoryService.Folder[agentOwner.ID, AssetType.CurrentOutfitFolder];
                 agent.CurrentOutfitFolder = currentOutfitFolder.ID;
-                logOutput?.Invoke(string.Format("Retrived current outfit folder for agent {0}", agent.Owner.FullName));
+                if (null != logOutput)
+                {
+                    logOutput.Invoke(string.Format("Retrived current outfit folder for agent {0}", agent.Owner.FullName));
+                }
             }
 
             InventoryFolderContent currentOutfit = inventoryService.Folder.Content[agentOwner.ID, agent.CurrentOutfitFolder];
             if (currentOutfit.Version == agent.Appearance.Serial && !rebake)
             {
-                logOutput?.Invoke(string.Format("No baking required for agent {0}", agent.Owner.FullName));
+                if (null != logOutput)
+                {
+                    logOutput.Invoke(string.Format("No baking required for agent {0}", agent.Owner.FullName));
+                }
                 return;
             }
 
@@ -478,7 +519,10 @@ namespace SilverSim.Scene.Types.Agent
                 actualItemsInDict.Add(item.ID, item);
             }
 
-            logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", agent.Owner.FullName));
+            if (null != logOutput)
+            {
+                logOutput.Invoke(string.Format("Processing assets for baking agent {0}", agent.Owner.FullName));
+            }
 
             foreach (InventoryItem linkItem in items)
             {
@@ -518,10 +562,17 @@ namespace SilverSim.Scene.Types.Agent
 
             agent.Wearables.All = wearables;
 
-            logOutput?.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
+            if (null != logOutput)
+            {
+                logOutput.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
+            }
+
             agent.BakeAppearanceFromWearablesInfo(sceneAssetService, logOutput);
 
-            logOutput?.Invoke(string.Format("Baking agent {0} completed", agent.Owner.FullName));
+            if (null != logOutput)
+            {
+                logOutput.Invoke(string.Format("Baking agent {0} completed", agent.Owner.FullName));
+            }
         }
         #endregion
 
