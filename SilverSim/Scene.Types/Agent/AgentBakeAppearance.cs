@@ -434,21 +434,24 @@ namespace SilverSim.Scene.Types.Agent
             return (byte)Math.Floor((val - min) * 255 / (max - min));
         }
 
-        public static void LoadAppearanceFromCurrentOutfit(this IAgent agent, AssetServiceInterface sceneAssetService, bool rebake = false)
+        public static void LoadAppearanceFromCurrentOutfit(this IAgent agent, AssetServiceInterface sceneAssetService, bool rebake = false, Action<string> logOutput = null)
         {
             UUI agentOwner = agent.Owner;
             InventoryServiceInterface inventoryService = agent.InventoryService;
             AssetServiceInterface assetService = agent.AssetService;
 
+            logOutput?.Invoke(string.Format("Baking agent {0}", agent.Owner.FullName));
             if (agent.CurrentOutfitFolder == UUID.Zero)
             {
                 InventoryFolder currentOutfitFolder = inventoryService.Folder[agentOwner.ID, AssetType.CurrentOutfitFolder];
                 agent.CurrentOutfitFolder = currentOutfitFolder.ID;
+                logOutput?.Invoke(string.Format("Retrived current outfit folder for agent {0}", agent.Owner.FullName));
             }
 
             InventoryFolderContent currentOutfit = inventoryService.Folder.Content[agentOwner.ID, agent.CurrentOutfitFolder];
-            if (currentOutfit.Version == agent.Appearance.Serial || rebake)
+            if (currentOutfit.Version == agent.Appearance.Serial && !rebake)
             {
+                logOutput?.Invoke(string.Format("No baking required for agent {0}", agent.Owner.FullName));
                 return;
             }
 
@@ -474,6 +477,8 @@ namespace SilverSim.Scene.Types.Agent
             {
                 actualItemsInDict.Add(item.ID, item);
             }
+
+            logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", agent.Owner.FullName));
 
             foreach (InventoryItem linkItem in items)
             {
@@ -513,17 +518,17 @@ namespace SilverSim.Scene.Types.Agent
 
             agent.Wearables.All = wearables;
 
-            if (rebake)
-            {
-                agent.BakeAppearanceFromWearablesInfo(sceneAssetService);
-            }
+            logOutput?.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
+            agent.BakeAppearanceFromWearablesInfo(sceneAssetService, logOutput);
+
+            logOutput?.Invoke(string.Format("Baking agent {0} completed", agent.Owner.FullName));
         }
         #endregion
 
         #region Actual Baking Code
         const int MAX_WEARABLES_PER_TYPE = 5;
 
-        public static void BakeAppearanceFromWearablesInfo(this IAgent agent, AssetServiceInterface sceneAssetService)
+        public static void BakeAppearanceFromWearablesInfo(this IAgent agent, AssetServiceInterface sceneAssetService, Action<string> logOutput = null)
         {
             UUI agentOwner = agent.Owner;
             InventoryServiceInterface inventoryService = agent.InventoryService;

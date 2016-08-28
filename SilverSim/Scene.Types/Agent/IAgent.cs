@@ -286,5 +286,8 @@ namespace SilverSim.Scene.Types.Agent
 
         void KickUser(string msg);
         void KickUser(string msg, Action<bool> callbackDelegate);
+
+        /* this is SSB */
+        void RebakeAppearance(Action<string> logOutput = null);
     }
 }

@@ -120,6 +120,7 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.ResetCommands.Add("windparam", ResetWindParamCmd);
             loader.CommandRegistry.GetCommands.Add("waterheight", GetWaterheightCmd);
             loader.CommandRegistry.SetCommands.Add("waterheight", SetWaterheightCmd);
+            loader.CommandRegistry.Commands.Add("rebake", RebakeCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -958,6 +959,52 @@ namespace SilverSim.Main.Cmd.Region
             if (!agentFound)
             {
                 io.WriteFormatted("Agent {0} {1} not found.", args[2], args[3]);
+            }
+        }
+
+        void RebakeCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("rebake <firstname> <lastname>");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("rebake needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            bool agentFound = false;
+            foreach (IAgent agent in scene.RootAgents)
+            {
+                UUI agentid = agent.Owner;
+                if (agentid.FullName.ToLower() == (args[1] + " " + args[2]).ToLower())
+                {
+                    agent.RebakeAppearance(io.Write);
+                    agentFound = true;
+                }
+            }
+
+            if (!agentFound)
+            {
+                io.WriteFormatted("Agent {0} {1} not found.", args[1], args[2]);
             }
         }
 

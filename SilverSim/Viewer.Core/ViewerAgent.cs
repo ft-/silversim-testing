@@ -1630,6 +1630,11 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        public void RebakeAppearance(Action<string> logOutput = null)
+        {
+            AgentBakeAppearance.LoadAppearanceFromCurrentOutfit(this, AssetService, true, logOutput);
+        }
+
         [PacketHandler(MessageType.CompleteAgentMovement)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleCompleteAgentMovement(Message m)
