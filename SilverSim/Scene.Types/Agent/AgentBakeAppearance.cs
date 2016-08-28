@@ -2,7 +2,6 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
@@ -17,10 +16,8 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Agent
 {

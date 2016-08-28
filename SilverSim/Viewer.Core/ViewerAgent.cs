@@ -1784,8 +1784,6 @@ namespace SilverSim.Viewer.Core
 
         public void HandleMessage(ChildAgentUpdate m)
         {
-            /* this message switches from child to root */
-
         }
 
         public void HandleMessage(ChildAgentPositionUpdate m)
