@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Project frameworkVersion="v4_5" name="OpenJp2.Net" path="SilverSim/OpenJp2" type="Library">
+  <Configuration name="Release">
+    <Options>
+      <OutputPath>../../bin/plugins/</OutputPath>
+    </Options>
+  </Configuration>
+  <Configuration name="Debug">
+    <Options>
+      <OutputPath>../../bin/plugins/</OutputPath>
+    </Options>
+  </Configuration>
+  <ReferencePath>../../bin/</ReferencePath>
+  <Reference name="System"/>
+  <Reference name="System.Core"/>
+  <Reference name="System.Drawing"/>
+  <Files>
+    <Match pattern="*.cs" recurse="true">
+        <Exclude pattern="TemporaryGeneratedFile"/>
+    </Match>
+    <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
+    <Match pattern="Product.licenseheader" path=".." recurse="false" buildAction="None"/>
+  </Files>
+</Project>
