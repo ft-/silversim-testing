@@ -21,29 +21,44 @@ namespace OpenJp2.Net
         static extern uint J2cEncodedGetLength(IntPtr dataref);
 
         [DllImport("openjp2", EntryPoint = "j2c_encoded_read")]
-        static extern uint J2cEncodedRead(IntPtr dataref, byte[] buffer, int length);
+        static extern int J2cEncodedRead(IntPtr dataref, byte[] buffer, int length);
 
         [DllImport("openjp2", EntryPoint = "j2c_encoded_free")]
-        static extern uint J2cEncodedFree(IntPtr dataref);
+        static extern void J2cEncodedFree(IntPtr dataref);
 
-        static J2cEncoder()
-        {
-            /* preload necessary windows dll */
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                if (Environment.Is64BitProcess)
-                {
-                    LoadLibrary(Path.GetFullPath("platform-libs/windows/64/openjp2.dll"));
-                }
-                else
-                {
-                    LoadLibrary(Path.GetFullPath("platform-libs/windows/32/openjp2.dll"));
-                }
-            }
-        }
+        static object m_InitLock = new object();
+        static bool m_Inited;
 
         public static byte[] Encode(Bitmap img, bool lossless)
         {
+            if(!m_Inited)
+            {
+                lock(m_InitLock)
+                {
+                    if(!m_Inited)
+                    {
+                        /* preload necessary windows dll */
+                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                        {
+                            if (Environment.Is64BitProcess)
+                            {
+                                if(IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/64/openjp2.dll")))
+                                {
+                                    throw new FileNotFoundException("missing platform-libs/windows/64/openjp2.dll");
+                                }
+                            }
+                            else
+                            {
+                                if(IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/32/openjp2.dll")))
+                                {
+                                    throw new FileNotFoundException("missing platform-libs/windows/32/openjp2.dll");
+                                }
+                            }
+                        }
+                        m_Inited = true;
+                    }
+                }
+            }
             int imgChannelWidth = img.Width * img.Height;
             int channels = 3;
             byte[] datastream;
@@ -51,16 +66,16 @@ namespace OpenJp2.Net
             {
                 channels = 4;
                 datastream = new byte[imgChannelWidth * channels];
+                int pixpos = 0;
                 for(int y = 0; y < img.Height; ++y)
                 {
                     for(int x = 0; x < img.Width; ++x)
                     {
                         Color c = img.GetPixel(x, y);
-                        int pixpos = y * img.Height + x;
-                        datastream[pixpos] = c.R;
-                        datastream[pixpos + imgChannelWidth] = c.G;
-                        datastream[pixpos + imgChannelWidth * 2] = c.B;
-                        datastream[pixpos + imgChannelWidth * 3] = c.A;
+                        datastream[pixpos++] = c.R;
+                        datastream[pixpos++] = c.G;
+                        datastream[pixpos++] = c.B;
+                        datastream[pixpos++] = c.A;
                     }
                 }
             }
@@ -68,15 +83,15 @@ namespace OpenJp2.Net
             {
                 channels = 3;
                 datastream = new byte[imgChannelWidth * channels];
+                int pixpos = 0;
                 for (int y = 0; y < img.Height; ++y)
                 {
                     for (int x = 0; x < img.Width; ++x)
                     {
                         Color c = img.GetPixel(x, y);
-                        int pixpos = y * img.Height + x;
-                        datastream[pixpos] = c.R;
-                        datastream[pixpos + imgChannelWidth] = c.G;
-                        datastream[pixpos + imgChannelWidth * 2] = c.B;
+                        datastream[pixpos++] = c.R;
+                        datastream[pixpos++] = c.G;
+                        datastream[pixpos++] = c.B;
                     }
                 }
             }
@@ -95,7 +110,10 @@ namespace OpenJp2.Net
             try
             {
                 j2cstream = new byte[J2cEncodedGetLength(nativePtr)];
-                J2cEncodedRead(nativePtr, j2cstream, j2cstream.Length);
+                if(j2cstream.Length != J2cEncodedRead(nativePtr, j2cstream, j2cstream.Length))
+                {
+                    throw new InvalidDataException();
+                }
             }
             finally
             {

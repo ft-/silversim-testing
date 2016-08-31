@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using log4net;
+using OpenJp2.Net;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
@@ -1035,7 +1036,7 @@ namespace SilverSim.Scene.Types.Agent
                     }
                 }
 
-                data.Data = CSJ2K.J2KEncoder.EncodeJPEG(bitmap);
+                data.Data = J2cEncoder.Encode(bitmap, true);
             }
 
             return data;
