@@ -4,6 +4,7 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
@@ -41,6 +42,7 @@ namespace SilverSim.Main.Cmd.Region
         private static readonly ILog m_Log = LogManager.GetLogger("REGION COMMANDS");
         private string m_ExternalHostName = string.Empty;
         private uint m_HttpPort;
+        ConfigurationLoader m_Loader;
         private string m_Scheme = Uri.UriSchemeHttp;
         string m_GatekeeperURI;
         SceneList m_Scenes;
@@ -56,6 +58,8 @@ namespace SilverSim.Main.Cmd.Region
         public void Startup(ConfigurationLoader loader)
         {
             m_Scenes = loader.Scenes;
+            m_Loader = loader;
+
             IConfig config = loader.Config.Configs["Network"];
             if (config != null)
             {
@@ -87,6 +91,7 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.DeleteCommands.Add("region", DeleteRegionCmd);
             loader.CommandRegistry.ShowCommands.Add("regionstats", ShowRegionStatsCmd);
             loader.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCmd);
+            loader.CommandRegistry.ShowCommands.Add("ports", ShowPortAllocationsCommand);
             loader.CommandRegistry.EnableCommands.Add("region", EnableRegionCmd);
             loader.CommandRegistry.DisableCommands.Add("region", DisableRegionCmd);
             loader.CommandRegistry.StartCommands.Add("region", StartRegionCmd);
@@ -1145,6 +1150,27 @@ namespace SilverSim.Main.Cmd.Region
             }
             io.Write(output.ToString());
         }
+
+        #region Show Port allocations
+        void ShowPortAllocationsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            StringBuilder sb = new StringBuilder("TCP Ports:\n----------------------------------------------\n");
+            foreach(KeyValuePair<int, string> kvp in m_Loader.KnownTcpPorts)
+            {
+                sb.AppendFormat("{0}:\n- Port: {1}\n", kvp.Value, kvp.Key);
+            }
+            sb.Append("\nUDP Ports:\n----------------------------------------------\n");
+            IEnumerable<RegionInfo> regions = regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+            foreach(RegionInfo region in regions)
+            {
+                string status;
+                status = m_Scenes.ContainsKey(region.ID) ? "online" : "offline";
+                sb.AppendFormat("Region \"{0}\" ({1})\n- Port: {2}\n- Status: ({3})\n", region.Name, region.ID, region.ServerPort, status);
+            }
+            io.Write(sb.ToString());
+        }
+        #endregion
+
 
         void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {

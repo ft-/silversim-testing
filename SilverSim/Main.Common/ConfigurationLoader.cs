@@ -2051,6 +2051,26 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        #region List TCP Ports
+        public Dictionary<int, string> KnownTcpPorts
+        {
+            get
+            {
+                Dictionary<int, string> tcpPorts = new Dictionary<int, string>();
+                tcpPorts.Add((int)HttpServer.Port, "HTTP Server");
+                try
+                {
+                    tcpPorts.Add((int)HttpsServer.Port, "HTTPS Server");
+                }
+                catch
+                {
+                    /* no HTTPS Server */
+                }
+                return tcpPorts;
+            }
+        }
+        #endregion
+
         #region Distribute server params
         public void TriggerParameterUpdated(UUID regionID, string parametername, string value)
         {
