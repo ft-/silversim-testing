@@ -1397,7 +1397,6 @@ namespace SilverSim.Main.Common
                 p.Value.ProcessMigrations();
             }
 
-            m_Log.Info("Initializing HTTP Server");
             IConfig httpConfig = m_Config.Configs["HTTP"];
             if(null == httpConfig)
             {
@@ -1407,7 +1406,7 @@ namespace SilverSim.Main.Common
 
             if(httpConfig.Contains("ServerCertificate"))
             {
-                m_Log.Fatal("Configuration section [Network] or preferred [HTTP] should not be configured for HTTPS");
+                m_Log.Fatal("Configuration section [HTTP] should not be configured for HTTPS");
                 throw new ConfigurationErrorException();
             }
 
