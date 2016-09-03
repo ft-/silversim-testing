@@ -12,7 +12,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -52,18 +51,23 @@ namespace SilverSim.Main.Common.HttpServer
         readonly bool m_IsBehindProxy;
         bool m_StoppingListeners;
 
-        readonly X509Certificate m_ServerCertificate;
+        X509Certificate2 m_ServerCertificate;
+        string m_CertificateFileName;
 
 
-        public BaseHttpServer(IConfig httpConfig)
+        public BaseHttpServer(IConfig httpConfig, bool useSsl = false)
         {
             Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
 
             if(httpConfig.Contains("ServerCertificate"))
             {
-                string filename = httpConfig.GetString("ServerCertificate");
-                m_ServerCertificate = X509Certificate.CreateFromCertFile(filename);
+                m_CertificateFileName = httpConfig.GetString("ServerCertificate");
+                Scheme = Uri.UriSchemeHttps;
+            }
+            else if(useSsl)
+            {
+                m_CertificateFileName = "../data/server-cert.p12";
                 Scheme = Uri.UriSchemeHttps;
             }
             else
@@ -74,13 +78,32 @@ namespace SilverSim.Main.Common.HttpServer
             m_Listener = new TcpListener(IPAddress.Any, (int)Port);
             m_Listener.Server.Ttl = 128;
 
-            m_Log.InfoFormat("Adding HTTP Server at port {0}", Port);
+            if (Scheme == Uri.UriSchemeHttps)
+            {
+                m_Log.InfoFormat("Adding HTTPS Server at port {0}", Port);
+            }
+            else
+            {
+                m_Log.InfoFormat("Adding HTTP Server at port {0}", Port);
+            }
         }
 
         public void Startup(ConfigurationLoader loader)
         {
             m_ExternalHostNameService = loader.ExternalHostNameService;
-            m_Log.InfoFormat("Starting HTTP Server");
+            if(!File.Exists(m_CertificateFileName) && Scheme == Uri.UriSchemeHttps)
+            {
+                SslSelfSignCertUtil.GenerateSelfSignedServiceCertificate(m_CertificateFileName, m_ExternalHostNameService.ExternalHostName);
+            }
+            if (Scheme == Uri.UriSchemeHttps)
+            {
+                m_ServerCertificate = new X509Certificate2(m_CertificateFileName);
+                m_Log.InfoFormat("Starting HTTPS Server");
+            }
+            else
+            {
+                m_Log.InfoFormat("Starting HTTP Server");
+            }
             m_Listener.Start();
             m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
         }
@@ -175,7 +198,7 @@ namespace SilverSim.Main.Common.HttpServer
                     }
                     catch (Exception e)
                     {
-                        m_Log.WarnFormat("Unexpected exception: {0}\n{1}", e.GetType().FullName, e.StackTrace);
+                        m_Log.WarnFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                         return;
                     }
 
@@ -275,7 +298,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             catch (Exception e)
             {
-                m_Log.DebugFormat("Exception: {0}\n{1}", e.GetType().Name, e.StackTrace);
+                m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
             }
             finally
             {

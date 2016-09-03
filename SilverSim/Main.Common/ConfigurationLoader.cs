@@ -1424,12 +1424,7 @@ namespace SilverSim.Main.Common
             IConfig httpsConfig = m_Config.Configs["HTTPS"];
             if(null != httpsConfig)
             {
-                if (httpsConfig.Contains("ServerCertificate"))
-                {
-                    m_Log.Fatal("Configuration section [HTTPS] should be configured for HTTPS");
-                    throw new ConfigurationErrorException();
-                }
-                BaseHttpServer httpsServer = new BaseHttpServer(httpsConfig);
+                BaseHttpServer httpsServer = new BaseHttpServer(httpsConfig, true);
                 httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
                 PluginInstances.Add("HttpsServer", httpsServer);
             }
