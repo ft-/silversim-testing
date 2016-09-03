@@ -23,9 +23,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
         ExternalHostNameServiceInterface m_ExternalHostNameService;
         private GridServiceInterface m_RegionService;
         private SceneFactoryInterface m_SceneFactory;
-        private uint m_HttpPort;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
-        private string m_Scheme = Uri.UriSchemeHttp;
         SceneList m_Scenes;
         string m_GatekeeperURI;
 
@@ -42,15 +40,6 @@ namespace SilverSim.Scene.RegionLoader.Basic
             IConfig config = loader.Config.Configs["Network"];
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
-            if (config != null)
-            {
-                m_HttpPort = (uint)config.GetInt("HttpListenerPort", 9000);
-
-                if (config.Contains("ServerCertificate"))
-                {
-                    m_Scheme = Uri.UriSchemeHttps;
-                }
-            }
 
             config = loader.Config.Configs["Startup"];
             if (config != null)
