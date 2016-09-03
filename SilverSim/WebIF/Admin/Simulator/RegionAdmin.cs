@@ -39,9 +39,8 @@ namespace SilverSim.WebIF.Admin.Simulator
         EstateServiceInterface m_EstateService;
         ServerParamServiceInterface m_ServerParams;
         SimulationDataStorageInterface m_SimulationData;
-        uint m_HttpPort;
+        BaseHttpServer m_HttpServer;
         ExternalHostNameServiceInterface m_ExternalHostNameService;
-        string m_Scheme = Uri.UriSchemeHttp;
         AdminWebIF m_WebIF;
         SceneList m_Scenes;
 
@@ -54,18 +53,9 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_HttpServer = loader.HttpServer;
             m_Scenes = loader.Scenes;
             m_ExternalHostNameService = loader.ExternalHostNameService;
-            IConfig config = loader.Config.Configs["Network"];
-            if (config != null)
-            {
-                m_HttpPort = (uint)config.GetInt("HttpListenerPort", 9000);
-
-                if (config.Contains("ServerCertificate"))
-                {
-                    m_Scheme = Uri.UriSchemeHttps;
-                }
-            }
 
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
@@ -555,7 +545,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 rInfo.Name = jsondata["name"].ToString();
                 rInfo.ID = UUID.Random;
                 rInfo.Access = RegionAccess.Mature;
-                rInfo.ServerHttpPort = m_HttpPort;
+                rInfo.ServerHttpPort = m_HttpServer.Port;
                 rInfo.ScopeID = UUID.Zero;
                 rInfo.ServerIP = string.Empty;
                 rInfo.Size = new GridVector(256, 256);
@@ -688,7 +678,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                             return;
                     }
                 }
-                rInfo.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostNameService.ExternalHostName, m_HttpPort);
+                rInfo.ServerURI = m_HttpServer.ServerURI;
                 try
                 {
                     m_RegionStorage.RegisterRegion(rInfo);
