@@ -4,6 +4,7 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Http;
+using SilverSim.ServiceInterfaces;
 using SilverSim.Threading;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -29,7 +31,22 @@ namespace SilverSim.Main.Common.HttpServer
 
         readonly TcpListener m_Listener;
         public uint Port { get; private set; }
-        public string ExternalHostName { get; private set; }
+        ExternalHostNameServiceInterface m_ExternalHostNameService;
+        public string ExternalHostName
+        {
+            get
+            {
+                return m_ExternalHostNameService.ExternalHostName;
+            }
+        }
+
+        public string ServerURI
+        {
+            get
+            {
+                return string.Format("{0}://{1}:{2}/", Scheme, ExternalHostName, Port);
+            }
+        }
         public string Scheme { get; private set; }
 
         readonly bool m_IsBehindProxy;
@@ -37,11 +54,11 @@ namespace SilverSim.Main.Common.HttpServer
 
         readonly X509Certificate m_ServerCertificate;
 
+
         public BaseHttpServer(IConfig httpConfig)
         {
             Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
-            ExternalHostName = httpConfig.GetString("ExternalHostName", "SYSTEMIP");
 
             if(httpConfig.Contains("ServerCertificate"))
             {
@@ -62,6 +79,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_ExternalHostNameService = loader.ExternalHostNameService;
             m_Log.InfoFormat("Starting HTTP Server");
             m_Listener.Start();
             m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);

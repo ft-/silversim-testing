@@ -48,34 +48,18 @@ namespace SilverSim.Scene.Registration
         public void RegionAdded(SceneInterface scene)
         {
             m_RegisteredScenes.Add(scene);
-            scene.OnIPChanged += IPChanged;
             RegionInfo ri = scene.GetRegionInfo();
-            ri.ServerHttpPort = m_HttpServer.Port;
             if(ri.Owner == null)
             {
                 ri.Owner = new UUI();
             }
-            ri.ServerURI =
-                ((m_HttpServer.Port == 80 && m_HttpServer.Scheme == Uri.UriSchemeHttp) ||
-                (m_HttpServer.Port == 443 && m_HttpServer.Scheme == Uri.UriSchemeHttps)) ?
 
-                m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + "/" :
-
-                m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + ":" + m_HttpServer.Port.ToString() + "/";
-
-            ri.ServerHttpPort = m_HttpServer.Port;
-            scene.ServerURI = ri.ServerURI;
             Dictionary<string, string> gridFeatures = scene.GridService.GetGridExtraFeatures();
             if (gridFeatures.ContainsKey("GridURL"))
             {
                 ri.GridURI = gridFeatures["GridURL"];
             }
             scene.GridService.RegisterRegion(ri);
-        }
-
-        public void IPChanged(SceneInterface scene, IPAddress address)
-        {
-            scene.GridService.RegisterRegion(scene.GetRegionInfo());
         }
 
         public void RegionRemoved(SceneInterface scene)

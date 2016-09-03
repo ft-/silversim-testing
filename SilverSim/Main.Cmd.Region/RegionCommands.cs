@@ -11,6 +11,7 @@ using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.SceneEnvironment;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
@@ -40,7 +41,7 @@ namespace SilverSim.Main.Cmd.Region
         EstateServiceInterface m_EstateService;
         SimulationDataStorageInterface m_SimulationData;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION COMMANDS");
-        private string m_ExternalHostName = string.Empty;
+        ExternalHostNameServiceInterface m_ExternalHostNameService;
         private uint m_HttpPort;
         ConfigurationLoader m_Loader;
         private string m_Scheme = Uri.UriSchemeHttp;
@@ -59,11 +60,11 @@ namespace SilverSim.Main.Cmd.Region
         {
             m_Scenes = loader.Scenes;
             m_Loader = loader;
+            m_ExternalHostNameService = loader.ExternalHostNameService;
 
             IConfig config = loader.Config.Configs["Network"];
             if (config != null)
             {
-                m_ExternalHostName = config.GetString("ExternalHostName", "SYSTEMIP");
                 m_HttpPort = (uint)config.GetInt("HttpListenerPort", 9000);
 
                 if (config.Contains("ServerCertificate"))
@@ -400,7 +401,7 @@ namespace SilverSim.Main.Cmd.Region
                     r.ID = regionEntry.GetString("RegionUUID");
                     r.Location = new GridVector(regionEntry.GetString("Location"), 256);
                     r.ServerPort = (uint)regionEntry.GetInt("InternalPort");
-                    r.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostName, m_HttpPort);
+                    r.ServerURI = string.Empty;
                     r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
                     r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
                     r.Flags = RegionFlags.RegionOnline;
@@ -425,7 +426,7 @@ namespace SilverSim.Main.Cmd.Region
                             break;
                     }
 
-                    r.ServerIP = regionEntry.GetString("ExternalHostName", m_ExternalHostName);
+                    r.ServerIP = regionEntry.GetString("ExternalHostName", m_ExternalHostNameService.ExternalHostName);
                     RegionInfo rInfoCheck;
                     if (m_RegionStorage.TryGetValue(UUID.Zero, r.Name, out rInfoCheck))
                     {
@@ -505,7 +506,7 @@ namespace SilverSim.Main.Cmd.Region
                 rInfo.Access = RegionAccess.Mature;
                 rInfo.ServerHttpPort = m_HttpPort;
                 rInfo.ScopeID = UUID.Zero;
-                rInfo.ServerIP = m_ExternalHostName;
+                rInfo.ServerIP = string.Empty;
                 rInfo.Size = new GridVector(256, 256);
                 rInfo.ProductName = "Mainland";
 
@@ -643,7 +644,7 @@ namespace SilverSim.Main.Cmd.Region
                             return;
                     }
                 }
-                rInfo.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostName, m_HttpPort);
+                rInfo.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostNameService.ExternalHostName, m_HttpPort);
                 m_RegionStorage.RegisterRegion(rInfo);
 
                 if (selectedEstate != null)
@@ -812,6 +813,11 @@ namespace SilverSim.Main.Cmd.Region
                 else
                 {
                     rInfo.GridURI = m_GatekeeperURI;
+                    if (string.IsNullOrEmpty(rInfo.ServerIP))
+                    {
+                        rInfo.ServerIP = m_ExternalHostNameService.ExternalHostName;
+                    }
+
                     io.Write(string.Format("Starting region {0} ({1})", rInfo.Name, rInfo.ID.ToString()));
                     m_Log.InfoFormat("Starting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
                     try

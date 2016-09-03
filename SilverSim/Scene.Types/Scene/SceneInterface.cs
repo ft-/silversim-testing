@@ -7,6 +7,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Economy;
@@ -106,15 +107,13 @@ namespace SilverSim.Scene.Types.Scene
         public UUID ScopeID { get; protected set; }
         public UUID RegionSecret { get; private set; }
         public uint RegionPort { get; protected set; }
-        public uint ServerHttpPort { get; protected set; }
+        public abstract uint ServerHttpPort { get; }
         public UUID RegionMapTexture { get; protected set; }
         public UUID ParcelMapTexture { get; protected set; }
-        public string ServerURI { get; set; } /* updated by region registrar */
+        public abstract string ServerURI { get; }
         public uint SizeX { get; private set; }
         public uint SizeY { get; private set; }
         public string Name { get; set; }
-        public IPAddress LastIPAddress { get; protected set; }
-        public string ExternalHostName { get; protected set; }
         public GridVector GridPosition { get; protected set; }
         public abstract ISceneObjects Objects { get; }
         public abstract ISceneObjectGroups ObjectGroups { get; }
@@ -124,7 +123,6 @@ namespace SilverSim.Scene.Types.Scene
         public abstract ISceneParcels Parcels { get; }
         public abstract List<ObjectUpdateInfo> UpdateInfos { get; }
         public event Action<SceneInterface> OnRemove;
-        public event Action<SceneInterface, IPAddress> OnIPChanged;
         public AssetServiceInterface TemporaryAssetService { get; protected set; }
         public AssetServiceInterface PersistentAssetService { get; protected set; }
         public AssetServiceInterface AssetService { get; private set; }
@@ -228,6 +226,15 @@ namespace SilverSim.Scene.Types.Scene
 
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
+
+        protected ExternalHostNameServiceInterface m_ExternalHostNameService;
+        public string ExternalHostName
+        {
+            get
+            {
+                return m_ExternalHostNameService.ExternalHostName;
+            }
+        }
 
         public RegionInfo GetRegionInfo()
         {
@@ -356,7 +363,6 @@ namespace SilverSim.Scene.Types.Scene
             AvatarNameService = new DefaultAvatarNameService(AvatarNameServices);
             CapabilitiesConfig = new Dictionary<string, string>();
             RegionSecret = UUID.Random;
-            LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
             LoginControl.OnLoginsEnabled += LoginsEnabledHandler;
 
@@ -422,27 +428,6 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract IUDPCircuitsManager UDPServer { get; }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public void TriggerIPChanged(IPAddress ip)
-        {
-            LastIPAddress = ip;
-            var ev = OnIPChanged;
-            if (ev != null)
-            {
-                foreach (Action<SceneInterface, IPAddress> del in ev.GetInvocationList().OfType<Action<SceneInterface, IPAddress>>())
-                {
-                    try
-                    {
-                        del(this, ip);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                    }
-                }
-            }
-        }
-
         public abstract void TriggerRegionSettingsChanged();
         public abstract void TriggerEstateUpdate();
         public abstract void TriggerRegionDataChanged();
@@ -495,24 +480,5 @@ namespace SilverSim.Scene.Types.Scene
         {
             m_LocalIDs.Remove(v.LocalID);
         }
-
-        #region Dynamic IP Support
-        public void CheckExternalNameLookup()
-        {
-            IPAddress[] addresses = Dns.GetHostAddresses(ExternalHostName);
-            for (int i = 0; i < addresses.Length; ++i)
-            {
-                if (addresses[i].AddressFamily == AddressFamily.InterNetwork)
-                {
-                    /* we take the first IPv4 address */
-                    if (!LastIPAddress.Equals(addresses[i]))
-                    {
-                        TriggerIPChanged(LastIPAddress);
-                    }
-                    return;
-                }
-            }
-        }
-        #endregion
     }
 }

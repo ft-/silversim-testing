@@ -3,6 +3,7 @@
 
 using log4net;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
@@ -15,6 +16,7 @@ using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scripting.Common;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
@@ -439,6 +441,7 @@ namespace SilverSim.Scene.Implementation.Basic
         readonly BasicSceneRootAgentsCollection m_SceneRootAgents;
         readonly SimulationDataStorageInterface m_SimulationDataStorage;
         readonly NeighborServiceInterface m_NeighborService;
+        readonly BaseHttpServer m_HttpServer;
 
         protected override object GetService(Type service)
         {
@@ -457,6 +460,22 @@ namespace SilverSim.Scene.Implementation.Basic
         }
 
         #endregion
+
+        public override string ServerURI
+        {
+            get
+            {
+                return m_HttpServer.ServerURI;
+            }
+        }
+
+        public override uint ServerHttpPort
+        {
+            get
+            {
+                return m_HttpServer.Port;
+            }
+        }
 
         #region Constructor
         internal BasicScene(
@@ -478,10 +497,13 @@ namespace SilverSim.Scene.Implementation.Basic
             NeighborServiceInterface neighborService,
             Dictionary<string, string> capabilitiesConfig,
             GridServiceInterface regionStorage,
-            SceneFactory myFactory)
+            SceneFactory myFactory,
+            ExternalHostNameServiceInterface externalHostNameService,
+            BaseHttpServer httpServer)
         : base(ri.Size.X, ri.Size.Y)
         {
             m_Scenes = scenes;
+            m_HttpServer = httpServer;
             if(persistentAssetService == null)
             {
                 throw new ArgumentNullException("persistentAssetService");
@@ -545,10 +567,8 @@ namespace SilverSim.Scene.Implementation.Basic
             ScopeID = ri.ScopeID;
             ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
-            ServerURI = ri.ServerURI;
-            ServerHttpPort = ri.ServerHttpPort;
             ServerParamService = serverParamService;
-            ExternalHostName = ri.ServerIP;
+            m_ExternalHostNameService = externalHostNameService;
             #endregion
 
             /* load estate flags cache */

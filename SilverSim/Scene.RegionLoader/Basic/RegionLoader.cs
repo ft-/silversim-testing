@@ -8,6 +8,7 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types.Grid;
 using System;
@@ -19,7 +20,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
     public class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
         readonly string m_RegionStorage = string.Empty;
-        private string m_ExternalHostName = string.Empty;
+        ExternalHostNameServiceInterface m_ExternalHostNameService;
         private GridServiceInterface m_RegionService;
         private SceneFactoryInterface m_SceneFactory;
         private uint m_HttpPort;
@@ -37,12 +38,12 @@ namespace SilverSim.Scene.RegionLoader.Basic
         public void Startup(ConfigurationLoader loader)
         {
             m_Scenes = loader.Scenes;
+            m_ExternalHostNameService = loader.ExternalHostNameService;
             IConfig config = loader.Config.Configs["Network"];
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
             if (config != null)
             {
-                m_ExternalHostName = config.GetString("ExternalHostName", "SYSTEMIP");
                 m_HttpPort = (uint)config.GetInt("HttpListenerPort", 9000);
 
                 if (config.Contains("ServerCertificate"))
@@ -74,6 +75,10 @@ namespace SilverSim.Scene.RegionLoader.Basic
             {
                 m_Log.InfoFormat("Starting Region {0}", ri.Name);
                 ri.GridURI = m_GatekeeperURI;
+                if(string.IsNullOrEmpty(ri.ServerIP))
+                {
+                    ri.ServerIP = m_ExternalHostNameService.ExternalHostName;
+                }
                 SceneInterface si = m_SceneFactory.Instantiate(ri);
                 m_Scenes.Add(si);
                 si.LoadSceneAsync();

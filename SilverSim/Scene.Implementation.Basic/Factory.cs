@@ -3,6 +3,7 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
@@ -10,6 +11,7 @@ using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
@@ -55,9 +57,11 @@ namespace SilverSim.Scene.Implementation.Basic
         readonly Dictionary<string, string> m_CapabilitiesConfig;
         IPhysicsSceneFactory m_PhysicsFactory;
         NeighborServiceInterface m_NeighborService;
+        ExternalHostNameServiceInterface m_ExternalHostNameService;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         SceneList m_Scenes;
         IMRouter m_IMRouter;
+        BaseHttpServer m_HttpServer;
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -94,6 +98,8 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_HttpServer = loader.HttpServer;
+            m_ExternalHostNameService = loader.ExternalHostNameService;
             m_Scenes = loader.Scenes;
             m_IMRouter = loader.IMRouter;
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
@@ -148,7 +154,9 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_NeighborService,
                 m_CapabilitiesConfig,
                 m_RegionStorage,
-                this);
+                this,
+                m_ExternalHostNameService,
+                m_HttpServer);
             return scene;
         }
     }
