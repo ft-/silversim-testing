@@ -1399,13 +1399,9 @@ namespace SilverSim.Main.Common
 
             m_Log.Info("Initializing HTTP Server");
             IConfig httpConfig = m_Config.Configs["HTTP"];
-            if (null == httpConfig)
-            {
-                httpConfig = m_Config.Configs["Network"];
-            }
             if(null == httpConfig)
             {
-                m_Log.Fatal("Missing configuration section [Network] or preferred [HTTP]");
+                m_Log.Fatal("Missing configuration section [HTTP]");
                 throw new ConfigurationErrorException();
             }
 

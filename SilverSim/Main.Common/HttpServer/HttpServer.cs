@@ -57,7 +57,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public BaseHttpServer(IConfig httpConfig, bool useSsl = false)
         {
-            Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
+            Port = (uint)httpConfig.GetInt("Port", useSsl ? 9001 : 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
 
             if(httpConfig.Contains("ServerCertificate"))
