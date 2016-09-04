@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Core
                         ChildAgentUpdate m = new ChildAgentUpdate();
                         m.RegionID = scene.ID;
                         m.RegionLocation = scene.GridPosition;
-                        m.AgentID = m_AgentID;
+                        m.AgentID = ID;
                         m.SessionID = SessionID;
                         m.AgentPosition = GlobalPosition;
                         m.AgentVelocity = Velocity;

@@ -17,7 +17,7 @@ namespace SilverSim.Viewer.Core
         {
             GridInstantMessage im = (GridInstantMessage)(ImprovedInstantMessage)m;
             im.IsFromGroup = false;
-            im.FromAgent.ID = m_AgentID;
+            im.FromAgent.ID = ID;
 
             im.OnResult = circuit.OnIMResult;
 

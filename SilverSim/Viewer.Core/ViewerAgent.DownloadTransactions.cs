@@ -97,7 +97,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public ulong AddNewFile(string filename, byte[] data)
+        public override ulong AddNewFile(string filename, byte[] data)
         {
             ulong xferid = NextXferID;
             DownloadTransferData tdata = new DownloadTransferData(data, xferid);

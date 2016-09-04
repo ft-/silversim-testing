@@ -20,8 +20,6 @@ namespace SilverSim.Viewer.Core
         #region Agent Controls Field
         ControlFlags m_TakenControls;
         ControlFlags m_IgnoredControls;
-        Quaternion m_HeadRotation = Quaternion.Identity;
-        Quaternion m_BodyRotation = Quaternion.Identity;
         ControlFlags m_ActiveAgentControlFlags;
         bool m_IsRunning;
         public class ScriptControlData
@@ -42,7 +40,7 @@ namespace SilverSim.Viewer.Core
         readonly Dictionary<ScriptInstance, ScriptControlData> m_ScriptControls = new Dictionary<ScriptInstance, ScriptControlData>();
         #endregion
 
-        public void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
+        public override void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {
             ScriptControlData data = new ScriptControlData();
             data.Taken = accept != 0 ? (ControlFlags)controls : ControlFlags.None;
@@ -50,7 +48,7 @@ namespace SilverSim.Viewer.Core
             this[instance] = data;
         }
 
-        public void ReleaseControls(ScriptInstance instance)
+        public override void ReleaseControls(ScriptInstance instance)
         {
             this[instance] = null;
         }
@@ -88,42 +86,6 @@ namespace SilverSim.Viewer.Core
                         m_TakenControls |= sc.Taken;
                         m_IgnoredControls |= sc.Ignored;
                     }
-                }
-            }
-        }
-
-        public Quaternion HeadRotation
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_HeadRotation;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_HeadRotation = value;
-                }
-            }
-        }
-
-        public Quaternion BodyRotation
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_BodyRotation;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_BodyRotation = value;
                 }
             }
         }

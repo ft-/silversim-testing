@@ -127,7 +127,7 @@ namespace SilverSim.Viewer.Core
                     if (!TeleportTo(circuit.Scene, hgRegionInfo.GridURI, hgRegionInfo.ID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                     {
                         TeleportFailed failedmsg = new TeleportFailed();
-                        failedmsg.AgentID = m_AgentID;
+                        failedmsg.AgentID = ID;
                         failedmsg.Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible");
                         SendMessageAlways(failedmsg, req.CircuitSceneID);
                     }
@@ -135,7 +135,7 @@ namespace SilverSim.Viewer.Core
                 else if(!TeleportTo(circuit.Scene, req.GridPosition, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                 {
                     TeleportFailed failedmsg = new TeleportFailed();
-                    failedmsg.AgentID = m_AgentID;
+                    failedmsg.AgentID = ID;
                     failedmsg.Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible");
                     SendMessageAlways(failedmsg, req.CircuitSceneID);
                 }
@@ -160,7 +160,7 @@ namespace SilverSim.Viewer.Core
                 if (!TeleportTo(circuit.Scene, req.RegionID, req.Position, req.LookAt, Types.Grid.TeleportFlags.ViaLocation))
                 {
                     TeleportFailed failedmsg = new TeleportFailed();
-                    failedmsg.AgentID = m_AgentID;
+                    failedmsg.AgentID = ID;
                     failedmsg.Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible");
                     SendMessageAlways(failedmsg, req.CircuitSceneID);
                 }

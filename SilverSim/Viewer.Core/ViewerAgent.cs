@@ -44,23 +44,20 @@ using System.Net;
 namespace SilverSim.Viewer.Core
 {
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
-    public partial class ViewerAgent : IAgent
+    public partial class ViewerAgent : SilverSim.Scene.Agent.Agent
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
-        public event Action<IObject> OnPositionChange;
-        readonly object m_DataLock = new object();
+        public override event Action<IObject> OnPositionChange;
         readonly SceneList m_Scenes;
 
         #region Agent fields
-        readonly UUID m_AgentID;
         private UUID m_CurrentSceneID;
-        double m_Health = 100f;
         #endregion
 
         readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
 
         /** <summary>Key is region ID</summary> */
-        public RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds
+        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds
         {
             get
             {
@@ -69,7 +66,7 @@ namespace SilverSim.Viewer.Core
         }
 
         readonly ClientInfo m_ClientInfo;
-        public ClientInfo Client 
+        public override ClientInfo Client 
         { 
             get
             {
@@ -78,7 +75,7 @@ namespace SilverSim.Viewer.Core
         }
 
         readonly UserAccount m_UntrustedAccountInfo;
-        public UserAccount UntrustedAccountInfo
+        public override UserAccount UntrustedAccountInfo
         { 
             get
             {
@@ -86,7 +83,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public SessionInfo Session 
+        public override SessionInfo Session 
         {
             get
             {
@@ -98,7 +95,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public List<GridType> SupportedGridTypes 
+        public override List<GridType> SupportedGridTypes 
         {
             get
             {
@@ -111,25 +108,8 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        Vector4 m_CollisionPlane = new Vector4(0, 0, 1, -1);
-
-        public Vector4 CollisionPlane
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_CollisionPlane;
-                }
-            }
-            set
-            {
-                /* nothing to do for now */
-            }
-        }
-
         IAgentTeleportServiceInterface m_ActiveTeleportService;
-        public IAgentTeleportServiceInterface ActiveTeleportService
+        public override IAgentTeleportServiceInterface ActiveTeleportService
         {
             get
             {
@@ -148,7 +128,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void RemoveActiveTeleportService(IAgentTeleportServiceInterface service)
+        public override void RemoveActiveTeleportService(IAgentTeleportServiceInterface service)
         {
             lock(m_DataLock)
             {
@@ -160,68 +140,9 @@ namespace SilverSim.Viewer.Core
         }
 
         #region ViewerAgent Properties
-        public UInt32 LocalID { get; set; }
-        public Uri HomeURI { get; private set; }
         public UUID SessionID { get; private set; }
         public double DrawDistance { get; private set; }
         #endregion
-
-        #region AgentLanguage
-        string m_AgentLanguage = string.Empty;
-        CultureInfo m_AgentCultureInfo;
-        readonly object m_AgentLanguageLock = new object();
-        public string AgentLanguage
-        {
-            get
-            {
-                lock (m_AgentLanguageLock)
-                {
-                    return m_AgentLanguage;
-                }
-            }
-
-            internal set
-            {
-                lock (m_AgentLanguageLock)
-                {
-                    m_AgentLanguage = value;
-                    try
-                    {
-                        m_AgentCultureInfo = new CultureInfo(value);
-#if DEBUG
-                        m_Log.DebugFormat("Agent {0} selected CultureInfo {1}", Owner.FullName, value);
-#endif
-                    }
-                    catch
-                    {
-                        m_AgentCultureInfo = EnUsCulture;
-#if DEBUG
-                        m_Log.DebugFormat("Agent {0} set to fallback CultureInfo en-US", Owner.FullName);
-#endif
-                    }
-                }
-            }
-        }
-
-        static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
-        public CultureInfo CurrentCulture
-        {
-            get
-            {
-                lock (m_AgentLanguageLock)
-                {
-                    return m_AgentCultureInfo ?? EnUsCulture;
-                }
-            }
-        }
-        #endregion
-
-        public void GetBoundingBox(out BoundingBox box)
-        {
-            box = new BoundingBox();
-            box.CenterOffset = Vector3.Zero;
-            box.Size = Size * Rotation;
-        }
 
         /* Circuits: UUID is SceneID */
         public readonly RwLockedDictionary<UUID, AgentCircuit> Circuits = new RwLockedDictionary<UUID, AgentCircuit>();
@@ -229,7 +150,7 @@ namespace SilverSim.Viewer.Core
 
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate() { return new RwLockedDictionary<uint, uint>(); });
 
-        public RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials
+        public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials
         {
             get
             {
@@ -238,7 +159,7 @@ namespace SilverSim.Viewer.Core
         }
 
         #region IObject Calls
-        public void InvokeOnPositionUpdate()
+        public override void InvokeOnPositionUpdate()
         {
             var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
             if (e != null)
@@ -258,322 +179,7 @@ namespace SilverSim.Viewer.Core
 
         #region IObject Properties
 
-        private IObject m_SittingOnObject;
-
-        public IObject SittingOnObject
-        {
-            /* we need to guard against our position routines and so on */
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_SittingOnObject;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_SittingOnObject = value;
-                }
-            }
-        }
-
-        public UUID ID
-        {
-            get
-            {
-                return m_AgentID;
-            }
-        }
-
-        public string Name
-        {
-            get
-            {
-                return string.Format("{0} {1}", FirstName, LastName);
-            }
-            set
-            {
-                string[] parts = value.Split(new char[] { ' ' }, 2);
-                FirstName = parts[0];
-                if (parts.Length > 1)
-                {
-                    LastName = parts[1];
-                }
-            }
-        }
-
-        public UGI Group { get; set;  }
-
-
-        public Vector3 LookAt
-        {
-            get
-            {
-                Vector3 angle = new Vector3(1, 0, 0);
-                return angle * Rotation;
-            }
-            set
-            {
-                Vector3 delta = value.Normalize();
-                Rotation = Quaternion.CreateFromEulers(new Vector3(0, 0, Math.Atan2(delta.Y, delta.X)));
-            }
-        }
-
-        public UUI Owner
-        {
-            get
-            {
-                UUI n = new UUI();
-                n.FirstName = FirstName;
-                n.LastName = LastName;
-                n.ID = ID;
-                n.HomeURI = HomeURI;
-                return n;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
-        }
-
-        public string Description
-        {
-            get
-            {
-                return string.Empty;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
-        }
-
-        private double m_HoverHeight;
-        public double HoverHeight
-        {
-            get
-            {
-                return m_HoverHeight;
-            }
-            set
-            {
-                m_HoverHeight = value.Clamp(-2f, 2f);
-            }
-        }
-
-        private Vector3 m_GlobalPosition = Vector3.Zero;
-
-        public Vector3 Position
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return (m_SittingOnObject != null) ?
-                        m_GlobalPosition - m_SittingOnObject.Position :
-                        m_GlobalPosition;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_GlobalPosition = (m_SittingOnObject != null) ?
-                        value + m_SittingOnObject.Position :
-                        value;
-                }
-                InvokeOnPositionUpdate();
-            }
-        }
-
-        private Vector3 m_Velocity = Vector3.Zero;
-        public Vector3 Velocity
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_Velocity;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_Velocity = value;
-                }
-            }
-        }
-
-        private Vector3 m_AngularVelocity = Vector3.Zero;
-        public Vector3 AngularVelocity
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_AngularVelocity;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_AngularVelocity = value;
-                }
-            }
-        }
-
-        private Vector3 m_AngularAcceleration = Vector3.Zero;
-        public Vector3 AngularAcceleration
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_AngularAcceleration;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_AngularAcceleration = value;
-                }
-            }
-        }
-
-        public Vector3 GlobalPosition
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_GlobalPosition;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_GlobalPosition = value;
-                }
-                InvokeOnPositionUpdate();
-            }
-        }
-
-        public Vector3 LocalPosition
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return (m_SittingOnObject != null) ?
-                        m_GlobalPosition - m_SittingOnObject.Position :
-                        m_GlobalPosition;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_GlobalPosition = (m_SittingOnObject != null) ?
-                        value + m_SittingOnObject.Position :
-                        value;
-                }
-                InvokeOnPositionUpdate();
-            }
-        }
-
-        private Vector3 m_Acceleration = Vector3.Zero;
-
-        public Vector3 Acceleration
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_Acceleration;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_Acceleration = value;
-                }
-            }
-        }
-
-        private Quaternion m_GlobalRotation = Quaternion.Identity;
-
-        public Quaternion GlobalRotation
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    return (m_SittingOnObject != null) ?
-                        m_GlobalRotation * m_SittingOnObject.Rotation :
-                        m_GlobalRotation;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_GlobalRotation = (m_SittingOnObject != null) ?
-                        value / m_SittingOnObject.Rotation :
-                        value;
-                }
-                InvokeOnPositionUpdate();
-            }
-        }
-
-        public Quaternion LocalRotation
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    return (m_SittingOnObject != null) ?
-                        m_GlobalRotation / m_SittingOnObject.Rotation :
-                        m_GlobalRotation;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_GlobalRotation = (m_SittingOnObject != null) ?
-                        value * m_SittingOnObject.Rotation :
-                        value;
-                }
-                InvokeOnPositionUpdate();
-            }
-        }
-
-        public Quaternion Rotation
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    return LocalRotation;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    LocalRotation = value;
-                }
-            }
-        }
-
-        public bool IsInScene(SceneInterface scene)
+        public override bool IsInScene(SceneInterface scene)
         {
             lock (m_DataLock)
             {
@@ -581,7 +187,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public UUID SceneID
+        public override UUID SceneID
         {
             get
             {
@@ -614,7 +220,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void AddWaitForRoot(SceneInterface scene, Action<object, bool> del, object o)
+        public override void AddWaitForRoot(SceneInterface scene, Action<object, bool> del, object o)
         {
             AgentCircuit circuit;
             if (Circuits.TryGetValue(scene.ID, out circuit))
@@ -635,361 +241,8 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
-        #region IObject Methods
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
-        {
-            switch (ParamsHelper.GetPrimParamType(enumerator))
-            {
-                case PrimitiveParamsType.Name:
-                    paramList.Add(Name);
-                    break;
-
-                case PrimitiveParamsType.Desc:
-                    paramList.Add(Description);
-                    break;
-
-                case PrimitiveParamsType.Type:
-                    throw new ArgumentException("PRIM_TYPE not allowed for agents");
-
-                case PrimitiveParamsType.Slice:
-                    throw new ArgumentException("PRIM_SLICE not allowed for agents");
-
-                case PrimitiveParamsType.PhysicsShapeType:
-                    throw new ArgumentException("PRIM_PHYSICSSHAPETYPE not allowed for agents");
-
-                case PrimitiveParamsType.Material:
-                    throw new ArgumentException("PRIM_MATERIAL not allowed for agents");
-
-                case PrimitiveParamsType.Position:
-                    paramList.Add(Position);
-                    break;
-
-                case PrimitiveParamsType.PosLocal:
-                    paramList.Add(LocalPosition);
-                    break;
-
-                case PrimitiveParamsType.Rotation:
-                    paramList.Add(Rotation);
-                    break;
-
-                case PrimitiveParamsType.RotLocal:
-                    paramList.Add(LocalRotation);
-                    break;
-
-                case PrimitiveParamsType.Size:
-                    paramList.Add(Size);
-                    break;
-
-                case PrimitiveParamsType.Texture:
-                    throw new ArgumentException("PRIM_TEXTURE not allowed for agents");
-
-                case PrimitiveParamsType.Text:
-                    throw new ArgumentException("PRIM_TEXT not allowed for agents");
-
-                case PrimitiveParamsType.Color:
-                    throw new ArgumentException("PRIM_COLOR not allowed for agents");
-
-                case PrimitiveParamsType.BumpShiny:
-                    throw new ArgumentException("PRIM_BUMPSHINY not allowed for agents");
-
-                case PrimitiveParamsType.PointLight:
-                    throw new ArgumentException("PRIM_POINTLIGHT not allowed for agents");
-
-                case PrimitiveParamsType.FullBright:
-                    throw new ArgumentException("PRIM_FULLBRIGHT not allowed for agents");
-
-                case PrimitiveParamsType.Flexible:
-                    throw new ArgumentException("PRIM_FLEXIBLE not allowed for agents");
-
-                case PrimitiveParamsType.TexGen:
-                    throw new ArgumentException("PRIM_TEXGEN not allowed for agents");
-
-                case PrimitiveParamsType.Glow:
-                    throw new ArgumentException("PRIM_GLOW not allowed for agents");
-
-                case PrimitiveParamsType.Omega:
-                    throw new ArgumentException("PRIM_OMEGA not allowed for agents");
-
-                case PrimitiveParamsType.Specular:
-                    throw new ArgumentException("PRIM_SPECULAR not allowed for agents");
-
-                case PrimitiveParamsType.Normal:
-                    throw new ArgumentException("PRIM_NORMAL not allowed for agents");
-
-                case PrimitiveParamsType.AlphaMode:
-                    throw new ArgumentException("PRIM_ALPHA_MODE not allowed for agents");
-
-                case PrimitiveParamsType.Alpha:
-                    throw new ArgumentException("PRIM_ALPHA not allowed for agents");
-
-                case PrimitiveParamsType.Projector:
-                    throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorEnabled:
-                    throw new ArgumentException("PRIM_PROJECTOR_ENABLED not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorTexture:
-                    throw new ArgumentException("PRIM_PROJECTOR_TEXTURE not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorFov:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOV not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorFocus:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOCUS not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorAmbience:
-                    throw new ArgumentException("PRIM_PROJECTOR_AMBIENCE not allowed for agents");
-
-                default:
-                    throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsUInt));
-            }
-        }
-
-        public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator)
-        {
-            switch (ParamsHelper.GetPrimParamType(enumerator))
-            {
-                case PrimitiveParamsType.Name:
-                    Name = ParamsHelper.GetString(enumerator, "PRIM_NAME");
-                    break;
-
-                case PrimitiveParamsType.Desc:
-                    Description = ParamsHelper.GetString(enumerator, "PRIM_DESC");
-                    break;
-
-                case PrimitiveParamsType.Type:
-                    throw new ArgumentException("PRIM_TYPE not allowed for agents");
-
-                case PrimitiveParamsType.Slice:
-                    throw new ArgumentException("PRIM_SLICE not allowed for agents");
-
-                case PrimitiveParamsType.PhysicsShapeType:
-                    throw new ArgumentException("PRIM_PHYSICSSHAPETYPE not allowed for agents");
-
-                case PrimitiveParamsType.Material:
-                    throw new ArgumentException("PRIM_MATERIAL not allowed for agents");
-
-                case PrimitiveParamsType.Position:
-                    Position = ParamsHelper.GetVector(enumerator, "PRIM_POSITION");
-                    break;
-
-                case PrimitiveParamsType.PosLocal:
-                    LocalPosition = ParamsHelper.GetVector(enumerator, "PRIM_POS_LOCAL");
-                    break;
-
-                case PrimitiveParamsType.Rotation:
-                    Rotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROTATION");
-                    break;
-
-                case PrimitiveParamsType.RotLocal:
-                    LocalRotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROT_LOCAL");
-                    break;
-
-                case PrimitiveParamsType.Size:
-                    throw new ArgumentException("PRIM_SIZE not allowed for agents");
-
-                case PrimitiveParamsType.Texture:
-                    throw new ArgumentException("PRIM_TEXTURE not allowed for agents");
-
-                case PrimitiveParamsType.Text:
-                    throw new ArgumentException("PRIM_TEXT not allowed for agents");
-
-                case PrimitiveParamsType.Color:
-                    throw new ArgumentException("PRIM_COLOR not allowed for agents");
-
-                case PrimitiveParamsType.BumpShiny:
-                    throw new ArgumentException("PRIM_BUMPSHINY not allowed for agents");
-
-                case PrimitiveParamsType.PointLight:
-                    throw new ArgumentException("PRIM_POINTLIGHT not allowed for agents");
-
-                case PrimitiveParamsType.FullBright:
-                    throw new ArgumentException("PRIM_FULLBRIGHT not allowed for agents");
-
-                case PrimitiveParamsType.Flexible:
-                    throw new ArgumentException("PRIM_FLEXIBLE not allowed for agents");
-
-                case PrimitiveParamsType.TexGen:
-                    throw new ArgumentException("PRIM_TEXGEN not allowed for agents");
-
-                case PrimitiveParamsType.Glow:
-                    throw new ArgumentException("PRIM_GLOW not allowed for agents");
-
-                case PrimitiveParamsType.Omega:
-                    throw new ArgumentException("PRIM_OMEGA not allowed for agents");
-
-                case PrimitiveParamsType.Specular:
-                    throw new ArgumentException("PRIM_SPECULAR not allowed for agents");
-
-                case PrimitiveParamsType.Normal:
-                    throw new ArgumentException("PRIM_NORMAL not allowed for agents");
-
-                case PrimitiveParamsType.AlphaMode:
-                    throw new ArgumentException("PRIM_ALPHA_MODE not allowed for agents");
-
-                case PrimitiveParamsType.Alpha:
-                    throw new ArgumentException("PRIM_ALPHA not allowed for agents");
-
-                case PrimitiveParamsType.Projector:
-                    throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorEnabled:
-                    throw new ArgumentException("PRIM_PROJECTOR_ENABLED not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorTexture:
-                    throw new ArgumentException("PRIM_PROJECTOR_TEXTURE not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorFov:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOV not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorFocus:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOCUS not allowed for agents");
-
-                case PrimitiveParamsType.ProjectorAmbience:
-                    throw new ArgumentException("PRIM_PROJECTOR_AMBIENCE not allowed for agents");
-
-                default:
-                    throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsInt));
-            }
-        }
-
-        public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
-        {
-            while (enumerator.MoveNext())
-            {
-                /* LSL ignores non-integer parameters, see http://wiki.secondlife.com/wiki/LlGetObjectDetails. */
-                if(enumerator.Current.LSL_Type != LSLValueType.Integer)
-                {
-                    continue;
-                }
-                switch (ParamsHelper.GetObjectDetailsType(enumerator))
-                {
-                    case ObjectDetailsType.Name:
-                        paramList.Add(Name);
-                        break;
-
-                    case ObjectDetailsType.Desc:
-                        paramList.Add(Description);
-                        break;
-
-                    case ObjectDetailsType.Pos:
-                        paramList.Add(Position);
-                        break;
-
-                    case ObjectDetailsType.Rot:
-                        paramList.Add(GlobalRotation);
-                        break;
-
-                    case ObjectDetailsType.Velocity:
-                        paramList.Add(Velocity);
-                        break;
-
-                    case ObjectDetailsType.LastOwner:
-                    case ObjectDetailsType.Owner:
-                    case ObjectDetailsType.Creator:
-                    case ObjectDetailsType.Root:
-                        paramList.Add(ID);
-                        break;
-
-                    case ObjectDetailsType.Group:
-                        paramList.Add(Group.ID);
-                        break;
-
-                    case ObjectDetailsType.RunningScriptCount:
-                        {
-                            int runningScriptCount = 0;
-                            foreach (ObjectGroup grp in Attachments.All)
-                            {
-                                foreach (ObjectPart part in grp.Values)
-                                {
-                                    runningScriptCount += part.Inventory.CountRunningScripts;
-                                }
-                            }
-                            paramList.Add(runningScriptCount);
-                        }
-                        break;
-
-                    case ObjectDetailsType.TotalScriptCount:
-                        {
-                            int n = 0;
-                            foreach (ObjectGroup grp in Attachments.All)
-                            {
-                                foreach (ObjectPart part in grp.Values)
-                                {
-                                    n += part.Inventory.CountScripts;
-                                }
-                            }
-                            paramList.Add(n);
-                        }
-                        break;
-
-                    case ObjectDetailsType.PrimEquivalence:
-                        paramList.Add(1);
-                        break;
-
-                    case ObjectDetailsType.ScriptTime:
-                    case ObjectDetailsType.ServerCost:
-                    case ObjectDetailsType.StreamingCost:
-                    case ObjectDetailsType.PhysicsCost:
-                        paramList.Add(0f);
-                        break;
-
-                    case ObjectDetailsType.ScriptMemory:
-                    case ObjectDetailsType.CharacterTime:
-                    case ObjectDetailsType.AttachedPoint:
-                    case ObjectDetailsType.PathfindingType:
-                        paramList.Add(0);
-                        break;
-
-                    case ObjectDetailsType.Physics:
-                        paramList.Add(true);
-                        break;
-
-                    case ObjectDetailsType.Phantom:
-                    case ObjectDetailsType.TempOnRez:
-                        paramList.Add(false);
-                        break;
-
-                    case ObjectDetailsType.HoverHeight:
-                        paramList.Add(HoverHeight);
-                        break;
-
-                    case ObjectDetailsType.BodyShapeType:
-                        byte[] vp = VisualParams;
-                        if (vp.Length > 31)
-                        {
-                            paramList.Add(vp[31] / 255f);
-                        }
-                        else
-                        {
-                            paramList.Add(-1f);
-                        }   
-                        break;
-
-                    case ObjectDetailsType.ClickAction:
-                        paramList.Add((int)ClickActionType.None);
-                        break;
-
-                    case ObjectDetailsType.Omega:
-                        paramList.Add(AngularVelocity);
-                        break;
-
-                    case ObjectDetailsType.RenderWeight:
-                    default:
-                        paramList.Add(-1);
-                        break;
-                }
-            }
-        }
-
-        public void PostEvent(IScriptEvent ev)
-        {
-            /* intentionally left empty */
-        }
-        #endregion
-
         #region IAgent Properties
-        public bool IsNpc
+        public override bool IsNpc
         {
             get
             {
@@ -999,7 +252,7 @@ namespace SilverSim.Viewer.Core
 
         bool m_IsInMouselook;
 
-        public bool IsInMouselook
+        public override bool IsInMouselook
         {
             get
             {
@@ -1007,10 +260,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-
-        public string DisplayName { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
 
         readonly RwLockedDictionary<UUID, FriendStatus> m_KnownFriends = new RwLockedDictionary<UUID, FriendStatus>();
         bool m_KnownFriendsCached;
@@ -1061,7 +310,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public RwLockedDictionary<UUID, FriendStatus> KnownFriends
+        public override RwLockedDictionary<UUID, FriendStatus> KnownFriends
         {
             get
             {
@@ -1074,7 +323,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void ClearKnownFriends()
+        public override void ClearKnownFriends()
         {
             lock(m_KnownFriendsCacheLock)
             {
@@ -1082,54 +331,11 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-
-        public double Health
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_Health;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_Health = value.Clamp(0, 100);
-#warning Implement death
-                }
-            }
-        }
-
-        public void IncreaseHealth(double v)
-        {
-            lock(m_DataLock)
-            {
-                if (v >= 0)
-                {
-                    m_Health = (m_Health + v).Clamp(0, 100);
-                }
-            }
-        }
-
-        public void DecreaseHealth(double v)
-        {
-            lock (m_DataLock)
-            {
-                if (v <= 0)
-                {
-                    m_Health = (m_Health - v).Clamp(0, 100);
-#warning Implement death
-                }
-            }
-        }
-
         public Dictionary<string, string> ServiceURLs = new Dictionary<string, string>();
 
         private bool m_IsActiveGod;
 
-        public bool IsActiveGod
+        public override bool IsActiveGod
         {
             get
             {
@@ -1137,13 +343,13 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
+        public override int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {
             get;
             set;
         }
 
-        public AssetServiceInterface AssetService
+        public override AssetServiceInterface AssetService
         {
             get
             {
@@ -1151,7 +357,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public InventoryServiceInterface InventoryService
+        public override InventoryServiceInterface InventoryService
         {
             get
             {
@@ -1159,7 +365,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public OfflineIMServiceInterface OfflineIMService
+        public override OfflineIMServiceInterface OfflineIMService
         {
             get
             {
@@ -1167,7 +373,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public GroupsServiceInterface GroupsService
+        public override GroupsServiceInterface GroupsService
         {
             get
             {
@@ -1175,7 +381,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public ProfileServiceInterface ProfileService
+        public override ProfileServiceInterface ProfileService
         {
             get
             {
@@ -1183,7 +389,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public FriendsServiceInterface FriendsService
+        public override FriendsServiceInterface FriendsService
         {
             get
             {
@@ -1191,7 +397,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public UserAgentServiceInterface UserAgentService
+        public override UserAgentServiceInterface UserAgentService
         {
             get
             {
@@ -1199,7 +405,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public PresenceServiceInterface PresenceService
+        public override PresenceServiceInterface PresenceService
         {
             get
             {
@@ -1207,7 +413,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public GridUserServiceInterface GridUserService
+        public override GridUserServiceInterface GridUserService
         {
             get
             {
@@ -1215,7 +421,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public EconomyServiceInterface EconomyService
+        public override EconomyServiceInterface EconomyService
         {
             get
             {
@@ -1225,7 +431,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region IAgent Methods
-        public bool IMSend(GridInstantMessage gim)
+        public override bool IMSend(GridInstantMessage gim)
         {
             AgentCircuit c;
             UUID sceneID = SceneID;
@@ -1247,7 +453,7 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
-        public DetectedTypeFlags DetectedType
+        public override DetectedTypeFlags DetectedType
         {
             get
             {
@@ -1289,7 +495,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void KickUser(string msg)
+        public override void KickUser(string msg)
         {
             Messages.User.KickUser req = new Messages.User.KickUser();
             req.AgentID = Owner.ID;
@@ -1299,7 +505,7 @@ namespace SilverSim.Viewer.Core
             SendMessageAlways(req, m_CurrentSceneID);
         }
 
-        public void KickUser(string msg, Action<bool> callbackDelegate)
+        public override void KickUser(string msg, Action<bool> callbackDelegate)
         {
             Messages.User.KickUser req = new Messages.User.KickUser();
             req.OnSendCompletion += callbackDelegate;
@@ -1310,7 +516,7 @@ namespace SilverSim.Viewer.Core
             SendMessageAlways(req, m_CurrentSceneID);
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public override bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
             {
@@ -1326,7 +532,7 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public override bool TeleportTo(SceneInterface sceneInterface, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
@@ -1341,7 +547,7 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public override bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
@@ -1356,7 +562,7 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public override bool TeleportTo(SceneInterface sceneInterface, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
@@ -1371,7 +577,7 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public override bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
@@ -1387,7 +593,7 @@ namespace SilverSim.Viewer.Core
         }
 
         /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
-        public bool TeleportHome(SceneInterface sceneInterface)
+        public override bool TeleportHome(SceneInterface sceneInterface)
         {
             foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
             {
@@ -1414,11 +620,11 @@ namespace SilverSim.Viewer.Core
             ClientInfo clientInfo,
             UserAccount untrustedAccountInfo,
             AgentServiceList serviceList)
+            : base(agentID, homeURI)
         {
             m_Scenes = scenes;
             m_TeleportServices = serviceList.GetAll<IAgentTeleportServiceInterface>();
             CollisionPlane = Vector4.UnitW;
-            m_AgentID = agentID;
             SessionID = sessionID;
             m_UntrustedAccountInfo = untrustedAccountInfo;
             m_SecureSessionID = secureSessionID;
@@ -1435,10 +641,8 @@ namespace SilverSim.Viewer.Core
             m_GridService = serviceList.Get<GridServiceInterface>();
             m_EconomyService = serviceList.Get<EconomyServiceInterface>();
             m_OfflineIMService = serviceList.Get<OfflineIMServiceInterface>();
-            HomeURI = homeURI;
             FirstName = firstName;
             LastName = lastName;
-            InitAnimations();
             if (m_EconomyService != null)
             {
                 m_EconomyService.Login(Owner, SessionID, m_SecureSessionID);
@@ -1456,7 +660,6 @@ namespace SilverSim.Viewer.Core
                 {
                     m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
                 }
-                m_SittingOnObject = null;
                 m_AssetService = null;
                 m_InventoryService = null;
                 m_GroupsService = null;
@@ -1472,7 +675,7 @@ namespace SilverSim.Viewer.Core
         #region Physics Linkage
         readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
-        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
+        public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
         {
             get
             {
@@ -1480,7 +683,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public IPhysicsObject PhysicsActor
+        public override IPhysicsObject PhysicsActor
         {
             get
             {
@@ -1496,33 +699,9 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        /* property here instead of a method. A lot more clear that we update something. */
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        public void PhysicsUpdate(PhysicsStateData value)
-        {
-            bool updateProcessed = false;
-            lock (m_DataLock)
-            {
-                if (SceneID == value.SceneID && null == m_SittingOnObject)
-                {
-                    m_GlobalPosition = value.Position;
-                    m_GlobalRotation = value.Rotation;
-                    m_Velocity = value.Velocity;
-                    m_AngularVelocity = value.AngularVelocity;
-                    m_Acceleration = value.Acceleration;
-                    m_AngularAcceleration = value.AngularAcceleration;
-                    m_CollisionPlane = value.CollisionPlane;
-                    updateProcessed = true;
-                }
-            }
-            if (updateProcessed)
-            {
-                InvokeOnPositionUpdate();
-            }
-        }
         #endregion
 
-        public RwLockedList<UUID> SelectedObjects(UUID scene)
+        public override RwLockedList<UUID> SelectedObjects(UUID scene)
         {
             AgentCircuit circuit;
             return (Circuits.TryGetValue(scene, out circuit)) ?
@@ -1530,37 +709,18 @@ namespace SilverSim.Viewer.Core
                 new RwLockedList<UUID>();
         }
 
-        int m_NextParcelSequenceId;
-
-        public int NextParcelSequenceId
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    int seqid = ++m_NextParcelSequenceId;
-                    if (seqid < 0)
-                    {
-                        seqid = 1;
-                        m_NextParcelSequenceId = seqid;
-                    }
-                    return seqid;
-                }
-            }
-        }
-
-        public bool UnSit()
+        public override bool UnSit()
         {
 #warning Implement ViewerAgent.UnSit()
             return false;
         }
 
-        public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
+        public override ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
         {
             return RequestPermissions(part, itemID, permissions, UUID.Zero);
         }
 
-        public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID)
+        public override ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID)
         {
             ScriptPermissions autoGrant = ScriptPermissions.None;
             if (SittingOnObject.ID == itemID || part.ObjectGroup.AttachPoint != Types.Agent.AttachmentPoint.NotAttached)
@@ -1589,9 +749,9 @@ namespace SilverSim.Viewer.Core
             return ScriptPermissions.None;
         }
 
-        public void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions)
+        public override void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions)
         {
-            m_AnimationController.RevokePermissions(sourceID, permissions);
+            RevokeAnimPermissions(sourceID, permissions);
         }
 
         [PacketHandler(MessageType.RegionHandshakeReply)]
@@ -1620,7 +780,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID)
+        public override void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID)
         {
             AgentCircuit circuit;
             if (Circuits.TryGetValue(fromSceneID, out circuit))
@@ -1628,11 +788,6 @@ namespace SilverSim.Viewer.Core
                 ParcelProperties props = circuit.Scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
                 circuit.SendMessage(props);
             }
-        }
-
-        public void RebakeAppearance(Action<string> logOutput = null)
-        {
-            AgentBakeAppearance.LoadAppearanceFromCurrentOutfit(this, AssetService, true, logOutput);
         }
 
         [PacketHandler(MessageType.CompleteAgentMovement)]
@@ -1769,7 +924,7 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Enable Simulator call for Teleport handling
-        public void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo)
+        public override void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo)
         {
             Messages.Circuit.EnableSimulator ensim = new Messages.Circuit.EnableSimulator();
             Messages.Circuit.EstablishAgentCommunication estagent = new Messages.Circuit.EstablishAgentCommunication();
@@ -1787,16 +942,16 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
-        public void HandleMessage(ChildAgentUpdate m)
+        public override void HandleMessage(ChildAgentUpdate m)
         {
         }
 
-        public void HandleMessage(ChildAgentPositionUpdate m)
+        public override void HandleMessage(ChildAgentPositionUpdate m)
         {
 
         }
 
-        public void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
+        public override void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
         {
             AgentCircuit circuit;
             if(Circuits.TryGetValue(fromSceneID, out circuit))
@@ -1805,7 +960,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void SendMessageIfRootAgent(Message m, UUID fromSceneID)
+        public override void SendMessageIfRootAgent(Message m, UUID fromSceneID)
         {
             if (fromSceneID == SceneID)
             {
@@ -1813,7 +968,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID)
+        public override void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID)
         {
             GridInstantMessage im = new GridInstantMessage();
             im.FromAgent = fromAvatar;
@@ -1830,13 +985,13 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void SendAlertMessage(string msg, UUID fromSceneID)
+        public override void SendAlertMessage(string msg, UUID fromSceneID)
         {
-            SilverSim.Viewer.Messages.Alert.AlertMessage m = new Messages.Alert.AlertMessage(msg);
+            Messages.Alert.AlertMessage m = new Messages.Alert.AlertMessage(msg);
             SendMessageAlways(m, fromSceneID);
         }
 
-        public void SendMessageAlways(Message m, UUID fromSceneID)
+        public override void SendMessageAlways(Message m, UUID fromSceneID)
         {
             AgentCircuit circuit;
             if(Circuits.TryGetValue(fromSceneID, out circuit))
@@ -1853,99 +1008,6 @@ namespace SilverSim.Viewer.Core
                 return circuit.Scene.GridPosition;
             }
             return defPos;
-        }
-
-        private void ToUInt16Bytes(double val, double min, double max, byte[] buf, int pos)
-        {
-            if (val < min)
-            {
-                val = min;
-            }
-            else if (val > max)
-            {
-                val = max;
-            }
-            val -= min;
-            val = val * 65535 / (max - min);
-            byte[] b = BitConverter.GetBytes((UInt16)val);
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(b);
-            }
-            Buffer.BlockCopy(b, 0, buf, pos, 2);
-        }
-
-        public byte[] TerseData
-        {
-            get
-            {
-                Quaternion rotation = Rotation;
-                if(SittingOnObject == null)
-                {
-                    rotation.X = 0;
-                    rotation.Y = 0;
-                }
-                Vector3 angvel = AngularVelocity;
-                Vector3 vel = Velocity;
-                Vector3 accel = Acceleration;
-
-                byte[] data = new byte[60];
-                int pos = 0;
-                {
-                    byte[] b = BitConverter.GetBytes(LocalID);
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(b);
-                    }
-                    Buffer.BlockCopy(b, 0, data, pos, 4);
-                    pos += 4;
-                }
-                data[pos++] = 0; //State
-                data[pos++] = 1;
-
-                /* Collision Plane */
-                Vector4 collPlane = CollisionPlane;
-                if(collPlane == Vector4.Zero)
-                {
-                    collPlane = Vector4.UnitW;
-                }
-                collPlane.ToBytes(data, pos);
-                pos += 16;
-
-                Position.ToBytes(data, pos);
-                pos += 12;
-
-                ToUInt16Bytes(vel.X, -128f, 128f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(vel.Y, -128f, 128f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(vel.Z, -128f, 128f, data, pos);
-                pos += 2;
-
-                ToUInt16Bytes(accel.X, -64, 64f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(accel.Y, -64, 64f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(accel.Z, -64, 64f, data, pos);
-                pos += 2;
-
-                ToUInt16Bytes(rotation.X, -1f, 1f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(rotation.Y, -1f, 1f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(rotation.Z, -1f, 1f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(rotation.W, -1f, 1f, data, pos);
-                pos += 2;
-
-                ToUInt16Bytes(angvel.X, -64f, 64f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(angvel.Y, -64f, 64f, data, pos);
-                pos += 2;
-                ToUInt16Bytes(angvel.Z, -64f, 64f, data, pos);
-
-                return data;
-            }
         }
     }
 }

@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Core
         {
             EstateOwnerMessage req = (EstateOwnerMessage)m;
             if(req.SessionID != SessionID ||
-                req.AgentID != m_AgentID)
+                req.AgentID != ID)
             {
                 return;
             }
@@ -279,7 +279,7 @@ namespace SilverSim.Viewer.Core
             SendEstateUpdateInfo(req.Invoice, req.TransactionID, estateInfo, req.CircuitSceneID);
         }
 
-        public void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true)
+        public override void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true)
         {
             EstateOwnerMessage msg = new EstateOwnerMessage();
             msg.AgentID = Owner.ID;

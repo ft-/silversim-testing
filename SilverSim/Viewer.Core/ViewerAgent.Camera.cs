@@ -2,16 +2,12 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        public Quaternion CameraRotation
+        public override Quaternion CameraRotation
         {
             get
             {
@@ -31,7 +27,7 @@ namespace SilverSim.Viewer.Core
         Vector3 m_CameraUpAxis;
         Vector3 m_CameraPosition;
 
-        public Vector3 CameraPosition
+        public override Vector3 CameraPosition
         {
             get
             {
@@ -62,7 +58,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public Vector3 CameraAtAxis
+        public override Vector3 CameraAtAxis
         {
             get
             {
@@ -80,7 +76,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public Vector3 CameraLeftAxis
+        public override Vector3 CameraLeftAxis
         {
             get
             {
@@ -98,7 +94,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public Vector3 CameraUpAxis
+        public override Vector3 CameraUpAxis
         {
             get
             {
