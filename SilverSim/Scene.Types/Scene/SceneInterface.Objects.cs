@@ -949,6 +949,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+#warning Implement attachment drop
         }
 
         [PacketHandler(MessageType.ObjectAttach)]
@@ -960,6 +961,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+#warning Implement attach object from region
         }
 
         [PacketHandler(MessageType.ObjectDescription)]
