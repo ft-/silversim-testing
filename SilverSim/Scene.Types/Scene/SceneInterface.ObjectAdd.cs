@@ -28,7 +28,7 @@ namespace SilverSim.Scene.Types.Scene
         public UInt32 ObjectAdd(ObjectAdd p)
         {
             RezObjectParams rezparams = new RezObjectParams();
-            SilverSim.Scene.Types.Object.ObjectGroup group = new SilverSim.Scene.Types.Object.ObjectGroup();
+            Object.ObjectGroup group = new Object.ObjectGroup();
             ObjectPart part = new ObjectPart();
             part.ID = UUID.Random;
             group.Add(1, part.ID, part);
@@ -39,7 +39,7 @@ namespace SilverSim.Scene.Types.Scene
             group.Owner = agentOwner;
             group.LastOwner = agentOwner;
             part.Creator = agentOwner;
-            SilverSim.Scene.Types.Object.ObjectPart.PrimitiveShape pshape;
+            ObjectPart.PrimitiveShape pshape;
             pshape = part.Shape;
             pshape.PCode = p.PCode;
             part.Material = p.Material;

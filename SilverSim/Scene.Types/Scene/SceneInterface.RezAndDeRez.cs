@@ -34,14 +34,62 @@ namespace SilverSim.Scene.Types.Scene
             public InventoryPermissionsMask NextOwnerMask;
         }
 
+        public Vector3 CalculateRezLocation(
+            RezObjectParams rezparams,
+            Vector3 scale)
+        {
+            Vector3 pos = rezparams.RayEnd + new Vector3(0, 0, scale.Z / 2f);
+            if(rezparams.RayEndIsIntersection)
+            {
+                return rezparams.RayEnd;
+            }
+
+            if(rezparams.RayTargetID != UUID.Zero)
+            {
+                ObjectPart target;
+                if(Primitives.TryGetValue(rezparams.RayTargetID, out target))
+                {
+                    pos = target.GlobalPosition;
+#warning Implement raycasting object
+                }
+                else
+                {
+#warning implement raycasting scene
+                }
+            }
+            else
+            {
+#warning implement this with ground location placement calculation
+            }
+            return pos;
+        }
+
         public List<UInt32> RezObjects(List<ObjectGroup> groups, RezObjectParams rezparams)
         {
-            throw new NotImplementedException();
+            List<UInt32> result = new List<uint>();
+            foreach(ObjectGroup grp in groups)
+            {
+                try
+                {
+                    result.Add(RezObject(grp, rezparams));
+                }
+                catch(Exception e)
+                {
+                    m_Log.DebugFormat("Exception at {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
+                    break;
+                }
+            }
+            return result;
         }
 
         public UInt32 RezObject(ObjectGroup group, RezObjectParams rezparams)
         {
-            throw new NotImplementedException();
+            group.GlobalPosition = CalculateRezLocation(
+                rezparams,
+                group.Size);
+            group.RezzingObjectID = UUID.Zero;
+            Add(group);
+            return group.LocalID;
         }
 
         [PacketHandler(MessageType.DeRezObject)]
