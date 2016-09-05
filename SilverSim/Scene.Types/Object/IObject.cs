@@ -282,7 +282,7 @@ namespace SilverSim.Scene.Types.Object
                 throw new ArgumentException("No parameter for " + paraName);
             }
             IValue current = enumerator.Current;
-            if (current.LSL_Type != LSLValueType.Float)
+            if (current.LSL_Type != LSLValueType.Float && current.LSL_Type != LSLValueType.Integer)
             {
                 throw new ArgumentException("Expecting a float parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
