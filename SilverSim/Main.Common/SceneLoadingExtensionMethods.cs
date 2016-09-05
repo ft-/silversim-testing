@@ -377,7 +377,11 @@ namespace SilverSim.Main.Common
                                 }
                                 catch(Exception e)
                                 {
+#if DEBUG
                                     m_Log.ErrorFormat("Loading script {0} (asset {1}) for {2} ({3}) in {4} ({5}) failed: {6}: {7}\n{8}", item.Name, item.AssetID, part.Name, part.ID, part.ObjectGroup.Name, part.ObjectGroup.ID, e.GetType().FullName, e.Message, e.StackTrace);
+#else
+                                    m_Log.ErrorFormat("Loading script {0} (asset {1}) for {2} ({3}) in {4} ({5}) failed: {6}", item.Name, item.AssetID, part.Name, part.ID, part.ObjectGroup.Name, part.ObjectGroup.ID, e.Message);
+#endif
                                 }
                             }
                             else

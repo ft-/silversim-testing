@@ -238,6 +238,20 @@ namespace SilverSim.Scripting.Common
                     ScriptLoader.Remove(item.AssetID, instance);
                     continue;
                 }
+                catch(InvalidProgramException e)
+                {
+                    ObjectPartInventoryItem item = ev.Item;
+                    ScriptInstance instance = item.ScriptInstance;
+                    /* stop the broken script */
+                    m_Log.WarnFormat("Automatically stopped script {0} ({1}) of {2} ({3}) in {4} ({5}) due to program error: {6}\n{7}",
+                        item.Name, item.AssetID.ToString(),
+                        ev.Part.Name, ev.Part.ID.ToString(),
+                        ev.Part.ObjectGroup.Name, ev.Part.ObjectGroup.ID.ToString(),
+                        e.Message,
+                        e.StackTrace);
+                    instance.IsRunning = false;
+                    continue;
+                }
                 finally
                 {
                     lock (tc)
