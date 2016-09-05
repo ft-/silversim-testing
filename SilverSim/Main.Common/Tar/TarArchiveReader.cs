@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -14,6 +15,9 @@ namespace SilverSim.Main.Common.Tar
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class TarArchiveReader : Stream
     {
+#if DEBUG
+        static ILog m_Log = LogManager.GetLogger("TAR ARCHIVE READER");
+#endif
         /* TarArchiveReader has Stream support, so that we can directly apply XmlTextReader and so on */
         [Serializable]
         public class EndOfTarException : Exception
@@ -61,11 +65,15 @@ namespace SilverSim.Main.Common.Tar
         byte[] ReadHeaderBytes()
         {
             byte[] buf = new byte[512];
-            while (m_LengthOfData > 0)
+            if (m_LengthOfData != 0)
             {
-                int readBytes = m_Stream.Read(buf, 0, m_LengthOfData > 512 ? 512 : m_LengthOfData);
-                m_LengthOfData -= readBytes;
-                m_Position += readBytes;
+                byte[] exbuf = new byte[8192];
+                while (m_LengthOfData > 0)
+                {
+                    int readBytes = m_Stream.Read(exbuf, 0, m_LengthOfData > exbuf.Length ? exbuf.Length : m_LengthOfData);
+                    m_LengthOfData -= readBytes;
+                    m_Position += readBytes;
+                }
             }
             while(m_Position % 512 != 0)
             {
@@ -76,6 +84,7 @@ namespace SilverSim.Main.Common.Tar
             {
                 throw new IOException();
             }
+            m_Position += 512;
 
             return buf;
         }
@@ -100,6 +109,7 @@ namespace SilverSim.Main.Common.Tar
                 {
                     haveLongLink = true;
                     byte[] fnameBytes = new byte[hdr.Length];
+                    m_LengthOfData = hdr.Length;
                     if(Read(fnameBytes, 0, hdr.Length) != hdr.Length)
                     {
                         throw new IOException();
@@ -118,6 +128,9 @@ namespace SilverSim.Main.Common.Tar
 
             } while (buf[156] == (byte)TarFileType.LongLink);
             m_LengthOfData = hdr.Length;
+#if DEBUG
+            m_Log.DebugFormat("File {0}: {1}: {2}", hdr.FileName, hdr.FileType.ToString(), hdr.Length);
+#endif
             return hdr;
         }
 
