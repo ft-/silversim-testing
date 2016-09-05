@@ -351,27 +351,38 @@ namespace SilverSim.Main.Common
                             if (loadparams.Scene.AssetService.TryGetValue(item.AssetID, out assetData))
                             {
                                 byte[] serializedState;
-                                if (loadparams.SimulationDataStorage.ScriptStates.TryGetValue(loadparams.Scene.ID, part.ID, item.ID, out serializedState))
+                                try
                                 {
-                                    item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, serializedState);
-                                    item.ScriptInstance.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.RegionStart));
-                                }
-                                else
-                                {
-                                    item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData);
-                                    item.ScriptInstance.IsResetRequired = true;
-                                }
+                                    if (loadparams.SimulationDataStorage.ScriptStates.TryGetValue(loadparams.Scene.ID, part.ID, item.ID, out serializedState))
+                                    {
+                                        item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, serializedState);
+                                        item.ScriptInstance.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.RegionStart));
+                                    }
+                                    else
+                                    {
+                                        item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData);
+                                        item.ScriptInstance.IsResetRequired = true;
+                                    }
 
-                                if(item.ScriptInstance.IsResetRequired)
-                                {
-                                    item.ScriptInstance.IsResetRequired = false;
-                                    item.ScriptInstance.IsRunning = true;
-                                    item.ScriptInstance.Reset();
+                                    if (item.ScriptInstance.IsResetRequired)
+                                    {
+                                        item.ScriptInstance.IsResetRequired = false;
+                                        item.ScriptInstance.IsRunning = true;
+                                        item.ScriptInstance.Reset();
+                                    }
+                                    if (++scriptcount % 50 == 0)
+                                    {
+                                        m_Log.InfoFormat("Started {2} scripts for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID, scriptcount);
+                                    }
                                 }
-                                if (++scriptcount % 50 == 0)
+                                catch(Exception e)
                                 {
-                                    m_Log.InfoFormat("Started {2} scripts for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID, scriptcount);
+                                    m_Log.ErrorFormat("Loading script {0} (asset {1}) for {2} ({3}) in {4} ({5}) failed: {6}: {7}\n{8}", item.Name, item.AssetID, part.Name, part.ID, part.ObjectGroup.Name, part.ObjectGroup.ID, e.GetType().FullName, e.Message, e.StackTrace);
                                 }
+                            }
+                            else
+                            {
+                                m_Log.ErrorFormat("Script {0} (asset {1}) is missing for {2} ({3}) in {4} ({5})", item.Name, item.AssetID, part.Name, part.ID, part.ObjectGroup.Name, part.ObjectGroup.ID);
                             }
                         }
                     }
