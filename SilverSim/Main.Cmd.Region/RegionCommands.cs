@@ -9,8 +9,10 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.SceneEnvironment;
+using SilverSim.Scene.Types.Script;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
@@ -118,6 +120,10 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.GetCommands.Add("waterheight", GetWaterheightCmd);
             loader.CommandRegistry.SetCommands.Add("waterheight", SetWaterheightCmd);
             loader.CommandRegistry.Commands.Add("rebake", RebakeCmd);
+            loader.CommandRegistry.EnableCommands.Add("script", EnableScriptCmd);
+            loader.CommandRegistry.DisableCommands.Add("script", DisableScriptCmd);
+            loader.CommandRegistry.EnableCommands.Add("scripts", EnableScriptsCmd);
+            loader.CommandRegistry.ShowCommands.Add("scripts", ShowScriptsCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -189,6 +195,272 @@ namespace SilverSim.Main.Cmd.Region
                 return false;
             }
             return true;
+        }
+
+        void ShowScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("show scripts [functional|not functional] [running|not running]");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("show scripts needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            bool excludeRunning = false;
+            bool excludeNotRunning = false;
+            bool excludeFunctional = false;
+            bool excludeNonFunctional = false;
+            bool negate = false;
+
+            for(int i = 2; i < args.Count; ++i)
+            {
+                switch(args[i])
+                {
+                    case "not":
+                        negate = true;
+                        break;
+
+                    case "running":
+                        excludeNotRunning = !negate;
+                        excludeRunning = negate;
+                        negate = false;
+                        break;
+
+                    case "functional":
+                        excludeNonFunctional = !negate;
+                        excludeFunctional = negate;
+                        negate = false;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+            }
+            else
+            {
+                foreach(ObjectPart part in scene.Primitives)
+                {
+                    ObjectGroup group = part.ObjectGroup;
+                    if(null == group)
+                    {
+                        continue;
+                    }
+                    foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+                    {
+                        ScriptInstance instance = item.ScriptInstance;
+                        if(item.InventoryType == Types.Inventory.InventoryType.LSLText)
+                        {
+                            if(excludeNonFunctional && null == instance)
+                            {
+                                continue;
+                            }
+                            if (null != instance)
+                            {
+                                if (excludeFunctional)
+                                {
+                                    continue;
+                                }
+                                if (excludeRunning && instance.IsRunning)
+                                {
+                                    continue;
+                                }
+                                if (excludeNotRunning && !instance.IsRunning)
+                                {
+                                    continue;
+                                }
+                            }
+                            io.WriteFormatted("Script {0} ({1})\n- Primitive: {2} ({3})\n- Object: {4} ({5}):\n- Functional: {6}\n- Running: {7}",
+                                item.Name, item.AssetID,
+                                part.Name, part.ID,
+                                group.Name, group.ID,
+                                instance != null ? "yes" : "no",
+                                instance != null && instance.IsRunning ? "running" : "not running");
+                        }
+                    }
+                }
+            }
+        }
+
+        void EnableScriptCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            UUID selectedPart;
+            if (args[0] == "help" || args.Count < 4)
+            {
+                io.Write("enable script <prim-id> <script-name>");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("enable script needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            ObjectPart part;
+            ObjectPartInventoryItem item;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+            }
+            else if (!UUID.TryParse(args[2], out selectedPart))
+            {
+                io.Write("invalid uuid");
+            }
+            else if (!scene.Primitives.TryGetValue(selectedPart, out part))
+            {
+                io.Write("primitive not found");
+            }
+            else if(!part.Inventory.TryGetValue(args[3], out item))
+            {
+                io.Write("item not found");
+            }
+            else
+            {
+                ScriptInstance instance = item.ScriptInstance;
+                if (null == instance)
+                {
+                    io.Write("item is not a valid script to be controlled");
+                }
+                else
+                {
+                    instance.IsRunning = true;
+                    io.Write("script is set running");
+                }
+            }
+        }
+
+        void EnableScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("enable scripts");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("enable scripts needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+            }
+            else
+            {
+                int count = 0;
+                foreach(ObjectPart part in scene.Primitives)
+                {
+                    foreach(ObjectPartInventoryItem item in part.Inventory.Values)
+                    {
+                        ScriptInstance instance = item.ScriptInstance;
+                        if(instance != null)
+                        {
+                            if (!instance.IsRunning)
+                            {
+                                instance.IsRunning = true;
+                                ++count;
+                            }
+                        }
+                    }
+                }
+                io.WriteFormatted("Scripts enabled: {0}", count);
+            }
+        }
+
+        void DisableScriptCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            UUID selectedPart;
+            if (args[0] == "help" || args.Count < 4)
+            {
+                io.Write("disable script <prim-id> <script-name>");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("disable script needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            ObjectPart part;
+            ObjectPartInventoryItem item;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+            }
+            else if (!UUID.TryParse(args[2], out selectedPart))
+            {
+                io.Write("invalid uuid");
+            }
+            else if (!scene.Primitives.TryGetValue(selectedPart, out part))
+            {
+                io.Write("primitive not found");
+            }
+            else if (!part.Inventory.TryGetValue(args[3], out item))
+            {
+                io.Write("item not found");
+            }
+            else
+            {
+                ScriptInstance instance = item.ScriptInstance;
+                if (null == instance)
+                {
+                    io.Write("item is not a valid script to be controlled");
+                }
+                else
+                {
+                    instance.IsRunning = true;
+                    io.Write("script is set running");
+                }
+            }
         }
 
         #region Region control commands
@@ -674,7 +946,7 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 RegionInfo rInfo;
-                if(!m_RegionStorage.TryGetValue(args[2], out rInfo))
+                if(!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
                 {
                     io.WriteFormatted("Region '{0}' not found", args[2]);
                 }
