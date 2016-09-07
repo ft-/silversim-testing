@@ -1183,7 +1183,7 @@ namespace SilverSim.Main.Common
             ArgvConfigSource configSource = new ArgvConfigSource(otherargs.ToArray());
             configSource.AddSwitch("Startup", "mode", "m");
             configSource.AddSwitch("Startup", "config", "c");
-            configSource.AddSwitch("Startup", "skipregions");
+            configSource.AddSwitch("Startup", "skip-regions");
             IConfig startup = configSource.Configs["Startup"];
             mode = startup.GetString("mode", "simulator");
             switch(mode)
@@ -1479,10 +1479,10 @@ namespace SilverSim.Main.Common
                 httpServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
 
                 m_Log.Info("Loading regions");
-                if (startup.Contains("skipregions"))
+                if (startup.Contains("skip-regions"))
                 {
                     m_Log.Warn("Skipping loading of regions");
-                    KnownConfigurationIssues.Add("Do not use --skipregions for production use");
+                    KnownConfigurationIssues.Add("Do not use --skip-regions for production use");
                 }
                 else
                 {
