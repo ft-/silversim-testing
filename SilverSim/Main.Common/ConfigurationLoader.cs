@@ -1482,7 +1482,6 @@ namespace SilverSim.Main.Common
                 if (startup.Contains("skip-regions"))
                 {
                     m_Log.Warn("Skipping loading of regions");
-                    KnownConfigurationIssues.Add("Do not use --skip-regions for production use");
                 }
                 else
                 {
