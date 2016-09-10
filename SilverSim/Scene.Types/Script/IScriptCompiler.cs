@@ -78,5 +78,6 @@ namespace SilverSim.Scene.Types.Script
 
         /* for testing */
         void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
+        void CompileToDisk(string filename, AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
     }
 }
