@@ -180,6 +180,7 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         if(m_StoppingListeners)
                         {
+                            
                             break;
                         }
                     }
@@ -187,9 +188,8 @@ namespace SilverSim.Main.Common.HttpServer
 
                 Interlocked.Increment(ref m_ActiveThreadCount);
                 Thread t = new Thread(AcceptedConnection);
-                t.IsBackground = true;
                 t.Start(args.AcceptSocket);
-                while(m_ActiveThreadCount > 200)
+                while(m_ActiveThreadCount > 200 && !m_StoppingListeners)
                 {
                     Thread.Sleep(1);
                 }
