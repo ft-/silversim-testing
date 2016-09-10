@@ -203,10 +203,18 @@ namespace SilverSim.Main.Common.HttpServer
 
                 Interlocked.Increment(ref m_ActiveThreadCount);
                 Thread t = new Thread(AcceptedConnection);
-                t.Start(args.AcceptSocket);
-                while(m_ActiveThreadCount > 200 && !m_StoppingListeners)
+                if (args.AcceptSocket.Connected)
                 {
-                    Thread.Sleep(1);
+                    t.Start(args.AcceptSocket);
+                    while (m_ActiveThreadCount > 200 && !m_StoppingListeners)
+                    {
+                        Thread.Sleep(1);
+                    }
+                }
+                else
+                {
+                    /* no connection get rid of the socket */
+                    args.AcceptSocket.Dispose();
                 }
             }
             Interlocked.Decrement(ref m_ActiveThreadCount);
