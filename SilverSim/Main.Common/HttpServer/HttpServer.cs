@@ -14,6 +14,7 @@ using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
@@ -53,12 +54,14 @@ namespace SilverSim.Main.Common.HttpServer
 
         X509Certificate2 m_ServerCertificate;
         string m_CertificateFileName;
-
+        Type m_SslStreamPreload;
 
         public BaseHttpServer(IConfig httpConfig, bool useSsl = false)
         {
             Port = (uint)httpConfig.GetInt("Port", useSsl ? 9001 : 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
+            /* prevent Mono from lazy loading SslStream at shutdown */
+            m_SslStreamPreload = typeof(SslStream);
 
             if(httpConfig.Contains("ServerCertificate"))
             {
