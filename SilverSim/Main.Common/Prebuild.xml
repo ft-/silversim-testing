@@ -17,7 +17,7 @@
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="Nini" path="../../bin/" localCopy="false"/>
   <Reference name="log4net" path="../../bin/" localCopy="false"/>
-  <Reference name="Mono.Security" path="../../bin/" localCopy="false"/>
+  <Reference name="Mono.Security" path="../../bin/" localCopy="false" version="4.0.0.0"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
   <Reference name="SilverSim.Http" localCopy="false"/>
   <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
