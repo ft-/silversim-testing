@@ -361,6 +361,10 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 /* commonly a broken pipe */
             }
+            catch(ObjectDisposedException)
+            {
+                /* commonly a broken pipe */
+            }
             catch (Exception e)
             {
                 m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
