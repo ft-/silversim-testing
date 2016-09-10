@@ -5,6 +5,11 @@ using System;
 
 namespace SilverSim.ServiceInterfaces.ServerParam
 {
+    /** 
+     * <summary>ServerParam declaration</summary>
+     * If used on method, it must have the following signature:
+     * void UpdateFunction(UUID regionid, string value)
+     */
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     [Serializable]
     public class ServerParamAttribute : Attribute

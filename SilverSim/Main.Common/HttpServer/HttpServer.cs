@@ -5,7 +5,9 @@ using log4net;
 using Nini.Config;
 using SilverSim.Http;
 using SilverSim.ServiceInterfaces;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +23,8 @@ using System.Threading;
 namespace SilverSim.Main.Common.HttpServer
 {
     [Description("HTTP Server")]
-    public class BaseHttpServer : IPlugin, IPluginShutdown
+    [ServerParam("MaxActiveHttpConnectionsPerPort")]
+    public class BaseHttpServer : IPlugin, IPluginShutdown, IServerParamListener
     {
         private static readonly ILog m_Log = LogManager.GetLogger("HTTP SERVER");
 
@@ -163,6 +166,18 @@ namespace SilverSim.Main.Common.HttpServer
         }
 
         int m_ActiveThreadCount;
+        int m_MaxActiveHttpConnections = 500;
+
+        [ServerParam("MaxActiveHttpConnectionsPerPort")]
+        public void MaxActiveHttpConnectionsPerPortUpdate(UUID regionId, string value)
+        {
+            int val;
+            if(UUID.Zero == regionId && int.TryParse(value, out val) && val > 0)
+            {
+                m_MaxActiveHttpConnections = val;
+            }
+        }
+
         AutoResetEvent m_AsyncListenerEvent = new AutoResetEvent(false);
 
         private void AcceptThread()
