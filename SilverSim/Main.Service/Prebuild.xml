@@ -2,11 +2,13 @@
 <Project frameworkVersion="v4_5" name="SilverSim.Main.Service" path="SilverSim/Main.Service" type="Exe">
   <Configuration name="Release">
     <Options>
+      <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
       <OutputPath>../../bin/</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
     <Options>
+      <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
       <OutputPath>../../bin/</OutputPath>
     </Options>
   </Configuration>
@@ -14,9 +16,6 @@
   <Reference name="System"/>
   <Reference name="System.ServiceProcess"/>
   <Reference name="System.Configuration.Install"/>
-  <Reference name="SilverSim.Main.Common" localCopy="false"/>
-  <Reference name="SilverSim.Types" localCopy="false"/>
-  <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
         <Exclude pattern="TemporaryGeneratedFile"/>

@@ -1,10 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Main.Common;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -13,6 +13,7 @@ namespace SilverSim.Main.Service
     sealed class MainService : ServiceBase
     {
         public const string SERVICE_NAME = "SilverSim";
+        Action m_ShutdownDelegate;
 
         public MainService()
         {
@@ -47,7 +48,11 @@ namespace SilverSim.Main.Service
 
         protected override void OnStop()
         {
-            m_ShutdownEvent.Set();
+            Action shutdownDelegate = m_ShutdownDelegate;
+            if(shutdownDelegate != null)
+            {
+                shutdownDelegate();
+            }
             while(!m_ShutdownCompleteEvent.WaitOne(1000))
             {
                 RequestAdditionalTime(1000);
@@ -57,7 +62,11 @@ namespace SilverSim.Main.Service
 
         protected override void OnShutdown()
         {
-            m_ShutdownEvent.Set();
+            Action shutdownDelegate = m_ShutdownDelegate;
+            if (shutdownDelegate != null)
+            {
+                shutdownDelegate();
+            }
             while (!m_ShutdownCompleteEvent.WaitOne(1000))
             {
                 RequestAdditionalTime(1000);
@@ -65,8 +74,6 @@ namespace SilverSim.Main.Service
             base.OnShutdown();
         }
 
-        ConfigurationLoader m_ConfigLoader;
-        readonly ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
         readonly ManualResetEvent m_ShutdownCompleteEvent = new ManualResetEvent(false);
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -78,22 +85,19 @@ namespace SilverSim.Main.Service
             m_ShutdownCompleteEvent.Reset();
 
             Thread.CurrentThread.Name = "SilverSim:Main";
-            try
+
+            /* by not hard referencing the assembly we can actually implement an updater concept here */
+            Assembly assembly = Assembly.Load("SilverSim.Main.Common");
+            Type t = assembly.GetType("SilverSim.Main.Common.Startup");
+            object startup = Activator.CreateInstance(t);
+            MethodInfo mi = t.GetMethod("Run");
+            m_ShutdownDelegate = (Action)Delegate.CreateDelegate(t, startup, t.GetMethod("Shutdown"));
+            Action<string> del = eventLog.WriteEntry;
+            if (!(bool)mi.Invoke(startup, new object[] { args, del }))
             {
-                m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent, ConfigurationLoader.LocalConsole.Disallowed);
-            }
-            catch (ConfigurationLoader.ConfigurationErrorException e)
-            {
-                eventLog.WriteEntry(string.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
-            }
-            catch (Exception e)
-            {
-                eventLog.WriteEntry(string.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
+#warning What to do with service when it fails here 
             }
 
-            m_ShutdownEvent.WaitOne();
-
-            m_ConfigLoader.Shutdown();
             m_ShutdownCompleteEvent.Set();
         }
 

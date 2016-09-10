@@ -43,5 +43,10 @@ namespace SilverSim.Main.Common
             m_ConfigLoader.Shutdown();
             return true;
         }
+
+        public void Shutdown()
+        {
+            m_ConfigLoader.TriggerShutdown();
+        }
     }
 }
