@@ -175,6 +175,30 @@ namespace SilverSim.Main.Common.HttpServer
             m_AsyncListenerEvent.Set();
         }
 
+        static string AddressToString(IPAddress ipAddr)
+        {
+            if(ipAddr.AddressFamily == AddressFamily.InterNetworkV6)
+            {
+                byte[] b = ipAddr.GetAddressBytes();
+                if(b[0] == 0 &&
+                    b[1] == 0 &&
+                    b[2] == 0 &&
+                    b[3] == 0 &&
+                    b[4] == 0 &&
+                    b[5] == 0 &&
+                    b[6] == 0 &&
+                    b[7] == 0 &&
+                    b[8] == 0 &&
+                    b[9] == 0 &&
+                    b[10] == 0xFF &&
+                    b[11] == 0xFF)
+                {
+                    return string.Format("{0}.{1}.{2}.{3}", b[12], b[13], b[14], b[15]);
+                }
+            }
+            return ipAddr.ToString();
+        }
+
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
@@ -185,12 +209,8 @@ namespace SilverSim.Main.Common.HttpServer
             try
             {
                 IPEndPoint ep = (IPEndPoint)socket.RemoteEndPoint;
-                IPAddress ipAddr = ep.Address;
-                if(ipAddr.IsIPv4MappedToIPv6)
-                {
-                    ipAddr = ipAddr.MapToIPv4();
-                }
-                string remoteAddr = ipAddr.ToString();
+                string remoteAddr = AddressToString(ep.Address);
+                m_Log.Debug(remoteAddr);
                 Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
                 Stream httpstream;
