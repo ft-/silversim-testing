@@ -80,7 +80,31 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             m_ListenerSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            m_ListenerSocket.Ttl = 128;
+
+            try
+            {
+                if (m_ListenerSocket.Ttl < 128)
+                {
+                    m_ListenerSocket.Ttl = 128;
+                }
+            }
+            catch (SocketException)
+            {
+                m_Log.Debug("Failed to increase default TTL");
+            }
+
+            /* since Win 2000, there is a WSAECONNRESET, we do not want that in our code */
+            try
+            {
+                const int SIO_UDP_CONNRESET = -1744830452;
+
+                m_ListenerSocket.IOControl(SIO_UDP_CONNRESET, new byte[] { 0 }, null);
+            }
+            catch (SocketException)
+            {
+                /* however, mono does not have an idea about what this is all about, so we catch that here */
+            }
+
             m_ListenerSocket.Bind(new IPEndPoint(IPAddress.Any, (int)Port));
             m_ListenerSocket.Listen(128);
 
