@@ -105,7 +105,8 @@ namespace SilverSim.Main.Common.HttpServer
                 /* however, mono does not have an idea about what this is all about, so we catch that here */
             }
 
-            m_ListenerSocket.Bind(new IPEndPoint(IPAddress.Any, (int)Port));
+            IPEndPoint ep = new IPEndPoint(IPAddress.Any, (int)Port);
+            m_ListenerSocket.Bind(ep);
             m_ListenerSocket.Listen(128);
 
             m_ListenerThread = new Thread(AcceptThread);
