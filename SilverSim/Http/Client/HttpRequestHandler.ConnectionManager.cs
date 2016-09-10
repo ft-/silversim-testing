@@ -142,18 +142,28 @@ namespace SilverSim.Http.Client
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                SslStream sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
-                sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
-                if(!sslstream.IsEncrypted)
-                {
-                    throw new AuthenticationException("Encryption not available");
-                }
-                return new HttpsStream(sslstream);
+                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
             }
             else
             {
                 throw new NotSupportedException();
             }
+        }
+
+        static HttpsStream ConnectToSslServer(
+            string host,
+            int port,
+            X509CertificateCollection clientCertificates,
+            SslProtocols enabledSslProtocols,
+            bool checkCertificateRevocation)
+        {
+            SslStream sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
+            sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
+            if (!sslstream.IsEncrypted)
+            {
+                throw new AuthenticationException("Encryption not available");
+            }
+            return new HttpsStream(sslstream);
         }
 
         static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
