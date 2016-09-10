@@ -137,30 +137,34 @@ namespace SilverSim.Main.Common.HttpServer
         }
 
         int m_ActiveThreadCount;
-        ManualResetEvent m_AsyncListenerEvent = new ManualResetEvent(false);
+        AutoResetEvent m_AsyncListenerEvent = new AutoResetEvent(false);
 
         private void AcceptThread()
         {
             Thread.CurrentThread.Name = Scheme.ToUpper() + " Server at " + Port.ToString();
             Interlocked.Increment(ref m_ActiveThreadCount);
-            while(!m_StoppingListeners)
+            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+            args.Completed += AcceptHandler;
+            while (!m_StoppingListeners)
             {
-                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-                args.Completed += AcceptHandler;
+                args.AcceptSocket = null;
                 if (m_ListenerSocket.AcceptAsync(args))
                 {
-                    if (!m_AsyncListenerEvent.WaitOne(1000))
+                    while (!m_AsyncListenerEvent.WaitOne(1000))
                     {
-                        continue;
+                        if(m_StoppingListeners)
+                        {
+                            break;
+                        }
                     }
                 }
-                if (args.SocketError == SocketError.Success && args.AcceptSocket != null)
+
+                Interlocked.Increment(ref m_ActiveThreadCount);
+                Thread t = new Thread(AcceptedConnection);
+                t.Start(args.AcceptSocket);
+                while(m_ActiveThreadCount > 200)
                 {
-                    Interlocked.Increment(ref m_ActiveThreadCount);
-                    Thread t = new Thread(AcceptedConnection);
-                    t.Name = "HTTP Accepted Connection for Port " + Port.ToString();
-                    t.Start(args.AcceptSocket);
-                    args.AcceptSocket = null;
+                    Thread.Sleep(1);
                 }
             }
             Interlocked.Decrement(ref m_ActiveThreadCount);
@@ -175,12 +179,20 @@ namespace SilverSim.Main.Common.HttpServer
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        private void AcceptedConnection(object o)
+        private void AcceptedConnection(object socko)
         {
-            Socket socket = (Socket)o;
+            Socket socket = (Socket)socko;
             try
             {
-                string remoteAddr = IPAddress.Parse(((IPEndPoint)socket.RemoteEndPoint).Address.ToString()).ToString();
+                IPEndPoint ep = (IPEndPoint)socket.RemoteEndPoint;
+                IPAddress ipAddr = ep.Address;
+                if(ipAddr.IsIPv4MappedToIPv6)
+                {
+                    ipAddr = ipAddr.MapToIPv4();
+                }
+                string remoteAddr = ipAddr.ToString();
+                Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
+
                 Stream httpstream;
                 if (m_ServerCertificate != null)
                 {
