@@ -79,7 +79,7 @@ namespace SilverSim.Main.Common.HttpServer
                 Scheme = Uri.UriSchemeHttp;
             }
 
-            m_ListenerSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            m_ListenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
