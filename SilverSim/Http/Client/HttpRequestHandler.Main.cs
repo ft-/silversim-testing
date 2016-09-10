@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
@@ -182,7 +183,15 @@ namespace SilverSim.Http.Client
                 }
                 throw;
             }
-            catch(IOException)
+            catch(SocketException)
+            {
+                if (retrycnt-- > 0)
+                {
+                    goto retry;
+                }
+                throw;
+            }
+            catch (IOException)
             {
                 if(retrycnt-- > 0)
                 {
@@ -231,6 +240,10 @@ namespace SilverSim.Http.Client
                     /* keep caller from being exceptioned */
                 }
                 catch (IOException)
+                {
+                    /* keep caller from being exceptioned */
+                }
+                catch (SocketException)
                 {
                     /* keep caller from being exceptioned */
                 }

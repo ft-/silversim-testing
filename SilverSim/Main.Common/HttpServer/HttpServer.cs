@@ -160,6 +160,7 @@ namespace SilverSim.Main.Common.HttpServer
                     Thread t = new Thread(AcceptedConnection);
                     t.Name = "HTTP Accepted Connection for Port " + Port.ToString();
                     t.Start(args.AcceptSocket);
+                    args.AcceptSocket = null;
                 }
             }
             Interlocked.Decrement(ref m_ActiveThreadCount);
@@ -321,6 +322,10 @@ namespace SilverSim.Main.Common.HttpServer
                 /* simply a closed connection */
             }
             catch (IOException)
+            {
+                /* commonly a broken pipe */
+            }
+            catch(SocketException)
             {
                 /* commonly a broken pipe */
             }
