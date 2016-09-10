@@ -180,6 +180,7 @@ namespace SilverSim.Main.Common.HttpServer
             Socket socket = (Socket)o;
             try
             {
+                string remoteAddr = IPAddress.Parse(((IPEndPoint)socket.RemoteEndPoint).Address.ToString()).ToString();
                 Stream httpstream;
                 if (m_ServerCertificate != null)
                 {
@@ -198,7 +199,6 @@ namespace SilverSim.Main.Common.HttpServer
                     HttpRequest req;
                     try
                     {
-                        string remoteAddr = IPAddress.Parse(((IPEndPoint)socket.RemoteEndPoint).Address.ToString()).ToString();
                         req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy);
                     }
                     catch (HttpResponse.ConnectionCloseException)
