@@ -14,6 +14,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.0.0.1")]
 [assembly: AssemblyFileVersion("0.0.0.1")]
 
+#if NO_SILVERSIM_TYPES
+#else
 [assembly: SilverSim.Types.Assembly.InterfaceVersion("0.0.0.0")]
+#endif
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(false)]
