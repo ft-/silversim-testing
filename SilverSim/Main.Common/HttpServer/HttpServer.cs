@@ -156,6 +156,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
             m_Log.InfoFormat("Stopping HTTP Server");
             m_StoppingListeners = true;
+            m_ListenerSocket.Close();
             while(m_ActiveThreadCount > 0)
             {
                 Thread.Sleep(1);
@@ -183,41 +184,56 @@ namespace SilverSim.Main.Common.HttpServer
         private void AcceptThread()
         {
             Thread.CurrentThread.Name = Scheme.ToUpper() + " Server at " + Port.ToString();
-            Interlocked.Increment(ref m_ActiveThreadCount);
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.Completed += AcceptHandler;
-            while (!m_StoppingListeners)
+            try
             {
-                args.AcceptSocket = null;
-                if (m_ListenerSocket.AcceptAsync(args))
+                Interlocked.Increment(ref m_ActiveThreadCount);
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+                args.Completed += AcceptHandler;
+
+                while (!m_StoppingListeners)
                 {
-                    while (!m_AsyncListenerEvent.WaitOne(1000))
+                    args.AcceptSocket = null;
+                    if (m_ListenerSocket.AcceptAsync(args))
                     {
-                        if(m_StoppingListeners)
+                        while (!m_AsyncListenerEvent.WaitOne(1000))
                         {
-                            
-                            break;
+                            if (m_StoppingListeners)
+                            {
+
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (args.AcceptSocket.Connected)
-                {
-                    Interlocked.Increment(ref m_ActiveThreadCount);
-                    Thread t = new Thread(AcceptedConnection);
-                    t.Start(args.AcceptSocket);
-                    while (m_ActiveThreadCount > 200 && !m_StoppingListeners)
+                    if(args.AcceptSocket == null)
                     {
-                        Thread.Sleep(1);
+
+                    }
+                    else if (args.AcceptSocket.Connected)
+                    {
+                        Interlocked.Increment(ref m_ActiveThreadCount);
+                        Thread t = new Thread(AcceptedConnection);
+                        t.Start(args.AcceptSocket);
+                        while (m_ActiveThreadCount > 200 && !m_StoppingListeners)
+                        {
+                            Thread.Sleep(1);
+                        }
+                    }
+                    else
+                    {
+                        /* no connection get rid of the socket */
+                        args.AcceptSocket.Dispose();
                     }
                 }
-                else
-                {
-                    /* no connection get rid of the socket */
-                    args.AcceptSocket.Dispose();
-                }
             }
-            Interlocked.Decrement(ref m_ActiveThreadCount);
+            catch (NullReferenceException)
+            {
+
+            }
+            finally
+            {
+                Interlocked.Decrement(ref m_ActiveThreadCount);
+            }
         }
 
         private void AcceptHandler(object o, SocketAsyncEventArgs args)
