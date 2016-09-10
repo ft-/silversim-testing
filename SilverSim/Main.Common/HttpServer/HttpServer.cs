@@ -14,9 +14,9 @@ using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -29,7 +29,6 @@ namespace SilverSim.Main.Common.HttpServer
         public RwLockedDictionary<string, Action<HttpRequest>> UriHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
         public RwLockedDictionary<string, Action<HttpRequest>> RootUriContentTypeHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
 
-        readonly TcpListener m_Listener;
         public uint Port { get; private set; }
         ExternalHostNameServiceInterface m_ExternalHostNameService;
         public string ExternalHostName
@@ -55,6 +54,8 @@ namespace SilverSim.Main.Common.HttpServer
         X509Certificate2 m_ServerCertificate;
         string m_CertificateFileName;
         Type m_SslStreamPreload;
+        Socket m_ListenerSocket;
+        Thread m_ListenerThread;
 
         public BaseHttpServer(IConfig httpConfig, bool useSsl = false)
         {
@@ -78,8 +79,13 @@ namespace SilverSim.Main.Common.HttpServer
                 Scheme = Uri.UriSchemeHttp;
             }
 
-            m_Listener = new TcpListener(IPAddress.Any, (int)Port);
-            m_Listener.Server.Ttl = 128;
+            m_ListenerSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            m_ListenerSocket.Ttl = 128;
+            m_ListenerSocket.Bind(new IPEndPoint(IPAddress.Any, (int)Port));
+            m_ListenerSocket.Listen(128);
+
+            m_ListenerThread = new Thread(AcceptThread);
+            m_ListenerThread.Start();
 
             if (Scheme == Uri.UriSchemeHttps)
             {
@@ -107,8 +113,6 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 m_Log.InfoFormat("Starting HTTP Server");
             }
-            m_Listener.Start();
-            m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
         }
 
         public ShutdownOrder ShutdownOrder 
@@ -123,35 +127,56 @@ namespace SilverSim.Main.Common.HttpServer
         {
             m_Log.InfoFormat("Stopping HTTP Server");
             m_StoppingListeners = true;
-            m_Listener.Stop();
+            while(m_ActiveThreadCount > 0)
+            {
+                Thread.Sleep(1);
+            }
             StartsWithUriHandlers.Clear();
             UriHandlers.Clear();
             RootUriContentTypeHandlers.Clear();
+        }
+
+        int m_ActiveThreadCount;
+        ManualResetEvent m_AsyncListenerEvent = new ManualResetEvent(false);
+
+        private void AcceptThread()
+        {
+            Thread.CurrentThread.Name = Scheme.ToUpper() + " Server at " + Port.ToString();
+            Interlocked.Increment(ref m_ActiveThreadCount);
+            while(!m_StoppingListeners)
+            {
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+                args.Completed += AcceptHandler;
+                if (m_ListenerSocket.AcceptAsync(args))
+                {
+                    if (!m_AsyncListenerEvent.WaitOne(1000))
+                    {
+                        continue;
+                    }
+                }
+                if (args.SocketError == SocketError.Success && args.AcceptSocket != null)
+                {
+                    Interlocked.Increment(ref m_ActiveThreadCount);
+                    Thread t = new Thread(AcceptedConnection);
+                    t.Name = "HTTP Accepted Connection for Port " + Port.ToString();
+                    t.Start(args.AcceptSocket);
+                }
+            }
+            Interlocked.Decrement(ref m_ActiveThreadCount);
+        }
+
+        private void AcceptHandler(object o, SocketAsyncEventArgs args)
+        {
+            m_AsyncListenerEvent.Set();
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        private void AcceptConnectionCallback(IAsyncResult ar)
+        private void AcceptedConnection(object o)
         {
-            Socket socket;
-            try
-            {
-                socket = m_Listener.EndAcceptSocket(ar);
-            }
-            catch(ObjectDisposedException)
-            {
-                return;
-            }
-            catch(NullReferenceException) /* de-initialization can result into null references */
-            {
-                return;
-            }
-            if (!m_StoppingListeners)
-            {
-                m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
-            }
+            Socket socket = (Socket)o;
             try
             {
                 Stream httpstream;
@@ -309,6 +334,7 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     socket.Close();
                 }
+                Interlocked.Decrement(ref m_ActiveThreadCount);
             }
         }
 
