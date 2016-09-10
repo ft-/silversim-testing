@@ -210,7 +210,6 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 IPEndPoint ep = (IPEndPoint)socket.RemoteEndPoint;
                 string remoteAddr = AddressToString(ep.Address);
-                m_Log.Debug(remoteAddr);
                 Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
                 Stream httpstream;

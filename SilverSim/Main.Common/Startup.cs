@@ -31,9 +31,10 @@ namespace SilverSim.Main.Common
             }
             catch (Exception e)
             {
-                writeLine(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message));
 #if DEBUG
-                writeLine(e.StackTrace);
+                writeLine(string.Format("Startup Exception {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace));
+#else
+                writeLine(string.Format("Startup Exception {0}: {1}", e.GetType().Name, e.Message));
 #endif
                 return false;
             }
