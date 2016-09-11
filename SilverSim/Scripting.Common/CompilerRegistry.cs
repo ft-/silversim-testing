@@ -290,6 +290,25 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
+            public void CompileToDisk(string filename, UUI user, UUID assetID, TextReader reader)
+            {
+                int linenumber = 1;
+                Dictionary<int, string> shbangs = new Dictionary<int, string>();
+                StringBuilder header = new StringBuilder();
+                while (reader.Peek() == '/')
+                {
+                    string shbang = reader.ReadLine();
+                    header.AppendLine(shbang);
+                    if (shbang.StartsWith("//#!"))
+                    {
+                        shbangs.Add(linenumber, shbang);
+                    }
+                }
+
+                IScriptCompiler compiler = DetermineShBangs(shbangs);
+
+                compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber);
+            }
         }
 
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
