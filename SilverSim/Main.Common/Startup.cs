@@ -24,18 +24,15 @@ namespace SilverSim.Main.Common
 #if DEBUG
                 writeLine(e.StackTrace);
 #endif
-                m_ConfigLoader.Shutdown();
                 return false;
             }
             catch (ConfigurationLoader.TestingErrorException)
             {
-                m_ConfigLoader.Shutdown();
                 return false;
             }
             catch(SocketException e)
             {
                 writeLine(string.Format("Startup Exception {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace));
-                m_ConfigLoader.Shutdown();
                 return false;
             }
             catch (Exception e)
@@ -45,7 +42,6 @@ namespace SilverSim.Main.Common
 #else
                 writeLine(string.Format("Startup Exception {0}: {1}", e.GetType().Name, e.Message));
 #endif
-                m_ConfigLoader.Shutdown();
                 return false;
             }
 
