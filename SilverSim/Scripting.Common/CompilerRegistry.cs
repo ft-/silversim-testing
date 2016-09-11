@@ -307,7 +307,10 @@ namespace SilverSim.Scripting.Common
 
                 IScriptCompiler compiler = DetermineShBangs(shbangs);
 
-                compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber);
+                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
+                {
+                    compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, linenumber);
+                }
             }
         }
 
