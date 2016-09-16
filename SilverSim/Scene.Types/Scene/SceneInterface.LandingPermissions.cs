@@ -317,7 +317,7 @@ namespace SilverSim.Scene.Types.Scene
                                     Random rand = new Random();
                                     while(relativeSpawns.Count > 0)
                                     {
-                                        absoluteSpawns.Add(relativeSpawns[rand.Next(relativeSpawns.Count - 1).Clamp(0, relativeSpawns.Count - 1)] + obj.GlobalPosition);
+                                        absoluteSpawns.Add(relativeSpawns[rand.Next(relativeSpawns.Count - 1).Clamp(0, relativeSpawns.Count - 1)] * obj.GlobalRotation + obj.GlobalPosition);
                                     }
                                 }
                                 break;
@@ -339,7 +339,7 @@ namespace SilverSim.Scene.Types.Scene
                                         for(int i = 0; i < relativeSpawns.Count; ++i)
                                         {
                                             double distindicator = 0;
-                                            Vector3 absSpawnV = relativeSpawns[i] + obj.GlobalPosition;
+                                            Vector3 absSpawnV = relativeSpawns[i] * obj.GlobalRotation + obj.GlobalPosition;
                                             foreach(Vector3 agLocation in agentLocations)
                                             {
                                                 distindicator += (agLocation - absSpawnV).LengthSquared;
@@ -367,7 +367,7 @@ namespace SilverSim.Scene.Types.Scene
                                         Vector3 closest = Vector3.Zero;
                                         for (int i = 0; i < relativeSpawns.Count; ++i)
                                         {
-                                            Vector3 v = relativeSpawns[i] + obj.GlobalPosition;
+                                            Vector3 v = relativeSpawns[i] * obj.GlobalRotation + obj.GlobalPosition;
                                             double newDist = (v - destinationLocation).LengthSquared;
                                             if (closestindex < 0 || distance > newDist)
                                             {
@@ -385,7 +385,7 @@ namespace SilverSim.Scene.Types.Scene
                             case "sequence":
                                 foreach(Vector3 v in relativeSpawns)
                                 {
-                                    absoluteSpawns.Add(v + obj.GlobalPosition);
+                                    absoluteSpawns.Add(v * obj.GlobalRotation + obj.GlobalPosition);
                                 }
                                 break;
                         }
@@ -397,9 +397,9 @@ namespace SilverSim.Scene.Types.Scene
                                (spawnParcel.PassPrice != 0 /* skip parcels with pass price here */ ||
                                     CheckParcelAccessRights(agent, spawnParcel)))
                             { 
-                                    /* found a viable spawn here */
-                                    p = spawnParcel;
-                                    destinationLocation = spawn;
+                                /* found a viable spawn here */
+                                p = spawnParcel;
+                                destinationLocation = spawn;
                                 foundTelehub = true;
                             }
                         }
