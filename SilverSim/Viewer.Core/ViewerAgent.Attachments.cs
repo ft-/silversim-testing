@@ -52,13 +52,19 @@ namespace SilverSim.Viewer.Core
                         {
                             return;
                         }
-                        if(req.FirstDetachAll)
+#if DEBUG
+                        m_Log.DebugFormat("RezMultipleAttachmentsFromInv for agent {0}", Owner.FullName);
+#endif
+                        if (req.FirstDetachAll)
                         {
                             /* get rid of all current attachments */
+#if DEBUG
+                            m_Log.DebugFormat("Detach previous attachments of agent {0}", Owner.FullName);
+#endif
                             DetachAllAttachments();
                         }
 
-                        foreach (SilverSim.Viewer.Messages.Object.RezMultipleAttachmentsFromInv.ObjectDataS d in req.ObjectData)
+                        foreach (Messages.Object.RezMultipleAttachmentsFromInv.ObjectDataS d in req.ObjectData)
                         {
                             RezAttachment(d.ItemID, d.AttachmentPoint);
                         }
@@ -67,11 +73,15 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.RezSingleAttachmentFromInv:
                     {
-                        SilverSim.Viewer.Messages.Object.RezSingleAttachmentFromInv req = (SilverSim.Viewer.Messages.Object.RezSingleAttachmentFromInv)m;
+
+                        Messages.Object.RezSingleAttachmentFromInv req = (Messages.Object.RezSingleAttachmentFromInv)m;
                         if (req.SessionID != SessionID || req.AgentID != ID)
                         {
                             return;
                         }
+#if DEBUG
+                        m_Log.DebugFormat("RezSingleAttachmentFromInv for agent {0}", Owner.FullName);
+#endif
                         RezAttachment(req.ItemID, req.AttachmentPoint);
                     }
                     break;
@@ -106,7 +116,7 @@ namespace SilverSim.Viewer.Core
             }
             else if(m.Number == MessageType.DetachAttachmentIntoInv)
             {
-                SilverSim.Viewer.Messages.Object.DetachAttachmentIntoInv req = (SilverSim.Viewer.Messages.Object.DetachAttachmentIntoInv)m;
+                Messages.Object.DetachAttachmentIntoInv req = (Messages.Object.DetachAttachmentIntoInv)m;
                 if (req.AgentID != ID)
                 {
                     return;
@@ -178,6 +188,9 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
+#if DEBUG
+                m_Log.DebugFormat("Deserializing object asset {0} for agent {1} {2} ({3})", data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID);
+#endif
                 try
                 {
                     objgroups = ObjectXML.FromAsset(data, m_RezzingAgent);
@@ -234,6 +247,9 @@ namespace SilverSim.Viewer.Core
                 grp.Position = grp.AttachedPos;
                 grp.IsChangedEnabled = true;
 
+#if DEBUG
+                m_Log.DebugFormat("Adding attachment asset {0} at {4} for agent {1} {2} ({3})", data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID, grp.AttachPoint.ToString());
+#endif
                 try
                 {
                     m_Scene.Add(grp);
@@ -272,6 +288,10 @@ namespace SilverSim.Viewer.Core
                 SendAlertMessage("ALERT: InvalidObjectParams", SceneID);
                 return;
             }
+#if DEBUG
+            m_Log.DebugFormat("Attaching item {0} / asset {1} to agent {2}", item.ID, item.AssetID, Owner.FullName);
+#endif
+
             bool accessFailed = false;
             try
             {
