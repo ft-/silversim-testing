@@ -26,12 +26,12 @@ namespace SilverSim.Types
         public override bool Equals(object obj)
         {
             UUI u = obj as UUI;
-            return (null != u) && this.ID == u.ID;
+            return (null != u) && EqualsGrid(u);
         }
 
         public bool Equals(UUI uui)
         {
-            return uui.ID == ID;
+            return EqualsGrid(uui);
         }
 
         public bool EqualsGrid(UUI uui)

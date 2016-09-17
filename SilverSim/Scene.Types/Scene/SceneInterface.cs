@@ -133,7 +133,6 @@ namespace SilverSim.Scene.Types.Scene
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
         public EstateServiceInterface EstateService { get; protected set; }
-        public ServerParamServiceInterface ServerParamService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
         readonly NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }

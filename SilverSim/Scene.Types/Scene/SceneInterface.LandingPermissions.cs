@@ -3,6 +3,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
@@ -16,8 +17,73 @@ using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Scene
 {
+    [ServerParam("EnableLandingOverride")]
+    [ServerParam("SpawnpointRouting")]
     public partial class SceneInterface
     {
+        bool m_EnableLandingOverrideLocal;
+        bool m_EnableLandingOverrideGlobal;
+        bool m_EnableLandingOverrideSetToLocal;
+
+        string m_SpawnPointRoutingLocal;
+        string m_SpawnPointRoutingGlobal;
+        bool m_SpawnPointRoutingSetToLocal;
+
+        bool EnableLandingOverride
+        {
+            get
+            {
+                return m_EnableLandingOverrideSetToLocal ? m_EnableLandingOverrideLocal : m_EnableLandingOverrideGlobal;
+            }
+        }
+
+        string SpawnPointRouting
+        {
+            get
+            {
+                return m_SpawnPointRoutingSetToLocal ? m_SpawnPointRoutingLocal : m_SpawnPointRoutingGlobal;
+            }
+        }
+
+        [ServerParam("EnableLandingOverride")]
+        public void EnableLandingOverrideUpdated(UUID regionID, string value)
+        {
+            ParameterUpdatedHandler(
+                ref m_EnableLandingOverrideLocal, 
+                ref m_EnableLandingOverrideGlobal, 
+                ref m_EnableLandingOverrideSetToLocal, 
+                regionID, value);
+        }
+
+        [ServerParam("SpawnpointRouting")]
+        public void EnableSpawnPointRoutingUpdated(UUID regionID, string value)
+        {
+            if (regionID != UUID.Zero)
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    m_SpawnPointRoutingSetToLocal = false;
+                }
+                else
+                {
+                    m_SpawnPointRoutingLocal = value;
+                    m_SpawnPointRoutingSetToLocal = true;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    m_SpawnPointRoutingLocal = "closest";
+                }
+                else
+                {
+                    m_SpawnPointRoutingGlobal = value;
+                }
+            }
+        }
+
+
         [Serializable]
         public class ParcelAccessDeniedException : Exception
         {
@@ -296,7 +362,7 @@ namespace SilverSim.Scene.Types.Scene
                 !IsEstateManager(agentOwner) &&
                 !Owner.EqualsGrid(agentOwner) &&
                 !IsPossibleGod(agentOwner)) ||
-                !ServerParamService.GetBoolean(ID, "EnableLandingOverride", false))
+                !EnableLandingOverride)
             {
                 bool foundTelehub = false;
 
@@ -310,7 +376,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         List<Vector3> relativeSpawns = SpawnPoints;
                         List<Vector3> absoluteSpawns = new List<Vector3>();
-                        switch(ServerParamService.GetString(ID, "SpawnpointRouting", "closest"))
+                        switch(SpawnPointRouting)
                         {
                             case "random":
                                 {

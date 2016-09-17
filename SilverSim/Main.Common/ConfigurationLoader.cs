@@ -2106,13 +2106,16 @@ namespace SilverSim.Main.Common
                                             continue;
                                         }
                                         foundSpecific = true;
+#if DEBUG
+                                        m_Log.DebugFormat("Updating scene {0} with parameter {1}/{2}", scene.Name, regionID.ToString(), parametername);
+#endif
                                         try
                                         {
                                             del(regionID, value);
                                         }
                                         catch (Exception e)
                                         {
-                                            m_Log.WarnFormat("Failed to update scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, regionID.ToString(), value, e.GetType().FullName, e.Message, e.StackTrace);
+                                            m_Log.WarnFormat("Failed to update scene {0} with parameter {1}/{2}: {3}: {4}\n{5}", scene.Name, regionID.ToString(), parametername, e.GetType().FullName, e.Message, e.StackTrace);
                                         }
                                     }
                                 }

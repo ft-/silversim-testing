@@ -19,7 +19,6 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Neighbor;
-using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -50,7 +49,6 @@ namespace SilverSim.Scene.Implementation.Basic
         GridServiceInterface m_GridService;
         GridServiceInterface m_RegionStorage;
         GroupsServiceInterface m_GroupsService;
-        ServerParamServiceInterface m_ServerParamService;
         IMServiceInterface m_IMService;
         EstateServiceInterface m_EstateService;
         SimulationDataStorageInterface m_SimulationDataStorage;
@@ -124,7 +122,6 @@ namespace SilverSim.Scene.Implementation.Basic
             m_AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
-            m_ServerParamService = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
             m_SimulationDataStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             foreach(string servicename in m_AvatarNameServiceNames)
@@ -145,7 +142,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_AssetService,
                 m_AssetCacheService,
                 m_GridService,
-                m_ServerParamService,
                 ri,
                 m_AvatarNameServices,
                 m_SimulationDataStorage,

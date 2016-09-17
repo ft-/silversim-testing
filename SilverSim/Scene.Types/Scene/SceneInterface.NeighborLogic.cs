@@ -13,9 +13,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Threading;
+using SilverSim.ServiceInterfaces.ServerParam;
 
 namespace SilverSim.Scene.Types.Scene
 {
+    [ServerParam("ChatPassInEnable")]
+    [ServerParam("ChatPassOutEnable")]
     public partial class SceneInterface
     {
         public class NeighborEntry
@@ -33,17 +37,104 @@ namespace SilverSim.Scene.Types.Scene
         public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
         public TryGetSceneDelegate TryGetScene;
 
+        readonly RwLockedList<UUID> m_ChatPassInEnableLocal = new RwLockedList<UUID>();
+        readonly RwLockedList<UUID> m_ChatPassInEnableGlobal = new RwLockedList<UUID>();
+        bool m_ChatPassInEnableSetToLocal = false;
+
+        readonly RwLockedList<UUID> m_ChatPassOutEnableLocal = new RwLockedList<UUID>();
+        readonly RwLockedList<UUID> m_ChatPassOutEnableGlobal = new RwLockedList<UUID>();
+        bool m_ChatPassOutEnableSetToLocal = false;
+
+        void ChatPassEnableUpdated(
+           RwLockedList<UUID> locallist,
+           RwLockedList<UUID> globallist,
+           ref bool settolocal,
+           UUID regionId,
+           string varname,
+           string value)
+        {
+            if(string.IsNullOrEmpty(value))
+            {
+                if(regionId != UUID.Zero)
+                {
+                    settolocal = false;
+                    locallist.Clear();
+                }
+                else
+                {
+                    globallist.Clear();
+                }
+            }
+            else
+            {
+                string[] parts = value.Split(',');
+                List<UUID> new_ids = new List<UUID>();
+                foreach(string part in parts)
+                {
+                    UUID id;
+                    if(!UUID.TryParse(part, out id))
+                    {
+                        m_Log.WarnFormat("Invalid UUID '{1}' found in {0}/{2} variable", regionId.ToString(), part, varname);
+                    }
+                    else if(!new_ids.Contains(id))
+                    {
+                        new_ids.Add(id);
+                    }
+                }
+
+                RwLockedList<UUID> activelist = regionId != UUID.Zero ? locallist : globallist;
+
+                foreach (UUID id in new List<UUID>(activelist))
+                {
+                    if(!new_ids.Contains(id))
+                    {
+                        activelist.Remove(id);
+                    }
+                }
+
+                foreach(UUID id in new_ids)
+                {
+                    if(!activelist.Contains(id))
+                    {
+                        activelist.Add(id);
+                    }
+                }
+
+                if(regionId != UUID.Zero)
+                {
+                    settolocal = true;
+                }
+            }
+        }
+
+        [ServerParam("ChatPassInEnable")]
+        public void ChatPassInEnableUpdated(UUID regionId, string value)
+        {
+            ChatPassEnableUpdated(
+                m_ChatPassInEnableLocal,
+                m_ChatPassInEnableGlobal,
+                ref m_ChatPassInEnableSetToLocal,
+                regionId,
+                "ChatPassInEnable",
+                value);
+        }
+
+        [ServerParam("ChatPassOutEnable")]
+        public void ChatPassOutEnableUpdated(UUID regionId, string value)
+        {
+            ChatPassEnableUpdated(
+                m_ChatPassOutEnableLocal,
+                m_ChatPassOutEnableGlobal,
+                ref m_ChatPassOutEnableSetToLocal,
+                regionId,
+                "ChatPassOutEnable",
+                value);
+        }
+
         public void ChatPassInbound(UUID fromRegionID, ListenEvent ev)
         {
-            bool chatPassInboundDefault = true;
-            if (null != ServerParamService)
-            {
-                chatPassInboundDefault = ServerParamService.GetBoolean(ID, "ChatPassInEnable", true);
-                chatPassInboundDefault = ServerParamService.GetBoolean(fromRegionID, "ChatPassInEnable", chatPassInboundDefault);
-                chatPassInboundDefault = ServerParamService.GetBoolean(ID, "ChatPassInEnable_" + ev.ID.ToString(), chatPassInboundDefault);
-                chatPassInboundDefault = ServerParamService.GetBoolean(fromRegionID, "ChatPassInEnable_" + ev.ID.ToString(), chatPassInboundDefault);
-            }
-            if(chatPassInboundDefault)
+            RwLockedList<UUID> activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
+            if(activelist.Count == 0 || activelist.Contains(UUID.Zero) || activelist.Contains(ev.ID))
             {
                 SendChatPass(ev);
             }
@@ -51,26 +142,15 @@ namespace SilverSim.Scene.Types.Scene
 
         protected void ChatPassLocalNeighbors(ListenEvent le)
         {
+            RwLockedList<UUID> activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
             bool chatPassDefault = true;
-            if (null != ServerParamService)
-            {
-                chatPassDefault = ServerParamService.GetBoolean(ID, "ChatPassOutEnable", true);
-            }
             foreach (KeyValuePair<UUID, NeighborEntry> kvp in Neighbors)
             {
                 SceneInterface remoteScene;
                 TryGetSceneDelegate m_TryGetScene = TryGetScene;
-                if(null != ServerParamService)
+                if(!(activelist.Count == 0 || activelist.Contains(le.ID) || activelist.Contains(UUID.Zero)))
                 {
-                    bool chatPass;
-                    chatPass = ServerParamService.GetBoolean(kvp.Key, "ChatPassOutEnable", chatPassDefault);
-                    chatPass = ServerParamService.GetBoolean(ID, "ChatPassOutEnable_" + le.ID.ToString(), chatPass);
-                    chatPass = ServerParamService.GetBoolean(kvp.Key, "ChatPassOutEnable_" + le.ID.ToString(), chatPass);
-
-                    if (!chatPass)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 if(null != kvp.Value.RemoteCircuit)

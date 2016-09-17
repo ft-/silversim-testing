@@ -3,6 +3,8 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.Inventory;
@@ -12,8 +14,45 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
+    [ServerParam("estate_manager_is_god")]
+    [ServerParam("region_owner_is_simconsole_user")]
+    [ServerParam("estate_owner_is_simconsole_user")]
+    [ServerParam("region_manager_is_simconsole_user")]
+    [ServerParam("parcel_owner_is_admin")]
+    [ServerParam("god_agents")]
     public abstract partial class SceneInterface
     {
+        void ParameterUpdatedHandler(ref bool localval, ref bool globalval, ref bool settolocalval, UUID regionId, string value)
+        {
+            if (regionId == UUID.Zero)
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    localval = false;
+                }
+                else if (!bool.TryParse(value, out globalval))
+                {
+                    localval = false;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    settolocalval = false;
+                }
+                else if (!bool.TryParse(value, out localval))
+                {
+                    settolocalval = true;
+                    localval = false;
+                }
+                else
+                {
+                    settolocalval = true;
+                }
+            }
+        }
+
         GroupPowers GetGroupPowers(UUI agentOwner, UGI group)
         {
             if(!IsGroupMember(agentOwner, group))
@@ -93,25 +132,43 @@ namespace SilverSim.Scene.Types.Scene
                 agent.EqualsGrid(estateOwner));
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool IsPossibleGod(UUI agent)
+        bool m_EstateManagerIsGodLocal;
+        bool m_EstateManagerIsGodGlobal;
+        bool m_EstateManagerIsGodSetToLocal;
+
+        bool EstateManagerIsGod
         {
-            if (agent.EqualsGrid(Owner))
+            get
             {
-                return true;
+                return m_EstateManagerIsGodSetToLocal ? m_EstateManagerIsGodLocal : m_EstateManagerIsGodGlobal;
             }
+        }
 
-            if (ServerParamService.GetBoolean(ID, "estate_manager_is_god", false) && IsEstateManager(agent))
+        [ServerParam("estate_manager_is_god")]
+        public void EstateManagerIsGodUpdated(UUID regionID, string value)
+        {
+            ParameterUpdatedHandler(
+                ref m_EstateManagerIsGodLocal,
+                ref m_EstateManagerIsGodGlobal,
+                ref m_EstateManagerIsGodSetToLocal,
+                regionID, value);
+        }
+
+        readonly RwLockedList<UUI> m_GodAgentsLocal = new RwLockedList<UUI>();
+        readonly RwLockedList<UUI> m_GodAgentsGlobal = new RwLockedList<UUI>();
+        bool m_GodAgentsSetToLocal;
+
+        void UpdateGodAgentsList(RwLockedList<UUI> list, UUID regionId, string value)
+        {
+            if(string.IsNullOrEmpty(value))
             {
-                return true;
+                list.Clear();
             }
-
-            string god_agents;
-            god_agents = ServerParamService.GetString(ID, "god_agents", string.Empty);
-            string[] god_agents_list = god_agents.Split(new char[] { '|' });
-            if(god_agents_list.Length != 1 || god_agents_list[0].Length != 0)
+            else
             {
-                foreach(string god_agent in god_agents_list)
+                string[] god_agents_list = value.Split(new char[] { ',' });
+                List<UUI> new_gods = new List<UUI>();
+                foreach (string god_agent in god_agents_list)
                 {
                     UUI uui;
                     try
@@ -120,34 +177,145 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch
                     {
-                        m_Log.WarnFormat("Invalid UUI '{0}' found in god_agents variable", god_agent);
+                        m_Log.WarnFormat("Invalid UUI '{1}' found in {0}/god_agents variable", regionId.ToString(), god_agent);
                         continue;
                     }
-                    if(uui.EqualsGrid(agent))
+                    new_gods.Add(uui);
+                }
+
+                foreach(UUI god in new List<UUI>(list))
+                {
+                    if (!new_gods.Contains(god))
                     {
-                        return true;
+                        list.Remove(god);
+                    }
+                }
+
+                foreach(UUI god in new_gods)
+                {
+                    if(!list.Contains(god))
+                    {
+                        list.Add(god);
                     }
                 }
             }
+        }
+        [ServerParam("god_agents")]
+        public void GodAgentsUpdated(UUID regionID, string value)
+        {
+            if(regionID != UUID.Zero)
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    m_GodAgentsSetToLocal = false;
+                    m_GodAgentsLocal.Clear();
+                }
+                UpdateGodAgentsList(m_GodAgentsLocal, regionID, value);
+            }
+            else
+            {
+                UpdateGodAgentsList(m_GodAgentsGlobal, regionID, value);
+            }
+        }
 
-            return false;
+        bool IsInGodAgents(UUI agent)
+        {
+            RwLockedList<UUI> activeList = m_GodAgentsSetToLocal ? m_GodAgentsLocal : m_GodAgentsGlobal;
+            return activeList.Contains(agent);
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        public bool IsPossibleGod(UUI agent)
+        {
+            return agent.EqualsGrid(Owner) ||
+                (EstateManagerIsGod && IsEstateManager(agent)) ||
+                IsInGodAgents(agent);
+        }
+
+        bool m_RegionOwnerIsSimConsoleUserLocal;
+        bool m_RegionOwnerIsSimConsoleUserGlobal;
+        bool m_RegionOwnerIsSimConsoleUserSetToLocal;
+
+        bool RegionOwnerIsSimConsoleUser
+        {
+            get
+            {
+                return m_RegionOwnerIsSimConsoleUserSetToLocal ? m_RegionOwnerIsSimConsoleUserLocal : m_RegionOwnerIsSimConsoleUserGlobal;
+            }
+        }
+
+        [ServerParam("region_owner_is_simconsole_user")]
+        public void RegionOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
+        {
+            ParameterUpdatedHandler(
+                ref m_RegionOwnerIsSimConsoleUserLocal,
+                ref m_RegionOwnerIsSimConsoleUserGlobal,
+                ref m_RegionOwnerIsSimConsoleUserSetToLocal,
+                regionId,
+                value);
+        }
+
+        bool m_EstateOwnerIsSimConsoleUserLocal;
+        bool m_EstateOwnerIsSimConsoleUserGlobal;
+        bool m_EstateOwnerIsSimConsoleUserSetToLocal;
+
+        bool EstateOwnerIsSimConsoleUser
+        {
+            get
+            {
+                return m_EstateOwnerIsSimConsoleUserSetToLocal ? m_EstateOwnerIsSimConsoleUserLocal : m_EstateOwnerIsSimConsoleUserGlobal;
+            }
+        }
+
+        [ServerParam("estate_owner_is_simconsole_user")]
+        public void EstateOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
+        {
+            ParameterUpdatedHandler(
+                ref m_EstateOwnerIsSimConsoleUserLocal,
+                ref m_EstateOwnerIsSimConsoleUserGlobal,
+                ref m_EstateOwnerIsSimConsoleUserSetToLocal,
+                regionId,
+                value);
+        }
+
+        bool m_EstateManagerIsSimConsoleUserLocal;
+        bool m_EstateManagerIsSimConsoleUserGlobal;
+        bool m_EstateManagerIsSimConsoleUserSetToLocal;
+
+        bool EstateManagerIsSimConsoleUser
+        {
+            get
+            {
+                return m_EstateManagerIsSimConsoleUserSetToLocal ? m_EstateManagerIsSimConsoleUserLocal : m_EstateManagerIsSimConsoleUserGlobal;
+            }
+        }
+
+        [ServerParam("estate_manager_is_simconsole_user")]
+        public void EstateManagerIsSimConsoleUserUpdated(UUID regionId, string value)
+        {
+            ParameterUpdatedHandler(
+                ref m_EstateManagerIsSimConsoleUserLocal,
+                ref m_EstateManagerIsSimConsoleUserGlobal,
+                ref m_EstateManagerIsSimConsoleUserSetToLocal,
+                regionId,
+                value);
         }
 
         public bool IsSimConsoleAllowed(UUI agent)
         {
-            if (ServerParamService.GetBoolean(ID, "region_owner_is_simconsole_user", false) && 
+            if (RegionOwnerIsSimConsoleUser && 
                 agent.EqualsGrid(Owner))
             {
                 return true;
             }
 
-            if (ServerParamService.GetBoolean(ID, "estate_owner_is_simconsole_user", false) &&
+            if (EstateOwnerIsSimConsoleUser &&
                 IsEstateOwner(agent))
             {
                 return true;
             }
 
-            if (ServerParamService.GetBoolean(ID, "estate_manager_is_simconsole_user", false) && 
+            if (EstateManagerIsSimConsoleUser && 
                 IsEstateManager(agent))
             {
                 return true;
@@ -507,6 +675,30 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
+
+        bool m_ParcelOwnerIsAdminLocal;
+        bool m_ParcelOwnerIsAdminGlobal;
+        bool m_ParcelOwnerIsAdminSetToLocal;
+
+        bool ParcelOwnerIsAdmin
+        {
+            get
+            {
+                return m_ParcelOwnerIsAdminSetToLocal ? m_ParcelOwnerIsAdminLocal : m_ParcelOwnerIsAdminGlobal;
+            }
+        }
+
+        [ServerParam("parcel_owner_is_admin")]
+        public void ParcelOwnerIsAdminUpdated(UUID regionId, string value)
+        {
+            ParameterUpdatedHandler(
+               ref m_ParcelOwnerIsAdminLocal,
+               ref m_ParcelOwnerIsAdminGlobal,
+               ref m_ParcelOwnerIsAdminSetToLocal,
+               regionId,
+               value);
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanTakeCopy(IAgent agent, ObjectGroup group, Vector3 location)
         {
@@ -546,8 +738,8 @@ namespace SilverSim.Scene.Types.Scene
 
             ParcelInfo pinfo;
             if(Parcels.TryGetValue(location, out pinfo) &&
-                pinfo.Owner.EqualsGrid(agentOwner) && 
-                ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
+                pinfo.Owner.EqualsGrid(agentOwner) &&
+                ParcelOwnerIsAdmin)
             {
                 return true;
             }
@@ -597,8 +789,8 @@ namespace SilverSim.Scene.Types.Scene
 
             ParcelInfo pinfo;
             if(Parcels.TryGetValue(location, out pinfo) &&
-                pinfo.Owner.EqualsGrid(agentOwner) && 
-                ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
+                pinfo.Owner.EqualsGrid(agentOwner) &&
+                ParcelOwnerIsAdmin)
             {
                 return true;
             }

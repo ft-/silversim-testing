@@ -488,7 +488,6 @@ namespace SilverSim.Scene.Implementation.Basic
             AssetServiceInterface persistentAssetService,
             AssetServiceInterface temporaryAssetService,
             GridServiceInterface gridService,
-            ServerParamServiceInterface serverParamService,
             RegionInfo ri,
             List<AvatarNameServiceInterface> avatarNameServices,
             SimulationDataStorageInterface simulationDataStorage,
@@ -511,10 +510,6 @@ namespace SilverSim.Scene.Implementation.Basic
             if (gridService == null)
             {
                 throw new ArgumentNullException("gridService");
-            }
-            if (serverParamService == null)
-            {
-                throw new ArgumentNullException("serverParamService");
             }
             if (ri == null)
             {
@@ -567,7 +562,6 @@ namespace SilverSim.Scene.Implementation.Basic
             ScopeID = ri.ScopeID;
             ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
-            ServerParamService = serverParamService;
             m_ExternalHostNameService = externalHostNameService;
             #endregion
 
