@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Core
             {
                 activeUploads += agent.m_TerrainTransactions.Count + agent.m_AssetTransactions.Count;
             }
-            foreach(UploadAssetAbstractCapability cap in m_UploadCapabilities)
+            foreach (UploadAssetAbstractCapability cap in m_UploadCapabilities)
             {
                 activeUploads += cap.ActiveUploads;
             }
@@ -113,12 +113,13 @@ namespace SilverSim.Viewer.Core
             {
                 m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = scene.Primitives.Count;
                 m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;
-            }
-            IPhysicsScene physics = Scene.PhysicsScene;
-            if(physics != null)
-            {
-                m_SimStatsData[(int)SimStatIndex.PhysicsFPS].StatValue = physics.PhysicsFPS;
-                m_SimStatsData[(int)SimStatIndex.PhysicsTimeMs].StatValue = physics.PhysicsExecutionTime * 1000f;
+
+                IPhysicsScene physics = scene.PhysicsScene;
+                if (physics != null)
+                {
+                    m_SimStatsData[(int)SimStatIndex.PhysicsFPS].StatValue = physics.PhysicsFPS;
+                    m_SimStatsData[(int)SimStatIndex.PhysicsTimeMs].StatValue = physics.PhysicsExecutionTime * 1000f;
+                }
             }
 
             SimStats stats = new SimStats();
