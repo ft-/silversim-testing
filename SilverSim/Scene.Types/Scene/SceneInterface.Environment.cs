@@ -14,6 +14,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public void UpdateEnvironmentSettings()
         {
+            Terrain.LowerLimit = (float)RegionSettings.TerrainLowerLimit;
+            Terrain.RaiseLimit = (float)RegionSettings.TerrainRaiseLimit;
             if(RegionSettings.UseEstateSun)
             {
                 uint estateID;

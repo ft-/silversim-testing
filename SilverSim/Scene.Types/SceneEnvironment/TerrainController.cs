@@ -28,6 +28,65 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public readonly RwLockedList<ITerrainListener> TerrainListeners = new RwLockedList<ITerrainListener>();
 
+        float m_LowerLimit;
+        float m_RaiseLimit;
+
+        public float LowerLimit
+        {
+            get
+            {
+                m_TerrainRwLock.AcquireReaderLock(-1);
+                try
+                {
+                    return m_LowerLimit;
+                }
+                finally
+                {
+                    m_TerrainRwLock.ReleaseReaderLock();
+                }
+            }
+            set
+            {
+                m_TerrainRwLock.AcquireWriterLock(-1);
+                try
+                {
+                    m_LowerLimit = value;
+                }
+                finally
+                {
+                    m_TerrainRwLock.ReleaseWriterLock();
+                }
+            }
+        }
+
+        public float RaiseLimit
+        {
+            get
+            {
+                m_TerrainRwLock.AcquireReaderLock(-1);
+                try
+                {
+                    return m_RaiseLimit;
+                }
+                finally
+                {
+                    m_TerrainRwLock.ReleaseReaderLock();
+                }
+            }
+            set
+            {
+                m_TerrainRwLock.AcquireWriterLock(-1);
+                try
+                {
+                    m_RaiseLimit = value;
+                }
+                finally
+                {
+                    m_TerrainRwLock.ReleaseWriterLock();
+                }
+            }
+        }
+
         public TerrainController(SceneInterface scene)
         {
             uint x;
@@ -35,6 +94,9 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
             uint xPatches = scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
             uint yPatches = scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+
+            LowerLimit = (float)scene.RegionSettings.TerrainLowerLimit;
+            RaiseLimit = (float)scene.RegionSettings.TerrainRaiseLimit;
 
             m_Scene = scene;
             m_TerrainPatches = new LayerPatch[yPatches, xPatches];
@@ -270,7 +332,16 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             try
             {
                 LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-                lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] += (float)change;
+                float val = lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] + (float)change;
+                if (val < LowerLimit)
+                {
+                    val = LowerLimit;
+                }
+                else if (val > RaiseLimit)
+                {
+                    val = RaiseLimit;
+                }
+                lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = val;
                 return lp;
             }
 #if DEBUG
@@ -297,9 +368,18 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             try
             {
                 LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-                lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] =
+                float val =
                     (float)(lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] * (1 - mix)) +
                     (float)(newval * mix);
+                if(val < LowerLimit)
+                {
+                    val = LowerLimit;
+                }
+                else if(val > RaiseLimit)
+                {
+                    val = RaiseLimit;
+                }
+                lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = val;
                 return lp;
             }
 #if DEBUG
@@ -332,7 +412,18 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
                 uint x = (uint)pos.X;
                 uint y = (uint)pos.Y;
-                this[x, y] = (float)value;
+                if (value < LowerLimit)
+                {
+                    this[x, y] = LowerLimit;
+                }
+                else if (value > RaiseLimit)
+                {
+                    this[x, y] = RaiseLimit;
+                }
+                else
+                {
+                    this[x, y] = (float)value;
+                }
             }
         }
         #endregion
