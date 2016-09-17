@@ -283,6 +283,9 @@ namespace SilverSim.Scene.Types.Object
                             catch
                             {
                                 parentID = 0;
+#if DEBUG
+                                m_Log.DebugFormat("Failed to find agent for attachment");
+#endif
                             }
                             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
                             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);

@@ -1041,13 +1041,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 
                 try
                 {
+                    objgroup.Scene = this;
                     foreach (ObjectPart objpart in objgroup.Values)
                     {
                         AddNewLocalID(objpart);
                         m_Primitives.Add(objpart.ID, objpart.LocalID, objpart);
                         removeAgain.Add(objpart);
                     }
-                    objgroup.Scene = this;
                     m_Objects.Add(objgroup.ID, objgroup);
 
                     foreach(ObjectPart objpart in objgroup.Values)
@@ -1066,6 +1066,7 @@ namespace SilverSim.Scene.Implementation.Basic
                         m_Primitives.Remove(objpart.ID);
                         RemoveLocalID(objpart);
                     }
+                    objgroup.Scene = null;
                 }
             }
             else
