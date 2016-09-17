@@ -99,13 +99,13 @@ namespace SilverSim.Viewer.Core
             List<DetachEntry> detachList = new List<DetachEntry>();
             if(m.Number == MessageType.ObjectDetach)
             {
-                SilverSim.Viewer.Messages.Object.ObjectDetach req = (SilverSim.Viewer.Messages.Object.ObjectDetach)m;
+                Messages.Object.ObjectDetach req = (Messages.Object.ObjectDetach)m;
                 if (req.SessionID != SessionID || req.AgentID != ID)
                 {
                     return;
                 }
 
-                foreach(UInt32 localid in req.ObjectList)
+                foreach (UInt32 localid in req.ObjectList)
                 {
                     KeyValuePair<UUID, KeyValuePair<UUID,UUID>> kvp;
                     if(m_AttachmentsList.TryGetValue(localid, out kvp))
@@ -116,11 +116,18 @@ namespace SilverSim.Viewer.Core
             }
             else if(m.Number == MessageType.DetachAttachmentIntoInv)
             {
+#if DEBUG
+                m_Log.DebugFormat("Detach attachment to inv received for {0}", Owner.FullName);
+#endif
                 Messages.Object.DetachAttachmentIntoInv req = (Messages.Object.DetachAttachmentIntoInv)m;
                 if (req.AgentID != ID)
                 {
                     return;
                 }
+
+#if DEBUG
+                m_Log.DebugFormat("Detach attachment {1} into inventory of {0}", Owner.FullName, req.ItemID);
+#endif
 
                 KeyValuePair<UInt32, KeyValuePair<UUID,UUID>> kvp;
                 if(m_AttachmentsList.TryGetValue(req.ItemID, out kvp))
