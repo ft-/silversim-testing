@@ -2070,7 +2070,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "PathRadiusOffset":
-                                shape.PathRadiusOffset = (sbyte)reader.ReadElementValueAsUInt();
+                                shape.PathRadiusOffset = (sbyte)reader.ReadElementValueAsInt();
                                 break;
 
                             case "PathRevolutions":
