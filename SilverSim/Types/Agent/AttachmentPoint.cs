@@ -67,7 +67,7 @@ namespace SilverSim.Types.Agent
         FaceTongue = 52,
         Groin = 53,
         HindLeftFoot = 54,
-        HindRightFot = 55,
+        HindRightFoot = 55,
 
         PositionMask = 0x7F,
         AppendFlag = 0x80
