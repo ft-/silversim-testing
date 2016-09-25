@@ -112,6 +112,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.AutoGrantRights["regions.control"].Add("regions.view");
             webif.AutoGrantRights["regions.logincontrol"].Add("regions.view");
             webif.AutoGrantRights["region.notice"].Add("regions.view");
+            webif.AutoGrantRights["regions.manage"].Add("scriptengines.view");
+            webif.AutoGrantRights["regions.view"].Add("scriptengines.view");
         }
 
         #region Script Engines
