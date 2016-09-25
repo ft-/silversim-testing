@@ -50,6 +50,14 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
+            public IList<string> Names
+            {
+                get
+                {
+                    return new List<string>(m_ScriptCompilers.Keys);
+                }
+            }
+
             private IScriptCompiler DetermineShBangs(
                 Dictionary<int, string> shbangs)
             {

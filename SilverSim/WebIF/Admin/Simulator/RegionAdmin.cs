@@ -11,6 +11,8 @@ using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.SceneEnvironment;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
@@ -96,6 +98,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.environment.set", HandleEnvironmentSet);
             webif.JsonMethods.Add("region.environment.get", HandleEnvironmentGet);
             webif.JsonMethods.Add("region.environment.resettodefaults", HandleEnvironmentResetToDefaults);
+            webif.JsonMethods.Add("scriptengines.list", HandleScriptEnginesList);
 
             webif.AutoGrantRights["regions.manage"].Add("regions.view");
             webif.AutoGrantRights["regions.environmentcontrol"].Add("regions.view");
@@ -110,6 +113,39 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.AutoGrantRights["regions.logincontrol"].Add("regions.view");
             webif.AutoGrantRights["region.notice"].Add("regions.view");
         }
+
+        #region Script Engines
+        [AdminWebIF.RequiredRight("scriptengines.view")]
+        void HandleScriptEnginesList(HttpRequest req, Map jsondata)
+        {
+            Map res = new Map();
+            AnArray compilerRes = new AnArray();
+            foreach(string name in CompilerRegistry.ScriptCompilers.Names)
+            {
+                IScriptCompiler compiler = CompilerRegistry.ScriptCompilers[name];
+                Map m = new Map();
+                ScriptEngineNameAttribute attr;
+                Type compilerType = compiler.GetType();
+                attr = Attribute.GetCustomAttribute(compilerType, typeof(ScriptEngineNameAttribute)) as ScriptEngineNameAttribute;
+                if(null != attr)
+                {
+                    if(attr.Name != name)
+                    {
+                        continue;
+                    }
+                }
+                DescriptionAttribute descAttr;
+                string desc;
+                descAttr = Attribute.GetCustomAttribute(compilerType, typeof(DescriptionAttribute)) as DescriptionAttribute;
+                desc = descAttr != null ? descAttr.Description : string.Empty;
+                m.Add("name", name);
+                m.Add("description", desc);
+                compilerRes.Add(m);
+            }
+            res.Add("scriptengines", compilerRes);
+            AdminWebIF.SuccessResponse(req, res);
+        }
+        #endregion
 
         #region Region View
         [AdminWebIF.RequiredRight("regions.manage")]
