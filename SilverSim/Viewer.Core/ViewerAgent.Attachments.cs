@@ -99,6 +99,9 @@ namespace SilverSim.Viewer.Core
             List<DetachEntry> detachList = new List<DetachEntry>();
             if(m.Number == MessageType.ObjectDetach)
             {
+#if DEBUG
+                m_Log.DebugFormat("ObjectDetach: Detach attachment to inv received for {0}", Owner.FullName);
+#endif
                 Messages.Object.ObjectDetach req = (Messages.Object.ObjectDetach)m;
                 if (req.SessionID != SessionID || req.AgentID != ID)
                 {
@@ -117,7 +120,7 @@ namespace SilverSim.Viewer.Core
             else if(m.Number == MessageType.DetachAttachmentIntoInv)
             {
 #if DEBUG
-                m_Log.DebugFormat("Detach attachment to inv received for {0}", Owner.FullName);
+                m_Log.DebugFormat("DetachAttachmentIntoInv: Detach attachment to inv received for {0}", Owner.FullName);
 #endif
                 Messages.Object.DetachAttachmentIntoInv req = (Messages.Object.DetachAttachmentIntoInv)m;
                 if (req.AgentID != ID)
