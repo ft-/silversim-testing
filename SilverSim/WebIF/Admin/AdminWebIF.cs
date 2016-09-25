@@ -261,6 +261,14 @@ namespace SilverSim.WebIF.Admin
                 m_HttpsServer.StartsWithUriHandlers.Add("/admin", HandleHttp);
             }
             loader.CommandRegistry.Commands.Add("admin-webif", AdminWebIFCmd);
+
+            if (m_HttpsServer != null)
+            {
+                if(m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", false))
+                {
+                    loader.KnownConfigurationIssues.Add("Set WebIF.Admin.EnableHTTP=false in section [WebIF]");
+                }
+            }
         }
 
         public void PostLoad()
@@ -361,7 +369,10 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
-                req.ErrorResponse(HttpStatusCode.Forbidden, "Not Allowed");
+                using (HttpResponse res = req.BeginResponse(HttpStatusCode.MovedPermanently, "Moved Permanently"))
+                {
+                    res.Headers.Add("Location", m_HttpsServer.ServerURI + "admin");
+                }
             }
         }
 
