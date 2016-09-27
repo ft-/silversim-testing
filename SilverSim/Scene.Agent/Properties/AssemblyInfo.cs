@@ -4,7 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-[assembly: AssemblyTitle("Viewer Core Protocol Implementation")]
+[assembly: AssemblyTitle("Common Agent Implementation")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: SuppressMessage("Gendarme.Rules.Correctness", "CheckParametersNullityInVisibleMethodsRule")]
