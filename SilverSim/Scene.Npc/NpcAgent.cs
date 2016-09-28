@@ -36,7 +36,7 @@ using System.Linq;
 
 namespace SilverSim.Scene.Npc
 {
-    public partial class NpcAgent : Scene.Agent.Agent
+    public partial class NpcAgent : Agent.Agent
     {
         public override event Action<IObject> OnPositionChange;
 
@@ -51,11 +51,12 @@ namespace SilverSim.Scene.Npc
             LastName = lastName;
         }
 
+        readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
         public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds
         {
             get
             {
-                throw new NotImplementedException();
+                return m_ActiveChilds;
             }
         }
 
@@ -68,7 +69,7 @@ namespace SilverSim.Scene.Npc
 
             set
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
         }
 
@@ -264,21 +265,34 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        public override IPhysicsObject PhysicsActor
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        #region Physics Linkage
+        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
         public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
         {
             get
             {
-                throw new NotImplementedException();
+                return m_PhysicsActors;
             }
         }
+
+        public override IPhysicsObject PhysicsActor
+        {
+            get
+            {
+                lock (m_DataLock)
+                {
+                    IPhysicsObject obj;
+                    if (!PhysicsActors.TryGetValue(SceneID, out obj))
+                    {
+                        obj = DummyAgentPhysicsObject.SharedInstance;
+                    }
+                    return obj;
+                }
+            }
+        }
+
+        #endregion
 
         public override PresenceServiceInterface PresenceService
         {
@@ -296,24 +310,15 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        public override UUID SceneID
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public override SessionInfo Session
         {
             get
             {
-                throw new NotImplementedException();
+                SessionInfo sInfo = new SessionInfo();
+                sInfo.SessionID = UUID.Zero;
+                sInfo.SecureSessionID = UUID.Zero;
+                sInfo.ServiceSessionID = string.Empty;
+                return sInfo;
             }
         }
 

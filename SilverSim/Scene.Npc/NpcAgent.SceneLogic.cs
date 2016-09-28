@@ -2,7 +2,9 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using SilverSim.Viewer.Messages.Avatar;
+using System;
 
 namespace SilverSim.Scene.Npc
 {
@@ -40,5 +42,20 @@ namespace SilverSim.Scene.Npc
                 m_CurrentScene = value;
             }
         }
+
+        public override UUID SceneID
+        {
+            get
+            {
+                return CurrentScene.ID;
+            }
+
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+
     }
 }
