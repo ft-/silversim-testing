@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
 using SilverSim.Scene.Types.Object;
@@ -83,12 +84,12 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return Vector3.UnitX;
             }
 
             set
             {
-                throw new NotImplementedException();
+                /* ignore */
             }
         }
 
@@ -96,12 +97,12 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return Vector3.UnitX;
             }
 
             set
             {
-                throw new NotImplementedException();
+                /* ignore */
             }
         }
 
@@ -109,12 +110,12 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return Vector3.Zero;
             }
 
             set
             {
-                throw new NotImplementedException();
+                /* ignore */
             }
         }
 
@@ -122,7 +123,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return Quaternion.Identity;
             }
 
             set
@@ -135,7 +136,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return Vector3.UnitX;
             }
 
             set
@@ -148,7 +149,13 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                ClientInfo cInfo = new ClientInfo();
+                cInfo.Channel = VersionInfo.ProductName;
+                cInfo.ClientIP = string.Empty;
+                cInfo.ClientVersion = VersionInfo.Version;
+                cInfo.ID0 = string.Empty;
+                cInfo.Mac = string.Empty;
+                return cInfo;
             }
         }
 
@@ -206,7 +213,8 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                /* NPCs are never gods */
+                return false;
             }
         }
 
@@ -214,7 +222,8 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                /* NPCs do not have this kind of distinguishing view mode */
+                return false;
             }
         }
 
@@ -230,7 +239,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return new RwLockedDictionary<UUID, FriendStatus>();
             }
         }
 
