@@ -8,7 +8,6 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
@@ -23,11 +22,8 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
-using SilverSim.Types.Agent;
-using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
-using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages.Agent;
 using System;
@@ -40,15 +36,44 @@ namespace SilverSim.Scene.Npc
     {
         public override event Action<IObject> OnPositionChange;
 
+        InventoryServiceInterface m_InventoryService = null;
+        ProfileServiceInterface m_ProfileService = null;
+        GridUserServiceInterface m_GridUserService = null;
+
         public NpcAgent(
             UUID agentId,
             string firstName,
             string lastName,
-            Uri homeURI)
+            Uri homeURI,
+            AgentServiceList serviceList)
             : base(agentId, homeURI)
         {
             FirstName = firstName;
             LastName = lastName;
+            m_InventoryService = serviceList.Get<InventoryServiceInterface>();
+            m_ProfileService = serviceList.Get<ProfileServiceInterface>();
+            m_GridUserService = serviceList.Get<GridUserServiceInterface>();
+        }
+
+        UUI m_NpcOwner = UUI.Unknown;
+
+        /* as the Npc must own itself, we actually have to provide a separate means to declare a NPC owner */
+        public UUI NpcOwner
+        {
+            get
+            {
+                lock(this)
+                {
+                    return new UUI(m_NpcOwner);
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_NpcOwner = new UUI(value);
+                }
+            }
         }
 
         readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
@@ -77,7 +102,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return CurrentScene.AssetService;
             }
         }
 
@@ -174,7 +199,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
         }
 
@@ -182,7 +207,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
         }
 
@@ -190,7 +215,11 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                if(m_GridUserService == null)
+                {
+                    throw new NotSupportedException();
+                }
+                return m_GridUserService;
             }
         }
 
@@ -198,7 +227,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                return CurrentScene.GroupsService;
             }
         }
 
@@ -206,7 +235,11 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                if(m_InventoryService == null)
+                {
+                    throw new NotSupportedException();
+                }
+                return m_InventoryService;
             }
         }
 
@@ -306,7 +339,11 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                if(m_ProfileService == null)
+                {
+                    throw new NotSupportedException();
+                }
+                return m_ProfileService;
             }
         }
 
@@ -343,7 +380,12 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                UserAccount acc = new UserAccount();
+                acc.Principal = Owner;
+                acc.IsLocalToGrid = true;
+                acc.ScopeID = UUID.Zero;
+                acc.UserLevel = 0;
+                return acc;
             }
         }
 
