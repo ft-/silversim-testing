@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Npc
             m_AgentServices.Add(m_InventoryService);
 
             /* presence is optional */
-            if (m_PresenceServiceName != null)
+            if (!string.IsNullOrWhiteSpace(m_PresenceServiceName))
             {
                 m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
                 m_AgentServices.Add(m_PresenceService);
