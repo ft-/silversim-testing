@@ -9,8 +9,7 @@ namespace SilverSim.Scene.Npc
     public enum NpcOptions
     {
         None = 0,
-        NotOwned = 1,
-        SenseAsAgent = 2,
-        UseObjectGroup = 4
+        SenseAsAgent = 1,
+        Persistent = 2
     }
 }

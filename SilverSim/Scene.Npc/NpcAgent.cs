@@ -39,6 +39,7 @@ namespace SilverSim.Scene.Npc
         InventoryServiceInterface m_InventoryService = null;
         ProfileServiceInterface m_ProfileService = null;
         GridUserServiceInterface m_GridUserService = null;
+        PresenceServiceInterface m_PresenceService = null;
 
         public NpcAgent(
             UUID agentId,
@@ -53,6 +54,7 @@ namespace SilverSim.Scene.Npc
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
+            m_PresenceService = serviceList.Get<PresenceServiceInterface>();
         }
 
         UUI m_NpcOwner = UUI.Unknown;
@@ -331,7 +333,11 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                throw new NotImplementedException();
+                if(null == m_PresenceService)
+                {
+                    throw new NotSupportedException();
+                }
+                return m_PresenceService;
             }
         }
 
