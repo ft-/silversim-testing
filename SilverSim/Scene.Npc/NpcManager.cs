@@ -11,6 +11,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SilverSim.Scene.Npc
 {
@@ -32,15 +33,21 @@ namespace SilverSim.Scene.Npc
 
         public void Startup(ConfigurationLoader loader)
         {
-            if (m_InventoryServiceName != null && m_PresenceServiceName != null)
+            /* inventory is needed for baking logic */
+            m_InventoryService = loader.GetService<InventoryServiceInterface>(m_InventoryServiceName);
+            m_AgentServices.Add(m_InventoryService);
+
+            /* presence is optional */
+            if (m_PresenceServiceName != null)
             {
-                m_InventoryService = loader.GetService<InventoryServiceInterface>(m_InventoryServiceName);
                 m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
-                m_AgentServices.Add(m_InventoryService);
                 m_AgentServices.Add(m_PresenceService);
             }
             loader.Scenes.OnRegionAdd += OnSceneAdded;
             loader.Scenes.OnRegionRemove += OnSceneRemoved;
+
+            loader.CommandRegistry.ShowCommands.Add("npcs", ShowNpcsCommand);
+            loader.CommandRegistry.RemoveCommands.Add("npc", RemoveNpcCommand);
         }
 
         readonly RwLockedDictionary<UUID, SceneInterface> m_KnownScenes = new RwLockedDictionary<UUID, SceneInterface>();
@@ -53,15 +60,15 @@ namespace SilverSim.Scene.Npc
         {
             m_KnownScenes.Remove(scene.ID);
             List<UUID> removeList = new List<UUID>();
-            foreach(NpcAgent agent in m_NpcAgents.Values)
+            foreach (NpcAgent agent in m_NpcAgents.Values)
             {
-                if(agent.CurrentScene == scene)
+                if (agent.CurrentScene == scene)
                 {
                     removeList.Add(agent.ID);
                 }
             }
 
-            foreach(UUID id in removeList)
+            foreach (UUID id in removeList)
             {
                 m_NpcAgents.Remove(id);
             }
@@ -94,7 +101,7 @@ namespace SilverSim.Scene.Npc
         public bool RemoveNpc(UUID npcId)
         {
             NpcAgent npc;
-            if(m_NpcAgents.Remove(npcId, out npc))
+            if (m_NpcAgents.Remove(npcId, out npc))
             {
                 npc.CurrentScene.Remove(npc);
                 return true;
@@ -108,6 +115,80 @@ namespace SilverSim.Scene.Npc
         public bool TryGetNpc(UUID npcId, out NpcAgent agent)
         {
             return m_NpcAgents.TryGetValue(npcId, out agent);
+        }
+
+        void ShowNpcsCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("show npcs - Shows all NPCs in region");
+                return;
+            }
+            UUID selectedScene = io.SelectedScene;
+            if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+
+            SceneInterface scene;
+            if (!m_KnownScenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("NPCs:\n----------------------------------------------\n");
+                foreach (NpcAgent agent in m_NpcAgents.Values)
+                {
+                    if (agent.CurrentScene != scene)
+                    {
+                        continue;
+                    }
+                    sb.AppendFormat("Npc {0} {1} ({2})\n- Owner: {3}", agent.Owner.FirstName, agent.Owner.LastName, agent.Owner.ID.ToString(), agent.NpcOwner.FullName);
+                }
+                io.Write(sb.ToString());
+            }
+        }
+
+        void RemoveNpcCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID npcId;
+            if (args[0] == "help" || args.Count < 3 || !UUID.TryParse(args[2], out npcId))
+            {
+                io.Write("remove npc <uuid> - Remove NPC");
+                return;
+            }
+
+            UUID selectedScene = io.SelectedScene;
+            if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+
+            SceneInterface scene;
+            if (!m_KnownScenes.TryGetValue(selectedScene, out scene))
+            {
+                scene = null;
+            }
+
+            NpcAgent npc;
+            if (!m_NpcAgents.TryGetValue(npcId, out npc))
+            {
+                io.Write("Npc does not exist");
+            }
+            else if (scene != null && npc.CurrentScene != scene)
+            {
+                io.Write("Npc is not on the region");
+            }
+            else if (!m_NpcAgents.Remove(npcId, out npc))
+            {
+                io.Write("Npc does not exist");
+            }
+            else
+            {
+                npc.CurrentScene.Remove(npc);
+                io.Write("Npc removed");
+            }
         }
     }
 

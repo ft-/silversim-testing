@@ -26,6 +26,7 @@ namespace SilverSim.Main.Common.CmdIO
         public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> GetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ChangeCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ClearCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> RemoveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EmptyCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> StartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> RestartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
@@ -43,6 +44,7 @@ namespace SilverSim.Main.Common.CmdIO
             Commands.Add("get", new CommandType("get", GetCommands).Command_Handler);
             Commands.Add("set", new CommandType("set", SetCommands).Command_Handler);
             Commands.Add("reset", new CommandType("reset", ResetCommands).Command_Handler);
+            Commands.Add("remove", new CommandType("remove", RemoveCommands).Command_Handler);
             Commands.Add("show", new CommandType("show", ShowCommands).Command_Handler);
             Commands.Add("create", new CommandType("create", CreateCommands).Command_Handler);
             Commands.Add("delete", new CommandType("delete", DeleteCommands).Command_Handler);
