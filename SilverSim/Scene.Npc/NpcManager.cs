@@ -11,10 +11,12 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace SilverSim.Scene.Npc
 {
+    [Description("NPC Manager")]
     public class NpcManager : IPlugin
     {
         string m_InventoryServiceName;
