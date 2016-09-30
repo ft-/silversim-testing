@@ -74,5 +74,7 @@ namespace SilverSim.ServiceInterfaces.Profile
         public abstract INotesInterface Notes { get; }
         public abstract IUserPreferencesInterface Preferences { get; }
         public abstract IPropertiesInterface Properties { get; }
+
+        public abstract void Remove(UUID scopeID, UUID accountID);
     }
 }

@@ -72,6 +72,29 @@ namespace SilverSim.Database.MySQL.Presence
         };
 
         #region PresenceServiceInterface
+        public override List<PresenceInfo> GetPresencesInRegion(UUID regionId)
+        {
+            List<PresenceInfo> presences = new List<PresenceInfo>();
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM presence WHERE RegionID LIKE ?regionID", conn))
+                {
+                    cmd.Parameters.AddParameter("?regionID", regionId);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        PresenceInfo pi = new PresenceInfo();
+                        pi.UserID.ID = reader.GetUUID("UserID");
+                        pi.RegionID = reader.GetUUID("RegionID");
+                        pi.SessionID = reader.GetUUID("SessionID");
+                        pi.SecureSessionID = reader.GetUUID("SecureSessionID");
+                        presences.Add(pi);
+                    }
+                }
+            }
+            return presences;
+        }
+
         public override List<PresenceInfo> this[UUID userID]
         {
             get
@@ -194,7 +217,7 @@ namespace SilverSim.Database.MySQL.Presence
         }
         #endregion
 
-        public void Remove(UUID scopeID, UUID userAccount)
+        public override void Remove(UUID scopeID, UUID userAccount)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

@@ -33,7 +33,7 @@ namespace SilverSim.Database.MySQL.Profile
             /* intentionally left empty */
         }
 
-        public void Remove(UUID scopeID, UUID userAccount)
+        public override void Remove(UUID scopeID, UUID userAccount)
         {
             using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {

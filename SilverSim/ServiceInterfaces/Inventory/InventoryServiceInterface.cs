@@ -12,6 +12,8 @@ namespace SilverSim.ServiceInterfaces.Inventory
 {
     public abstract class InventoryServiceInterface
     {
+        public abstract void Remove(UUID scopeID, UUID accountID);
+
         #region Accessors
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract IInventoryFolderServiceInterface Folder

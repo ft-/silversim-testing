@@ -43,7 +43,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         SimulationDataStorageInterface m_SimulationData;
         BaseHttpServer m_HttpServer;
         ExternalHostNameServiceInterface m_ExternalHostNameService;
-        AdminWebIF m_WebIF;
+        IAdminWebIF m_WebIF;
         SceneList m_Scenes;
 
         public RegionAdmin(string regionStorageName, string simulationDataName, string estateServiceName)
@@ -65,7 +65,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_ServerParams = loader.GetServerParamStorage();
 
-            AdminWebIF webif = loader.GetAdminWebIF();
+            IAdminWebIF webif = loader.GetAdminWebIF();
             m_WebIF = webif;
             webif.JsonMethods.Add("region.create", HandleCreate);
             webif.JsonMethods.Add("region.change", HandleChange);
@@ -117,7 +117,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         #region Script Engines
-        [AdminWebIF.RequiredRight("scriptengines.view")]
+        [AdminWebIfRequiredRight("scriptengines.view")]
         void HandleScriptEnginesList(HttpRequest req, Map jsondata)
         {
             Map res = new Map();
@@ -145,12 +145,12 @@ namespace SilverSim.WebIF.Admin.Simulator
                 compilerRes.Add(m);
             }
             res.Add("scriptengines", compilerRes);
-            AdminWebIF.SuccessResponse(req, res);
+            m_WebIF.SuccessResponse(req, res);
         }
         #endregion
 
         #region Region View
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleGetEstates(HttpRequest req, Map jsondata)
         {
             List<EstateInfo> estates = m_EstateService.All;
@@ -165,15 +165,15 @@ namespace SilverSim.WebIF.Admin.Simulator
                 estateRes.Add(m);
             }
             res.Add("estates", estateRes);
-            AdminWebIF.SuccessResponse(req, res);
+            m_WebIF.SuccessResponse(req, res);
         }
 
-        [AdminWebIF.RequiredRight("regions.view")]
+        [AdminWebIfRequiredRight("regions.view")]
         void HandleGet(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
             RegionInfo rInfo;
@@ -210,11 +210,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                 permissions.Add("estate_manager", m);
                 res.Add("simconsole", permissions);
 
-                AdminWebIF.SuccessResponse(req, res);
+                m_WebIF.SuccessResponse(req, res);
             }
             else
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
         }
 
@@ -226,7 +226,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m.Add("IsLoginsEnabled", isOnline && scene.LoginControl.IsLoginEnabled);
         }
 
-        [AdminWebIF.RequiredRight("regions.view")]
+        [AdminWebIfRequiredRight("regions.view")]
         void HandleList(HttpRequest req, Map jsondata)
         {
             List<RegionInfo> regions = m_RegionStorage.GetAllRegions(UUID.Zero);
@@ -241,18 +241,18 @@ namespace SilverSim.WebIF.Admin.Simulator
                 regionsRes.Add(m);
             }
             res.Add("regions", regionsRes);
-            AdminWebIF.SuccessResponse(req, res);
+            m_WebIF.SuccessResponse(req, res);
         }
         #endregion
 
         #region Region Online Changes
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleChangeAccess(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("id") ||
                 !jsondata.ContainsKey("access"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
@@ -273,13 +273,13 @@ namespace SilverSim.WebIF.Admin.Simulator
                     break;
 
                 default:
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
             }
 
             if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
@@ -290,7 +290,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
 
@@ -301,16 +301,16 @@ namespace SilverSim.WebIF.Admin.Simulator
                 scene.TriggerRegionDataChanged();
             }
 
-            AdminWebIF.SuccessResponse(req, new Map());
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleChangeOwner(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("id") ||
                 !jsondata.ContainsKey("owner"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
@@ -318,13 +318,13 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
             if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                 return;
             }
 
@@ -334,7 +334,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
 
@@ -344,16 +344,16 @@ namespace SilverSim.WebIF.Admin.Simulator
                 scene.Owner = rInfo.Owner;
             }
 
-            AdminWebIF.SuccessResponse(req, new Map());
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleChangeLocation(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("id") ||
                 !jsondata.ContainsKey("location"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
@@ -361,7 +361,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
@@ -371,13 +371,13 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                 return;
             }
 
             if(m_Scenes.ContainsKey(rInfo.ID))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.IsRunning);
                 return;
             }
 
@@ -387,7 +387,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
 
@@ -397,16 +397,16 @@ namespace SilverSim.WebIF.Admin.Simulator
                 scene.Owner = rInfo.Owner;
             }
 
-            AdminWebIF.SuccessResponse(req, new Map());
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleChangeEstate(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("id") ||
                 !jsondata.ContainsKey("estateid"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
@@ -415,7 +415,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             if(!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo) ||
                 !m_EstateService.TryGetValue(jsondata["estateid"].AsUInt, out eInfo))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
@@ -425,7 +425,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
             SceneInterface scene;
@@ -433,7 +433,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 scene.TriggerEstateUpdate();
             }
-            AdminWebIF.SuccessResponse(req, new Map());
+            m_WebIF.SuccessResponse(req, new Map());
         }
         #endregion
 
@@ -444,11 +444,11 @@ namespace SilverSim.WebIF.Admin.Simulator
             scene = null;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotRunning);
             }
             else if (scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
             {
@@ -456,12 +456,12 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             return false;
         }
 
-        [AdminWebIF.RequiredRight("regions.agents.teleporthome")]
+        [AdminWebIfRequiredRight("regions.agents.teleporthome")]
         void HandleAgentTeleportHome(HttpRequest req, Map jsondata)
         {
             IAgent agent;
@@ -477,11 +477,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     agent.KickUser(msg);
                 }
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.agents.kick")]
+        [AdminWebIfRequiredRight("regions.agents.kick")]
         void HandleAgentKick(HttpRequest req, Map jsondata)
         {
             IAgent agent;
@@ -494,46 +494,46 @@ namespace SilverSim.WebIF.Admin.Simulator
                     msg = jsondata["message"].ToString();
                 }
                 agent.KickUser(msg);
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.agents.view")]
+        [AdminWebIfRequiredRight("regions.agents.view")]
         void HandleAgentGet(HttpRequest req, Map jsondata)
         {
             SceneInterface si;
             IAgent agent;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotRunning);
             }
             else if (!si.Agents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 Map res = new Map();
                 res.Add("agent", agent.ToJsonMap(si));
-                AdminWebIF.SuccessResponse(req, res);
+                m_WebIF.SuccessResponse(req, res);
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.agents.view")]
+        [AdminWebIfRequiredRight("regions.agents.view")]
         void HandleAgentsView(HttpRequest req, Map jsondata)
         {
             SceneInterface si;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotRunning);
             }
             else
             {
@@ -554,27 +554,27 @@ namespace SilverSim.WebIF.Admin.Simulator
                     agents.Add(agent.ToJsonMap(si));
                 }
                 res.Add("agents", agents);
-                AdminWebIF.SuccessResponse(req, res);
+                m_WebIF.SuccessResponse(req, res);
             }
         }
         #endregion
 
         #region Manage regions
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleCreate(HttpRequest req, Map jsondata)
         {
             RegionInfo rInfo;
             if (!jsondata.ContainsKey("name") || !jsondata.ContainsKey("port") || !jsondata.ContainsKey("location"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (m_EstateService.All.Count == 0)
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NoEstates);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NoEstates);
             }
             else if (m_RegionStorage.TryGetValue(UUID.Zero, jsondata["name"].ToString(), out rInfo))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.AlreadyExists);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.AlreadyExists);
             }
             else
             {
@@ -591,12 +591,12 @@ namespace SilverSim.WebIF.Admin.Simulator
 
                 if (!uint.TryParse(jsondata["port"].ToString(), out rInfo.ServerPort))
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
                 if (rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
 
@@ -606,7 +606,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 catch
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
 
@@ -617,19 +617,19 @@ namespace SilverSim.WebIF.Admin.Simulator
                 if(jsondata.ContainsKey("regionid") &&
                     !UUID.TryParse(jsondata["regionid"].ToString(), out rInfo.ID))
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
                 if (jsondata.ContainsKey("scopeid") &&
                     !UUID.TryParse(jsondata["scopeid"].ToString(), out rInfo.ScopeID))
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
                 if (jsondata.ContainsKey("staticmaptile") &&
                     !UUID.TryParse(jsondata["staticmaptile"].ToString(), out rInfo.RegionMapTexture))
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
                 if(jsondata.ContainsKey("size"))
@@ -640,12 +640,12 @@ namespace SilverSim.WebIF.Admin.Simulator
                     }
                     catch
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     if (rInfo.Size.X % 256 != 0 || rInfo.Size.Y % 256 != 0)
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                 }
@@ -657,7 +657,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     if (!m_EstateService.TryGetValue(jsondata["estate"].ToString(), out selectedEstate))
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     rInfo.Owner = selectedEstate.Owner;
@@ -666,7 +666,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     if (!m_EstateService.TryGetValue(jsondata["estateid"].AsUInt, out selectedEstate))
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     rInfo.Owner = selectedEstate.Owner;
@@ -675,7 +675,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 if (jsondata.ContainsKey("owner") &&
                     !m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
                 if(jsondata.ContainsKey("status"))
@@ -691,7 +691,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                             break;
 
                         default:
-                            AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                            m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                             return;
                     }
                 }
@@ -712,7 +712,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                             break;
 
                         default:
-                            AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                            m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                             return;
                     }
                 }
@@ -723,7 +723,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 catch
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                     return;
                 }
 
@@ -744,21 +744,21 @@ namespace SilverSim.WebIF.Admin.Simulator
                         m_EstateService.RegionMap[rInfo.ID] = allEstates[0].ID;
                     }
                 }
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleChange(HttpRequest req, Map jsondata)
         {
             RegionInfo rInfo;
             if(!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(UUID.Zero, jsondata["id"].AsUUID, out rInfo))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -774,7 +774,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     rInfo.ServerPort = jsondata["port"].AsUInt;
                     if(rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     changeRegionData = true;
@@ -783,7 +783,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     if (!UUID.TryParse(jsondata["scopeid"].ToString(), out rInfo.ScopeID))
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     changeRegionData = true;
@@ -797,7 +797,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     if(!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     changeRegionData = true;
@@ -806,7 +806,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     if(!m_EstateService.TryGetValue(jsondata["estate"].ToString(), out selectedEstate))
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     changeRegionData = true;
@@ -833,7 +833,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                             break;
 
                         default:
-                            AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                            m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                             return;
                     }
                     changeRegionData = true;
@@ -842,7 +842,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     if(!UUID.TryParse(jsondata["staticmaptile"].ToString(), out rInfo.RegionMapTexture))
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     changeRegionData = true;
@@ -851,7 +851,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 SceneInterface si;
                 if (m_Scenes.TryGetValue(rInfo.ID, out si))
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.IsRunning);
                     return;
                 }
                 if (changeRegionData)
@@ -862,7 +862,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     }
                     catch
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                         return;
                     }
                 }
@@ -873,21 +873,21 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleDelete(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else if (m_Scenes.ContainsKey(region.ID))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.IsRunning);
             }
             else
             {
@@ -901,107 +901,107 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     m_Log.ErrorFormat("Exception encountered when deleting region: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                 }
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
         #endregion
 
         #region Login Control
-        [AdminWebIF.RequiredRight("regions.logincontrol")]
+        [AdminWebIfRequiredRight("regions.logincontrol")]
         void HandleLoginEnable(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 scene.LoginControl.Ready(SceneInterface.ReadyFlags.LoginsEnable);
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.logincontrol")]
+        [AdminWebIfRequiredRight("regions.logincontrol")]
         void HandleLoginDisable(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 scene.LoginControl.NotReady(SceneInterface.ReadyFlags.LoginsEnable);
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
         #endregion
 
         #region Start/Stop Control
-        [AdminWebIF.RequiredRight("regions.control")]
+        [AdminWebIfRequiredRight("regions.control")]
         void HandleRestart(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("seconds"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
 
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 scene.RequestRegionRestart(jsondata["seconds"].AsInt);
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.control")]
+        [AdminWebIfRequiredRight("regions.control")]
         void HandleRestartAbort(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
 
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 scene.AbortRegionRestart();
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.control")]
+        [AdminWebIfRequiredRight("regions.control")]
         void HandleStart(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else if (m_Scenes.ContainsKey(region.ID))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.AlreadyStarted);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.AlreadyStarted);
             }
             else
             {
@@ -1014,48 +1014,48 @@ namespace SilverSim.WebIF.Admin.Simulator
                 catch (Exception e)
                 {
                     m_Log.ErrorFormat("Failed to start region: {0}", e.Message);
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.FailedToStart);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.FailedToStart);
                     return;
                 }
                 m_Scenes.Add(si);
                 si.LoadSceneAsync();
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.control")]
+        [AdminWebIfRequiredRight("regions.control")]
         void HandleStop(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
 
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 m_Scenes.Remove(scene);
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
         #endregion
 
         #region Notices
-        [AdminWebIF.RequiredRight("region.notice")]
+        [AdminWebIfRequiredRight("region.notice")]
         void HandleNotice(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("message"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -1063,11 +1063,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
                 }
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("region.agents.notice")]
+        [AdminWebIfRequiredRight("region.agents.notice")]
         void HandleAgentNotice(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
@@ -1076,26 +1076,26 @@ namespace SilverSim.WebIF.Admin.Simulator
                 !jsondata.ContainsKey("agentid") ||
                 !jsondata.ContainsKey("message"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene) ||
                 !scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             { 
                 agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.notice")]
+        [AdminWebIfRequiredRight("regions.notice")]
         void HandleNotices(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("message"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
@@ -1106,60 +1106,60 @@ namespace SilverSim.WebIF.Admin.Simulator
                         agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
                     }
                 }
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
         #endregion
 
         #region Enable/Disable
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleEnable(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 try
                 {
                     m_RegionStorage.AddRegionFlags(region.ID, RegionFlags.RegionOnline);
-                    AdminWebIF.SuccessResponse(req, new Map());
+                    m_WebIF.SuccessResponse(req, new Map());
                 }
                 catch
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 }
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleDisable(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
             if (!jsondata.ContainsKey("id"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
                 try
                 {
                     m_RegionStorage.RemoveRegionFlags(region.ID, RegionFlags.RegionOnline);
-                    AdminWebIF.SuccessResponse(req, new Map());
+                    m_WebIF.SuccessResponse(req, new Map());
                 }
                 catch
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 }
             }
         }
@@ -1170,17 +1170,17 @@ namespace SilverSim.WebIF.Admin.Simulator
         const string EstateManagerIsSimConsoleUser = "estate_manager_is_simconsole_user";
         const string RegionOwnerIsSimConsoleUser = "region_owner_is_simconsole_user";
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleEnableEstateOwnerSimConsole(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -1199,28 +1199,28 @@ namespace SilverSim.WebIF.Admin.Simulator
                         break;
 
                     default:
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                 }
 
                 Map m = new Map();
                 m.Add("effective", m_ServerParams.GetBoolean(region.ID, EstateOwnerIsSimConsoleUser, false));
                 m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateOwnerIsSimConsoleUser, false));
-                AdminWebIF.SuccessResponse(req, m);
+                m_WebIF.SuccessResponse(req, m);
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleEnableEstateManagerSimConsole(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -1239,28 +1239,28 @@ namespace SilverSim.WebIF.Admin.Simulator
                         break;
 
                     default:
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                 }
 
                 Map m = new Map();
                 m.Add("effective", m_ServerParams.GetBoolean(region.ID, EstateManagerIsSimConsoleUser, false));
                 m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateManagerIsSimConsoleUser, false));
-                AdminWebIF.SuccessResponse(req, m);
+                m_WebIF.SuccessResponse(req, m);
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.manage")]
+        [AdminWebIfRequiredRight("regions.manage")]
         void HandleEnableRegionOwnerSimConsole(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -1279,31 +1279,31 @@ namespace SilverSim.WebIF.Admin.Simulator
                         break;
 
                     default:
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                 }
 
                 Map m = new Map();
                 m.Add("effective", m_ServerParams.GetBoolean(region.ID, RegionOwnerIsSimConsoleUser, false));
                 m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, RegionOwnerIsSimConsoleUser, false));
-                AdminWebIF.SuccessResponse(req, m);
+                m_WebIF.SuccessResponse(req, m);
             }
         }
 
         #endregion
 
         #region Environment Control
-        [AdminWebIF.RequiredRight("regions.environmentcontrol")]
+        [AdminWebIfRequiredRight("regions.environmentcontrol")]
         public void HandleEnvironmentSet(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("parameter") || !jsondata.ContainsKey("value"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -1381,25 +1381,25 @@ namespace SilverSim.WebIF.Admin.Simulator
                         break;
 
                     default:
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                 }
 
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.environmentcontrol")]
+        [AdminWebIfRequiredRight("regions.environmentcontrol")]
         public void HandleEnvironmentGet(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("parameter"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -1476,24 +1476,24 @@ namespace SilverSim.WebIF.Admin.Simulator
                         break;
 
                     default:
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                 }
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.environmentcontrol")]
+        [AdminWebIfRequiredRight("regions.environmentcontrol")]
         public void HandleEnvironmentResetToDefaults(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("which"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
@@ -1520,11 +1520,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                         break;
 
                     default:
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                 }
 
-                AdminWebIF.SuccessResponse(req, new Map());
+                m_WebIF.SuccessResponse(req, new Map());
             }
         }
         #endregion

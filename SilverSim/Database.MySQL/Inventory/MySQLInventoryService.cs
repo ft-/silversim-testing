@@ -174,7 +174,7 @@ namespace SilverSim.Database.MySQL.Inventory
             /* intentionally left empty */
         }
 
-        public void Remove(UUID scopeID, UUID userAccount)
+        public override void Remove(UUID scopeID, UUID userAccount)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {

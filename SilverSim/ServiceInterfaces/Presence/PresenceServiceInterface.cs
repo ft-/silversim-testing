@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.ServiceInterfaces.Account;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
 using System;
@@ -108,6 +109,8 @@ namespace SilverSim.ServiceInterfaces.Presence
             get;
         }
 
+        public abstract List<PresenceInfo> GetPresencesInRegion(UUID regionId);
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract PresenceInfo this[UUID sessionID, UUID userID]
         {
@@ -123,5 +126,6 @@ namespace SilverSim.ServiceInterfaces.Presence
         }
 
         public abstract void LogoutRegion(UUID regionID);
+        public abstract void Remove(UUID scopeID, UUID accountID);
     }
 }

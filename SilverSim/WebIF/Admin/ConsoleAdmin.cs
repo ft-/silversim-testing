@@ -16,7 +16,7 @@ namespace SilverSim.WebIF.Admin
     [Description("WebIF Console Admin Support")]
     public class ConsoleAdmin : IPlugin, IPluginShutdown
     {
-        AdminWebIF m_WebIF;
+        IAdminWebIF m_WebIF;
         CommandRegistry m_Commands;
 
         public ConsoleAdmin()
@@ -56,7 +56,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        [AdminWebIF.RequiredRight("console.access")]
+        [AdminWebIfRequiredRight("console.access")]
         public void ConsoleCommand(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("command"))
@@ -72,7 +72,7 @@ namespace SilverSim.WebIF.Admin
                 {
                     using (StreamWriter w = new StreamWriter(o, UTF8NoBOM))
                     {
-                        AdminWebIF webif = m_WebIF;
+                        IAdminWebIF webif = m_WebIF;
                         if (webif != null)
                         {
                             ConsoleAdminTty tty = new ConsoleAdminTty(w);

@@ -25,7 +25,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         readonly string m_RegionStorageName;
         EstateServiceInterface m_EstateService;
         GridServiceInterface m_RegionStorageService;
-        AdminWebIF m_WebIF;
+        IAdminWebIF m_WebIF;
         SceneList m_Scenes;
 
         public EstateAdmin(string estateServiceName, string regionStorageName)
@@ -39,7 +39,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m_Scenes = loader.Scenes;
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_RegionStorageService = loader.GetService<GridServiceInterface>(m_RegionStorageName);
-            AdminWebIF webif = loader.GetAdminWebIF();
+            IAdminWebIF webif = loader.GetAdminWebIF();
             m_WebIF = webif;
             webif.JsonMethods.Add("estates.list", HandleList);
             webif.JsonMethods.Add("estate.get", HandleGet);
@@ -52,7 +52,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.AutoGrantRights["estate.notice"].Add("estates.view");
         }
 
-        [AdminWebIF.RequiredRight("estates.view")]
+        [AdminWebIfRequiredRight("estates.view")]
         void HandleList(HttpRequest req, Map jsondata)
         {
             List<EstateInfo> estates = m_EstateService.All;
@@ -65,10 +65,10 @@ namespace SilverSim.WebIF.Admin.Simulator
                 estateRes.Add(estate.ToJsonMap());
             }
             res.Add("estates", estateRes);
-            AdminWebIF.SuccessResponse(req, res);
+            m_WebIF.SuccessResponse(req, res);
         }
 
-        [AdminWebIF.RequiredRight("estates.view")]
+        [AdminWebIfRequiredRight("estates.view")]
         void HandleGet(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
@@ -81,7 +81,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
@@ -104,10 +104,10 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             res.Add("regions", regionsdata);
 
-            AdminWebIF.SuccessResponse(req, res);
+            m_WebIF.SuccessResponse(req, res);
         }
 
-        [AdminWebIF.RequiredRight("estates.manage")]
+        [AdminWebIfRequiredRight("estates.manage")]
         void HandleUpdate(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
@@ -117,14 +117,14 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
             if (jsondata.ContainsKey("owner") &&
                 !m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                 return;
             }
 
@@ -163,7 +163,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
@@ -173,7 +173,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
 
@@ -186,16 +186,16 @@ namespace SilverSim.WebIF.Admin.Simulator
                     scene.TriggerEstateUpdate();
                 }
             }
-            AdminWebIF.SuccessResponse(req, new Map());
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
-        [AdminWebIF.RequiredRight("estates.manage")]
+        [AdminWebIfRequiredRight("estates.manage")]
         void HandleCreate(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo = new EstateInfo();
             if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                 return;
             }
             try
@@ -226,7 +226,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
@@ -236,13 +236,13 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
-            AdminWebIF.SuccessResponse(req, new Map());
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
-        [AdminWebIF.RequiredRight("estates.manage")]
+        [AdminWebIfRequiredRight("estates.manage")]
         void HandleDelete(HttpRequest req, Map jsondata)
         {
             uint estateID;
@@ -252,13 +252,13 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
             if(m_EstateService.RegionMap[estateID].Count != 0)
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InUse);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InUse);
                 return;
             }
 
@@ -268,18 +268,18 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             catch
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
-            AdminWebIF.SuccessResponse(req, new Map());
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
-        [AdminWebIF.RequiredRight("estate.notice")]
+        [AdminWebIfRequiredRight("estate.notice")]
         void HandleNotice(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("id") || !jsondata.ContainsKey("message"))
             {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
@@ -292,11 +292,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                     {
                         Map m = new Map();
                         m.Add("noticed_regions", new AnArray());
-                        AdminWebIF.SuccessResponse(req, m);
+                        m_WebIF.SuccessResponse(req, m);
                     }
                     else
                     {
-                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                     }
                 }
                 else
@@ -319,7 +319,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     }
                     Map m = new Map();
                     m.Add("noticed_regions", regions);
-                    AdminWebIF.SuccessResponse(req, m);
+                    m_WebIF.SuccessResponse(req, m);
                 }
             }
         }

@@ -8,9 +8,9 @@ namespace SilverSim.WebIF.Admin
 {
     public static class AdminExtensionMethods
     {
-        public static AdminWebIF GetAdminWebIF(this ConfigurationLoader loader)
+        public static IAdminWebIF GetAdminWebIF(this ConfigurationLoader loader)
         {
-            List<AdminWebIF> webIF = loader.GetServicesByValue<AdminWebIF>();
+            List<IAdminWebIF> webIF = loader.GetServicesByValue<IAdminWebIF>();
             if (webIF.Count == 0)
             {
                 throw new ConfigurationLoader.ConfigurationErrorException("No Admin WebIF service configured");

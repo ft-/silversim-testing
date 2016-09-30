@@ -34,6 +34,11 @@ namespace SilverSim.Database.Memory.Presence
         #endregion
 
         #region PresenceServiceInterface
+        public override List<PresenceInfo> GetPresencesInRegion(UUID regionId)
+        {
+            return new List<PresenceInfo>(from presence in m_Data.Values where presence.RegionID == regionId select presence);
+        }
+
         public override List<PresenceInfo> this[UUID userID]
         {
             get
@@ -103,7 +108,7 @@ namespace SilverSim.Database.Memory.Presence
         }
         #endregion
 
-        public void Remove(UUID scopeID, UUID userAccount)
+        public override void Remove(UUID scopeID, UUID userAccount)
         {
             List<UUID> sessionids = new List<UUID>(from presence in m_Data where presence.Value.UserID.ID == userAccount select presence.Key);
 
