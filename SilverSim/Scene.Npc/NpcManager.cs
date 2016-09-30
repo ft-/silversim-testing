@@ -177,6 +177,14 @@ namespace SilverSim.Scene.Npc
             {
                 if (agent.CurrentScene == scene)
                 {
+                    try
+                    {
+                        agent.DetachAllAttachments();
+                    }
+                    catch
+                    {
+                        m_Log.WarnFormat("Failed to detach attachments of NPC {0} {1} ({2})", agent.Owner.FirstName, agent.Owner.LastName, agent.Owner.ID);
+                    }
                     removeList.Add(agent.ID, agent);
                 }
             }
@@ -245,7 +253,6 @@ namespace SilverSim.Scene.Npc
                     npcInfo.Owner = agent.NpcOwner;
                     npcInfo.Group = agent.Group;
                     inventoryService.CheckInventory(npcInfo.Npc.ID);
-                    agent.LoadAppearanceFromNotecard(nc);
                     presenceService.Store(npcInfo);
                     scene.Add(agent);
                 }
@@ -262,11 +269,11 @@ namespace SilverSim.Scene.Npc
 
                 try
                 {
-                    agent.RebakeAppearance();
+                    agent.LoadAppearanceFromNotecard(nc);
                 }
                 catch
                 {
-                    m_Log.WarnFormat("Failed to rebake NPC {0} {1} ({2})", npcId.FirstName, npcId.LastName, npcId.ID.ToString());
+                    m_Log.WarnFormat("Failed to load NPC appearance {0} {1} ({2})", npcId.FirstName, npcId.LastName, npcId.ID.ToString());
                 }
                 return agent;
             }

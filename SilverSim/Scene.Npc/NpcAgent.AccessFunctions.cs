@@ -260,9 +260,9 @@ namespace SilverSim.Scene.Npc
             }
 
             /* generate inventory entries for attachments */
-            foreach(KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvp in appearance.Attachments)
+            foreach (KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvp in appearance.Attachments)
             {
-                foreach(KeyValuePair<UUID, UUID> kvpInner in kvp.Value)
+                foreach (KeyValuePair<UUID, UUID> kvpInner in kvp.Value)
                 {
                     InventoryItem item = new InventoryItem();
                     item.AssetID = kvpInner.Value;
@@ -294,7 +294,7 @@ namespace SilverSim.Scene.Npc
 
             DetachAllAttachments();
 
-            foreach(InventoryItem item in attachmentsToRez)
+            foreach (InventoryItem item in attachmentsToRez)
             {
                 AssetData data;
                 try
@@ -303,19 +303,29 @@ namespace SilverSim.Scene.Npc
                 }
                 catch(Exception e)
                 {
-                    m_Log.WarnFormat("Fetch error for object asset {0} for agent {1} {2} ({3}): {4}: {5}",
+                    m_Log.WarnFormat("Fetch error for object asset {0} for NPC {1} {2} ({3}): {4}: {5}",
                         item.AssetID, Owner.FirstName, Owner.LastName, Owner.ID, e.GetType().FullName, e.ToString());
                     break;
                 }
 
                 if(data.Type != AssetType.Object)
                 {
-                    m_Log.WarnFormat("Wrong asset for object asset {0} for agent {1} {2} ({3})",
+                    m_Log.WarnFormat("Wrong asset for object asset {0} for NPC {1} {2} ({3})",
                         item.AssetID, Owner.FirstName, Owner.LastName, Owner.ID);
                     break;
                 }
 
                 AttachFromInventory(data, item.ID);
+            }
+
+            try
+            {
+                RebakeAppearance();
+            }
+            catch
+            {
+                m_Log.WarnFormat("Failed to rebake NPC {0} {1} ({2})",
+                    Owner.FirstName, Owner.LastName, Owner.ID);
             }
         }
 
