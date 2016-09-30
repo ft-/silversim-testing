@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
@@ -35,26 +36,27 @@ namespace SilverSim.Scene.Npc
     public partial class NpcAgent : Agent.Agent
     {
         public override event Action<IObject> OnPositionChange;
+        private static readonly ILog m_Log = LogManager.GetLogger("NPC AGENT");
 
         InventoryServiceInterface m_InventoryService = null;
         ProfileServiceInterface m_ProfileService = null;
         GridUserServiceInterface m_GridUserService = null;
         PresenceServiceInterface m_PresenceService = null;
+        NpcPresenceServiceInterface m_NpcPresenceService = null;
 
         public NpcAgent(
-            UUID agentId,
-            string firstName,
-            string lastName,
+            UUI npcID,
             Uri homeURI,
             AgentServiceList serviceList)
-            : base(agentId, homeURI)
+            : base(npcID.ID, homeURI)
         {
-            FirstName = firstName;
-            LastName = lastName;
+            FirstName = npcID.FirstName;
+            LastName = npcID.LastName;
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
+            m_NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
         }
 
         UUI m_NpcOwner = UUI.Unknown;
@@ -210,6 +212,14 @@ namespace SilverSim.Scene.Npc
             get
             {
                 throw new NotSupportedException();
+            }
+        }
+
+        public NpcPresenceServiceInterface NpcPresenceService
+        {
+            get
+            {
+                return m_NpcPresenceService;
             }
         }
 

@@ -165,14 +165,23 @@ namespace SilverSim.Viewer.Core
             readonly UUID m_ItemID;
             readonly UUI m_RezzingAgent;
             readonly AttachmentPoint m_AttachPoint;
+            readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
 
-            internal RezAttachmentHandler(SceneInterface scene, UUID itemid, UUID assetid, AssetServiceInterface source, UUI rezzingagent, AttachmentPoint attachPoint)
+            internal RezAttachmentHandler(
+                SceneInterface scene, 
+                UUID itemid, 
+                UUID assetid, 
+                AssetServiceInterface source, 
+                UUI rezzingagent, AttachmentPoint 
+                attachPoint,
+                RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> attachmentsList)
                 : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
             {
                 m_Scene = scene;
                 m_RezzingAgent = rezzingagent;
                 m_ItemID = itemid;
                 m_AttachPoint = attachPoint;
+                m_AttachmentsList = attachmentsList;
             }
 
             void SendAlertMessage(string msg)
@@ -263,6 +272,7 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     m_Scene.Add(grp);
+                    m_AttachmentsList.Add(m_ItemID, grp.LocalID, new KeyValuePair<UUID, UUID>(m_Scene.ID, grp.ID));
                 }
                 catch
                 {
@@ -321,7 +331,14 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            new RezAttachmentHandler(Circuits[SceneID].Scene, itemID, item.AssetID, AssetService, Owner, attachpointFlagged).QueueWorkItem();
+            new RezAttachmentHandler(
+                Circuits[SceneID].Scene, 
+                itemID, 
+                item.AssetID, 
+                AssetService, 
+                Owner, 
+                attachpointFlagged,
+                m_AttachmentsList).QueueWorkItem();
         }
 
         void DetachAttachment(DetachEntry entry)

@@ -6,6 +6,7 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
@@ -24,18 +25,44 @@ namespace SilverSim.Scene.Npc
     [Description("NPC Manager")]
     public class NpcManager : IPlugin
     {
+        sealed class NpcNonPersistentPresenceService : NpcPresenceServiceInterface
+        {
+            public NpcNonPersistentPresenceService()
+            {
+
+            }
+
+            public override List<NpcPresenceInfo> this[UUID regionID]
+            {
+                get
+                {
+                    return new List<NpcPresenceInfo>();
+                }
+            }
+
+            public override void Remove(UUID scopeID, UUID npcID)
+            {
+                /* nothing to do */
+            }
+
+            public override void Store(NpcPresenceInfo presenceInfo)
+            {
+                /* nothing to do */
+            }
+        }
+
         private static readonly ILog m_Log = LogManager.GetLogger("NPC MANAGER");
 
         string m_PersistentInventoryServiceName;
         string m_NonpersistentInventoryServiceName;
         string m_PersistentProfileServiceName;
         string m_NonpersistentProfileServiceName;
-        string m_PresenceServiceName;
+        string m_NpcPresenceServiceName;
         InventoryServiceInterface m_PersistentInventoryService;
         InventoryServiceInterface m_NonpersistentInventoryService;
         ProfileServiceInterface m_PersistentProfileService;
         ProfileServiceInterface m_NonpersistentProfileService;
-        PresenceServiceInterface m_PresenceService;
+        NpcPresenceServiceInterface m_NpcPresenceService;
         IAdminWebIF m_AdminWebIF;
 
         public NpcManager(IConfig ownConfig)
@@ -44,7 +71,7 @@ namespace SilverSim.Scene.Npc
             m_NonpersistentProfileServiceName = ownConfig.GetString("NonpersistentProfileService", string.Empty);
             m_PersistentInventoryServiceName = ownConfig.GetString("PersistentInventoryService", string.Empty);
             m_NonpersistentInventoryServiceName = ownConfig.GetString("NonpersistentInventoryService", string.Empty);
-            m_PresenceServiceName = ownConfig.GetString("PresenceService", string.Empty);
+            m_NpcPresenceServiceName = ownConfig.GetString("PresenceService", string.Empty);
         }
 
         readonly RwLockedDictionary<UUID, NpcAgent> m_NpcAgents = new RwLockedDictionary<UUID, NpcAgent>();
@@ -57,25 +84,32 @@ namespace SilverSim.Scene.Npc
             if(webifs.Count > 0)
             {
                 m_AdminWebIF = webifs[0];
-
+                m_AdminWebIF.JsonMethods.Add("npcs.show", HandleShowNpcs);
+                m_AdminWebIF.JsonMethods.Add("npc.remove", HandleRemoveNpc);
+                m_AdminWebIF.AutoGrantRights["npcs.manage"].Add("npcs.view");
             }
             /* non persistent inventory is needed for baking logic */
             m_NonpersistentInventoryService = loader.GetService<InventoryServiceInterface>(m_NonpersistentInventoryServiceName);
             m_NonpersistentAgentServices.Add(m_NonpersistentInventoryService);
+            m_NonpersistentAgentServices.Add(new NpcNonPersistentPresenceService());
 
-            /* presence is optional */
-            if (!string.IsNullOrEmpty(m_PresenceServiceName) || !string.IsNullOrEmpty(m_PersistentInventoryServiceName))
+            /* persistence is optional */
+            if (!string.IsNullOrEmpty(m_NpcPresenceServiceName) || !string.IsNullOrEmpty(m_PersistentInventoryServiceName))
             {
-                m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
-                m_PersistentAgentServices.Add(m_PresenceService);
+                m_NpcPresenceService = loader.GetService<NpcPresenceServiceInterface>(m_NpcPresenceServiceName);
+                m_PersistentAgentServices.Add(m_NpcPresenceService);
                 m_PersistentInventoryService = loader.GetService<InventoryServiceInterface>(m_PersistentInventoryServiceName);
                 m_PersistentAgentServices.Add(m_PersistentInventoryService);
+
+                /* profile is optional */
+                if (!string.IsNullOrEmpty(m_PersistentProfileServiceName))
+                {
+                    m_PersistentProfileService = loader.GetService<ProfileServiceInterface>(m_PersistentProfileServiceName);
+                    m_PersistentAgentServices.Add(m_PersistentProfileService);
+                }
             }
-            if(!string.IsNullOrEmpty(m_PersistentProfileServiceName))
-            {
-                m_PersistentProfileService = loader.GetService<ProfileServiceInterface>(m_PersistentProfileServiceName);
-                m_PersistentAgentServices.Add(m_PersistentProfileService);
-            }
+
+            /* profile is optional */
             if (!string.IsNullOrEmpty(m_NonpersistentProfileServiceName))
             {
                 m_NonpersistentProfileService = loader.GetService<ProfileServiceInterface>(m_NonpersistentProfileServiceName);
@@ -92,20 +126,34 @@ namespace SilverSim.Scene.Npc
         void OnSceneAdded(SceneInterface scene)
         {
             m_KnownScenes.Add(scene.ID, scene);
-            if(null != m_PresenceService)
+            if(null != m_NpcPresenceService)
             {
-                foreach(PresenceInfo npcInfo in m_PresenceService.GetPresencesInRegion(scene.ID))
+                foreach(NpcPresenceInfo npcInfo in m_NpcPresenceService[scene.ID])
                 {
                     NpcAgent agent;
                     try
                     {
-                        agent = new NpcAgent(npcInfo.UserID.ID, npcInfo.UserID.FirstName, npcInfo.UserID.LastName, null, m_PersistentAgentServices);
-                        /* npcowner and group is not yet persisted */
+                        agent = new NpcAgent(npcInfo.Npc, null, m_PersistentAgentServices);
+                        agent.GlobalPosition = npcInfo.Position;
+                        agent.LookAt = npcInfo.LookAt;
+                        agent.NpcOwner = npcInfo.Owner;
+                        agent.Group = npcInfo.Group;
                         scene.Add(agent);
+                        try
+                        {
+                            if (npcInfo.SittingOnObjectID != UUID.Zero)
+                            {
+                                agent.DoSit(npcInfo.SittingOnObjectID);
+                            }
+                        }
+                        catch
+                        {
+                            m_Log.WarnFormat("Failed to sit persistent NPC {0} {1} ({2}) on object id {3}", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString(), npcInfo.SittingOnObjectID.ToString());
+                        }
                     }
                     catch
                     {
-                        m_Log.WarnFormat("Failed to instantiate persistent NPC {0} {1} ({2})", npcInfo.UserID.FirstName, npcInfo.UserID.LastName, npcInfo.UserID.ID.ToString());
+                        m_Log.WarnFormat("Failed to instantiate persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString());
                         continue;
                     }
 
@@ -115,7 +163,7 @@ namespace SilverSim.Scene.Npc
                     }
                     catch
                     {
-                        m_Log.WarnFormat("Failed to rebake persistent NPC {0} {1} ({2})", npcInfo.UserID.FirstName, npcInfo.UserID.LastName, npcInfo.UserID.ID.ToString());
+                        m_Log.WarnFormat("Failed to rebake persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString());
                     }
                 }
             }
@@ -124,23 +172,39 @@ namespace SilverSim.Scene.Npc
         void OnSceneRemoved(SceneInterface scene)
         {
             m_KnownScenes.Remove(scene.ID);
-            List<UUID> removeList = new List<UUID>();
+            Dictionary<UUID, NpcAgent> removeList = new Dictionary<UUID, NpcAgent>();
             foreach (NpcAgent agent in m_NpcAgents.Values)
             {
                 if (agent.CurrentScene == scene)
                 {
-                    removeList.Add(agent.ID);
+                    removeList.Add(agent.ID, agent);
                 }
             }
 
-            foreach (UUID id in removeList)
+            foreach (KeyValuePair<UUID, NpcAgent> kvp in removeList)
             {
-                m_NonpersistentInventoryService.Remove(UUID.Zero, id);
+                /* we have to call the next two removes explicitly. We only want to act upon non-persisted data */
+                m_NonpersistentInventoryService.Remove(UUID.Zero, kvp.Key);
                 if (null != m_NonpersistentProfileService)
                 {
-                    m_NonpersistentProfileService.Remove(UUID.Zero, id);
+                    m_NonpersistentProfileService.Remove(UUID.Zero, kvp.Key);
                 }
-                m_NpcAgents.Remove(id);
+                NpcPresenceInfo presenceInfo = new NpcPresenceInfo();
+                NpcAgent npc = kvp.Value;
+                presenceInfo.Npc = npc.Owner;
+                presenceInfo.Owner = npc.NpcOwner;
+                presenceInfo.Position = npc.Position;
+                presenceInfo.LookAt = npc.LookAt;
+                presenceInfo.Group = npc.Group;
+                presenceInfo.RegionID = npc.SceneID;
+                IObject obj = npc.SittingOnObject;
+                presenceInfo.SittingOnObjectID = obj != null ? obj.ID : UUID.Zero;
+               
+                if(m_NpcAgents.Remove(kvp.Key))
+                {
+                    /* we do not distinguish persistent/non-persistent here since NpcAgent has a property for referencing it */
+                    npc.NpcPresenceService.Store(presenceInfo);
+                }
             }
         }
 
@@ -149,46 +213,62 @@ namespace SilverSim.Scene.Npc
         {
             SceneInterface scene;
             AgentServiceList agentServiceList = m_NonpersistentAgentServices;
-            InventoryServiceInterface inventoryService = m_NonpersistentInventoryService;
+            
             if((options & NpcOptions.Persistent) != NpcOptions.None)
             {
-                if(m_PresenceService == null)
+                if(m_NpcPresenceService == null)
                 {
                     throw new InvalidOperationException("Persistence of NPCs not configured");
                 }
                 agentServiceList = m_PersistentAgentServices;
-                inventoryService = m_PersistentInventoryService;
             }
 
-            UUID npcId = UUID.Random;
+            NpcPresenceServiceInterface presenceService = agentServiceList.Get<NpcPresenceServiceInterface>();
+            InventoryServiceInterface inventoryService = agentServiceList.Get<InventoryServiceInterface>();
+
+            UUI npcId = new UUI();
+            npcId.ID = UUID.Random;
+            npcId.FirstName = firstName;
+            npcId.LastName = lastName;
 
             if (m_KnownScenes.TryGetValue(sceneid, out scene))
             {
-                NpcAgent agent = new NpcAgent(npcId, firstName, lastName, null, agentServiceList);
+                NpcAgent agent = new NpcAgent(npcId, null, agentServiceList);
                 agent.NpcOwner = owner;
                 agent.Group = group;
                 try
                 {
                     m_NpcAgents.Add(agent.ID, agent);
-                    PresenceInfo npcInfo = new PresenceInfo();
+                    NpcPresenceInfo npcInfo = new NpcPresenceInfo();
                     npcInfo.RegionID = sceneid;
-                    npcInfo.SecureSessionID = UUID.Random;
-                    npcInfo.SessionID = UUID.Random;
-                    npcInfo.UserID = agent.Owner;
-                    m_PresenceService[npcInfo.SessionID, agent.ID, PresenceServiceInterface.SetType.Login] = npcInfo;
+                    npcInfo.Npc = agent.Owner;
+                    npcInfo.Owner = agent.NpcOwner;
+                    npcInfo.Group = agent.Group;
+                    inventoryService.CheckInventory(npcInfo.Npc.ID);
+                    agent.LoadAppearanceFromNotecard(nc);
+                    presenceService.Store(npcInfo);
                     scene.Add(agent);
-                    return agent;
                 }
                 catch
                 {
-                    if(m_PresenceService != null)
+                    if(m_NpcPresenceService != null)
                     {
-                        m_PresenceService.Remove(UUID.Zero, agent.ID);
+                        presenceService.Remove(UUID.Zero, agent.ID);
                     }
                     inventoryService.Remove(UUID.Zero, agent.ID);
                     m_NpcAgents.Remove(agent.ID);
                     throw;
                 }
+
+                try
+                {
+                    agent.RebakeAppearance();
+                }
+                catch
+                {
+                    m_Log.WarnFormat("Failed to rebake NPC {0} {1} ({2})", npcId.FirstName, npcId.LastName, npcId.ID.ToString());
+                }
+                return agent;
             }
 
             throw new KeyNotFoundException("Scene not found");
@@ -265,7 +345,11 @@ namespace SilverSim.Scene.Npc
                     {
                         continue;
                     }
-                    sb.AppendFormat("Npc {0} {1} ({2})\n- Owner: {3}", agent.Owner.FirstName, agent.Owner.LastName, agent.Owner.ID.ToString(), agent.NpcOwner.FullName);
+                    sb.AppendFormat("Npc {0} {1} ({2})\n- Owner: {3}\n", agent.Owner.FirstName, agent.Owner.LastName, agent.Owner.ID.ToString(), agent.NpcOwner.FullName);
+                    if(m_NpcPresenceService != null && m_NpcPresenceService[agent.Owner.ID].Count != 0)
+                    {
+                        sb.AppendFormat("- Persistent NPC\n");
+                    }
                 }
                 io.Write(sb.ToString());
             }
@@ -396,6 +480,7 @@ namespace SilverSim.Scene.Npc
                 Map npcdata = new Map();
                 npcdata.Add("uui", npcid);
                 npcdata.Add("owner", npcowner);
+                npcdata.Add("persistent", (m_NpcPresenceService != null && m_NpcPresenceService[agent.Owner.ID].Count != 0));
                 npcs.Add(npcdata);
             }
             Map res = new Map();
