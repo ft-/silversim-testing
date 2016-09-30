@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -25,17 +26,18 @@ namespace SilverSim.Scene.Types.Scene
             ExpectedFlags = PhysicsTerrain | SceneObjects
         }
 
-        public readonly LoginController LoginControl = new LoginController();
+        public readonly LoginController LoginControl;
 
         [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
         public class LoginController
         {
             ReadyFlags m_CurrentFlags = ReadyFlags.ExpectedFlags;
             readonly object m_Lock = new object();
+            readonly SceneInterface m_Scene;
 
-            public LoginController()
+            public LoginController(SceneInterface scene)
             {
-
+                m_Scene = scene;
             }
 
             public void Ready(ReadyFlags lf)
@@ -78,11 +80,12 @@ namespace SilverSim.Scene.Types.Scene
                 var ev = OnLoginsEnabled;
                 if(ev != null)
                 {
-                    foreach (Action<bool> del in ev.GetInvocationList().OfType<Action<bool>>())
+                    UUID sceneID = m_Scene.ID;
+                    foreach (Action<UUID, bool> del in ev.GetInvocationList().OfType<Action<UUID, bool>>())
                     {
                         try
                         {
-                            del(state);
+                            del(sceneID, state);
                         }
                         catch (Exception e)
                         {
@@ -92,7 +95,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            public event Action<bool> OnLoginsEnabled;
+            public event Action<UUID, bool> OnLoginsEnabled;
         }
     }
 }

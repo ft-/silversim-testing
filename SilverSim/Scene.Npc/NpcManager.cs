@@ -126,44 +126,62 @@ namespace SilverSim.Scene.Npc
         void OnSceneAdded(SceneInterface scene)
         {
             m_KnownScenes.Add(scene.ID, scene);
-            if(null != m_NpcPresenceService)
+            scene.LoginControl.OnLoginsEnabled += LoginControl_OnLoginsEnabled;
+        }
+
+        private void LoginControl_OnLoginsEnabled(UUID sceneID, bool obj)
+        {
+            SceneInterface scene;
+            bool notrezzedbefore = true;
+            if(null != m_NpcPresenceService && m_KnownScenes.TryGetValue(sceneID, out scene))
             {
                 foreach(NpcPresenceInfo npcInfo in m_NpcPresenceService[scene.ID])
                 {
                     NpcAgent agent;
-                    try
+                    IAgent d;
+                    if (!scene.Agents.TryGetValue(npcInfo.Npc.ID, out d))
                     {
-                        agent = new NpcAgent(npcInfo.Npc, null, m_PersistentAgentServices);
-                        agent.GlobalPosition = npcInfo.Position;
-                        agent.LookAt = npcInfo.LookAt;
-                        agent.NpcOwner = npcInfo.Owner;
-                        agent.Group = npcInfo.Group;
-                        scene.Add(agent);
+                        if(notrezzedbefore)
+                        {
+                            m_Log.Info("Rezzing persistent NPCs");
+                            notrezzedbefore = false;
+                        }
+                        /* only rez if not rezzed before */
+                        m_Log.InfoFormat("Rezzing persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID);
                         try
                         {
-                            if (npcInfo.SittingOnObjectID != UUID.Zero)
+                            agent = new NpcAgent(npcInfo.Npc, null, m_PersistentAgentServices);
+                            agent.GlobalPosition = npcInfo.Position;
+                            agent.LookAt = npcInfo.LookAt;
+                            agent.NpcOwner = npcInfo.Owner;
+                            agent.Group = npcInfo.Group;
+                            scene.Add(agent);
+                            try
                             {
-                                agent.DoSit(npcInfo.SittingOnObjectID);
+                                if (npcInfo.SittingOnObjectID != UUID.Zero)
+                                {
+                                    agent.DoSit(npcInfo.SittingOnObjectID);
+                                }
+                            }
+                            catch
+                            {
+                                m_Log.WarnFormat("Failed to sit persistent NPC {0} {1} ({2}) on object id {3}", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString(), npcInfo.SittingOnObjectID.ToString());
                             }
                         }
                         catch
                         {
-                            m_Log.WarnFormat("Failed to sit persistent NPC {0} {1} ({2}) on object id {3}", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString(), npcInfo.SittingOnObjectID.ToString());
+                            m_Log.WarnFormat("Failed to instantiate persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString());
+                            continue;
                         }
-                    }
-                    catch
-                    {
-                        m_Log.WarnFormat("Failed to instantiate persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString());
-                        continue;
-                    }
 
-                    try
-                    {
-                        agent.RebakeAppearance();
-                    }
-                    catch
-                    {
-                        m_Log.WarnFormat("Failed to rebake persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString());
+                        try
+                        {
+                            agent.RebakeAppearance();
+                        }
+                        catch
+                        {
+                            m_Log.WarnFormat("Failed to rebake persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID.ToString());
+                        }
                     }
                 }
             }
@@ -171,6 +189,7 @@ namespace SilverSim.Scene.Npc
 
         void OnSceneRemoved(SceneInterface scene)
         {
+            scene.LoginControl.OnLoginsEnabled -= LoginControl_OnLoginsEnabled;
             m_KnownScenes.Remove(scene.ID);
             Dictionary<UUID, NpcAgent> removeList = new Dictionary<UUID, NpcAgent>();
             foreach (NpcAgent agent in m_NpcAgents.Values)
@@ -216,7 +235,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        #region Control Functions
+#region Control Functions
         public NpcAgent CreateNpc(UUID sceneid, UUI owner, UGI group, string firstName, string lastName, Vector3 position, Notecard nc, NpcOptions options = NpcOptions.None)
         {
             SceneInterface scene;
@@ -322,9 +341,9 @@ namespace SilverSim.Scene.Npc
         {
             return m_NpcAgents.TryGetValue(npcId, out agent);
         }
-        #endregion
+#endregion
 
-        #region Console commands
+#region Console commands
         void ShowNpcsCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
@@ -403,9 +422,9 @@ namespace SilverSim.Scene.Npc
                 io.Write("Npc removed");
             }
         }
-        #endregion
+#endregion
 
-        #region WebIF
+#region WebIF
         [AdminWebIfRequiredRight("npcs.manage")]
         void HandleRemoveNpc(HttpRequest req, Map jsondata)
         {
@@ -494,7 +513,7 @@ namespace SilverSim.Scene.Npc
             res.Add("npcs", npcs);
             m_AdminWebIF.SuccessResponse(req, res);
         }
-        #endregion
+#endregion
     }
 
     [PluginName("NpcManager")]

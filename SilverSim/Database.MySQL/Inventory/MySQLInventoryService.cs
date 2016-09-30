@@ -25,11 +25,64 @@ namespace SilverSim.Database.MySQL.Inventory
         readonly string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
         readonly DefaultInventoryFolderContentService m_ContentService;
+        readonly string m_InventoryItemTable;
+        readonly string m_InventoryFolderTable;
 
-        public MySQLInventoryService(string connectionString)
+        readonly IMigrationElement[] Migrations;
+
+        public MySQLInventoryService(string connectionString, string inventoryitemtable, string inventoryfoldertable)
         {
+            m_InventoryItemTable = inventoryitemtable;
+            m_InventoryFolderTable = inventoryfoldertable;
             m_ConnectionString = connectionString;
             m_ContentService = new DefaultInventoryFolderContentService(this);
+
+            Migrations = new IMigrationElement[]
+            {
+                new SqlTable(m_InventoryFolderTable),
+                new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<UUID>("ParentFolderID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<UUID>("OwnerID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
+                new AddColumn<InventoryType>("InventoryType") { IsNullAllowed = false, Default = InventoryType.Unknown },
+                new AddColumn<int>("Version") { IsNullAllowed = false, Default = 0 },
+                new PrimaryKeyInfo("ID"),
+                new NamedKeyInfo("inventoryfolders_owner_index", "OwnerID"),
+                new NamedKeyInfo("inventoryfolders_owner_folderid", "OwnerID", "ParentFolderID"),
+                new NamedKeyInfo("inventoryfolders_owner_type", "OwnerID", "InventoryType"),
+
+                new SqlTable(m_InventoryItemTable),
+                new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<UUID>("ParentFolderID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
+                new AddColumn<string>("Description") { Cardinality = 128, IsNullAllowed = false, Default = string.Empty },
+                new AddColumn<InventoryType>("InventoryType") { IsNullAllowed = false, Default = InventoryType.Unknown },
+                new AddColumn<InventoryFlags>("Flags") { IsNullAllowed = false, Default = InventoryFlags.None },
+                new AddColumn<UUID>("OwnerID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<UUID>("LastOwnerID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<UUID>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<Date>("CreationDate") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
+                new AddColumn<InventoryPermissionsMask>("BasePermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+                new AddColumn<InventoryPermissionsMask>("CurrentPermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+                new AddColumn<InventoryPermissionsMask>("EveryOnePermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+                new AddColumn<InventoryPermissionsMask>("NextOwnerPermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+                new AddColumn<InventoryPermissionsMask>("GroupPermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+                new AddColumn<int>("SalePrice") { IsNullAllowed = false, Default = 10 },
+                new AddColumn<InventoryItem.SaleInfoData.SaleType>("SaleType") { IsNullAllowed = false, Default = InventoryItem.SaleInfoData.SaleType.NoSale },
+                new AddColumn<InventoryPermissionsMask>("SalePermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
+                new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<bool>("IsGroupOwned") { IsNullAllowed = false, Default = false },
+                new AddColumn<UUID>("AssetID") { IsNullAllowed = false, Default = UUID.Zero },
+                new AddColumn<AssetType>("AssetType") { IsNullAllowed = false, Default = AssetType.Unknown },
+                new PrimaryKeyInfo("ID"),
+                new NamedKeyInfo("inventoryitems_OwnerID", "OwnerID"),
+                new NamedKeyInfo("inventoryitems_OwnerID_ID", "OwnerID", "ID"),
+                new NamedKeyInfo("inventoryitems_OwnerID_ParentFolderID", "OwnerID", "ParentFolderID"),
+                new TableRevision(2),
+                /* necessary boolean correction */
+                new ChangeColumn<bool>("IsGroupOwned") { IsNullAllowed = false, Default = false },
+            };
+
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -64,7 +117,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND AssetType = ?assettype AND (flags & 1) <>0", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND AssetType = ?assettype AND (flags & 1) <>0", connection))
                 {
                     cmd.Parameters.AddParameter("?ownerid", principalID);
                     cmd.Parameters.AddParameter("?assettype", AssetType.Gesture);
@@ -87,7 +140,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE ?ownerid", connection))
                 {
                     cmd.Parameters.AddParameter("?ownerid", principalID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -121,52 +174,6 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
-        {
-            new SqlTable("inventoryfolders"),
-            new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<UUID>("ParentFolderID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<UUID>("OwnerID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<InventoryType>("InventoryType") { IsNullAllowed = false, Default = InventoryType.Unknown },
-            new AddColumn<int>("Version") { IsNullAllowed = false, Default = 0 },
-            new PrimaryKeyInfo("ID"),
-            new NamedKeyInfo("inventoryfolders_owner_index", "OwnerID"),
-            new NamedKeyInfo("inventoryfolders_owner_folderid", "OwnerID", "ParentFolderID"),
-            new NamedKeyInfo("inventoryfolders_owner_type", "OwnerID", "InventoryType"),
-
-            new SqlTable("inventoryitems"),
-            new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<UUID>("ParentFolderID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<string>("Description") { Cardinality = 128, IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<InventoryType>("InventoryType") { IsNullAllowed = false, Default = InventoryType.Unknown },
-            new AddColumn<InventoryFlags>("Flags") { IsNullAllowed = false, Default = InventoryFlags.None },
-            new AddColumn<UUID>("OwnerID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<UUID>("LastOwnerID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<UUID>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<Date>("CreationDate") { IsNullAllowed = false, Default = Date.UnixTimeToDateTime(0) },
-            new AddColumn<InventoryPermissionsMask>("BasePermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
-            new AddColumn<InventoryPermissionsMask>("CurrentPermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
-            new AddColumn<InventoryPermissionsMask>("EveryOnePermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
-            new AddColumn<InventoryPermissionsMask>("NextOwnerPermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
-            new AddColumn<InventoryPermissionsMask>("GroupPermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
-            new AddColumn<int>("SalePrice") { IsNullAllowed = false, Default = 10 },
-            new AddColumn<InventoryItem.SaleInfoData.SaleType>("SaleType") { IsNullAllowed = false, Default = InventoryItem.SaleInfoData.SaleType.NoSale },
-            new AddColumn<InventoryPermissionsMask>("SalePermissionsMask") { IsNullAllowed = false, Default = InventoryPermissionsMask.None },
-            new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<bool>("IsGroupOwned") { IsNullAllowed = false, Default = false },
-            new AddColumn<UUID>("AssetID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<AssetType>("AssetType") { IsNullAllowed = false, Default = AssetType.Unknown },
-            new PrimaryKeyInfo("ID"),
-            new NamedKeyInfo("inventoryitems_OwnerID", "OwnerID"),
-            new NamedKeyInfo("inventoryitems_OwnerID_ID", "OwnerID", "ID"),
-            new NamedKeyInfo("inventoryitems_OwnerID_ParentFolderID", "OwnerID", "ParentFolderID"),
-            new TableRevision(2),
-            /* necessary boolean correction */
-            new ChangeColumn<bool>("IsGroupOwned") { IsNullAllowed = false, Default = false },
-        };
-
         #endregion
 
         public void Startup(ConfigurationLoader loader)
@@ -181,12 +188,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 connection.InsideTransaction(delegate()
                 {
-                    using(MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryitems WHERE OwnerID LIKE ?ownerid", connection))
+                    using(MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("?ownerid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE ?ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("?ownerid", userAccount);
                         cmd.ExecuteNonQuery();
@@ -209,7 +216,10 @@ namespace SilverSim.Database.MySQL.Inventory
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new MySQLInventoryService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
+            return new MySQLInventoryService(
+                MySQLUtilities.BuildConnectionString(ownSection, m_Log),
+                ownSection.GetString("ItemTable", "inventoryitems"),
+                ownSection.GetString("FolderTable", "inventoryfolders"));
         }
     }
     #endregion

@@ -83,12 +83,15 @@ namespace SilverSim.Database.MySQL.Presence
                     cmd.Parameters.AddParameter("?regionID", regionId);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        PresenceInfo pi = new PresenceInfo();
-                        pi.UserID.ID = reader.GetUUID("UserID");
-                        pi.RegionID = reader.GetUUID("RegionID");
-                        pi.SessionID = reader.GetUUID("SessionID");
-                        pi.SecureSessionID = reader.GetUUID("SecureSessionID");
-                        presences.Add(pi);
+                        while (reader.Read())
+                        {
+                            PresenceInfo pi = new PresenceInfo();
+                            pi.UserID.ID = reader.GetUUID("UserID");
+                            pi.RegionID = reader.GetUUID("RegionID");
+                            pi.SessionID = reader.GetUUID("SessionID");
+                            pi.SecureSessionID = reader.GetUUID("SecureSessionID");
+                            presences.Add(pi);
+                        }
                     }
                 }
             }

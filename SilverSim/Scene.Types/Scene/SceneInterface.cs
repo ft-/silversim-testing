@@ -334,7 +334,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private const uint PARCEL_BLOCK_SIZE = 4;
 
-        void LoginsEnabledHandler(bool state)
+        void LoginsEnabledHandler(UUID sceneid, bool state)
         {
             if (state)
             {
@@ -352,6 +352,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {
+            LoginControl = new LoginController(this);
             RegionMapTexture = TextureConstant.DefaultTerrainTexture2; /* set Default terrain Texture 2 as initial RegionMapTexture */
             SizeX = sizeX;
             SizeY = sizeY;

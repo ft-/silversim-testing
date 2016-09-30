@@ -3,6 +3,7 @@
 
 using log4net;
 using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
@@ -15,6 +16,7 @@ using System.Text;
 
 namespace SilverSim.Database.MySQL.Presence
 {
+    #region Service Implementation
     public class MySQLNpcPresenceService : NpcPresenceServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;
@@ -86,8 +88,8 @@ namespace SilverSim.Database.MySQL.Presence
         {
             new SqlTable("npcpresence"),
             new AddColumn<UUID>("NpcID") { IsNullAllowed = false, Default = UUID.Zero },
-            new AddColumn<string>("FirstName") { IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<string>("LastName") { IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("FirstName") { Cardinality = 31, IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<string>("LastName") { Cardinality = 31, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUI.Unknown },
             new AddColumn<UGI>("Group") { IsNullAllowed = false, Default = UGI.Unknown },
             new AddColumn<NpcOptions>("Options") { IsNullAllowed = false, Default = NpcOptions.None },
@@ -111,18 +113,21 @@ namespace SilverSim.Database.MySQL.Presence
                         cmd.Parameters.AddParameter("?regionID", regionID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            NpcPresenceInfo pi = new NpcPresenceInfo();
-                            pi.Npc.ID = reader.GetUUID("NpcID");
-                            pi.Npc.FirstName = reader.GetString("FirstName");
-                            pi.Npc.LastName = reader.GetString("LastName");
-                            pi.Owner = reader.GetUUI("Owner");
-                            pi.Group = reader.GetUGI("Group");
-                            pi.Options = reader.GetEnum<NpcOptions>("Options");
-                            pi.RegionID = reader.GetUUID("RegionID");
-                            pi.Position = reader.GetVector3("Position");
-                            pi.LookAt = reader.GetVector3("LookAt");
-                            pi.SittingOnObjectID = reader.GetUUID("SittingOnObjectID");
-                            presences.Add(pi);
+                            while (reader.Read())
+                            {
+                                NpcPresenceInfo pi = new NpcPresenceInfo();
+                                pi.Npc.ID = reader.GetUUID("NpcID");
+                                pi.Npc.FirstName = reader.GetString("FirstName");
+                                pi.Npc.LastName = reader.GetString("LastName");
+                                pi.Owner = reader.GetUUI("Owner");
+                                pi.Group = reader.GetUGI("Group");
+                                pi.Options = reader.GetEnum<NpcOptions>("Options");
+                                pi.RegionID = reader.GetUUID("RegionID");
+                                pi.Position = reader.GetVector3("Position");
+                                pi.LookAt = reader.GetVector3("LookAt");
+                                pi.SittingOnObjectID = reader.GetUUID("SittingOnObjectID");
+                                presences.Add(pi);
+                            }
                         }
                     }
                 }
@@ -130,4 +135,22 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
     }
+    #endregion
+
+    #region Factory
+    [PluginName("NpcPresence")]
+    public class MySQLNpcPresenceServiceFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL NPCPRESENCE SERVICE");
+        public MySQLNpcPresenceServiceFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new MySQLNpcPresenceService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
+        }
+    }
+    #endregion
 }

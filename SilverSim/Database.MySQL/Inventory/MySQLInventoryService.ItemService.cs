@@ -18,7 +18,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryitems WHERE ID LIKE ?itemid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE ID LIKE ?itemid", connection))
                 {
                     cmd.Parameters.AddParameter("?itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -39,7 +39,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE ID LIKE ?itemid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE ID LIKE ?itemid", connection))
                 {
                     cmd.Parameters.AddParameter("?itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -89,7 +89,7 @@ namespace SilverSim.Database.MySQL.Inventory
                         matchStrings.Add(string.Format("\"{0}\"", itemid.ToString()));
                     }
                     string qStr = string.Join(",", matchStrings);
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID IN (" + qStr + ")", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID IN (" + qStr + ")", connection))
                     {
                         cmd.Parameters.AddParameter("?ownerid", principalID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -111,7 +111,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
                 {
                     cmd.Parameters.AddParameter("?ownerid", principalID);
                     cmd.Parameters.AddParameter("?itemid", key);
@@ -133,7 +133,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
                 {
                     cmd.Parameters.AddParameter("?ownerid", principalID);
                     cmd.Parameters.AddParameter("?itemid", key);
@@ -171,7 +171,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsertInto("inventoryitems", item.ToDictionary());
+                connection.InsertInto(m_InventoryItemTable, item.ToDictionary());
             }
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
@@ -192,7 +192,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 newVals["GroupPermissionsMask"] = item.Permissions.Group;
                 newVals["SalePrice"] = item.SaleInfo.Price;
                 newVals["SaleType"] = item.SaleInfo.Type;
-                connection.UpdateSet("inventoryitems", newVals, string.Format("OwnerID LIKE '{0}' AND ID LIKE '{1}'", item.Owner.ID, item.ID));
+                connection.UpdateSet(m_InventoryItemTable, newVals, string.Format("OwnerID LIKE '{0}' AND ID LIKE '{1}'", item.Owner.ID, item.ID));
             }
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
@@ -203,7 +203,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
                 {
                     cmd.Parameters.AddParameter("?ownerid", principalID);
                     cmd.Parameters.AddParameter("?itemid", id);
@@ -241,8 +241,8 @@ namespace SilverSim.Database.MySQL.Inventory
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM inventoryfolders WHERE ID LIKE '{0}' AND OwnerID LIKE '{2}')" +
-                    "UPDATE inventoryitems SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, id, principalID),
+                using (MySqlCommand cmd = new MySqlCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID LIKE '{0}' AND OwnerID LIKE '{2}')" +
+                    "UPDATE " + m_InventoryItemTable + " SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, id, principalID),
                     connection))
                 {
                     if (cmd.ExecuteNonQuery() < 1)
@@ -263,7 +263,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("UPDATE inventoryfolders SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
                     {
                         cmd.Parameters.AddParameter("?ownerid", principalID);
                         cmd.Parameters.AddParameter("?folderid", folderID);
