@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.ServiceInterfaces.Chat;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -76,7 +77,47 @@ namespace SilverSim.Scene.Npc
 
         public void DoTouch(UUID objectKey, int linkNum)
         {
-#warning Implement touch for NPCs
+            ObjectGroup grp;
+            ObjectPart part;
+            if(!CurrentScene.ObjectGroups.TryGetValue(objectKey, out grp))
+            {
+                return;
+            }
+            else if(!grp.TryGetValue(linkNum, out part))
+            {
+                return;
+            }
+            DetectInfo dInfo = new DetectInfo();
+            dInfo.LinkNumber = linkNum;
+            dInfo.TouchFace = -1;
+            dInfo.Name = Owner.FullName;
+            dInfo.GrabOffset = part.LocalPosition * -1f;
+            dInfo.Group = Group;
+            dInfo.Key = ID;
+            dInfo.ObjType = DetectedTypeFlags.Npc;
+            dInfo.ObjType |= (SittingOnObject != null) ? DetectedTypeFlags.Passive : DetectedTypeFlags.Active;
+            dInfo.Owner = Owner;
+            dInfo.Position = GlobalPosition;
+            dInfo.Rotation = GlobalRotation;
+            dInfo.TouchBinormal = Vector3.Zero;
+            dInfo.TouchNormal = Vector3.Zero;
+            dInfo.TouchST = new Vector3(-1f, -1f, 0);
+            dInfo.TouchUV = new Vector3(-1f, -1f, 0);
+
+            TouchEvent te = new TouchEvent();
+            te.Type = TouchEvent.TouchType.Start;
+            te.Detected.Add(dInfo);
+            part.PostTouchEvent(te);
+
+            te = new TouchEvent();
+            te.Type = TouchEvent.TouchType.Continuous;
+            te.Detected.Add(dInfo);
+            part.PostTouchEvent(te);
+
+            te = new TouchEvent();
+            te.Type = TouchEvent.TouchType.End;
+            te.Detected.Add(dInfo);
+            part.PostTouchEvent(te);
         }
 
         public void DoSit(UUID objectKey)
