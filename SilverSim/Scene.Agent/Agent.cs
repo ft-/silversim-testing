@@ -2,21 +2,16 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Agent;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Script.Events;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.Types;
-using SilverSim.Types.Account;
-using SilverSim.Types.Primitive;
-using System;
-using System.Collections.Generic;
 using SilverSim.Scene.Types.Neighbor;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
+using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
@@ -25,14 +20,18 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
+using SilverSim.Types;
+using SilverSim.Types.Account;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
+using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
-using System.Diagnostics.CodeAnalysis;
+using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Agent
 {

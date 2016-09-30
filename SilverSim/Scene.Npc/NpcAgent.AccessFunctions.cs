@@ -2,19 +2,11 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.ServiceInterfaces.Chat;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.Agent;
-using SilverSim.Types.Asset;
-using SilverSim.Types.Asset.Format;
-using SilverSim.Types.Inventory;
-using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Npc
 {
