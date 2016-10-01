@@ -10,6 +10,7 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -36,6 +37,14 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Properties
+        public override ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes
+        {
+            get
+            {
+                return this;
+            }
+        }
+
         public override ISimulationDataEnvControllerStorageInterface EnvironmentController
         {
             get

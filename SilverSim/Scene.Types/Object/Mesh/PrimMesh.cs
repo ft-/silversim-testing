@@ -1,8 +1,8 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
 using System;
 
@@ -30,9 +30,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             TRAPEZOID_P3 = -Vector3.UnitX;
         }
 
-        internal static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
+        internal static MeshLOD ShapeToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
-            Mesh mesh;
+            MeshLOD mesh;
             switch (shape.ShapeType)
             {
                 case PrimitiveShapeType.Box:

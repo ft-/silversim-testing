@@ -16,6 +16,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 conn.MigrateTables(Migrations_Regions, m_Log);
                 conn.MigrateTables(Migrations_Parcels, m_Log);
                 conn.MigrateTables(Migrations_Objects, m_Log);
+                conn.MigrateTables(Migrations_Physics, m_Log);
             }
         }
     }

@@ -14,7 +14,7 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        public class PrimitiveShape
+        public class PrimitiveShape : IEquatable<PrimitiveShape>
         {
             #region Constructor
             public PrimitiveShape()
@@ -710,6 +710,32 @@ namespace SilverSim.Scene.Types.Object
                 }
 
                 return shape;
+            }
+
+            public bool Equals(PrimitiveShape other)
+            {
+                byte[] a = Serialization;
+                byte[] b = other.Serialization;
+                if(a.Length == b.Length)
+                {
+                    return a.Equals(b);
+                }
+                return false;
+            }
+
+            public override bool Equals(object o)
+            {
+                PrimitiveShape s = o as PrimitiveShape;
+                if(null == s)
+                {
+                    return false;
+                }
+                return Equals(s);
+            }
+
+            public override int GetHashCode()
+            {
+                return Serialization.GetHashCode();
             }
         }
 

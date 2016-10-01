@@ -14,7 +14,6 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
-using SilverSim.Types.Presence;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

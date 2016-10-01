@@ -4,19 +4,17 @@
 using CSJ2K;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 
 namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class SculptMesh
     {
-        internal static Mesh SculptMeshToMesh(this AssetData data, ObjectPart.PrimitiveShape.Decoded shape)
+        internal static MeshLOD SculptMeshToMesh(this AssetData data, ObjectPart.PrimitiveShape.Decoded shape)
         {
             if(data.Type != AssetType.Texture)
             {
@@ -28,7 +26,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
         }
 
-        internal static Mesh SculptMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape)
+        internal static MeshLOD SculptMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape)
         {
             using (Image im = J2kImage.FromStream(st))
             {
@@ -53,10 +51,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        internal static Mesh SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape)
+        internal static MeshLOD SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape)
         {
             bool mirror = shape.IsSculptMirrored;
-            Mesh mesh = new Mesh();
+            MeshLOD mesh = new MeshLOD();
             int vertexRowCount = bitmap.Width + 1;
             bool reverse_horizontal = shape.IsSculptInverted ? !mirror : mirror;
             PrimitiveSculptType sculptType = shape.SculptType;
@@ -122,16 +120,16 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 for(int col = 0; col < vertexRowCount - 1; ++col)
                 {
                     int row2 = row;
-                    Mesh.Triangle tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = row + col;
-                    tri.VectorIndex1 = row + col + 1;
-                    tri.VectorIndex2 = row2 + col + 1;
+                    Triangle tri = new Triangle();
+                    tri.Vertex1 = row + col;
+                    tri.Vertex2 = row + col + 1;
+                    tri.Vertex3 = row2 + col + 1;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = row + col;
-                    tri.VectorIndex1 = row2 + col;
-                    tri.VectorIndex2 = row2 + col + 1;
+                    tri = new Triangle();
+                    tri.Vertex1 = row + col;
+                    tri.Vertex2 = row2 + col;
+                    tri.Vertex3 = row2 + col + 1;
                     mesh.Triangles.Add(tri);
                 }
             }

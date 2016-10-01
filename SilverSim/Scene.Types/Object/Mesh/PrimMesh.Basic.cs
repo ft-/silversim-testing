@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return extrusionPath;
         }
 
-        static Mesh BoxCylPrismToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
+        static MeshLOD BoxCylPrismToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             PathDetails path;
             switch(shape.ShapeType)
@@ -79,7 +80,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
 
-            Mesh mesh = new Mesh();
+            MeshLOD mesh = new MeshLOD();
             for (; cut < cutEnd; cut += cutStep)
             {
                 mesh.Vertices.AddRange(path.ExtrudeBasic(shape, twistBegin, twistEnd, cut));
@@ -102,16 +103,16 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     /* p2 and p3 are on next row */
                     int z2 = (z + 1) % verticeTotalCount;
                     int l2 = (l + 1) % verticeRowCount; /* loop closure */
-                    Mesh.Triangle tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = z + l;
-                    tri.VectorIndex1 = z + l + 1;
-                    tri.VectorIndex2 = z2 + l2 + 1;
+                    Triangle tri = new Triangle();
+                    tri.Vertex1 = z + l;
+                    tri.Vertex2 = z + l + 1;
+                    tri.Vertex3 = z2 + l2 + 1;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = z + l;
-                    tri.VectorIndex1 = z2 + l;
-                    tri.VectorIndex2 = z2 + l2 + 1;
+                    tri = new Triangle();
+                    tri.Vertex1 = z + l;
+                    tri.Vertex2 = z2 + l;
+                    tri.Vertex3 = z2 + l2 + 1;
                     mesh.Triangles.Add(tri);
                 }
             }
@@ -127,55 +128,55 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     int l2 = verticeRowCount - l - 1;
 
-                    Mesh.Triangle tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = l;
-                    tri.VectorIndex1 = l + 1;
-                    tri.VectorIndex2 = l2;
+                    Triangle tri = new Triangle();
+                    tri.Vertex1 = l;
+                    tri.Vertex2 = l + 1;
+                    tri.Vertex3 = l2;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = l + 1;
-                    tri.VectorIndex1 = l2;
-                    tri.VectorIndex2 = l2 - 1;
+                    tri = new Triangle();
+                    tri.Vertex1 = l + 1;
+                    tri.Vertex2 = l2;
+                    tri.Vertex3 = l2 - 1;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = l + 1 + bottomIndex;
-                    tri.VectorIndex1 = l2 + bottomIndex;
-                    tri.VectorIndex2 = l2 - 1 + bottomIndex;
+                    tri = new Triangle();
+                    tri.Vertex1 = l + 1 + bottomIndex;
+                    tri.Vertex2 = l2 + bottomIndex;
+                    tri.Vertex3 = l2 - 1 + bottomIndex;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = l + 1 + bottomIndex;
-                    tri.VectorIndex1 = l2 + bottomIndex;
-                    tri.VectorIndex2 = l2 - 1 + bottomIndex;
+                    tri = new Triangle();
+                    tri.Vertex1 = l + 1 + bottomIndex;
+                    tri.Vertex2 = l2 + bottomIndex;
+                    tri.Vertex3 = l2 - 1 + bottomIndex;
                     mesh.Triangles.Add(tri);
                 }
 
                 if(!path.IsOpenHollow)
                 {
-                    Mesh.Triangle tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = 0;
-                    tri.VectorIndex1 = verticeRowCount - 1;
-                    tri.VectorIndex2 = verticeRowCount / 2;
+                    Triangle tri = new Triangle();
+                    tri.Vertex1 = 0;
+                    tri.Vertex2 = verticeRowCount - 1;
+                    tri.Vertex3 = verticeRowCount / 2;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = 0;
-                    tri.VectorIndex1 = verticeRowCount / 2 - 1;
-                    tri.VectorIndex2 = verticeRowCount / 2;
+                    tri = new Triangle();
+                    tri.Vertex1 = 0;
+                    tri.Vertex2 = verticeRowCount / 2 - 1;
+                    tri.Vertex3 = verticeRowCount / 2;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = bottomIndex;
-                    tri.VectorIndex1 = verticeRowCount - 1 + bottomIndex;
-                    tri.VectorIndex2 = verticeRowCount / 2 + bottomIndex;
+                    tri = new Triangle();
+                    tri.Vertex1 = bottomIndex;
+                    tri.Vertex2 = verticeRowCount - 1 + bottomIndex;
+                    tri.Vertex3 = verticeRowCount / 2 + bottomIndex;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = bottomIndex;
-                    tri.VectorIndex1 = verticeRowCount / 2 - 1 + bottomIndex;
-                    tri.VectorIndex2 = verticeRowCount / 2 + bottomIndex;
+                    tri = new Triangle();
+                    tri.Vertex1 = bottomIndex;
+                    tri.Vertex2 = verticeRowCount / 2 - 1 + bottomIndex;
+                    tri.Vertex3 = verticeRowCount / 2 + bottomIndex;
                     mesh.Triangles.Add(tri);
                 }
             }
@@ -196,16 +197,16 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     int l2 = (l + 1) % verticeRowCount;
 
-                    Mesh.Triangle tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = l;
-                    tri.VectorIndex1 = l2;
-                    tri.VectorIndex2 = centerpointTop;
+                    Triangle tri = new Triangle();
+                    tri.Vertex1 = l;
+                    tri.Vertex2 = l2;
+                    tri.Vertex3 = centerpointTop;
                     mesh.Triangles.Add(tri);
 
-                    tri = new Mesh.Triangle();
-                    tri.VectorIndex0 = l + bottomIndex;
-                    tri.VectorIndex1 = l2 + bottomIndex;
-                    tri.VectorIndex2 = centerpointBottom;
+                    tri = new Triangle();
+                    tri.Vertex1 = l + bottomIndex;
+                    tri.Vertex2 = l2 + bottomIndex;
+                    tri.Vertex3 = centerpointBottom;
                     mesh.Triangles.Add(tri);
                 }
             }

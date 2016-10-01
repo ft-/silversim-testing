@@ -2,37 +2,34 @@
 // GNU Affero General Public License v3
 
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.Types;
+using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class ExtensionMethods
     {
-        public static Mesh ToMesh(this ObjectPart part, AssetServiceInterface assetService)
+        public static MeshLOD ToMesh(this ObjectPart part, AssetServiceInterface assetService)
         {
             return part.Shape.DecodedParams.ToMesh(assetService);
         }
 
-        public static Mesh ToMesh(this ObjectPart.PrimitiveShape shape, AssetServiceInterface assetService)
+        public static MeshLOD ToMesh(this ObjectPart.PrimitiveShape shape, AssetServiceInterface assetService)
         {
             return shape.DecodedParams.ToMesh(assetService);
         }
 
-        public static Mesh ToMesh(this ObjectPart.PrimitiveShape.Decoded shape, AssetServiceInterface assetService, bool usePhysicsMesh = false)
+        public static MeshLOD ToMesh(this ObjectPart.PrimitiveShape.Decoded shape, AssetServiceInterface assetService)
         {
-            Mesh mesh;
+            MeshLOD mesh;
             switch(shape.ShapeType)
             {
                 case PrimitiveShapeType.Sculpt:
                     switch(shape.SculptType & PrimitiveSculptType.TypeMask)
                     {
                         case PrimitiveSculptType.Mesh:
-                            mesh = assetService[shape.SculptMap].LLMeshToMesh(shape, usePhysicsMesh);
+                            LLMesh llMesh = new LLMesh(assetService[shape.SculptMap]);
+                            mesh = llMesh.GetLOD(LLMesh.LodLevel.LOD3);
                             break;
 
                         default:
@@ -45,9 +42,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     mesh = shape.ShapeToMesh();
                     break;
             }
-
-            /* clean up de-generate triangles and duplicate vertices */
-            mesh.Optimize();
 
             return mesh;
         }

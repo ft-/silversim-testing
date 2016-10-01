@@ -2,15 +2,11 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types.StructuredData.Llsd;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Types.Asset.Format.Mesh
 {
-    public class PhysicsMesh : LOD
+    public class PhysicsMesh : MeshLOD
     {
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public PhysicsMesh(AssetData asset)
@@ -40,7 +36,20 @@ namespace SilverSim.Types.Asset.Format.Mesh
             {
                 physicsMap = (Map)meshmap["physics_mesh"];
             }
+            /* prefer lowest LOD */
+            else if (meshmap.ContainsKey("lowest_lod"))
+            {
+                physicsMap = (Map)meshmap["lowest_lod"];
+            }
+            else if (meshmap.ContainsKey("low_lod"))
+            {
+                physicsMap = (Map)meshmap["low_lod"];
+            }
             else if (meshmap.ContainsKey("medium_lod"))
+            {
+                physicsMap = (Map)meshmap["medium_lod"];
+            }
+            else if (meshmap.ContainsKey("high_lod"))
             {
                 physicsMap = (Map)meshmap["high_lod"];
             }

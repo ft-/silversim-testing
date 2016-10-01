@@ -31,6 +31,14 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region Properties
+        public override ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes
+        {
+            get
+            {
+                return this;
+            }
+        }
+
         public override ISimulationDataEnvControllerStorageInterface EnvironmentController
         {
             get

@@ -18,6 +18,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
+        public abstract ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes
+        {
+            get;
+        }
+
         public abstract ISimulationDataEnvControllerStorageInterface EnvironmentController
         {
             get;
