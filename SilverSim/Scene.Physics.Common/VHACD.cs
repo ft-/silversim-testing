@@ -145,7 +145,7 @@ namespace SilverSim.Scene.Physics.Common
                 Marshal.Copy(hull.Points, resPoints, 0, hull.NumPoints * 3);
                 int[] resTris = new int[hull.NumTriangles];
                 Marshal.Copy(hull.Triangles, resTris, 0, hull.NumTriangles * 3);
-
+#warning Implement conversion to PhysicsConvexShape
             }
 
             return shape;
