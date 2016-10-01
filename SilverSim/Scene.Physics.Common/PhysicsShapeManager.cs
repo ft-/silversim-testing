@@ -31,8 +31,10 @@ namespace SilverSim.Scene.Physics.Common
 
         PhysicsConvexShape DecomposeConvex(MeshLOD lod)
         {
-#warning Implement Convex Decomposition
-            throw new NotImplementedException("DecomposeConvex");
+            using (VHACD vhacd = new VHACD())
+            {
+                return vhacd.Compute(lod);
+            }
         }
 
         public bool TryGetConvexShape(ObjectPart.PrimitiveShape shape, out PhysicsConvexShape physics)
