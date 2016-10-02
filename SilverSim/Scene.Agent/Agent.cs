@@ -55,6 +55,7 @@ namespace SilverSim.Scene.Agent
 
         protected Agent(UUID agentId, Uri homeURI)
         {
+            Group = UGI.Unknown;
             m_AgentID = agentId;
             HomeURI = homeURI;
             m_AnimationController = new AgentAnimationController(ID, SendAnimations);
