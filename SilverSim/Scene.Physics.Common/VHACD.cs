@@ -4,12 +4,8 @@
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.Scene.Physics.Common
 {
@@ -112,6 +108,10 @@ namespace SilverSim.Scene.Physics.Common
 
         public PhysicsConvexShape Compute(MeshLOD m)
         {
+            if(m_VHacd == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException("VHACD");
+            }
             double[] points = new double[m.Vertices.Count * 3];
             int[] tris = new int[m.Triangles.Count * 3];
             int idx = 0;
@@ -145,7 +145,20 @@ namespace SilverSim.Scene.Physics.Common
                 Marshal.Copy(hull.Points, resPoints, 0, hull.NumPoints * 3);
                 int[] resTris = new int[hull.NumTriangles];
                 Marshal.Copy(hull.Triangles, resTris, 0, hull.NumTriangles * 3);
-#warning Implement conversion to PhysicsConvexShape
+
+                PhysicsConvexShape.ConvexHull cHull = new PhysicsConvexShape.ConvexHull();
+                for (int vertidx = 0; vertidx < hull.NumPoints; vertidx += 3)
+                {
+                    cHull.Vertices.Add(new Vector3(
+                        resPoints[vertidx + 0],
+                        resPoints[vertidx + 1],
+                        resPoints[vertidx + 2]));
+                }
+                for(int triidx = 0; triidx < hull.NumTriangles; ++triidx)
+                {
+                    cHull.Triangles.Add(resTris[triidx]);
+                }
+                shape.Hulls.Add(cHull);
             }
 
             return shape;

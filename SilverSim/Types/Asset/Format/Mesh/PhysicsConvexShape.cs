@@ -10,7 +10,18 @@ namespace SilverSim.Types.Asset.Format.Mesh
 {
     public class PhysicsConvexShape
     {
-        public readonly List<List<Vector3>> Hulls = new List<List<Vector3>>();
+        public class ConvexHull
+        {
+            public readonly List<Vector3> Vertices = new List<Vector3>();
+            public readonly List<int> Triangles = new List<int>();
+
+            public ConvexHull()
+            {
+
+            }
+        }
+
+        public readonly List<ConvexHull> Hulls = new List<ConvexHull>();
         public bool HasHullList = false;
 
         public PhysicsConvexShape()
@@ -22,39 +33,68 @@ namespace SilverSim.Types.Asset.Format.Mesh
             Load(data, physOffset, physSize);
         }
 
+        static int LEBytesToInt32(byte[] b, int offset)
+        {
+            byte[] data = b;
+            int ofs = offset;
+            if(!BitConverter.IsLittleEndian)
+            {
+                data = new byte[4];
+                Buffer.BlockCopy(b, offset, data, 0, 4);
+                Array.Reverse(data);
+                ofs = 0;
+            }
+            return BitConverter.ToInt32(b, ofs);
+        }
+
+        static void Int32ToLEBytes(int val, byte[] b, int offset)
+        {
+            byte[] d = BitConverter.GetBytes(val);
+            if(!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(d);
+            }
+            Buffer.BlockCopy(d, 0, b, offset, 4);
+        }
+
         public byte[] SerializedData
         {
             get
             {
                 int counthulls = 0;
                 int countverts = 0;
-                foreach(List<Vector3> hull in Hulls)
+                int counttris = 0;
+                foreach(ConvexHull hull in Hulls)
                 {
-                    ++counthulls;
-                    countverts += hull.Count;
+                    counthulls += 2;
+                    countverts += hull.Vertices.Count;
+                    counttris += hull.Triangles.Count;
                 }
 
-                byte[] serializedData = new byte[5 + counthulls * sizeof(int) + countverts * 12];
+                byte[] serializedData = new byte[5 + counthulls * 8 + countverts * 12 + counttris * 4];
                 int byteOffset = 5;
                 serializedData[0] = (byte)'P';
                 serializedData[1] = (byte)'H';
                 serializedData[2] = (byte)'U';
                 serializedData[3] = (byte)'L';
                 SerializedData[4] = HasHullList ? (byte)1 : (byte)0;
-                foreach (List<Vector3> hull in Hulls)
+
+                foreach (ConvexHull hull in Hulls)
                 {
-                    byte[] d = BitConverter.GetBytes(hull.Count);
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(d);
-                    }
-                    Buffer.BlockCopy(d, 0, serializedData, byteOffset, 4);
+                    Int32ToLEBytes(hull.Vertices.Count, serializedData, byteOffset);
+                    byteOffset += 4;
+                    Int32ToLEBytes(hull.Triangles.Count, serializedData, byteOffset);
                     byteOffset += 4;
 
-                    foreach(Vector3 v in hull)
+                    foreach(Vector3 v in hull.Vertices)
                     {
                         v.ToBytes(serializedData, byteOffset);
                         byteOffset += 12;
+                    }
+                    foreach(int v in hull.Triangles)
+                    {
+                        Int32ToLEBytes(v, serializedData, byteOffset);
+                        byteOffset += 4;
                     }
                 }
 
@@ -76,27 +116,22 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 Hulls.Clear();
                 while(byteOffset < value.Length)
                 {
-                    int hullCount;
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        byte[] d = new byte[4];
-                        Buffer.BlockCopy(value, byteOffset, d, 0, 4);
-                        Array.Reverse(d);
-                        hullCount = BitConverter.ToInt32(d, 0);
-                    }
-                    else
-                    {
-                        hullCount = BitConverter.ToInt32(value, byteOffset);
-                    }
+                    int vertexCount = LEBytesToInt32(value, byteOffset);
+                    byteOffset += 4;
+                    int triCount = LEBytesToInt32(value, byteOffset);
                     byteOffset += 4;
 
-                    List<Vector3> hull = new List<Vector3>();
-                    for(int idx = 0; idx < hullCount; ++idx)
+                    ConvexHull hull = new ConvexHull();
+                    for(int idx = 0; idx < vertexCount; ++idx)
                     {
-                        Vector3 v = new Vector3();
-                        v.FromBytes(value, byteOffset);
+                        hull.Vertices.Add(new Vector3(value, byteOffset));
                         byteOffset += 12;
-                        hull.Add(v);
+                    }
+
+                    for(int idx = 0; idx < triCount; ++idx)
+                    {
+                        hull.Triangles.Add(LEBytesToInt32(value, byteOffset));
+                        byteOffset += 4;
                     }
                 }
             }
@@ -134,7 +169,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 byte[] hullList = (BinaryData)physics_convex["HullList"];
                 byte[] positions = (BinaryData)physics_convex["Positions"];
                 int byteposition = 0;
-                List<Vector3> hull = new List<Vector3>();
+                ConvexHull hull = new ConvexHull();
                 foreach(byte b in hullList)
                 {
                     int hullElements = b == 0 ? 256 : (int)b;
@@ -149,7 +184,8 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
                         Vector3 v = new Vector3(
                             x, y, z);
-                        hull.Add(v.ElementMultiply(range) + min);
+                        hull.Vertices.Add(v.ElementMultiply(range) + min);
+                        hull.Triangles.Add(idx);
                     }
                 }
                 Hulls.Add(hull);
@@ -160,7 +196,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 byte[] positions = (BinaryData)physics_convex["BoundingVerts"];
                 int hullElements = positions.Length / 6;
                 int byteposition = 0;
-                List<Vector3> hull = new List<Vector3>();
+                ConvexHull hull = new ConvexHull();
                 for (int idx = 0; idx < hullElements; ++idx)
                 {
                     uint x = positions[byteposition++];
@@ -172,7 +208,8 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
                     Vector3 v = new Vector3(
                         x, y, z);
-                    hull.Add(v.ElementMultiply(range) + min);
+                    hull.Vertices.Add(v.ElementMultiply(range) + min);
+                    hull.Triangles.Add(idx);
                 }
                 Hulls.Add(hull);
             }

@@ -9,7 +9,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
-using System;
 
 namespace SilverSim.Scene.Physics.Common
 {

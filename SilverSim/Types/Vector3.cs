@@ -56,6 +56,14 @@ namespace SilverSim.Types
             Z = vector.Z;
         }
 
+        public Vector3(byte[] data, int offset)
+        {
+            X = 0;
+            Y = 0;
+            Z = 0;
+            FromBytes(data, offset);
+        }
+
         #endregion Constructors
 
         #region Properties
@@ -113,9 +121,9 @@ namespace SilverSim.Types
 
                 Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 12);
 
-                System.Array.Reverse(conversionBuffer, 0, 4);
-                System.Array.Reverse(conversionBuffer, 4, 4);
-                System.Array.Reverse(conversionBuffer, 8, 4);
+                Array.Reverse(conversionBuffer, 0, 4);
+                Array.Reverse(conversionBuffer, 4, 4);
+                Array.Reverse(conversionBuffer, 8, 4);
 
                 X = BitConverter.ToSingle(conversionBuffer, 0);
                 Y = BitConverter.ToSingle(conversionBuffer, 4);
