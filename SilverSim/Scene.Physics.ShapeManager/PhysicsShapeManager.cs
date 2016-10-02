@@ -1,6 +1,8 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using System;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
@@ -15,23 +17,27 @@ namespace SilverSim.Scene.Physics.ShapeManager
 {
     public sealed class PhysicsShapeManager : IPlugin
     {
-        readonly AssetServiceInterface m_AssetService;
-        readonly SimulationDataStorageInterface m_SimulationStorage;
+        AssetServiceInterface m_AssetService;
+        SimulationDataStorageInterface m_SimulationStorage;
 
         readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesBySculptMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
         readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
 
+        string m_AssetServiceName;
+        string m_SimulationDataStorageName;
+
         public PhysicsShapeManager(
-            AssetServiceInterface assetService,
-            SimulationDataStorageInterface simulationStorage)
+            string assetServiceName,
+            string simulationStorageName)
         {
-            m_AssetService = assetService;
-            m_SimulationStorage = simulationStorage;
+            m_AssetServiceName = assetServiceName;
+            m_SimulationDataStorageName = simulationStorageName;
         }
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* nothing to do */
+            m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
+            m_SimulationStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
         }
 
         PhysicsConvexShape DecomposeConvex(MeshLOD lod)
@@ -187,6 +193,22 @@ namespace SilverSim.Scene.Physics.ShapeManager
             m_SimulationStorage.PhysicsConvexShapes[shape] = physics;
 
             return true;
+        }
+    }
+
+    [PluginName("PhysicsShapeManager")]
+    public class PhysicsShapeManagerFactory : IPluginFactory
+    {
+        public PhysicsShapeManagerFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new PhysicsShapeManager(
+                ownSection.GetString("AssetService"),
+                ownSection.GetString("SimulationDataStorage"));
         }
     }
 }
