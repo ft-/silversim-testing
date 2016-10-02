@@ -7,7 +7,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace SilverSim.Scene.Physics.Common
+namespace SilverSim.Scene.Physics.ShapeManager
 {
     public class VHACD : IDisposable
     {

@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Mesh;
@@ -10,9 +11,9 @@ using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
 
-namespace SilverSim.Scene.Physics.Common
+namespace SilverSim.Scene.Physics.ShapeManager
 {
-    public class PhysicsShapeManager
+    public sealed class PhysicsShapeManager : IPlugin
     {
         readonly AssetServiceInterface m_AssetService;
         readonly SimulationDataStorageInterface m_SimulationStorage;
@@ -26,6 +27,11 @@ namespace SilverSim.Scene.Physics.Common
         {
             m_AssetService = assetService;
             m_SimulationStorage = simulationStorage;
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+            /* nothing to do */
         }
 
         PhysicsConvexShape DecomposeConvex(MeshLOD lod)
