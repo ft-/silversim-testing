@@ -164,7 +164,6 @@ namespace SilverSim.Scene.Physics.Common
             return shape;
         }
 
-
         static VHACD()
         {
             if (!m_Inited)
