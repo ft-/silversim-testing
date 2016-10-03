@@ -1,7 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using System;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
@@ -12,6 +11,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
+using System.Threading;
 
 namespace SilverSim.Scene.Physics.ShapeManager
 {
@@ -25,6 +25,38 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
         string m_AssetServiceName;
         string m_SimulationDataStorageName;
+        ReaderWriterLock m_Lock = new ReaderWriterLock();
+
+        public sealed class PhysicsShapeMeshReference : PhysicsShapeReference
+        {
+            UUID m_ID;
+            internal PhysicsShapeMeshReference(UUID id, PhysicsShapeManager manager, PhysicsConvexShape shape)
+                : base(manager, shape)
+            {
+                m_ID = id;
+            }
+
+            ~PhysicsShapeMeshReference()
+            {
+                m_PhysicsManager.DecrementUseCount(m_ID, m_ConvexShape);
+            }
+        }
+
+        public sealed class PhysicsShapePrimShapeReference : PhysicsShapeReference
+        {
+            ObjectPart.PrimitiveShape m_Shape;
+
+            internal PhysicsShapePrimShapeReference(ObjectPart.PrimitiveShape primshape, PhysicsShapeManager manager, PhysicsConvexShape shape)
+                : base(manager, shape)
+            {
+                m_Shape = new ObjectPart.PrimitiveShape(primshape);
+            }
+
+            ~PhysicsShapePrimShapeReference()
+            {
+                m_PhysicsManager.DecrementUseCount(m_Shape, m_ConvexShape);
+            }
+        }
 
         public PhysicsShapeManager(
             string assetServiceName,
@@ -48,7 +80,45 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
-        public bool TryGetConvexShape(ObjectPart.PrimitiveShape shape, out PhysicsConvexShape physics)
+        internal void DecrementUseCount(UUID id, PhysicsConvexShape shape)
+        {
+            if (0 == Interlocked.Decrement(ref shape.UseCount))
+            {
+                m_Lock.AcquireWriterLock(-1);
+                try
+                {
+                    m_ConvexShapesBySculptMesh.RemoveIf(id, delegate (PhysicsConvexShape s)
+                    {
+                        return s.UseCount == 0;
+                    });
+                }
+                finally
+                {
+                    m_Lock.ReleaseWriterLock();
+                }
+            }
+        }
+
+        internal void DecrementUseCount(ObjectPart.PrimitiveShape primshape, PhysicsConvexShape shape)
+        {
+            if (0 == Interlocked.Decrement(ref shape.UseCount))
+            {
+                m_Lock.AcquireWriterLock(-1);
+                try
+                {
+                    m_ConvexShapesByPrimShape.RemoveIf(primshape, delegate (PhysicsConvexShape s)
+                    {
+                        return s.UseCount == 0;
+                    });
+                }
+                finally
+                {
+                    m_Lock.ReleaseWriterLock();
+                }
+            }
+        }
+
+        public bool TryGetConvexShape(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physics)
         {
             if(shape.Type == PrimitiveShapeType.Sculpt)
             {
@@ -59,7 +129,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
                     default:
                         /* calculate convex from sculpt */
-                        return TryGetConvexShapeFromSculpt(shape, out physics);
+                        return TryGetConvexShapeFromPrim(shape, out physics);
                 }
             }
             else
@@ -125,72 +195,85 @@ namespace SilverSim.Scene.Physics.ShapeManager
             return convexShape;
         }
 
-        bool TryGetConvexShapeFromSculpt(ObjectPart.PrimitiveShape shape, out PhysicsConvexShape physics)
+        bool TryGetConvexShapeFromMesh(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
-            if (m_ConvexShapesByPrimShape.TryGetValue(shape, out physics))
-            {
-                return true;
-            }
-
-            /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
-            physics = ConvertToMesh(shape);
-            try
-            {
-                m_ConvexShapesByPrimShape.Add(shape, physics);
-            }
-            catch
-            {
-                physics = m_ConvexShapesByPrimShape[shape];
-            }
-
-            m_SimulationStorage.PhysicsConvexShapes[shape] = physics;
-
-            return true;
-        }
-
-        bool TryGetConvexShapeFromMesh(ObjectPart.PrimitiveShape shape, out PhysicsConvexShape physics)
-        {
+            PhysicsConvexShape physicshape;
             UUID meshId = shape.SculptMap;
-            if(m_ConvexShapesBySculptMesh.TryGetValue(meshId, out physics))
+            m_Lock.AcquireReaderLock(-1);
+            try
             {
-                return true;
+                if (m_ConvexShapesBySculptMesh.TryGetValue(meshId, out physicshape))
+                {
+                    physicshaperef = new PhysicsShapeMeshReference(meshId, this, physicshape);
+                    return true;
+                }
+            }
+            finally
+            {
+                m_Lock.ReleaseReaderLock();
             }
 
             /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
-            physics = ConvertToMesh(shape);
+            physicshape = ConvertToMesh(shape);
+
+            m_Lock.AcquireReaderLock(-1);
             try
             {
-                m_ConvexShapesBySculptMesh.Add(meshId, physics);
+                try
+                {
+                    m_ConvexShapesBySculptMesh.Add(meshId, physicshape);
+                }
+                catch
+                {
+                    physicshape = m_ConvexShapesBySculptMesh[meshId];
+                }
+                physicshaperef = new PhysicsShapeMeshReference(meshId, this, physicshape);
             }
-            catch
+            finally
             {
-                physics = m_ConvexShapesBySculptMesh[meshId];
+                m_Lock.ReleaseReaderLock();
             }
-
-            m_SimulationStorage.PhysicsConvexShapes[meshId] = physics;
 
             return true;
         }
 
-        bool TryGetConvexShapeFromPrim(ObjectPart.PrimitiveShape shape, out PhysicsConvexShape physics)
+        bool TryGetConvexShapeFromPrim(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
-            if (m_ConvexShapesByPrimShape.TryGetValue(shape, out physics))
+            PhysicsConvexShape physicshape;
+            m_Lock.AcquireReaderLock(-1);
+            try
             {
-                return true;
+                if (m_ConvexShapesByPrimShape.TryGetValue(shape, out physicshape))
+                {
+                    physicshaperef = new PhysicsShapePrimShapeReference(shape, this, physicshape);
+                    return true;
+                }
+            }
+            finally
+            {
+                m_Lock.ReleaseReaderLock();
             }
 
             /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
-            physics = ConvertToMesh(shape);
+            physicshape = ConvertToMesh(shape);
+
+            m_Lock.AcquireReaderLock(-1);
             try
             {
-                m_ConvexShapesByPrimShape.Add(shape, physics);
+                try
+                {
+                    m_ConvexShapesByPrimShape.Add(shape, physicshape);
+                }
+                catch
+                {
+                    physicshape = m_ConvexShapesByPrimShape[shape];
+                }
+                physicshaperef = new PhysicsShapePrimShapeReference(shape, this, physicshape);
             }
-            catch
+            finally
             {
-                physics = m_ConvexShapesByPrimShape[shape];
+                m_Lock.ReleaseReaderLock();
             }
-
-            m_SimulationStorage.PhysicsConvexShapes[shape] = physics;
 
             return true;
         }

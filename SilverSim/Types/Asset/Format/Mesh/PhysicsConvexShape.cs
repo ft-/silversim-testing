@@ -23,6 +23,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
         public readonly List<ConvexHull> Hulls = new List<ConvexHull>();
         public bool HasHullList = false;
+        public int UseCount; /* used by PhysicsShapeManager */
 
         public PhysicsConvexShape()
         {

@@ -20,6 +20,11 @@ namespace SilverSim.Scene.Types.Object
             public PrimitiveShape()
             {
             }
+
+            public PrimitiveShape(PrimitiveShape c)
+            {
+                CopyFrom(c);
+            }
             #endregion
 
             #region Fields
