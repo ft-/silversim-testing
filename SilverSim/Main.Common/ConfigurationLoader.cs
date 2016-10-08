@@ -1905,8 +1905,13 @@ namespace SilverSim.Main.Common
                 UUID regionId;
                 if (!UUID.TryParse(args[2], out regionId))
                 {
-                    io.Write("regionid is not a UUID");
-                    return;
+                    SceneInterface scene;
+                    if (!Scenes.TryGetValue(args[2], out scene))
+                    {
+                        io.Write("regionid is not a UUID nor a region name");
+                        return;
+                    }
+                    regionId = scene.ID;
                 }
                 try
                 {
@@ -1924,7 +1929,7 @@ namespace SilverSim.Main.Common
         {
             if (args[0] == "help" || args.Count < 4 || args.Count > 5)
             {
-                io.Write("set serverparam <regionid> <param> <value>\nset serverparam <param> <value>");
+                io.Write("set serverparam <regionid> <param> <value>\nset serverparam <regionname> <param> <value>\nset serverparam <param> <value>");
             }
             else if (limitedToScene != UUID.Zero)
             {
@@ -1946,8 +1951,13 @@ namespace SilverSim.Main.Common
                 UUID regionId;
                 if (!UUID.TryParse(args[2], out regionId))
                 {
-                    io.Write("regionid is not a UUID");
-                    return;
+                    SceneInterface scene;
+                    if (!Scenes.TryGetValue(args[2], out scene))
+                    {
+                        io.Write("regionid is not a UUID nor a region name");
+                        return;
+                    }
+                    regionId = scene.ID;
                 }
                 try
                 {
