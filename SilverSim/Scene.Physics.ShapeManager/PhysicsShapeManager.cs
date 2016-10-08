@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
@@ -216,9 +217,12 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 m_Lock.ReleaseReaderLock();
             }
 
-            /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
-            physicshape = ConvertToMesh(shape);
-            m_SimulationStorage.PhysicsConvexShapes[meshId] = physicshape;
+            if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(meshId, out physicshape))
+            {
+                /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
+                physicshape = ConvertToMesh(shape);
+                m_SimulationStorage.PhysicsConvexShapes[meshId] = physicshape;
+            }
 
             m_Lock.AcquireReaderLock(-1);
             try
@@ -258,9 +262,12 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 m_Lock.ReleaseReaderLock();
             }
 
-            /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
-            physicshape = ConvertToMesh(shape);
-            m_SimulationStorage.PhysicsConvexShapes[shape] = physicshape;
+            if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(shape, out physicshape))
+            {
+                /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
+                physicshape = ConvertToMesh(shape);
+                m_SimulationStorage.PhysicsConvexShapes[shape] = physicshape;
+            }
 
             m_Lock.AcquireReaderLock(-1);
             try
