@@ -202,18 +202,25 @@ namespace SilverSim.Database.MySQL.ServerParam
 
         protected override void Store(UUID regionID, string parameter, string value)
         {
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            if (string.IsNullOrEmpty(value))
             {
-                connection.Open();
-                connection.InsideTransaction(delegate()
+                Remove(regionID, parameter);
+            }
+            else
+            {
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
-                    Dictionary<string, object> param = new Dictionary<string, object>();
-                    param["regionid"] = regionID;
-                    param["parametername"] = parameter;
-                    param["parametervalue"] = value;
-                    connection.ReplaceInto("serverparams", param);
-                    m_Cache[regionID][parameter] = value;
-                });
+                    connection.Open();
+                    connection.InsideTransaction(delegate ()
+                    {
+                        Dictionary<string, object> param = new Dictionary<string, object>();
+                        param["regionid"] = regionID;
+                        param["parametername"] = parameter;
+                        param["parametervalue"] = value;
+                        connection.ReplaceInto("serverparams", param);
+                        m_Cache[regionID][parameter] = value;
+                    });
+                }
             }
         }
 
