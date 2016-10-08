@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.Core
     {
         void Cap_RenderMaterials(HttpRequest httpreq)
         {
-            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

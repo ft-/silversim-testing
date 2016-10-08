@@ -46,8 +46,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateGestureTaskInventory(ViewerAgent agent, SceneInterface scene, string serverURI, IPEndPoint ep)
-            : base(agent.Owner, serverURI, ep)
+        public UpdateGestureTaskInventory(ViewerAgent agent, SceneInterface scene, string serverURI, string remoteip)
+            : base(agent.Owner, serverURI, remoteip)
         {
             m_Agent = agent;
             m_Scene = scene;

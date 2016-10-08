@@ -33,8 +33,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UploadBakedTexture(UUI creator, AssetServiceInterface assetService, string serverURI, IPEndPoint ep)
-            : base(creator, serverURI, ep)
+        public UploadBakedTexture(
+            UUI creator,
+            AssetServiceInterface assetService,
+            string serverURI,
+            string remoteip)
+            : base(creator, serverURI, remoteip)
         {
             m_AssetService = assetService;
         }

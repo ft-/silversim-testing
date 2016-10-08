@@ -1564,7 +1564,7 @@ namespace SilverSim.Viewer.Groups
         [CapabilityHandler("GroupMemberData")]
         public void HandleGroupMemberDataCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
         {
-            if (!req.CallerIP.Equals(circuit.RemoteEndPoint))
+            if (req.CallerIP != circuit.RemoteIP)
             {
                 req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

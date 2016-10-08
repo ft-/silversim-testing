@@ -126,7 +126,7 @@ namespace SilverSim.Viewer.Core
         public void RegionSeedHandler(HttpRequest httpreq)
         {
             IValue o;
-            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;
@@ -308,89 +308,149 @@ namespace SilverSim.Viewer.Core
             string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
             AddDefCapabilityFactory("DispatchRegionInfo", regionSeedID, delegate(ViewerAgent agent)
             {
-                return new DispatchRegionInfo(agent, Server.Scene, (IPEndPoint)RemoteEndPoint);
+                return new DispatchRegionInfo(
+                    agent, 
+                    Server.Scene,
+                    RemoteIP);
             }, capConfig);
             AddDefCapabilityFactory("CopyInventoryFromNotecard", regionSeedID, delegate (ViewerAgent agent)
             {
-                return new CopyInventoryFromNotecard(agent, Server.Scene, (IPEndPoint)RemoteEndPoint);
+                return new CopyInventoryFromNotecard(
+                    agent, 
+                    Server.Scene,
+                    RemoteIP);
             }, capConfig);
             AddDefCapabilityFactory("ParcelPropertiesUpdate", regionSeedID, delegate (ViewerAgent agent)
             {
-                return new ParcelPropertiesUpdate(agent, Server.Scene, (IPEndPoint)RemoteEndPoint);
+                return new ParcelPropertiesUpdate(
+                    agent,
+                    Server.Scene,
+                    RemoteIP);
             }, capConfig);
             AddDefCapabilityFactory("AgentPreferences", regionSeedID, delegate(ViewerAgent agent)
             {
-                return new AgentPreferences(agent, (IPEndPoint)RemoteEndPoint);
+                return new AgentPreferences(
+                    agent,
+                    RemoteIP);
             }, capConfig);
             AddDefCapabilityFactory("ObjectAdd", regionSeedID, delegate(ViewerAgent agent)
             {
-                return new ObjectAdd(Server.Scene, agent.Owner, (IPEndPoint)RemoteEndPoint);
+                return new ObjectAdd(
+                    Server.Scene, 
+                    agent.Owner,
+                    RemoteIP);
             }, capConfig);
             AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UploadBakedTexture(agent.Owner, Server.Scene.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new UploadBakedTexture(
+                    agent.Owner, 
+                    Server.Scene.AssetService,
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new NewFileAgentInventory(agent, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventory(
+                    agent, 
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(agent, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(
+                    agent, 
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateGestureAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateGestureAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new UpdateGestureAgentInventory(
+                    agent,
+                    agent.InventoryService, 
+                    agent.AssetService, 
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateNotecardAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new UpdateNotecardAgentInventory(
+                    agent, 
+                    agent.InventoryService, 
+                    agent.AssetService, 
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateScriptAgent(agent, agent.InventoryService, agent.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new UpdateScriptAgent(
+                    agent,
+                    agent.InventoryService, 
+                    agent.AssetService,
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateScriptTask", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateScriptTask(agent, Server.Scene, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new UpdateScriptTask(
+                    agent,
+                    Server.Scene, 
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateGestureTaskInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateGestureTaskInventory(agent, Server.Scene, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new UpdateGestureTaskInventory(
+                    agent, 
+                    Server.Scene, 
+                    localHostName, 
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardTaskInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateNotecardTaskInventory(agent, Server.Scene, localHostName, (IPEndPoint)RemoteEndPoint);
+                UploadAssetAbstractCapability capability = new UpdateNotecardTaskInventory(
+                    agent, 
+                    Server.Scene, 
+                    localHostName,
+                    RemoteIP);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(ViewerAgent agent) 
             {
-                return new ParcelNavigateMedia(agent.Owner, Server.Scene, (IPEndPoint)RemoteEndPoint);
+                return new ParcelNavigateMedia(
+                    agent.Owner, 
+                    Server.Scene,
+                    RemoteIP);
             }, capConfig);
             AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(ViewerAgent agent) 
             {
-                return new ObjectMedia(agent.Owner, Server.Scene, (IPEndPoint)RemoteEndPoint);
+                return new ObjectMedia(
+                    agent.Owner,
+                    Server.Scene,
+                    RemoteIP);
             }, capConfig);
             AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(ViewerAgent agent) 
             {
-                return new ObjectMediaNavigate(agent.Owner, Server.Scene, (IPEndPoint)RemoteEndPoint);
+                return new ObjectMediaNavigate(
+                    agent.Owner,
+                    Server.Scene,
+                    RemoteIP);
             }, capConfig);
 #if DEBUG
             m_Log.DebugFormat("Registered {0} capabilities", m_RegisteredCapabilities.Count);

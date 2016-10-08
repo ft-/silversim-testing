@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace SilverSim.Viewer.Core
@@ -42,6 +43,35 @@ namespace SilverSim.Viewer.Core
         protected int m_PacketsSent;
         protected int m_UnackedBytes;
         protected readonly object m_UnackedBytesLock = new object();
+
+        public string RemoteIP
+        {
+            get
+            {
+                IPAddress ipAddr = ((IPEndPoint)RemoteEndPoint).Address;
+                if (ipAddr.AddressFamily == AddressFamily.InterNetworkV6)
+                {
+                    byte[] b = ipAddr.GetAddressBytes();
+                    if (b[0] == 0 &&
+                        b[1] == 0 &&
+                        b[2] == 0 &&
+                        b[3] == 0 &&
+                        b[4] == 0 &&
+                        b[5] == 0 &&
+                        b[6] == 0 &&
+                        b[7] == 0 &&
+                        b[8] == 0 &&
+                        b[9] == 0 &&
+                        b[10] == 0xFF &&
+                        b[11] == 0xFF)
+                    {
+                        return string.Format("{0}.{1}.{2}.{3}", b[12], b[13], b[14], b[15]);
+                    }
+                }
+                return ipAddr.ToString();
+            }
+        }
+
 
         internal UDPCircuitsManager Server
         {

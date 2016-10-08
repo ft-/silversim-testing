@@ -29,7 +29,7 @@ namespace SilverSim.Viewer.Core
 
         void Cap_GetDisplayNames(HttpRequest httpreq)
         {
-            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

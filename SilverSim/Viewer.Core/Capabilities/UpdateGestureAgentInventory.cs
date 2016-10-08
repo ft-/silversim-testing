@@ -40,8 +40,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             InventoryServiceInterface inventoryService, 
             AssetServiceInterface assetService, 
             string serverURI, 
-            IPEndPoint ep)
-            : base(agent.Owner, serverURI, ep)
+            string remoteip)
+            : base(agent.Owner, serverURI, remoteip)
         {
             m_InventoryService = inventoryService;
             m_AssetService = assetService;

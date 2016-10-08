@@ -16,7 +16,7 @@ namespace SilverSim.Viewer.Core
         {
             string[] parts = httpreq.RawUrl.Substring(1).Split('/');
 
-            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

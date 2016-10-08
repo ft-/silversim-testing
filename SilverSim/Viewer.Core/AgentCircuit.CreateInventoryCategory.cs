@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.Core
         public void Cap_CreateInventoryCategory(HttpRequest httpreq)
         {
             IValue o;
-            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

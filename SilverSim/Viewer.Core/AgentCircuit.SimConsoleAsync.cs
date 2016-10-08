@@ -16,7 +16,7 @@ namespace SilverSim.Viewer.Core
         void Cap_SimConsoleAsync(HttpRequest httpreq)
         {
             IValue iv;
-            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

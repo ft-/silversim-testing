@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.Core.Capabilities
     {
         readonly SceneInterface m_Scene;
         readonly UUI m_Creator;
-        readonly IPEndPoint m_RemoteEndPoint;
+        readonly string m_RemoteIP;
 
         public string CapabilityName
         {
@@ -30,11 +30,11 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public ObjectAdd(SceneInterface scene, UUI creator, IPEndPoint ep)
+        public ObjectAdd(SceneInterface scene, UUI creator, string remoteip)
         {
             m_Scene = scene;
             m_Creator = creator;
-            m_RemoteEndPoint = ep;
+            m_RemoteIP = remoteip;
         }
 
         UInt32 BinToUInt(IValue v)
@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
-            if (!httpreq.CallerIP.Equals(m_RemoteEndPoint))
+            if (httpreq.CallerIP != m_RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

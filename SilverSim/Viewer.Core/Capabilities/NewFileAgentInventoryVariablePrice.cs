@@ -43,8 +43,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public NewFileAgentInventoryVariablePrice(ViewerAgent agent, string serverURI, IPEndPoint ep)
-            : base(agent.Owner, serverURI, ep)
+        public NewFileAgentInventoryVariablePrice(ViewerAgent agent, string serverURI, string remoteip)
+            : base(agent.Owner, serverURI, remoteip)
         {
             m_Agent = agent;
             m_InventoryService = agent.InventoryService;

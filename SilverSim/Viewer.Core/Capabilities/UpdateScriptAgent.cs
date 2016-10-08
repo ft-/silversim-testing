@@ -41,8 +41,13 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateScriptAgent(ViewerAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI, IPEndPoint ep)
-            : base(agent.Owner, serverURI, ep)
+        public UpdateScriptAgent(
+            ViewerAgent agent, 
+            InventoryServiceInterface inventoryService, 
+            AssetServiceInterface assetService,
+            string serverURI, 
+            string remoteip)
+            : base(agent.Owner, serverURI, remoteip)
         {
             m_Agent = agent;
             m_InventoryService = inventoryService;

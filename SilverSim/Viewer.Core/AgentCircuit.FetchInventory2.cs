@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Core
         void Cap_FetchInventory2(HttpRequest httpreq)
         {
             IValue o;
-            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;

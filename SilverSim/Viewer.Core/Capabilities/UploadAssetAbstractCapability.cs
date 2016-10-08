@@ -19,13 +19,13 @@ namespace SilverSim.Viewer.Core.Capabilities
         public abstract string CapabilityName { get; }
         protected UUI m_Creator { get; private set; }
         protected string m_ServerURI;
-        protected readonly IPEndPoint m_RemoteEndPoint;
+        protected readonly string m_RemoteIP;
 
-        public UploadAssetAbstractCapability(UUI creator, string serverURI, IPEndPoint ep)
+        public UploadAssetAbstractCapability(UUI creator, string serverURI, string remoteip)
         {
             m_Creator = creator;
             m_ServerURI = serverURI;
-            m_RemoteEndPoint = ep;
+            m_RemoteIP = remoteip;
         }
 
         public abstract UUID GetUploaderID(Map reqmap);
@@ -119,7 +119,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
-            if (!httpreq.CallerIP.Equals(m_RemoteEndPoint))
+            if (httpreq.CallerIP != m_RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;
