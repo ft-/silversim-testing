@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using System;
@@ -11,6 +12,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
 {
     public class VHACD : IDisposable
     {
+        static ILog m_Log = LogManager.GetLogger("VHACD");
+
         public struct ConvexHull
         {
             public IntPtr Points;
@@ -141,21 +144,29 @@ namespace SilverSim.Scene.Physics.ShapeManager
             {
                 ConvexHull hull = new ConvexHull();
                 VHacd_GetConvexHull(m_VHacd, hullidx, ref hull);
-                double[] resPoints = new double[hull.NumPoints];
+                double[] resPoints = new double[hull.NumPoints * 3];
                 Marshal.Copy(hull.Points, resPoints, 0, hull.NumPoints * 3);
                 int[] resTris = new int[hull.NumTriangles];
-                Marshal.Copy(hull.Triangles, resTris, 0, hull.NumTriangles * 3);
+                Marshal.Copy(hull.Triangles, resTris, 0, hull.NumTriangles);
 
                 PhysicsConvexShape.ConvexHull cHull = new PhysicsConvexShape.ConvexHull();
-                for (int vertidx = 0; vertidx < hull.NumPoints; vertidx += 3)
+                for (int vertidx = 0; vertidx < hull.NumPoints * 3; vertidx += 3)
                 {
                     cHull.Vertices.Add(new Vector3(
                         resPoints[vertidx + 0],
                         resPoints[vertidx + 1],
                         resPoints[vertidx + 2]));
                 }
+
+                int vCount = cHull.Vertices.Count;
                 for(int triidx = 0; triidx < hull.NumTriangles; ++triidx)
                 {
+                    int tri = resTris[triidx];
+                    if(tri >= vCount || tri < 0)
+                    {
+                        m_Log.ErrorFormat("Tri Index out of range");
+                        throw new InvalidDataException("Tri index out of range");
+                    }
                     cHull.Triangles.Add(resTris[triidx]);
                 }
                 shape.Hulls.Add(cHull);

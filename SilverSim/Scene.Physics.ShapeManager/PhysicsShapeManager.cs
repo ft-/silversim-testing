@@ -15,6 +15,7 @@ using System.Threading;
 
 namespace SilverSim.Scene.Physics.ShapeManager
 {
+    /** <summary>PhysicsShapeManager provides a common accessor to Convex Hull generation from primitives</summary> */
     public sealed class PhysicsShapeManager : IPlugin
     {
         AssetServiceInterface m_AssetService;
@@ -27,6 +28,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         string m_SimulationDataStorageName;
         ReaderWriterLock m_Lock = new ReaderWriterLock();
 
+        /** <summary>referencing class to provide usage counting for meshes</summary> */
         public sealed class PhysicsShapeMeshReference : PhysicsShapeReference
         {
             UUID m_ID;
@@ -42,6 +44,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
+        /** <summary>referencing class to provide usage counting for sculpts and prims</summary> */
         public sealed class PhysicsShapePrimShapeReference : PhysicsShapeReference
         {
             ObjectPart.PrimitiveShape m_Shape;
