@@ -116,6 +116,7 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("session.validate", HandleSessionValidateRequest);
             JsonMethods.Add("serverparam.get", GetServerParam);
             JsonMethods.Add("serverparams.get", GetServerParams);
+            JsonMethods.Add("serverparams.show", ShowServerParams);
             JsonMethods.Add("serverparam.set", SetServerParam);
             JsonMethods.Add("issues.get", IssuesView);
             JsonMethods.Add("modules.list", ModulesList);
@@ -999,6 +1000,35 @@ namespace SilverSim.WebIF.Admin
             }
             Map mres = new Map();
             mres["issues"] = res;
+            SuccessResponse(req, mres);
+        }
+
+        [AdminWebIfRequiredRight("serverparams.manage")]
+        void ShowServerParams(HttpRequest req, Map jsondata)
+        {
+            AnArray res = new AnArray();
+            Dictionary<string, ServerParamAttribute> resList = new Dictionary<string, ServerParamAttribute>();
+            foreach (KeyValuePair<string, ServerParamAttribute> kvp in m_Loader.ServerParams)
+            {
+                ServerParamAttribute paraType;
+                if (!resList.TryGetValue(kvp.Key, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
+                {
+                    resList[kvp.Key] = kvp.Value;
+                }
+            }
+
+            foreach (KeyValuePair<string, ServerParamAttribute> kvp in resList)
+            {
+                Map eres = new Map();
+                eres.Add("name", kvp.Key);
+                if (!string.IsNullOrEmpty(kvp.Value.Description))
+                {
+                    eres.Add("description", kvp.Value.Description);
+                }
+                eres.Add("type", kvp.Value.Type.ToString());
+            }
+            Map mres = new Map();
+            mres["serverparams"] = res;
             SuccessResponse(req, mres);
         }
 

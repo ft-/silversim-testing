@@ -2076,47 +2076,21 @@ namespace SilverSim.Main.Common
         void ShowServerParamsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             StringBuilder sb = new StringBuilder();
-            Dictionary<string, ServerParamType> resList = new Dictionary<string, ServerParamType>();
-            foreach(IServerParamListener listener in GetServicesByValue<IServerParamListener>())
-            {
-                Type instanceType = listener.GetType();
-                ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
-                foreach (ServerParamAttribute attr in attrs)
-                {
-                    ServerParamType paraType;
-                    if (!resList.TryGetValue(attr.ParameterName, out paraType) || paraType == ServerParamType.GlobalOnly)
-                    {
-                        resList[attr.ParameterName] = attr.Type;
-                    }
-                }
+            Dictionary<string, ServerParamAttribute> resList = new Dictionary<string, ServerParamAttribute>();
 
-                if(instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
-                {
-                    IServerParamAnyListener anyListener = (IServerParamAnyListener)listener;
-                    foreach(KeyValuePair<string, ServerParamType> kvp in anyListener.ServerParams)
-                    {
-                        ServerParamType paraType;
-                        if (!resList.TryGetValue(kvp.Key, out paraType) || paraType == ServerParamType.GlobalOnly)
-                        {
-                            resList[kvp.Key] = kvp.Value;
-                        }
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<string, ServerParamType> kvp in ServerParams)
+            foreach (KeyValuePair<string, ServerParamAttribute> kvp in ServerParams)
             {
-                ServerParamType paraType;
-                if (!resList.TryGetValue(kvp.Key, out paraType) || paraType == ServerParamType.GlobalOnly)
+                ServerParamAttribute paraType;
+                if (!resList.TryGetValue(kvp.Key, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
                 {
                     resList[kvp.Key] = kvp.Value;
                 }
             }
 
             sb.Append("Server Params:-------------------------------------------------\n");
-            foreach(KeyValuePair<string, ServerParamType> kvp in resList)
+            foreach(KeyValuePair<string, ServerParamAttribute> kvp in resList)
             {
-                if(kvp.Value == ServerParamType.GlobalOnly)
+                if(kvp.Value.Type == ServerParamType.GlobalOnly)
                 {
                     sb.AppendFormat("{0} - global only\n", kvp.Key);
                 }
@@ -2124,15 +2098,19 @@ namespace SilverSim.Main.Common
                 {
                     sb.AppendFormat("{0} - global and region\n", kvp.Key);
                 }
+                if(!string.IsNullOrEmpty(kvp.Value.Description))
+                {
+                    sb.AppendFormat("- {0}\n", kvp.Value.Description);
+                }
             }
             io.Write(sb.ToString());
         }
 
-        public IDictionary<string, ServerParamType> ServerParams
+        public IDictionary<string, ServerParamAttribute> ServerParams
         {
             get
             {
-                Dictionary<string, ServerParamType> resList = new Dictionary<string, ServerParamType>();
+                Dictionary<string, ServerParamAttribute> resList = new Dictionary<string, ServerParamAttribute>();
                 foreach(SceneInterface scene in Scenes.Values)
                 {
                     Type instanceType = scene.GetType();
@@ -2141,7 +2119,34 @@ namespace SilverSim.Main.Common
                     {
                         if (!resList.ContainsKey(attr.ParameterName))
                         {
-                            resList.Add(attr.ParameterName, ServerParamType.GlobalAndRegion);
+                            resList.Add(attr.ParameterName, attr);
+                        }
+                    }
+                }
+
+                foreach (IServerParamListener listener in GetServicesByValue<IServerParamListener>())
+                {
+                    Type instanceType = listener.GetType();
+                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
+                    foreach (ServerParamAttribute attr in attrs)
+                    {
+                        ServerParamAttribute paraType;
+                        if (!resList.TryGetValue(attr.ParameterName, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
+                        {
+                            resList[attr.ParameterName] = attr;
+                        }
+                    }
+
+                    if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
+                    {
+                        IServerParamAnyListener anyListener = (IServerParamAnyListener)listener;
+                        foreach (KeyValuePair<string, ServerParamAttribute> kvp in anyListener.ServerParams)
+                        {
+                            ServerParamAttribute paraType;
+                            if (!resList.TryGetValue(kvp.Key, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
+                            {
+                                resList[kvp.Key] = kvp.Value;
+                            }
                         }
                     }
                 }

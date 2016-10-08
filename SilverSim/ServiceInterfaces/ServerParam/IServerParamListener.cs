@@ -19,6 +19,6 @@ namespace SilverSim.ServiceInterfaces.ServerParam
     public interface IServerParamAnyListener : IServerParamListener
     {
         void TriggerParameterUpdated(UUID regionID, string parametername, string value);
-        IDictionary<string, ServerParamType> ServerParams { get; }
+        IDictionary<string, ServerParamAttribute> ServerParams { get; }
     }
 }
