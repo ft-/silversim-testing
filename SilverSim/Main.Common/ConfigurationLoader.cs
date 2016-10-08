@@ -1230,6 +1230,7 @@ namespace SilverSim.Main.Common
             CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
             CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
             CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
+            CommandRegistry.ShowCommands.Add("serverparams", ShowServerParamsCommand);
             CommandRegistry.ShowCommands.Add("issues", ShowIssuesCommand);
             CommandRegistry.ShowCommands.Add("cacheddns", ShowCachedDnsCommand);
             CommandRegistry.DeleteCommands.Add("cacheddns", RemoveCachedDnsCommand);
@@ -2072,6 +2073,82 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Distribute server params
+        void ShowServerParamsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            StringBuilder sb = new StringBuilder();
+            Dictionary<string, ServerParamType> resList = new Dictionary<string, ServerParamType>();
+            foreach(IServerParamListener listener in GetServicesByValue<IServerParamListener>())
+            {
+                Type instanceType = listener.GetType();
+                ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
+                foreach (ServerParamAttribute attr in attrs)
+                {
+                    ServerParamType paraType;
+                    if (!resList.TryGetValue(attr.ParameterName, out paraType) || paraType == ServerParamType.GlobalOnly)
+                    {
+                        resList[attr.ParameterName] = attr.Type;
+                    }
+                }
+
+                if(instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
+                {
+                    IServerParamAnyListener anyListener = (IServerParamAnyListener)listener;
+                    foreach(KeyValuePair<string, ServerParamType> kvp in anyListener.ServerParams)
+                    {
+                        ServerParamType paraType;
+                        if (!resList.TryGetValue(kvp.Key, out paraType) || paraType == ServerParamType.GlobalOnly)
+                        {
+                            resList[kvp.Key] = kvp.Value;
+                        }
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<string, ServerParamType> kvp in ServerParams)
+            {
+                ServerParamType paraType;
+                if (!resList.TryGetValue(kvp.Key, out paraType) || paraType == ServerParamType.GlobalOnly)
+                {
+                    resList[kvp.Key] = kvp.Value;
+                }
+            }
+
+            sb.Append("Server Params:-------------------------------------------------\n");
+            foreach(KeyValuePair<string, ServerParamType> kvp in resList)
+            {
+                if(kvp.Value == ServerParamType.GlobalOnly)
+                {
+                    sb.AppendFormat("{0} - global only\n", kvp.Key);
+                }
+                else
+                {
+                    sb.AppendFormat("{0} - global and region\n", kvp.Key);
+                }
+            }
+            io.Write(sb.ToString());
+        }
+
+        public IDictionary<string, ServerParamType> ServerParams
+        {
+            get
+            {
+                Dictionary<string, ServerParamType> resList = new Dictionary<string, ServerParamType>();
+                foreach(SceneInterface scene in Scenes.Values)
+                {
+                    Type instanceType = scene.GetType();
+                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
+                    foreach(ServerParamAttribute attr in attrs)
+                    {
+                        if (!resList.ContainsKey(attr.ParameterName))
+                        {
+                            resList.Add(attr.ParameterName, ServerParamType.GlobalAndRegion);
+                        }
+                    }
+                }
+                return resList;
+            }
+        }
+
         public void TriggerParameterUpdated(UUID regionID, string parametername, string value)
         {
             ServerParamServiceInterface serverParams = GetServerParamStorage();

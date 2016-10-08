@@ -15,9 +15,14 @@ namespace SilverSim.ServiceInterfaces.ServerParam
     public class ServerParamAttribute : Attribute
     {
         public string ParameterName { get; private set; }
+        public string Description { get; set; }
+        public ServerParamType Type { get; set; }
+
         public ServerParamAttribute(string name)
         {
             ParameterName = name;
+            Type = ServerParamType.GlobalAndRegion;
+            Description = string.Empty;
         }
     }
 

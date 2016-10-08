@@ -19,8 +19,8 @@ namespace SilverSim.Database.MySQL.Grid
 {
     #region Service Implementation
     [Description("MySQL Grid Backend")]
-    [ServerParam("DeleteOnUnregister")]
-    [ServerParam("AllowDuplicateRegionNames")]
+    [ServerParam("DeleteOnUnregister", Type = ServerParamType.GlobalOnly)]
+    [ServerParam("AllowDuplicateRegionNames", Type = ServerParamType.GlobalOnly)]
     public sealed class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin, IServerParamListener
     {
         readonly string m_ConnectionString;
