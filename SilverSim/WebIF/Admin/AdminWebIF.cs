@@ -1026,6 +1026,23 @@ namespace SilverSim.WebIF.Admin
                     eres.Add("description", kvp.Value.Description);
                 }
                 eres.Add("type", kvp.Value.Type.ToString());
+                Type paraType = kvp.Value.ParameterType;
+                if(paraType == typeof(bool))
+                {
+                    eres.Add("valuerange", "bool");
+                }
+                else if(paraType == typeof(uint))
+                {
+                    eres.Add("valuerange", "uint");
+                }
+                else if (paraType == typeof(int))
+                {
+                    eres.Add("valuerange", "int");
+                }
+                else
+                {
+                    eres.Add("valuerange", "string");
+                }
             }
             Map mres = new Map();
             mres["serverparams"] = res;
