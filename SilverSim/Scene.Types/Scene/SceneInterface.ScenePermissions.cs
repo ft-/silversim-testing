@@ -14,11 +14,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    [ServerParam("estate_manager_is_god")]
-    [ServerParam("region_owner_is_simconsole_user")]
-    [ServerParam("estate_owner_is_simconsole_user")]
-    [ServerParam("region_manager_is_simconsole_user")]
-    [ServerParam("parcel_owner_is_admin")]
+    [ServerParam("estate_manager_is_god", ParameterType = typeof(bool))]
+    [ServerParam("region_owner_is_simconsole_user", ParameterType = typeof(bool))]
+    [ServerParam("estate_owner_is_simconsole_user", ParameterType = typeof(bool))]
+    [ServerParam("region_manager_is_simconsole_user", ParameterType = typeof(bool))]
+    [ServerParam("parcel_owner_is_admin", ParameterType = typeof(bool))]
     [ServerParam("god_agents")]
     public abstract partial class SceneInterface
     {
@@ -144,7 +144,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [ServerParam("estate_manager_is_god")]
+        [ServerParam("estate_manager_is_god", ParameterType = typeof(bool))]
         public void EstateManagerIsGodUpdated(UUID regionID, string value)
         {
             ParameterUpdatedHandler(
@@ -244,7 +244,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [ServerParam("region_owner_is_simconsole_user")]
+        [ServerParam("region_owner_is_simconsole_user", ParameterType = typeof(bool))]
         public void RegionOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
         {
             ParameterUpdatedHandler(
@@ -267,7 +267,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [ServerParam("estate_owner_is_simconsole_user")]
+        [ServerParam("estate_owner_is_simconsole_user", ParameterType = typeof(bool))]
         public void EstateOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
         {
             ParameterUpdatedHandler(
@@ -290,7 +290,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [ServerParam("estate_manager_is_simconsole_user")]
+        [ServerParam("estate_manager_is_simconsole_user", ParameterType = typeof(bool))]
         public void EstateManagerIsSimConsoleUserUpdated(UUID regionId, string value)
         {
             ParameterUpdatedHandler(
@@ -688,7 +688,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [ServerParam("parcel_owner_is_admin")]
+        [ServerParam("parcel_owner_is_admin", ParameterType = typeof(bool))]
         public void ParcelOwnerIsAdminUpdated(UUID regionId, string value)
         {
             ParameterUpdatedHandler(

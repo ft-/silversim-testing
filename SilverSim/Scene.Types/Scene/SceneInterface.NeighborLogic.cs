@@ -18,8 +18,8 @@ using SilverSim.ServiceInterfaces.ServerParam;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    [ServerParam("ChatPassInEnable")]
-    [ServerParam("ChatPassOutEnable")]
+    [ServerParam("ChatPassInEnable", ParameterType = typeof(bool))]
+    [ServerParam("ChatPassOutEnable", ParameterType = typeof(bool))]
     public partial class SceneInterface
     {
         public class NeighborEntry
@@ -107,7 +107,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [ServerParam("ChatPassInEnable")]
+        [ServerParam("ChatPassInEnable", ParameterType = typeof(bool))]
         public void ChatPassInEnableUpdated(UUID regionId, string value)
         {
             ChatPassEnableUpdated(
@@ -119,7 +119,7 @@ namespace SilverSim.Scene.Types.Scene
                 value);
         }
 
-        [ServerParam("ChatPassOutEnable")]
+        [ServerParam("ChatPassOutEnable", ParameterType = typeof(bool))]
         public void ChatPassOutEnableUpdated(UUID regionId, string value)
         {
             ChatPassEnableUpdated(

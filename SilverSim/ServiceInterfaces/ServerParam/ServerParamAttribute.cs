@@ -17,6 +17,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         public string ParameterName { get; private set; }
         public string Description { get; set; }
         public ServerParamType Type { get; set; }
+        public Type ParameterType { get; set; }
 
         public ServerParamAttribute(string name)
         {

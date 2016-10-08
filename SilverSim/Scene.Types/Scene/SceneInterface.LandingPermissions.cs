@@ -17,7 +17,7 @@ using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    [ServerParam("EnableLandingOverride")]
+    [ServerParam("EnableLandingOverride", ParameterType = typeof(bool))]
     [ServerParam("SpawnpointRouting")]
     public partial class SceneInterface
     {
@@ -45,7 +45,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [ServerParam("EnableLandingOverride")]
+        [ServerParam("EnableLandingOverride", ParameterType = typeof(bool))]
         public void EnableLandingOverrideUpdated(UUID regionID, string value)
         {
             ParameterUpdatedHandler(
