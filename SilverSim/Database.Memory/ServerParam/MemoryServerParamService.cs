@@ -129,7 +129,14 @@ namespace SilverSim.Database.Memory.ServerParam
 
         protected override void Store(UUID regionID, string parameter, string value)
         {
-            m_Parameters[regionID][parameter] = value;
+            if (string.IsNullOrEmpty(value))
+            {
+                Remove(regionID, parameter);
+            }
+            else
+            {
+                m_Parameters[regionID][parameter] = value;
+            }
         }
 
         public override bool Remove(UUID regionID, string parameter)
