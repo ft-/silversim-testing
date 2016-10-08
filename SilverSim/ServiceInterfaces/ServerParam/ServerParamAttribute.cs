@@ -24,6 +24,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             ParameterName = name;
             Type = ServerParamType.GlobalAndRegion;
             Description = string.Empty;
+            ParameterType = typeof(string);
         }
     }
 
