@@ -218,6 +218,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
             /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
             physicshape = ConvertToMesh(shape);
+            m_SimulationStorage.PhysicsConvexShapes[meshId] = physicshape;
 
             m_Lock.AcquireReaderLock(-1);
             try
@@ -259,6 +260,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
             /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
             physicshape = ConvertToMesh(shape);
+            m_SimulationStorage.PhysicsConvexShapes[shape] = physicshape;
 
             m_Lock.AcquireReaderLock(-1);
             try

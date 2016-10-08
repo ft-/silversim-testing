@@ -72,34 +72,34 @@ namespace SilverSim.Types.Asset.Format.Mesh
                     counttris += hull.Triangles.Count;
                 }
 
-                byte[] serializedData = new byte[5 + counthulls * 8 + countverts * 12 + counttris * 4];
+                byte[] createSerializedData = new byte[5 + counthulls * 8 + countverts * 12 + counttris * 4];
                 int byteOffset = 5;
-                serializedData[0] = (byte)'P';
-                serializedData[1] = (byte)'H';
-                serializedData[2] = (byte)'U';
-                serializedData[3] = (byte)'L';
-                SerializedData[4] = HasHullList ? (byte)1 : (byte)0;
+                createSerializedData[0] = (byte)'P';
+                createSerializedData[1] = (byte)'H';
+                createSerializedData[2] = (byte)'U';
+                createSerializedData[3] = (byte)'L';
+                createSerializedData[4] = HasHullList ? (byte)1 : (byte)0;
 
                 foreach (ConvexHull hull in Hulls)
                 {
-                    Int32ToLEBytes(hull.Vertices.Count, serializedData, byteOffset);
+                    Int32ToLEBytes(hull.Vertices.Count, createSerializedData, byteOffset);
                     byteOffset += 4;
-                    Int32ToLEBytes(hull.Triangles.Count, serializedData, byteOffset);
+                    Int32ToLEBytes(hull.Triangles.Count, createSerializedData, byteOffset);
                     byteOffset += 4;
 
                     foreach(Vector3 v in hull.Vertices)
                     {
-                        v.ToBytes(serializedData, byteOffset);
+                        v.ToBytes(createSerializedData, byteOffset);
                         byteOffset += 12;
                     }
                     foreach(int v in hull.Triangles)
                     {
-                        Int32ToLEBytes(v, serializedData, byteOffset);
+                        Int32ToLEBytes(v, createSerializedData, byteOffset);
                         byteOffset += 4;
                     }
                 }
 
-                return serializedData;
+                return createSerializedData;
             }
 
             set
