@@ -2087,7 +2087,7 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            sb.Append("Server Params:-------------------------------------------------\n");
+            sb.Append("Server Params:\n-------------------------------------------------\n");
             foreach(KeyValuePair<string, ServerParamAttribute> kvp in resList)
             {
                 if(kvp.Value.Type == ServerParamType.GlobalOnly)
