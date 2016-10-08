@@ -275,6 +275,11 @@ namespace SilverSim.Viewer.Search
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public void HandleAvatarPickerSearchCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
         {
+            if (!req.CallerIP.Equals(circuit.RemoteEndPoint))
+            {
+                req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
             string[] parts = req.RawUrl.Substring(1).Split('/');
             if (req.Method != "GET")
             {

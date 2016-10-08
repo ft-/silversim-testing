@@ -126,6 +126,11 @@ namespace SilverSim.Viewer.Core
         public void RegionSeedHandler(HttpRequest httpreq)
         {
             IValue o;
+            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
