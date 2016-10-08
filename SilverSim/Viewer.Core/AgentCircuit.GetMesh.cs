@@ -17,7 +17,12 @@ namespace SilverSim.Viewer.Core
         {
             string[] parts = httpreq.RawUrl.Substring(1).Split('/');
 
-            if(httpreq.Method != "GET")
+            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method Not Allowed");
                 return;

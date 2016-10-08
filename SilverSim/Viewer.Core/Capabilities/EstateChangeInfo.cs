@@ -15,6 +15,7 @@ namespace SilverSim.Viewer.Core.Capabilities
     {
         readonly SceneInterface m_Scene;
         readonly ViewerAgent m_Agent;
+        readonly IPEndPoint m_RemoteEndPoint;
 
         public string CapabilityName
         {
@@ -24,14 +25,20 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public EstateChangeInfo(ViewerAgent agent, SceneInterface scene)
+        public EstateChangeInfo(ViewerAgent agent, SceneInterface scene, IPEndPoint ep)
         {
             m_Agent = agent;
             m_Scene = scene;
+            m_RemoteEndPoint = ep;
         }
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
+            if (!httpreq.CallerIP.Equals(m_RemoteEndPoint))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");

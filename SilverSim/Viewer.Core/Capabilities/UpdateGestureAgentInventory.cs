@@ -8,6 +8,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
+using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -34,8 +35,13 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateGestureAgentInventory(ViewerAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
-            : base(agent.Owner, serverURI)
+        public UpdateGestureAgentInventory(
+            ViewerAgent agent, 
+            InventoryServiceInterface inventoryService, 
+            AssetServiceInterface assetService, 
+            string serverURI, 
+            IPEndPoint ep)
+            : base(agent.Owner, serverURI, ep)
         {
             m_InventoryService = inventoryService;
             m_AssetService = assetService;

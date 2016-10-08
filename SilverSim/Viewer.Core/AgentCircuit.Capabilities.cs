@@ -2,7 +2,6 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
 using SilverSim.Types;
@@ -304,81 +303,90 @@ namespace SilverSim.Viewer.Core
             string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
             AddDefCapabilityFactory("DispatchRegionInfo", regionSeedID, delegate(ViewerAgent agent)
             {
-                return new DispatchRegionInfo(agent, Server.Scene);
+                return new DispatchRegionInfo(agent, Server.Scene, (IPEndPoint)RemoteEndPoint);
             }, capConfig);
             AddDefCapabilityFactory("CopyInventoryFromNotecard", regionSeedID, delegate (ViewerAgent agent)
             {
-                return new CopyInventoryFromNotecard(agent, Server.Scene);
+                return new CopyInventoryFromNotecard(agent, Server.Scene, (IPEndPoint)RemoteEndPoint);
             }, capConfig);
             AddDefCapabilityFactory("ParcelPropertiesUpdate", regionSeedID, delegate (ViewerAgent agent)
             {
-                return new ParcelPropertiesUpdate(agent, Server.Scene);
+                return new ParcelPropertiesUpdate(agent, Server.Scene, (IPEndPoint)RemoteEndPoint);
             }, capConfig);
             AddDefCapabilityFactory("AgentPreferences", regionSeedID, delegate(ViewerAgent agent)
             {
-                return new AgentPreferences(agent);
+                return new AgentPreferences(agent, (IPEndPoint)RemoteEndPoint);
             }, capConfig);
             AddDefCapabilityFactory("ObjectAdd", regionSeedID, delegate(ViewerAgent agent)
             {
-                return new ObjectAdd(Server.Scene, agent.Owner);
+                return new ObjectAdd(Server.Scene, agent.Owner, (IPEndPoint)RemoteEndPoint);
             }, capConfig);
             AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UploadBakedTexture(agent.Owner, Server.Scene.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UploadBakedTexture(agent.Owner, Server.Scene.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new NewFileAgentInventory(agent, localHostName);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventory(agent, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(agent, localHostName);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(agent, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateGestureAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateGestureAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateGestureAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateNotecardAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateNotecardAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateScriptAgent(agent, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateScriptAgent(agent, agent.InventoryService, agent.AssetService, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateScriptTask", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateScriptTask(agent, Server.Scene, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateScriptTask(agent, Server.Scene, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateGestureTaskInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateGestureTaskInventory(agent, Server.Scene, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateGestureTaskInventory(agent, Server.Scene, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardTaskInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new UpdateNotecardTaskInventory(agent, Server.Scene, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateNotecardTaskInventory(agent, Server.Scene, localHostName, (IPEndPoint)RemoteEndPoint);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(ViewerAgent agent) { return new ParcelNavigateMedia(agent.Owner, Server.Scene); }, capConfig);
-            AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(ViewerAgent agent) { return new ObjectMedia(agent.Owner, Server.Scene); }, capConfig);
-            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(ViewerAgent agent) { return new ObjectMediaNavigate(agent.Owner, Server.Scene); }, capConfig);
+            AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(ViewerAgent agent) 
+            {
+                return new ParcelNavigateMedia(agent.Owner, Server.Scene, (IPEndPoint)RemoteEndPoint);
+            }, capConfig);
+            AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(ViewerAgent agent) 
+            {
+                return new ObjectMedia(agent.Owner, Server.Scene, (IPEndPoint)RemoteEndPoint);
+            }, capConfig);
+            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(ViewerAgent agent) 
+            {
+                return new ObjectMediaNavigate(agent.Owner, Server.Scene, (IPEndPoint)RemoteEndPoint);
+            }, capConfig);
 #if DEBUG
             m_Log.DebugFormat("Registered {0} capabilities", m_RegisteredCapabilities.Count);
 #endif

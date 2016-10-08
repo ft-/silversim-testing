@@ -8,6 +8,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
+using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -45,8 +46,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateNotecardTaskInventory(ViewerAgent agent, SceneInterface scene, string serverURI)
-            : base(agent.Owner, serverURI)
+        public UpdateNotecardTaskInventory(ViewerAgent agent, SceneInterface scene, string serverURI, IPEndPoint ep)
+            : base(agent.Owner, serverURI, ep)
         {
             m_Agent = agent;
             m_Scene = scene;

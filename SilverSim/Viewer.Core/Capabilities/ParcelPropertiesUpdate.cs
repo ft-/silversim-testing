@@ -18,11 +18,13 @@ namespace SilverSim.Viewer.Core.Capabilities
         private static readonly ILog m_Log = LogManager.GetLogger("PARCEL PROPERTIES UPDATE");
         readonly ViewerAgent m_Agent;
         readonly SceneInterface m_Scene;
+        readonly IPEndPoint m_RemoteEndPoint;
 
-        public ParcelPropertiesUpdate(ViewerAgent agent, SceneInterface scene)
+        public ParcelPropertiesUpdate(ViewerAgent agent, SceneInterface scene, IPEndPoint ep)
         {
             m_Agent = agent;
             m_Scene = scene;
+            m_RemoteEndPoint = ep;
         }
 
         public string CapabilityName
@@ -35,6 +37,11 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
+            if (!httpreq.CallerIP.Equals(m_RemoteEndPoint))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");

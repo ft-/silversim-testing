@@ -65,6 +65,11 @@ namespace SilverSim.Viewer.Core
         void Cap_FetchInventory2(HttpRequest httpreq)
         {
             IValue o;
+            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");

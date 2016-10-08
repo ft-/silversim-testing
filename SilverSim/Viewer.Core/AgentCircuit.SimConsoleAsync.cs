@@ -16,6 +16,11 @@ namespace SilverSim.Viewer.Core
         void Cap_SimConsoleAsync(HttpRequest httpreq)
         {
             IValue iv;
+            if (!httpreq.CallerIP.Equals(RemoteEndPoint))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");

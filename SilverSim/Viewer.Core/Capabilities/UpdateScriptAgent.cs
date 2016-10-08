@@ -12,6 +12,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -40,8 +41,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateScriptAgent(ViewerAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
-            : base(agent.Owner, serverURI)
+        public UpdateScriptAgent(ViewerAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI, IPEndPoint ep)
+            : base(agent.Owner, serverURI, ep)
         {
             m_Agent = agent;
             m_InventoryService = inventoryService;

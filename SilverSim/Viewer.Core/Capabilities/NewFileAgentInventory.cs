@@ -10,6 +10,7 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -38,8 +39,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public NewFileAgentInventory(ViewerAgent agent, string serverURI)
-            : base(agent.Owner, serverURI)
+        public NewFileAgentInventory(ViewerAgent agent, string serverURI, IPEndPoint ep)
+            : base(agent.Owner, serverURI, ep)
         {
             m_Agent = agent;
             m_InventoryService = agent.InventoryService;

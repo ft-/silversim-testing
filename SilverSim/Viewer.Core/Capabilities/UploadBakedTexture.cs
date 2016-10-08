@@ -7,6 +7,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System.Collections.Generic;
+using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -32,8 +33,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UploadBakedTexture(UUI creator, AssetServiceInterface assetService, string serverURI)
-            : base(creator, serverURI)
+        public UploadBakedTexture(UUI creator, AssetServiceInterface assetService, string serverURI, IPEndPoint ep)
+            : base(creator, serverURI, ep)
         {
             m_AssetService = assetService;
         }
