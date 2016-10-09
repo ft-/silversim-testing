@@ -320,8 +320,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
 
             c_p3 = TRIANGLE_P0.Rotate2D_XY(angle);
-            double a2 = c_p3.X;
-            double b2 = -c_p3.Y;
+            double a2 = c_p3.Y;
+            double b2 = -c_p3.X;
             double d2 = a2 * c_p3.X + b2 * c_p3.Y;
 
             /* Cramer rule */
