@@ -466,7 +466,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
-                            innerDirectionalVec *= (shape.ProfileHollow * 0.5);
+                            innerDirectionalVec *= (shape.ProfileHollow);
                             break;
 
                         case PrimitiveProfileHollowShape.Same:
@@ -547,7 +547,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                         case PrimitiveProfileHollowShape.Same:
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
-                            innerDirectionalVec *= (shape.ProfileHollow * 0.5);
+                            innerDirectionalVec *= (shape.ProfileHollow);
                             break;
 
                         case PrimitiveProfileHollowShape.Square:
@@ -627,7 +627,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
                             innerDirectionalVec = startPoint.Rotate2D_XY(angle);
-                            innerDirectionalVec *= (shape.ProfileHollow * 0.5);
+                            innerDirectionalVec *= (shape.ProfileHollow);
                             break;
 
                         case PrimitiveProfileHollowShape.Square:
