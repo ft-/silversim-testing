@@ -343,6 +343,50 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 0.5 * scale / dirYabs);
         }
 
+        static void InsertAngle(List<double> angles, double angle)
+        {
+            int c = angles.Count;
+            int i;
+            for (i = 0; i < c; ++i)
+            {
+                if (angles[i] > angle)
+                {
+                    break;
+                }
+            }
+            if (i == c)
+            {
+                angles.Add(angle);
+            }
+            else
+            {
+                angles.Insert(i, angle);
+            }
+        }
+
+        static readonly double[] CornerAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5 };
+        static List<double> CalcBaseAngles(double startangle, double endangle, double stepangle)
+        {
+            List<double> angles = new List<double>();
+            double genangle;
+            for (genangle = startangle; genangle < endangle; genangle += stepangle)
+            {
+                angles.Add(genangle);
+            }
+
+            foreach (double angle in CornerAngles)
+            {
+                if (startangle <= angle && endangle >= angle)
+                {
+                    if (!angles.Contains(angle))
+                    {
+                        InsertAngle(angles, angle);
+                    }
+                }
+            }
+            return angles;
+        }
+
         static PathDetails CalcBoxPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             PathDetails Path = new PathDetails();
@@ -364,14 +408,15 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
+            List<double> angles = CalcBaseAngles(startangle, endangle, stepangle);
 
-            if(shape.IsHollow)
+            if (shape.IsHollow)
             {
                 /* we calculate two points */
                 Vector3 startPoint = START_VECTOR_BOX * 0.5;
-                for (; startangle < endangle; startangle += stepangle)
+                foreach(double angle in angles)
                 {
-                    Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(startangle);
+                    Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(angle);
                     Vector3 innerDirectionalVec = outerDirectionalVec;
 
                     double outerDirXabs = Math.Abs(outerDirectionalVec.X);
@@ -383,7 +428,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     switch (shape.HoleShape)
                     {
                         case PrimitiveProfileHollowShape.Triangle:
-                            innerDirectionalVec = CalcTrianglePoint(shape.ProfileHollow);
+                            innerDirectionalVec = CalcTrianglePoint(angle) * shape.ProfileHollow;
                             break;
 
                         case PrimitiveProfileHollowShape.Circle:
@@ -412,9 +457,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 /* no hollow, so it becomes simple */
                 Vector3 startPoint = START_VECTOR_BOX * 0.5;
-                for (; startangle < endangle; startangle += stepangle )
+                foreach (double angle in angles)
                 {
-                    Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
+                    Vector3 directionalVec = startPoint.Rotate2D_XY(angle);
                     /* normalize on single component to 0.5, simplifies algorithm */
                     directionalVec = directionalVec.CalcPointToSquareBoundary(1);
                     Path.Vertices.Add(directionalVec);
@@ -449,20 +494,21 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
+            List<double> angles = CalcBaseAngles(startangle, endangle, stepangle);
 
             if (shape.IsHollow)
             {
                 /* we calculate two points */
                 Vector3 startPoint = Vector3.UnitX * 0.5;
-                for (; startangle < endangle; startangle += stepangle)
+                foreach(double angle in angles)
                 {
-                    Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(startangle);
+                    Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(angle);
                     Vector3 innerDirectionalVec = outerDirectionalVec;
 
                     switch (shape.HoleShape)
                     {
                         case PrimitiveProfileHollowShape.Triangle:
-                            innerDirectionalVec = CalcTrianglePoint(startangle) * shape.ProfileHollow;
+                            innerDirectionalVec = CalcTrianglePoint(angle) * shape.ProfileHollow;
                             break;
 
                         case PrimitiveProfileHollowShape.Same:
@@ -492,9 +538,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 /* no hollow, so it becomes simple */
                 Vector3 startPoint = Vector3.UnitX * 0.5;
-                for (; startangle < endangle; startangle += stepangle)
+                foreach (double angle in angles)
                 {
-                    Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
+                    Vector3 directionalVec = startPoint.Rotate2D_XY(angle);
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
@@ -527,14 +573,15 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
+            List<double> angles = CalcBaseAngles(startangle, endangle, stepangle);
 
             if (shape.IsHollow)
             {
                 /* we calculate two points */
                 Vector3 startPoint = Vector3.UnitX * 0.5;
-                for (; startangle < endangle; startangle += stepangle)
+                foreach (double angle in angles)
                 {
-                    Vector3 outerDirectionalVec = CalcTrianglePoint(startangle);
+                    Vector3 outerDirectionalVec = CalcTrianglePoint(angle);
                     Vector3 innerDirectionalVec;
 
                     switch (shape.HoleShape)
@@ -546,12 +593,12 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
-                            innerDirectionalVec = startPoint.Rotate2D_XY(startangle);
+                            innerDirectionalVec = startPoint.Rotate2D_XY(angle);
                             innerDirectionalVec *= (shape.ProfileHollow * 0.5);
                             break;
 
                         case PrimitiveProfileHollowShape.Square:
-                            innerDirectionalVec = startPoint.Rotate2D_XY(startangle);
+                            innerDirectionalVec = startPoint.Rotate2D_XY(angle);
                             double innerDirXabs = Math.Abs(innerDirectionalVec.X);
                             double innerDirYabs = Math.Abs(innerDirectionalVec.Y);
                             /* inner normalize on single component to 0.5 * hollow */
@@ -574,9 +621,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 /* no hollow, so it becomes simple */
                 Vector3 startPoint = Vector3.UnitX * 0.5;
-                for (; startangle < endangle; startangle += stepangle)
+                foreach (double angle in angles)
                 {
-                    Vector3 directionalVec = CalcTrianglePoint(startangle);
+                    Vector3 directionalVec = CalcTrianglePoint(angle);
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
