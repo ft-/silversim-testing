@@ -193,34 +193,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     tri.Vertex3 = l2 - 1 + bottomIndex;
                     mesh.Triangles.Add(tri);
                 }
-
-                /*
-                if (path.IsOpenHollow)
-                {
-                    Triangle tri = new Triangle();
-                    tri.Vertex1 = 0;
-                    tri.Vertex2 = verticeRowCount - 1;
-                    tri.Vertex3 = verticeRowCount / 2;
-                    mesh.Triangles.Add(tri);
-
-                    tri = new Triangle();
-                    tri.Vertex1 = 0;
-                    tri.Vertex2 = verticeRowCount / 2 - 1;
-                    tri.Vertex3 = verticeRowCount / 2;
-                    mesh.Triangles.Add(tri);
-
-                    tri = new Triangle();
-                    tri.Vertex1 = bottomIndex;
-                    tri.Vertex2 = verticeRowCount - 1 + bottomIndex;
-                    tri.Vertex3 = verticeRowCount / 2 + bottomIndex;
-                    mesh.Triangles.Add(tri);
-
-                    tri = new Triangle();
-                    tri.Vertex1 = bottomIndex;
-                    tri.Vertex2 = verticeRowCount / 2 - 1 + bottomIndex;
-                    tri.Vertex3 = verticeRowCount / 2 + bottomIndex;
-                    mesh.Triangles.Add(tri);
-                }*/
             }
             else
             {
@@ -279,55 +251,84 @@ namespace SilverSim.Scene.Types.Object.Mesh
         }
 
         const double TRIANGLE_ANGLE_SECTIONS = 2f / 3f * Math.PI;
-        static readonly Vector3 TRIANGLE_P0 = new Vector3(0.5, 0, 0);
-        static readonly Vector3 TRIANGLE_P1 = new Vector3(0.5, -0.5, 0);
-        static readonly Vector3 TRIANGLE_P2 = new Vector3(-0.5, -0.5, 0);
+        static readonly Vector3 TRIANGLE_P0 = new Vector3(0, 0.5, 0);
+        static readonly Vector3 TRIANGLE_P1 = new Vector3(-0.5, -0.5, 0);
+        static readonly Vector3 TRIANGLE_P2 = new Vector3(0.5, -0.5, 0);
+
+        static double CalcEquA(Vector3 v1, Vector3 v2)
+        {
+            return v1.Y - v2.Y;
+        }
+
+        static double CalcEquB(Vector3 v1, Vector3 v2)
+        {
+            return v2.X - v1.X;
+        }
+        
+        static double CalcEquD(Vector3 v1, Vector3 v2)
+        {
+            return CalcEquA(v1, v2) * v1.X + CalcEquB(v1, v2) * v1.Y;
+        }
+
+        static double CalcTriBaseAngle(Vector3 v)
+        {
+            double ang = Math.Atan2(v.Y, v.X) - Math.Atan2(0.5, 0);
+            while(ang < 0)
+            {
+                ang += 2 * Math.PI;
+            }
+            return ang;
+        }
+
+        static readonly double[] TriEqu_A = new double[3] { CalcEquA(TRIANGLE_P0, TRIANGLE_P1), CalcEquA(TRIANGLE_P1, TRIANGLE_P2), CalcEquA(TRIANGLE_P2, TRIANGLE_P0) };
+        static readonly double[] TriEqu_B = new double[3] { CalcEquB(TRIANGLE_P0, TRIANGLE_P1), CalcEquB(TRIANGLE_P1, TRIANGLE_P2), CalcEquB(TRIANGLE_P2, TRIANGLE_P0) };
+        static readonly double[] TriEqu_D = new double[3] { CalcEquD(TRIANGLE_P0, TRIANGLE_P1), CalcEquD(TRIANGLE_P1, TRIANGLE_P2), CalcEquD(TRIANGLE_P2, TRIANGLE_P0) };
+        static readonly double TRI_SEC_1 = CalcTriBaseAngle(TRIANGLE_P1);
+        static readonly double TRI_SEC_2 = CalcTriBaseAngle(TRIANGLE_P2);
 
         static Vector3 CalcTrianglePoint(double angle)
         {
             /*                      p0 (0.5, 0.0)
              *                      /\
-             *              side 3 /  \ side 1
-             * (-0.5, -0.5)    p2 /____\  p1 (0.5, -0.5)
+             *              side 1 /  \ side 3
+             * (-0.5, -0.5)    p1 /____\  p2 (0.5, -0.5)
              *                    side 2
              */
-            Vector3 c_p1;
-            Vector3 c_p2;
             Vector3 c_p3;
+            double a1;
+            double b1;
+            double d1;
 
-            if(angle < TRIANGLE_ANGLE_SECTIONS)
+            if(angle < TRI_SEC_1)
             {
-                c_p1 = TRIANGLE_P0;
-                c_p2 = TRIANGLE_P1;
+                a1 = TriEqu_A[0];
+                b1 = TriEqu_B[0];
+                d1 = TriEqu_D[0];
             }
-            else if(angle < 2 * TRIANGLE_ANGLE_SECTIONS)
+            else if(angle <= TRI_SEC_2)
             {
-                c_p1 = TRIANGLE_P1;
-                c_p2 = TRIANGLE_P2;
+                a1 = TriEqu_A[1];
+                b1 = TriEqu_B[1];
+                d1 = TriEqu_D[1];
             }
             else
             {
-                c_p1 = TRIANGLE_P2;
-                c_p2 = TRIANGLE_P0;
+                a1 = TriEqu_A[2];
+                b1 = TriEqu_B[2];
+                d1 = TriEqu_D[2];
             }
 
-            double above_div_common;
-            double x_above_div;
-            double below_div;
-            double y_above_div;
 
-            c_p3 = new Vector3(Math.Cos(angle), Math.Sin(angle), 0);
+            c_p3 = TRIANGLE_P0.Rotate2D_XY(angle);
+            double a2 = c_p3.X;
+            double b2 = -c_p3.Y;
+            double d2 = a2 * c_p3.X + b2 * c_p3.Y;
 
-            /* According to Cramer, we can calculate from two lines the intersection point.
-             * The original algorithm has four points (two per line) but our fourth is always the Zero Vector.
-             * So, point 4 is eliminated.
-             */
-            above_div_common = -(c_p2.X * c_p1.Y - c_p1.X * c_p2.Y);
-            x_above_div = c_p3.X * above_div_common;
-            below_div = (-c_p3.Y) * (c_p2.X - c_p1.X) - (c_p2.Y - c_p1.Y) * (-c_p3.X);
-
-            y_above_div = c_p3.Y * above_div_common;
-            return new Vector3(x_above_div / below_div, y_above_div / below_div, 0);
+            /* Cramer rule */
+            double div = (a1 * b2 - a2 * b1);
+            double x = (b2 * d1 - b1 * d2) / div;
+            double y = (a1 * d2 - a2 * d1) / div;
+            return new Vector3(x, y, 0);
         }
 
         sealed class PathDetails
@@ -372,6 +373,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         }
 
         static readonly double[] CornerAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5 };
+        static readonly double[] PrismAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5, TRI_SEC_1, TRI_SEC_2 };
         static List<double> CalcBaseAngles(this ObjectPart.PrimitiveShape.Decoded shape, double startangle, double endangle, double stepangle)
         {
             List<double> angles = new List<double>();
@@ -389,13 +391,29 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 angles.Add(endangle);
             }
 
-            foreach (double angle in CornerAngles)
+            if (shape.ShapeType == PrimitiveShapeType.Prism)
             {
-                if (startangle <= angle && endangle >= angle)
+                foreach (double angle in PrismAngles)
                 {
-                    if (!angles.Contains(angle))
+                    if (startangle <= angle && endangle >= angle)
                     {
-                        InsertAngle(angles, angle);
+                        if (!angles.Contains(angle))
+                        {
+                            InsertAngle(angles, angle);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (double angle in CornerAngles)
+                {
+                    if (startangle <= angle && endangle >= angle)
+                    {
+                        if (!angles.Contains(angle))
+                        {
+                            InsertAngle(angles, angle);
+                        }
                     }
                 }
             }
@@ -635,7 +653,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
             else
             {
                 /* no hollow, so it becomes simple */
-                Vector3 startPoint = Vector3.UnitX * 0.5;
                 foreach (double angle in angles)
                 {
                     Vector3 directionalVec = CalcTrianglePoint(angle);
