@@ -674,9 +674,11 @@ namespace SilverSim.Viewer.Core
             UUID regionSeedID, 
             Dictionary<string, string> serviceURLs,
             string gatekeeperURI,
-            List<IProtocolExtender> extenders)
+            List<IProtocolExtender> extenders,
+            EndPoint remoteEndPoint)
             : base(server, circuitcode)
         {
+            RemoteEndPoint = remoteEndPoint;
             m_Commands = commands;
             InitSimStats();
 
