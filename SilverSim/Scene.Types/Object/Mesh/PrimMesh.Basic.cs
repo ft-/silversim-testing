@@ -106,9 +106,16 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double twistEnd = shape.TwistEnd * Math.PI;
 
             MeshLOD mesh = new MeshLOD();
-            for (; cut < cutEnd; cut += cutStep)
+            if (double.Epsilon <= Math.Abs(shape.TwistBegin - shape.TwistEnd))
             {
-                mesh.Vertices.AddRange(path.ExtrudeBasic(shape, twistBegin, twistEnd, cut));
+                for (; cut < cutEnd; cut += cutStep)
+                {
+                    mesh.Vertices.AddRange(path.ExtrudeBasic(shape, twistBegin, twistEnd, cut));
+                }
+            }
+            else
+            {
+                mesh.Vertices.AddRange(path.ExtrudeBasic(shape, twistBegin, twistEnd, cutBegin));
             }
             mesh.Vertices.AddRange(path.ExtrudeBasic(shape, twistBegin, twistEnd, cutEnd));
 
@@ -365,13 +372,21 @@ namespace SilverSim.Scene.Types.Object.Mesh
         }
 
         static readonly double[] CornerAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5 };
-        static List<double> CalcBaseAngles(double startangle, double endangle, double stepangle)
+        static List<double> CalcBaseAngles(this ObjectPart.PrimitiveShape.Decoded shape, double startangle, double endangle, double stepangle)
         {
             List<double> angles = new List<double>();
             double genangle;
-            for (genangle = startangle; genangle < endangle; genangle += stepangle)
+            if (shape.IsHollow || shape.ShapeType != PrimitiveShapeType.Box)
             {
-                angles.Add(genangle);
+                for (genangle = startangle; genangle < endangle; genangle += stepangle)
+                {
+                    angles.Add(genangle);
+                }
+            }
+            else
+            {
+                angles.Add(startangle);
+                angles.Add(endangle);
             }
 
             foreach (double angle in CornerAngles)
@@ -408,7 +423,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
-            List<double> angles = CalcBaseAngles(startangle, endangle, stepangle);
+            List<double> angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
             if (shape.IsHollow)
             {
@@ -494,7 +509,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
-            List<double> angles = CalcBaseAngles(startangle, endangle, stepangle);
+            List<double> angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
             if (shape.IsHollow)
             {
@@ -573,7 +588,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
-            List<double> angles = CalcBaseAngles(startangle, endangle, stepangle);
+            List<double> angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
             if (shape.IsHollow)
             {
