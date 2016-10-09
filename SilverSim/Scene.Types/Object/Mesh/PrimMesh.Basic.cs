@@ -12,32 +12,56 @@ namespace SilverSim.Scene.Types.Object.Mesh
     public static partial class PrimMesh
     {
         #region Box/Cylinder/Prism calculation
-        static List<Vector3> ExtrudeBasic(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
+        static void CalcTopSizeAndShear(ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut, out Vector3 topSize, out Vector3 shear, out double twist)
         {
-            List<Vector3> extrusionPath = new List<Vector3>();
-            double twist = twistBegin.Lerp(twistEnd, cut);
-            Vector3 topSize = new Vector3();
-            Vector3 shear = new Vector3();
+            twist = twistBegin.Lerp(twistEnd, cut);
+            topSize = new Vector3();
+            shear = new Vector3();
 
             #region cut
             topSize.X = shape.PathScale.X < 0f ?
-                1.0.Clamp(1f + shape.PathScale.X, 1f - cut) :
-                1.0.Clamp(1f - shape.PathScale.X, cut);
+                1.0.Lerp(1f + shape.PathScale.X, 1f - cut) :
+                1.0.Lerp(1f - shape.PathScale.X, cut);
 
             topSize.Y = shape.PathScale.Y < 0f ?
-                1.0.Clamp(1f + shape.PathScale.Y, 1f - cut) :
-                1.0.Clamp(1f - shape.PathScale.Y, cut);
+                1.0.Lerp(1f + shape.PathScale.Y, 1f - cut) :
+                1.0.Lerp(1f - shape.PathScale.Y, cut);
             #endregion
 
             #region top_shear
             shear.X = shape.TopShear.X < 0f ?
-                1.0.Clamp(1f + shape.TopShear.X, 1f - cut) :
-                1.0.Clamp(1f - shape.TopShear.X, cut);
-            
+                0.0.Lerp(shape.TopShear.X, 1f - cut) :
+                0.0.Lerp(shape.TopShear.X, cut);
+
             shear.Y = shape.TopShear.Y < 0f ?
-                1.0.Clamp(1f + shape.TopShear.Y, 1f - cut) :
-                1.0.Clamp(1f - shape.TopShear.Y, 1f - cut);
+                0.0.Lerp(shape.TopShear.Y, 1f - cut) :
+                0.0.Lerp(shape.TopShear.Y, cut);
             #endregion
+        }
+
+        static Vector3 ApplyTortureParams(ObjectPart.PrimitiveShape.Decoded shape, Vector3 v, double twistBegin, double twistEnd, double cut)
+        {
+            double twist;
+            Vector3 topSize;
+            Vector3 shear;
+            CalcTopSizeAndShear(shape, twistBegin, twistEnd, cut, out topSize, out shear, out twist);
+
+            Vector3 outvertex = v;
+            outvertex.X *= topSize.X;
+            outvertex.Y *= topSize.Y;
+            outvertex = outvertex.Rotate2D_XY(twist);
+            outvertex += shear;
+            outvertex.Z = cut - 0.5;
+            return outvertex;
+        }
+
+        static List<Vector3> ExtrudeBasic(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
+        {
+            List<Vector3> extrusionPath = new List<Vector3>();
+            double twist;
+            Vector3 topSize;
+            Vector3 shear;
+            CalcTopSizeAndShear(shape, twistBegin, twistEnd, cut, out topSize, out shear, out twist);
 
             /* generate extrusions */
             foreach (Vector3 vertex in path.Vertices)
@@ -45,8 +69,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 Vector3 outvertex = vertex;
                 outvertex.X *= topSize.X;
                 outvertex.Y *= topSize.Y;
-                outvertex += shape.TopShear;
                 outvertex = outvertex.Rotate2D_XY(twist);
+                outvertex += shear;
                 outvertex.Z = cut - 0.5;
                 extrusionPath.Add(outvertex);
             }
@@ -75,6 +99,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
 
             double cut = shape.ProfileBegin;
+            double cutBegin = cut;
             double cutEnd = 1f - shape.ProfileEnd;
             double cutStep = (cutEnd - cut) / 10f;
             double twistBegin = shape.TwistBegin * Math.PI;
@@ -89,11 +114,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             int verticeRowCount = path.Vertices.Count;
             int verticeTotalCount = mesh.Vertices.Count;
+            int verticeRowEndCount = verticeRowCount;
+            if(!shape.IsOpen && shape.IsHollow)
+            {
+                verticeRowEndCount -= 1;
+            }
 
             /* generate z-triangles */
-            for (int z = 0; z < verticeTotalCount - verticeRowCount; z += verticeRowCount)
+            for (int l = 0; l < verticeRowEndCount; ++l)
             {
-                for (int l = 0; l < verticeRowCount; ++l)
+                if(!shape.IsOpen && shape.IsHollow && l == verticeRowCount / 2 - 1)
+                {
+                    continue;
+                }
+                for (int z = 0; z < verticeTotalCount - verticeRowCount; z += verticeRowCount)
                 {
                     /* p0  ___  p1 */
                     /*    |   |    */
@@ -101,18 +135,18 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     /* p3       p2 */
                     /* tris: p0, p1, p2 and p0, p3, p2 */
                     /* p2 and p3 are on next row */
-                    int z2 = (z + 1) % verticeTotalCount;
+                    int z2 = z + verticeRowCount;
                     int l2 = (l + 1) % verticeRowCount; /* loop closure */
                     Triangle tri = new Triangle();
                     tri.Vertex1 = z + l;
-                    tri.Vertex2 = z + l + 1;
-                    tri.Vertex3 = z2 + l2 + 1;
+                    tri.Vertex2 = z2 + l2;
+                    tri.Vertex3 = z + l2;
                     mesh.Triangles.Add(tri);
 
                     tri = new Triangle();
                     tri.Vertex1 = z + l;
                     tri.Vertex2 = z2 + l;
-                    tri.Vertex3 = z2 + l2 + 1;
+                    tri.Vertex3 = z2 + l2;
                     mesh.Triangles.Add(tri);
                 }
             }
@@ -130,8 +164,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                     Triangle tri = new Triangle();
                     tri.Vertex1 = l;
-                    tri.Vertex2 = l + 1;
-                    tri.Vertex3 = l2;
+                    tri.Vertex2 = l2;
+                    tri.Vertex3 = l + 1;
                     mesh.Triangles.Add(tri);
 
                     tri = new Triangle();
@@ -141,9 +175,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     mesh.Triangles.Add(tri);
 
                     tri = new Triangle();
-                    tri.Vertex1 = l + 1 + bottomIndex;
+                    tri.Vertex1 = l + bottomIndex;
                     tri.Vertex2 = l2 + bottomIndex;
-                    tri.Vertex3 = l2 - 1 + bottomIndex;
+                    tri.Vertex3 = l + 1 + bottomIndex;
                     mesh.Triangles.Add(tri);
 
                     tri = new Triangle();
@@ -153,7 +187,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     mesh.Triangles.Add(tri);
                 }
 
-                if(!path.IsOpenHollow)
+                /*
+                if (path.IsOpenHollow)
                 {
                     Triangle tri = new Triangle();
                     tri.Vertex1 = 0;
@@ -178,7 +213,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     tri.Vertex2 = verticeRowCount / 2 - 1 + bottomIndex;
                     tri.Vertex3 = verticeRowCount / 2 + bottomIndex;
                     mesh.Triangles.Add(tri);
-                }
+                }*/
             }
             else
             {
@@ -190,9 +225,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 z2 = mesh.Vertices[verticeTotalCount - 1].Z;
                 int centerpointTop = mesh.Vertices.Count;
                 int bottomIndex = verticeTotalCount - verticeRowCount;
-                mesh.Vertices.Add(new Vector3(0, 0, z1));
+                mesh.Vertices.Add(ApplyTortureParams(shape, new Vector3(0, 0, 0), twistBegin, twistEnd, cutBegin));
                 int centerpointBottom = mesh.Vertices.Count;
-                mesh.Vertices.Add(new Vector3(0, 0, z2));
+                mesh.Vertices.Add(ApplyTortureParams(shape, new Vector3(0, 0, 0), twistBegin, twistEnd, cutEnd));
                 for(int l = 0; l < verticeRowCount; ++l)
                 {
                     int l2 = (l + 1) % verticeRowCount;
@@ -213,23 +248,27 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             return mesh;
         }
-        #endregion
+#endregion
 
-        #region 2D Path calculation
+#region 2D Path calculation
         static Vector3 Rotate2D_XY(this Vector3 vec, double angle)
         {
+            double sin = Math.Sin(angle);
+            double cos = Math.Cos(angle);
             return new Vector3(
-                vec.Y * Math.Sin(angle) + vec.X * Math.Cos(angle),
-                vec.X * Math.Sin(angle) + vec.Y * Math.Cos(angle),
+                vec.X * cos - vec.Y * sin,
+                vec.X * sin + vec.Y * cos,
                 0);
         }
 
         static Vector3 Rotate2D_YZ(this Vector3 vec, double angle)
         {
+            double sin = Math.Sin(angle);
+            double cos = Math.Cos(angle);
             return new Vector3(
                 0,
-                vec.Z * Math.Sin(angle) + vec.Y * Math.Cos(angle),
-                vec.Y * Math.Sin(angle) + vec.Z * Math.Cos(angle));
+                vec.Y * cos - vec.Z * sin,
+                vec.Y * sin + vec.Z * cos);
         }
 
         const double TRIANGLE_ANGLE_SECTIONS = 2f / 3f * Math.PI;
@@ -295,6 +334,15 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
         }
 
+        static Vector3 CalcPointToSquareBoundary(this Vector3 v, double scale)
+        {
+            double dirXabs = Math.Abs(v.X);
+            double dirYabs = Math.Abs(v.Y);
+            return v * (dirXabs > dirYabs ?
+                0.5 * scale / dirXabs :
+                0.5 * scale / dirYabs);
+        }
+
         static PathDetails CalcBoxPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             PathDetails Path = new PathDetails();
@@ -326,10 +374,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(startangle);
                     Vector3 innerDirectionalVec = outerDirectionalVec;
 
+                    double outerDirXabs = Math.Abs(outerDirectionalVec.X);
+                    double outerDirYabs = Math.Abs(outerDirectionalVec.Y);
+
                     /* outer normalize on single component to 0.5, simplifies algorithm */
-                    outerDirectionalVec *= Math.Abs(outerDirectionalVec.X) > Math.Abs(outerDirectionalVec.Y) ?
-                        0.5 / outerDirectionalVec.X :
-                        0.5 / outerDirectionalVec.Y;
+                    outerDirectionalVec = outerDirectionalVec.CalcPointToSquareBoundary(1);
 
                     switch (shape.HoleShape)
                     {
@@ -345,9 +394,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                         case PrimitiveProfileHollowShape.Same:
                         case PrimitiveProfileHollowShape.Square:
                             /* inner normalize on single component to 0.5 * hollow */
-                            innerDirectionalVec *= Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y) ?
-                                0.5 * shape.ProfileHollow / innerDirectionalVec.X :
-                                0.5 * shape.ProfileHollow / innerDirectionalVec.Y;
+                            innerDirectionalVec = innerDirectionalVec.CalcPointToSquareBoundary(shape.ProfileHollow);
                             break;
 
                         default:
@@ -369,9 +416,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
                     /* normalize on single component to 0.5, simplifies algorithm */
-                    directionalVec *= Math.Abs(directionalVec.X) > Math.Abs(directionalVec.Y) ?
-                        0.5 / directionalVec.X :
-                        0.5 / directionalVec.Y;
+                    directionalVec = directionalVec.CalcPointToSquareBoundary(1);
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
@@ -428,9 +473,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Square:
                             /* inner normalize on single component to 0.5 * hollow */
-                            innerDirectionalVec *= Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y) ?
-                                0.5 * shape.ProfileHollow / innerDirectionalVec.X :
-                                0.5 * shape.ProfileHollow / innerDirectionalVec.Y;
+                            innerDirectionalVec = innerDirectionalVec.CalcPointToSquareBoundary(shape.ProfileHollow);
                             break;
 
                         default:
@@ -509,10 +552,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Square:
                             innerDirectionalVec = startPoint.Rotate2D_XY(startangle);
+                            double innerDirXabs = Math.Abs(innerDirectionalVec.X);
+                            double innerDirYabs = Math.Abs(innerDirectionalVec.Y);
                             /* inner normalize on single component to 0.5 * hollow */
-                            innerDirectionalVec *= Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y) ?
-                                0.5 * shape.ProfileHollow / innerDirectionalVec.X :
-                                0.5 * shape.ProfileHollow / innerDirectionalVec.Y;
+                            innerDirectionalVec = innerDirectionalVec.CalcPointToSquareBoundary(shape.ProfileHollow);
                             break;
 
                         default:
@@ -533,7 +576,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 Vector3 startPoint = Vector3.UnitX * 0.5;
                 for (; startangle < endangle; startangle += stepangle)
                 {
-                    Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
+                    Vector3 directionalVec = CalcTrianglePoint(startangle);
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
@@ -544,6 +587,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             return Path;
         }
-        #endregion
+#endregion
     }
 }
