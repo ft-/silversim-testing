@@ -227,9 +227,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             return mesh;
         }
-#endregion
+        #endregion
 
-#region 2D Path calculation
+        #region 2D Path calculation
         static Vector3 Rotate2D_XY(this Vector3 vec, double angle)
         {
             double sin = Math.Sin(angle);
@@ -249,11 +249,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 vec.Y * cos - vec.Z * sin,
                 vec.Y * sin + vec.Z * cos);
         }
-
-        const double TRIANGLE_ANGLE_SECTIONS = 2f / 3f * Math.PI;
-        static readonly Vector3 TRIANGLE_P0 = new Vector3(0, 0.5, 0);
-        static readonly Vector3 TRIANGLE_P1 = new Vector3(-0.5, -0.5, 0);
-        static readonly Vector3 TRIANGLE_P2 = new Vector3(0.5, -0.5, 0);
 
         static double CalcEquA(Vector3 v1, Vector3 v2)
         {
@@ -280,11 +275,68 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return ang;
         }
 
+        static readonly Vector3 TRIANGLE_P0 = Vector3.UnitX * 0.5;
+        static readonly Vector3 TRIANGLE_P1 = Vector3.UnitX.Rotate2D_XY(2.0943977032870302) * 0.5;
+        static readonly Vector3 TRIANGLE_P2 = Vector3.UnitX.Rotate2D_XY(-2.0943977032870302) * 0.5;
         static readonly double[] TriEqu_A = new double[3] { CalcEquA(TRIANGLE_P0, TRIANGLE_P1), CalcEquA(TRIANGLE_P1, TRIANGLE_P2), CalcEquA(TRIANGLE_P2, TRIANGLE_P0) };
         static readonly double[] TriEqu_B = new double[3] { CalcEquB(TRIANGLE_P0, TRIANGLE_P1), CalcEquB(TRIANGLE_P1, TRIANGLE_P2), CalcEquB(TRIANGLE_P2, TRIANGLE_P0) };
         static readonly double[] TriEqu_D = new double[3] { CalcEquD(TRIANGLE_P0, TRIANGLE_P1), CalcEquD(TRIANGLE_P1, TRIANGLE_P2), CalcEquD(TRIANGLE_P2, TRIANGLE_P0) };
-        static readonly double TRI_SEC_1 = CalcTriBaseAngle(TRIANGLE_P1);
-        static readonly double TRI_SEC_2 = CalcTriBaseAngle(TRIANGLE_P2);
+
+        static readonly Vector3 TOPEDGE_SQUARE_P0 = Vector3.UnitX * 0.5 / 0.7;
+        static readonly Vector3 TOPEDGE_SQUARE_P1 = Vector3.UnitY * 0.5 / 0.7;
+        static readonly Vector3 TOPEDGE_SQUARE_P2 = -Vector3.UnitX * 0.5 / 0.7;
+        static readonly Vector3 TOPEDGE_SQUARE_P3 = -Vector3.UnitY * 0.5 / 0.7;
+
+        static readonly double[] TopEdgeEqu_A = new double[4] { CalcEquA(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquA(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquA(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquA(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
+        static readonly double[] TopEdgeEqu_B = new double[4] { CalcEquB(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquB(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquB(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquB(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
+        static readonly double[] TopEdgeEqu_D = new double[4] { CalcEquD(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquD(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquD(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquD(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
+        static readonly double TopEdgeAngSeg0 = Math.PI / 2;
+        static readonly double TopEdgeAngSeg2 = Math.PI * 3 / 2;
+
+        static Vector3 CalcTopEdgedSquare(double angle)
+        {
+            Vector3 c_p3;
+            double a1;
+            double b1;
+            double d1;
+
+            if (angle < TopEdgeAngSeg0)
+            {
+                a1 = TopEdgeEqu_A[0];
+                b1 = TopEdgeEqu_B[0];
+                d1 = TopEdgeEqu_D[0];
+            }
+            else if (angle <= Math.PI)
+            {
+                a1 = TopEdgeEqu_A[1];
+                b1 = TopEdgeEqu_B[1];
+                d1 = TopEdgeEqu_D[1];
+            }
+            else if (angle <= TopEdgeAngSeg2)
+            {
+                a1 = TopEdgeEqu_A[2];
+                b1 = TopEdgeEqu_B[2];
+                d1 = TopEdgeEqu_D[2];
+            }
+            else
+            {
+                a1 = TopEdgeEqu_A[3];
+                b1 = TopEdgeEqu_B[3];
+                d1 = TopEdgeEqu_D[3];
+            }
+
+
+            c_p3 = TOPEDGE_SQUARE_P0.Rotate2D_XY(angle);
+            double a2 = c_p3.Y;
+            double b2 = -c_p3.X;
+            double d2 = a2 * c_p3.X + b2 * c_p3.Y;
+
+            /* Cramer rule */
+            double div = (a1 * b2 - a2 * b1);
+            double x = (b2 * d1 - b1 * d2) / div;
+            double y = (a1 * d2 - a2 * d1) / div;
+            return new Vector3(x, y, 0);
+        }
 
         static Vector3 CalcTrianglePoint(double angle)
         {
@@ -299,13 +351,13 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double b1;
             double d1;
 
-            if(angle < TRI_SEC_1)
+            if(angle < 2.0943977032870302)
             {
                 a1 = TriEqu_A[0];
                 b1 = TriEqu_B[0];
                 d1 = TriEqu_D[0];
             }
-            else if(angle <= TRI_SEC_2)
+            else if(angle <= 2 * Math.PI - 2.0943977032870302)
             {
                 a1 = TriEqu_A[1];
                 b1 = TriEqu_B[1];
@@ -373,7 +425,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         }
 
         static readonly double[] CornerAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5 };
-        static readonly double[] PrismAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5, TRI_SEC_1, TRI_SEC_2 };
+        static readonly double[] PrismAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5, 2.0943977032870302, 2 * Math.PI - 2.0943977032870302 };
         static List<double> CalcBaseAngles(this ObjectPart.PrimitiveShape.Decoded shape, double startangle, double endangle, double stepangle)
         {
             List<double> angles = new List<double>();
@@ -391,6 +443,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 angles.Add(endangle);
             }
 
+            if(shape.HoleShape == PrimitiveProfileHollowShape.Triangle && shape.IsHollow)
+            {
+                foreach (double angle in PrismAngles)
+                {
+                    if (startangle <= angle && endangle >= angle)
+                    {
+                        if (!angles.Contains(angle))
+                        {
+                            InsertAngle(angles, angle);
+                        }
+                    }
+                }
+
+            }
             if (shape.ShapeType == PrimitiveShapeType.Prism)
             {
                 foreach (double angle in PrismAngles)
@@ -422,6 +488,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         static PathDetails CalcBoxPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
+            /* Box has cut start at 0.5,-0.5 */
             PathDetails Path = new PathDetails();
 
             double startangle;
@@ -461,7 +528,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     switch (shape.HoleShape)
                     {
                         case PrimitiveProfileHollowShape.Triangle:
-                            innerDirectionalVec = CalcTrianglePoint(angle) * shape.ProfileHollow;
+                            innerDirectionalVec = CalcTrianglePoint(angle).Rotate2D_XY(-2.3561944901923448) * shape.ProfileHollow * 0.5;
                             break;
 
                         case PrimitiveProfileHollowShape.Circle:
@@ -508,6 +575,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         static PathDetails CalcCylinderPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
+            /* Cylinder has cut start at 0,0.5 */
             PathDetails Path = new PathDetails();
 
             double startangle;
@@ -552,7 +620,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Square:
                             /* inner normalize on single component to 0.5 * hollow */
-                            innerDirectionalVec = innerDirectionalVec.CalcPointToSquareBoundary(shape.ProfileHollow);
+                            innerDirectionalVec = CalcTopEdgedSquare(angle) * shape.ProfileHollow;
                             break;
 
                         default:
@@ -587,6 +655,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         static PathDetails CalcPrismPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
+            /* Prism has cut start at 0,0.5 */
             PathDetails Path = new PathDetails();
 
             double startangle;
@@ -611,6 +680,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             if (shape.IsHollow)
             {
                 /* we calculate two points */
+                double profileHollow = shape.ProfileHollow * 0.5;
                 Vector3 startPoint = Vector3.UnitX * 0.5;
                 foreach (double angle in angles)
                 {
@@ -621,21 +691,16 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     {
                         case PrimitiveProfileHollowShape.Triangle:
                         case PrimitiveProfileHollowShape.Same:
-                            innerDirectionalVec = outerDirectionalVec * shape.ProfileHollow;
+                            innerDirectionalVec = outerDirectionalVec * profileHollow;
                             break;
 
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
-                            innerDirectionalVec = startPoint.Rotate2D_XY(angle);
-                            innerDirectionalVec *= (shape.ProfileHollow);
+                            innerDirectionalVec = startPoint.Rotate2D_XY(angle) * profileHollow;
                             break;
 
                         case PrimitiveProfileHollowShape.Square:
-                            innerDirectionalVec = startPoint.Rotate2D_XY(angle);
-                            double innerDirXabs = Math.Abs(innerDirectionalVec.X);
-                            double innerDirYabs = Math.Abs(innerDirectionalVec.Y);
-                            /* inner normalize on single component to 0.5 * hollow */
-                            innerDirectionalVec = innerDirectionalVec.CalcPointToSquareBoundary(shape.ProfileHollow);
+                            innerDirectionalVec = CalcTopEdgedSquare(angle) * profileHollow;
                             break;
 
                         default:
@@ -666,6 +731,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             return Path;
         }
-#endregion
+        #endregion
     }
 }
