@@ -18,6 +18,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         bool ContainsKey(ObjectPart.PrimitiveShape primShape);
         bool Remove(UUID meshid);
         bool Remove(ObjectPart.PrimitiveShape primShape);
+        void RemoveAll();
         ICollection<UUID> KnownMeshIds { get; }
     }
 }

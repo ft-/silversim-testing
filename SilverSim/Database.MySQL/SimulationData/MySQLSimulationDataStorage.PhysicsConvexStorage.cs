@@ -206,5 +206,24 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return sculptids;
             }
         }
+
+        void ISimulationDataPhysicsConvexStorageInterface.RemoveAll()
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.InsideTransaction(delegate ()
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primphysics WHERE 1", conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM meshphysics WHERE 1", conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                });
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.CmdIO;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Mesh;
@@ -12,6 +13,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.Scene.Physics.ShapeManager

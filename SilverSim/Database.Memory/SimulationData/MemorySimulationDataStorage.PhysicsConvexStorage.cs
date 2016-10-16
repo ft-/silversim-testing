@@ -76,5 +76,12 @@ namespace SilverSim.Database.Memory.SimulationData
                 return m_ConvexShapesByMesh.Keys;
             }
         }
+
+        void ISimulationDataPhysicsConvexStorageInterface.RemoveAll()
+        {
+            m_ConvexShapesByMesh.Clear();
+            m_ConvexShapesByPrimShape.Clear();
+        }
+
     }
 }
