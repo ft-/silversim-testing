@@ -52,6 +52,16 @@ namespace SilverSim.Scene.Types.Object.Mesh
             outvertex = outvertex.Rotate2D_XY(twist);
             outvertex += shear;
             outvertex.Z = cut - 0.5;
+            switch(shape.ShapeType)
+            {
+                case PrimitiveShapeType.Torus:
+                case PrimitiveShapeType.Tube:
+                case PrimitiveShapeType.Ring:
+                    outvertex.Z = outvertex.X;
+                    outvertex.X = 0;
+                    break;
+            }
+
             return outvertex;
         }
 
@@ -119,11 +129,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
             mesh.Vertices.AddRange(path.ExtrudeBasic(shape, twistBegin, twistEnd, cutEnd));
 
-            shape.BuildTriangles(mesh, path, cutBegin, cutEnd);
+            shape.BuildBasicTriangles(mesh, path, cutBegin, cutEnd);
             return mesh;
         }
 
-        static void BuildTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
+        static void BuildBasicTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
         {
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
