@@ -11,13 +11,15 @@ using SilverSim.Types;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System;
+using SilverSim.ServiceInterfaces.Statistics;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Simulation Data Backend")]
-    public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin
+    public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IQueueStatsAccess
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         readonly string m_ConnectionString;
@@ -156,6 +158,25 @@ namespace SilverSim.Database.MySQL.SimulationData
                         cmd.ExecuteNonQuery();
                     }
                 }
+            }
+        }
+
+        IList<QueueStatAccessor> IQueueStatsAccess.QueueStats
+        {
+            get
+            {
+                List<QueueStatAccessor> statFuncs = new List<QueueStatAccessor>();
+                foreach(MySQLTerrainListener terListener in m_TerrainListenerThreads)
+                {
+                    statFuncs.Add(new QueueStatAccessor("TerrainStore." + terListener.RegionID.ToString(), terListener.GetStats));
+                }
+
+                foreach(MySQLSceneListener sceneListener in m_SceneListenerThreads)
+                {
+                    statFuncs.Add(new QueueStatAccessor("SceneStore." + sceneListener.RegionID.ToString(), sceneListener.GetStats));
+                }
+
+                return statFuncs;
             }
         }
     }

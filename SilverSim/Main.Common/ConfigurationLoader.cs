@@ -32,6 +32,7 @@ using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.ServiceInterfaces.Statistics;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Assembly;
@@ -1227,6 +1228,7 @@ namespace SilverSim.Main.Common
             CommandRegistry.Commands.Add("execute", ExecuteCommand);
             CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
             CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
+            CommandRegistry.ShowCommands.Add("queues", ShowQueuesCommand);
             CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
             CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
             CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
@@ -2058,6 +2060,32 @@ namespace SilverSim.Main.Common
             else
             {
                 io.WriteFormatted("Threads: {0}", Process.GetCurrentProcess().Threads.Count);
+            }
+        }
+
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+        void ShowQueuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("Show queue stats on instance");
+            }
+            else if(UUID.Zero != limitedToScene)
+            {
+                io.Write("Not allowed on limited console");
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("Queue List:\n----------------------------------------------");
+                foreach(KeyValuePair<string, IQueueStatsAccess> kvp in GetServices<IQueueStatsAccess>())
+                {
+                    foreach (QueueStatAccessor accessors in kvp.Value.QueueStats)
+                    {
+                        QueueStat stat = accessors.GetData();
+                        sb.AppendFormat("\n{0}: {1}:\n- Status: {2}\n- Count: {3}\n- Processed: {4}\n", kvp.Key, accessors.Name, stat.Status, stat.Count, stat.Processed);
+                    }
+                }
+                io.Write(sb.ToString());
             }
         }
         #endregion
