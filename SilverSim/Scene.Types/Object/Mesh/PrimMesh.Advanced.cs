@@ -152,22 +152,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double twistEnd = shape.TwistEnd * Math.PI * 2;
 
             MeshLOD mesh = new MeshLOD();
-            if (shape.ShapeType == PrimitiveShapeType.Sphere)
+            for (; cut < cutEnd; cut += cutStep)
             {
-                for (; cut < cutEnd; cut += cutStep)
-                {
-                    mesh.Vertices.AddRange(path.ExtrudeSphere(shape, twistBegin, twistEnd, cut));
-                }
-                mesh.Vertices.AddRange(path.ExtrudeSphere(shape, twistBegin, twistEnd, cutEnd));
+                mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cut));
             }
-            else
-            {
-                for (; cut < cutEnd; cut += cutStep)
-                {
-                    mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cut));
-                }
-                mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cutEnd));
-            }
+            mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cutEnd));
 
             shape.BuildAdvancedTriangles(mesh, path, cutBegin, cutEnd);
 
@@ -255,7 +244,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
             else if(shape.ProfileBegin != shape.ProfileEnd)
             {
-                /* build a center point and connect all vertexes with triangles */
+                /* build a center point and connect all vertices with triangles */
                 double z1;
                 double z2;
 

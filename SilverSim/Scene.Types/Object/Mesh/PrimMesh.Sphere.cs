@@ -20,66 +20,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
          * additionally, pathscale, revolutions and skew avail
          */
 
-        #region extrude sphere
-        static List<Vector3> ExtrudeSphere(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
-        {
-            List<Vector3> extrusionPath = new List<Vector3>();
-            double twist = twistBegin.Lerp(twistEnd, cut);
-            double angle = 0.0.Lerp(shape.Revolutions * 2 * Math.PI, cut);
-            Vector3 topSize = new Vector3();
-            Vector3 taper = new Vector3();
-            double radiusOffset;
-
-            #region cut
-            topSize.X = shape.PathScale.X < 0f ?
-                1.0.Clamp(1f + shape.PathScale.X, 1f - cut) :
-                1.0.Clamp(1f - shape.PathScale.X, cut);
-
-            topSize.Y = shape.PathScale.Y < 0f ?
-                1.0.Clamp(1f + shape.PathScale.Y, 1f - cut) :
-                1.0.Clamp(1f - shape.PathScale.Y, cut);
-            #endregion
-
-            #region taper
-            taper.X = shape.Taper.X < 0f ?
-                1.0.Clamp(1f + shape.Taper.X, 1f - cut) :
-                1.0.Clamp(1f - shape.Taper.X, cut);
-
-            taper.Y = shape.Taper.Y < 0f ?
-                1.0.Clamp(1f + shape.Taper.Y, 1f - cut) :
-                1.0.Clamp(1f - shape.Taper.Y, cut);
-            #endregion
-
-            #region radius offset
-            radiusOffset = shape.RadiusOffset < 0f ?
-                1.0.Clamp(1f + shape.RadiusOffset, 1f - cut) :
-                1.0.Clamp(1f - shape.RadiusOffset, cut);
-            #endregion
-
-            /* generate extrusions */
-            foreach (Vector3 vertex in path.Vertices)
-            {
-                Vector3 outvertex = vertex;
-                outvertex.X *= topSize.X;
-                outvertex.Y = 1.0.Clamp(outvertex.Y, shape.PathScale.Y);
-                outvertex.Y *= topSize.Y;
-                outvertex += shape.TopShear;
-                outvertex.X *= shape.PathScale.X;
-                outvertex.Y *= taper.Y;
-                outvertex.Z *= taper.Z;
-                outvertex = outvertex.Rotate2D_YZ(twist);
-                outvertex.Z *= (1 / (shape.Skew * shape.Revolutions));
-                outvertex.Z += shape.Skew * shape.Revolutions * cut;
-                outvertex += outvertex.Rotate2D_XY(angle);
-                outvertex.X *= radiusOffset;
-                outvertex.Y *= radiusOffset;
-
-                extrusionPath.Add(outvertex);
-            }
-            return extrusionPath;
-        }
-        #endregion
-
         #region Calculate Sphere 2D Path
         static Vector3 CalcTrapezoidInSpherePoint(double angle)
         {
@@ -169,7 +109,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             PathDetails Path = new PathDetails();
 
             double startangle = Math.PI * shape.ProfileBegin;
-            double endangle = Math.PI * shape.ProfileEnd;
+            double endangle = Math.PI * (1f - shape.ProfileEnd);
             double stepangle = (endangle - startangle) / 60;
 
             if (shape.IsHollow)
@@ -202,6 +142,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
                             throw new NotImplementedException();
                     }
 
+                    outerDirectionalVec.Z = outerDirectionalVec.X;
+                    innerDirectionalVec.Z = innerDirectionalVec.X;
+                    outerDirectionalVec.X = 0;
+                    innerDirectionalVec.X = 0;
+
                     /* inner path is reversed */
                     Path.Vertices.Add(outerDirectionalVec);
                     Path.Vertices.Insert(0, innerDirectionalVec);
@@ -217,6 +162,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 for (; startangle < endangle; startangle += stepangle)
                 {
                     Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
+                    directionalVec.Z = directionalVec.X;
+                    directionalVec.X = 0;
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
