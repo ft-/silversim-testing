@@ -58,6 +58,7 @@ namespace SilverSim.Types
             foreach(IValue iv in this)
             {
                 s.Append(iv.ToString());
+                s.Append(",");
             }
             return s.ToString();
         }

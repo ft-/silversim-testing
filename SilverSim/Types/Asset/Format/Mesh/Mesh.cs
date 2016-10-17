@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.IO.Compression;
 
 namespace SilverSim.Types.Asset.Format.Mesh
 {
@@ -188,7 +189,10 @@ namespace SilverSim.Types.Asset.Format.Mesh
             AnArray submeshes;
             using (MemoryStream ms = new MemoryStream(data, physOffset, physSize))
             {
-                submeshes = (AnArray)LlsdBinary.Deserialize(ms);
+                using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Decompress))
+                {
+                    submeshes = (AnArray)LlsdBinary.Deserialize(gz);
+                }
             }
             int faceNo = 0;
             foreach(IValue iv in submeshes)
@@ -204,11 +208,13 @@ namespace SilverSim.Types.Asset.Format.Mesh
                     Map posDom = (Map)submesh["PositionDomain"];
                     if (posDom.ContainsKey("Max"))
                     {
-                        posMax = posDom["Max"].AsVector3;
+                        AnArray ivdom = (AnArray)posDom["Max"];
+                        posMax = new Vector3(ivdom[0].AsReal, ivdom[1].AsReal, ivdom[2].AsReal);
                     }
                     if (posDom.ContainsKey("Min"))
                     {
-                        posMin = posDom["Min"].AsVector3;
+                        AnArray ivdom = (AnArray)posDom["Min"];
+                        posMin = new Vector3(ivdom[0].AsReal, ivdom[1].AsReal, ivdom[2].AsReal);
                     }
                 }
                 byte[] posBytes = (BinaryData)submesh["Position"];
@@ -224,15 +230,15 @@ namespace SilverSim.Types.Asset.Format.Mesh
                     Map texDom = (Map)submesh["TexCoord0Domain"];
                     if(texDom.ContainsKey("Max"))
                     {
-                        byte[] domData = (BinaryData)texDom["Max"];
-                        uvMax.U = BytesLEToFloat(domData, 0);
-                        uvMax.V = BytesLEToFloat(domData, 4);
+                        AnArray domData = (AnArray)texDom["Max"];
+                        uvMax.U = (float)domData[0].AsReal;
+                        uvMax.V = (float)domData[1].AsReal;
                     }
                     if(texDom.ContainsKey("Min"))
                     {
-                        byte[] domData = (BinaryData)texDom["Min"];
-                        uvMin.U = BytesLEToFloat(domData, 0);
-                        uvMin.V = BytesLEToFloat(domData, 4);
+                        AnArray domData = (AnArray)texDom["Min"];
+                        uvMin.U = (float)domData[0].AsReal;
+                        uvMin.V = (float)domData[1].AsReal;
                     }
                 }
                 ushort faceIndexOffset = (ushort)Vertices.Count;

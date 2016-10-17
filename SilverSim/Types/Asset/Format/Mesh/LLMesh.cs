@@ -3,6 +3,7 @@
 
 using SilverSim.Types.StructuredData.Llsd;
 using System;
+using System.IO;
 
 namespace SilverSim.Types.Asset.Format.Mesh
 {
@@ -21,8 +22,11 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
             try
             {
-                m_MeshData = (Map)LlsdBinary.Deserialize(asset.InputStream);
-                m_EndOfHeader = (int)asset.InputStream.Position;
+                using (Stream s = asset.InputStream)
+                {
+                    m_MeshData = (Map)LlsdBinary.Deserialize(s);
+                    m_EndOfHeader = (int)s.Position;
+                }
             }
             catch
             {
