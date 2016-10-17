@@ -115,11 +115,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* generate triangles */
             int totalVerticeCount = mesh.Vertices.Count;
 
-            for (int row = 0; row < totalVerticeCount - vertexRowCount; totalVerticeCount += vertexRowCount)
+            for (int row = 0; row < totalVerticeCount - vertexRowCount; row += vertexRowCount)
             {
                 for(int col = 0; col < vertexRowCount - 1; ++col)
                 {
-                    int row2 = row;
+                    int row2 = row + 1;
                     Triangle tri = new Triangle();
                     tri.Vertex1 = row + col;
                     tri.Vertex2 = row + col + 1;
