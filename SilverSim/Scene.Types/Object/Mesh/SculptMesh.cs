@@ -6,6 +6,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
@@ -55,39 +56,55 @@ namespace SilverSim.Scene.Types.Object.Mesh
         {
             bool mirror = shape.IsSculptMirrored;
             MeshLOD mesh = new MeshLOD();
-            int vertexRowCount = bitmap.Width + 1;
             bool reverse_horizontal = shape.IsSculptInverted ? !mirror : mirror;
             PrimitiveSculptType sculptType = shape.SculptType;
 
-            /* generate vertex map */
-            for (int y = 0; y <= bitmap.Height; ++y)
+            int sculptSizeS;
+            int sculptSizeT;
+            int sculptVerts = bitmap.Width * bitmap.Height / 4;
+            if(sculptVerts > 32 * 32)
             {
-                for (int x = 0; x <= bitmap.Width; ++x)
-                {
-                    int ax;
-                    int ay;
+                sculptVerts = 32 * 32;
+            }
+            double ratio = (double)bitmap.Width / (double)bitmap.Height;
 
-                    ay = y;
-                    ax = reverse_horizontal ?
-                        bitmap.Width - 1 - x :
-                        x;
+            sculptSizeS = (int)Math.Sqrt(sculptVerts / ratio);
+
+            sculptSizeS = Math.Max(sculptSizeS, 4);
+            sculptSizeT = sculptVerts / sculptSizeS;
+
+            sculptSizeT = Math.Max(sculptSizeT, 4);
+            sculptSizeS = sculptVerts / sculptSizeT;
+
+            /* generate vertex map */
+            for (int s = 0; s < sculptSizeS; ++s)
+            {
+                for (int t = 0; t < sculptSizeT; ++t)
+                {
+                    int reversed_t = t;
+                    if(reverse_horizontal)
+                    {
+                        reversed_t = sculptSizeT - t - 1;
+                    }
+                    int x = (int)((double)reversed_t / (sculptSizeT - 1) * bitmap.Width);
+                    int y = (int)((double)s / (sculptSizeS - 1) * bitmap.Height);
 
                     if (y == 0)
                     {
                         if (sculptType == PrimitiveSculptType.Sphere)
                         {
-                            ax = bitmap.Width / 2;
+                            x = bitmap.Width / 2;
                         }
                     }
                     else if (y == bitmap.Height)
                     {
-                        ay = (sculptType == PrimitiveSculptType.Torus) ?
+                        y = (sculptType == PrimitiveSculptType.Torus) ?
                             0 :
                             bitmap.Height - 1;
 
                         if (sculptType == PrimitiveSculptType.Sphere)
                         {
-                            ax = bitmap.Width / 2;
+                            x = bitmap.Width / 2;
                         }
                     }
 
@@ -98,38 +115,37 @@ namespace SilverSim.Scene.Types.Object.Mesh
                             case PrimitiveSculptType.Sphere:
                             case PrimitiveSculptType.Torus:
                             case PrimitiveSculptType.Cylinder:
-                                ax = 0;
+                                x = 0;
                                 break;
 
                             default:
-                                ax = bitmap.Width - 1;
+                                x = bitmap.Width - 1;
                                 break;
                         }
                     }
 
-                    Vector3 v = bitmap.GetVertex(ax, ay, mirror);
+                    Vector3 v = bitmap.GetVertex(x, y, mirror);
                     mesh.Vertices.Add(v);
                 }
             }
 
             /* generate triangles */
-            int totalVerticeCount = mesh.Vertices.Count;
-
-            for (int row = 0; row < totalVerticeCount - vertexRowCount; row += vertexRowCount)
+            for (int row = 0; row < sculptSizeS - 1; ++row)
             {
-                for(int col = 0; col < vertexRowCount - 1; ++col)
+                int rowIndex = (row * sculptSizeT);
+                int row2Index = rowIndex + sculptSizeT;
+                for(int col = 0; col < sculptSizeT - 1; ++col)
                 {
-                    int row2 = row + 1;
                     Triangle tri = new Triangle();
-                    tri.Vertex1 = row + col;
-                    tri.Vertex2 = row + col + 1;
-                    tri.Vertex3 = row2 + col + 1;
+                    tri.Vertex1 = rowIndex + col;
+                    tri.Vertex2 = row2Index + col + 1;
+                    tri.Vertex3 = rowIndex + col + 1;
                     mesh.Triangles.Add(tri);
 
                     tri = new Triangle();
-                    tri.Vertex1 = row + col;
-                    tri.Vertex2 = row2 + col;
-                    tri.Vertex3 = row2 + col + 1;
+                    tri.Vertex1 = rowIndex + col;
+                    tri.Vertex2 = row2Index + col;
+                    tri.Vertex3 = row2Index + col + 1;
                     mesh.Triangles.Add(tri);
                 }
             }
