@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        internal static MeshLOD SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape)
+        internal static MeshLOD SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape, bool generate_uv = false)
         {
             bool mirror = shape.IsSculptMirrored;
             MeshLOD mesh = new MeshLOD();
@@ -126,6 +126,14 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                     Vector3 v = bitmap.GetVertex(x, y, mirror);
                     mesh.Vertices.Add(v);
+                    if(generate_uv)
+                    {
+                        UVCoord uv = new UVCoord();
+                        uv.U = (float)reversed_t / (sculptSizeS - t);
+                        uv.V = (float)s / (sculptSizeS - 1);
+
+                        mesh.UVCoords.Add(uv);
+                    }
                 }
             }
 
