@@ -114,6 +114,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double cutStep = (cutEnd - cut) / 10f;
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
+            double neededSteps = Math.Min(1, Math.Ceiling((shape.TwistEnd - shape.TwistBegin) / (5 * Math.PI / 180) * (cutEnd - cut)));
+            cutStep /= neededSteps;
 
             MeshLOD mesh = new MeshLOD();
             if (double.Epsilon <= Math.Abs(shape.TwistBegin - shape.TwistEnd))
