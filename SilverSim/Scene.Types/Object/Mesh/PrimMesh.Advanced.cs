@@ -52,15 +52,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 outvertex.Z *= 1 - Math.Abs(skew);
                 outvertex.Z += skew * (1f - cut);
 
-                outvertex.Y = outvertex.Y * pathscale + 0.5 - pathscale * 0.5;
+                outvertex.Y = outvertex.Y * pathscale + (0.5 - pathscale * 0.5) * radiusOffset;
 
                 outvertex = outvertex.Rotate2D_XY(-angle);
                 outvertex.Z += outvertex.X * shape.TopShear.X;
                 outvertex.Y += outvertex.X * shape.TopShear.Y;
-
-#warning find out how to calculate radius offset
-                //outvertex.X *= radiusOffset;
-                //outvertex.Y *= radiusOffset;
 
                 extrusionPath.Add(outvertex);
             }
