@@ -234,7 +234,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-#region Control Functions
+        #region Control Functions
         public NpcAgent CreateNpc(UUID sceneid, UUI owner, UGI group, string firstName, string lastName, Vector3 position, Notecard nc, NpcOptions options = NpcOptions.None)
         {
             SceneInterface scene;
@@ -340,9 +340,9 @@ namespace SilverSim.Scene.Npc
         {
             return m_NpcAgents.TryGetValue(npcId, out agent);
         }
-#endregion
+        #endregion
 
-#region Console commands
+        #region Console commands
         void ShowNpcsCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
@@ -421,9 +421,9 @@ namespace SilverSim.Scene.Npc
                 io.Write("Npc removed");
             }
         }
-#endregion
+        #endregion
 
-#region WebIF
+        #region WebIF
         [AdminWebIfRequiredRight("npcs.manage")]
         void HandleRemoveNpc(HttpRequest req, Map jsondata)
         {
@@ -512,7 +512,7 @@ namespace SilverSim.Scene.Npc
             res.Add("npcs", npcs);
             m_AdminWebIF.SuccessResponse(req, res);
         }
-#endregion
+        #endregion
     }
 
     [PluginName("NpcManager")]
