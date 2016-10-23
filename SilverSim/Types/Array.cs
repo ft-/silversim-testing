@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Linq;
 
 namespace SilverSim.Types
 {
@@ -145,6 +146,10 @@ namespace SilverSim.Types
             return true;
         }
 
+        public IEnumerable<T> GetValues<T>()
+        {
+            return from val in this where val is T select (T)val;
+        }
 
         #region Helper
         public ABoolean AsBoolean { get { return new ABoolean(); } }
