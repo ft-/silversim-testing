@@ -514,11 +514,6 @@ namespace SilverSim.Scene.Npc
             throw new NotImplementedException();
         }
 
-        public override bool UnSit()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void InvokeOnPositionUpdate()
         {
             var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */

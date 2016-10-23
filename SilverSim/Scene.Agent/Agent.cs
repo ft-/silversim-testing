@@ -102,7 +102,21 @@ namespace SilverSim.Scene.Agent
             {
                 lock (m_DataLock)
                 {
+                    Vector3 eulers = LocalRotation.GetEulerAngles();
+                    Vector3 l = GlobalPosition;
+                    l.Z += AvatarHeight / 2;
+                    Quaternion q = Quaternion.CreateFromEulers(0, 0, eulers.Z);
+                    bool unsit = false;
+                    if (null != m_SittingOnObject && value == null)
+                    {
+                        unsit = true;
+                    }
                     m_SittingOnObject = value;
+                    if(unsit)
+                    {
+                        GlobalRotation = q;
+                        GlobalPosition = l;
+                    }
                 }
             }
         }
@@ -872,6 +886,20 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public bool UnSit()
+        {
+            Quaternion bodyRot = BodyRotation;
+            Vector3 euler = BodyRotation.GetEulerAngles();
+            Quaternion q = Quaternion.CreateFromEulers(0, 0, euler.Z);
+            IObject obj = SittingOnObject;
+            if (obj == null)
+            {
+                return false;
+            }
+            ObjectGroup grp = (ObjectGroup)obj;
+            return grp.AgentSitting.UnSit(this);
+        }
+
         public abstract bool IMSend(GridInstantMessage im);
         public abstract void ClearKnownFriends();
         public abstract void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);
@@ -884,7 +912,6 @@ namespace SilverSim.Scene.Agent
         public abstract void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
         public abstract void HandleMessage(ChildAgentUpdate m);
         public abstract void HandleMessage(ChildAgentPositionUpdate m);
-        public abstract bool UnSit();
         public abstract RwLockedList<UUID> SelectedObjects(UUID scene);
         public abstract ulong AddNewFile(string filename, byte[] data);
         public abstract ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);

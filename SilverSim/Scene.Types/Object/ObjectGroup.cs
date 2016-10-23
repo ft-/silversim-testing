@@ -1046,6 +1046,7 @@ namespace SilverSim.Scene.Types.Object
         public class AgentSittingInterface
         {
             readonly ObjectGroup m_Group;
+            readonly object m_SitLock = new object();
 
             public AgentSittingInterface(ObjectGroup group)
             {
@@ -1065,6 +1066,11 @@ namespace SilverSim.Scene.Types.Object
                 return m_Group.m_SittingAgents.TryGetValue(p, out agent);
             }
 
+            public bool TryGetValue(IAgent agent, out ObjectPart part)
+            {
+                return m_Group.m_SittingAgents.TryGetValue(agent, out part);
+            }
+
             public bool TryGetValue(UUID agentid, out IAgent agent)
             {
                 foreach(IAgent ag in m_Group.m_SittingAgents.Keys1)
@@ -1077,6 +1083,103 @@ namespace SilverSim.Scene.Types.Object
                 }
                 agent = null;
                 return false;
+            }
+
+            static readonly Vector3 SIT_TARGET_OFFSET = new Vector3(0, 0, 0.4);
+
+            public void Sit(IAgent agent, int preferedLinkNumber = -1)
+            {
+                Sit(agent, Vector3.Zero, preferedLinkNumber);
+            }
+
+            public void Sit(IAgent agent, Vector3 preferedOffset, int preferedLinkNumber = -1)
+            {
+                ObjectGroup sitOn = (ObjectGroup)agent.SittingOnObject;
+                if(sitOn != null)
+                {
+                    sitOn.m_SittingAgents.Remove(agent);
+                }
+
+                ObjectPart sitOnTarget = null;
+                lock (m_SitLock)
+                {
+                    if (preferedLinkNumber > 0)
+                    {
+                        ObjectPart part;
+                        if (m_Group.TryGetValue(preferedLinkNumber, out part))
+                        {
+                            if (!m_Group.m_SittingAgents.ContainsKey(part))
+                            {
+                                /* select prim */
+                                sitOnTarget = part;
+                            }
+                        }
+                    }
+
+                    if (null == sitOnTarget)
+                    {
+                        foreach (ObjectPart part in m_Group.ValuesByKey1)
+                        {
+                            if (!part.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
+                                !part.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
+                            {
+                                if (!m_Group.m_SittingAgents.ContainsKey(part))
+                                {
+                                    /* select prim */
+                                    sitOnTarget = part;
+                                }
+                            }
+                        }
+                    }
+
+                    if (null == sitOnTarget)
+                    {
+                        sitOnTarget = m_Group.RootPart;
+                    }
+
+                    m_Group.m_SittingAgents.Add(agent, sitOnTarget);
+                    agent.SittingOnObject = sitOnTarget;
+
+                }
+                if(!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
+                    !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
+                {
+                    agent.LocalPosition = (sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET);
+                    agent.LocalRotation = sitOnTarget.SitTargetOrientation;
+                }
+                else
+                {
+#warning Implement Unscripted sit here
+                }
+
+                SceneInterface scene = m_Group.Scene;
+                if (null != scene)
+                {
+                    scene.SendAgentObjectToAllAgents(agent);
+                }
+            }
+
+            public bool UnSit(IAgent agent)
+            {
+                bool res;
+                lock (m_SitLock)
+                {
+                    res = m_Group.m_SittingAgents.Remove(agent);
+                    if (res)
+                    {
+                        agent.SittingOnObject = null;
+                    }
+                }
+
+                if(res)
+                {
+                    SceneInterface scene = m_Group.Scene;
+                    if (null != scene)
+                    {
+                        scene.SendAgentObjectToAllAgents(agent);
+                    }
+                }
+                return res;
             }
         }
         #endregion

@@ -30,6 +30,7 @@ using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Avatar;
 using SilverSim.Viewer.Messages.Parcel;
 using SilverSim.Viewer.Messages.Script;
 using System;
@@ -706,12 +707,6 @@ namespace SilverSim.Viewer.Core
                 new RwLockedList<UUID>();
         }
 
-        public override bool UnSit()
-        {
-#warning Implement ViewerAgent.UnSit()
-            return false;
-        }
-
         public override ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
         {
             return RequestPermissions(part, itemID, permissions, UUID.Zero);
@@ -784,6 +779,48 @@ namespace SilverSim.Viewer.Core
             {
                 ParcelProperties props = circuit.Scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
                 circuit.SendMessage(props);
+            }
+        }
+
+        [PacketHandler(MessageType.AgentRequestSit)]
+        public void HandleAgentRequestSit(Message m)
+        {
+            AgentCircuit circuit;
+            AgentRequestSit sitreq = (AgentRequestSit)m;
+            if(sitreq.SessionID != sitreq.CircuitSessionID ||
+                sitreq.AgentID != sitreq.CircuitAgentID)
+            {
+                return;
+            }
+
+            if(Circuits.TryGetValue(sitreq.CircuitSceneID, out circuit))
+            {
+                SceneInterface scene = circuit.Scene;
+                if(null == scene || scene.ID != SceneID)
+                {
+                    return;
+                }
+                ObjectPart part;
+                if(scene.Primitives.TryGetValue(sitreq.TargetID, out part))
+                {
+                    ObjectGroup grp = part.ObjectGroup;
+                    if(null != grp)
+                    {
+                        grp.AgentSitting.Sit(this, sitreq.Offset, part.LinkNumber);
+                        if (grp.AgentSitting.TryGetValue(this, out part))
+                        {
+                            AvatarSitResponse sitres = new AvatarSitResponse();
+                            sitres.SitObject = part.ID;
+                            sitres.IsAutoPilot = false;
+                            sitres.SitPosition = LocalPosition;
+                            sitres.SitRotation = LocalRotation;
+                            sitres.CameraEyeOffset = part.CameraEyeOffset;
+                            sitres.CameraAtOffset = part.CameraAtOffset;
+                            sitres.ForceMouselook = part.ForceMouselook;
+                            SendMessageIfRootAgent(sitres, scene.ID);
+                        }
+                    }
+                }
             }
         }
 
