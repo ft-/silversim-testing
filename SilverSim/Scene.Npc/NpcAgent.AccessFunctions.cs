@@ -3,6 +3,7 @@
 
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -122,7 +123,19 @@ namespace SilverSim.Scene.Npc
 
         public void DoSit(UUID objectKey)
         {
-#warning Implement sit on command for persisted npcs
+            SceneInterface scene = CurrentScene;
+            if(scene != null)
+            {
+                ObjectPart part;
+                if(scene.Primitives.TryGetValue(objectKey, out part))
+                {
+                    ObjectGroup grp = part.ObjectGroup;
+                    if (grp != null)
+                    {
+                        grp.AgentSitting.Sit(this, grp.RootPart != part ? part.LinkNumber : -1);
+                    }
+                }
+            }
         }
 
     }
