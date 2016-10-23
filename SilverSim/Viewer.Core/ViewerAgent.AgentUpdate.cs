@@ -1,16 +1,13 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
-using System;
+using SilverSim.Viewer.Messages;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
@@ -228,7 +225,7 @@ namespace SilverSim.Viewer.Core
 
             if (m_ActiveAgentControlFlags.HasStandUp())
             {
-
+                UnSit();
             }
 
             if (m_ActiveAgentControlFlags.HasSitOnGround())
