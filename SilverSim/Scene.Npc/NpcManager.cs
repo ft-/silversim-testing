@@ -408,7 +408,7 @@ namespace SilverSim.Scene.Npc
             }
             else if (scene != null && npc.CurrentScene != scene)
             {
-                io.Write("Npc is not on the region");
+                io.Write("Npc is not in the region");
             }
             else if (!m_NpcAgents.Remove(npcId, out npc))
             {
