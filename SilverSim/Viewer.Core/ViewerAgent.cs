@@ -806,7 +806,7 @@ namespace SilverSim.Viewer.Core
                     ObjectGroup grp = part.ObjectGroup;
                     if(null != grp)
                     {
-                        grp.AgentSitting.Sit(this, sitreq.Offset, part.LinkNumber);
+                        grp.AgentSitting.Sit(this, sitreq.Offset, grp.RootPart != part ? part.LinkNumber : -1);
                         if (grp.AgentSitting.TryGetValue(this, out part))
                         {
                             AvatarSitResponse sitres = new AvatarSitResponse();
