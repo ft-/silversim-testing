@@ -13,6 +13,11 @@ namespace SilverSim.Scene.Agent
     {
         protected abstract void SendAnimations(AvatarAnimation m);
 
+        public void SetDefaultAnimation(string anim_state)
+        {
+            m_AnimationController.SetDefaultAnimation(anim_state);
+        }
+
         protected void SendAnimations()
         {
             m_AnimationController.SendAnimations();

@@ -1100,7 +1100,42 @@ namespace SilverSim.Scene.Types.Object
                     sitOn.m_SittingAgents.Remove(agent);
                 }
 
-                ObjectPart sitOnTarget = null;
+                Vector3 sitPosition;
+                Quaternion sitTarget;
+                ObjectPart sitOnTarget;
+                lock (m_SitLock)
+                {
+                    CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber);
+                    m_Group.m_SittingAgents.Add(agent, sitOnTarget);
+                    agent.SittingOnObject = sitOn;
+
+                }
+                if(!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
+                    !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
+                {
+                    agent.LocalPosition = (sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET);
+                    agent.LocalRotation = sitOnTarget.SitTargetOrientation;
+                }
+                else
+                {
+                    agent.LocalPosition = preferedOffset;
+                    agent.GlobalRotation = Quaternion.Identity;
+#warning Implement Unscripted sit here
+                }
+
+                agent.SetDefaultAnimation("sitting");
+
+                SceneInterface scene = m_Group.Scene;
+                if (null != scene)
+                {
+                    scene.SendAgentObjectToAllAgents(agent);
+                    m_Group.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
+                }
+            }
+
+            public void CheckSittable(IAgent agent, out Vector3 sitPosition, out Quaternion sitRotation, out ObjectPart sitOnTarget, Vector3 preferedOffset, int preferedLinkNumber = -1)
+            {
+                sitOnTarget = null;
                 lock (m_SitLock)
                 {
                     if (preferedLinkNumber > 0)
@@ -1136,29 +1171,18 @@ namespace SilverSim.Scene.Types.Object
                     {
                         sitOnTarget = m_Group.RootPart;
                     }
-
-                    m_Group.m_SittingAgents.Add(agent, sitOnTarget);
-                    agent.SittingOnObject = sitOnTarget;
-
                 }
-                if(!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
+                if (!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
                     !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
                 {
-                    agent.LocalPosition = (sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET);
-                    agent.LocalRotation = sitOnTarget.SitTargetOrientation;
+                    sitPosition = (sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET);
+                    sitRotation = sitOnTarget.SitTargetOrientation;
                 }
                 else
                 {
-                    agent.LocalPosition = preferedOffset;
-                    agent.GlobalRotation = Quaternion.Identity;
+                    sitPosition = preferedOffset;
+                    sitRotation = Quaternion.Identity;
 #warning Implement Unscripted sit here
-                }
-
-                SceneInterface scene = m_Group.Scene;
-                if (null != scene)
-                {
-                    scene.SendAgentObjectToAllAgents(agent);
-                    m_Group.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                 }
             }
 
@@ -1188,6 +1212,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         scene.SendAgentObjectToAllAgents(agent);
                     }
+                    agent.SetDefaultAnimation("standing");
                 }
                 return res;
             }

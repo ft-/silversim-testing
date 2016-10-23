@@ -86,9 +86,9 @@ namespace SilverSim.Scene.Agent
 
         #region IObject Properties
 
-        private IObject m_SittingOnObject;
+        private ObjectGroup m_SittingOnObject;
 
-        public IObject SittingOnObject
+        public ObjectGroup SittingOnObject
         {
             /* we need to guard against our position routines and so on */
             get

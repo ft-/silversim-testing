@@ -144,7 +144,7 @@ namespace SilverSim.Scene.Types.Agent
             set;
         }
 
-        IObject SittingOnObject
+        ObjectGroup SittingOnObject
         {
             get;
             set;
@@ -159,6 +159,8 @@ namespace SilverSim.Scene.Types.Agent
 
         void IncreaseHealth(double v);
         void DecreaseHealth(double v);
+
+        void SetDefaultAnimation(string anim_state);
 
         AppearanceInfo.AvatarTextureData Textures
         {

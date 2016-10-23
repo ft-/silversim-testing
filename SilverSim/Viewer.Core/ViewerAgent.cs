@@ -782,6 +782,9 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        UUID m_AgentSitTarget = UUID.Zero;
+        Vector3 m_AgentRequestedSitOffset = Vector3.Zero;
+
         [PacketHandler(MessageType.AgentRequestSit)]
         public void HandleAgentRequestSit(Message m)
         {
@@ -806,19 +809,56 @@ namespace SilverSim.Viewer.Core
                     ObjectGroup grp = part.ObjectGroup;
                     if(null != grp)
                     {
-                        grp.AgentSitting.Sit(this, sitreq.Offset, grp.RootPart != part ? part.LinkNumber : -1);
-                        if (grp.AgentSitting.TryGetValue(this, out part))
+                        ObjectPart sitOnLink;
+                        Vector3 sitOffset;
+                        Quaternion sitRotation;
+                        grp.AgentSitting.CheckSittable(this, out sitOffset, out sitRotation, out sitOnLink, sitreq.Offset, grp.RootPart != part ? part.LinkNumber : -1);
+
+                        lock (m_DataLock)
                         {
-                            AvatarSitResponse sitres = new AvatarSitResponse();
-                            sitres.SitObject = part.ID;
-                            sitres.IsAutoPilot = false;
-                            sitres.SitPosition = LocalPosition;
-                            sitres.SitRotation = LocalRotation;
-                            sitres.CameraEyeOffset = part.CameraEyeOffset;
-                            sitres.CameraAtOffset = part.CameraAtOffset;
-                            sitres.ForceMouselook = part.ForceMouselook;
-                            SendMessageIfRootAgent(sitres, scene.ID);
+                            m_AgentSitTarget = sitOnLink.ID;
+                            m_AgentRequestedSitOffset = sitOffset;
                         }
+
+                        AvatarSitResponse sitres = new AvatarSitResponse();
+                        sitres.SitObject = sitOnLink.ID;
+                        sitres.IsAutoPilot = false;
+                        sitres.SitPosition = LocalPosition;
+                        sitres.SitRotation = LocalRotation;
+                        sitres.CameraEyeOffset = sitOnLink.CameraEyeOffset;
+                        sitres.CameraAtOffset = sitOnLink.CameraAtOffset;
+                        sitres.ForceMouselook = sitOnLink.ForceMouselook;
+                        SendMessageIfRootAgent(sitres, scene.ID);
+                    }
+                }
+            }
+        }
+
+        [PacketHandler(MessageType.AgentSit)]
+        public void HandleAgentSit(Message m)
+        {
+            AgentCircuit circuit;
+            AgentSit sitreq = (AgentSit)m;
+            if (sitreq.SessionID != sitreq.CircuitSessionID ||
+                sitreq.AgentID != sitreq.CircuitAgentID)
+            {
+                return;
+            }
+
+            if (Circuits.TryGetValue(sitreq.CircuitSceneID, out circuit))
+            {
+                SceneInterface scene = circuit.Scene;
+                if (null == scene || scene.ID != SceneID)
+                {
+                    return;
+                }
+                ObjectPart part;
+                if (scene.Primitives.TryGetValue(m_AgentSitTarget, out part))
+                {
+                    ObjectGroup grp = part.ObjectGroup;
+                    if (null != grp)
+                    {
+                        grp.AgentSitting.Sit(this, m_AgentRequestedSitOffset, grp.RootPart != part ? part.LinkNumber : -1);
                     }
                 }
             }
