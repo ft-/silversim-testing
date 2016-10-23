@@ -127,6 +127,25 @@ namespace SilverSim.Types
         }
         #endregion Add methods
 
+        public bool TryGetValue<T>(int key, out T val)
+        {
+            IValue iv;
+            if(key < 0 || key >= Count)
+            {
+                val = default(T);
+                return false;
+            }
+            iv = this[key];
+            if (!(iv is T))
+            {
+                val = default(T);
+                return false;
+            }
+            val = (T)iv;
+            return true;
+        }
+
+
         #region Helper
         public ABoolean AsBoolean { get { return new ABoolean(); } }
         public Integer AsInteger { get { return new Integer(); } }
