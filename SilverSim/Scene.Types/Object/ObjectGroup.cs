@@ -1149,6 +1149,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 else
                 {
+                    agent.LocalPosition = preferedOffset;
 #warning Implement Unscripted sit here
                 }
 
