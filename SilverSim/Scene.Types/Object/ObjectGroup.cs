@@ -1150,6 +1150,7 @@ namespace SilverSim.Scene.Types.Object
                 else
                 {
                     agent.LocalPosition = preferedOffset;
+                    agent.GlobalRotation = Quaternion.Identity;
 #warning Implement Unscripted sit here
                 }
 
