@@ -1158,22 +1158,30 @@ namespace SilverSim.Scene.Types.Object
                 if (null != scene)
                 {
                     scene.SendAgentObjectToAllAgents(agent);
+                    m_Group.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                 }
             }
 
             public bool UnSit(IAgent agent)
             {
                 bool res;
+                IObject satOn = null;
                 lock (m_SitLock)
                 {
                     res = m_Group.m_SittingAgents.Remove(agent);
                     if (res)
                     {
+                        satOn = agent.SittingOnObject;
                         agent.SittingOnObject = null;
                     }
                 }
 
-                if(res)
+                if(null != satOn)
+                {
+                    satOn.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
+                }
+
+                if (res)
                 {
                     SceneInterface scene = m_Group.Scene;
                     if (null != scene)
