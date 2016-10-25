@@ -113,7 +113,6 @@ namespace SilverSim.Main.Common.HttpServer
             m_ListenerSocket.Listen(128);
 
             m_ListenerThread = new Thread(AcceptThread);
-            m_ListenerThread.IsBackground = true;
             m_ListenerThread.Start();
 
             if (Scheme == Uri.UriSchemeHttps)
@@ -209,7 +208,7 @@ namespace SilverSim.Main.Common.HttpServer
                     {
 
                     }
-                    else if (args.AcceptSocket.Connected)
+                    else if (args.AcceptSocket.Connected && !m_StoppingListeners)
                     {
                         Interlocked.Increment(ref m_ActiveThreadCount);
                         Thread t = new Thread(AcceptedConnection);
