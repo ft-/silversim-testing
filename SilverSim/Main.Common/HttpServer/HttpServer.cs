@@ -271,180 +271,187 @@ namespace SilverSim.Main.Common.HttpServer
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void AcceptedConnection(object socko)
         {
-            Socket socket = (Socket)socko;
             try
             {
-                IPEndPoint ep = (IPEndPoint)socket.RemoteEndPoint;
-                string remoteAddr = AddressToString(ep.Address);
-                Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
-
-                Stream httpstream;
-                if (m_ServerCertificate != null)
+                Socket socket = (Socket)socko;
+                try
                 {
-                    /* Start SSL handshake */
-                    SslStream sslstream = new SslStream(new NetworkStream(socket));
-                    sslstream.AuthenticateAsServer(m_ServerCertificate);
-                    httpstream = sslstream;
-                }
-                else
-                {
-                    httpstream = new HttpStream(socket);
-                }
+                    IPEndPoint ep = (IPEndPoint)socket.RemoteEndPoint;
+                    string remoteAddr = AddressToString(ep.Address);
+                    Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
-                while (true)
-                {
-                    HttpRequest req;
-                    try
+                    Stream httpstream;
+                    if (m_ServerCertificate != null)
                     {
-                        req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy);
-                    }
-                    catch (HttpResponse.ConnectionCloseException)
-                    {
-                        return;
-                    }
-                    catch(HttpStream.TimeoutException)
-                    {
-                        return;
-                    }
-                    catch(TimeoutException)
-                    {
-                        return;
-                    }
-                    catch(IOException)
-                    {
-                        return;
-                    }
-                    catch(InvalidDataException)
-                    {
-                        return;
-                    }
-                    catch(ObjectDisposedException)
-                    {
-                        return;
-                    }
-                    catch(SocketException)
-                    {
-                        return;
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.WarnFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
-                        return;
-                    }
-
-                    if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
-                    {
-                        HttpResponse res = req.BeginResponse(HttpStatusCode.LengthRequired, "Length Required");
-                        res.Close();
-                    }
-
-                    Action<HttpRequest> del;
-                    if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
-                    {
-                        try
-                        {
-                            del(req);
-                        }
-                        catch (HttpResponse.ConnectionCloseException)
-                        {
-                            return;
-                        }
-                        catch(HttpResponse.DisconnectFromThreadException)
-                        {
-                            socket = null;
-                            return;
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
-                        }
-                        req.Close();
-                    }
-                    else if (UriHandlers.TryGetValue(req.RawUrl, out del))
-                    {
-                        try
-                        {
-                            del(req);
-                        }
-                        catch (HttpResponse.ConnectionCloseException)
-                        {
-                            return;
-                        }
-                        catch (HttpResponse.DisconnectFromThreadException)
-                        {
-                            socket = null;
-                            return;
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
-                        }
-                        req.Close();
+                        /* Start SSL handshake */
+                        SslStream sslstream = new SslStream(new NetworkStream(socket));
+                        sslstream.AuthenticateAsServer(m_ServerCertificate);
+                        httpstream = sslstream;
                     }
                     else
                     {
-                        foreach (KeyValuePair<string, Action<HttpRequest>> kvp in StartsWithUriHandlers)
+                        httpstream = new HttpStream(socket);
+                    }
+
+                    while (true)
+                    {
+                        HttpRequest req;
+                        try
                         {
-                            if (req.RawUrl.StartsWith(kvp.Key))
-                            {
-                                try
-                                {
-                                    kvp.Value(req);
-                                }
-                                catch (HttpResponse.ConnectionCloseException)
-                                {
-                                    return;
-                                }
-                                catch (HttpResponse.DisconnectFromThreadException)
-                                {
-                                    socket = null;
-                                    return;
-                                }
-                                catch (Exception e)
-                                {
-                                    m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
-                                }
-                                req.Close();
-                                return;
-                            }
+                            req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy);
+                        }
+                        catch (HttpResponse.ConnectionCloseException)
+                        {
+                            return;
+                        }
+                        catch (HttpStream.TimeoutException)
+                        {
+                            return;
+                        }
+                        catch (TimeoutException)
+                        {
+                            return;
+                        }
+                        catch (IOException)
+                        {
+                            return;
+                        }
+                        catch (InvalidDataException)
+                        {
+                            return;
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            return;
+                        }
+                        catch (SocketException)
+                        {
+                            return;
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.WarnFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
+                            return;
                         }
 
-                        using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
+                        if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
                         {
-                            byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
-                            res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+                            HttpResponse res = req.BeginResponse(HttpStatusCode.LengthRequired, "Length Required");
+                            res.Close();
                         }
+
+                        Action<HttpRequest> del;
+                        if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
+                        {
+                            try
+                            {
+                                del(req);
+                            }
+                            catch (HttpResponse.ConnectionCloseException)
+                            {
+                                return;
+                            }
+                            catch (HttpResponse.DisconnectFromThreadException)
+                            {
+                                socket = null;
+                                return;
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                            }
+                            req.Close();
+                        }
+                        else if (UriHandlers.TryGetValue(req.RawUrl, out del))
+                        {
+                            try
+                            {
+                                del(req);
+                            }
+                            catch (HttpResponse.ConnectionCloseException)
+                            {
+                                return;
+                            }
+                            catch (HttpResponse.DisconnectFromThreadException)
+                            {
+                                socket = null;
+                                return;
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                            }
+                            req.Close();
+                        }
+                        else
+                        {
+                            foreach (KeyValuePair<string, Action<HttpRequest>> kvp in StartsWithUriHandlers)
+                            {
+                                if (req.RawUrl.StartsWith(kvp.Key))
+                                {
+                                    try
+                                    {
+                                        kvp.Value(req);
+                                    }
+                                    catch (HttpResponse.ConnectionCloseException)
+                                    {
+                                        return;
+                                    }
+                                    catch (HttpResponse.DisconnectFromThreadException)
+                                    {
+                                        socket = null;
+                                        return;
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                                    }
+                                    req.Close();
+                                    return;
+                                }
+                            }
+
+                            using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
+                            {
+                                byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
+                                res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+                            }
+                        }
+                        httpstream.ReadTimeout = 10000;
                     }
-                    httpstream.ReadTimeout = 10000;
                 }
-            }
-            catch (HttpResponse.ConnectionCloseException)
-            {
-                /* simply a closed connection */
-            }
-            catch (IOException)
-            {
-                /* commonly a broken pipe */
-            }
-            catch(SocketException)
-            {
-                /* commonly a broken pipe */
-            }
-            catch(ObjectDisposedException)
-            {
-                /* commonly a broken pipe */
+                catch (HttpResponse.ConnectionCloseException)
+                {
+                    /* simply a closed connection */
+                }
+                catch (IOException)
+                {
+                    /* commonly a broken pipe */
+                }
+                catch (SocketException)
+                {
+                    /* commonly a broken pipe */
+                }
+                catch (ObjectDisposedException)
+                {
+                    /* commonly a broken pipe */
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
+                }
+                finally
+                {
+                    if (null != socket)
+                    {
+                        socket.Close();
+                    }
+                    Interlocked.Decrement(ref m_ActiveThreadCount);
+                }
             }
             catch (Exception e)
             {
                 m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
-            }
-            finally
-            {
-                if (null != socket)
-                {
-                    socket.Close();
-                }
-                Interlocked.Decrement(ref m_ActiveThreadCount);
             }
         }
 
