@@ -14,8 +14,11 @@ namespace SilverSim.Main
         static void Main(string[] args)
         {
             Console.TreatControlCAsInput = true;
+            Assembly monoSec;
 
             Thread.CurrentThread.Name = "SilverSim:Main";
+
+            monoSec = Assembly.LoadFile("Mono.Security.dll");
 
             /* by not hard referencing the assembly we can actually implement an updater concept here */
             Assembly assembly = Assembly.Load("SilverSim.Main.Common");
