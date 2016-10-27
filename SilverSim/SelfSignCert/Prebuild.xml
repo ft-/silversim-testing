@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Project frameworkVersion="v4_5" name="SilverSim.SelfSignCert" path="SilverSim/SelfSignCert" type="Library">
+  <Configuration name="Release">
+    <Options>
+      <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
+      <OutputPath>../../bin/</OutputPath>
+    </Options>
+  </Configuration>
+  <Configuration name="Debug">
+    <Options>
+      <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
+      <OutputPath>../../bin/</OutputPath>
+    </Options>
+  </Configuration>
+  <ReferencePath>../../bin/</ReferencePath>
+  <Reference name="log4net" path="../../bin/" localCopy="false"/>
+  <Reference name="System"/>
+  <Reference name="System.Core"/>
+  <Reference name="Mono.Security" path="../../bin/platform-libs" localCopy="false"/>
+  <Files>
+    <Match pattern="*.cs" recurse="true">
+        <Exclude pattern="TemporaryGeneratedFile"/>
+    </Match>
+    <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
+    <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
+    <Match pattern="Product.licenseheader" path=".." recurse="false" buildAction="None"/>
+  </Files>
+</Project>

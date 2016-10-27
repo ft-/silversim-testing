@@ -1,52 +1,30 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using Mono.Security.X509;
-using Mono.Security.X509.Extensions;
 using System;
 using System.Collections;
+using System.IO;
+using System.Reflection;
 using System.Security.Cryptography;
 
 namespace SilverSim.Main.Common.HttpServer
 {
     public static class SslSelfSignCertUtil
     {
+        static Action<string, string> m_SelfSignCertFunc;
+
         public static void GenerateSelfSignedServiceCertificate(string filename, string hostname)
         {
-            X509CertificateBuilder builder = new X509CertificateBuilder(3);
-            byte[] sn = Guid.NewGuid().ToByteArray();
-            if ((sn[0] & 0x80) == 0x80)
+            /* Mono.Security is providing some subtle issues when trying to load 4.0.0.0 on Mono 4.4 to 4.6.
+             * So, we make our dependency being loaded by an assembly that allows preloading the assembly on Win. 
+             */
+            if(null == m_SelfSignCertFunc)
             {
-                sn[0] -= 0x80;
+                Assembly selfSignCert = Assembly.Load("SilverSim.SelfSignCert");
+                Type selfSignCertType = selfSignCert.GetType("SilverSim.SelfSignCert.SslSelfSignCertUtil");
+                m_SelfSignCertFunc = (Action<string,string>) selfSignCertType.GetMethod("GenerateSelfSignedServiceCertificate", new Type[] { typeof(string), typeof(string) }).CreateDelegate(typeof(Action<string,string>));
             }
-
-            RSA rsaKey = (RSA)RSA.Create();
-            ExtendedKeyUsageExtension eku = new ExtendedKeyUsageExtension();
-            eku.KeyPurpose.Add("1.3.6.1.5.5.7.3.1"); /* SSL Server */
-
-            builder.SerialNumber = sn;
-            builder.IssuerName = "CN=" + hostname;
-            builder.NotBefore = DateTime.Now;
-            DateTime notAfter = DateTime.Now;
-            builder.NotAfter = notAfter.AddYears(1000);
-            builder.SubjectName = "CN=" + hostname;
-            builder.SubjectPublicKey = rsaKey;
-            builder.Hash = "SHA512";
-            builder.Extensions.Add(eku);
-
-            byte[] rawCert = builder.Sign(rsaKey);
-
-            PKCS12 p12 = new PKCS12();
-            p12.Password = string.Empty;
-            ArrayList list = new ArrayList();
-
-            list.Add(new byte[4] { 1, 0, 0, 0 });
-            Hashtable attributes = new Hashtable(1);
-            attributes.Add(PKCS9.localKeyId, list);
-
-            p12.AddCertificate(new X509Certificate(rawCert), attributes);
-            p12.AddPkcs8ShroudedKeyBag(rsaKey, attributes);
-            p12.SaveToFile(filename);
+            m_SelfSignCertFunc(filename, hostname);
         }
     }
 }
