@@ -130,6 +130,7 @@ namespace SilverSim.Main.Common.HttpServer
             m_ExternalHostNameService = loader.ExternalHostNameService;
             if(!File.Exists(m_CertificateFileName) && Scheme == Uri.UriSchemeHttps)
             {
+                m_Log.Warn("Generating self-signed cert");
                 SslSelfSignCertUtil.GenerateSelfSignedServiceCertificate(m_CertificateFileName, m_ExternalHostNameService.ExternalHostName);
             }
             if (Scheme == Uri.UriSchemeHttps)
