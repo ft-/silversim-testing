@@ -293,7 +293,6 @@ namespace SilverSim.Main.Common
         #endregion
 
         static Assembly m_MonoSecurity;
-        static Assembly m_SelfSignCert;
 
         static Assembly ResolveMonoSecurityEventHandler(object sender, ResolveEventArgs args)
         {
