@@ -131,7 +131,15 @@ namespace SilverSim.Main.Common.HttpServer
             if(!File.Exists(m_CertificateFileName) && Scheme == Uri.UriSchemeHttps)
             {
                 m_Log.Warn("Generating self-signed cert");
-                SslSelfSignCertUtil.GenerateSelfSignedServiceCertificate(m_CertificateFileName, m_ExternalHostNameService.ExternalHostName);
+                try
+                {
+                    SslSelfSignCertUtil.GenerateSelfSignedServiceCertificate(m_CertificateFileName, m_ExternalHostNameService.ExternalHostName);
+                }
+                catch(Exception e)
+                {
+                    m_Log.Error("Creating self-signed cert failed", e);
+                    throw new ConfigurationLoader.ConfigurationErrorException("Creating self-signed cert failed");
+                }
             }
             if (Scheme == Uri.UriSchemeHttps)
             {
