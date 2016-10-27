@@ -292,8 +292,33 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        static Assembly m_MonoSecurity;
+
+        static Assembly ResolveMonoSecurityEventHandler(object sender, ResolveEventArgs args)
+        {
+            AssemblyName aName = new AssemblyName(args.Name);
+            if (aName.Name == "Mono.Security")
+            {
+                return m_MonoSecurity;
+            }
+            return null;
+        }
+
         static ConfigurationLoader()
         {
+            /* Mono.Security is providing some subtle issues when trying to load 4.0.0.0 on Mono 4.4 to 4.6.
+             * So, we make our dependency being loaded by an assembly that allows preloading the assembly on Win. 
+             */
+            try
+            {
+                m_MonoSecurity = Assembly.Load("Mono.Security");
+            }
+            catch
+            {
+                m_MonoSecurity = Assembly.LoadFile(Path.GetFullPath("platform-libs/Mono.Security.dll"));
+                AppDomain.CurrentDomain.AssemblyResolve += ResolveMonoSecurityEventHandler;
+            }
+
             /* prevent circular dependencies by assigning relevant parts here */
             ObjectGroup.CompilerRegistry = CompilerRegistry.ScriptCompilers;
             FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
