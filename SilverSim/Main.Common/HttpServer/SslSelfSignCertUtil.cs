@@ -2,10 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
-using System.Collections;
-using System.IO;
 using System.Reflection;
-using System.Security.Cryptography;
 
 namespace SilverSim.Main.Common.HttpServer
 {
