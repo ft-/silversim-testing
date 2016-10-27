@@ -292,30 +292,8 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
-        static Assembly m_MonoSecurity;
-
-        static Assembly ResolveMonoSecurityEventHandler(object sender, ResolveEventArgs args)
-        {
-            AssemblyName aName = new AssemblyName(args.Name);
-            if (aName.Name == "Mono.Security")
-            {
-                return m_MonoSecurity;
-            }
-            return null;
-        }
-
         static ConfigurationLoader()
         {
-            try
-            {
-                m_MonoSecurity = Assembly.Load("Mono.Security");
-            }
-            catch
-            {
-                m_MonoSecurity = Assembly.LoadFile(Path.GetFullPath("platform-libs/Mono.Security.dll"));
-                AppDomain.CurrentDomain.AssemblyResolve += ResolveMonoSecurityEventHandler;
-            }
-
             /* prevent circular dependencies by assigning relevant parts here */
             ObjectGroup.CompilerRegistry = CompilerRegistry.ScriptCompilers;
             FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";

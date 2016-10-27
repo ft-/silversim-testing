@@ -20,7 +20,7 @@ namespace SilverSim.SelfSignCert
                 sn[0] -= 0x80;
             }
 
-            RSA rsaKey = (RSA)RSA.Create();
+            RSA rsaKey = RSA.Create();
             ExtendedKeyUsageExtension eku = new ExtendedKeyUsageExtension();
             eku.KeyPurpose.Add("1.3.6.1.5.5.7.3.1"); /* SSL Server */
 
