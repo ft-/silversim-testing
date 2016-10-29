@@ -18,9 +18,8 @@ namespace SilverSim.Scene.Physics.Common
         protected ObjectGroup m_Group;
         protected VehicleMotor m_Vehicle;
         bool m_Phantom;
-        bool m_ContributesToCollisionSurfaceAsChild;
         bool m_VolumeDetect;
-        readonly PhysicsStateData m_StateData;
+        protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
         protected UUID SceneID { get; private set; }
 
