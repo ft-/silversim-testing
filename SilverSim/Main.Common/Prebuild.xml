@@ -14,6 +14,7 @@
   <Reference name="System"/>
   <Reference name="System.Xml"/>
   <Reference name="System.Web"/>
+  <Reference name="System.Security"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="Nini" path="../../bin/" localCopy="false"/>
   <Reference name="log4net" path="../../bin/" localCopy="false"/>
