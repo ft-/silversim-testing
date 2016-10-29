@@ -143,7 +143,15 @@ namespace SilverSim.Main.Common.HttpServer
             }
             if (Scheme == Uri.UriSchemeHttps)
             {
-                m_ServerCertificate = new X509Certificate2(m_CertificateFileName);
+                try
+                {
+                    m_ServerCertificate = new X509Certificate2(m_CertificateFileName);
+                }
+                catch(Exception e)
+                {
+                    m_Log.Error("Loading certificate failed", e);
+                    throw new ConfigurationLoader.ConfigurationErrorException("Loading certificate failed");
+                }
                 m_Log.InfoFormat("Starting HTTPS Server");
             }
             else
