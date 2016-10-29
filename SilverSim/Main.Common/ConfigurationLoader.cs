@@ -309,11 +309,7 @@ namespace SilverSim.Main.Common
             /* Mono.Security is providing some subtle issues when trying to load 4.0.0.0 on Mono 4.4 to 4.6.
              * So, we make our dependency being loaded by an assembly that allows preloading the assembly on Win. 
              */
-            try
-            {
-                m_MonoSecurity = Assembly.Load("Mono.Security");
-            }
-            catch
+            if(!VersionInfo.IsPlatformMono)
             {
                 m_MonoSecurity = Assembly.LoadFile(Path.GetFullPath("platform-libs/Mono.Security.dll"));
                 AppDomain.CurrentDomain.AssemblyResolve += ResolveMonoSecurityEventHandler;
