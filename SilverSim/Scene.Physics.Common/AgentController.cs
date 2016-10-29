@@ -5,6 +5,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Physics.Common
@@ -26,9 +27,10 @@ namespace SilverSim.Scene.Physics.Common
         {
             lock (m_Lock)
             {
+                bool saveState = IsPhysicsActive;
                 IsPhysicsActive = false;
                 target.ReceiveState(m_StateData, positionOffset);
-                IsPhysicsActive = true;
+                IsPhysicsActive = saveState;
             }
         }
 
@@ -36,6 +38,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             lock (m_Lock)
             {
+                bool saveState = IsPhysicsActive;
                 IsPhysicsActive = false;
                 m_StateData.Position = data.Position + positionOffset;
                 m_StateData.Rotation = data.Rotation;
@@ -43,12 +46,10 @@ namespace SilverSim.Scene.Physics.Common
                 m_StateData.AngularVelocity = data.AngularVelocity;
                 m_StateData.Acceleration = data.Acceleration;
                 m_StateData.AngularAcceleration = data.AngularAcceleration;
-                IsPhysicsActive = true;
+                IsPhysicsActive = saveState;
             }
         }
 
-        public abstract void SetDeltaLinearVelocity(Vector3 value);
-        public abstract void SetDeltaAngularVelocity(Vector3 value);
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
         public bool IsPhantom 
         {
@@ -202,39 +203,35 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public void Process(double dt)
+        protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {
-            if (IsPhysicsActive)
+            List<PositionalForce> forces = new List<PositionalForce>();
+            agentTorque = Vector3.Zero;
+            if (!IsPhysicsActive)
             {
-                Vector3 linearForce = Vector3.Zero;
-                Vector3 angularTorque = Vector3.Zero;
-
-                linearForce += BuoyancyMotor(m_Agent, dt);
-                linearForce += GravityMotor(m_Agent, dt);
-                linearForce += HoverMotor(m_Agent, dt);
-                linearForce += TargetVelocityMotor(m_Agent, ControlTargetVelocityInput, 1f, dt);
-
-                angularTorque += TargetRotationMotor(m_Agent, m_Agent.BodyRotation, 1f, dt);
-
-                lock (m_Lock)
-                {
-                    linearForce += m_AppliedForce;
-                    angularTorque += m_AppliedTorque;
-                    linearForce += m_LinearImpulse;
-                    m_LinearImpulse = Vector3.Zero;
-                    angularTorque += m_AngularImpulse;
-                    m_AngularImpulse = Vector3.Zero;
-                }
-
-                /* process acceleration and velocity */
-                m_Agent.Acceleration = linearForce / Mass;
-#warning implement inertia applied mass correctly
-                m_Agent.AngularAcceleration = angularTorque / Mass;
-
-                /* we need to scale the accelerations towards timescale */
-                SetDeltaLinearVelocity(m_Agent.Acceleration * dt);
-                SetDeltaAngularVelocity(m_Agent.AngularAcceleration * dt);
+                return forces;
             }
+
+            forces.Add(new PositionalForce(BuoyancyMotor(m_Agent), Vector3.Zero));
+            forces.Add(new PositionalForce(GravityMotor(m_Agent), Vector3.Zero));
+            forces.Add(new PositionalForce(HoverMotor(m_Agent), Vector3.Zero));
+            forces.Add(new PositionalForce(TargetVelocityMotor(m_Agent, ControlTargetVelocityInput, 1f), Vector3.Zero));
+
+            agentTorque = TargetRotationMotor(m_Agent, m_Agent.BodyRotation, 1f);
+
+            lock(m_Lock)
+            {
+                forces.Add(new PositionalForce(m_LinearImpulse, Vector3.Zero));
+                m_LinearImpulse = Vector3.Zero;
+                agentTorque += m_AngularImpulse;
+                m_AngularImpulse = Vector3.Zero;
+                forces.Add(new PositionalForce(m_AppliedForce, Vector3.Zero));
+                agentTorque += m_AppliedTorque;
+            }
+
+            return forces;
         }
+
+        public abstract void Process(double dt);
     }
 }

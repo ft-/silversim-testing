@@ -14,7 +14,6 @@ namespace SilverSim.Scene.Physics.Common
 
         static CommonPhysicsController()
         {
-            GravityAccelerationConstant = 9.8f;
         }
 
         protected CommonPhysicsController()
@@ -22,8 +21,20 @@ namespace SilverSim.Scene.Physics.Common
 
         }
 
+        protected struct PositionalForce
+        {
+            public Vector3 Force;
+            public Vector3 LocalPosition;
+
+            public PositionalForce(Vector3 force, Vector3 localpos)
+            {
+                Force = force;
+                LocalPosition = localpos;
+            }
+        }
+
         #region Gravity and Buoyancy
-        protected Vector3 GravityMotor(IObject obj, double dt)
+        protected Vector3 GravityMotor(IObject obj)
         {
             return new Vector3(0, 0, obj.PhysicsActor.Mass * GravityAccelerationConstant);
         }
@@ -44,7 +55,7 @@ namespace SilverSim.Scene.Physics.Common
         }
 
 
-        protected Vector3 BuoyancyMotor(IObject obj, double dt)
+        protected Vector3 BuoyancyMotor(IObject obj)
         {
             return new Vector3(0, 0, -(m_Buoyancy - 1) * obj.PhysicsActor.Mass * GravityAccelerationConstant);
         }
@@ -53,7 +64,7 @@ namespace SilverSim.Scene.Physics.Common
         #region Hover Motor
         double m_HoverHeight;
         bool m_HoverEnabled;
-        protected Vector3 HoverMotor(IObject obj, double dt)
+        protected Vector3 HoverMotor(IObject obj)
         {
             if (m_HoverEnabled)
             {
@@ -69,14 +80,14 @@ namespace SilverSim.Scene.Physics.Common
         #endregion
 
         #region Target Velocity Motor
-        protected Vector3 TargetVelocityMotor(IObject obj, Vector3 targetvel, double factor, double dt)
+        protected Vector3 TargetVelocityMotor(IObject obj, Vector3 targetvel, double factor)
         {
             return (targetvel - obj.Velocity) * factor;
         }
         #endregion
 
         #region Target Rotation Motor
-        protected Vector3 TargetRotationMotor(IObject obj, Quaternion targetrot, double factor, double dt)
+        protected Vector3 TargetRotationMotor(IObject obj, Quaternion targetrot, double factor)
         {
             return (targetrot / obj.Rotation).AsVector3 * factor;
         }

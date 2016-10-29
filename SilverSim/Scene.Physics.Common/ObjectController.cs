@@ -22,9 +22,11 @@ namespace SilverSim.Scene.Physics.Common
         bool m_VolumeDetect;
         readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
+        protected UUID SceneID { get; private set; }
 
         protected ObjectController(ObjectGroup part, UUID sceneID)
         {
+            SceneID = sceneID;
             m_StateData = new PhysicsStateData(part, sceneID);
             m_Group = part;
             m_Phantom = true;
@@ -58,9 +60,6 @@ namespace SilverSim.Scene.Physics.Common
 
         public abstract void UpdateCollisionInfo();
 
-        public abstract void SetDeltaLinearVelocity(Vector3 value);
-        public abstract void SetDeltaAngularVelocity(Vector3 value);
-        public abstract void SetControlTargetVelocity(Vector3 value);
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
         public bool IsPhantom
         {
@@ -154,7 +153,7 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         Vector3 m_AppliedInertia = Vector3.One;
-        bool m_AppliedInertiaUpdate;
+        protected bool m_AppliedInertiaUpdate;
         public Vector3 AppliedInertia
         {
             get
@@ -163,6 +162,17 @@ namespace SilverSim.Scene.Physics.Common
                 {
                     return m_AppliedInertia;
                 }
+            }
+        }
+
+        /* to be used by physics object */
+        public void GetMassAndInertia(out double mass, out Vector3 inertia)
+        {
+            lock(m_Lock)
+            {
+                mass = m_Mass;
+                inertia = m_AppliedInertia;
+                m_AppliedInertiaUpdate = false;
             }
         }
 
@@ -188,137 +198,51 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        Vector3 m_CurrentInertia = Vector3.One;
-
-        void ProcessAdvancedPhysics(double dt, PhysicsStateData currentState, out Vector3 linearForce, out Vector3 angularForce)
+        protected List<PositionalForce> CalculateForces(double dt, out Vector3 vehicleTorque)
         {
-            Vector3 lThrusters = Vector3.Zero;
-            Vector3 hThrusters = Vector3.Zero;
-            Vector3 oldInertia = Vector3.Zero;
-            Vector3 newInertia = Vector3.Zero;
-            bool updateInertia;
-
-            angularForce = Vector3.Zero;
-
-            lock(m_Lock)
+            List<PositionalForce> forces = new List<PositionalForce>();
+            vehicleTorque = Vector3.Zero;
+            if (!IsPhysicsActive)
             {
-                updateInertia = m_AppliedInertiaUpdate;
-                if (updateInertia)
-                {
-                    oldInertia = m_CurrentInertia;
-                    newInertia = m_AppliedInertia;
-                    m_CurrentInertia = newInertia;
-                }
+                return forces;
             }
 
-            /* Jold/Jnew*omega_old=omega_new */
-            if (updateInertia)
-            {
-                Vector3 newAngularVelocity = oldInertia.ElementDivide(newInertia).ElementMultiply(currentState.AngularVelocity);
-                /* we have to divide by dt to produce dt / dt later to have immediate effect */
-                angularForce += (newAngularVelocity - currentState.AngularVelocity) / dt;
-            }
+            forces.Add(new PositionalForce(BuoyancyMotor(m_Group), Vector3.Zero));
+            forces.Add(new PositionalForce(GravityMotor(m_Group), Vector3.Zero));
+            forces.Add(new PositionalForce(HoverMotor(m_Group), Vector3.Zero));
 
-            Vector3 centerOfGravityOffset;
-            lock(m_Lock)
-            {
-                centerOfGravityOffset = m_CenterOfGravityOffset;
-            }
             foreach (KeyValuePair<UUID, Vector3> kvp in m_Group.AttachedForces)
             {
                 ObjectPart part;
                 if (m_Group.TryGetValue(kvp.Key, out part))
                 {
-                    Vector3 pos = part.LocalPosition - centerOfGravityOffset;
-                    Vector3 force = kvp.Value * part.LocalRotation;
-                    if (pos.X < 0)
-                    {
-                        lThrusters.X += force.X / Math.Abs(pos.X);
-                    }
-                    else if (pos.X > 0)
-                    {
-                        hThrusters.X += force.Y / pos.Y;
-                    }
-                    if (pos.Y < 0)
-                    {
-                        lThrusters.Y += force.Y / Math.Abs(pos.Y);
-                    }
-                    else if (pos.Y > 0)
-                    {
-                        hThrusters.Y += force.Y / pos.Y;
-                    }
-                    if (pos.Z < 0)
-                    {
-                        lThrusters.Z += force.Z / Math.Abs(pos.Z);
-                    }
-                    else if (pos.Z > 0)
-                    {
-                        hThrusters.Z += force.Z / pos.Z;
-                    }
+                    forces.Add(new PositionalForce(kvp.Value, part.LocalPosition));
                 }
             }
-            angularForce += (hThrusters - lThrusters);
-            linearForce = hThrusters + lThrusters;
-        }
 
-        public void Process(double dt)
-        {
-            if(IsPhysicsActive)
+            VehicleParams vehicleParams = m_Group.VehicleParams;
+            if (vehicleParams.VehicleType != VehicleType.None)
             {
-                VehicleParams vehicleParams = m_Group.VehicleParams;
-                if(vehicleParams.VehicleType == VehicleType.None)
-                {
-                    return;
-                }
 
-                double totalMass = Mass;
-
-                Vector3 linearForce = Vector3.Zero;
-                Vector3 angularTorque = Vector3.Zero;
-
-                linearForce += BuoyancyMotor(m_Group, dt);
-                linearForce += GravityMotor(m_Group, dt);
-                linearForce += HoverMotor(m_Group, dt);
-
-                if (m_Group.AttachedForces.Count != 0)
-                {
-                    Vector3 advLinear;
-                    Vector3 advAngular;
-                    ProcessAdvancedPhysics(dt, m_StateData, out advLinear, out advAngular);
-                    linearForce += advLinear;
-                    angularTorque += advAngular;
-                }
-                else
-                {
-                    lock(m_Lock)
-                    {
-                        m_CurrentInertia = m_AppliedInertia;
-                    }
-                }
-
-                m_Vehicle.Process(dt, m_StateData, m_Group.Scene, totalMass);
-                linearForce += m_Vehicle.LinearForce;
-                angularTorque += m_Vehicle.AngularTorque;
-
-                lock (m_Lock)
-                {
-                    linearForce += m_AppliedForce;
-                    angularTorque += m_AppliedTorque;
-                    linearForce += m_LinearImpulse;
-                    m_LinearImpulse = Vector3.Zero;
-                    angularTorque += m_AngularImpulse;
-                    m_AngularImpulse = Vector3.Zero;
-                }
-
-                /* process acceleration and velocity */
-                m_Group.Acceleration = linearForce / totalMass;
-                m_Group.AngularAcceleration = angularTorque.ElementMultiply(AppliedInertia);
-
-                /* we need to scale the accelerations towards timescale */
-                SetDeltaLinearVelocity(m_Group.Acceleration * dt);
-                SetDeltaAngularVelocity(m_Group.AngularAcceleration * dt);
+                m_Vehicle.Process(dt, m_StateData, m_Group.Scene, Mass);
+                forces.Add(new PositionalForce(m_Vehicle.LinearForce, Vector3.Zero));
+                vehicleTorque = m_Vehicle.AngularTorque;
             }
+
+            lock (m_Lock)
+            {
+                forces.Add(new PositionalForce(m_LinearImpulse, Vector3.Zero));
+                m_LinearImpulse = Vector3.Zero;
+                vehicleTorque += m_AngularImpulse;
+                m_AngularImpulse = Vector3.Zero;
+                forces.Add(new PositionalForce(m_AppliedForce, Vector3.Zero));
+                vehicleTorque += m_AppliedTorque;
+            }
+
+            return forces;
         }
+
+        public abstract void Process(double dt);
 
         #endregion
     }
