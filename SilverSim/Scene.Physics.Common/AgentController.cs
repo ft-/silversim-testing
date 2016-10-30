@@ -226,7 +226,7 @@ namespace SilverSim.Scene.Physics.Common
                     ObjectPart part;
                     if (grp.TryGetValue(kvp.Key, out part))
                     {
-                        forces.Add(new PositionalForce(kvp.Value, part.LocalPosition));
+                        forces.Add(new PositionalForce(kvp.Value, part.LocalPosition + grp.Position));
                     }
                 }
             }
