@@ -53,6 +53,18 @@ namespace SilverSim.Scene.Agent
         public UInt32 LocalID { get; set; }
         #endregion
 
+        public double PhysicsGravityMultiplier
+        {
+            get
+            {
+                return 1;
+            }
+            set
+            {
+                /* nothing to do */
+            }
+        }
+
         protected Agent(UUID agentId, Uri homeURI)
         {
             Group = UGI.Unknown;

@@ -34,9 +34,14 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         #region Gravity and Buoyancy
+        protected double GravityConstant(IObject obj)
+        {
+            return obj.PhysicsActor.Mass * GravityAccelerationConstant * obj.PhysicsGravityMultiplier;
+        }
+
         protected Vector3 GravityMotor(IObject obj)
         {
-            return new Vector3(0, 0, obj.PhysicsActor.Mass * GravityAccelerationConstant);
+            return new Vector3(0, 0, -GravityConstant(obj));
         }
 
         double m_Buoyancy;
@@ -57,7 +62,7 @@ namespace SilverSim.Scene.Physics.Common
 
         protected Vector3 BuoyancyMotor(IObject obj)
         {
-            return new Vector3(0, 0, -(m_Buoyancy - 1) * obj.PhysicsActor.Mass * GravityAccelerationConstant);
+            return new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
         }
         #endregion
 
@@ -68,7 +73,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             if (m_HoverEnabled)
             {
-                Vector3 v = new Vector3(0, 0, -obj.PhysicsActor.Mass * GravityAccelerationConstant + m_Buoyancy * obj.PhysicsActor.Mass * GravityAccelerationConstant);
+                Vector3 v = new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
                 v.Z += (m_HoverHeight - obj.Position.Z);
                 return v;
             }

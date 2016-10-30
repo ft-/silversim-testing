@@ -163,6 +163,13 @@ namespace SilverSim.Scene.Types.Object
             set;
         }
 
+        double PhysicsGravityMultiplier
+        {
+            get;
+            set;
+        }
+
+
         bool IsInScene(SceneInterface scene);
 
         byte[] TerseData

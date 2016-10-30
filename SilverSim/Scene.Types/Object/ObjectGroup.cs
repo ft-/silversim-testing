@@ -190,6 +190,18 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public double PhysicsGravityMultiplier
+        {
+            get
+            {
+                return RootPart.PhysicsGravityMultiplier;
+            }
+            set
+            {
+                RootPart.PhysicsGravityMultiplier = value;
+            }
+        }
+
         internal void TriggerOnAssetIDChange()
         {
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
