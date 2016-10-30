@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
@@ -216,6 +217,19 @@ namespace SilverSim.Scene.Physics.Common
             forces.Add(new PositionalForce(GravityMotor(m_Agent), Vector3.Zero));
             forces.Add(new PositionalForce(HoverMotor(m_Agent), Vector3.Zero));
             forces.Add(new PositionalForce(TargetVelocityMotor(m_Agent, ControlTargetVelocityInput, 1f), Vector3.Zero));
+
+            /* let us allow advanced physics force input to be used on agents */
+            foreach (ObjectGroup grp in m_Agent.Attachments.All)
+            {
+                foreach (KeyValuePair<UUID, Vector3> kvp in grp.AttachedForces)
+                {
+                    ObjectPart part;
+                    if (grp.TryGetValue(kvp.Key, out part))
+                    {
+                        forces.Add(new PositionalForce(kvp.Value, part.LocalPosition));
+                    }
+                }
+            }
 
             agentTorque = TargetRotationMotor(m_Agent, m_Agent.BodyRotation, 1f);
 

@@ -186,7 +186,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             IEnumerable<RegionInfo> regions = regions = m_RegionStorage.GetAllRegions(UUID.Zero);
             foreach (RegionInfo region in regions)
             {
-                string status;
                 Map regiondata = new Map();
                 regiondata.Add("type", "regionport");
                 regiondata.Add("online", m_Scenes.ContainsKey(region.ID));
