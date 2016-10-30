@@ -3,13 +3,11 @@
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Physics.Common
 {
     public abstract class CommonPhysicsController
     {
-        [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
         public double CombinedGravityAccelerationConstant
         {
             get
