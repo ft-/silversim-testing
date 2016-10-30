@@ -93,16 +93,6 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
-        public void SetDeltaLinearVelocity(Vector3 value)
-        {
-            /* intentionally left empty */
-        }
-
-        public void SetDeltaAngularVelocity(Vector3 value)
-        {
-            /* intentionally left empty */
-        }
-
         public void SetAppliedForce(Vector3 value)
         {
             /* intentionally left empty */
