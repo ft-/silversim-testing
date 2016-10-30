@@ -1373,7 +1373,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
                 }
-                IncrementPhysicsParameterUpdateSerial();
             }
         }
 
