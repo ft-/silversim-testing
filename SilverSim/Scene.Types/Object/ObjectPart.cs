@@ -1436,7 +1436,6 @@ namespace SilverSim.Scene.Types.Object
                     m_PhysicsGravityMultiplier = value;
                 }
                 IsChanged = m_IsChangedEnabled;
-                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
