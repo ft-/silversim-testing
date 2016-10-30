@@ -45,6 +45,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         ExternalHostNameServiceInterface m_ExternalHostNameService;
         IAdminWebIF m_WebIF;
         SceneList m_Scenes;
+        ConfigurationLoader m_Loader;
 
         public RegionAdmin(string regionStorageName, string simulationDataName, string estateServiceName)
         {
@@ -55,6 +56,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Loader = loader;
             m_HttpServer = loader.HttpServer;
             m_Scenes = loader.Scenes;
             m_ExternalHostNameService = loader.ExternalHostNameService;
@@ -73,6 +75,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("regions.list", HandleList);
             webif.JsonMethods.Add("region.start", HandleStart);
             webif.JsonMethods.Add("region.stop", HandleStop);
+            webif.JsonMethods.Add("region.getports", HandleGetPorts);
             webif.JsonMethods.Add("region.get", HandleGet);
             webif.JsonMethods.Add("region.get.estates", HandleGetEstates);
             webif.JsonMethods.Add("region.change.location", HandleChangeLocation);
@@ -166,6 +169,32 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             res.Add("estates", estateRes);
             m_WebIF.SuccessResponse(req, res);
+        }
+
+        [AdminWebIfRequiredRight("regions.view")]
+        void HandleGetPorts(HttpRequest req, Map jsondata)
+        {
+            Map resdata = new Map();
+            Map tcpdata = new Map();
+            resdata.Add("tcp", tcpdata);
+            foreach(KeyValuePair<int, string> kvp in m_Loader.KnownTcpPorts)
+            {
+                tcpdata.Add(kvp.Key.ToString(), kvp.Value);
+            }
+            Map udpdata = new Map();
+            resdata.Add("udp", udpdata);
+            IEnumerable<RegionInfo> regions = regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+            foreach (RegionInfo region in regions)
+            {
+                string status;
+                Map regiondata = new Map();
+                regiondata.Add("type", "regionport");
+                regiondata.Add("online", m_Scenes.ContainsKey(region.ID));
+                regiondata.Add("regionid", region.ID);
+                regiondata.Add("regionname", region.Name);
+                udpdata.Add(region.ServerPort.ToString(), regiondata);
+            }
+            m_WebIF.SuccessResponse(req, resdata);
         }
 
         [AdminWebIfRequiredRight("regions.view")]
