@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 (flags & VehicleFlags.MousePointBank) != 0;
         }
 
-        public void Process(double dt, PhysicsStateData currentState, SceneInterface scene, double mass)
+        public void Process(double dt, PhysicsStateData currentState, SceneInterface scene, double mass, double multgravity)
         {
             if(m_Params.VehicleType == VehicleType.None)
             {
@@ -251,7 +251,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Buoyancy
             /* we simply act against the physics effect of the BuoyancyMotor */
-            linearForce.Z -= m_Params[VehicleFloatParamId.Buoyancy] * mass * CommonPhysicsController.GravityAccelerationConstant;
+            linearForce.Z -= m_Params[VehicleFloatParamId.Buoyancy] * mass * multgravity;
             #endregion
 
             #region Angular Deflection

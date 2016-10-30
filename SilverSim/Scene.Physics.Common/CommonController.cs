@@ -10,7 +10,15 @@ namespace SilverSim.Scene.Physics.Common
     public abstract class CommonPhysicsController
     {
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
-        public static double GravityAccelerationConstant { get; set; }
+        public double CombinedGravityAccelerationConstant
+        {
+            get
+            {
+                return BaseGravityAccelerationConstant + AdditionalGravityAccelerationConstant;
+            }
+        }
+        public double AdditionalGravityAccelerationConstant { get; set; }
+        protected abstract double BaseGravityAccelerationConstant { get; }
 
         static CommonPhysicsController()
         {
@@ -36,7 +44,7 @@ namespace SilverSim.Scene.Physics.Common
         #region Gravity and Buoyancy
         protected double GravityConstant(IObject obj)
         {
-            return obj.PhysicsActor.Mass * GravityAccelerationConstant * obj.PhysicsGravityMultiplier;
+            return obj.PhysicsActor.Mass * CombinedGravityAccelerationConstant * obj.PhysicsGravityMultiplier;
         }
 
         protected Vector3 GravityMotor(IObject obj)
