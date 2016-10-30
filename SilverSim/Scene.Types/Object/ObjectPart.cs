@@ -100,6 +100,29 @@ namespace SilverSim.Scene.Types.Object
 
         public int LoadedLinkNumber; /* not authoritative, just for loading from XML */
 
+        public uint m_PhysicsParameterUpdateSerial = 1;
+
+        public uint PhysicsParameterUpdateSerial
+        {
+            get
+            {
+                return m_PhysicsParameterUpdateSerial;
+            }
+        }
+
+        void IncrementPhysicsParameterUpdateSerial()
+        {
+            lock (m_DataLock)
+            {
+                uint serial = m_PhysicsParameterUpdateSerial + 1;
+                if (serial == 0)
+                {
+                    serial = 1;
+                }
+                m_PhysicsParameterUpdateSerial = serial;
+            }
+        }
+
         public class OmegaParam
         {
             #region Constructor
@@ -859,6 +882,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_PassCollisionMode = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
@@ -1117,6 +1141,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_PhysicsShapeType = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
             }
         }
@@ -1175,6 +1200,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
@@ -1219,6 +1245,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Slice = value;
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
             }
         }
@@ -1326,6 +1353,7 @@ namespace SilverSim.Scene.Types.Object
                     m_PhysicsDensity = value;
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
@@ -1345,6 +1373,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
                 }
+                IncrementPhysicsParameterUpdateSerial();
             }
         }
 
@@ -1364,6 +1393,7 @@ namespace SilverSim.Scene.Types.Object
                     m_PhysicsFriction = value;
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
@@ -1384,6 +1414,7 @@ namespace SilverSim.Scene.Types.Object
                     m_PhysicsRestitution = value;
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
@@ -1405,6 +1436,7 @@ namespace SilverSim.Scene.Types.Object
                     m_PhysicsGravityMultiplier = value;
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
