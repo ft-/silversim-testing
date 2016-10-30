@@ -107,6 +107,10 @@ namespace SilverSim.Scene.Physics.Common
             {
                 lock(m_Lock)
                 {
+                    foreach(ObjectPart part in m_Group.ValuesByKey1)
+                    {
+                        m_Mass += part.Mass;
+                    }
                     return m_Mass;
                 }
             }
