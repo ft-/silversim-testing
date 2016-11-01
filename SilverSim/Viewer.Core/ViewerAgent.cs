@@ -198,6 +198,11 @@ namespace SilverSim.Viewer.Core
             {
                 IList<KeyValuePair<Action<object, bool>, object>> waitForRootList;
                 AgentCircuit circuit;
+                IPhysicsObject physAgent;
+                if(PhysicsActors.TryGetValue(m_CurrentSceneID, out physAgent) && m_CurrentSceneID != value)
+                {
+                    physAgent.IsPhysicsActive = false;
+                }
                 if(!Circuits.TryGetValue(value, out circuit))
                 {
                     circuit = null;
@@ -214,6 +219,10 @@ namespace SilverSim.Viewer.Core
                     {
                         kvp.Key(kvp.Value, true);
                     }
+                }
+                if (PhysicsActors.TryGetValue(m_CurrentSceneID, out physAgent))
+                {
+                    physAgent.IsPhysicsActive = true;
                 }
             }
         }

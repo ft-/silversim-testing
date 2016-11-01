@@ -24,7 +24,6 @@ namespace SilverSim.Scene.Types.Physics
 
             m_UfoTimer = new Timer(0.1);
             m_UfoTimer.Elapsed += UfoTimerFunction;
-            IsPhysicsActive = true;
             m_Agent = agent;
             m_UfoTimer.Start();
         }
