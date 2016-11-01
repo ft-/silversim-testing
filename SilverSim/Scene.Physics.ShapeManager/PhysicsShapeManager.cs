@@ -47,6 +47,15 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
+        /** <summary>referencing class to provide default avatar shapehes</summary> */
+        public sealed class PhysicsShapeDefaultAvatarReference : PhysicsShapeReference
+        {
+            internal PhysicsShapeDefaultAvatarReference(PhysicsShapeManager manager, PhysicsConvexShape shape)
+                : base(manager, shape)
+            {
+            }
+        }
+
         /** <summary>referencing class to provide usage counting for sculpts and prims</summary> */
         public sealed class PhysicsShapePrimShapeReference : PhysicsShapeReference
         {
@@ -72,13 +81,88 @@ namespace SilverSim.Scene.Physics.ShapeManager
             m_SimulationDataStorageName = simulationStorageName;
         }
 
+        static PhysicsConvexShape GenerateDefaultAvatarShape()
+        {
+            MeshLOD meshLod = new MeshLOD();
+
+            meshLod.Vertices.Add(new Vector3(-0.5, -0.5, 0));
+            meshLod.Vertices.Add(new Vector3(0.5, -0.5, 0));
+            meshLod.Vertices.Add(new Vector3(0.5, 0.5, 0));
+            meshLod.Vertices.Add(new Vector3(-0.5, 0.5, 0));
+
+            meshLod.Vertices.Add(new Vector3(-0.1, -0.1, -0.5));
+            meshLod.Vertices.Add(new Vector3(0.1, -0.1, -0.5));
+            meshLod.Vertices.Add(new Vector3(0.1, 0.1, -0.5));
+            meshLod.Vertices.Add(new Vector3(-0.1, 0.1, -0.5));
+
+            meshLod.Vertices.Add(new Vector3(-0.5, -0.5, 0.5));
+            meshLod.Vertices.Add(new Vector3(0.5, -0.5, 0.5));
+            meshLod.Vertices.Add(new Vector3(0.5, 0.5, 0.5));
+            meshLod.Vertices.Add(new Vector3(-0.5, 0.5, 0.5));
+
+            #region Top
+            meshLod.Triangles.Add(new Triangle(8, 9, 10));
+            meshLod.Triangles.Add(new Triangle(8, 11, 10));
+            #endregion
+
+            #region Bottom
+            meshLod.Triangles.Add(new Triangle(4, 5, 6));
+            meshLod.Triangles.Add(new Triangle(4, 7, 6));
+            #endregion
+
+            #region Lower Sides A
+            meshLod.Triangles.Add(new Triangle(4, 5, 1));
+            meshLod.Triangles.Add(new Triangle(4, 0, 1));
+            #endregion
+
+            #region Lower Sides B
+            meshLod.Triangles.Add(new Triangle(5, 6, 1));
+            meshLod.Triangles.Add(new Triangle(6, 1, 2));
+            #endregion
+
+            #region Lower Sides C
+            meshLod.Triangles.Add(new Triangle(6, 7, 2));
+            meshLod.Triangles.Add(new Triangle(7, 2, 3));
+            #endregion
+
+            #region Lower Sides D
+            meshLod.Triangles.Add(new Triangle(4, 7, 3));
+            meshLod.Triangles.Add(new Triangle(4, 0, 3));
+            #endregion
+
+            #region Upper Sides A
+            meshLod.Triangles.Add(new Triangle(0, 1, 8));
+            meshLod.Triangles.Add(new Triangle(1, 8, 9));
+            #endregion
+
+            #region Upper Sides B
+            meshLod.Triangles.Add(new Triangle(1, 2, 9));
+            meshLod.Triangles.Add(new Triangle(2, 9, 10));
+            #endregion
+
+            #region Upper Sides C
+            meshLod.Triangles.Add(new Triangle(2, 3, 10));
+            meshLod.Triangles.Add(new Triangle(3, 10, 11));
+            #endregion
+
+            #region Upper Sides D
+            meshLod.Triangles.Add(new Triangle(3, 0, 8));
+            meshLod.Triangles.Add(new Triangle(3, 8, 11));
+            #endregion
+
+            return DecomposeConvex(meshLod);
+        }
+
+        public PhysicsShapeReference DefaultAvatarConvexShape { get; private set;}
+
         public void Startup(ConfigurationLoader loader)
         {
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_SimulationStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
+            DefaultAvatarConvexShape = new PhysicsShapeDefaultAvatarReference(this, GenerateDefaultAvatarShape());
         }
 
-        PhysicsConvexShape DecomposeConvex(MeshLOD lod)
+        static PhysicsConvexShape DecomposeConvex(MeshLOD lod)
         {
             using (VHACD vhacd = new VHACD())
             {
