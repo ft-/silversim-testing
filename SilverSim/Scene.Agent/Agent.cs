@@ -521,6 +521,9 @@ namespace SilverSim.Scene.Agent
                 case PrimitiveParamsType.Alpha:
                     throw new ArgumentException("PRIM_ALPHA not allowed for agents");
 
+                case PrimitiveParamsType.SitTarget:
+                    throw new ArgumentException("PRIM_SIT_TARGET not allowed for agents");
+
                 case PrimitiveParamsType.Projector:
                     throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
 
@@ -628,6 +631,9 @@ namespace SilverSim.Scene.Agent
 
                 case PrimitiveParamsType.Alpha:
                     throw new ArgumentException("PRIM_ALPHA not allowed for agents");
+
+                case PrimitiveParamsType.SitTarget:
+                    throw new ArgumentException("PRIM_SIT_TARGET not allowed for agents");
 
                 case PrimitiveParamsType.Projector:
                     throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
