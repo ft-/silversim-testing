@@ -1066,6 +1066,12 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.SitTarget:
+                    paramList.Add(SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) || SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon));
+                    paramList.Add(SitTargetOffset);
+                    paramList.Add(SitTargetOrientation);
+                    break;
+
                 case PrimitiveParamsType.Projector:
                     {
                         ProjectionParam param = Projection;
@@ -1430,6 +1436,24 @@ namespace SilverSim.Scene.Types.Object
                         p.Spinrate = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA");
                         p.Gain = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA");
                         Omega = p;
+                    }
+                    break;
+
+                case PrimitiveParamsType.SitTarget:
+                    {
+                        int i = ParamsHelper.GetInteger(enumerator, "PRIM_SIT_TARGET");
+                        Vector3 offset = ParamsHelper.GetVector(enumerator, "PRIM_SIT_TARGET");
+                        Quaternion q = ParamsHelper.GetRotation(enumerator, "PRIM_SIT_TARGET");
+                        if(i != 0)
+                        {
+                            SitTargetOffset = offset;
+                            SitTargetOrientation = q;
+                        }
+                        else
+                        {
+                            SitTargetOffset = Vector3.Zero;
+                            SitTargetOrientation = Quaternion.Identity;
+                        }
                     }
                     break;
 

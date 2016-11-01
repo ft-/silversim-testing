@@ -116,6 +116,9 @@ namespace SilverSim.Types.Primitive
         Specular = 36,
         Normal = 37,
         AlphaMode = 38,
+        AllowUnsit = 39,
+        ScriptedSitOnly = 40,
+        SitTarget = 41,
 
         Alpha = 11001,
 
