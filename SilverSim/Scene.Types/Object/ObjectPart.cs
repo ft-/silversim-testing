@@ -85,8 +85,8 @@ namespace SilverSim.Scene.Types.Object
         private PrimitiveFlags m_PrimitiveFlags;
         private Map m_DynAttrMap = new Map();
         public bool IsScripted { get; private set; }
-        public bool m_AllowUnsit = true;
-        public bool m_IsScriptedSitOnly;
+        bool m_AllowUnsit = true;
+        bool m_IsScriptedSitOnly;
 
         public Map DynAttrs
         {
@@ -2076,6 +2076,8 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("Friction", (float)PhysicsFriction);
                     writer.WriteNamedValue("Bounce", (float)PhysicsRestitution);
                     writer.WriteNamedValue("GravityModifier", (float)PhysicsGravityMultiplier);
+                    writer.WriteNamedValue("AllowUnsit", AllowUnsit);
+                    writer.WriteNamedValue("ScriptedSitOnly", IsScriptedSitOnly);
                 }
                 writer.WriteEndElement();
             }
@@ -2437,6 +2439,14 @@ namespace SilverSim.Scene.Types.Object
                         {
                             case "AllowedDrop":
                                 part.IsAllowedDrop = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "AllowUnsit":
+                                part.AllowUnsit = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "ScriptedSitOnly":
+                                part.IsScriptedSitOnly = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "ForceMouselook": /* boolean field */
