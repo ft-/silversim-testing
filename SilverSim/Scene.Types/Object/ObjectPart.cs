@@ -2066,11 +2066,11 @@ namespace SilverSim.Scene.Types.Object
 
                     writer.WriteNamedValue("TextureAnimation", TextureAnimationBytes);
                     writer.WriteNamedValue("ParticleSystem", ParticleSystemBytes);
-                    writer.WriteNamedValue("PayPrice0", 0);
-                    writer.WriteNamedValue("PayPrice1", 0);
-                    writer.WriteNamedValue("PayPrice2", 0);
-                    writer.WriteNamedValue("PayPrice3", 0);
-                    writer.WriteNamedValue("PayPrice4", 0);
+                    writer.WriteNamedValue("PayPrice0", ObjectGroup.PayPrice0);
+                    writer.WriteNamedValue("PayPrice1", ObjectGroup.PayPrice1);
+                    writer.WriteNamedValue("PayPrice2", ObjectGroup.PayPrice2);
+                    writer.WriteNamedValue("PayPrice3", ObjectGroup.PayPrice3);
+                    writer.WriteNamedValue("PayPrice4", ObjectGroup.PayPrice4);
                     writer.WriteNamedValue("PhysicsShapeType", (int)PhysicsShapeType);
                     writer.WriteNamedValue("Density", (float)PhysicsDensity);
                     writer.WriteNamedValue("Friction", (float)PhysicsFriction);
