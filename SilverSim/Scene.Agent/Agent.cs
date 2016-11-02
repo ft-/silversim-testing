@@ -521,6 +521,12 @@ namespace SilverSim.Scene.Agent
                 case PrimitiveParamsType.Alpha:
                     throw new ArgumentException("PRIM_ALPHA not allowed for agents");
 
+                case PrimitiveParamsType.AllowUnsit:
+                    throw new ArgumentException("PRIM_ALLOW_UNSIT not allowed for agents");
+
+                case PrimitiveParamsType.ScriptedSitOnly:
+                    throw new ArgumentException("PRIM_SCRIPTED_SIT_ONLY not allowed for agents");
+
                 case PrimitiveParamsType.SitTarget:
                     throw new ArgumentException("PRIM_SIT_TARGET not allowed for agents");
 
@@ -631,6 +637,12 @@ namespace SilverSim.Scene.Agent
 
                 case PrimitiveParamsType.Alpha:
                     throw new ArgumentException("PRIM_ALPHA not allowed for agents");
+
+                case PrimitiveParamsType.AllowUnsit:
+                    throw new ArgumentException("PRIM_ALLOW_UNSIT not allowed for agents");
+
+                case PrimitiveParamsType.ScriptedSitOnly:
+                    throw new ArgumentException("PRIM_SCRIPTED_SIT_ONLY not allowed for agents");
 
                 case PrimitiveParamsType.SitTarget:
                     throw new ArgumentException("PRIM_SIT_TARGET not allowed for agents");

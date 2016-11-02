@@ -85,6 +85,8 @@ namespace SilverSim.Scene.Types.Object
         private PrimitiveFlags m_PrimitiveFlags;
         private Map m_DynAttrMap = new Map();
         public bool IsScripted { get; private set; }
+        public bool m_AllowUnsit = true;
+        public bool m_IsScriptedSitOnly;
 
         public Map DynAttrs
         {
@@ -723,6 +725,34 @@ namespace SilverSim.Scene.Types.Object
             }
             IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(0);
+        }
+
+        public bool IsScriptedSitOnly
+        {
+            get
+            {
+                return m_IsScriptedSitOnly;
+            }
+            set
+            {
+                IsScriptedSitOnly = value;
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public bool AllowUnsit
+        {
+            get
+            {
+                return m_AllowUnsit;
+            }
+            set
+            {
+                m_AllowUnsit = value;
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
         }
 
         public InventoryPermissionsMask NextOwnerMask

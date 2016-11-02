@@ -1066,6 +1066,14 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.AllowUnsit:
+                    paramList.Add(AllowUnsit ? 1 : 0);
+                    break;
+
+                case PrimitiveParamsType.ScriptedSitOnly:
+                    paramList.Add(IsScriptedSitOnly ? 1 : 0);
+                    break;
+
                 case PrimitiveParamsType.SitTarget:
                     paramList.Add(SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) || SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon));
                     paramList.Add(SitTargetOffset);
@@ -1439,12 +1447,20 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.AllowUnsit:
+                    AllowUnsit = ParamsHelper.GetBoolean(enumerator, "PRIM_ALLOW_UNSIT");
+                    break;
+
+                case PrimitiveParamsType.ScriptedSitOnly:
+                    IsScriptedSitOnly = ParamsHelper.GetBoolean(enumerator, "PRIM_SCRIPTED_SIT_ONLY");
+                    break;
+
                 case PrimitiveParamsType.SitTarget:
                     {
-                        int i = ParamsHelper.GetInteger(enumerator, "PRIM_SIT_TARGET");
+                        bool sitenabled = ParamsHelper.GetBoolean(enumerator, "PRIM_SIT_TARGET");
                         Vector3 offset = ParamsHelper.GetVector(enumerator, "PRIM_SIT_TARGET");
                         Quaternion q = ParamsHelper.GetRotation(enumerator, "PRIM_SIT_TARGET");
-                        if(i != 0)
+                        if(sitenabled)
                         {
                             SitTargetOffset = offset;
                             SitTargetOrientation = q;
