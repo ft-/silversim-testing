@@ -42,6 +42,8 @@ namespace SilverSim.Scene.Types.Agent
         string LastName { get; set; }
         UUID SceneID { get; set; }
 
+        bool AllowUnsit { get; set; }
+
         ClientInfo Client { get; }
         SessionInfo Session { get; }
         UserAccount UntrustedAccountInfo { get; }

@@ -71,6 +71,7 @@ namespace SilverSim.Scene.Agent
             m_AgentID = agentId;
             HomeURI = homeURI;
             m_AnimationController = new AgentAnimationController(ID, SendAnimations);
+            AllowUnsit = true;
         }
 
         ~Agent()
@@ -100,6 +101,8 @@ namespace SilverSim.Scene.Agent
 
         private ObjectGroup m_SittingOnObject;
 
+        public bool AllowUnsit { get; set; }
+
         public ObjectGroup SittingOnObject
         {
             /* we need to guard against our position routines and so on */
@@ -128,6 +131,7 @@ namespace SilverSim.Scene.Agent
                     {
                         GlobalRotation = q;
                         GlobalPosition = l;
+                        AllowUnsit = false;
                     }
                 }
             }

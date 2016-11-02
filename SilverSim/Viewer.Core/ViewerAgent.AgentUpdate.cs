@@ -225,7 +225,10 @@ namespace SilverSim.Viewer.Core
 
             if (m_ActiveAgentControlFlags.HasStandUp())
             {
-                UnSit();
+                if (SittingOnObject != null && AllowUnsit)
+                {
+                    UnSit();
+                }
             }
 
             if (m_ActiveAgentControlFlags.HasSitOnGround())

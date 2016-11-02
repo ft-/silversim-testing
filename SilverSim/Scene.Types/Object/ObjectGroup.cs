@@ -1120,8 +1120,9 @@ namespace SilverSim.Scene.Types.Object
                     CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber);
                     m_Group.m_SittingAgents.Add(agent, sitOnTarget);
                     agent.SittingOnObject = sitOn;
-
                 }
+                agent.AllowUnsit = sitOnTarget.AllowUnsit;
+
                 if(!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
                     !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
                 {
@@ -1170,7 +1171,7 @@ namespace SilverSim.Scene.Types.Object
                             if (!part.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
                                 !part.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
                             {
-                                if (!m_Group.m_SittingAgents.ContainsKey(part))
+                                if (!m_Group.m_SittingAgents.ContainsKey(part) && (!part.IsScriptedSitOnly))
                                 {
                                     /* select prim */
                                     sitOnTarget = part;
@@ -1181,6 +1182,12 @@ namespace SilverSim.Scene.Types.Object
 
                     if (null == sitOnTarget)
                     {
+                        if(m_Group.RootPart.IsScriptedSitOnly)
+                        {
+                            sitPosition = Vector3.Zero;
+                            sitRotation = Quaternion.Identity;
+                            return;
+                        }
                         sitOnTarget = m_Group.RootPart;
                     }
                 }

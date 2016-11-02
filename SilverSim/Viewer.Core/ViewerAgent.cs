@@ -822,7 +822,10 @@ namespace SilverSim.Viewer.Core
                         Vector3 sitOffset;
                         Quaternion sitRotation;
                         grp.AgentSitting.CheckSittable(this, out sitOffset, out sitRotation, out sitOnLink, sitreq.Offset, grp.RootPart != part ? part.LinkNumber : -1);
-
+                        if(null == sitOnLink)
+                        {
+                            return;
+                        }
                         lock (m_DataLock)
                         {
                             m_AgentSitTarget = sitOnLink.ID;
