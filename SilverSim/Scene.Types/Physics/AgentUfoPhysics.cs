@@ -5,6 +5,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using System.Diagnostics.CodeAnalysis;
 using System.Timers;
+using System;
 
 namespace SilverSim.Scene.Types.Physics
 {
@@ -173,6 +174,42 @@ namespace SilverSim.Scene.Types.Physics
             {
                 return 0f;
             }
+            set
+            {
+            }
+        }
+
+        public bool IsRotateXEnabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+            }
+        }
+
+        public bool IsRotateYEnabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+            }
+        }
+
+        public bool IsRotateZEnabled
+        {
+            get
+            {
+                return true;
+            }
+
             set
             {
             }

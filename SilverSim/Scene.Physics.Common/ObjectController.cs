@@ -17,8 +17,6 @@ namespace SilverSim.Scene.Physics.Common
     {
         protected ObjectGroup m_Group;
         protected VehicleMotor m_Vehicle;
-        bool m_Phantom;
-        bool m_VolumeDetect;
         protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
         protected UUID SceneID { get; private set; }
@@ -28,7 +26,6 @@ namespace SilverSim.Scene.Physics.Common
             SceneID = sceneID;
             m_StateData = new PhysicsStateData(part, sceneID);
             m_Group = part;
-            m_Phantom = true;
             m_Vehicle = m_Group.VehicleParams.GetMotor();
         }
 
@@ -57,34 +54,12 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public abstract void UpdateCollisionInfo();
-
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
-        public bool IsPhantom
-        {
-            get
-            {
-                return m_Phantom;
-            }
-            set
-            {
-                m_Phantom = value;
-                UpdateCollisionInfo();
-            }
-        }
-
-        public bool IsVolumeDetect 
-        {
-            get
-            {
-                return m_VolumeDetect;
-            }
-            set
-            {
-                m_VolumeDetect = value;
-                UpdateCollisionInfo();
-            }
-        }
+        public abstract bool IsPhantom { get; set; }
+        public abstract bool IsVolumeDetect { get; set; }
+        public abstract bool IsRotateXEnabled { get; set; }
+        public abstract bool IsRotateYEnabled { get; set; }
+        public abstract bool IsRotateZEnabled { get; set; }
 
         public bool IsAgentCollisionActive 
         {

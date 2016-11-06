@@ -6,7 +6,6 @@ using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -62,10 +61,58 @@ namespace SilverSim.Scene.Types.Object
         bool m_IsPhysics;
         bool m_IsVolumeDetect;
         double m_Buoyancy;
+        bool m_IsRotateXEnabled = true;
+        bool m_IsRotateYEnabled = true;
+        bool m_IsRotateZEnabled = true;
 
         public readonly VehicleParams VehicleParams = new VehicleParams();
 
         #endregion
+
+        public bool IsRotateXEnabled
+        {
+            get
+            {
+                return m_IsRotateXEnabled;
+            }
+            set
+            {
+                m_IsRotateXEnabled = value;
+                PhysicsActor.IsRotateXEnabled = value;
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
+
+        public bool IsRotateYEnabled
+        {
+            get
+            {
+                return m_IsRotateYEnabled;
+            }
+            set
+            {
+                m_IsRotateYEnabled = value;
+                PhysicsActor.IsRotateYEnabled = value;
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
+
+        public bool IsRotateZEnabled
+        {
+            get
+            {
+                return m_IsRotateZEnabled;
+            }
+            set
+            {
+                m_IsRotateZEnabled = value;
+                PhysicsActor.IsRotateZEnabled = value;
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
 
         public bool IsPhantom
         {

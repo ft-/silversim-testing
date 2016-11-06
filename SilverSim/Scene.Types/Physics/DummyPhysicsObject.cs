@@ -2,7 +2,6 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Physics
 {
@@ -112,6 +111,42 @@ namespace SilverSim.Scene.Types.Physics
             set
             {
                 /* intentionally left empty */
+            }
+        }
+
+        public bool IsRotateXEnabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+            }
+        }
+
+        public bool IsRotateYEnabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+            }
+        }
+
+        public bool IsRotateZEnabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
             }
         }
 

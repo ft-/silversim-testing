@@ -13,6 +13,9 @@ namespace SilverSim.Scene.Types.Physics
         void SetLinearImpulse(Vector3 value);
         void SetAngularImpulse(Vector3 value);
 
+        bool IsRotateXEnabled { get; set; }
+        bool IsRotateYEnabled { get; set; }
+        bool IsRotateZEnabled { get; set; }
         bool IsPhysicsActive { get; set; } /* disables updates of object */
         bool IsPhantom { get; set; }
         bool IsVolumeDetect { get; set; }

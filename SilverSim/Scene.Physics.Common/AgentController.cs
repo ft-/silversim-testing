@@ -75,6 +75,9 @@ namespace SilverSim.Scene.Physics.Common
 
         public abstract bool IsVolumeDetect { get; set; }
         public abstract bool IsAgentCollisionActive { get; set; }
+        public abstract bool IsRotateXEnabled { get; set; }
+        public abstract bool IsRotateYEnabled { get; set; }
+        public abstract bool IsRotateZEnabled { get; set; }
 
         Vector3 m_ControlTargetVelocity = Vector3.Zero;
         public void SetControlTargetVelocity(Vector3 value)
