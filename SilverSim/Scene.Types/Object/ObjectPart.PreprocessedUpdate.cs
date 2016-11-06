@@ -246,6 +246,10 @@ namespace SilverSim.Scene.Types.Object
                         {
                             primUpdateFlags |= (uint)PrimitiveFlags.Scripted;
                         }
+                        if(ObjectGroup.IsVolumeDetect)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.VolumeDetect;
+                        }
                         if (ObjectGroup.IsGroupOwned)
                         {
                             primUpdateFlags |= (uint)PrimitiveFlags.ObjectGroupOwned;

@@ -1915,6 +1915,9 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("LocalId", LocalID);
                     writer.WriteNamedValue("Name", Name);
                     writer.WriteNamedValue("Material", (int)Material);
+                    writer.WriteNamedValue("IsRotateXEnabled", ObjectGroup.IsRotateXEnabled);
+                    writer.WriteNamedValue("IsRotateYEnabled", ObjectGroup.IsRotateYEnabled);
+                    writer.WriteNamedValue("IsRotateZEnabled", ObjectGroup.IsRotateZEnabled);
                     writer.WriteNamedValue("PassTouch", PassTouchMode != PassEventMode.Never);
                     writer.WriteNamedValue("PassTouchAlways", PassTouchMode == PassEventMode.Always);
                     writer.WriteNamedValue("PassCollisions", PassCollisionMode != PassEventMode.Never);
@@ -2493,6 +2496,39 @@ namespace SilverSim.Scene.Types.Object
                                 part.Material = (PrimitiveMaterial)reader.ReadElementValueAsInt();
                                 break;
 
+                            case "IsRotateXEnabled":
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.IsRotateXEnabled = reader.ReadElementValueAsBoolean();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
+                                break;
+
+                            case "IsRotateYEnabled":
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.IsRotateYEnabled = reader.ReadElementValueAsBoolean();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
+                                break;
+
+                            case "IsRotateZEnabled":
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.IsRotateZEnabled = reader.ReadElementValueAsBoolean();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
+                                break;
+
                             case "PassTouch":
                             case "PassTouches":
                                 IsPassTouches = reader.ReadElementValueAsBoolean();
@@ -2926,6 +2962,10 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 rootGroup.IsTempOnRez = true;
                             }
+                            if((part.Flags & PrimitiveFlags.VolumeDetect) != 0)
+                            {
+                                rootGroup.IsVolumeDetect = true;
+                            }
                         }
 
                         part.PassCollisionMode = !IsPassCollisions ?
@@ -2943,7 +2983,7 @@ namespace SilverSim.Scene.Types.Object
                         
                         part.Flags &= ~(
                             PrimitiveFlags.InventoryEmpty | PrimitiveFlags.Physics | PrimitiveFlags.Temporary | PrimitiveFlags.TemporaryOnRez |
-                            PrimitiveFlags.AllowInventoryDrop | PrimitiveFlags.Scripted |
+                            PrimitiveFlags.AllowInventoryDrop | PrimitiveFlags.Scripted | PrimitiveFlags.VolumeDetect |
                             PrimitiveFlags.ObjectGroupOwned | PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectOwnerModify);
                         part.Inventory.InventorySerial = InventorySerial;
                         return part;
