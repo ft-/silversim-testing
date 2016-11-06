@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
@@ -14,12 +15,18 @@ namespace SilverSim.Scene.Physics.Common
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract class AgentController : CommonPhysicsController, IAgentPhysicsObject
     {
+#if DEBUG
+        private static readonly ILog m_Log = LogManager.GetLogger("AGENT CONTROLLER");
+#endif
+
         protected IAgent m_Agent { get; private set; }
         protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
 
         protected AgentController(IAgent agent, UUID sceneID)
         {
+            ControlTargetVelocityInputFactor = 10;
+            ControlTargetRotationInputFactor = 10;
             m_Agent = agent;
             m_StateData = new PhysicsStateData(agent, sceneID);
         }
@@ -84,6 +91,12 @@ namespace SilverSim.Scene.Physics.Common
         {
             lock (m_Lock)
             {
+#if DEBUG
+                if(!value.ApproxEquals(m_ControlTargetVelocity, double.Epsilon))
+                {
+                    m_Log.DebugFormat("Agent control velocity for {0}: {1}", m_Agent.Owner.FullName, value.ToString());
+                }
+#endif
                 m_ControlTargetVelocity = value;
             }
         }
@@ -207,6 +220,9 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        protected double ControlTargetVelocityInputFactor { get; set; }
+        protected double ControlTargetRotationInputFactor { get; set; }
+
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {
             List<PositionalForce> forces = new List<PositionalForce>();
@@ -219,7 +235,7 @@ namespace SilverSim.Scene.Physics.Common
             forces.Add(new PositionalForce(BuoyancyMotor(m_Agent), Vector3.Zero));
             forces.Add(new PositionalForce(GravityMotor(m_Agent), Vector3.Zero));
             forces.Add(new PositionalForce(HoverMotor(m_Agent), Vector3.Zero));
-            forces.Add(new PositionalForce(TargetVelocityMotor(m_Agent, ControlTargetVelocityInput, 1f), Vector3.Zero));
+            forces.Add(new PositionalForce(TargetVelocityMotor(m_Agent, ControlTargetVelocityInput, ControlTargetVelocityInputFactor), Vector3.Zero));
 
             /* let us allow advanced physics force input to be used on agents */
             foreach (ObjectGroup grp in m_Agent.Attachments.All)
@@ -234,7 +250,7 @@ namespace SilverSim.Scene.Physics.Common
                 }
             }
 
-            agentTorque = TargetRotationMotor(m_Agent, m_Agent.BodyRotation, 1f);
+            agentTorque = TargetRotationMotor(m_Agent, m_Agent.BodyRotation, ControlTargetRotationInputFactor);
 
             lock(m_Lock)
             {
