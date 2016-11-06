@@ -74,6 +74,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             objgroup.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
             objgroup.IsPhantom = dbReader.GetBool("IsPhantom");
             objgroup.IsPhysics = dbReader.GetBool("IsPhysics");
+            objgroup.IsRotateXEnabled = dbReader.GetBool("IsRotateXEnabled");
+            objgroup.IsRotateYEnabled = dbReader.GetBool("IsRotateYEnabled");
+            objgroup.IsRotateZEnabled = dbReader.GetBool("IsRotateZEnabled");
             objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
             objgroup.Owner = dbReader.GetUUI("Owner");
             objgroup.LastOwner = dbReader.GetUUI("LastOwner");

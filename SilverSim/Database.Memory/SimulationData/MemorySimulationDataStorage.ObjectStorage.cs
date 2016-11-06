@@ -63,6 +63,9 @@ namespace SilverSim.Database.Memory.SimulationData
         ObjectGroup ObjectGroupFromMap(Map map)
         {
             ObjectGroup objgroup = new ObjectGroup();
+            objgroup.IsRotateXEnabled = map["IsRotateXEnabled"].AsBoolean;
+            objgroup.IsRotateYEnabled = map["IsRotateYEnabled"].AsBoolean;
+            objgroup.IsRotateZEnabled = map["IsRotateZEnabled"].AsBoolean;
             objgroup.IsVolumeDetect = map["IsVolumeDetect"].AsBoolean;
             objgroup.IsPhantom = map["IsPhantom"].AsBoolean;
             objgroup.IsPhysics = map["IsPhysics"].AsBoolean;

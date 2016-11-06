@@ -46,6 +46,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             new NamedKeyInfo("RegionID", "RegionID"),
             new TableRevision(6),
             new AddColumn<bool>("IsIncludedInSearch") { IsNullAllowed = false, Default = false },
+            new TableRevision(7),
+            new AddColumn<bool>("IsRotateXEnabled") { IsNullAllowed = false, Default = true },
+            new AddColumn<bool>("IsRotateYEnabled") { IsNullAllowed = false, Default = true },
+            new AddColumn<bool>("IsRotateZEnabled") { IsNullAllowed = false, Default = true },
             #endregion
 
             #region Table prims

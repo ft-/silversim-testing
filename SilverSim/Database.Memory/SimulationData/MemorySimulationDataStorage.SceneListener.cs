@@ -240,6 +240,9 @@ namespace SilverSim.Database.Memory.SimulationData
                 Map data = new Map();
                 data.Add("ID", objgroup.ID);
                 data.Add("RegionID", objgroup.Scene.ID);
+                data.Add("IsRotateXEnabled", objgroup.IsRotateXEnabled);
+                data.Add("IsRotateYEnabled", objgroup.IsRotateYEnabled);
+                data.Add("IsRotateZEnabled", objgroup.IsRotateZEnabled);
                 data.Add("IsVolumeDetect", objgroup.IsVolumeDetect);
                 data.Add("IsPhantom", objgroup.IsPhantom);
                 data.Add("IsPhysics", objgroup.IsPhysics);
