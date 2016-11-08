@@ -149,10 +149,6 @@ namespace SilverSim.Scene.Physics.ShapeManager
             #endregion
 
             PhysicsConvexShape shape = DecomposeConvex(meshLod);
-#if DEBUG
-            meshLod.DumpToBlenderRaw("../data/avatarcapsule.raw");
-            shape.DumpToBlenderRaw("../data/avatarhull.raw");
-#endif
             return shape;
         }
 
