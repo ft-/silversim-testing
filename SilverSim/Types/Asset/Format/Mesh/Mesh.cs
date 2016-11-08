@@ -5,6 +5,7 @@ using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 
@@ -266,6 +267,26 @@ namespace SilverSim.Types.Asset.Format.Mesh
                     Triangle t = new Triangle(v1, v2, v3);
                     t.FaceIdx = faceNo;
                     Triangles.Add(t);
+                }
+            }
+        }
+
+        static string VertexToString(Vector3 v)
+        {
+            return string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
+        }
+
+        public void DumpToBlenderRaw(string filename)
+        {
+            /* write a blender .raw */
+            using (StreamWriter w = new StreamWriter(filename))
+            {
+                foreach (Triangle tri in Triangles)
+                {
+                    w.WriteLine("{0} {1} {2}",
+                        VertexToString(Vertices[tri.Vertex1]),
+                        VertexToString(Vertices[tri.Vertex2]),
+                        VertexToString(Vertices[tri.Vertex3]));
                 }
             }
         }

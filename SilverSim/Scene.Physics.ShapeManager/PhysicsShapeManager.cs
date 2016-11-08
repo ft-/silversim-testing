@@ -1,10 +1,8 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
-using SilverSim.Main.Common.CmdIO;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Mesh;
@@ -13,7 +11,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.Scene.Physics.ShapeManager
@@ -102,47 +99,47 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
             #region Top
             meshLod.Triangles.Add(new Triangle(8, 9, 10));
-            meshLod.Triangles.Add(new Triangle(8, 11, 10));
+            meshLod.Triangles.Add(new Triangle(11, 8, 10));
             #endregion
 
             #region Bottom
-            meshLod.Triangles.Add(new Triangle(4, 5, 6));
-            meshLod.Triangles.Add(new Triangle(4, 7, 6));
+            meshLod.Triangles.Add(new Triangle(5, 4, 6));
+            meshLod.Triangles.Add(new Triangle(6, 4, 7));
             #endregion
 
             #region Lower Sides A
-            meshLod.Triangles.Add(new Triangle(4, 5, 1));
-            meshLod.Triangles.Add(new Triangle(4, 0, 1));
+            meshLod.Triangles.Add(new Triangle(1, 4, 5));
+            meshLod.Triangles.Add(new Triangle(1, 0, 4));
             #endregion
 
             #region Lower Sides B
-            meshLod.Triangles.Add(new Triangle(5, 6, 1));
-            meshLod.Triangles.Add(new Triangle(6, 1, 2));
+            meshLod.Triangles.Add(new Triangle(1, 5, 6));
+            meshLod.Triangles.Add(new Triangle(2, 1, 6));
             #endregion
 
             #region Lower Sides C
-            meshLod.Triangles.Add(new Triangle(6, 7, 2));
-            meshLod.Triangles.Add(new Triangle(7, 2, 3));
+            meshLod.Triangles.Add(new Triangle(2, 6, 7));
+            meshLod.Triangles.Add(new Triangle(3, 2, 7));
             #endregion
 
             #region Lower Sides D
-            meshLod.Triangles.Add(new Triangle(4, 7, 3));
+            meshLod.Triangles.Add(new Triangle(4, 3, 7));
             meshLod.Triangles.Add(new Triangle(4, 0, 3));
             #endregion
 
             #region Upper Sides A
             meshLod.Triangles.Add(new Triangle(0, 1, 8));
-            meshLod.Triangles.Add(new Triangle(1, 8, 9));
+            meshLod.Triangles.Add(new Triangle(8, 1, 9));
             #endregion
 
             #region Upper Sides B
             meshLod.Triangles.Add(new Triangle(1, 2, 9));
-            meshLod.Triangles.Add(new Triangle(2, 9, 10));
+            meshLod.Triangles.Add(new Triangle(9, 2, 10));
             #endregion
 
             #region Upper Sides C
             meshLod.Triangles.Add(new Triangle(2, 3, 10));
-            meshLod.Triangles.Add(new Triangle(3, 10, 11));
+            meshLod.Triangles.Add(new Triangle(10, 3, 11));
             #endregion
 
             #region Upper Sides D
@@ -150,7 +147,12 @@ namespace SilverSim.Scene.Physics.ShapeManager
             meshLod.Triangles.Add(new Triangle(3, 8, 11));
             #endregion
 
-            return DecomposeConvex(meshLod);
+            PhysicsConvexShape shape = DecomposeConvex(meshLod);
+#if DEBUG
+            meshLod.DumpToBlenderRaw("../data/avatarcapsule.raw");
+            shape.DumpToBlenderRaw("../data/avatarhull.raw");
+#endif
+            return shape;
         }
 
         public PhysicsShapeReference DefaultAvatarConvexShape { get; private set;}

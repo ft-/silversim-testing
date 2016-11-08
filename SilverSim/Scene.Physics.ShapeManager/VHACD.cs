@@ -45,15 +45,15 @@ namespace SilverSim.Scene.Physics.ShapeManager
             {
                 Resolution = 100000;
                 Depth = 20;
-                Concavity = 0.001;
+                Concavity = 0.0025;
                 PlaneDownsampling = 4;
                 ConvexhullDownsampling = 4;
                 Alpha = 0.05;
                 Beta = 0.05;
-                Gamma = 0.0005;
+                Gamma = 0.00125;
                 Pca = 0;
                 Mode = 0; // 0: voxel-based (recommended), 1: tetrahedron-based
-                MaxNumVerticesPerCH = 64;
+                MaxNumVerticesPerCH = 32;
                 MinVolumePerCH = 0.0001;
                 Callback = IntPtr.Zero;
                 Logger = IntPtr.Zero;
@@ -140,14 +140,15 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
 
             PhysicsConvexShape shape = new PhysicsConvexShape();
-            for(uint hullidx = 0; hullidx < VHacd_GetNConvexHulls(m_VHacd); ++hullidx)
+            int numhulls = VHacd_GetNConvexHulls(m_VHacd);
+            for (uint hullidx = 0; hullidx < numhulls; ++hullidx)
             {
                 ConvexHull hull = new ConvexHull();
                 VHacd_GetConvexHull(m_VHacd, hullidx, ref hull);
                 double[] resPoints = new double[hull.NumPoints * 3];
                 Marshal.Copy(hull.Points, resPoints, 0, hull.NumPoints * 3);
-                int[] resTris = new int[hull.NumTriangles];
-                Marshal.Copy(hull.Triangles, resTris, 0, hull.NumTriangles);
+                int[] resTris = new int[hull.NumTriangles * 3];
+                Marshal.Copy(hull.Triangles, resTris, 0, hull.NumTriangles * 3);
 
                 PhysicsConvexShape.ConvexHull cHull = new PhysicsConvexShape.ConvexHull();
                 for (int vertidx = 0; vertidx < hull.NumPoints * 3; vertidx += 3)
@@ -159,7 +160,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 }
 
                 int vCount = cHull.Vertices.Count;
-                for(int triidx = 0; triidx < hull.NumTriangles; ++triidx)
+                for(int triidx = 0; triidx < hull.NumTriangles * 3; ++triidx)
                 {
                     int tri = resTris[triidx];
                     if(tri >= vCount || tri < 0)

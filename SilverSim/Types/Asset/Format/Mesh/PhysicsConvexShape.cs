@@ -4,6 +4,7 @@
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace SilverSim.Types.Asset.Format.Mesh
@@ -217,6 +218,30 @@ namespace SilverSim.Types.Asset.Format.Mesh
             else
             {
                 throw new NoSuchMeshDataException();
+            }
+        }
+
+        static string VertexToString(Vector3 v)
+        {
+            return string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
+        }
+
+        public void DumpToBlenderRaw(string filename)
+        {
+            /* write a blender .raw */
+            using (StreamWriter w = new StreamWriter(filename))
+            {
+                foreach(ConvexHull hull in Hulls)
+                {
+                    int triidx;
+                    for(triidx = 0; triidx < hull.Triangles.Count; triidx += 3)
+                    {
+                        w.WriteLine("{0} {1} {2}",
+                            VertexToString(hull.Vertices[hull.Triangles[triidx + 0]]),
+                            VertexToString(hull.Vertices[hull.Triangles[triidx + 1]]),
+                            VertexToString(hull.Vertices[hull.Triangles[triidx + 2]]));
+                    }
+                }
             }
         }
     }
