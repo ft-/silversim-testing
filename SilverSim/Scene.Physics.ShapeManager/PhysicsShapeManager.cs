@@ -6,6 +6,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Mesh;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -16,7 +17,7 @@ using System.Threading;
 namespace SilverSim.Scene.Physics.ShapeManager
 {
     /** <summary>PhysicsShapeManager provides a common accessor to Convex Hull generation from primitives</summary> */
-    public sealed class PhysicsShapeManager : IPlugin
+    public sealed class PhysicsShapeManager : IPlugin, IPhysicsHacdCleanCache
     {
         AssetServiceInterface m_AssetService;
         SimulationDataStorageInterface m_SimulationStorage;
@@ -376,6 +377,20 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
 
             return true;
+        }
+
+        void IPhysicsHacdCleanCache.CleanCache()
+        {
+            m_ConvexShapesBySculptMesh.Clear();
+            m_ConvexShapesByPrimShape.Clear();
+        }
+
+        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder
+        {
+            get
+            {
+                return HacdCleanCacheOrder.PhysicsShapeManager;
+            }
         }
     }
 
