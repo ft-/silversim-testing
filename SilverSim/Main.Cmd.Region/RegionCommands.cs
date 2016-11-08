@@ -10,6 +10,7 @@ using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
@@ -124,6 +125,7 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.DisableCommands.Add("script", DisableScriptCmd);
             loader.CommandRegistry.EnableCommands.Add("scripts", EnableScriptsCmd);
             loader.CommandRegistry.ShowCommands.Add("scripts", ShowScriptsCmd);
+            loader.CommandRegistry.ClearCommands.Add("hacdcache", ClearHacdCacheCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -195,6 +197,66 @@ namespace SilverSim.Main.Cmd.Region
                 return false;
             }
             return true;
+        }
+
+        [Description("Clear HACD cache")]
+        void ClearHacdCacheCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(args[0] == "help")
+            {
+                io.Write("clear hacdcache\nOnly use this command in case of physics having wrong shapes loaded. \nAll regions have to be restarted.");
+            }
+            else if(limitedToScene != UUID.Zero)
+            {
+                io.Write("clearing HACD cache cannot be done on limited console.");
+            }
+            else
+            {
+                List<IPhysicsHacdCleanCache> beforePsm = new List<IPhysicsHacdCleanCache>();
+                List<IPhysicsHacdCleanCache> withPsm = new List<IPhysicsHacdCleanCache>();
+                List<IPhysicsHacdCleanCache> afterPsm = new List<IPhysicsHacdCleanCache>();
+                foreach(IPhysicsHacdCleanCache service in m_Loader.GetServicesByValue<IPhysicsHacdCleanCache>())
+                {
+                    switch(service.CleanOrder)
+                    {
+                        case HacdCleanCacheOrder.BeforePhysicsShapeManager:
+                            beforePsm.Add(service);
+                            break;
+
+                        case HacdCleanCacheOrder.PhysicsShapeManager:
+                            withPsm.Add(service);
+                            break;
+
+                        case HacdCleanCacheOrder.AfterPhysicsShapeManager:
+                            afterPsm.Add(service);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                try
+                {
+                    foreach (IPhysicsHacdCleanCache service in beforePsm)
+                    {
+                        service.CleanCache();
+                    }
+                    foreach (IPhysicsHacdCleanCache service in withPsm)
+                    {
+                        service.CleanCache();
+                    }
+                    foreach (IPhysicsHacdCleanCache service in afterPsm)
+                    {
+                        service.CleanCache();
+                    }
+                    io.Write("Restart all regions now for rebuilding HACD data.");
+                }
+                catch(Exception e)
+                {
+                    io.WriteFormatted("Could not clean HACD cache: {0}", e.Message);
+                }
+            }
         }
 
         void ShowScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)

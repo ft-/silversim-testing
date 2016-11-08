@@ -5,13 +5,14 @@ using MySql.Data.MySqlClient;
 using SilverSim.Database.MySQL._Migration;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    partial class MySQLSimulationDataStorage : ISimulationDataPhysicsConvexStorageInterface
+    partial class MySQLSimulationDataStorage : ISimulationDataPhysicsConvexStorageInterface, IPhysicsHacdCleanCache
     {
         static readonly IMigrationElement[] Migrations_Physics = new IMigrationElement[]
         {
@@ -223,6 +224,20 @@ namespace SilverSim.Database.MySQL.SimulationData
                         cmd.ExecuteNonQuery();
                     }
                 });
+            }
+        }
+
+
+        void IPhysicsHacdCleanCache.CleanCache()
+        {
+            ((ISimulationDataPhysicsConvexStorageInterface)this).RemoveAll();
+        }
+
+        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder
+        {
+            get
+            {
+                return HacdCleanCacheOrder.AfterPhysicsShapeManager;
             }
         }
     }

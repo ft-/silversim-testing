@@ -3,6 +3,7 @@
 
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
-    partial class MemorySimulationDataStorage : ISimulationDataPhysicsConvexStorageInterface
+    partial class MemorySimulationDataStorage : ISimulationDataPhysicsConvexStorageInterface, IPhysicsHacdCleanCache
     {
         readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesByMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
         readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
@@ -83,5 +84,17 @@ namespace SilverSim.Database.Memory.SimulationData
             m_ConvexShapesByPrimShape.Clear();
         }
 
+        void IPhysicsHacdCleanCache.CleanCache()
+        {
+            ((ISimulationDataPhysicsConvexStorageInterface)this).RemoveAll();
+        }
+
+        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder
+        {
+            get
+            {
+                return HacdCleanCacheOrder.BeforePhysicsShapeManager;
+            }
+        }
     }
 }
