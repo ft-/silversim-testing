@@ -3,21 +3,19 @@
 
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectGroup
     {
-        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
-
         public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
         {
             get
             {
-                return m_PhysicsActors;
+                throw new NotSupportedException();
             }
         }
 
@@ -25,62 +23,25 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_Lock)
-                {
-                    IPhysicsObject obj;
-                    SceneInterface scene = Scene;
-                    if (scene == null || !m_PhysicsActors.TryGetValue(scene.ID, out obj))
-                    {
-                        obj = DummyPhysicsObject.SharedInstance;
-                    }
-                    return obj;
-                }
+                return RootPart.PhysicsActor;
             }
         }
 
 
-        readonly object m_PhysicsUpdateLock = new object();
         public void PhysicsUpdate(PhysicsStateData value)
         {
-            lock (m_PhysicsUpdateLock)
-            {
-                if (Scene.ID == value.SceneID)
-                {
-                    Position = value.Position;
-                    Rotation = value.Rotation;
-                    Velocity = value.Velocity;
-                    AngularVelocity = value.AngularVelocity;
-                    Acceleration = value.Acceleration;
-                    AngularAcceleration = value.AngularAcceleration;
-                }
-            }
+            throw new NotSupportedException();
         }
-
-        #region Fields
-        bool m_IsPhantom;
-        bool m_IsPhysics;
-        bool m_IsVolumeDetect;
-        double m_Buoyancy;
-        bool m_IsRotateXEnabled = true;
-        bool m_IsRotateYEnabled = true;
-        bool m_IsRotateZEnabled = true;
-
-        public readonly VehicleParams VehicleParams = new VehicleParams();
-
-        #endregion
 
         public bool IsRotateXEnabled
         {
             get
             {
-                return m_IsRotateXEnabled;
+                return RootPart.IsRotateXEnabled;
             }
             set
             {
-                m_IsRotateXEnabled = value;
-                PhysicsActor.IsRotateXEnabled = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart.IsRotateXEnabled = value;
             }
         }
 
@@ -88,14 +49,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_IsRotateYEnabled;
+                return RootPart.IsRotateYEnabled;
             }
             set
             {
-                m_IsRotateYEnabled = value;
-                PhysicsActor.IsRotateYEnabled = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart.IsRotateYEnabled = value;
             }
         }
 
@@ -103,29 +61,31 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_IsRotateZEnabled;
+                return RootPart.IsRotateZEnabled;
             }
             set
             {
-                m_IsRotateZEnabled = value;
-                PhysicsActor.IsRotateZEnabled = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart.IsRotateZEnabled = value;
             }
         }
+
+        object m_PhysicsLinksetUpdateLock = new object();
 
         public bool IsPhantom
         {
             get
             {
-                return m_IsPhantom;
+                return RootPart.IsPhantom;
             }
             set
             {
-                m_IsPhantom = value;
-                PhysicsActor.IsPhantom = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        part.IsPhantom = value;
+                    }
+                }
             }
         }
 
@@ -133,14 +93,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_IsPhysics;
+                return RootPart.IsPhysics;
             }
             set
             {
-                m_IsPhysics = value;
-                PhysicsActor.IsPhysicsActive = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        part.IsPhysics = value;
+                    }
+                }
             }
         }
 
@@ -148,14 +111,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_IsVolumeDetect;
+                return RootPart.IsVolumeDetect;
             }
             set
             {
-                m_IsVolumeDetect = value;
-                PhysicsActor.IsVolumeDetect = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        part.IsVolumeDetect = value;
+                    }
+                }
             }
         }
 
@@ -163,14 +129,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_Buoyancy;
+                return RootPart.Buoyancy;
             }
             set
             {
-                m_Buoyancy = value;
-                PhysicsActor.Buoyancy = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart.Buoyancy = value;
             }
         }
 
@@ -178,54 +141,44 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return VehicleParams.VehicleType;
+                return RootPart.VehicleType;
             }
             set
             {
-                VehicleParams.VehicleType = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart.VehicleType = value;
             }
         }
         public VehicleFlags VehicleFlags
         {
             get
             {
-                return VehicleParams.Flags;
+                return RootPart.VehicleFlags;
             }
             set
             {
-                VehicleParams.Flags = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart.VehicleFlags = value;
             }
         }
 
         public void SetVehicleFlags(VehicleFlags value)
-        { 
-            VehicleParams.SetFlags(value);
-            IsChanged = m_IsChangedEnabled;
-            TriggerOnUpdate(UpdateChangedFlags.Physics);
+        {
+            RootPart.SetVehicleFlags(value);
         }
 
         public void ClearVehicleFlags(VehicleFlags value) 
         {
-            VehicleParams.ClearFlags(value);
-            IsChanged = m_IsChangedEnabled;
-            TriggerOnUpdate(UpdateChangedFlags.Physics);
+            RootPart.ClearVehicleFlags(value);
         }
 
         public Quaternion this[VehicleRotationParamId id]
         {
             get
             {
-                return VehicleParams[id];
+                return RootPart[id];
             }
             set
             {
-                VehicleParams[id] = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart[id] = value;
             }
         }
 
@@ -233,13 +186,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return VehicleParams[id];
+                return RootPart[id];
             }
             set
             {
-                VehicleParams[id] = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart[id] = value;
             }
         }
 
@@ -247,13 +198,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return VehicleParams[id];
+                return RootPart[id];
             }
             set
             {
-                VehicleParams[id] = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                RootPart[id] = value;
             }
         }
     }

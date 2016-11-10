@@ -1616,12 +1616,11 @@ namespace SilverSim.Scene.Types.Object
                             throw new InvalidObjectXmlException();
                         }
 
-                        foreach(ObjectPart part in group.Values)
+                        foreach (ObjectPart part in group.Values)
                         {
-                            part.ObjectGroup = group;
                             part.Owner = currentOwner;
-                            part.UpdateData(ObjectPart.UpdateDataFlags.All);
                         }
+                        group.FinalizeObject();
                         return group;
 
                     default:
@@ -1632,8 +1631,15 @@ namespace SilverSim.Scene.Types.Object
 
         public void FinalizeObject()
         {
-            foreach (ObjectPart part in this.Values)
+            ObjectPart rootPart = RootPart;
+
+            foreach (ObjectPart part in Values)
             {
+                /* make those parameters align well */
+                part.IsPhantom = rootPart.IsPhantom;
+                part.IsPhysics = rootPart.IsPhysics;
+                part.IsVolumeDetect = rootPart.IsVolumeDetect;
+
                 part.ObjectGroup = this;
                 part.UpdateData(ObjectPart.UpdateDataFlags.All);
             }

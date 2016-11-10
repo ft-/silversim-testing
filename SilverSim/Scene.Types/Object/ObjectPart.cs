@@ -272,28 +272,6 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        #region Physics Linkage
-        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
-        {
-            get
-            {
-                throw new NotSupportedException();
-            }
-        }
-        public IPhysicsObject PhysicsActor
-        {
-            get
-            {
-                throw new NotSupportedException();
-            }
-        }
-
-        public void PhysicsUpdate(PhysicsStateData data)
-        {
-            /* intentionally left empty */
-        }
-        #endregion
-
         public void GetBoundingBox(out BoundingBox box)
         {
             box = new BoundingBox();
@@ -1359,117 +1337,6 @@ namespace SilverSim.Scene.Types.Object
             return true;
         }
 
-        #region Physics Properties
-
-        double m_Mass = 1;
-        double m_PhysicsDensity = 1000f;
-        double m_PhysicsFriction = 0.6f;
-        double m_PhysicsRestitution = 0.5f;
-        double m_PhysicsGravityMultiplier = 1f;
-
-        public double PhysicsDensity
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsDensity;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_PhysicsDensity = value;
-                }
-                IsChanged = m_IsChangedEnabled;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
-            }
-        }
-
-        public double Mass
-        {
-            get
-            {
-                lock(m_DataLock)
-                {
-                    return m_Mass;
-                }
-            }
-            set
-            {
-                lock(m_DataLock)
-                {
-                    m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
-                }
-            }
-        }
-
-        public double PhysicsFriction
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsFriction;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_PhysicsFriction = value;
-                }
-                IsChanged = m_IsChangedEnabled;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
-            }
-        }
-
-        public double PhysicsRestitution
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsRestitution;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_PhysicsRestitution = value;
-                }
-                IsChanged = m_IsChangedEnabled;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
-            }
-        }
-
-
-        public double PhysicsGravityMultiplier
-        {
-            get
-            {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsGravityMultiplier;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    m_PhysicsGravityMultiplier = value;
-                }
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
-            }
-        }
-        #endregion
-
         #region Position Properties
         public Vector3 Position
         {
@@ -2497,36 +2364,15 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "IsRotateXEnabled":
-                                if (null != rootGroup)
-                                {
-                                    rootGroup.IsRotateXEnabled = reader.ReadElementValueAsBoolean();
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
-                                }
+                                part.IsRotateXEnabled = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "IsRotateYEnabled":
-                                if (null != rootGroup)
-                                {
-                                    rootGroup.IsRotateYEnabled = reader.ReadElementValueAsBoolean();
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
-                                }
+                                part.IsRotateYEnabled = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "IsRotateZEnabled":
-                                if (null != rootGroup)
-                                {
-                                    rootGroup.IsRotateZEnabled = reader.ReadElementValueAsBoolean();
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
-                                }
+                                part.IsRotateZEnabled = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "PassTouch":
@@ -2950,10 +2796,6 @@ namespace SilverSim.Scene.Types.Object
                         /* get rid of every flag, we do create internally */
                         if (null != rootGroup)
                         {
-                            if ((part.Flags & PrimitiveFlags.Physics) != 0)
-                            {
-                                rootGroup.IsPhysics = true;
-                            }
                             if((part.Flags & PrimitiveFlags.Temporary) != 0)
                             {
                                 rootGroup.IsTemporary = true;
@@ -2962,10 +2804,14 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 rootGroup.IsTempOnRez = true;
                             }
-                            if((part.Flags & PrimitiveFlags.VolumeDetect) != 0)
-                            {
-                                rootGroup.IsVolumeDetect = true;
-                            }
+                        }
+                        if ((part.Flags & PrimitiveFlags.Physics) != 0)
+                        {
+                            part.IsPhysics = true;
+                        }
+                        if ((part.Flags & PrimitiveFlags.VolumeDetect) != 0)
+                        {
+                            part.IsVolumeDetect = true;
                         }
 
                         part.PassCollisionMode = !IsPassCollisions ?

@@ -50,6 +50,13 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<bool>("IsRotateXEnabled") { IsNullAllowed = false, Default = true },
             new AddColumn<bool>("IsRotateYEnabled") { IsNullAllowed = false, Default = true },
             new AddColumn<bool>("IsRotateZEnabled") { IsNullAllowed = false, Default = true },
+            new TableRevision(8),
+            new DropColumn("IsVolumeDetect"),
+            new DropColumn("IsPhantom"),
+            new DropColumn("IsPhysics"),
+            new DropColumn("IsRotateXEnabled"),
+            new DropColumn("IsRotateYEnabled"),
+            new DropColumn("IsRotateZEnabled"),
             #endregion
 
             #region Table prims
@@ -132,6 +139,13 @@ namespace SilverSim.Database.MySQL.SimulationData
             new DropColumn("IsPassCollisions"),
             new AddColumn<PassEventMode>("PassTouchMode") { IsNullAllowed = false, Default = PassEventMode.Always },
             new AddColumn<PassEventMode>("PassCollisionMode") { IsNullAllowed = false, Default = PassEventMode.IfNotHandled },
+            new TableRevision(11),
+            new AddColumn<bool>("IsVolumeDetect") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsPhantom") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsPhysics") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsRotateXEnabled") { IsNullAllowed = false, Default = true },
+            new AddColumn<bool>("IsRotateYEnabled") { IsNullAllowed = false, Default = true },
+            new AddColumn<bool>("IsRotateZEnabled") { IsNullAllowed = false, Default = true },
             #endregion
 
             #region Table primitems

@@ -71,12 +71,6 @@ namespace SilverSim.Database.MySQL.SimulationData
         ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader)
         {
             ObjectGroup objgroup = new ObjectGroup();
-            objgroup.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
-            objgroup.IsPhantom = dbReader.GetBool("IsPhantom");
-            objgroup.IsPhysics = dbReader.GetBool("IsPhysics");
-            objgroup.IsRotateXEnabled = dbReader.GetBool("IsRotateXEnabled");
-            objgroup.IsRotateYEnabled = dbReader.GetBool("IsRotateYEnabled");
-            objgroup.IsRotateZEnabled = dbReader.GetBool("IsRotateZEnabled");
             objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
             objgroup.Owner = dbReader.GetUUI("Owner");
             objgroup.LastOwner = dbReader.GetUUI("LastOwner");
@@ -183,6 +177,13 @@ namespace SilverSim.Database.MySQL.SimulationData
             objpart.PhysicsFriction = dbReader.GetDouble("PhysicsFriction");
             objpart.PhysicsRestitution = dbReader.GetDouble("PhysicsRestitution");
             objpart.PhysicsGravityMultiplier = dbReader.GetDouble("PhysicsGravityMultiplier");
+
+            objpart.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
+            objpart.IsPhantom = dbReader.GetBool("IsPhantom");
+            objpart.IsPhysics = dbReader.GetBool("IsPhysics");
+            objpart.IsRotateXEnabled = dbReader.GetBool("IsRotateXEnabled");
+            objpart.IsRotateYEnabled = dbReader.GetBool("IsRotateYEnabled");
+            objpart.IsRotateZEnabled = dbReader.GetBool("IsRotateZEnabled");
 
             return objpart;
         }

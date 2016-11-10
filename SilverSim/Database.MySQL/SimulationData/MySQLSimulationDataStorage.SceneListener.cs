@@ -398,12 +398,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 data.Add("ID", objgroup.ID);
                 data.Add("RegionID", objgroup.Scene.ID);
-                data.Add("IsRotateXEnabled", objgroup.IsRotateXEnabled);
-                data.Add("IsRotateYEnabled", objgroup.IsRotateYEnabled);
-                data.Add("IsRotateZEnabled", objgroup.IsRotateZEnabled);
-                data.Add("IsVolumeDetect", objgroup.IsVolumeDetect);
-                data.Add("IsPhantom", objgroup.IsPhantom);
-                data.Add("IsPhysics", objgroup.IsPhysics);
                 data.Add("IsTempOnRez", objgroup.IsTempOnRez);
                 data.Add("Owner", objgroup.Owner);
                 data.Add("LastOwner", objgroup.LastOwner);
@@ -481,6 +475,13 @@ namespace SilverSim.Database.MySQL.SimulationData
                 data.Add("PhysicsFriction", objpart.PhysicsFriction);
                 data.Add("PhysicsRestitution", objpart.PhysicsRestitution);
                 data.Add("PhysicsGravityMultiplier", objpart.PhysicsGravityMultiplier);
+
+                data.Add("IsRotateXEnabled", objpart.IsRotateXEnabled);
+                data.Add("IsRotateYEnabled", objpart.IsRotateYEnabled);
+                data.Add("IsRotateZEnabled", objpart.IsRotateZEnabled);
+                data.Add("IsVolumeDetect", objpart.IsVolumeDetect);
+                data.Add("IsPhantom", objpart.IsPhantom);
+                data.Add("IsPhysics", objpart.IsPhysics);
 
                 return data;
             }

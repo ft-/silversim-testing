@@ -6,7 +6,6 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -15,18 +14,18 @@ namespace SilverSim.Scene.Physics.Common
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract class ObjectController : CommonPhysicsController, IPhysicsObject
     {
-        protected ObjectGroup m_Group;
+        protected ObjectPart m_Part;
         protected VehicleMotor m_Vehicle;
         protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
         protected UUID SceneID { get; private set; }
 
-        protected ObjectController(ObjectGroup part, UUID sceneID)
+        protected ObjectController(ObjectPart part, UUID sceneID)
         {
             SceneID = sceneID;
             m_StateData = new PhysicsStateData(part, sceneID);
-            m_Group = part;
-            m_Vehicle = m_Group.VehicleParams.GetMotor();
+            m_Part = part;
+            m_Vehicle = part.VehicleParams.GetMotor();
         }
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
@@ -82,7 +81,7 @@ namespace SilverSim.Scene.Physics.Common
             {
                 lock(m_Lock)
                 {
-                    foreach(ObjectPart part in m_Group.ValuesByKey1)
+                    foreach(ObjectPart part in m_Part.ObjectGroup.ValuesByKey1)
                     {
                         m_Mass += part.Mass;
                     }
@@ -160,7 +159,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             Vector3 inertia = Vector3.One / 100000; /* introduce a very little mass to prevent 0 */
             double totalLinearMass = 0.000001; /* introduce a very little mass to prevent 0 */
-            foreach(ObjectPart part in m_Group.Values)
+            foreach(ObjectPart part in m_Part.ObjectGroup.Values)
             {
                 Vector3 pos = part.LocalPosition;
                 double m = part.Mass;
@@ -178,31 +177,36 @@ namespace SilverSim.Scene.Physics.Common
 
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 vehicleTorque)
         {
+            ObjectGroup grp = m_Part.ObjectGroup;
             List<PositionalForce> forces = new List<PositionalForce>();
             vehicleTorque = Vector3.Zero;
+            if (grp == null || grp.RootPart != m_Part)
+            {
+                return forces;
+            }
             if (!IsPhysicsActive)
             {
                 return forces;
             }
 
-            forces.Add(new PositionalForce(BuoyancyMotor(m_Group), Vector3.Zero));
-            forces.Add(new PositionalForce(GravityMotor(m_Group), Vector3.Zero));
-            forces.Add(new PositionalForce(HoverMotor(m_Group), Vector3.Zero));
+            forces.Add(new PositionalForce(BuoyancyMotor(m_Part), Vector3.Zero));
+            forces.Add(new PositionalForce(GravityMotor(m_Part), Vector3.Zero));
+            forces.Add(new PositionalForce(HoverMotor(m_Part), Vector3.Zero));
 
-            foreach (KeyValuePair<UUID, Vector3> kvp in m_Group.AttachedForces)
+            foreach (KeyValuePair<UUID, Vector3> kvp in grp.AttachedForces)
             {
                 ObjectPart part;
-                if (m_Group.TryGetValue(kvp.Key, out part))
+                if (grp.TryGetValue(kvp.Key, out part))
                 {
                     forces.Add(new PositionalForce(kvp.Value, part.LocalPosition));
                 }
             }
 
-            VehicleParams vehicleParams = m_Group.VehicleParams;
+            VehicleParams vehicleParams = m_Part.VehicleParams;
             if (vehicleParams.VehicleType != VehicleType.None)
             {
 
-                m_Vehicle.Process(dt, m_StateData, m_Group.Scene, Mass, m_Group.PhysicsGravityMultiplier * CombinedGravityAccelerationConstant);
+                m_Vehicle.Process(dt, m_StateData, grp.Scene, Mass, m_Part.PhysicsGravityMultiplier * CombinedGravityAccelerationConstant);
                 forces.Add(new PositionalForce(m_Vehicle.LinearForce, Vector3.Zero));
                 vehicleTorque = m_Vehicle.AngularTorque;
             }

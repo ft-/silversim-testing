@@ -63,12 +63,6 @@ namespace SilverSim.Database.Memory.SimulationData
         ObjectGroup ObjectGroupFromMap(Map map)
         {
             ObjectGroup objgroup = new ObjectGroup();
-            objgroup.IsRotateXEnabled = map["IsRotateXEnabled"].AsBoolean;
-            objgroup.IsRotateYEnabled = map["IsRotateYEnabled"].AsBoolean;
-            objgroup.IsRotateZEnabled = map["IsRotateZEnabled"].AsBoolean;
-            objgroup.IsVolumeDetect = map["IsVolumeDetect"].AsBoolean;
-            objgroup.IsPhantom = map["IsPhantom"].AsBoolean;
-            objgroup.IsPhysics = map["IsPhysics"].AsBoolean;
             objgroup.IsTempOnRez = map["IsTempOnRez"].AsBoolean;
             objgroup.Owner = new UUI(map["Owner"].ToString());
             objgroup.LastOwner = new UUI(map["LastOwner"].ToString());
@@ -175,6 +169,13 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.PhysicsFriction = map["PhysicsFriction"].AsReal;
             objpart.PhysicsRestitution = map["PhysicsRestitution"].AsReal;
             objpart.PhysicsGravityMultiplier = map["PhysicsGravityMultiplier"].AsReal;
+
+            objpart.IsRotateXEnabled = map["IsRotateXEnabled"].AsBoolean;
+            objpart.IsRotateYEnabled = map["IsRotateYEnabled"].AsBoolean;
+            objpart.IsRotateZEnabled = map["IsRotateZEnabled"].AsBoolean;
+            objpart.IsVolumeDetect = map["IsVolumeDetect"].AsBoolean;
+            objpart.IsPhantom = map["IsPhantom"].AsBoolean;
+            objpart.IsPhysics = map["IsPhysics"].AsBoolean;
 
             return objpart;
         }
