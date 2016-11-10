@@ -1,7 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 
@@ -41,12 +40,12 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         #region Gravity and Buoyancy
-        protected double GravityConstant(IObject obj)
+        protected double GravityConstant(IPhysicalObject obj)
         {
             return obj.PhysicsActor.Mass * CombinedGravityAccelerationConstant * obj.PhysicsGravityMultiplier;
         }
 
-        protected Vector3 GravityMotor(IObject obj)
+        protected Vector3 GravityMotor(IPhysicalObject obj)
         {
             return new Vector3(0, 0, -GravityConstant(obj));
         }
@@ -67,7 +66,7 @@ namespace SilverSim.Scene.Physics.Common
         }
 
 
-        protected Vector3 BuoyancyMotor(IObject obj)
+        protected Vector3 BuoyancyMotor(IPhysicalObject obj)
         {
             return new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
         }
@@ -76,7 +75,7 @@ namespace SilverSim.Scene.Physics.Common
         #region Hover Motor
         double m_HoverHeight;
         bool m_HoverEnabled;
-        protected Vector3 HoverMotor(IObject obj)
+        protected Vector3 HoverMotor(IPhysicalObject obj)
         {
             if (m_HoverEnabled)
             {
@@ -92,14 +91,14 @@ namespace SilverSim.Scene.Physics.Common
         #endregion
 
         #region Target Velocity Motor
-        protected Vector3 TargetVelocityMotor(IObject obj, Vector3 targetvel, double factor)
+        protected Vector3 TargetVelocityMotor(IPhysicalObject obj, Vector3 targetvel, double factor)
         {
             return (targetvel - obj.Velocity) * factor;
         }
         #endregion
 
         #region Target Rotation Motor
-        protected Vector3 TargetRotationMotor(IObject obj, Quaternion targetrot, double factor)
+        protected Vector3 TargetRotationMotor(IPhysicalObject obj, Quaternion targetrot, double factor)
         {
             return (targetrot / obj.Rotation).AsVector3 * factor;
         }

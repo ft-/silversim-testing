@@ -33,9 +33,10 @@ namespace SilverSim.Scene.Types.Physics
         {
             if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
+                IAgent agent = (IAgent)obj;
                 IPhysicsObject physobj;
-                m_Agents.Remove(obj);
-                obj.PhysicsActors.Remove(m_SceneID, out physobj);
+                m_Agents.Remove(agent);
+                agent.PhysicsActors.Remove(m_SceneID, out physobj);
             }
         }
 

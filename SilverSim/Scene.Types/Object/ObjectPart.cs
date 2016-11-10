@@ -25,7 +25,7 @@ using System.Xml;
 namespace SilverSim.Scene.Types.Object
 {
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
-    public partial class ObjectPart : IObject
+    public partial class ObjectPart : IPhysicalObject
     {
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
 

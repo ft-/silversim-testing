@@ -176,17 +176,6 @@ namespace SilverSim.Scene.Types.Object
             get;
         }
 
-        RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
-        {
-            get;
-        }
-    
-        IPhysicsObject PhysicsActor
-        {
-            get;
-        }
-
-        void PhysicsUpdate(PhysicsStateData data);
         #endregion
 
         #region Methods
@@ -197,6 +186,21 @@ namespace SilverSim.Scene.Types.Object
         DetectedTypeFlags DetectedType { get; }
         void PostEvent(IScriptEvent ev);
         #endregion
+    }
+
+    public interface IPhysicalObject : IObject
+    {
+        RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
+        {
+            get;
+        }
+
+        IPhysicsObject PhysicsActor
+        {
+            get;
+        }
+
+        void PhysicsUpdate(PhysicsStateData data);
     }
 
     #region Params Helper

@@ -35,7 +35,7 @@ using System.Globalization;
 
 namespace SilverSim.Scene.Types.Agent
 {
-    public interface IAgent : IObject, ISceneListener
+    public interface IAgent : IPhysicalObject, ISceneListener
     {
         string DisplayName { get; set; }
         string FirstName { get; set; }
