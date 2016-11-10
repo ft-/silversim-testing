@@ -141,7 +141,7 @@ namespace SilverSim.Scene.Types.Object
                     IPhysicsObject obj;
                     ObjectGroup group = ObjectGroup;
                     SceneInterface scene = null;
-                    if (null == group)
+                    if (null != group)
                     {
                         scene = group.Scene;
                     }
