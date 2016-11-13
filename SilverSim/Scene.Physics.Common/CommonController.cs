@@ -27,7 +27,7 @@ namespace SilverSim.Scene.Physics.Common
 
         }
 
-        protected struct PositionalForce
+        public struct PositionalForce
         {
             public Vector3 Force;
             public Vector3 LocalPosition;
