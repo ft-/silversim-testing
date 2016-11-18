@@ -31,12 +31,15 @@ using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using System;
+using System.Linq;
 using System.Collections.Generic;
+using log4net;
 
 namespace SilverSim.Scene.Agent
 {
     public abstract partial class Agent : IAgent
     {
+        static ILog m_Log = LogManager.GetLogger("AGENT");
         protected readonly object m_DataLock = new object();
 
         #region Agent fields
@@ -95,7 +98,24 @@ namespace SilverSim.Scene.Agent
             box.Size = Size * Rotation;
         }
 
-        public abstract void InvokeOnPositionUpdate();
+        public virtual void InvokeOnPositionUpdate()
+        {
+            var ev = OnPositionChange; /* events are not exactly thread-safe */
+            if (null != ev)
+            {
+                foreach (Action<IObject> del in ev.GetInvocationList().OfType<Action<IObject>>())
+                {
+                    try
+                    {
+                        del(this);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Debug("Exception during OnPositionUpdate processing", e);
+                    }
+                }
+            }
+        }
 
         #region IObject Properties
 
@@ -830,7 +850,7 @@ namespace SilverSim.Scene.Agent
 
         UUID m_CurrentOutfitFolder = UUID.Zero;
 
-        public abstract event Action<IObject> OnPositionChange;
+        public event Action<IObject> OnPositionChange;
 
         public UUID CurrentOutfitFolder
         {

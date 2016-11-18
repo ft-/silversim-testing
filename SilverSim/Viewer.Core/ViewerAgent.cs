@@ -45,7 +45,6 @@ namespace SilverSim.Viewer.Core
     public partial class ViewerAgent : SilverSim.Scene.Agent.Agent
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
-        public override event Action<IObject> OnPositionChange;
         readonly SceneList m_Scenes;
 
         #region Agent fields
@@ -159,14 +158,8 @@ namespace SilverSim.Viewer.Core
         #region IObject Calls
         public override void InvokeOnPositionUpdate()
         {
-            var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
-            if (e != null)
-            {
-                foreach (Action<IObject> del in e.GetInvocationList().OfType<Action<IObject>>())
-                {
-                    del(this);
-                }
-            }
+            base.InvokeOnPositionUpdate();
+
             AgentCircuit c;
             if(Circuits.TryGetValue(SceneID, out c))
             {

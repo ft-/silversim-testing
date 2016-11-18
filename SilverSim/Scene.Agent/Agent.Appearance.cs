@@ -9,6 +9,7 @@ using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace SilverSim.Scene.Agent
@@ -57,11 +58,32 @@ namespace SilverSim.Scene.Agent
         private byte[] m_VisualParams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
         private readonly AppearanceInfo.AvatarTextureData m_TextureHashes = new AppearanceInfo.AvatarTextureData();
         private readonly AppearanceInfo.AvatarTextureData m_Textures = new AppearanceInfo.AvatarTextureData();
-        public double AvatarHeight;
+        public double AvatarHeight { get; private set; }
         public UInt32 Serial = 1;
         public const int MaxVisualParams = 260;
         protected const int NUM_AVATAR_TEXTURES = 21;
         private byte[] m_TextureEntry = new byte[0];
+
+        public Action<IAgent> OnAppearanceUpdate;
+
+        protected void InvokeOnAppearanceUpdate()
+        {
+            var ev = OnAppearanceUpdate; /* events are not exactly thread safe */
+            if(null != ev)
+            {
+                foreach(Action<IAgent> del in ev.GetInvocationList().OfType<Action<IAgent>>())
+                {
+                    try
+                    {
+                        del(this);
+                    }
+                    catch(Exception e)
+                    {
+                        m_Log.Debug("Exception on OnAppearanceUpdate", e);
+                    }
+                }
+            }
+        }
 
         public AppearanceInfo.AvatarTextureData Textures
         {
@@ -116,6 +138,7 @@ namespace SilverSim.Scene.Agent
                 {
                     m_VisualParamsLock.ReleaseWriterLock();
                 }
+                InvokeOnAppearanceUpdate();
             }
         }
 
@@ -177,6 +200,7 @@ namespace SilverSim.Scene.Agent
                     Textures.All = value.AvatarTextures.All;
                     //value.Attachments;
                 }
+                InvokeOnAppearanceUpdate();
             }
         }
 

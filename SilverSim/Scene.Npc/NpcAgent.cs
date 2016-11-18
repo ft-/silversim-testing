@@ -35,7 +35,6 @@ namespace SilverSim.Scene.Npc
 {
     public partial class NpcAgent : Agent.Agent
     {
-        public override event Action<IObject> OnPositionChange;
         private static readonly ILog m_Log = LogManager.GetLogger("NPC AGENT");
 
         InventoryServiceInterface m_InventoryService = null;
@@ -516,14 +515,7 @@ namespace SilverSim.Scene.Npc
 
         public override void InvokeOnPositionUpdate()
         {
-            var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
-            if (e != null)
-            {
-                foreach (Action<IObject> del in e.GetInvocationList().OfType<Action<IObject>>())
-                {
-                    del(this);
-                }
-            }
+            base.InvokeOnPositionUpdate();
 
             SceneInterface currentScene = CurrentScene;
             if(null != currentScene)
