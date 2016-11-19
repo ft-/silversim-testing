@@ -127,10 +127,26 @@ namespace SilverSim.Scene.Agent
             }
             set
             {
+                bool updated = false;
                 m_VisualParamsLock.AcquireWriterLock(-1);
                 try
                 {
                     int VisualParamCount = MaxVisualParams < value.Length ? MaxVisualParams : value.Length;
+                    if(VisualParamCount == m_VisualParams.Length)
+                    {
+                        int i;
+                        for(i = 0; i < m_VisualParams.Length; ++i)
+                        {
+                            if(m_VisualParams[i] != value[i])
+                            {
+                                updated = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        updated = true;
+                    }
                     m_VisualParams = new byte[VisualParamCount];
                     Buffer.BlockCopy(value, 0, m_VisualParams, 0, VisualParamCount);
                 }
@@ -138,7 +154,13 @@ namespace SilverSim.Scene.Agent
                 {
                     m_VisualParamsLock.ReleaseWriterLock();
                 }
-                InvokeOnAppearanceUpdate();
+#if DEBUG
+                m_Log.DebugFormat("VisualParams property setter called for {0}: updated={1}", Owner.FullName, updated);
+#endif
+                if (updated)
+                {
+                    InvokeOnAppearanceUpdate();
+                }
             }
         }
 
@@ -200,6 +222,9 @@ namespace SilverSim.Scene.Agent
                     Textures.All = value.AvatarTextures.All;
                     //value.Attachments;
                 }
+#if DEBUG
+                m_Log.DebugFormat("Appearance property setter called for {0}", Owner.FullName);
+#endif
                 InvokeOnAppearanceUpdate();
             }
         }
