@@ -54,7 +54,7 @@ namespace SilverSim.Types
 
         public Date(string v)
         {
-            DateTime.ParseExact(v, DateFormats, EnUsCulture, DateTimeStyles.None);
+            DateTime.ParseExact(v, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None);
         }
 
         public Date(byte[] data, int pos)
@@ -203,7 +203,6 @@ namespace SilverSim.Types
         #endregion
 
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0);
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
         private static readonly string[] DateFormats = new string[2]
         {
             "yyyy-MM-ddTHH:mm:ssZ",

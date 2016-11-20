@@ -66,7 +66,7 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            return string.Format(EnUsCulture, "{0}", m_Value);
+            return string.Format(CultureInfo.InvariantCulture, "{0}", m_Value);
         }
 
         #region Serialization
@@ -79,7 +79,7 @@ namespace SilverSim.Types
 
                 Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 8);
 
-                System.Array.Reverse(conversionBuffer, 0, 8);
+                Array.Reverse(conversionBuffer, 0, 8);
 
                 m_Value = BitConverter.ToSingle(conversionBuffer, 0);
             }
@@ -96,7 +96,7 @@ namespace SilverSim.Types
 
             if (!BitConverter.IsLittleEndian)
             {
-                System.Array.Reverse(dest, pos + 0, 8);
+                Array.Reverse(dest, pos + 0, 8);
             }
         }
         #endregion Serialization
@@ -191,14 +191,14 @@ namespace SilverSim.Types
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static Real Parse(string v)
         {
-            return new Real(Double.Parse(v.Trim(), EnUsCulture));
+            return new Real(Double.Parse(v.Trim(), CultureInfo.InvariantCulture));
         }
 
         public static bool TryParse(string v, out Real res)
         {
             res = default(Real);
             double f;
-            if(!Double.TryParse(v.Trim(), NumberStyles.Float, EnUsCulture, out f))
+            if(!Double.TryParse(v.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out f))
             {
                 return false;
             }
@@ -218,8 +218,5 @@ namespace SilverSim.Types
         public int AsInt { get { return (int)m_Value; } }
         public ulong AsULong { get { return (ulong)m_Value; } }
         #endregion
-
-
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
     }
 }

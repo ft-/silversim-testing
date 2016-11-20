@@ -139,7 +139,7 @@ namespace SilverSim.Scene.Agent
                 {
                     Vector3 eulers = LocalRotation.GetEulerAngles();
                     Vector3 l = GlobalPosition;
-                    l.Z += AvatarHeight / 2;
+                    l.Z += Size.Z / 2;
                     Quaternion q = Quaternion.CreateFromEulers(0, 0, eulers.Z);
                     bool unsit = false;
                     if (null != m_SittingOnObject && value == null)

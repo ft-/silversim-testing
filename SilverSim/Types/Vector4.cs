@@ -342,10 +342,10 @@ namespace SilverSim.Types
             double z;
             double w;
 
-            if(!double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
-                !double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
-                !double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z) ||
-                !double.TryParse(split[3], NumberStyles.Float, EnUsCulture, out w))
+            if(!double.TryParse(split[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) ||
+                !double.TryParse(split[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y) ||
+                !double.TryParse(split[2], NumberStyles.Float, CultureInfo.InvariantCulture, out z) ||
+                !double.TryParse(split[3], NumberStyles.Float, CultureInfo.InvariantCulture, out w))
             {
                 return false;
             }
@@ -377,7 +377,7 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            return String.Format(EnUsCulture, "<{0}, {1}, {2}, {3}>", X, Y, Z, W);
+            return String.Format(CultureInfo.InvariantCulture, "<{0}, {1}, {2}, {3}>", X, Y, Z, W);
         }
 
         #endregion Overrides
@@ -465,7 +465,5 @@ namespace SilverSim.Types
         public readonly static Vector4 UnitY = new Vector4(0f, 1f, 0f, 0f);
         public readonly static Vector4 UnitZ = new Vector4(0f, 0f, 1f, 0f);
         public readonly static Vector4 UnitW = new Vector4(0f, 0f, 0f, 1f);
-
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
     }
 }

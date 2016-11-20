@@ -54,7 +54,7 @@ namespace SilverSim.Viewer.Core
             m_TextureEntry = m.ObjectData;
             
             VisualParams = m.VisualParams;
-            AvatarHeight = m.Size.Z;
+            Size = m.Size;
             Messages.Appearance.AvatarAppearance res = new Messages.Appearance.AvatarAppearance();
             res.Sender = ID;
             res.IsTrial = false;

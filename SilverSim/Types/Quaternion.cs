@@ -518,9 +518,9 @@ namespace SilverSim.Types
             double y;
             double z;
             double w;
-            if(!double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
-               !double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
-                !double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z))
+            if(!double.TryParse(split[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) ||
+               !double.TryParse(split[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y) ||
+                !double.TryParse(split[2], NumberStyles.Float, CultureInfo.InvariantCulture, out z))
             {
                 return false;
             }
@@ -530,7 +530,7 @@ namespace SilverSim.Types
             }
             else
             {
-                if (!double.TryParse(split[3], NumberStyles.Float, EnUsCulture, out w))
+                if (!double.TryParse(split[3], NumberStyles.Float, CultureInfo.InvariantCulture, out w))
                 {
                     return false;
                 }
@@ -700,14 +700,14 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            return string.Format(EnUsCulture, "<{0},{1},{2},{3}>", X, Y, Z, W);
+            return string.Format(CultureInfo.InvariantCulture, "<{0},{1},{2},{3}>", X, Y, Z, W);
         }
 
         public string X_String
         {
             get
             {
-                return string.Format(EnUsCulture, "{0}", X);
+                return string.Format(CultureInfo.InvariantCulture, "{0}", X);
             }
         }
 
@@ -715,7 +715,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return string.Format(EnUsCulture, "{0}", Y);
+                return string.Format(CultureInfo.InvariantCulture, "{0}", Y);
             }
         }
 
@@ -723,7 +723,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return string.Format(EnUsCulture, "{0}", Z);
+                return string.Format(CultureInfo.InvariantCulture, "{0}", Z);
             }
         }
 
@@ -731,7 +731,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return string.Format(EnUsCulture, "{0}", W);
+                return string.Format(CultureInfo.InvariantCulture, "{0}", W);
             }
         }
 
@@ -975,7 +975,5 @@ namespace SilverSim.Types
 
         /// <summary>A quaternion with a value of 0,0,0,1</summary>
         public readonly static Quaternion Identity = new Quaternion(0f, 0f, 0f, 1f);
-
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
     }
 }

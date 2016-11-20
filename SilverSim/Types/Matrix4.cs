@@ -1053,7 +1053,7 @@ namespace SilverSim.Types
         [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
         public override string ToString()
         {
-            return string.Format(EnUsCulture,
+            return string.Format(CultureInfo.InvariantCulture,
                 "|{0}, {1}, {2}, {3}|\n|{4}, {5}, {6}, {7}|\n|{8}, {9}, {10}, {11}|\n|{12}, {13}, {14}, {15}|",
                 M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44);
         }
@@ -1237,7 +1237,5 @@ namespace SilverSim.Types
             0f, 1f, 0f, 0f,
             0f, 0f, 1f, 0f,
             0f, 0f, 0f, 1f);
-
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
     }
 }

@@ -218,9 +218,9 @@ namespace SilverSim.Types
             double y;
             double z;
 
-            if(!Double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
-                !Double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
-                !Double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z))
+            if(!Double.TryParse(split[0], NumberStyles.Float, CultureInfo.InvariantCulture, out x) ||
+                !Double.TryParse(split[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y) ||
+                !Double.TryParse(split[2], NumberStyles.Float, CultureInfo.InvariantCulture, out z))
             {
                 return false;
             }
@@ -286,7 +286,7 @@ namespace SilverSim.Types
         /// <returns>A string representation of the vector</returns>
         public override string ToString()
         {
-            return string.Format(EnUsCulture, "<{0},{1},{2}>", X, Y, Z);
+            return string.Format(CultureInfo.InvariantCulture, "<{0},{1},{2}>", X, Y, Z);
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
@@ -294,11 +294,11 @@ namespace SilverSim.Types
         {
             get
             {
-                return string.Format(EnUsCulture, "{0}", X);
+                return string.Format(CultureInfo.InvariantCulture, "{0}", X);
             }
             set
             {
-                X = double.Parse(value, EnUsCulture);
+                X = double.Parse(value, CultureInfo.InvariantCulture);
             }
         }
 
@@ -307,11 +307,11 @@ namespace SilverSim.Types
         {
             get
             {
-                return string.Format(EnUsCulture, "{0}", Y);
+                return string.Format(CultureInfo.InvariantCulture, "{0}", Y);
             }
             set
             {
-                Y = double.Parse(value, EnUsCulture);
+                Y = double.Parse(value, CultureInfo.InvariantCulture);
             }
         }
 
@@ -320,11 +320,11 @@ namespace SilverSim.Types
         {
             get
             {
-                return string.Format(EnUsCulture, "{0}", Z);
+                return string.Format(CultureInfo.InvariantCulture, "{0}", Z);
             }
             set
             {
-                Z = double.Parse(value, EnUsCulture);
+                Z = double.Parse(value, CultureInfo.InvariantCulture);
             }
         }
 
@@ -480,7 +480,5 @@ namespace SilverSim.Types
         public readonly static Vector3 UnitY = new Vector3(0f, 1f, 0f);
         /// <summary>A unit vector facing up (Z axis), value 0,0,1</summary>
         public readonly static Vector3 UnitZ = new Vector3(0f, 0f, 1f);
-
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
     }
 }

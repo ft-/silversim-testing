@@ -116,12 +116,12 @@ namespace SilverSim.Types
         public static implicit operator bool(AString v)
         {
             bool result;
-            if(Boolean.TryParse(v.ToString(), out result))
+            if(bool.TryParse(v.ToString(), out result))
             {
                 return result;
             }
-            Int32 res;
-            if(Int32.TryParse(v.ToString(), out res))
+            int res;
+            if(int.TryParse(v.ToString(), out res))
             {
                 return res != 0;
             }
@@ -143,7 +143,7 @@ namespace SilverSim.Types
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator double(AString v)
         {
-            return Double.Parse(v.m_Value.Trim(), EnUsCulture);
+            return double.Parse(v.m_Value.Trim(), CultureInfo.InvariantCulture);
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
@@ -192,7 +192,5 @@ namespace SilverSim.Types
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public ulong AsULong { get { return ulong.Parse(m_Value); } }
         #endregion
-
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
     }
 }
