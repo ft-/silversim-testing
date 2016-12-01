@@ -7,6 +7,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.ServiceInterfaces.PortControl;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
@@ -56,8 +57,12 @@ namespace SilverSim.Viewer.Core
         public bool LogAssetFailures;
         public bool LogTransferPacket;
 
-        public UDPCircuitsManager(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene)
+        readonly List<IPortControlServiceInterface> m_PortControlServices;
+
+        public UDPCircuitsManager(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene,
+            List<IPortControlServiceInterface> portControlServices)
         {
+            m_PortControlServices = portControlServices;
             Scene = scene;
             m_IMService = imService;
             m_ChatService = chatService;
@@ -95,6 +100,11 @@ namespace SilverSim.Viewer.Core
             /* handle Bind before starting anything else */
             m_UdpSocket.Bind(ep);
 
+            foreach(IPortControlServiceInterface portControl in m_PortControlServices)
+            {
+                portControl.EnablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Udp, port);
+            }
+
             m_ChatThread = new Thread(ChatSendHandler);
             m_ChatThread.Start();
             m_Log.InfoFormat("Initialized UDP Circuits Manager at {0}:{1}", bindAddress.ToString(), port);
@@ -114,6 +124,17 @@ namespace SilverSim.Viewer.Core
             Stop();
             m_ChatQueue.Enqueue(new ShutdownEvent());
             m_UdpSocket.Dispose();
+            foreach (IPortControlServiceInterface portControl in m_PortControlServices)
+            {
+                try
+                {
+                    portControl.DisablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Udp, m_BindPort);
+                }
+                catch(Exception e)
+                {
+                    m_Log.DebugFormat("Failed to disable port {0}: {1}: {2}", m_BindPort, e.GetType().FullName, e.Message);
+                }
+            }
             Scene = null;
         }
 

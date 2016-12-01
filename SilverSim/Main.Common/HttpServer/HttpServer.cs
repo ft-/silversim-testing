@@ -5,6 +5,7 @@ using log4net;
 using Nini.Config;
 using SilverSim.Http;
 using SilverSim.ServiceInterfaces;
+using SilverSim.ServiceInterfaces.PortControl;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -59,9 +60,11 @@ namespace SilverSim.Main.Common.HttpServer
         Type m_SslStreamPreload;
         Socket m_ListenerSocket;
         Thread m_ListenerThread;
+        List<IPortControlServiceInterface> m_PortControlServices = new List<IPortControlServiceInterface>();
 
-        public BaseHttpServer(IConfig httpConfig, bool useSsl = false)
+        public BaseHttpServer(IConfig httpConfig, ConfigurationLoader loader, bool useSsl = false)
         {
+            m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
             Port = (uint)httpConfig.GetInt("Port", useSsl ? 9001 : 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
             /* prevent Mono from lazy loading SslStream at shutdown */
@@ -111,6 +114,11 @@ namespace SilverSim.Main.Common.HttpServer
             IPEndPoint ep = new IPEndPoint(IPAddress.Any, (int)Port);
             m_ListenerSocket.Bind(ep);
             m_ListenerSocket.Listen(128);
+
+            foreach(IPortControlServiceInterface iface in m_PortControlServices)
+            {
+                iface.EnablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Tcp, (int)Port);
+            }
 
             m_ListenerThread = new Thread(AcceptThread);
             m_ListenerThread.Start();
@@ -173,13 +181,24 @@ namespace SilverSim.Main.Common.HttpServer
             m_Log.InfoFormat("Stopping HTTP Server");
             m_StoppingListeners = true;
             m_ListenerSocket.Close();
-            while(m_ActiveThreadCount > 0)
+            while (m_ActiveThreadCount > 0)
             {
                 Thread.Sleep(1);
             }
             StartsWithUriHandlers.Clear();
             UriHandlers.Clear();
             RootUriContentTypeHandlers.Clear();
+            foreach (IPortControlServiceInterface iface in m_PortControlServices)
+            {
+                try
+                {
+                    iface.DisablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Tcp, (int)Port);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Failed to disable port {0}: {1}: {2}", Port, e.GetType().FullName, e.Message);
+                }
+            }
         }
 
         int m_ActiveThreadCount;

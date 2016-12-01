@@ -19,6 +19,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Neighbor;
+using SilverSim.ServiceInterfaces.PortControl;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -60,6 +61,7 @@ namespace SilverSim.Scene.Implementation.Basic
         SceneList m_Scenes;
         IMRouter m_IMRouter;
         BaseHttpServer m_HttpServer;
+        List<IPortControlServiceInterface> m_PortControlServices;
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -97,6 +99,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public void Startup(ConfigurationLoader loader)
         {
             m_HttpServer = loader.HttpServer;
+            m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
             m_ExternalHostNameService = loader.ExternalHostNameService;
             m_Scenes = loader.Scenes;
             m_IMRouter = loader.IMRouter;
@@ -152,7 +155,8 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_RegionStorage,
                 this,
                 m_ExternalHostNameService,
-                m_HttpServer);
+                m_HttpServer,
+                m_PortControlServices);
             return scene;
         }
     }

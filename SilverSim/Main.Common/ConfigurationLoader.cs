@@ -29,6 +29,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Neighbor;
+using SilverSim.ServiceInterfaces.PortControl;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
@@ -350,6 +351,7 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
             FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
             FeaturesTable[typeof(IServerParamListener)] = "Server Params";
+            FeaturesTable[typeof(IPortControlServiceInterface)] = "Port Control";
 
             AppDomain.CurrentDomain.AssemblyResolve += ArchSpecificResolveEventHandler;
         }
@@ -1437,14 +1439,14 @@ namespace SilverSim.Main.Common
 
             BaseHttpServer httpServer;
 
-            httpServer = new BaseHttpServer(httpConfig);
+            httpServer = new BaseHttpServer(httpConfig, this);
             PluginInstances.Add("HttpServer", httpServer);
             httpServer.UriHandlers.Add("/helo", HeloResponseHandler);
 
             IConfig httpsConfig = m_Config.Configs["HTTPS"];
             if(null != httpsConfig)
             {
-                BaseHttpServer httpsServer = new BaseHttpServer(httpsConfig, true);
+                BaseHttpServer httpsServer = new BaseHttpServer(httpsConfig, this, true);
                 httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
                 PluginInstances.Add("HttpsServer", httpsServer);
             }

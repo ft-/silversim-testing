@@ -24,6 +24,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Neighbor;
+using SilverSim.ServiceInterfaces.PortControl;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -498,12 +499,13 @@ namespace SilverSim.Scene.Implementation.Basic
             GridServiceInterface regionStorage,
             SceneFactory myFactory,
             ExternalHostNameServiceInterface externalHostNameService,
-            BaseHttpServer httpServer)
+            BaseHttpServer httpServer,
+            List<IPortControlServiceInterface> portControlServices)
         : base(ri.Size.X, ri.Size.Y)
         {
             m_Scenes = scenes;
             m_HttpServer = httpServer;
-            if(persistentAssetService == null)
+            if (persistentAssetService == null)
             {
                 throw new ArgumentNullException("persistentAssetService");
             }
@@ -580,7 +582,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
             m_RestartObject = new RestartObject(scenes, this, myFactory, regionStorage);
 
-            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
+            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this, portControlServices);
             m_SceneObjects = new BasicSceneObjectsCollection(this);
             m_SceneObjectParts = new BasicSceneObjectPartsCollection(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
