@@ -80,5 +80,12 @@ namespace SilverSim.ServiceInterfaces.Account
 
         public abstract void Remove(UUID scopeID, UUID accountID);
         #endregion
+
+        public virtual void SetEverLoggedIn(UUID scopeID, UUID accountID)
+        {
+            UserAccount account = this[scopeID, accountID];
+            account.IsEverLoggedIn = true;
+            Update(account);
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             info.UserFlags = reader.GetUInt32("UserFlags");
             info.UserTitle = reader.GetString("UserTitle");
             info.IsLocalToGrid = true;
+            info.IsEverLoggedIn = reader.GetBool("IsEverLoggedIn");
 
             return info;
         }

@@ -70,7 +70,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
             new NamedKeyInfo("FirstName", "FirstName"),
             new NamedKeyInfo("LastName", "LastName"),
             new TableRevision(2),
-            new ChangeColumn<uint>("UserFlags") { IsNullAllowed = false, Default = (uint)0 }
+            new ChangeColumn<uint>("UserFlags") { IsNullAllowed = false, Default = (uint)0 },
+            new TableRevision(3),
+            new AddColumn<int>("IsEverLoggedIn") {IsNullAllowed = false, Default = 0 }
         };
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)
@@ -375,6 +377,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             data["UserLevel"] = userAccount.UserLevel;
             data["UserFlags"] = userAccount.UserFlags;
             data["UserTitle"] = userAccount.UserTitle;
+            data["IsEverLoggedIn"] = userAccount.IsEverLoggedIn ? 1 : 0;
 
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
@@ -393,6 +396,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             data["UserLevel"] = userAccount.UserLevel;
             data["UserFlags"] = userAccount.UserFlags;
             data["UserTitle"] = userAccount.UserTitle;
+            data["IsEverLoggedIn"] = userAccount.IsEverLoggedIn ? 1 : 0;
             Dictionary<string, object> w = new Dictionary<string,object>();
             w["ScopeID"] = userAccount.ScopeID;
             w["ID"] = userAccount.Principal.ID;
@@ -410,6 +414,23 @@ namespace SilverSim.Database.MySQL.UserAccounts
             {
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM useraccounts WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddParameter("?id", accountID);
+                    cmd.Parameters.AddParameter("?scopeid", scopeID);
+                    if (cmd.ExecuteNonQuery() < 1)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+            }
+        }
+
+        public override void SetEverLoggedIn(UUID scopeID, UUID accountID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("UPDATE useraccounts SET IsEverLoggedIn=1 WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountID);
                     cmd.Parameters.AddParameter("?scopeid", scopeID);

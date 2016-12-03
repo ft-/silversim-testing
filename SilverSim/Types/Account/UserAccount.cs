@@ -15,6 +15,7 @@ namespace SilverSim.Types.Account
         public uint UserFlags;
         public string UserTitle = string.Empty;
         public bool IsLocalToGrid;
+        public bool IsEverLoggedIn;
         public Dictionary<string, string> ServiceURLs = new Dictionary<string,string>(); /* only valid when IsLocalToGrid is set to false */
 
         public UserAccount()
@@ -32,6 +33,7 @@ namespace SilverSim.Types.Account
             UserFlags = src.UserFlags;
             UserTitle = src.UserTitle;
             ServiceURLs = new Dictionary<string, string>(src.ServiceURLs);
+            IsEverLoggedIn = src.IsEverLoggedIn;
         }
     }
 }
