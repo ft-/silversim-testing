@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System;
 
 namespace SilverSim.Database.Memory.UserAccounts
 {
@@ -193,6 +194,15 @@ namespace SilverSim.Database.Memory.UserAccounts
         public override void Remove(UUID scopeID, UUID accountID)
         {
             m_Data.RemoveIf(accountID, delegate (UserAccount acc) { return acc.ScopeID == scopeID || scopeID == UUID.Zero; });
+        }
+
+        public override void SetEverLoggedIn(UUID scopeID, UUID accountID)
+        {
+            UserAccount ua;
+            if(m_Data.TryGetValue(accountID, out ua))
+            {
+                ua.IsEverLoggedIn = true;
+            }
         }
     }
     #endregion
