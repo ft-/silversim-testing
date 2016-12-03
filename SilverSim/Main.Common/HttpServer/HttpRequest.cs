@@ -37,6 +37,7 @@ namespace SilverSim.Main.Common.HttpServer
         public HttpResponse Response { get; private set; }
         public string CallerIP { get; private set; }
         public bool Expect100Continue { get; private set; }
+        public bool IsSsl { get; private set; }
 
         public bool IsChunkedAccepted
         {
@@ -130,8 +131,9 @@ namespace SilverSim.Main.Common.HttpServer
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public HttpRequest(Stream httpStream, string callerIP, bool isBehindProxy)
+        public HttpRequest(Stream httpStream, string callerIP, bool isBehindProxy, bool isSsl)
         {
+            IsSsl = isSsl;
             m_HttpStream = httpStream;
             Body = null;
             string headerLine;

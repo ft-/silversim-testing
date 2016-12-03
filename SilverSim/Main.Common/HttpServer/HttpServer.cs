@@ -321,7 +321,7 @@ namespace SilverSim.Main.Common.HttpServer
                     Stream httpstream;
                     httpstream = new HttpStream(socket);
 
-                    AcceptedConnection_Internal(httpstream, remoteAddr);
+                    AcceptedConnection_Internal(httpstream, remoteAddr, false);
                 }
                 catch (HttpResponse.DisconnectFromThreadException)
                 {
@@ -365,7 +365,7 @@ namespace SilverSim.Main.Common.HttpServer
                     SslStream sslstream = new SslStream(new NetworkStream(socket));
                     sslstream.AuthenticateAsServer(m_ServerCertificate);
 
-                    AcceptedConnection_Internal(sslstream, remoteAddr);
+                    AcceptedConnection_Internal(sslstream, remoteAddr, true);
                 }
                 catch (HttpResponse.DisconnectFromThreadException)
                 {
@@ -410,7 +410,7 @@ namespace SilverSim.Main.Common.HttpServer
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        private void AcceptedConnection_Internal(Stream httpstream, string remoteAddr)
+        private void AcceptedConnection_Internal(Stream httpstream, string remoteAddr, bool isSsl)
         {
             try
             {
@@ -419,7 +419,7 @@ namespace SilverSim.Main.Common.HttpServer
                     HttpRequest req;
                     try
                     {
-                        req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy);
+                        req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy, isSsl);
                     }
                     catch (HttpResponse.ConnectionCloseException)
                     {
