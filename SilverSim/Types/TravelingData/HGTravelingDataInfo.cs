@@ -1,9 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-namespace SilverSim.Types.HGTraveling
+namespace SilverSim.Types.TravelingData
 {
-    public struct HGTravelingDataInfo
+    public struct TravelingDataInfo
     {
         public UUID SessionID;
         public UUID UserID;

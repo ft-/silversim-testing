@@ -8,19 +8,19 @@ using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
-using SilverSim.ServiceInterfaces.HGTraveling;
+using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Types;
-using SilverSim.Types.HGTraveling;
+using SilverSim.Types.TravelingData;
 using System.Collections.Generic;
 
-namespace SilverSim.Database.MySQL.HGTravelingData
+namespace SilverSim.Database.MySQL.TravelingData
 {
     #region Service implementation
-    static class MySQLHGTravelingDataExtensionMethods
+    static class MySQLTravelingDataExtensionMethods
     {
-        public static HGTravelingDataInfo ToHGTravelingData(this MySqlDataReader reader)
+        public static TravelingDataInfo ToTravelingData(this MySqlDataReader reader)
         {
-            HGTravelingDataInfo info = new HGTravelingDataInfo();
+            TravelingDataInfo info = new TravelingDataInfo();
             info.SessionID = reader.GetUUID("SessionID");
             info.UserID = reader.GetUUID("UserID");
             info.GridExternalName = reader.GetString("GridExternalName");
@@ -31,12 +31,12 @@ namespace SilverSim.Database.MySQL.HGTravelingData
         }
     }
 
-    public class MySQLHGTravelingDataService : HGTravelingDataServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    public class MySQLTravelingDataService : TravelingDataServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL HGTRAVELINGDATA SERVICE");
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL TRAVELINGDATA SERVICE");
         readonly string m_ConnectionString;
 
-        public MySQLHGTravelingDataService(string connectionString)
+        public MySQLTravelingDataService(string connectionString)
         {
             m_ConnectionString = connectionString;
         }
@@ -46,12 +46,12 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             /* intentionally left empty */
         }
 
-        public override HGTravelingDataInfo GetHGTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI)
+        public override TravelingDataInfo GetTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM hgtravelingdata WHERE UserID LIKE ?id AND GridExternalName NOT LIKE ?homeuri LIMIT 1", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND GridExternalName NOT LIKE ?homeuri LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     cmd.Parameters.AddParameter("?homeuri", homeURI);
@@ -59,7 +59,7 @@ namespace SilverSim.Database.MySQL.HGTravelingData
                     {
                         if (reader.Read())
                         {
-                            return reader.ToHGTravelingData();
+                            return reader.ToTravelingData();
                         }
                         throw new KeyNotFoundException();
                     }
@@ -67,19 +67,19 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             }
         }
 
-        public override HGTravelingDataInfo GetHGTravelingData(UUID sessionID)
+        public override TravelingDataInfo GetTravelingData(UUID sessionID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM hgtravelingdata WHERE SessionID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", sessionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(reader.Read())
                         {
-                            return reader.ToHGTravelingData();
+                            return reader.ToTravelingData();
                         }
                         throw new KeyNotFoundException();
                     }
@@ -87,12 +87,12 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             }
         }
 
-        public override HGTravelingDataInfo GetHGTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
+        public override TravelingDataInfo GetTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM hgtravelingdata WHERE UserID LIKE ?id AND ClientIPAddress LIKE ?ip", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND ClientIPAddress LIKE ?ip", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     cmd.Parameters.AddParameter("?ip", ipAddress);
@@ -100,7 +100,7 @@ namespace SilverSim.Database.MySQL.HGTravelingData
                     {
                         if (reader.Read())
                         {
-                            return reader.ToHGTravelingData();
+                            return reader.ToTravelingData();
                         }
                         throw new KeyNotFoundException();
                     }
@@ -108,20 +108,20 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             }
         }
 
-        public override List<HGTravelingDataInfo> GetHGTravelingDatasByAgentUUID(UUID agentID)
+        public override List<TravelingDataInfo> GetTravelingDatasByAgentUUID(UUID agentID)
         {
-            List<HGTravelingDataInfo> infos = new List<HGTravelingDataInfo>();
+            List<TravelingDataInfo> infos = new List<TravelingDataInfo>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM hgtravelingdata WHERE UserID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            infos.Add(reader.ToHGTravelingData());
+                            infos.Add(reader.ToTravelingData());
                         }
                     }
                 }
@@ -134,7 +134,7 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM hgtravelingdata WHERE SessionID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", sessionID);
                     return cmd.ExecuteNonQuery() > 0;
@@ -147,7 +147,7 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM hgtravelingdata WHERE UserID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountID);
                     cmd.ExecuteNonQuery();
@@ -160,7 +160,7 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM hgtravelingdata WHERE UserID LIKE ?id", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     return cmd.ExecuteNonQuery() > 0;
@@ -168,7 +168,7 @@ namespace SilverSim.Database.MySQL.HGTravelingData
             }
         }
 
-        public override void Store(HGTravelingDataInfo data)
+        public override void Store(TravelingDataInfo data)
         {
             Dictionary<string, object> insertVals = new Dictionary<string, object>();
             insertVals.Add("SessionID", data.SessionID.ToString());
@@ -186,7 +186,7 @@ namespace SilverSim.Database.MySQL.HGTravelingData
 
         static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
-            new SqlTable("hgtravelingdata"),
+            new SqlTable("travelingdata"),
             new AddColumn<UUID>("SessionID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<UUID>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("GridExternalName") { Cardinality = 255, IsNullAllowed = false },
@@ -218,18 +218,18 @@ namespace SilverSim.Database.MySQL.HGTravelingData
     #endregion
 
     #region Factory
-    [PluginName("HGTravelingData")]
-    public class MySQLHGTravelingDataServiceFactory : IPluginFactory
+    [PluginName("TravelingData")]
+    public class MySQLTravelingDataServiceFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL HGTRAVELINGDATA SERVICE");
-        public MySQLHGTravelingDataServiceFactory()
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL TRAVELINGDATA SERVICE");
+        public MySQLTravelingDataServiceFactory()
         {
 
         }
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new MySQLHGTravelingDataService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
+            return new MySQLTravelingDataService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
         }
     }
     #endregion

@@ -11,7 +11,7 @@ using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.HGTraveling;
+using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.ServerParam;
@@ -24,7 +24,7 @@ using SilverSim.Types.AuthInfo;
 using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
 using SilverSim.Types.GridUser;
-using SilverSim.Types.HGTraveling;
+using SilverSim.Types.TravelingData;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.Json;
@@ -70,7 +70,7 @@ namespace SilverSim.Grid.Login
         FriendsServiceInterface m_FriendsService;
         AuthInfoServiceInterface m_AuthInfoService;
         AvatarServiceInterface m_AvatarService;
-        HGTravelingDataServiceInterface m_HGTravelingDataService;
+        TravelingDataServiceInterface m_TravelingDataService;
         ILoginConnectorServiceInterface m_LoginConnectorService;
 
         string m_UserAccountServiceName;
@@ -81,7 +81,7 @@ namespace SilverSim.Grid.Login
         string m_FriendsServiceName;
         string m_AuthInfoServiceName;
         string m_AvatarServiceName;
-        string m_HGTravelingDataServiceName;
+        string m_TravelingDataServiceName;
         string m_LoginConnectorServiceName;
         UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
         UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
@@ -107,7 +107,7 @@ namespace SilverSim.Grid.Login
             m_FriendsServiceName = ownSection.GetString("FriendsService", "FriendsService");
             m_AvatarServiceName = ownSection.GetString("AvatarService", "AvatarService");
             m_AuthInfoServiceName = ownSection.GetString("AuthInfoService", "AuthInfoService");
-            m_HGTravelingDataServiceName = ownSection.GetString("HGTravelingDataService", "HGTravelingDataService");
+            m_TravelingDataServiceName = ownSection.GetString("TravelingDataService", "TravelingDataService");
             m_LoginConnectorServiceName = ownSection.GetString("LoginConnectorService", "LoginConnectorService");
         }
 
@@ -122,7 +122,7 @@ namespace SilverSim.Grid.Login
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             m_AvatarService = loader.GetService<AvatarServiceInterface>(m_AvatarServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
-            m_HGTravelingDataService = loader.GetService<HGTravelingDataServiceInterface>(m_HGTravelingDataServiceName);
+            m_TravelingDataService = loader.GetService<TravelingDataServiceInterface>(m_TravelingDataServiceName);
             m_LoginConnectorService = loader.GetService<ILoginConnectorServiceInterface>(m_LoginConnectorServiceName);
 
             m_ConfigurationIssues = loader.KnownConfigurationIssues;
@@ -503,7 +503,7 @@ namespace SilverSim.Grid.Login
                 }
                 try
                 {
-                    m_HGTravelingDataService.RemoveByAgentUUID(loginData.Account.Principal.ID);
+                    m_TravelingDataService.RemoveByAgentUUID(loginData.Account.Principal.ID);
                 }
                 catch
                 {
@@ -554,7 +554,7 @@ namespace SilverSim.Grid.Login
         void LoginAuthenticatedAndPresenceAndGridUserAdded(HttpRequest httpreq, LoginData loginData)
         {
             Uri gkUri = m_GatekeeperUri;
-            HGTravelingDataInfo hgdata = new HGTravelingDataInfo();
+            TravelingDataInfo hgdata = new TravelingDataInfo();
             hgdata.SessionID = loginData.SessionInfo.SessionID;
             hgdata.UserID = loginData.Account.Principal.ID;
             hgdata.GridExternalName = gkUri != null ? gkUri.ToString() : m_HttpServer.ServerURI;
@@ -564,7 +564,7 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                m_HGTravelingDataService.Store(hgdata);
+                m_TravelingDataService.Store(hgdata);
             }
             catch
             {
@@ -577,7 +577,7 @@ namespace SilverSim.Grid.Login
             }
             catch
             {
-                m_HGTravelingDataService.Remove(loginData.SessionInfo.SessionID);
+                m_TravelingDataService.Remove(loginData.SessionInfo.SessionID);
                 throw;
             }
         }

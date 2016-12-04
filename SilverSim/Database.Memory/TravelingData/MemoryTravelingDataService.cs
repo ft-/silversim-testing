@@ -4,32 +4,32 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
-using SilverSim.ServiceInterfaces.HGTraveling;
+using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.HGTraveling;
+using SilverSim.Types.TravelingData;
 using System.Collections.Generic;
 
-namespace SilverSim.Database.Memory.HGTravelingData
+namespace SilverSim.Database.Memory.TravelingData
 {
     #region Service implementation
-    public class MemoryHGTravelingDataService : HGTravelingDataServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    public class MemoryTravelingDataService : TravelingDataServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly RwLockedDictionary<UUID, HGTravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, HGTravelingDataInfo>();
+        readonly RwLockedDictionary<UUID, TravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, TravelingDataInfo>();
 
-        public MemoryHGTravelingDataService()
+        public MemoryTravelingDataService()
         {
 
         }
 
-        public override HGTravelingDataInfo GetHGTravelingData(UUID sessionID)
+        public override TravelingDataInfo GetTravelingData(UUID sessionID)
         {
             return m_HGTravelingDatas[sessionID];
         }
 
-        public override HGTravelingDataInfo GetHGTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
+        public override TravelingDataInfo GetTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
         {
-            foreach(HGTravelingDataInfo hgd in m_HGTravelingDatas.Values)
+            foreach(TravelingDataInfo hgd in m_HGTravelingDatas.Values)
             {
                 if(hgd.ClientIPAddress == ipAddress && hgd.UserID == agentID)
                 {
@@ -39,9 +39,9 @@ namespace SilverSim.Database.Memory.HGTravelingData
             throw new KeyNotFoundException();
         }
 
-        public override HGTravelingDataInfo GetHGTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI)
+        public override TravelingDataInfo GetTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI)
         {
-            foreach (HGTravelingDataInfo hgd in m_HGTravelingDatas.Values)
+            foreach (TravelingDataInfo hgd in m_HGTravelingDatas.Values)
             {
                 if (hgd.GridExternalName != homeURI && hgd.UserID == agentID)
                 {
@@ -51,10 +51,10 @@ namespace SilverSim.Database.Memory.HGTravelingData
             throw new KeyNotFoundException();
         }
 
-        public override List<HGTravelingDataInfo> GetHGTravelingDatasByAgentUUID(UUID agentID)
+        public override List<TravelingDataInfo> GetTravelingDatasByAgentUUID(UUID agentID)
         {
-            List<HGTravelingDataInfo> hgds = new List<HGTravelingDataInfo>();
-            foreach(HGTravelingDataInfo hgd in m_HGTravelingDatas.Values)
+            List<TravelingDataInfo> hgds = new List<TravelingDataInfo>();
+            foreach(TravelingDataInfo hgd in m_HGTravelingDatas.Values)
             {
                 if(hgd.UserID == agentID)
                 {
@@ -77,7 +77,7 @@ namespace SilverSim.Database.Memory.HGTravelingData
         public override bool RemoveByAgentUUID(UUID agentID)
         {
             List<UUID> sessionIds = new List<UUID>();
-            foreach(KeyValuePair<UUID, HGTravelingDataInfo> kvp in m_HGTravelingDatas)
+            foreach(KeyValuePair<UUID, TravelingDataInfo> kvp in m_HGTravelingDatas)
             {
                 if(kvp.Value.UserID == agentID)
                 {
@@ -101,7 +101,7 @@ namespace SilverSim.Database.Memory.HGTravelingData
             /* intentionally left empty */
         }
 
-        public override void Store(HGTravelingDataInfo data)
+        public override void Store(TravelingDataInfo data)
         {
             m_HGTravelingDatas[data.SessionID] = data;
         }
@@ -109,17 +109,17 @@ namespace SilverSim.Database.Memory.HGTravelingData
     #endregion
 
     #region Factory
-    [PluginName("HGTravelingData")]
-    public class MemoryHGTravelingDataServiceFactory : IPluginFactory
+    [PluginName("TravelingData")]
+    public class MemoryTravelingDataServiceFactory : IPluginFactory
     {
-        public MemoryHGTravelingDataServiceFactory()
+        public MemoryTravelingDataServiceFactory()
         {
 
         }
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new MemoryHGTravelingDataService();
+            return new MemoryTravelingDataService();
         }
     }
     #endregion
