@@ -3,6 +3,7 @@
 
 using log4net;
 using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.AuthInfo
 {
+    #region Service implementation
     public class MySQLAuthInfoService : AuthInfoServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AUTHINFO SERVICE");
@@ -188,4 +190,22 @@ namespace SilverSim.Database.MySQL.AuthInfo
             }
         }
     }
+    #endregion
+
+    #region Factory
+    [PluginName("AuthInfo")]
+    public class MySQLAuthInfoServiceFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AUTHINFO SERVICE");
+        public MySQLAuthInfoServiceFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new MySQLAuthInfoService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
+        }
+    }
+    #endregion
 }

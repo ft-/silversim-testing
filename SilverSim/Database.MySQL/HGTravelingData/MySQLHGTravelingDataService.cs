@@ -219,10 +219,10 @@ namespace SilverSim.Database.MySQL.HGTravelingData
 
     #region Factory
     [PluginName("HGTravelingData")]
-    public class MySQLUserAccountServiceFactory : IPluginFactory
+    public class MySQLHGTravelingDataServiceFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
-        public MySQLUserAccountServiceFactory()
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL HGTRAVELINGDATA SERVICE");
+        public MySQLHGTravelingDataServiceFactory()
         {
 
         }
