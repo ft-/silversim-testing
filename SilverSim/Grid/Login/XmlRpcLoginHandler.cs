@@ -4,6 +4,7 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.ServiceInterfaces.Teleport;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AuthInfo;
 using SilverSim.ServiceInterfaces.Avatar;
@@ -70,6 +71,7 @@ namespace SilverSim.Grid.Login
         AuthInfoServiceInterface m_AuthInfoService;
         AvatarServiceInterface m_AvatarService;
         HGTravelingDataServiceInterface m_HGTravelingDataService;
+        ILoginConnectorServiceInterface m_LoginConnectorService;
 
         string m_UserAccountServiceName;
         string m_GridUserServiceName;
@@ -80,6 +82,7 @@ namespace SilverSim.Grid.Login
         string m_AuthInfoServiceName;
         string m_AvatarServiceName;
         string m_HGTravelingDataServiceName;
+        string m_LoginConnectorServiceName;
         UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
         UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
         string m_WelcomeMessage = "Greetings Programs";
@@ -105,6 +108,7 @@ namespace SilverSim.Grid.Login
             m_AvatarServiceName = ownSection.GetString("AvatarService", "AvatarService");
             m_AuthInfoServiceName = ownSection.GetString("AuthInfoService", "AuthInfoService");
             m_HGTravelingDataServiceName = ownSection.GetString("HGTravelingDataService", "HGTravelingDataService");
+            m_LoginConnectorServiceName = ownSection.GetString("LoginConnectorService", "LoginConnectorService");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -119,6 +123,7 @@ namespace SilverSim.Grid.Login
             m_AvatarService = loader.GetService<AvatarServiceInterface>(m_AvatarServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             m_HGTravelingDataService = loader.GetService<HGTravelingDataServiceInterface>(m_HGTravelingDataServiceName);
+            m_LoginConnectorService = loader.GetService<ILoginConnectorServiceInterface>(m_LoginConnectorServiceName);
 
             m_ConfigurationIssues = loader.KnownConfigurationIssues;
             m_HttpServer = loader.HttpServer;
@@ -209,8 +214,8 @@ namespace SilverSim.Grid.Login
             public ClientInfo ClientInfo = new ClientInfo();
             public SessionInfo SessionInfo = new SessionInfo();
             public UserAccount Account;
-            public DestinationInfo DestinationInfo;
-            public CircuitInfo CircuitInfo;
+            public DestinationInfo DestinationInfo = new DestinationInfo();
+            public CircuitInfo CircuitInfo = new CircuitInfo();
             public readonly List<string> LoginOptions = new List<string>();
             public List<InventoryFolder> InventorySkeleton;
             public List<InventoryFolder> InventoryLibSkeleton;
@@ -311,6 +316,7 @@ namespace SilverSim.Grid.Login
             loginData.ClientInfo.Mac = loginParams["mac"];
             loginData.ClientInfo.ID0 = loginParams["id0"];
             loginData.ClientInfo.ClientIP = httpreq.CallerIP;
+            loginData.DestinationInfo.StartLocation = loginParams["start"];
 
             UUID scopeId = UUID.Zero;
             IValue iv;
@@ -576,6 +582,13 @@ namespace SilverSim.Grid.Login
         void LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(HttpRequest httpreq, LoginData loginData)
         {
             // Implement destination lookup and login */
+            TeleportFlags flags = TeleportFlags.None;
+            if(loginData.Account.UserLevel >= 200)
+            {
+                flags |= TeleportFlags.Godlike;
+            }
+
+            m_LoginConnectorService.LoginTo(loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, null, flags);
 
             XmlRpc.XmlRpcResponse res = new XmlRpc.XmlRpcResponse();
             Map resStruct = new Map();
