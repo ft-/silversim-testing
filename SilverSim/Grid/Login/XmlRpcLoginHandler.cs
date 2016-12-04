@@ -224,6 +224,8 @@ namespace SilverSim.Grid.Login
             public InventoryFolder InventoryRoot;
             public InventoryFolder InventoryLibRoot;
             public List<FriendInfo> Friends;
+            public bool HaveAppearance;
+            public AppearanceInfo AppearanceInfo;
 
             public LoginData()
             {
@@ -373,8 +375,9 @@ namespace SilverSim.Grid.Login
                 return;
             }
 
-            // After authentication, we have to remove the token if something fails
+            loginData.HaveAppearance = m_AvatarService.TryGetAppearanceInfo(loginData.Account.Principal.ID, out loginData.AppearanceInfo);
 
+            // After authentication, we have to remove the token if something fails
             try
             {
                 LoginAuthenticated(httpreq, loginData);
@@ -581,14 +584,20 @@ namespace SilverSim.Grid.Login
 
         void LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(HttpRequest httpreq, LoginData loginData)
         {
-            // Implement destination lookup and login */
             TeleportFlags flags = TeleportFlags.None;
             if(loginData.Account.UserLevel >= 200)
             {
                 flags |= TeleportFlags.Godlike;
             }
 
-            m_LoginConnectorService.LoginTo(loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, null, flags);
+            try
+            {
+                m_LoginConnectorService.LoginTo(loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, loginData.AppearanceInfo, flags);
+            }
+            catch(Exception e)
+            {
+                throw new LoginFailResponseException("key", e.Message);
+            }
 
             XmlRpc.XmlRpcResponse res = new XmlRpc.XmlRpcResponse();
             Map resStruct = new Map();
@@ -615,6 +624,7 @@ namespace SilverSim.Grid.Login
                 Map loginFlags = new Map();
                 loginFlags.Add("stipend_since_login", "N");
                 loginFlags.Add("ever_logged_in", loginData.Account.IsEverLoggedIn ? "Y" : "N");
+                loginFlags.Add("gendered", loginData.HaveAppearance ? "Y" : "N");
                 loginFlags.Add("daylight_savings", "N");
                 resStruct.Add("login-flags", loginFlags);
             }
