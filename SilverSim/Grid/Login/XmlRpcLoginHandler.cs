@@ -592,7 +592,7 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                m_LoginConnectorService.LoginTo(loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, loginData.AppearanceInfo, flags);
+                m_LoginConnectorService.LoginTo(loginData.Account, loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, loginData.AppearanceInfo, flags);
             }
             catch(Exception e)
             {

@@ -32,6 +32,25 @@ namespace SilverSim.Types.Grid
             Flags = ri.Flags;
             ScopeID = ri.ScopeID;
         }
+
+        public void UpdateFromRegion(RegionInfo ri)
+        {
+            ID = ri.ID;
+            Location = ri.Location;
+            Size = ri.Size;
+            Name = ri.Name;
+            ServerIP = ri.ServerIP;
+            ServerHttpPort = ri.ServerHttpPort;
+            ServerURI = ri.ServerURI;
+            ServerPort = ri.ServerPort;
+            RegionMapTexture = ri.RegionMapTexture;
+            ParcelMapTexture = ri.ParcelMapTexture;
+            Access = ri.Access;
+            RegionSecret = ri.RegionSecret;
+            Owner = new UUI(ri.Owner);
+            Flags = ri.Flags;
+            ScopeID = ri.ScopeID;
+        }
         #endregion
 
         #region Fields
