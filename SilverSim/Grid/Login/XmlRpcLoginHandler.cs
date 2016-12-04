@@ -590,9 +590,10 @@ namespace SilverSim.Grid.Login
                 flags |= TeleportFlags.Godlike;
             }
 
+            string seedCapsURI;
             try
             {
-                m_LoginConnectorService.LoginTo(loginData.Account, loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, loginData.AppearanceInfo, flags);
+                m_LoginConnectorService.LoginTo(loginData.Account, loginData.ClientInfo, loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, loginData.AppearanceInfo, flags, out seedCapsURI);
             }
             catch(Exception e)
             {
@@ -604,7 +605,7 @@ namespace SilverSim.Grid.Login
             res.ReturnValue = resStruct;
             resStruct.Add("look_at", string.Format(CultureInfo.InvariantCulture, "[r{0},r{1},r{2}]", loginData.DestinationInfo.LookAt.X, loginData.DestinationInfo.LookAt.Y, loginData.DestinationInfo.LookAt.Z));
             resStruct.Add("agent_access_max", "A");
-            resStruct.Add("seed_capability", loginData.DestinationInfo.ServerURI + "CAPS/" + loginData.CircuitInfo.CapsPath + "0000/");
+            resStruct.Add("seed_capability", seedCapsURI);
             resStruct.Add("region_x", loginData.DestinationInfo.Location.X);
             resStruct.Add("region_y", loginData.DestinationInfo.Location.Y);
             resStruct.Add("regioN_size_x", loginData.DestinationInfo.Size.X);
