@@ -3,6 +3,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.HGTraveling;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.HGTraveling
 {
@@ -13,11 +14,11 @@ namespace SilverSim.ServiceInterfaces.HGTraveling
 
         }
 
-        public abstract HGTravelingData GetHGTravelingData(UUID sessionID);
-        public abstract HGTravelingData GetHGTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress);
-        public abstract HGTravelingData GetHGTravelingDatasByAgentUUID(UUID agentID);
-        public abstract HGTravelingData GetHGTravelignDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI);
-        public abstract void Store(HGTravelingData data);
+        public abstract HGTravelingDataInfo GetHGTravelingData(UUID sessionID);
+        public abstract HGTravelingDataInfo GetHGTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress);
+        public abstract List<HGTravelingDataInfo> GetHGTravelingDatasByAgentUUID(UUID agentID);
+        public abstract HGTravelingDataInfo GetHGTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI);
+        public abstract void Store(HGTravelingDataInfo data);
         public abstract bool Remove(UUID sessionID);
         public abstract bool RemoveByAgentUUID(UUID agentID);
     }

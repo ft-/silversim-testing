@@ -545,7 +545,7 @@ namespace SilverSim.Grid.Login
         void LoginAuthenticatedAndPresenceAndGridUserAdded(HttpRequest httpreq, LoginData loginData)
         {
             Uri gkUri = m_GatekeeperUri;
-            HGTravelingData hgdata = new HGTravelingData();
+            HGTravelingDataInfo hgdata = new HGTravelingDataInfo();
             hgdata.SessionID = loginData.SessionInfo.SessionID;
             hgdata.UserID = loginData.Account.Principal.ID;
             hgdata.GridExternalName = gkUri != null ? gkUri.ToString() : m_HttpServer.ServerURI;

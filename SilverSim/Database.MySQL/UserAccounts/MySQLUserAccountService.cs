@@ -18,7 +18,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 {
     #region Service Implementation
     [Description("MySQL UserAccount Backend")]
-    public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
+    public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");

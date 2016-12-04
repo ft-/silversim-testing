@@ -3,7 +3,7 @@
 
 namespace SilverSim.Types.HGTraveling
 {
-    public struct HGTravelingData
+    public struct HGTravelingDataInfo
     {
         public UUID SessionID;
         public UUID UserID;

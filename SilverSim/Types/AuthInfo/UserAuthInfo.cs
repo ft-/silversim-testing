@@ -8,7 +8,5 @@ namespace SilverSim.Types.AuthInfo
         public UUID ID;
         public string PasswordHash;
         public string PasswordSalt;
-        public string WebLoginKey;
-        public string AccountType;
     }
 }
