@@ -123,11 +123,16 @@ namespace SilverSim.ServiceInterfaces.Avatar
             this[avatarID] = vals;
         }
 
-        public AppearanceInfo GetAppearanceInfo(UUID avatarID)
+        public bool TryGetAppearanceInfo(UUID avatarID, out AppearanceInfo aInfo)
         {
             Dictionary<string, string> items = this[avatarID];
 
-            AppearanceInfo aInfo = new AppearanceInfo();
+            aInfo = new AppearanceInfo();
+
+            if (items.Count == 0)
+            {
+                return false;
+            }
 
             string val;
             uint uintval;
@@ -192,7 +197,7 @@ namespace SilverSim.ServiceInterfaces.Avatar
             }
             aInfo.Wearables.All = wearables;
 
-            return aInfo;
+            return true;
         }
     }
 }
