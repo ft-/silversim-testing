@@ -10,6 +10,6 @@ namespace SilverSim.Scene.ServiceInterfaces.Teleport
 {
     public interface ILoginConnectorServiceInterface
     {
-        void LoginTo(SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, TeleportFlags flags);
+        void LoginTo(UserAccount account, SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, TeleportFlags flags);
     }
 }
