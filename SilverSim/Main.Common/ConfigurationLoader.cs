@@ -1222,6 +1222,11 @@ namespace SilverSim.Main.Common
                     defaultsIniName = "Grid.defaults.ini";
                     break;
 
+                case "standalone":
+                    defaultConfigName = "../data/SilverSim.Standalone.ini";
+                    defaultsIniName = "Standalone.defaults.ini";
+                    break;
+
                 case "testing":
                     defaultConfigName = string.Empty;
                     defaultsIniName = "Testing.defaults.ini";
