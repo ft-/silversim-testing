@@ -44,8 +44,9 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
         public abstract UserAuthInfo this[UUID accountid] { get; }
         public abstract void Store(UserAuthInfo info);
 
-        public abstract UUID AddToken(UUID principalId, int lifetime_in_minutes);
+        public abstract UUID AddToken(UUID principalId, UUID sessionid, int lifetime_in_minutes);
         public abstract void VerifyToken(UUID principalId, UUID token, int lifetime_extension_in_minutes);
         public abstract void ReleaseToken(UUID accountId, UUID secureSessionId);
+        public abstract void ReleaseTokenBySession(UUID accountId, UUID sessionId);
     }
 }

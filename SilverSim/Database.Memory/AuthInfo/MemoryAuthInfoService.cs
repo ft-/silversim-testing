@@ -17,11 +17,14 @@ namespace SilverSim.Database.Memory.AuthInfo
     {
         class AuthToken
         {
-            public UUID UserID;
+            public readonly UUID UserID;
+            public readonly UUID SessionID;
             public Date ValidUntil;
 
-            public AuthToken(UUID userID, int lifetime_in_minutes)
+            public AuthToken(UUID userID, UUID sessionID, int lifetime_in_minutes)
             {
+                UserID = userID;
+                SessionID = sessionID;
                 ValidUntil = Date.UnixTimeToDateTime(Date.Now.AsULong + (ulong)lifetime_in_minutes * 60);
             }
         }
@@ -69,10 +72,10 @@ namespace SilverSim.Database.Memory.AuthInfo
             m_AuthInfos[info.ID] = info;
         }
 
-        public override UUID AddToken(UUID principalId, int lifetime_in_minutes)
+        public override UUID AddToken(UUID principalId, UUID sessionid, int lifetime_in_minutes)
         {
             UUID newTokenId = UUID.Random;
-            AuthToken tok = new AuthToken(principalId, lifetime_in_minutes);
+            AuthToken tok = new AuthToken(principalId, sessionid, lifetime_in_minutes);
             m_Tokens.Add(newTokenId, tok);
             return newTokenId;
         }
@@ -100,6 +103,18 @@ namespace SilverSim.Database.Memory.AuthInfo
         public override void ReleaseToken(UUID accountId, UUID secureSessionId)
         {
             m_Tokens.RemoveIf(secureSessionId, delegate (AuthToken tok) { return accountId == tok.UserID; });
+        }
+
+        public override void ReleaseTokenBySession(UUID accountId, UUID sessionId)
+        {
+            foreach(KeyValuePair<UUID, AuthToken> kvp in m_Tokens)
+            {
+                if(kvp.Value.SessionID == sessionId && kvp.Value.UserID == accountId)
+                {
+                    m_Tokens.Remove(kvp.Key);
+                    return;
+                }
+            }
         }
     }
     #endregion

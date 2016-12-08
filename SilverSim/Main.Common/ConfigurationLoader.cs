@@ -1508,6 +1508,8 @@ namespace SilverSim.Main.Common
                 KnownConfigurationIssues.Add("Configure HTTPS support in [HTTPS] section");
             }
 
+            httpServer.Startup(this);
+
             if(startupConfig != null)
             {
                 HomeURI = startupConfig.GetString("HomeURI", httpServer.ExternalHostName);
@@ -1533,7 +1535,10 @@ namespace SilverSim.Main.Common
             m_Log.Info("Starting modules");
             foreach(IPlugin instance in PluginInstances.Values)
             {
-                instance.Startup(this);
+                if (instance != httpServer)
+                {
+                    instance.Startup(this);
+                }
             }
 
             if(PluginInstances.ContainsKey("ServerParamStorage"))

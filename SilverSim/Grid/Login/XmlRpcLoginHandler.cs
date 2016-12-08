@@ -241,7 +241,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        UUID Authenticate(UUID avatarid, string passwd)
+        UUID Authenticate(UUID avatarid, UUID sessionid, string passwd)
         {
             UserAuthInfo uai = m_AuthInfoService[avatarid];
             string salted = ComputeMD5(passwd + ":" + uai.PasswordSalt);
@@ -250,7 +250,7 @@ namespace SilverSim.Grid.Login
             {
                 throw new LoginFailResponseException("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
-            return m_AuthInfoService.AddToken(uai.ID, 30);
+            return m_AuthInfoService.AddToken(uai.ID, sessionid, 30);
         }
 
         void HandleLogin(HttpRequest httpreq)
@@ -367,7 +367,7 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                loginData.SessionInfo.SecureSessionID = Authenticate(loginData.Account.Principal.ID, passwd);
+                loginData.SessionInfo.SecureSessionID = Authenticate(loginData.Account.Principal.ID, loginData.SessionInfo.SessionID, passwd);
             }
             catch
             {

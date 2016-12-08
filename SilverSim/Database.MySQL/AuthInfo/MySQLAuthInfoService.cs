@@ -38,15 +38,16 @@ namespace SilverSim.Database.MySQL.AuthInfo
             new AddColumn<UUID>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("PasswordHash") { Cardinality = 32, IsFixed = true, IsNullAllowed = false },
             new AddColumn<string>("PasswordSalt") { Cardinality = 32, IsFixed = true, IsNullAllowed = false },
-            new PrimaryKeyInfo("SessionID"),
-            new NamedKeyInfo("UserIDSessionID", "UserID", "SessionID") { IsUnique = true },
+            new PrimaryKeyInfo("UserID"),
             new SqlTable("tokens"),
             new AddColumn<UUID>("UserID") { IsNullAllowed = false },
             new AddColumn<string>("Token") { IsNullAllowed = false },
             new AddColumn<Date>("Validity") { IsNullAllowed = false },
             new PrimaryKeyInfo("UserID", "Token"),
             new NamedKeyInfo("TokenIndex", "Token"),
-            new NamedKeyInfo("UserIDIndex", "UserID")
+            new NamedKeyInfo("UserIDIndex", "UserID"),
+            new NamedKeyInfo("UserIDSessionID", "UserID", "SessionID") { IsUnique = true },
+            new NamedKeyInfo("SessionIDIndex", "SessionID") { IsUnique = true },
         };
 
         public void VerifyConnection()
@@ -127,11 +128,12 @@ namespace SilverSim.Database.MySQL.AuthInfo
             }
         }
 
-        public override UUID AddToken(UUID principalId, int lifetime_in_minutes)
+        public override UUID AddToken(UUID principalId, UUID sessionid, int lifetime_in_minutes)
         {
             UUID secureSessionID = UUID.Random;
             Dictionary<string, object> vals = new Dictionary<string, object>();
             vals.Add("UserID", principalId);
+            vals.Add("SessionID", sessionid);
             vals.Add("Token", secureSessionID);
             ulong d = Date.Now.AsULong + (ulong)lifetime_in_minutes * 30;
             vals.Add("Validity", Date.UnixTimeToDateTime(d));
@@ -183,6 +185,23 @@ namespace SilverSim.Database.MySQL.AuthInfo
                     cmd.Parameters.AddParameter("?id", accountId);
                     cmd.Parameters.AddParameter("?token", secureSessionId);
                     if(cmd.ExecuteNonQuery() < 1)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+            }
+        }
+
+        public override void ReleaseTokenBySession(UUID accountId, UUID sessionId)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE ?id AND SessionID LIKE ?sessionid", connection))
+                {
+                    cmd.Parameters.AddParameter("?id", accountId);
+                    cmd.Parameters.AddParameter("?sessionid", sessionId);
+                    if (cmd.ExecuteNonQuery() < 1)
                     {
                         throw new KeyNotFoundException();
                     }
