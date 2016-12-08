@@ -117,8 +117,8 @@ namespace SilverSim.Scene.Npc
             loader.Scenes.OnRegionAdd += OnSceneAdded;
             loader.Scenes.OnRegionRemove += OnSceneRemoved;
 
-            loader.CommandRegistry.ShowCommands.Add("npcs", ShowNpcsCommand);
-            loader.CommandRegistry.RemoveCommands.Add("npc", RemoveNpcCommand);
+            loader.CommandRegistry.AddShowCommand("npcs", ShowNpcsCommand);
+            loader.CommandRegistry.AddRemoveCommand("npc", RemoveNpcCommand);
         }
 
         readonly RwLockedDictionary<UUID, SceneInterface> m_KnownScenes = new RwLockedDictionary<UUID, SceneInterface>();

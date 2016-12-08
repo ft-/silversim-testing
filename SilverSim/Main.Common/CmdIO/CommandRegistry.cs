@@ -15,50 +15,153 @@ namespace SilverSim.Main.Common.CmdIO
         // for documentation:
         //public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
 
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CreateCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DeleteCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> LoadCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SaveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ShowCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ResetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> GetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ChangeCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ClearCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> RemoveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EmptyCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> StartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> RestartCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> StopCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SelectCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EnableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DisableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> AlertCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        public readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> KickCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_CreateCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DeleteCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_LoadCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SaveCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ShowCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SetCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ResetCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_GetCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ChangeCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ClearCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RemoveCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_EmptyCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_StartCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RestartCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_StopCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SelectCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_EnableCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DisableCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_AlertCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_KickCommands;
+
+        readonly object m_RegisterCmdGroupLock = new object();
+
+        public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands
+        {
+            get
+            {
+                return m_Commands;
+            }
+        }
+
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CheckAddCommandType(string cmd, ref RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
+        {
+            lock (m_RegisterCmdGroupLock)
+            {
+                if(null == dict)
+                {
+                    dict = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+                    Commands.Add(cmd, new CommandType(cmd, dict).Command_Handler);
+                }
+                return dict;
+            }
+        }
+
+        public void AddCreateCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("create", ref m_CreateCommands).Add(cmd, handler);
+        }
+
+        public void AddDeleteCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("delete", ref m_DeleteCommands).Add(cmd, handler);
+        }
+
+        public void AddLoadCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("load", ref m_LoadCommands).Add(cmd, handler);
+        }
+
+        public void AddSaveCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("save", ref m_SaveCommands).Add(cmd, handler);
+        }
+
+        public void AddGetCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("get", ref m_GetCommands).Add(cmd, handler);
+        }
+
+        public void AddSetCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("set", ref m_SetCommands).Add(cmd, handler);
+        }
+
+        public void AddResetCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("reset", ref m_ResetCommands).Add(cmd, handler);
+        }
+
+        public void AddRemoveCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("remove", ref m_RemoveCommands).Add(cmd, handler);
+        }
+
+        public void AddShowCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("show", ref m_ShowCommands).Add(cmd, handler);
+        }
+
+        public void AddChangeCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("change", ref m_ChangeCommands).Add(cmd, handler);
+        }
+
+        public void AddSelectCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("select", ref m_SelectCommands).Add(cmd, handler);
+        }
+
+        public void AddClearCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("clear", ref m_ClearCommands).Add(cmd, handler);
+        }
+
+        public void AddEmptyCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("empty", ref m_EmptyCommands).Add(cmd, handler);
+        }
+
+        public void AddRestartCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("restart", ref m_RestartCommands).Add(cmd, handler);
+        }
+
+        public void AddStartCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("start", ref m_StartCommands).Add(cmd, handler);
+        }
+
+        public void AddStopCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("stop", ref m_StopCommands).Add(cmd, handler);
+        }
+
+        public void AddEnableCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("enable", ref m_EnableCommands).Add(cmd, handler);
+        }
+
+        public void AddDisableCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("disable", ref m_DisableCommands).Add(cmd, handler);
+        }
+
+        public void AddAlertCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("alert", ref m_AlertCommands).Add(cmd, handler);
+        }
+
+        public void AddKickCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("kick", ref m_KickCommands).Add(cmd, handler);
+        }
 
         public CommandRegistry()
         {
-            Commands.Add("load", new CommandType("load", LoadCommands).Command_Handler);
-            Commands.Add("save", new CommandType("save", SaveCommands).Command_Handler);
-            Commands.Add("get", new CommandType("get", GetCommands).Command_Handler);
-            Commands.Add("set", new CommandType("set", SetCommands).Command_Handler);
-            Commands.Add("reset", new CommandType("reset", ResetCommands).Command_Handler);
-            Commands.Add("remove", new CommandType("remove", RemoveCommands).Command_Handler);
-            Commands.Add("show", new CommandType("show", ShowCommands).Command_Handler);
-            Commands.Add("create", new CommandType("create", CreateCommands).Command_Handler);
-            Commands.Add("delete", new CommandType("delete", DeleteCommands).Command_Handler);
-            Commands.Add("change", new CommandType("change", ChangeCommands).Command_Handler);
-            Commands.Add("select", new CommandType("select", SelectCommands).Command_Handler);
-            Commands.Add("clear", new CommandType("clear", ClearCommands).Command_Handler);
-            Commands.Add("empty", new CommandType("empty", EmptyCommands).Command_Handler);
-            Commands.Add("restart", new CommandType("restart", RestartCommands).Command_Handler);
-            Commands.Add("start", new CommandType("start", StartCommands).Command_Handler);
-            Commands.Add("stop", new CommandType("stop", StopCommands).Command_Handler);
-            Commands.Add("enable", new CommandType("enable", EnableCommands).Command_Handler);
-            Commands.Add("disable", new CommandType("disable", DisableCommands).Command_Handler);
-            Commands.Add("alert", new CommandType("alert", AlertCommands).Command_Handler);
-            Commands.Add("kick", new CommandType("kick", KickCommands).Command_Handler);
         }
 
         sealed class CommandType

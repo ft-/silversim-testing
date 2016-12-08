@@ -1254,16 +1254,16 @@ namespace SilverSim.Main.Common
 
             CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
             CommandRegistry.Commands.Add("execute", ExecuteCommand);
-            CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
-            CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
-            CommandRegistry.ShowCommands.Add("queues", ShowQueuesCommand);
-            CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
-            CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
-            CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
-            CommandRegistry.ShowCommands.Add("serverparams", ShowServerParamsCommand);
-            CommandRegistry.ShowCommands.Add("issues", ShowIssuesCommand);
-            CommandRegistry.ShowCommands.Add("cacheddns", ShowCachedDnsCommand);
-            CommandRegistry.DeleteCommands.Add("cacheddns", RemoveCachedDnsCommand);
+            CommandRegistry.AddShowCommand("memory", ShowMemoryCommand);
+            CommandRegistry.AddShowCommand("threadcount", ShowThreadCountCommand);
+            CommandRegistry.AddShowCommand("queues", ShowQueuesCommand);
+            CommandRegistry.AddShowCommand("modules", ShowModulesCommand);
+            CommandRegistry.AddGetCommand("serverparam", GetServerParamCommand);
+            CommandRegistry.AddSetCommand("serverparam", SetServerParamCommand);
+            CommandRegistry.AddShowCommand("serverparams", ShowServerParamsCommand);
+            CommandRegistry.AddShowCommand("issues", ShowIssuesCommand);
+            CommandRegistry.AddShowCommand("cacheddns", ShowCachedDnsCommand);
+            CommandRegistry.AddDeleteCommand("cacheddns", RemoveCachedDnsCommand);
 
             while(m_Sources.Count != 0)
             {

@@ -40,8 +40,8 @@ namespace SilverSim.LoadStore.Terrain
         public void Startup(ConfigurationLoader loader)
         {
             m_Scenes = loader.Scenes;
-            loader.CommandRegistry.LoadCommands.Add("terrain", LoadTerrainCommand);
-            loader.CommandRegistry.SaveCommands.Add("terrain", SaveTerrainCommand);
+            loader.CommandRegistry.AddLoadCommand("terrain", LoadTerrainCommand);
+            loader.CommandRegistry.AddSaveCommand("terrain", SaveTerrainCommand);
 
             foreach(ITerrainFileStorage iface in loader.GetServicesByValue<ITerrainFileStorage>())
             {

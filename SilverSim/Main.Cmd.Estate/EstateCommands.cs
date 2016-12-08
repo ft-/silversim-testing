@@ -42,11 +42,11 @@ namespace SilverSim.Main.Cmd.Estate
             m_Scenes = loader.Scenes;
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
-            loader.CommandRegistry.ShowCommands.Add("estates", ShowEstatesCmd);
-            loader.CommandRegistry.ChangeCommands.Add("estate", ChangeEstateCmd);
-            loader.CommandRegistry.CreateCommands.Add("estate", CreateEstateCmd);
-            loader.CommandRegistry.DeleteCommands.Add("estate", DeleteEstateCmd);
-            loader.CommandRegistry.AlertCommands.Add("estate", AlertEstateCmd);
+            loader.CommandRegistry.AddShowCommand("estates", ShowEstatesCmd);
+            loader.CommandRegistry.AddChangeCommand("estate", ChangeEstateCmd);
+            loader.CommandRegistry.AddCreateCommand("estate", CreateEstateCmd);
+            loader.CommandRegistry.AddDeleteCommand("estate", DeleteEstateCmd);
+            loader.CommandRegistry.AddAlertCommand("estate", AlertEstateCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if(null != sceneConfig)
