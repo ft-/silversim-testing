@@ -46,7 +46,6 @@ namespace SilverSim.Main.Cmd.Region
         private static readonly ILog m_Log = LogManager.GetLogger("REGION COMMANDS");
         ExternalHostNameServiceInterface m_ExternalHostNameService;
         ConfigurationLoader m_Loader;
-        string m_GatekeeperURI;
         BaseHttpServer m_HttpServer;
         SceneList m_Scenes;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
@@ -64,18 +63,6 @@ namespace SilverSim.Main.Cmd.Region
             m_Scenes = loader.Scenes;
             m_Loader = loader;
             m_ExternalHostNameService = loader.ExternalHostNameService;
-
-            IConfig config;
-
-            config = loader.Config.Configs["Startup"];
-            if(config != null)
-            {
-                m_GatekeeperURI = config.GetString("GatekeeperURI", "");
-                if(m_GatekeeperURI.Length != 0 && !m_GatekeeperURI.EndsWith("/"))
-                {
-                    m_GatekeeperURI += "/";
-                }
-            }
 
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
@@ -1137,7 +1124,7 @@ namespace SilverSim.Main.Cmd.Region
                 }
                 else
                 {
-                    rInfo.GridURI = m_GatekeeperURI;
+                    rInfo.GridURI = m_Loader.GatekeeperURI;
                     if (string.IsNullOrEmpty(rInfo.ServerIP))
                     {
                         rInfo.ServerIP = m_ExternalHostNameService.ExternalHostName;
@@ -1562,7 +1549,7 @@ namespace SilverSim.Main.Cmd.Region
                         ResolveName(rInfo.Owner).FullName,
                         gridcoord.X_String + "," + gridcoord.Y_String,
                         rInfo.ServerPort,
-                        m_GatekeeperURI);
+                        m_Loader.GatekeeperURI);
                 }
             }
             io.Write(output.ToString());

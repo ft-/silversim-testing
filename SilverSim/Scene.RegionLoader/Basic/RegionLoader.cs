@@ -25,7 +25,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private SceneFactoryInterface m_SceneFactory;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
         SceneList m_Scenes;
-        string m_GatekeeperURI;
+        string m_GatekeeperUri;
 
         #region Constructor
         internal RegionLoaderService(string regionStorage)
@@ -35,21 +35,12 @@ namespace SilverSim.Scene.RegionLoader.Basic
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_GatekeeperUri = loader.GatekeeperURI;
             m_Scenes = loader.Scenes;
             m_ExternalHostNameService = loader.ExternalHostNameService;
             IConfig config = loader.Config.Configs["Network"];
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
-
-            config = loader.Config.Configs["Startup"];
-            if (config != null)
-            {
-                m_GatekeeperURI = config.GetString("GatekeeperURI", "");
-                if (m_GatekeeperURI.Length != 0 && !m_GatekeeperURI.EndsWith("/"))
-                {
-                    m_GatekeeperURI += "/";
-                }
-            }
         }
         #endregion
 
@@ -63,7 +54,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
             foreach(RegionInfo ri in m_RegionService.GetOnlineRegions())
             {
                 m_Log.InfoFormat("Starting Region {0}", ri.Name);
-                ri.GridURI = m_GatekeeperURI;
+                ri.GridURI = m_GatekeeperUri;
                 if(string.IsNullOrEmpty(ri.ServerIP))
                 {
                     ri.ServerIP = m_ExternalHostNameService.ExternalHostName;

@@ -1173,6 +1173,54 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        string m_GatekeeperURI = string.Empty;
+
+        /** <summary>specifies the inter-grid region management server (not updated after any Startup has been called)</summary> */
+        public string GatekeeperURI
+        {
+            get
+            {
+                return m_GatekeeperURI;
+            }
+            set
+            {
+                if(!value.EndsWith("/"))
+                {
+                    value += "/";
+                }
+                m_GatekeeperURI = value;
+            }
+        }
+
+        string m_HomeURI = string.Empty;
+
+        /** <summary>specifies the user server (not updated after any Startup has been called)</summary> */
+        public string HomeURI
+        {
+            get
+            {
+                return m_HomeURI;
+            }
+            set
+            {
+                if(!value.EndsWith("/"))
+                {
+                    value += "/";
+                }
+                m_HomeURI = value;
+            }
+        }
+
+        public string GridNick
+        {
+            get; set;
+        }
+
+        public string GridName
+        {
+            get; set;
+        }
+
         #region Constructor and Main
         public enum LocalConsole
         {
@@ -1458,6 +1506,14 @@ namespace SilverSim.Main.Common
             else
             {
                 KnownConfigurationIssues.Add("Configure HTTPS support in [HTTPS] section");
+            }
+
+            if(startupConfig != null)
+            {
+                HomeURI = startupConfig.GetString("HomeURI", httpServer.ExternalHostName);
+                GatekeeperURI = startupConfig.GetString("GatekeeperURI", HomeURI);
+                GridName = startupConfig.GetString("GridName", string.Empty);
+                GridNick = startupConfig.GetString("GridNick", string.Empty);
             }
 
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());

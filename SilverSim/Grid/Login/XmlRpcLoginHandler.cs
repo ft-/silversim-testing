@@ -52,8 +52,6 @@ namespace SilverSim.Grid.Login
     [ServerParam("GridNick", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
     [ServerParam("GridName", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
     [ServerParam("AllowMultiplePresences", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("GatekeeperURI", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("HomeURI", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
     [ServerParam("MaxAgentGroups", ParameterType = typeof(uint), Type = ServerParamType.GlobalOnly)]
     public class XmlRpcLoginHandler : IPlugin, IServerParamListener
     {
@@ -93,9 +91,9 @@ namespace SilverSim.Grid.Login
         string m_GridNick = string.Empty;
         string m_GridName = string.Empty;
         bool m_AllowMultiplePresences;
-        Uri m_HomeUri;
-        Uri m_GatekeeperUri;
         int m_MaxAgentGroups = 42;
+        string m_HomeUri;
+        string m_GatekeeperUri;
 
         public XmlRpcLoginHandler(IConfig ownSection)
         {
@@ -113,6 +111,7 @@ namespace SilverSim.Grid.Login
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_HomeUri = loader.HomeURI;
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
@@ -135,6 +134,7 @@ namespace SilverSim.Grid.Login
             {
                 m_HttpsServer = null;
             }
+
             m_HttpServer.UriHandlers.Add("/login", HandleLogin);
             m_HttpServer.UriHandlers.Add("/get_grid_info", HandleGetGridInfo);
             m_HttpServer.UriHandlers.Add("/json_grid_info", HandleJsonGridInfo);
@@ -553,11 +553,10 @@ namespace SilverSim.Grid.Login
 
         void LoginAuthenticatedAndPresenceAndGridUserAdded(HttpRequest httpreq, LoginData loginData)
         {
-            Uri gkUri = m_GatekeeperUri;
             TravelingDataInfo hgdata = new TravelingDataInfo();
             hgdata.SessionID = loginData.SessionInfo.SessionID;
             hgdata.UserID = loginData.Account.Principal.ID;
-            hgdata.GridExternalName = gkUri != null ? gkUri.ToString() : m_HttpServer.ServerURI;
+            hgdata.GridExternalName = m_GatekeeperUri;
             hgdata.ServiceToken = UUID.Random.ToString();
             hgdata.ClientIPAddress = loginData.ClientInfo.ClientIP;
             loginData.SessionInfo.ServiceSessionID = hgdata.GridExternalName + ";" + UUID.Random.ToString();
@@ -1113,34 +1112,6 @@ namespace SilverSim.Grid.Login
                 return;
             }
             m_GridNick = value;
-        }
-
-        [ServerParam("HomeURI")]
-        public void HandleHomeURI(UUID regionid, string value)
-        {
-            if(regionid != UUID.Zero)
-            {
-                return;
-            }
-
-            if(!Uri.TryCreate(value, UriKind.Absolute, out m_HomeUri))
-            {
-                m_HomeUri = null;
-            }
-        }
-
-        [ServerParam("GatekeeperURI")]
-        public void HandleGatekeeperURI(UUID regionid, string value)
-        {
-            if(regionid != UUID.Zero)
-            {
-                return;
-            }
-
-            if(!Uri.TryCreate(value, UriKind.Absolute, out m_GatekeeperUri))
-            {
-                m_GatekeeperUri = null;
-            }
         }
         #endregion
     }
