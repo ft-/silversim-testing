@@ -28,6 +28,7 @@ namespace SilverSim.Database.MySQL.Grid
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
         private bool IsDeleteOnUnregister;
         private bool AllowDuplicateRegionNames;
+        List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
 
         [ServerParam("DeleteOnUnregister")]
         public void DeleteOnUnregisterUpdated(UUID regionid, string value)
@@ -58,7 +59,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_RegionDefaultServices = loader.GetServicesByValue<RegionDefaultFlagsServiceInterface>();
         }
         #endregion
 
@@ -361,7 +362,12 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override void RegisterRegion(RegionInfo regionInfo)
         {
-            using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            foreach (RegionDefaultFlagsServiceInterface service in m_RegionDefaultServices)
+            {
+                regionInfo.Flags |= service.GetRegionDefaultFlags(regionInfo.ID);
+            }
+
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
 

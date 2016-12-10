@@ -3,10 +3,12 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.CmdIO;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SilverSim.Main.Cmd.MapServer
 {
@@ -28,9 +30,39 @@ namespace SilverSim.Main.Cmd.MapServer
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_RegionDefaultFlagsService = loader.GetService<RegionDefaultFlagsServiceInterface>(m_RegionDefaultFlagsServiceName);
             loader.CommandRegistry.AddChangeCommand("regionflags", ChangeRegionFlagDefaultsCmd);
+            loader.CommandRegistry.AddShowCommand("defaultregionflags", ShowRegionFlagDefaultsCmd);
         }
 
-        void ChangeRegionFlagDefaultsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void ShowRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
+        {
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Command not allowed on limited console");
+            }
+            else if (args[0] == "help")
+            {
+                io.Write("show defaultregionflags");
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("Default RegionFlags:\n----------------------------------------------------------------------\n");
+                foreach(KeyValuePair<UUID, RegionFlags> kvp in m_RegionDefaultFlagsService.GetAllRegionDefaultFlags())
+                {
+                    RegionInfo ri;
+                    if(m_GridService.TryGetValue(kvp.Key, out ri))
+                    {
+                        sb.AppendFormat("Region {0} ({1}):\n- {2}", ri.Name, kvp.Key, kvp.Value.ToString());
+                    }
+                    else
+                    {
+                        sb.AppendFormat("Region ? ({0}):\n- {1}", kvp.Key, kvp.Value.ToString());
+                    }
+                }
+                io.Write(sb.ToString());
+            }
+        }
+
+        void ChangeRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
         {
             if(limitedToScene != UUID.Zero)
             {
