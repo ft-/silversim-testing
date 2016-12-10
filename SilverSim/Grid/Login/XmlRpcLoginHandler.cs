@@ -112,6 +112,7 @@ namespace SilverSim.Grid.Login
         public void Startup(ConfigurationLoader loader)
         {
             m_HomeUri = loader.HomeURI;
+            m_GatekeeperUri = loader.GatekeeperURI;
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
@@ -233,18 +234,10 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        string ComputeMD5(string input)
-        {
-            using (MD5 md5 = MD5.Create())
-            {
-                return md5.ComputeHash(UTF8NoBOM.GetBytes(input)).ToString().ToLower();
-            }
-        }
-
         UUID Authenticate(UUID avatarid, UUID sessionid, string passwd)
         {
             UserAuthInfo uai = m_AuthInfoService[avatarid];
-            string salted = ComputeMD5(passwd + ":" + uai.PasswordSalt);
+            string salted = (passwd + ":" + uai.PasswordSalt).ComputeMD5();
 
             if(salted != uai.PasswordHash)
             {
@@ -345,9 +338,14 @@ namespace SilverSim.Grid.Login
                 LoginFailResponse(httpreq, "key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
                 return;
             }
-            if(!passwd.StartsWith("$1$"))
+            if(loginData.Account.UserLevel < 0)
             {
-                passwd = ComputeMD5(passwd);
+                LoginFailResponse(httpreq, "key", "Could not authenticate your avatar. Account has been disabled.");
+                return;
+            }
+            if (!passwd.StartsWith("$1$"))
+            {
+                passwd = passwd.ComputeMD5();
             }
             else
             {

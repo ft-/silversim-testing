@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 
@@ -156,6 +157,14 @@ namespace SilverSim.Types
         public static string ToHexString(this byte[] data)
         {
             return BitConverter.ToString(data).Replace("-", string.Empty);
+        }
+
+        public static string ComputeMD5(this string input)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                return md5.ComputeHash(m_UTF8NoBOM.GetBytes(input)).ToHexString().ToLower();
+            }
         }
 
         public static string TrimToMaxLength(this string s, int length)

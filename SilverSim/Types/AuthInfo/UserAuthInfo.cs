@@ -21,19 +21,9 @@ namespace SilverSim.Types.AuthInfo
             }
             set
             {
-                PasswordSalt = CalcMD5(UUID.Random.ToString());
-                PasswordHash = CalcMD5(CalcMD5(value) + ":" + PasswordSalt);
+                PasswordSalt = UUID.Random.ToString().ComputeMD5();
+                PasswordHash = (value.ComputeMD5() + ":" + PasswordSalt).ComputeMD5();
             }
         }
-
-        static string CalcMD5(string data)
-        {
-            using (MD5 md5 = MD5.Create())
-            {
-                return md5.ComputeHash(UTF8NoBOM.GetBytes(data)).ToHexString().ToLower();
-            }
-        }
-
-        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

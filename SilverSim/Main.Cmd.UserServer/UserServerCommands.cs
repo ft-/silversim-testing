@@ -79,6 +79,11 @@ namespace SilverSim.Main.Cmd.UserServer
                     {
                         case "userlevel":
                             account.UserLevel = int.Parse(args[argi + 1]);
+                            if(account.UserLevel < -1 || account.UserLevel > 255)
+                            {
+                                io.WriteFormatted("User level parameter {0} is not valid", account.UserLevel);
+                                return;
+                            }
                             break;
 
                         case "email":
