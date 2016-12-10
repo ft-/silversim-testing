@@ -40,6 +40,7 @@ namespace SilverSim.Main.Cmd.UserServer
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             loader.CommandRegistry.AddCreateCommand("user", CreateUserCommand);
             loader.CommandRegistry.AddDeleteCommand("user", DeleteUserCommand);
+            loader.CommandRegistry.AddChangeCommand("user", ChangeUserCommand);
         }
 
         bool IsNameValid(string s)
@@ -52,6 +53,54 @@ namespace SilverSim.Main.Cmd.UserServer
                 }
             }
             return true;
+        }
+
+        [Description("Change user")]
+        void ChangeUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UserAccount account;
+            if(args[0] == "help" || args.Count < 4 || args.Count % 2 != 0)
+            {
+                io.Write("change user <firstname> <lastname> (<token> <parameter>)*\n" +
+                        "Token parameters:\n" +
+                        "userlevel <level>\n" + 
+                        "email <email>\n" +
+                        "usertitle <usertitle>\n");
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                io.Write("change user not allowed on limited console");
+            }
+            else if(m_UserAccountService.TryGetValue(UUID.Zero, args[2], args[3], out account))
+            {
+                for(int argi = 4; argi < args.Count; argi += 2)
+                {
+                    switch(args[argi])
+                    {
+                        case "userlevel":
+                            account.UserLevel = int.Parse(args[argi + 1]);
+                            break;
+
+                        case "email":
+                            account.Email = args[argi + 1];
+                            break;
+
+                        case "usertitle":
+                            account.UserTitle = args[argi + 1];
+                            break;
+
+                        default:
+                            io.WriteFormatted("Unsupported token parameter {0}", args[argi]);
+                            return;
+                    }
+                }
+
+                m_UserAccountService.Update(account);
+            }
+            else
+            {
+                io.WriteFormatted("User \"{0}\" \"{1}\" not found", args[2], args[3]);
+            }
         }
 
         [Description("Create user")]
