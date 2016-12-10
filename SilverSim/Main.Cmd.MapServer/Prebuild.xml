@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_5" name="SilverSim.Grid" path="SilverSim/Grid" type="Library">
+<Project frameworkVersion="v4_5" name="SilverSim.Main.Cmd.MapServer" path="SilverSim/Main.Cmd.MapServer" type="Library">
   <Configuration name="Release">
     <Options>
       <OutputPath>../../bin/plugins/</OutputPath>
@@ -12,18 +12,15 @@
   </Configuration>
   <ReferencePath>../../bin/</ReferencePath>
   <Reference name="System"/>
-  <Reference name="System.Core"/>
   <Reference name="System.Xml"/>
-  <Reference name="System.Drawing"/>
-  <Reference name="Paloma.TargaImage" localCopy="false"/>
+  <Reference name="System.Web"/>
+  <Reference name="SilverSim.Threading" localCopy="false"/>
+  <Reference name="Nini" path="../../bin/" localCopy="false"/>
+  <Reference name="log4net" path="../../bin/" localCopy="false"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
+  <Reference name="SilverSim.Http" localCopy="false"/>
   <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
-  <Reference name="SilverSim.Scene.Types" localCopy="false"/>
-  <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
-  <Reference name="SilverSim.Threading" localCopy="false"/>
-  <Reference name="log4net" path="../../bin/" localCopy="false"/>
-  <Reference name="Nini" path="../../bin/" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
         <Exclude pattern="TemporaryGeneratedFile"/>
