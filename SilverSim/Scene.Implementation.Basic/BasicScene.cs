@@ -25,7 +25,6 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.PortControl;
-using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;

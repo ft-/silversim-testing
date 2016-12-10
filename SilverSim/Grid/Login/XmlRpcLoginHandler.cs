@@ -1116,8 +1116,14 @@ namespace SilverSim.Grid.Login
     #endregion
 
     #region Service factory
+    [PluginName("XmlRpcLoginHandler")]
     public class XmlRpcLoginHandlerFactory : IPluginFactory
     {
+        public XmlRpcLoginHandlerFactory()
+        {
+
+        }
+
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new XmlRpcLoginHandler(ownSection);
