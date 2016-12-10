@@ -30,6 +30,7 @@ namespace SilverSim.Main.Cmd.MapServer
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_RegionDefaultFlagsService = loader.GetService<RegionDefaultFlagsServiceInterface>(m_RegionDefaultFlagsServiceName);
             loader.CommandRegistry.AddChangeCommand("regionflags", ChangeRegionFlagDefaultsCmd);
+            loader.CommandRegistry.AddClearCommand("regionflags", ClearRegionFlagDefaultsCmd);
             loader.CommandRegistry.AddShowCommand("defaultregionflags", ShowRegionFlagDefaultsCmd);
         }
 
@@ -195,6 +196,59 @@ namespace SilverSim.Main.Cmd.MapServer
                 catch
                 {
                     io.Write("Failed to set new region flag defaults");
+                }
+            }
+        }
+
+        void ClearRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
+        {
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Command not allowed on limited console");
+            }
+            else if (args[0] == "help" || args.Count != 4)
+            {
+                io.Write("clear regionflags id <uuid>\n" +
+                        "clear regionflags name <name>");
+            }
+            else
+            {
+                UUID id;
+                if (args[2] == "id")
+                {
+                    if (!UUID.TryParse(args[3], out id))
+                    {
+                        io.Write("uuid is not valid");
+                        return;
+                    }
+                }
+                else if (args[2] == "name")
+                {
+                    RegionInfo ri;
+                    if (m_GridService.TryGetValue(UUID.Zero, args[3], out ri))
+                    {
+                        id = ri.ID;
+                    }
+                    else
+                    {
+                        io.WriteFormatted("unknown region {0}", args[3]);
+                        return;
+                    }
+                }
+                else
+                {
+                    io.Write("Invalid parameters");
+                    return;
+                }
+
+                try
+                {
+                    m_GridService.RemoveRegionFlags(id, RegionFlags.FallbackRegion | RegionFlags.DefaultRegion | RegionFlags.DefaultHGRegion | RegionFlags.Persistent);
+                    m_RegionDefaultFlagsService.ChangeRegionDefaultFlags(id, RegionFlags.None, ~RegionFlags.None);
+                }
+                catch
+                {
+                    io.Write("Failed to set clear region flag defaults");
                 }
             }
         }

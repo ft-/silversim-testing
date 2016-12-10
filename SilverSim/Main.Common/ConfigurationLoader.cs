@@ -1228,6 +1228,32 @@ namespace SilverSim.Main.Common
             Allowed
         }
 
+        void ProcessConfigurations()
+        {
+            while (m_Sources.Count != 0)
+            {
+                ICFG_Source source = m_Sources.Dequeue();
+                try
+                {
+                    m_Config.Merge(source.ConfigSource);
+                }
+                catch
+                {
+                    System.Console.Write(String.Format(source.Message, source.Name));
+                    System.Console.WriteLine();
+                    throw new ConfigurationErrorException();
+                }
+                LoadGridsXml();
+                AddIncludes(source);
+                ProcessImportResources();
+                ProcessParameterMap();
+                ProcessResourceMap();
+            }
+            LoadGridsXml();
+            ProcessParameterMap();
+            ProcessUseTemplates();
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
@@ -1301,9 +1327,14 @@ namespace SilverSim.Main.Common
                     m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
                 }
             }
+
+            /* pre-process defaults ini before adding the final configuration */
+            ProcessConfigurations();
+
             /* make the resource assets available for all users not just scene */
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
             AddSource(mainConfig);
+            ProcessConfigurations();
 
             CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
             CommandRegistry.Commands.Add("execute", ExecuteCommand);
@@ -1317,29 +1348,6 @@ namespace SilverSim.Main.Common
             CommandRegistry.AddShowCommand("issues", ShowIssuesCommand);
             CommandRegistry.AddShowCommand("cacheddns", ShowCachedDnsCommand);
             CommandRegistry.AddDeleteCommand("cacheddns", RemoveCachedDnsCommand);
-
-            while(m_Sources.Count != 0)
-            {
-                ICFG_Source source = m_Sources.Dequeue();
-                try
-                {
-                    m_Config.Merge(source.ConfigSource);
-                }
-                catch
-                {
-                    System.Console.Write(String.Format(source.Message, source.Name));
-                    System.Console.WriteLine();
-                    throw new ConfigurationErrorException();
-                }
-                LoadGridsXml();
-                AddIncludes(source);
-                ProcessImportResources();
-                ProcessParameterMap();
-                ProcessResourceMap();
-            }
-            LoadGridsXml();
-            ProcessParameterMap();
-            ProcessUseTemplates();
 
             /* inject config values from arguments */
             foreach (string arg in defineargs)
