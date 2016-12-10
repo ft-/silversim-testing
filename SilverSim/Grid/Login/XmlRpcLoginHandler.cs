@@ -237,7 +237,7 @@ namespace SilverSim.Grid.Login
         {
             using (MD5 md5 = MD5.Create())
             {
-                return md5.ComputeHash(UTF8NoBOM.GetBytes(input)).ToString();
+                return md5.ComputeHash(UTF8NoBOM.GetBytes(input)).ToString().ToLower();
             }
         }
 
