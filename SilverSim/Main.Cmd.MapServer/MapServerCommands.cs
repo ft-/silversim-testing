@@ -32,6 +32,56 @@ namespace SilverSim.Main.Cmd.MapServer
             loader.CommandRegistry.AddChangeCommand("regionflags", ChangeRegionFlagDefaultsCmd);
             loader.CommandRegistry.AddClearCommand("regionflags", ClearRegionFlagDefaultsCmd);
             loader.CommandRegistry.AddShowCommand("defaultregionflags", ShowRegionFlagDefaultsCmd);
+            loader.CommandRegistry.AddUnregisterCommand("region", UnregisterRegionCmd);
+        }
+
+        void UnregisterRegionCmd(List<string> args, TTY io, UUID limitedToScene)
+        {
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Command not allowed on limited console");
+            }
+            else if (args[0] == "help" || args.Count != 4)
+            {
+                io.Write("unregister region id <regionid>\nunregister region name <name>");
+            }
+            else
+            {
+                UUID id;
+                RegionInfo ri;
+                switch(args[2])
+                {
+                    case "id":
+                        if(!UUID.TryParse(args[3], out id))
+                        {
+                            io.Write("regionid is not valid");
+                            return;
+                        }
+                        break;
+
+                    case "name":
+                        if (!m_GridService.TryGetValue(UUID.Zero, args[3], out ri))
+                        {
+                            io.WriteFormatted("region \"{0}\" is not known", args[3]);
+                            return;
+                        }
+                        id = ri.ID;
+                        break;
+
+                    default:
+                        io.WriteFormatted("Unknown region identifier type {0}", args[2]);
+                        return;
+                }
+
+                try
+                {
+                    m_GridService.UnregisterRegion(UUID.Zero, id);
+                }
+                catch
+                {
+                    io.Write("Failed to remove region");
+                }
+            }
         }
 
         void ShowRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
