@@ -4,6 +4,9 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.Types;
+using SilverSim.Types.Grid;
+using System.Collections.Generic;
 
 namespace SilverSim.Main.Cmd.MapServer
 {
@@ -24,6 +27,144 @@ namespace SilverSim.Main.Cmd.MapServer
         {
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_RegionDefaultFlagsService = loader.GetService<RegionDefaultFlagsServiceInterface>(m_RegionDefaultFlagsServiceName);
+            loader.CommandRegistry.AddChangeCommand("regionflags", ChangeRegionFlagDefaultsCmd);
+        }
+
+        void ChangeRegionFlagDefaultsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(limitedToScene != UUID.Zero)
+            {
+                io.Write("Command not allowed on limited console");
+            }
+            else if(args[0] == "help" || args.Count < 4 || args.Count % 2 != 0)
+            {
+                io.Write("change regionflags id <uuid> flags..\n" +
+                        "change regionflags name <name> flags..\n\nFlags:\n" +
+                        "fallback true|false\ndefault true|false\ndefaulthg true|false\npersistent true|false");
+            }
+            else
+            {
+                UUID id;
+                if(args[2] == "id")
+                {
+                    if(!UUID.TryParse(args[3], out id))
+                    {
+                        io.Write("uuid is not valid");
+                        return;
+                    }
+                }
+                else if(args[2] == "name")
+                {
+                    RegionInfo ri;
+                    if(m_GridService.TryGetValue(UUID.Zero, args[3], out ri))
+                    {
+                        id = ri.ID;
+                    }
+                    else
+                    {
+                        io.WriteFormatted("unknown region {0}", args[3]);
+                        return;
+                    }
+                }
+                else
+                {
+                    io.Write("Invalid parameters");
+                    return;
+                }
+
+                RegionFlags setFlags = RegionFlags.None;
+                RegionFlags removeFlags = RegionFlags.None;
+
+                bool val;
+                for(int argi = 4; argi < args.Count; argi += 2)
+                {
+                    switch(args[argi])
+                    {
+                        case "fallback":
+                            if(!bool.TryParse(args[argi + 1], out val))
+                            {
+                                io.WriteFormatted("{0} is not a valid boolean", args[argi + 1]);
+                                return;
+                            }
+                            if(val)
+                            {
+                                setFlags |= RegionFlags.FallbackRegion;
+                                removeFlags &= (~RegionFlags.FallbackRegion);
+                            }
+                            else
+                            {
+                                setFlags &= (~RegionFlags.FallbackRegion);
+                                removeFlags |= RegionFlags.FallbackRegion;
+                            }
+                            break;
+                        case "default":
+                            if (!bool.TryParse(args[argi + 1], out val))
+                            {
+                                io.WriteFormatted("{0} is not a valid boolean", args[argi + 1]);
+                                return;
+                            }
+                            if (val)
+                            {
+                                setFlags |= RegionFlags.DefaultRegion;
+                                removeFlags &= (~RegionFlags.DefaultRegion);
+                            }
+                            else
+                            {
+                                setFlags &= (~RegionFlags.DefaultRegion);
+                                removeFlags |= RegionFlags.DefaultRegion;
+                            }
+                            break;
+                        case "defaulthg":
+                            if (!bool.TryParse(args[argi + 1], out val))
+                            {
+                                io.WriteFormatted("{0} is not a valid boolean", args[argi + 1]);
+                                return;
+                            }
+                            if (val)
+                            {
+                                setFlags |= RegionFlags.DefaultHGRegion;
+                                removeFlags &= (~RegionFlags.DefaultHGRegion);
+                            }
+                            else
+                            {
+                                setFlags &= (~RegionFlags.DefaultHGRegion);
+                                removeFlags |= RegionFlags.DefaultHGRegion;
+                            }
+                            break;
+                        case "persistent":
+                            if (!bool.TryParse(args[argi + 1], out val))
+                            {
+                                io.WriteFormatted("{0} is not a valid boolean", args[argi + 1]);
+                                return;
+                            }
+                            if (val)
+                            {
+                                setFlags |= RegionFlags.Persistent;
+                                removeFlags &= (~RegionFlags.Persistent);
+                            }
+                            else
+                            {
+                                setFlags &= (~RegionFlags.Persistent);
+                                removeFlags |= RegionFlags.Persistent;
+                            }
+                            break;
+                        default:
+                            io.WriteFormatted("{0} is not a known flag", args[argi]);
+                            return;
+                    }
+                }
+
+                try
+                {
+                    m_GridService.AddRegionFlags(id, setFlags);
+                    m_GridService.RemoveRegionFlags(id, removeFlags);
+                    m_RegionDefaultFlagsService.ChangeRegionDefaultFlags(id, setFlags, removeFlags);
+                }
+                catch
+                {
+                    io.Write("Failed to set new region flag defaults");
+                }
+            }
         }
     }
 

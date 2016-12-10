@@ -36,6 +36,7 @@ namespace SilverSim.Main.Common.CmdIO
         RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DisableCommands;
         RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_AlertCommands;
         RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_KickCommands;
+        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_UnregisterCommands;
 
         readonly object m_RegisterCmdGroupLock = new object();
 
@@ -68,6 +69,11 @@ namespace SilverSim.Main.Common.CmdIO
         public void AddDeleteCommand(string cmd, Action<List<string>, TTY, UUID> handler)
         {
             CheckAddCommandType("delete", ref m_DeleteCommands).Add(cmd, handler);
+        }
+
+        public void AddUnregisterCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            CheckAddCommandType("unregister", ref m_UnregisterCommands).Add(cmd, handler);
         }
 
         public void AddLoadCommand(string cmd, Action<List<string>, TTY, UUID> handler)
