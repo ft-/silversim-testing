@@ -1341,7 +1341,6 @@ namespace SilverSim.Main.Common
             if (!string.IsNullOrEmpty(mainConfig))
             {
                 AddSource(mainConfig);
-                ProcessConfigurations();
             }
             else
             {
@@ -1399,6 +1398,7 @@ namespace SilverSim.Main.Common
                         break;
                 }
             }
+            ProcessConfigurations();
 
             string logConfigFile = string.Empty;
             IConfig startupConfig = m_Config.Configs["Startup"];
