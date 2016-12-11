@@ -1311,6 +1311,11 @@ namespace SilverSim.Main.Common
                     defaultsIniName = "Testing.defaults.ini";
                     break;
 
+                case "custom":
+                    defaultConfigName = string.Empty;
+                    defaultsIniName = "CustomConfig.defaults.ini";
+                    break;
+
                 default:
                     throw new ArgumentException("Invalid mode parameter");
             }
