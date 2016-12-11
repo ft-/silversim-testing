@@ -32,7 +32,29 @@ namespace SilverSim.Main.Cmd.MapServer
             loader.CommandRegistry.AddChangeCommand("regionflags", ChangeRegionFlagDefaultsCmd);
             loader.CommandRegistry.AddClearCommand("regionflags", ClearRegionFlagDefaultsCmd);
             loader.CommandRegistry.AddShowCommand("defaultregionflags", ShowRegionFlagDefaultsCmd);
-            loader.CommandRegistry.AddUnregisterCommand("region", UnregisterRegionCmd);
+            loader.CommandRegistry.AddUnregisterCommand("gridregion", UnregisterRegionCmd);
+            loader.CommandRegistry.AddShowCommand("gridregions", ShowRegionsCmd);
+        }
+
+        void ShowRegionsCmd(List<string> args, TTY io, UUID limitedToScene)
+        {
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Command not allowed on limited console");
+            }
+            else if (args[0] == "help" || args.Count != 3)
+            {
+                io.Write("show gridregions <searchkey>");
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("Regions:\n--------------------------------------------------\n");
+                foreach (RegionInfo ri in m_GridService.SearchRegionsByName(UUID.Zero, args[2]))
+                {
+                    sb.AppendFormat("Region {0}\n- ID: ({1})\n- Flags: {2}\n", ri.Name, ri.ID, ri.Flags.ToString());
+                }
+                io.Write(sb.ToString());
+            }
         }
 
         void UnregisterRegionCmd(List<string> args, TTY io, UUID limitedToScene)
