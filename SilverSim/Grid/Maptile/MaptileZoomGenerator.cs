@@ -7,12 +7,14 @@ using SilverSim.ServiceInterfaces.Maptile;
 using SilverSim.Types;
 using SilverSim.Types.Maptile;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
 namespace SilverSim.Grid.Maptile
 {
+    [Description("Generator for maptile zoom levels")]
     public class MaptileZoomGenerator : MaptileServiceInterface, IPlugin
     {
         readonly string m_MaptileServiceName;

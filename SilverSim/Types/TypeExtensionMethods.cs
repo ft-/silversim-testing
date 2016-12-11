@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -215,6 +216,40 @@ namespace SilverSim.Types
             }
 
             return true;
+        }
+
+        public static byte[] ReadToStreamEnd(this Stream s)
+        {
+            List<byte[]> segments = new List<byte[]>();
+            int dataSize;
+            int totalSize = 0;
+            byte[] buffer;
+            do
+            {
+                buffer = new byte[10240];
+                dataSize = s.Read(buffer, 0, buffer.Length);
+                totalSize += dataSize;
+                if (dataSize < buffer.Length)
+                {
+                    byte[] actData = new byte[dataSize];
+                    Buffer.BlockCopy(buffer, 0, actData, 0, dataSize);
+                    segments.Add(actData);
+                }
+                else
+                {
+                    segments.Add(buffer);
+                }
+                totalSize += dataSize;
+            } while (dataSize != 0);
+
+            int offset = 0;
+            byte[] finalData = new byte[totalSize];
+            foreach(byte[] seg in segments)
+            {
+                Buffer.BlockCopy(seg, 0, finalData, offset, seg.Length);
+                offset += seg.Length;
+            }
+            return finalData;
         }
     }
 }
