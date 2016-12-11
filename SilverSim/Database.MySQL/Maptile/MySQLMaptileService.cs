@@ -105,6 +105,21 @@ namespace SilverSim.Database.MySQL.Maptile
             }
         }
 
+        public override bool Remove(GridVector location, int zoomlevel)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELEETE FROM maptiles WHERE LocX LIKE ?locx AND LocY LIKE ?locy AND ZoomLevel = ?zoomlevel", connection))
+                {
+                    cmd.Parameters.AddParameter("?locx", location.X);
+                    cmd.Parameters.AddParameter("?locy", location.Y);
+                    cmd.Parameters.AddParameter("?zoomlevel", zoomlevel);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
         public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
         {
             List<MaptileInfo> infos = new List<MaptileInfo>();
@@ -112,7 +127,7 @@ namespace SilverSim.Database.MySQL.Maptile
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT LocX, LocY, LastUpdate WHERE ScopeID LIKE ?scopeid AND ZoomLevel = ?zoomlevel AND locX >= ?locxlow AND locY >= ?locylow AND locX <= ?locxhigh AND locY <= ?locyhigh", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT LocX, LocY, LastUpdate FROM maptiles WHERE ScopeID LIKE ?scopeid AND ZoomLevel = ?zoomlevel AND locX >= ?locxlow AND locY >= ?locylow AND locX <= ?locxhigh AND locY <= ?locyhigh", connection))
                 {
                     cmd.Parameters.AddParameter("?scopeid", scopeid);
                     cmd.Parameters.AddParameter("?zoomlevel", zoomlevel);

@@ -31,6 +31,8 @@ namespace SilverSim.ServiceInterfaces.Maptile
 
         public abstract void Store(MaptileData data);
 
+        public abstract bool Remove(GridVector location, int zoomlevel);
+
         public abstract List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel);
     }
 }

@@ -54,6 +54,11 @@ namespace SilverSim.Database.Memory.Maptile
             m_Maptiles[GetKey(data)] = new MaptileData(data);
         }
 
+        public override bool Remove(GridVector location, int zoomlevel)
+        {
+            return m_Maptiles.Remove(GetKey(location, zoomlevel));
+        }
+
         public override bool TryGetValue(GridVector location, int zoomlevel, out MaptileData data)
         {
             return m_Maptiles.TryGetValue(GetKey(location, zoomlevel), out data);
