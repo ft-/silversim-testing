@@ -1338,8 +1338,16 @@ namespace SilverSim.Main.Common
 
             /* make the resource assets available for all users not just scene */
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
-            AddSource(mainConfig);
-            ProcessConfigurations();
+            if (!string.IsNullOrEmpty(mainConfig))
+            {
+                AddSource(mainConfig);
+                ProcessConfigurations();
+            }
+            else
+            {
+                IConfig cfg = m_Config.AddConfig("HTTP");
+                cfg.Set("ListenerPort", "9000");
+            }
 
             CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
             CommandRegistry.Commands.Add("execute", ExecuteCommand);
