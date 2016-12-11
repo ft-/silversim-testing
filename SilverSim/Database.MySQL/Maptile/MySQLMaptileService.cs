@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL.Maptile
             }
         }
 
-        public override bool TryGetValue(GridVector location, int zoomlevel, out MaptileData data)
+        public override bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data)
         {
             data = default(MaptileData);
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -105,7 +105,7 @@ namespace SilverSim.Database.MySQL.Maptile
             }
         }
 
-        public override bool Remove(GridVector location, int zoomlevel)
+        public override bool Remove(UUID scopeid, GridVector location, int zoomlevel)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {

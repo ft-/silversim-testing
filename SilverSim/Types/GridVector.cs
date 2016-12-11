@@ -119,6 +119,15 @@ namespace SilverSim.Types
             }
         }
 
+        public GridVector AlignToZoomlevel(int zoomlevel)
+        {
+            uint zoomborder = (uint)(256 << (zoomlevel - 1));
+            GridVector res = new GridVector();
+            res.X = X - X % zoomborder;
+            res.Y = Y - Y & zoomborder;
+            return res;
+        }
+
         public static GridVector Zero
         {
             get

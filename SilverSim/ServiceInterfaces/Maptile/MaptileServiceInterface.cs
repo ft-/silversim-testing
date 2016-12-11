@@ -14,12 +14,12 @@ namespace SilverSim.ServiceInterfaces.Maptile
 
         }
 
-        public MaptileData this[GridVector location, int zoomlevel]
+        public MaptileData this[UUID scopeid, GridVector location, int zoomlevel]
         {
             get
             {
                 MaptileData data;
-                if(TryGetValue(location, zoomlevel, out data))
+                if(TryGetValue(scopeid, location, zoomlevel, out data))
                 {
                     return data;
                 }
@@ -27,11 +27,11 @@ namespace SilverSim.ServiceInterfaces.Maptile
             }
         }
 
-        public abstract bool TryGetValue(GridVector location, int zoomlevel, out MaptileData data);
+        public abstract bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data);
 
         public abstract void Store(MaptileData data);
 
-        public abstract bool Remove(GridVector location, int zoomlevel);
+        public abstract bool Remove(UUID scopeid, GridVector location, int zoomlevel);
 
         public abstract List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel);
     }
