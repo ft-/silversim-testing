@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System;
 
 namespace SilverSim.Grid.Maptile
 {
@@ -22,7 +21,7 @@ namespace SilverSim.Grid.Maptile
 
         public MaptileZoomGenerator(IConfig ownSection)
         {
-            m_MaptileServiceName = ownSection.GetString("MaptileService", "MaptileService");
+            m_MaptileServiceName = ownSection.GetString("MaptileStorage", "MaptileStorage");
         }
 
         public void Startup(ConfigurationLoader loader)
