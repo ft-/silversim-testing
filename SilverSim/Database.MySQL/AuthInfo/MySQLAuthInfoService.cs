@@ -129,6 +129,23 @@ namespace SilverSim.Database.MySQL.AuthInfo
             }
         }
 
+        public override void SetPassword(UUID principalId, string password)
+        {
+            /* we use UserAuthInfo to calculate a new password */
+            UserAuthInfo ai = new UserAuthInfo();
+            ai.Password = password;
+
+            Dictionary<string, object> vals = new Dictionary<string, object>();
+            vals.Add("PasswordHash", ai.PasswordHash);
+            vals.Add("PasswordSalt", ai.PasswordSalt);
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("auth", vals, "UserID LIKE \"" + principalId.ToString() + "\"");
+            }
+        }
+
         public override UUID AddToken(UUID principalId, UUID sessionid, int lifetime_in_minutes)
         {
             UUID secureSessionID = UUID.Random;
