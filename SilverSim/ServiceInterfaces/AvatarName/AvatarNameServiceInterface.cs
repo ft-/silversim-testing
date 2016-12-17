@@ -7,6 +7,35 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.AvatarName
 {
+    public static class AvatarNameServiceExtensionMethods
+    {
+        public static UUI FindUUIByName(this List<AvatarNameServiceInterface> list, string firstname, string lastname)
+        {
+            UUI uui;
+            foreach(AvatarNameServiceInterface service in list)
+            {
+                if(service.TryGetValue(firstname, lastname, out uui))
+                {
+                    return uui;
+                }
+            }
+            throw new KeyNotFoundException();
+        }
+
+        public static UUI FindUUIById(this List<AvatarNameServiceInterface> list, UUID id)
+        {
+            UUI uui;
+            foreach (AvatarNameServiceInterface service in list)
+            {
+                if (service.TryGetValue(id, out uui))
+                {
+                    return uui;
+                }
+            }
+            throw new KeyNotFoundException();
+        }
+    }
+
     public abstract class AvatarNameServiceInterface
     {
         public AvatarNameServiceInterface()
