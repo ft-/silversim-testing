@@ -15,7 +15,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public bool CheckIfAllowed(HttpRequest req)
         {
-            return true;
+            return IsAllowedDefault;
         }
     }
 }
