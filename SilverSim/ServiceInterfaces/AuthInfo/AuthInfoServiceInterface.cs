@@ -34,6 +34,32 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
         }
     }
 
+    public class AuthenticationFailedException : Exception
+    {
+        public AuthenticationFailedException()
+        {
+
+        }
+
+        public AuthenticationFailedException(string message)
+             : base(message)
+        {
+
+        }
+
+        protected AuthenticationFailedException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+        {
+
+        }
+
+        public AuthenticationFailedException(string message, Exception innerException)
+        : base(message, innerException)
+        {
+
+        }
+    }
+
     public abstract class AuthInfoServiceInterface
     {
         protected AuthInfoServiceInterface()
@@ -48,5 +74,17 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
         public abstract void VerifyToken(UUID principalId, UUID token, int lifetime_extension_in_minutes);
         public abstract void ReleaseToken(UUID accountId, UUID secureSessionId);
         public abstract void ReleaseTokenBySession(UUID accountId, UUID sessionId);
+
+        public virtual UUID Authenticate(UUID sessionId, UUID principalId, string password, int lifetime_in_minutes)
+        {
+            UserAuthInfo uai = this[principalId];
+            string salted = (password + ":" + uai.PasswordSalt).ComputeMD5();
+
+            if (salted != uai.PasswordHash)
+            {
+                throw new AuthenticationFailedException("Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
+            }
+            return AddToken(uai.ID, sessionId, 30);
+        }
     }
 }

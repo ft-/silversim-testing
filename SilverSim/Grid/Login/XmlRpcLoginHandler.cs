@@ -236,14 +236,14 @@ namespace SilverSim.Grid.Login
 
         UUID Authenticate(UUID avatarid, UUID sessionid, string passwd)
         {
-            UserAuthInfo uai = m_AuthInfoService[avatarid];
-            string salted = (passwd + ":" + uai.PasswordSalt).ComputeMD5();
-
-            if(salted != uai.PasswordHash)
+            try
+            {
+                m_AuthInfoService.Authenticate(sessionid, avatarid, passwd, 30);
+            }
+            catch(AuthenticationFailedException)
             {
                 throw new LoginFailResponseException("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
-            return m_AuthInfoService.AddToken(uai.ID, sessionid, 30);
         }
 
         void HandleLogin(HttpRequest httpreq)
