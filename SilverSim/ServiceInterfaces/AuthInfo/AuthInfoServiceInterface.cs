@@ -74,6 +74,13 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
         public abstract void VerifyToken(UUID principalId, UUID token, int lifetime_extension_in_minutes);
         public abstract void ReleaseToken(UUID accountId, UUID secureSessionId);
         public abstract void ReleaseTokenBySession(UUID accountId, UUID sessionId);
+        
+        public virtual void SetPassword(UUID principalId, string password)
+        {
+            UserAuthInfo uai = this[principalId];
+            uai.Password = password;
+            Store(uai);
+        }
 
         public virtual UUID Authenticate(UUID sessionId, UUID principalId, string password, int lifetime_in_minutes)
         {
