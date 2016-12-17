@@ -238,7 +238,7 @@ namespace SilverSim.Grid.Login
         {
             try
             {
-                m_AuthInfoService.Authenticate(sessionid, avatarid, passwd, 30);
+                return m_AuthInfoService.Authenticate(sessionid, avatarid, passwd, 30);
             }
             catch(AuthenticationFailedException)
             {
