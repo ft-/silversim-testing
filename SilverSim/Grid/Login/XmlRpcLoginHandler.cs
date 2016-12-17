@@ -343,14 +343,6 @@ namespace SilverSim.Grid.Login
                 LoginFailResponse(httpreq, "key", "Could not authenticate your avatar. Account has been disabled.");
                 return;
             }
-            if (!passwd.StartsWith("$1$"))
-            {
-                passwd = passwd.ComputeMD5();
-            }
-            else
-            {
-                passwd = passwd.Substring(3);
-            }
 
             AnArray optarray = null;
             if (structParam.TryGetValue<AnArray>("options", out optarray))

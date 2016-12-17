@@ -77,6 +77,14 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
 
         public virtual UUID Authenticate(UUID sessionId, UUID principalId, string password, int lifetime_in_minutes)
         {
+            if (!password.StartsWith("$1$"))
+            {
+                password = password.ComputeMD5();
+            }
+            else
+            {
+                password = password.Substring(3);
+            }
             UserAuthInfo uai = this[principalId];
             string salted = (password + ":" + uai.PasswordSalt).ComputeMD5();
 
