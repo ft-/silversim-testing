@@ -1287,6 +1287,7 @@ namespace SilverSim.Main.Common
             switch(mode)
             {
                 case "simulator":
+                case "sim":
                     defaultConfigName = "../data/SilverSim.ini";
                     defaultsIniName = "Simulator.defaults.ini";
                     break;
