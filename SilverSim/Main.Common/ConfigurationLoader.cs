@@ -2129,14 +2129,29 @@ namespace SilverSim.Main.Common
         {
             if (args[0] == "help")
             {
-                io.Write("Show currently loaded modules");
+                io.Write("show modules [<searchstring>] - Show currently loaded modules");
             }
             else
             {
+                string searchstring = string.Empty;
+                if(args.Count > 2)
+                {
+                    searchstring = args[2].ToLower();
+                }
+
                 StringBuilder output = new StringBuilder("Module List:\n----------------------------------------------");
+                if(!string.IsNullOrEmpty(searchstring))
+                {
+                    output.AppendFormat("\n<limited to modules containing \"{0}\">\n", searchstring);
+                }
                 foreach (KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
                 {
                     DescriptionAttribute desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
+                    if(!string.IsNullOrEmpty(searchstring) &&
+                        !moduledesc.Key.ToLower().Contains(searchstring))
+                    {
+                        continue;
+                    }
 
                     output.AppendFormat("\nModule {0}:", moduledesc.Key);
                     if (null != desc)
