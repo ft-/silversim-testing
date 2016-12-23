@@ -62,7 +62,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                 return true;
             }
             uui = input;
-            return true;
+            return false;
         }
 
         public UUI this[UUI input]

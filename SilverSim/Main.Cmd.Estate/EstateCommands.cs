@@ -78,7 +78,7 @@ namespace SilverSim.Main.Cmd.Estate
         bool TranslateToUUI(string arg, out UUI uui)
         {
             uui = UUI.Unknown;
-            if (arg.Contains(","))
+            if (arg.Contains("."))
             {
                 bool found = false;
                 string[] names = arg.Split(new char[] { '.' }, 2);

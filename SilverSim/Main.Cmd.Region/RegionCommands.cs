@@ -144,7 +144,7 @@ namespace SilverSim.Main.Cmd.Region
         bool TranslateToUUI(string arg, out UUI uui)
         {
             uui = UUI.Unknown;
-            if (arg.Contains(","))
+            if (arg.Contains("."))
             {
                 bool found = false;
                 string[] names = arg.Split(new char[] { '.' }, 2);
@@ -756,12 +756,12 @@ namespace SilverSim.Main.Cmd.Region
                         if (ownerEstates.Count != 0)
                         {
                             m_EstateService.RegionMap[r.ID] = ownerEstates[0].ID;
-                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, ResolveName(allEstates[0].Owner).FullName);
                         }
                         else if (allEstates.Count != 0)
                         {
                             m_EstateService.RegionMap[r.ID] = allEstates[0].ID;
-                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, ResolveName(allEstates[0].Owner).FullName);
                         }
                     }
                 }
