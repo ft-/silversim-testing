@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
@@ -11,33 +12,30 @@ using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
-using SilverSim.Types.AuthInfo;
 using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
 using SilverSim.Types.GridUser;
-using SilverSim.Types.TravelingData;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.Json;
 using SilverSim.Types.StructuredData.XmlRpc;
+using SilverSim.Types.TravelingData;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
-using log4net;
 
 namespace SilverSim.Grid.Login
 {
@@ -591,8 +589,9 @@ namespace SilverSim.Grid.Login
             {
                 m_TravelingDataService.Store(hgdata);
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Error("Failed to store current grid location data", e);
                 throw new LoginFailResponseException("key", "Error connecting to the desired location. Failed to store current grid location data.");
             }
 

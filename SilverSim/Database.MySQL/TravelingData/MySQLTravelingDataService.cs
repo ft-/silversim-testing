@@ -180,7 +180,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.ReplaceInto("hgtravelingdata", insertVals);
+                connection.ReplaceInto("travelingdata", insertVals);
             }
         }
 
