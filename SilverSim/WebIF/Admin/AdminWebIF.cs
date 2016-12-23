@@ -688,7 +688,7 @@ namespace SilverSim.WebIF.Admin
             string chgpwcmd = string.Empty;
             if(m_EnableSetPasswordCommand)
             {
-                chgpwcmd = "admin-webif change password <user> <pass>\n";
+                chgpwcmd = "admin-webif change password <user>\nadmin-webif change password <user> <pass>\n";
             }
             io.Write("admin-webif show users\n" +
                 "admin-webif show user <user>\n" +
@@ -782,9 +782,15 @@ namespace SilverSim.WebIF.Admin
                             switch(args[2])
                             {
                                 case "password":
-                                    if(args.Count < 5 || !m_EnableSetPasswordCommand)
+                                    if(args.Count < 4 || !m_EnableSetPasswordCommand)
                                     {
                                         DisplayAdminWebIFHelp(io);
+                                    }
+                                    else if(args.Count == 4)
+                                    {
+                                        io.Write(SetUserPassword(args[3], io.GetPass("Password")) ?
+                                            "Password changed." :
+                                            "User does not exist.");
                                     }
                                     else
                                     {
