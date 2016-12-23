@@ -73,7 +73,6 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.AddDeleteCommand("region", DeleteRegionCmd);
             loader.CommandRegistry.AddShowCommand("regionstats", ShowRegionStatsCmd);
             loader.CommandRegistry.AddShowCommand("regions", ShowRegionsCmd);
-            loader.CommandRegistry.AddShowCommand("ports", ShowPortAllocationsCommand);
             loader.CommandRegistry.AddEnableCommand("region", EnableRegionCmd);
             loader.CommandRegistry.AddDisableCommand("region", DisableRegionCmd);
             loader.CommandRegistry.AddStartCommand("region", StartRegionCmd);
@@ -1468,27 +1467,6 @@ namespace SilverSim.Main.Cmd.Region
             }
             io.Write(output.ToString());
         }
-
-        #region Show Port allocations
-        void ShowPortAllocationsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
-        {
-            StringBuilder sb = new StringBuilder("TCP Ports:\n----------------------------------------------\n");
-            foreach(KeyValuePair<int, string> kvp in m_Loader.KnownTcpPorts)
-            {
-                sb.AppendFormat("{0}:\n- Port: {1}\n", kvp.Value, kvp.Key);
-            }
-            sb.Append("\nUDP Ports:\n----------------------------------------------\n");
-            IEnumerable<RegionInfo> regions = regions = m_RegionStorage.GetAllRegions(UUID.Zero);
-            foreach(RegionInfo region in regions)
-            {
-                string status;
-                status = m_Scenes.ContainsKey(region.ID) ? "online" : "offline";
-                sb.AppendFormat("Region \"{0}\" ({1})\n- Port: {2}\n- Status: ({3})\n", region.Name, region.ID, region.ServerPort, status);
-            }
-            io.Write(sb.ToString());
-        }
-        #endregion
-
 
         void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {

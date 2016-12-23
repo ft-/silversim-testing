@@ -37,6 +37,7 @@ using SilverSim.ServiceInterfaces.Statistics;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Assembly;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1568,6 +1569,15 @@ namespace SilverSim.Main.Common
                 }
             }
 
+            IConfig configLoader = Config.Configs["ConfigurationLoader"];
+            if(null != configLoader)
+            {
+                m_RegionStorage = configLoader.Contains("RegionStorage") ? 
+                    GetService<GridServiceInterface>(configLoader.GetString("RegionStorage")) : 
+                    null;
+            }
+            CommandRegistry.AddShowCommand("ports", ShowPortAllocationsCommand);
+
             if(PluginInstances.ContainsKey("ServerParamStorage"))
             {
                 ServerParamServiceInterface serverParams = GetServerParamStorage();
@@ -1943,6 +1953,30 @@ namespace SilverSim.Main.Common
             {
                 s.Shutdown();
             }
+        }
+        #endregion
+
+        #region Show Port allocations
+        GridServiceInterface m_RegionStorage;
+        void ShowPortAllocationsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            StringBuilder sb = new StringBuilder("TCP Ports:\n----------------------------------------------\n");
+            foreach (KeyValuePair<int, string> kvp in KnownTcpPorts)
+            {
+                sb.AppendFormat("{0}:\n- Port: {1}\n", kvp.Value, kvp.Key);
+            }
+            if (null != m_RegionStorage)
+            {
+                sb.Append("\nUDP Ports:\n----------------------------------------------\n");
+                IEnumerable<RegionInfo> regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+                foreach (RegionInfo region in regions)
+                {
+                    string status;
+                    status = Scenes.ContainsKey(region.ID) ? "online" : "offline";
+                    sb.AppendFormat("Region \"{0}\" ({1})\n- Port: {2}\n- Status: ({3})\n", region.Name, region.ID, region.ServerPort, status);
+                }
+            }
+            io.Write(sb.ToString());
         }
         #endregion
 
