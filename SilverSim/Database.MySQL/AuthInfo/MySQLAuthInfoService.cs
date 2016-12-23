@@ -12,10 +12,12 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.AuthInfo;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.AuthInfo
 {
     #region Service implementation
+    [Description("MySQL AuthInfo Backend")]
     public class MySQLAuthInfoService : AuthInfoServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AUTHINFO SERVICE");

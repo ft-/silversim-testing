@@ -14,6 +14,7 @@ using System.ComponentModel;
 
 namespace SilverSim.Main.Cmd.UserServer
 {
+    [Description("User Server Console Commands")]
     public class UserServerCommands : IPlugin
     {
         readonly string m_UserAccountServiceName;

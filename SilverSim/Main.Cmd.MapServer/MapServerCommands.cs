@@ -8,10 +8,12 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace SilverSim.Main.Cmd.MapServer
 {
+    [Description("Map Server Console Commands")]
     public class MapServerCommands : IPlugin
     {
         readonly string m_GridServiceName;

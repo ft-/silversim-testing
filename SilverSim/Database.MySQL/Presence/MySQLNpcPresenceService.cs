@@ -11,12 +11,12 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Presence
 {
     #region Service Implementation
+    [Description("MySQL NpcPresence Backend")]
     public class MySQLNpcPresenceService : NpcPresenceServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;

@@ -16,10 +16,12 @@ using MySql.Data.MySqlClient;
 using log4net;
 using Nini.Config;
 using SilverSim.Database.MySQL._Migration;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.OfflineIM
 {
     #region Service implementation
+    [Description("MySQL OfflineIM Backend")]
     public class MySQLOfflineIMService : OfflineIMServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL OFFLINEIM SERVICE");

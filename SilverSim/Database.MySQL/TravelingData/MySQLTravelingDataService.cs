@@ -12,6 +12,7 @@ using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Types;
 using SilverSim.Types.TravelingData;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.TravelingData
 {
@@ -31,6 +32,7 @@ namespace SilverSim.Database.MySQL.TravelingData
         }
     }
 
+    [Description("MySQL TravelingData Backend")]
     public class MySQLTravelingDataService : TravelingDataServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL TRAVELINGDATA SERVICE");

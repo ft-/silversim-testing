@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
@@ -9,9 +10,12 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Maptile;
 using SilverSim.Types;
 using SilverSim.Types.Maptile;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Maptile
 {
+    [Description("MySQL Maptile Backend")]
     public class MySQLMaptileService : MaptileServiceInterface, IPlugin, IDBServiceInterface
     {
         readonly string m_ConnectionString;

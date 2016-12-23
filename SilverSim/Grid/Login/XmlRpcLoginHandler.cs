@@ -31,6 +31,7 @@ using SilverSim.Types.StructuredData.XmlRpc;
 using SilverSim.Types.TravelingData;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -40,6 +41,7 @@ using System.Xml;
 namespace SilverSim.Grid.Login
 {
     #region Service Implementation
+    [Description("XmlRpc Login Handler")]
     [ServerParam("AllowLoginViaHttpWhenHttpsIsConfigured", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly)]
     [ServerParam("WelcomeMessage", ParameterType = typeof(string), Type = ServerParamType.GlobalOnly)]
     [ServerParam("GridLibraryOwner", ParameterType = typeof(UUID), Type = ServerParamType.GlobalOnly)]

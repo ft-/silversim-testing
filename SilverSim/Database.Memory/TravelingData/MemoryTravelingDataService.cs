@@ -9,10 +9,12 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.TravelingData;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.TravelingData
 {
     #region Service implementation
+    [Description("Memory TravelingData backend")]
     public class MemoryTravelingDataService : TravelingDataServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly RwLockedDictionary<UUID, TravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, TravelingDataInfo>();

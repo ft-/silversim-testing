@@ -1,17 +1,18 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Maptile;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Maptile;
 using System.Collections.Generic;
-using Nini.Config;
-using System;
+using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.Maptile
 {
+    [Description("Memory Maptile Backend")]
     public class MemoryMaptileService : MaptileServiceInterface, IPlugin
     {
         readonly RwLockedDictionary<string, MaptileData> m_Maptiles = new RwLockedDictionary<string, MaptileData>();

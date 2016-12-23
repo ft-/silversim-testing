@@ -1,22 +1,19 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
+using MySql.Data.MySqlClient;
+using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Friends;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SilverSim.Types;
-using MySql.Data.MySqlClient;
 using SilverSim.Types.Friends;
-using SilverSim.Database.MySQL._Migration;
-using log4net;
-using Nini.Config;
-using SilverSim.ServiceInterfaces.AvatarName;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Friends
 {
@@ -34,6 +31,7 @@ namespace SilverSim.Database.MySQL.Friends
         }
     }
 
+    [Description("MySQL Friends Backend")]
     public class MySQLFriendsService : FriendsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         readonly string m_ConnectionString;

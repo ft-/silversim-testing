@@ -9,10 +9,12 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.AuthInfo;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.AuthInfo
 {
     #region Service implementation
+    [Description("Memory AuthInfo backend")]
     public class MemoryAuthInfoService : AuthInfoServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         class AuthToken

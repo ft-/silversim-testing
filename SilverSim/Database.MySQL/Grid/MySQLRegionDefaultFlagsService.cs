@@ -3,6 +3,7 @@
 
 using log4net;
 using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
@@ -10,11 +11,11 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
-using Nini.Config;
-using System;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Grid
 {
+    [Description("MySQL RegionDefaultFlags Backend")]
     public class MySQLRegionDefaultFlagsService : RegionDefaultFlagsServiceInterface, IPlugin, IDBServiceInterface
     {
         readonly string m_ConnectionString;

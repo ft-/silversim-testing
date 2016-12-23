@@ -10,9 +10,11 @@ using System;
 using System.Collections.Generic;
 using Nini.Config;
 using log4net;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.UserAccounts
 {
+    [Description("MySQL UserAccount AvatarName backend")]
     public class MySQLUserAccountNameService : AvatarNameServiceInterface, IPlugin, IDBServiceInterface
     {
         readonly string m_ConnectionString;
