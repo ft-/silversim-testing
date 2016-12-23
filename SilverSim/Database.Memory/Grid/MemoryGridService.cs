@@ -25,6 +25,8 @@ namespace SilverSim.Database.MySQL.Grid
         private bool IsDeleteOnUnregister;
         private bool AllowDuplicateRegionNames;
         readonly RwLockedDictionary<UUID, RegionInfo> m_Data = new RwLockedDictionary<UUID, RegionInfo>();
+        bool m_UseRegionDefaultServices;
+        List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
 
         public void TriggerParameterUpdated(UUID regionid, string parameter, string value)
         {
@@ -48,13 +50,14 @@ namespace SilverSim.Database.MySQL.Grid
         }
 
         #region Constructor
-        public MemoryGridService()
+        public MemoryGridService(IConfig ownSection)
         {
+            m_UseRegionDefaultServices = ownSection.GetBoolean("UseRegionDefaultServices", false);
         }
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* nothing to do */
+            m_RegionDefaultServices = loader.GetServicesByValue<RegionDefaultFlagsServiceInterface>();
         }
         #endregion
 
@@ -224,6 +227,11 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override void RegisterRegion(RegionInfo regionInfo)
         {
+            foreach (RegionDefaultFlagsServiceInterface service in m_RegionDefaultServices)
+            {
+                regionInfo.Flags |= service.GetRegionDefaultFlags(regionInfo.ID);
+            }
+
             RegionInfo oldRegion;
             if (!AllowDuplicateRegionNames && TryGetValue(regionInfo.ScopeID, regionInfo.Name, out oldRegion) && oldRegion.ID != regionInfo.ID)
             {
@@ -378,7 +386,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new MemoryGridService();
+            return new MemoryGridService(ownSection);
         }
     }
     #endregion
