@@ -82,7 +82,7 @@ namespace SilverSim.Types
         public bool TryGetValue<T>(string key, out T val)
         {
             IValue iv;
-            if(!TryGetValue(key, out iv))
+            if(!base.TryGetValue(key, out iv))
             {
                 val = default(T);
                 return false;

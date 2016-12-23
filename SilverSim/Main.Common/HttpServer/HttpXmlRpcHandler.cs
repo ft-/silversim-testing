@@ -40,6 +40,8 @@ namespace SilverSim.Main.Common.HttpServer
                 FaultResponse(httpreq, -32700, "Invalid XML RPC Request");
                 return;
             }
+            req.CallerIP = httpreq.CallerIP;
+            req.IsSsl = httpreq.IsSsl;
 
             Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse> del;
             XmlRpc.XmlRpcResponse res;

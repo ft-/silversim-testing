@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.Friends
             m_AvatarNameServiceNames = avatarNameServices.Split(',');
         }
 
-        const string m_InnerJoinSelectFull = "SELECT A.*, B.RightsToFriend AS RightsToUser FROM friends AS A INNER JOIN friends as B ON A.Friend LIKE B.User AND A.User LIKE B.Friend ";
+        const string m_InnerJoinSelectFull = "SELECT A.*, B.RightsToFriend AS RightsToUser FROM friends AS A INNER JOIN friends as B ON A.FriendID LIKE B.UserID AND A.UserID LIKE B.FriendID ";
 
         public void ResolveUUI(FriendInfo fi)
         {

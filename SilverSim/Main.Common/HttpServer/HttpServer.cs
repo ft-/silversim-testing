@@ -468,6 +468,10 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             del(req);
                         }
+                        catch (HttpServerException e)
+                        {
+                            e.Serialize(req);
+                        }
                         catch (HttpResponse.ConnectionCloseException)
                         {
                             return;
@@ -487,6 +491,10 @@ namespace SilverSim.Main.Common.HttpServer
                         try
                         {
                             del(req);
+                        }
+                        catch (HttpServerException e)
+                        {
+                            e.Serialize(req);
                         }
                         catch (HttpResponse.ConnectionCloseException)
                         {
@@ -511,6 +519,10 @@ namespace SilverSim.Main.Common.HttpServer
                                 try
                                 {
                                     kvp.Value(req);
+                                }
+                                catch (HttpServerException e)
+                                {
+                                    e.Serialize(req);
                                 }
                                 catch (HttpResponse.ConnectionCloseException)
                                 {

@@ -828,6 +828,10 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             public string MethodName;
             public AnArray Params = new AnArray();
 
+            /* Informative properties */
+            public string CallerIP { get; set; }
+            public bool IsSsl { get; set; }
+
             public XmlRpcRequest()
             {
 
@@ -907,6 +911,12 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             public XmlRpcFaultResponse()
             {
 
+            }
+
+            public XmlRpcFaultResponse(int faultCode, string faultString)
+            {
+                FaultCode = faultCode;
+                FaultString = faultString;
             }
 
             public void Serialize(Stream o)

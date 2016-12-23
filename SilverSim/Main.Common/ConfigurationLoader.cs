@@ -38,6 +38,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Assembly;
 using SilverSim.Types.Grid;
+using SilverSim.Types.StructuredData.XmlRpc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -437,6 +438,31 @@ namespace SilverSim.Main.Common
                 return GetService<BaseHttpServer>("HttpsServer");
             }
         }
+
+        public HttpXmlRpcHandler XmlRpcServer
+        {
+            get
+            {
+                return GetService<HttpXmlRpcHandler>("XmlRpcServer");
+            }
+        }
+
+        public HttpJson20RpcHandler Json20RpcServer
+        {
+            get
+            {
+                return GetService<HttpJson20RpcHandler>("JSON2.0RpcServer");
+            }
+        }
+
+        public CapsHttpRedirector CapsRedirector
+        {
+            get
+            {
+                return GetService<CapsHttpRedirector>("CapsRedirector");
+            }
+        }
+
         #endregion
 
         #region Configuration Loader Helpers
@@ -1362,8 +1388,12 @@ namespace SilverSim.Main.Common
             CommandRegistry.AddShowCommand("issues", ShowIssuesCommand);
             CommandRegistry.AddShowCommand("cacheddns", ShowCachedDnsCommand);
             CommandRegistry.AddDeleteCommand("cacheddns", RemoveCachedDnsCommand);
+            CommandRegistry.AddShowCommand("ports", ShowPortAllocationsCommand);
 #if DEBUG
             CommandRegistry.AddShowCommand("http-handlers", ShowHttpHandlersCommand);
+            CommandRegistry.AddShowCommand("xmlrpc-handlers", ShowXmlRpcHandlersCommand);
+            CommandRegistry.AddShowCommand("json20rpc-handlers", ShowJson20RpcHandlersCommand);
+            CommandRegistry.AddShowCommand("caps-handlers", ShowCapsHandlersCommand);
 #endif
 
             /* inject config values from arguments */
@@ -1579,7 +1609,6 @@ namespace SilverSim.Main.Common
                     GetService<GridServiceInterface>(configLoader.GetString("RegionStorage")) : 
                     null;
             }
-            CommandRegistry.AddShowCommand("ports", ShowPortAllocationsCommand);
 
             if(PluginInstances.ContainsKey("ServerParamStorage"))
             {
@@ -1961,8 +1990,9 @@ namespace SilverSim.Main.Common
 
         void ShowHttpHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            StringBuilder sb = new StringBuilder("HTTP Handlers:\n----------------------------------------------\n");
-            ListHttpHandlers(sb, HttpServer);
+            BaseHttpServer http = HttpServer;
+            StringBuilder sb = new StringBuilder("HTTP Handlers: (" + http.ServerURI + ")\n----------------------------------------------\n");
+            ListHttpHandlers(sb, http);
             BaseHttpServer https;
             try
             {
@@ -1974,7 +2004,7 @@ namespace SilverSim.Main.Common
             }
             if(null != https)
             {
-                sb.Append("\nHTTPS Handlers:\n----------------------------------------------\n");
+                sb.AppendFormat("\nHTTPS Handlers: ({0})\n----------------------------------------------\n", https.ServerURI);
                 ListHttpHandlers(sb, https);
             }
             io.Write(sb.ToString());
@@ -1994,6 +2024,44 @@ namespace SilverSim.Main.Common
             {
                 sb.AppendFormat("Content-Type: {0}\n", kvp.Key);
             }
+        }
+
+        void ShowXmlRpcHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            StringBuilder sb = new StringBuilder("XMLRPC Handlers:\n----------------------------------------------\n");
+            HttpXmlRpcHandler server = XmlRpcServer;
+            foreach(KeyValuePair<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>> kvp in server.XmlRpcMethods)
+            {
+                sb.AppendFormat("Method: {0}\n", kvp.Key);
+            }
+            io.Write(sb.ToString());
+        }
+
+        void ShowJson20RpcHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            StringBuilder sb = new StringBuilder("JSON2.0RPC Handlers:\n----------------------------------------------\n");
+            HttpJson20RpcHandler server = Json20RpcServer;
+            foreach (KeyValuePair<string, Func<string, IValue, IValue>> kvp in server.Json20RpcMethods)
+            {
+                sb.AppendFormat("Method: {0}\n", kvp.Key);
+            }
+            io.Write(sb.ToString());
+        }
+
+        void ShowCapsHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            StringBuilder sb = new StringBuilder("Caps Handlers:\n----------------------------------------------\n");
+            CapsHttpRedirector redirector = CapsRedirector;
+            foreach(KeyValuePair<string, RwLockedDictionary<UUID, Action<HttpRequest>>> kvp in redirector.Caps)
+            {
+                sb.AppendFormat("Capability: {0}\n", kvp.Key);
+                foreach(KeyValuePair<UUID, Action<HttpRequest>> kvpInner in kvp.Value)
+                {
+                    sb.AppendFormat("- ID: {0}\n", kvpInner.Key);
+                }
+                sb.AppendLine();
+            }
+            io.Write(sb.ToString());
         }
 
         #region Show Port allocations

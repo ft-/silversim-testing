@@ -37,6 +37,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
+using log4net;
 
 namespace SilverSim.Grid.Login
 {
@@ -55,8 +56,11 @@ namespace SilverSim.Grid.Login
     [ServerParam("MaxAgentGroups", ParameterType = typeof(uint), Type = ServerParamType.GlobalOnly)]
     public class XmlRpcLoginHandler : IPlugin, IServerParamListener
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC LOGIN");
+
         BaseHttpServer m_HttpServer;
         BaseHttpServer m_HttpsServer;
+        HttpXmlRpcHandler m_XmlRpcServer;
         RwLockedList<string> m_ConfigurationIssues;
         bool m_AllowLoginViaHttpWhenHttpsIsConfigured;
 
@@ -112,6 +116,7 @@ namespace SilverSim.Grid.Login
         public void Startup(ConfigurationLoader loader)
         {
             m_HomeUri = loader.HomeURI;
+            m_XmlRpcServer = loader.XmlRpcServer;
             m_GatekeeperUri = loader.GatekeeperURI;
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
@@ -145,6 +150,7 @@ namespace SilverSim.Grid.Login
                 m_HttpsServer.UriHandlers.Add("/get_grid_info", HandleGetGridInfo);
                 m_HttpsServer.UriHandlers.Add("/json_grid_info", HandleJsonGridInfo);
             }
+            m_XmlRpcServer.XmlRpcMethods.Add("login_to_simulator", HandleLogin);
         }
 
         Dictionary<string, string> CollectGridInfo()
@@ -248,16 +254,17 @@ namespace SilverSim.Grid.Login
 
         void HandleLogin(HttpRequest httpreq)
         {
-            if(!m_AllowLoginViaHttpWhenHttpsIsConfigured && m_HttpsServer != null && !httpreq.IsSsl)
+            if (!m_AllowLoginViaHttpWhenHttpsIsConfigured && m_HttpsServer != null && !httpreq.IsSsl)
             {
                 HandleLoginRedirect(httpreq);
                 return;
             }
 
             /* no LSL requests allowed here */
-            if(httpreq.ContainsHeader("X-SecondLife-Shard"))
+            if (httpreq.ContainsHeader("X-SecondLife-Shard"))
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                m_Log.ErrorFormat("Received request with X-SecondLife-Shard from {0}", httpreq.CallerIP);
                 return;
             }
 
@@ -265,29 +272,55 @@ namespace SilverSim.Grid.Login
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                m_Log.ErrorFormat("Received wrong method request from {0}", httpreq.CallerIP);
                 return;
             }
             try
             {
                 req = XmlRpc.DeserializeRequest(httpreq.Body);
+                req.IsSsl = httpreq.IsSsl;
+                req.CallerIP = httpreq.CallerIP;
             }
             catch
             {
-                FaultResponse(httpreq, -32700, "Invalid XML RPC Request");
+                m_Log.ErrorFormat("Deserialization of login request from {0} failed", httpreq.CallerIP);
+                using (HttpResponse res = httpreq.BeginResponse("text/xml"))
+                {
+                    using (Stream s = res.GetOutputStream())
+                    {
+                        new XmlRpc.XmlRpcFaultResponse(-32700, "Invalid XML RPC Request").Serialize(s);
+                    }
+                }
                 return;
             }
 
-            if(req.Params.Count != 1)
+            using (HttpResponse res = httpreq.BeginResponse("text/xml"))
             {
-                FaultResponse(httpreq, 4, "Missing struct parameter");
-                return;
+                using (Stream s = res.GetOutputStream())
+                {
+                    HandleLogin(req).Serialize(s);
+                }
+            }
+        }
+        XmlRpc.XmlRpcResponse HandleLogin(XmlRpc.XmlRpcRequest req)
+        {
+            if (!m_AllowLoginViaHttpWhenHttpsIsConfigured && m_HttpsServer != null && !req.IsSsl)
+            {
+                throw new HttpRedirectKeepVerbException(m_HttpsServer + "login");
+            }
+
+            if (req.Params.Count != 1)
+            {
+                
+                m_Log.ErrorFormat("Request from {0} does not contain a single struct parameter", req.CallerIP);
+                throw new XmlRpc.XmlRpcFaultException(4, "Missing struct parameter");
             }
 
             Map structParam = req.Params[0] as Map;
             if(null == structParam)
             {
-                FaultResponse(httpreq, 4, "Missing struct parameter");
-                return;
+                m_Log.ErrorFormat("Request from {0} does not contain struct parameter", req.CallerIP);
+                throw new XmlRpc.XmlRpcFaultException(4, "Missing struct parameter");
             }
 
             Dictionary<string, string> loginParams = new Dictionary<string, string>();
@@ -295,8 +328,8 @@ namespace SilverSim.Grid.Login
             {
                 if (!structParam.ContainsKey(reqparam))
                 {
-                    FaultResponse(httpreq, 4, "Missing parameter " + reqparam);
-                    return;
+                    m_Log.ErrorFormat("Request from {0} does not contain a parameter {1}", req.CallerIP, reqparam);
+                    throw new XmlRpc.XmlRpcFaultException(4, "Missing parameter " + reqparam);
                 }
                 loginParams.Add(reqparam, structParam[reqparam].ToString());
             }
@@ -310,7 +343,7 @@ namespace SilverSim.Grid.Login
             loginData.ClientInfo.ClientVersion = loginParams["version"];
             loginData.ClientInfo.Mac = loginParams["mac"];
             loginData.ClientInfo.ID0 = loginParams["id0"];
-            loginData.ClientInfo.ClientIP = httpreq.CallerIP;
+            loginData.ClientInfo.ClientIP = req.CallerIP;
             loginData.DestinationInfo.StartLocation = loginParams["start"];
 
             UUID scopeId = UUID.Zero;
@@ -319,8 +352,8 @@ namespace SilverSim.Grid.Login
             {
                 if(!UUID.TryParse(iv.ToString(), out scopeId))
                 {
-                    FaultResponse(httpreq, 4, "Invalid parameter scope_id");
-                    return;
+                    m_Log.ErrorFormat("Request from {0} does not contain invalid parameter scope_id", req.CallerIP);
+                    throw new XmlRpc.XmlRpcFaultException(4, "Invalid parameter scope_id");
                 }
             }
 
@@ -330,18 +363,18 @@ namespace SilverSim.Grid.Login
             }
             catch
             {
-                LoginFailResponse(httpreq, "key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
-                return;
+                m_Log.ErrorFormat("Request from {0} does not reference a known account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+                return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
-            if(scopeId != loginData.Account.ScopeID && loginData.Account.ScopeID != UUID.Zero)
+            if (scopeId != loginData.Account.ScopeID && loginData.Account.ScopeID != UUID.Zero)
             {
-                LoginFailResponse(httpreq, "key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
-                return;
+                m_Log.ErrorFormat("Request from {0} does not reference a valid account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+                return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
             if(loginData.Account.UserLevel < 0)
             {
-                LoginFailResponse(httpreq, "key", "Could not authenticate your avatar. Account has been disabled.");
-                return;
+                m_Log.ErrorFormat("Request from {0} does not reference an enabled account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+                return LoginFailResponse("key", "Could not authenticate your avatar. Account has been disabled.");
             }
 
             AnArray optarray = null;
@@ -361,8 +394,8 @@ namespace SilverSim.Grid.Login
             }
             catch
             {
-                LoginFailResponse(httpreq, "key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
-                return;
+                m_Log.ErrorFormat("Request from {0} failed to authenticate account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+                return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
 
             loginData.HaveAppearance = m_AvatarService.TryGetAppearanceInfo(loginData.Account.Principal.ID, out loginData.AppearanceInfo);
@@ -370,13 +403,15 @@ namespace SilverSim.Grid.Login
             // After authentication, we have to remove the token if something fails
             try
             {
-                LoginAuthenticated(httpreq, loginData);
+                return LoginAuthenticated(req, loginData);
             }
             catch(LoginFailResponseException e)
             {
                 m_AuthInfoService.ReleaseToken(loginData.Account.Principal.ID, loginData.SessionInfo.SecureSessionID);
-                LoginFailResponse(httpreq, e.Reason, e.Message);
-                return;
+#if DEBUG
+                m_Log.ErrorFormat("Request from {0} failed to process.\nException {1}: {2}\n{3}", req.CallerIP, e.GetType().FullName, e.Message, e.StackTrace);
+#endif
+                return LoginFailResponse(e.Reason, e.Message);
             }
             catch
             {
@@ -384,7 +419,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        void LoginAuthenticated(HttpRequest httpreq, LoginData loginData)
+        XmlRpc.XmlRpcResponse LoginAuthenticated(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             try
             {
@@ -465,8 +500,9 @@ namespace SilverSim.Grid.Login
                 {
                     loginData.Friends = m_FriendsService[loginData.Account.Principal];
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.Error("Accessing friends failed", e);
                     throw new LoginFailResponseException("key", "Error accessing friends");
                 }
             }
@@ -516,7 +552,7 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                LoginAuthenticatedAndPresenceAdded(httpreq, loginData);
+                return LoginAuthenticatedAndPresenceAdded(req, loginData);
             }
             catch
             {
@@ -525,12 +561,12 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        void LoginAuthenticatedAndPresenceAdded(HttpRequest httpreq, LoginData loginData)
+        XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             m_GridUserService.LoggedInAdd(loginData.Account.Principal);
             try
             {
-                LoginAuthenticatedAndPresenceAndGridUserAdded(httpreq, loginData);
+                return LoginAuthenticatedAndPresenceAndGridUserAdded(req, loginData);
             }
             catch
             {
@@ -541,7 +577,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        void LoginAuthenticatedAndPresenceAndGridUserAdded(HttpRequest httpreq, LoginData loginData)
+        XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             TravelingDataInfo hgdata = new TravelingDataInfo();
             hgdata.SessionID = loginData.SessionInfo.SessionID;
@@ -562,7 +598,7 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(httpreq, loginData);
+                return LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(req, loginData);
             }
             catch
             {
@@ -571,7 +607,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        void LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(HttpRequest httpreq, LoginData loginData)
+        XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             TeleportFlags flags = TeleportFlags.None;
             if(loginData.Account.UserLevel >= 200)
@@ -822,13 +858,7 @@ namespace SilverSim.Grid.Login
                 }
             }
 
-            using (HttpResponse httpres = httpreq.BeginResponse("text/xml"))
-            {
-                using (Stream o = httpres.GetOutputStream())
-                {
-                    res.Serialize(o);
-                }
-            }
+            return res;
         }
 
         const string Option_InventoryRoot = "inventory-root";
@@ -861,36 +891,15 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        void LoginFailResponse(HttpRequest req, string reason, string message)
+        XmlRpc.XmlRpcResponse LoginFailResponse(string reason, string message)
         {
-            using (HttpResponse response = req.BeginResponse("text/xml"))
-            {
-                XmlRpc.XmlRpcResponse res = new XmlRpc.XmlRpcResponse();
-                Map m = new Map();
-                m.Add("reason", reason);
-                m.Add("message", message);
-                m.Add("login", false);
-                res.ReturnValue = m;
-
-                byte[] buffer = res.Serialize();
-                response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
-                response.Close();
-            }
-        }
-
-        void FaultResponse(HttpRequest req, int statusCode, string statusMessage)
-        {
-            using (HttpResponse response = req.BeginResponse("text/xml"))
-            {
-                XmlRpc.XmlRpcFaultResponse res = new XmlRpc.XmlRpcFaultResponse();
-                res.FaultCode = statusCode;
-                res.FaultString = statusMessage;
-
-                byte[] buffer = res.Serialize();
-                response.ContentType = "text/xml";
-                response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
-                response.Close();
-            }
+            XmlRpc.XmlRpcResponse res = new XmlRpc.XmlRpcResponse();
+            Map m = new Map();
+            m.Add("reason", reason);
+            m.Add("message", message);
+            m.Add("login", false);
+            res.ReturnValue = m;
+            return res;
         }
 
         public void HandleLoginRedirect(HttpRequest httpreq)
