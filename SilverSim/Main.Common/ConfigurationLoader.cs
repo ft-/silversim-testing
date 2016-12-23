@@ -1362,6 +1362,9 @@ namespace SilverSim.Main.Common
             CommandRegistry.AddShowCommand("issues", ShowIssuesCommand);
             CommandRegistry.AddShowCommand("cacheddns", ShowCachedDnsCommand);
             CommandRegistry.AddDeleteCommand("cacheddns", RemoveCachedDnsCommand);
+#if DEBUG
+            CommandRegistry.AddShowCommand("http-handlers", ShowHttpHandlersCommand);
+#endif
 
             /* inject config values from arguments */
             foreach (string arg in defineargs)
@@ -1955,6 +1958,43 @@ namespace SilverSim.Main.Common
             }
         }
         #endregion
+
+        void ShowHttpHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            StringBuilder sb = new StringBuilder("HTTP Handlers:\n----------------------------------------------\n");
+            ListHttpHandlers(sb, HttpServer);
+            BaseHttpServer https;
+            try
+            {
+                https = HttpsServer;
+            }
+            catch
+            {
+                https = null;
+            }
+            if(null != https)
+            {
+                sb.Append("\nHTTPS Handlers:\n----------------------------------------------\n");
+                ListHttpHandlers(sb, https);
+            }
+            io.Write(sb.ToString());
+        }
+
+        void ListHttpHandlers(StringBuilder sb, BaseHttpServer server)
+        {
+            foreach(KeyValuePair<string, Action<HttpRequest>> kvp in server.UriHandlers)
+            {
+                sb.AppendFormat("URL: {0}\n", kvp.Key);
+            }
+            foreach(KeyValuePair<string, Action<HttpRequest>> kvp in server.StartsWithUriHandlers)
+            {
+                sb.AppendFormat("URL: {0}*\n", kvp.Key);
+            }
+            foreach (KeyValuePair<string, Action<HttpRequest>> kvp in server.RootUriContentTypeHandlers)
+            {
+                sb.AppendFormat("Content-Type: {0}\n", kvp.Key);
+            }
+        }
 
         #region Show Port allocations
         GridServiceInterface m_RegionStorage;
