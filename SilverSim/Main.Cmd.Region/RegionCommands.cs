@@ -1114,6 +1114,10 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("start region <regionname>");
             }
+            else if (args.Count < 3)
+            {
+                io.Write("missing region name");
+            }
             else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {
                 SceneInterface si;
@@ -1156,6 +1160,10 @@ namespace SilverSim.Main.Cmd.Region
             else if (args[0] == "help")
             {
                 io.Write("stop region <regionname>");
+            }
+            else if (args.Count < 3)
+            {
+                io.Write("missing region name");
             }
             else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {

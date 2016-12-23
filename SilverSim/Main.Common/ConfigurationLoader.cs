@@ -1573,7 +1573,7 @@ namespace SilverSim.Main.Common
 
             if(startupConfig != null)
             {
-                HomeURI = startupConfig.GetString("HomeURI", httpServer.ExternalHostName);
+                HomeURI = startupConfig.GetString("HomeURI", httpServer.ServerURI);
                 GatekeeperURI = startupConfig.GetString("GatekeeperURI", HomeURI);
                 GridName = startupConfig.GetString("GridName", string.Empty);
                 GridNick = startupConfig.GetString("GridNick", string.Empty);
