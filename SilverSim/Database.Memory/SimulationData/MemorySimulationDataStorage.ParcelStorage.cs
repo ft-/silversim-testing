@@ -44,14 +44,9 @@ namespace SilverSim.Database.Memory.SimulationData
         List<UUID> ISimulationDataParcelStorageInterface.ParcelsInRegion(UUID key)
         {
             RwLockedDictionary<UUID, ParcelInfo> parcels;
-            if (m_ParcelData.TryGetValue(key, out parcels))
-            {
-                return new List<UUID>(parcels.Keys);
-            }
-            else
-            {
-                return new List<UUID>();
-            }
+            return (m_ParcelData.TryGetValue(key, out parcels)) ?
+                new List<UUID>(parcels.Keys) :
+                new List<UUID>();
         }
 
         void ISimulationDataParcelStorageInterface.Store(UUID regionID, ParcelInfo parcel)

@@ -19,14 +19,9 @@ namespace SilverSim.Database.Memory.Estate
             get 
             {
                 RwLockedDictionary<UUI, bool> res;
-                if (m_EstateAccessData.TryGetValue(estateID, out res))
-                {
-                    return new List<UUI>(from uui in res.Keys where true select new UUI(uui));
-                }
-                else
-                {
-                    return new List<UUI>();
-                }
+                return (m_EstateAccessData.TryGetValue(estateID, out res)) ?
+                    new List<UUI>(from uui in res.Keys where true select new UUI(uui)) :
+                    new List<UUI>();
             }
         }
 

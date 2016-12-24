@@ -2434,14 +2434,7 @@ namespace SilverSim.Main.Common
             sb.Append("Server Params:\n-------------------------------------------------\n");
             foreach(KeyValuePair<string, ServerParamAttribute> kvp in resList)
             {
-                if(kvp.Value.Type == ServerParamType.GlobalOnly)
-                {
-                    sb.AppendFormat("{0} - global only\n", kvp.Key);
-                }
-                else
-                {
-                    sb.AppendFormat("{0} - global and region\n", kvp.Key);
-                }
+                sb.AppendFormat(kvp.Value.Type == ServerParamType.GlobalOnly ? "{0} - global only\n" : "{0} - global and region\n", kvp.Key);
                 if(!string.IsNullOrEmpty(kvp.Value.Description))
                 {
                     sb.AppendFormat("- {0}\n", kvp.Value.Description);

@@ -954,14 +954,7 @@ namespace SilverSim.Grid.Login
             bool val;
             lock (m_ConfigUpdateLock)
             {
-                if (bool.TryParse(value, out val))
-                {
-                    m_AllowLoginViaHttpWhenHttpsIsConfigured = val;
-                }
-                else
-                {
-                    m_AllowLoginViaHttpWhenHttpsIsConfigured = false;
-                }
+                m_AllowLoginViaHttpWhenHttpsIsConfigured = bool.TryParse(value, out val) && val;
                 if (m_AllowLoginViaHttpWhenHttpsIsConfigured)
                 {
                     m_ConfigurationIssues.AddIfNotExists(ConfigIssueText);
@@ -981,14 +974,8 @@ namespace SilverSim.Grid.Login
                 return;
             }
             int val;
-            if(string.IsNullOrEmpty(value) || !int.TryParse(value, out val))
-            {
-                m_MaxAgentGroups = 42;
-            }
-            else
-            {
-                m_MaxAgentGroups = val;
-            }
+            m_MaxAgentGroups = (!string.IsNullOrEmpty(value) && int.TryParse(value, out val)) ?
+                 val : 42;
         }
 
         [ServerParam("WelcomeMessage")]
