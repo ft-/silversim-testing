@@ -32,7 +32,7 @@ namespace SilverSim.Database.Memory.Asset
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            /* intentionally left empty */
         }
         #endregion
 
