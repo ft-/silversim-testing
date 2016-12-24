@@ -1281,6 +1281,34 @@ namespace SilverSim.Main.Common
             ProcessUseTemplates();
         }
 
+        void ShowModeHelp()
+        {
+            string searchstring = GetType().Assembly.GetName().Name + ".Resources.ModeConfig.";
+            int searchstringlen = searchstring.Length;
+            foreach (string res in GetType().Assembly.GetManifestResourceNames())
+            {
+                if(res.StartsWith(searchstring))
+                {
+                    string modepara = res.Substring(searchstringlen);
+                    modepara = modepara.Substring(0, modepara.Length - 4);
+                    try
+                    {
+                        IConfigSource modeParamsSource = new CFG_IniResourceSource("ModeConfig." + modepara.ToLower() + ".ini").ConfigSource;
+                        IConfig modeConfig = modeParamsSource.Configs["ModeConfig"];
+                        string description = modeConfig.GetString("Description", string.Empty);
+                        if(!string.IsNullOrEmpty(description))
+                        {
+                            System.Console.WriteLine(string.Format("{0} - {1}", modepara, description));
+                        }
+                    }
+                    catch
+                    {
+                        /* intentionally left empty */
+                    }
+                }
+            }
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
@@ -1311,42 +1339,41 @@ namespace SilverSim.Main.Common
             configSource.AddSwitch("Startup", "skip-regions");
             IConfig startup = configSource.Configs["Startup"];
             mode = startup.GetString("mode", "simulator");
-            switch(mode)
+            string newmode = mode;
+            IConfig modeConfig;
+
+            if(mode == "?" || mode == "help")
             {
-                case "simulator":
-                case "sim":
-                    defaultConfigName = "../data/SilverSim.ini";
-                    defaultsIniName = "Simulator.defaults.ini";
-                    break;
-
-                case "grid":
-                    defaultConfigName = "../data/SilverSim.Grid.ini";
-                    defaultsIniName = "Grid.defaults.ini";
-                    break;
-
-                case "bare":
-                    defaultConfigName = "../data/SilverSim.Bare.ini";
-                    defaultsIniName = "Bare.defaults.ini";
-                    break;
-
-                case "standalone":
-                    defaultConfigName = "../data/SilverSim.Standalone.ini";
-                    defaultsIniName = "Standalone.defaults.ini";
-                    break;
-
-                case "testing":
-                    defaultConfigName = string.Empty;
-                    defaultsIniName = "Testing.defaults.ini";
-                    break;
-
-                case "custom":
-                    defaultConfigName = string.Empty;
-                    defaultsIniName = "CustomConfig.defaults.ini";
-                    break;
-
-                default:
-                    throw new ArgumentException("Invalid mode parameter");
+                ShowModeHelp();
+                shutdownEvent.Set();
+                return;
             }
+            {
+                List<string> loopCheck = new List<string>();
+                do
+                {
+                    if(loopCheck.Contains(mode))
+                    {
+                        throw new ArgumentException("Internal error with mode parameter");
+                    }
+                    loopCheck.Add(mode);
+                    mode = newmode;
+                    try
+                    {
+                        IConfigSource modeParamsSource = new CFG_IniResourceSource("ModeConfig." + mode.ToLower() + ".ini").ConfigSource;
+                        modeConfig = modeParamsSource.Configs["ModeConfig"];
+                    }
+                    catch
+                    {
+                        ShowModeHelp();
+                        throw new ArgumentException("Invalid mode parameter");
+                    }
+                } while (mode != (newmode = modeConfig.GetString("Mode", mode)));
+            }
+
+            defaultConfigName = modeConfig.GetString("DefaultConfigName", string.Empty);
+            defaultsIniName = modeConfig.GetString("DefaultsIniName", string.Empty);
+
             string mainConfig = startup.GetString("config", defaultConfigName);
 
             if (defaultsIniName.Length != 0)
