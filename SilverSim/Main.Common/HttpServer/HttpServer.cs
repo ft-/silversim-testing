@@ -56,11 +56,11 @@ namespace SilverSim.Main.Common.HttpServer
         bool m_StoppingListeners;
 
         X509Certificate2 m_ServerCertificate;
-        string m_CertificateFileName;
-        Type m_SslStreamPreload;
-        Socket m_ListenerSocket;
-        Thread m_ListenerThread;
-        List<IPortControlServiceInterface> m_PortControlServices = new List<IPortControlServiceInterface>();
+        readonly string m_CertificateFileName;
+        readonly Type m_SslStreamPreload;
+        readonly Socket m_ListenerSocket;
+        readonly Thread m_ListenerThread;
+        readonly List<IPortControlServiceInterface> m_PortControlServices = new List<IPortControlServiceInterface>();
 
         public BaseHttpServer(IConfig httpConfig, ConfigurationLoader loader, bool useSsl = false)
         {
@@ -219,7 +219,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        AutoResetEvent m_AsyncListenerEvent = new AutoResetEvent(false);
+        readonly AutoResetEvent m_AsyncListenerEvent = new AutoResetEvent(false);
 
         private void AcceptThread()
         {

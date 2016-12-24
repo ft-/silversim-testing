@@ -10,7 +10,7 @@ namespace SilverSim.Main.Common
     public class Startup
     {
         ConfigurationLoader m_ConfigLoader;
-        ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
+        readonly ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
         public bool Run(string[] args, Action<string> writeLine)
         {

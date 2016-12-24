@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        object m_PhysicsLinksetUpdateLock = new object();
+        readonly object m_PhysicsLinksetUpdateLock = new object();
 
         public bool IsPhantom
         {

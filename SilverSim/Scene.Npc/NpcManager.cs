@@ -52,11 +52,11 @@ namespace SilverSim.Scene.Npc
 
         private static readonly ILog m_Log = LogManager.GetLogger("NPC MANAGER");
 
-        string m_PersistentInventoryServiceName;
-        string m_NonpersistentInventoryServiceName;
-        string m_PersistentProfileServiceName;
-        string m_NonpersistentProfileServiceName;
-        string m_NpcPresenceServiceName;
+        readonly string m_PersistentInventoryServiceName;
+        readonly string m_NonpersistentInventoryServiceName;
+        readonly string m_PersistentProfileServiceName;
+        readonly string m_NonpersistentProfileServiceName;
+        readonly string m_NpcPresenceServiceName;
         InventoryServiceInterface m_PersistentInventoryService;
         InventoryServiceInterface m_NonpersistentInventoryService;
         ProfileServiceInterface m_PersistentProfileService;
@@ -74,8 +74,8 @@ namespace SilverSim.Scene.Npc
         }
 
         readonly RwLockedDictionary<UUID, NpcAgent> m_NpcAgents = new RwLockedDictionary<UUID, NpcAgent>();
-        AgentServiceList m_NonpersistentAgentServices = new AgentServiceList();
-        AgentServiceList m_PersistentAgentServices = new AgentServiceList();
+        readonly AgentServiceList m_NonpersistentAgentServices = new AgentServiceList();
+        readonly AgentServiceList m_PersistentAgentServices = new AgentServiceList();
 
         public void Startup(ConfigurationLoader loader)
         {

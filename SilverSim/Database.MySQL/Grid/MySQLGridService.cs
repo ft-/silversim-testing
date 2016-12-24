@@ -28,7 +28,7 @@ namespace SilverSim.Database.MySQL.Grid
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
         private bool m_IsDeleteOnUnregister;
         private bool m_AllowDuplicateRegionNames;
-        bool m_UseRegionDefaultServices;
+        readonly bool m_UseRegionDefaultServices;
         List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
 
         [ServerParam("DeleteOnUnregister")]

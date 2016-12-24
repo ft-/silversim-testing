@@ -367,7 +367,7 @@ namespace SilverSim.Main.Common
         }
 
         #region Plugin Registry
-        bool m_ServerParamInitialLoadProcessed;
+        readonly bool m_ServerParamInitialLoadProcessed;
 
         public void AddPlugin(string name, IPlugin plugin)
         {
@@ -2098,7 +2098,7 @@ namespace SilverSim.Main.Common
         }
 
         #region Show Port allocations
-        GridServiceInterface m_RegionStorage;
+        readonly GridServiceInterface m_RegionStorage;
         void ShowPortAllocationsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             StringBuilder sb = new StringBuilder("TCP Ports:\n----------------------------------------------\n");

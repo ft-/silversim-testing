@@ -76,16 +76,16 @@ namespace SilverSim.Grid.Login
         TravelingDataServiceInterface m_TravelingDataService;
         ILoginConnectorServiceInterface m_LoginConnectorService;
 
-        string m_UserAccountServiceName;
-        string m_GridUserServiceName;
-        string m_GridServiceName;
-        string m_InventoryServiceName;
-        string m_PresenceServiceName;
-        string m_FriendsServiceName;
-        string m_AuthInfoServiceName;
-        string m_AvatarServiceName;
-        string m_TravelingDataServiceName;
-        string m_LoginConnectorServiceName;
+        readonly string m_UserAccountServiceName;
+        readonly string m_GridUserServiceName;
+        readonly string m_GridServiceName;
+        readonly string m_InventoryServiceName;
+        readonly string m_PresenceServiceName;
+        readonly string m_FriendsServiceName;
+        readonly string m_AuthInfoServiceName;
+        readonly string m_AvatarServiceName;
+        readonly string m_TravelingDataServiceName;
+        readonly string m_LoginConnectorServiceName;
         UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
         UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
         string m_WelcomeMessage = "Greetings Programs";

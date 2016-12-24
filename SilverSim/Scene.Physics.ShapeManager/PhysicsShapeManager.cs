@@ -25,14 +25,14 @@ namespace SilverSim.Scene.Physics.ShapeManager
         readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesBySculptMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
         readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
 
-        string m_AssetServiceName;
-        string m_SimulationDataStorageName;
-        ReaderWriterLock m_Lock = new ReaderWriterLock();
+        readonly string m_AssetServiceName;
+        readonly string m_SimulationDataStorageName;
+        readonly ReaderWriterLock m_Lock = new ReaderWriterLock();
 
         /** <summary>referencing class to provide usage counting for meshes</summary> */
         public sealed class PhysicsShapeMeshReference : PhysicsShapeReference
         {
-            UUID m_ID;
+            readonly UUID m_ID;
             internal PhysicsShapeMeshReference(UUID id, PhysicsShapeManager manager, PhysicsConvexShape shape)
                 : base(manager, shape)
             {
@@ -57,7 +57,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         /** <summary>referencing class to provide usage counting for sculpts and prims</summary> */
         public sealed class PhysicsShapePrimShapeReference : PhysicsShapeReference
         {
-            ObjectPart.PrimitiveShape m_Shape;
+            readonly ObjectPart.PrimitiveShape m_Shape;
 
             internal PhysicsShapePrimShapeReference(ObjectPart.PrimitiveShape primshape, PhysicsShapeManager manager, PhysicsConvexShape shape)
                 : base(manager, shape)

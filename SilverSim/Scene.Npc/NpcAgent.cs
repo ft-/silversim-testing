@@ -36,11 +36,11 @@ namespace SilverSim.Scene.Npc
     {
         private static readonly ILog m_Log = LogManager.GetLogger("NPC AGENT");
 
-        InventoryServiceInterface m_InventoryService;
-        ProfileServiceInterface m_ProfileService;
-        GridUserServiceInterface m_GridUserService;
-        PresenceServiceInterface m_PresenceService;
-        NpcPresenceServiceInterface m_NpcPresenceService;
+        readonly InventoryServiceInterface m_InventoryService;
+        readonly ProfileServiceInterface m_ProfileService;
+        readonly GridUserServiceInterface m_GridUserService;
+        readonly PresenceServiceInterface m_PresenceService;
+        readonly NpcPresenceServiceInterface m_NpcPresenceService;
 
         public NpcAgent(
             UUI npcID,
@@ -381,7 +381,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate () { return new RwLockedDictionary<uint, uint>(); });
+        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate () { return new RwLockedDictionary<uint, uint>(); });
         public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials
         {
             get

@@ -25,7 +25,7 @@ namespace SilverSim.Database.MySQL.Grid
         private bool IsDeleteOnUnregister;
         private bool AllowDuplicateRegionNames;
         readonly RwLockedDictionary<UUID, RegionInfo> m_Data = new RwLockedDictionary<UUID, RegionInfo>();
-        bool m_UseRegionDefaultServices;
+        readonly bool m_UseRegionDefaultServices;
         List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
 
         public void TriggerParameterUpdated(UUID regionid, string parameter, string value)

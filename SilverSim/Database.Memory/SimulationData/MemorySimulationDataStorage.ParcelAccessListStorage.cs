@@ -13,7 +13,7 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public class MemorySimulationDataParcelAccessListStorage : ISimulationDataParcelAccessListStorageInterface
     {
-        RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>>(delegate() { return new RwLockedDictionary<UUI, ParcelAccessEntry>(); });
+        readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>>(delegate() { return new RwLockedDictionary<UUI, ParcelAccessEntry>(); });
         public MemorySimulationDataParcelAccessListStorage()
         {
         }
