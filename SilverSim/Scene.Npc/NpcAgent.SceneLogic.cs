@@ -10,8 +10,6 @@ namespace SilverSim.Scene.Npc
 {
     public partial class NpcAgent
     {
-        SceneInterface m_CurrentScene;
-
         public override bool IsInScene(SceneInterface scene)
         {
             SceneInterface currentScene = CurrentScene;
@@ -31,17 +29,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        internal SceneInterface CurrentScene
-        {
-            get
-            {
-                return m_CurrentScene;
-            }
-            set
-            {
-                m_CurrentScene = value;
-            }
-        }
+        internal SceneInterface CurrentScene { get; set; }
 
         public override UUID SceneID
         {
