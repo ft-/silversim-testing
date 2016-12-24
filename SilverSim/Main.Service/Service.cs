@@ -101,5 +101,9 @@ namespace SilverSim.Main.Service
             m_ShutdownCompleteEvent.Set();
         }
 
+        ~MainService()
+        {
+            m_ShutdownCompleteEvent.Dispose();
+        }
     }
 }

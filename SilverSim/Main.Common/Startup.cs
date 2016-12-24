@@ -55,5 +55,10 @@ namespace SilverSim.Main.Common
         {
             m_ConfigLoader.TriggerShutdown();
         }
+
+        ~Startup()
+        {
+            m_ShutdownEvent.Dispose();
+        }
     }
 }

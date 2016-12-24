@@ -86,6 +86,11 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        ~ScriptWorkerThreadPool()
+        {
+            m_WaitShutdownEvent.Dispose();
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void PostScript(ScriptInstance i)
         {

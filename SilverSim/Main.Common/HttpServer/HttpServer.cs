@@ -133,6 +133,11 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        ~BaseHttpServer()
+        {
+            m_AsyncListenerEvent.Dispose();
+        }
+
         public void Startup(ConfigurationLoader loader)
         {
             m_ExternalHostNameService = loader.ExternalHostNameService;
