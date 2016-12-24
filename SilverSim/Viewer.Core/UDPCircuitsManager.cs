@@ -260,6 +260,7 @@ namespace SilverSim.Viewer.Core
                                         !acircuit.AgentID.Equals(agentID))
                                     {
                                         /* no match on SessionID or AgentID */
+                                        m_Log.DebugFormat("Unmatched UseCircuitCode for AgentID {0} SessionID {1} CircuitCode {2} received", agentID, sessionID, circuitcode);
                                     }
                                     else
                                     {
@@ -324,6 +325,10 @@ namespace SilverSim.Viewer.Core
                                         }
                                     }
                                 }
+                            }
+                            else
+                            {
+                                m_Log.DebugFormat("UseCircuitCode received for unknown circuit {0}", circuitcode);
                             }
                         }
                     }

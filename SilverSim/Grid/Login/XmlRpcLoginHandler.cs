@@ -231,7 +231,7 @@ namespace SilverSim.Grid.Login
                     int rand;
                     lock (m_RandomNumberLock)
                     {
-                        rand = m_RandomNumber.Next(Int32.MinValue, Int32.MaxValue);
+                        rand = m_RandomNumber.Next(1, Int32.MaxValue);
                     }
                     return (uint)rand;
                 }
@@ -666,7 +666,7 @@ namespace SilverSim.Grid.Login
             resStruct.Add("region_y", loginData.DestinationInfo.Location.Y);
             resStruct.Add("region_size_x", loginData.DestinationInfo.Size.X);
             resStruct.Add("region_size_y", loginData.DestinationInfo.Size.Y);
-            resStruct.Add("circuit_code", loginData.CircuitInfo.CircuitCode);
+            resStruct.Add("circuit_code", (int)loginData.CircuitInfo.CircuitCode);
             if(loginData.InventoryRoot != null)
             {
                 Map data = new Map();
