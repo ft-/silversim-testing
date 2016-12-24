@@ -68,7 +68,7 @@ namespace SilverSim.Types.Grid
             {
                 if(null == m_SimIP)
                 {
-                    IPAddress[] addresses = DnsNameCache.GetHostAddresses(ServerIP);
+                    IPAddress[] addresses = DnsNameCache.GetHostAddresses(ServerIP, true);
                     if(addresses.Length == 0)
                     {
                         throw new InvalidOperationException();

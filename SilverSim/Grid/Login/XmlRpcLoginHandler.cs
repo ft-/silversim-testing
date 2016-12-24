@@ -221,6 +221,22 @@ namespace SilverSim.Grid.Login
 
         class LoginData
         {
+            static Random m_RandomNumber = new Random();
+            static object m_RandomNumberLock = new object();
+
+            private static uint NewCircuitCode
+            {
+                get
+                {
+                    int rand;
+                    lock (m_RandomNumberLock)
+                    {
+                        rand = m_RandomNumber.Next(Int32.MinValue, Int32.MaxValue);
+                    }
+                    return (uint)rand;
+                }
+            }
+
             public ClientInfo ClientInfo = new ClientInfo();
             public SessionInfo SessionInfo = new SessionInfo();
             public UserAccount Account;
@@ -239,7 +255,8 @@ namespace SilverSim.Grid.Login
 
             public LoginData()
             {
-
+                CircuitInfo.CapsPath = UUID.Random.ToString();
+                CircuitInfo.CircuitCode = NewCircuitCode;
             }
         }
 
@@ -642,10 +659,11 @@ namespace SilverSim.Grid.Login
             res.ReturnValue = resStruct;
             resStruct.Add("look_at", string.Format(CultureInfo.InvariantCulture, "[r{0},r{1},r{2}]", loginData.DestinationInfo.LookAt.X, loginData.DestinationInfo.LookAt.Y, loginData.DestinationInfo.LookAt.Z));
             resStruct.Add("agent_access_max", "A");
+            resStruct.Add("max-agent-groups", m_MaxAgentGroups);
             resStruct.Add("seed_capability", seedCapsURI);
             resStruct.Add("region_x", loginData.DestinationInfo.Location.X);
             resStruct.Add("region_y", loginData.DestinationInfo.Location.Y);
-            resStruct.Add("regioN_size_x", loginData.DestinationInfo.Size.X);
+            resStruct.Add("region_size_x", loginData.DestinationInfo.Size.X);
             resStruct.Add("region_size_y", loginData.DestinationInfo.Size.Y);
             resStruct.Add("circuit_code", loginData.CircuitInfo.CircuitCode);
             if(loginData.InventoryRoot != null)
@@ -772,7 +790,7 @@ namespace SilverSim.Grid.Login
                 resStruct.Add("inventory-skeleton", folderArray);
             }
 
-            resStruct.Add("sim-ip", loginData.DestinationInfo.SimIP.ToString());
+            resStruct.Add("sim_ip", ((IPEndPoint)loginData.DestinationInfo.SimIP).Address.ToString());
             resStruct.Add("map-server-url", loginData.CircuitInfo.MapServerURL);
 
             if(loginData.Friends != null)

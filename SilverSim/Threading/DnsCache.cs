@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Timers;
 
 namespace SilverSim.Threading
@@ -48,7 +50,7 @@ namespace SilverSim.Threading
             }
         }
 
-        public static IPAddress[] GetHostAddresses(string host)
+        public static IPAddress[] GetHostAddresses(string host, bool ipv4only = false)
         {
             KeyValuePair<IPAddress[], int> kvp;
             IPAddress[] addresses;
@@ -62,6 +64,11 @@ namespace SilverSim.Threading
                 addresses = kvp.Key;
             }
 
+            if (ipv4only)
+            {
+                IEnumerable<IPAddress> filtered_addrs = from addr in addresses where addr.AddressFamily == AddressFamily.InterNetwork select addr;
+                addresses = filtered_addrs.ToArray();
+            }
             return addresses;
         }
 
