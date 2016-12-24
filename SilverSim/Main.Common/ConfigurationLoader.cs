@@ -1298,7 +1298,13 @@ namespace SilverSim.Main.Common
                         string description = modeConfig.GetString("Description", string.Empty);
                         if(!string.IsNullOrEmpty(description))
                         {
-                            System.Console.WriteLine(string.Format("{0} - {1}", modepara, description));
+                            System.Console.WriteLine(string.Format("-m={0}\n  {1}", modepara, description));
+                            string defaultsIniName = modeConfig.GetString("DefaultConfigName", string.Empty);
+                            if(!string.IsNullOrEmpty(defaultsIniName))
+                            {
+                                System.Console.WriteLine(string.Format("  defaults to use {0}", defaultsIniName));
+                            }
+                            System.Console.WriteLine();
                         }
                     }
                     catch
