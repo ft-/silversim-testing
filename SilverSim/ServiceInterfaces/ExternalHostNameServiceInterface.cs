@@ -1,9 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-
 using SilverSim.Threading;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.ServiceInterfaces
