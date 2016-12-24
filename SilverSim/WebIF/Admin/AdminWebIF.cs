@@ -246,12 +246,9 @@ namespace SilverSim.WebIF.Admin
             }
             loader.CommandRegistry.Commands.Add("admin-webif", AdminWebIFCmd);
 
-            if (m_HttpsServer != null)
+            if (m_HttpsServer != null && m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", false))
             {
-                if(m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", false))
-                {
-                    loader.KnownConfigurationIssues.Add("Set WebIF.Admin.EnableHTTP=false in section [WebIF]");
-                }
+                loader.KnownConfigurationIssues.Add("Set WebIF.Admin.EnableHTTP=false in section [WebIF]");
             }
         }
 
