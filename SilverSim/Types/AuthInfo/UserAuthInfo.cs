@@ -56,15 +56,11 @@ namespace SilverSim.Types.AuthInfo
 
         public void CheckPassword(string password)
         {
-            if (!password.StartsWith("$1$"))
-            {
-                password = password.ComputeMD5();
-            }
-            else
-            {
-                password = password.Substring(3);
-            }
-            string salted = (password + ":" + PasswordSalt).ComputeMD5();
+            string actpassword;
+            actpassword = password.StartsWith("$1$") ?
+                password.Substring(3) :
+                password.ComputeMD5();
+            string salted = (actpassword + ":" + PasswordSalt).ComputeMD5();
 
             if (salted != PasswordHash)
             {

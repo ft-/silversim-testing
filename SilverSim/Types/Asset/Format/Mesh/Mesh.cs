@@ -58,8 +58,9 @@ namespace SilverSim.Types.Asset.Format.Mesh
             Load(data, physOffset, physSize);
         }
 
-        static Vector3 U16LEBytesToVertex(byte[] data, int offs, Vector3 posMin, Vector3 posMax)
+        static Vector3 U16LEBytesToVertex(byte[] data, int offset, Vector3 posMin, Vector3 posMax)
         {
+            int offs = offset;
             byte[] buf = data;
             if(!BitConverter.IsLittleEndian)
             {
@@ -80,8 +81,9 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return new Vector3(x, y, z);
         }
 
-        static UVCoord U16LEBytesToUV(byte[] data, int offs, UVCoord posMin, UVCoord posMax)
+        static UVCoord U16LEBytesToUV(byte[] data, int offset, UVCoord posMin, UVCoord posMax)
         {
+            int offs = offset;
             byte[] buf = data;
             if (!BitConverter.IsLittleEndian)
             {
@@ -100,9 +102,10 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return new UVCoord(u, v);
         }
 
-        static float BytesLEToFloat(byte[] data, int offs)
+        static float BytesLEToFloat(byte[] data, int offset)
         {
             byte[] buf = data;
+            int offs = offset;
             if(!BitConverter.IsLittleEndian)
             {
                 buf = new byte[4];
@@ -114,9 +117,10 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return BitConverter.ToSingle(data, offs);
         }
 
-        static ushort BytesLEToU16(byte[] data, int offs)
+        static ushort BytesLEToU16(byte[] data, int offset)
         {
             byte[] buf = data;
+            int offs = offset;
             if (!BitConverter.IsLittleEndian)
             {
                 buf = new byte[2];
