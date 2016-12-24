@@ -121,7 +121,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-
+                    /* prevent us from bailing out if should there be an inventory item error */
                 }
             }
 

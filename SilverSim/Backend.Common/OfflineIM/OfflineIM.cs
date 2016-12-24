@@ -104,7 +104,7 @@ namespace SilverSim.Backend.Common.OfflineIM
                 }
                 catch
                 {
-
+                    /* exception intentionally ignored */
                 }
             }
             return true;
