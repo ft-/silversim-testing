@@ -6,6 +6,7 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.ServiceInterfaces.Teleport;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AuthInfo;
 using SilverSim.ServiceInterfaces.Avatar;
@@ -98,6 +99,7 @@ namespace SilverSim.Grid.Login
         int m_MaxAgentGroups = 42;
         string m_HomeUri;
         string m_GatekeeperUri;
+        List<IServiceURLsGetInterface> m_ServiceURLsGetters = new List<IServiceURLsGetInterface>();
 
         public XmlRpcLoginHandler(IConfig ownSection)
         {
@@ -115,6 +117,7 @@ namespace SilverSim.Grid.Login
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_ServiceURLsGetters = loader.GetServicesByValue<IServiceURLsGetInterface>();
             m_HomeUri = loader.HomeURI;
             m_XmlRpcServer = loader.XmlRpcServer;
             m_GatekeeperUri = loader.GatekeeperURI;
@@ -616,6 +619,11 @@ namespace SilverSim.Grid.Login
                 flags |= TeleportFlags.Godlike;
             }
 
+            foreach(IServiceURLsGetInterface getter in m_ServiceURLsGetters)
+            {
+                getter.GetServiceURLs(loginData.Account.ServiceURLs);
+            }
+
             string seedCapsURI;
             try
             {
@@ -623,6 +631,7 @@ namespace SilverSim.Grid.Login
             }
             catch(Exception e)
             {
+                m_Log.Error("Login to simulator failed", e);
                 throw new LoginFailResponseException("key", e.Message);
             }
 

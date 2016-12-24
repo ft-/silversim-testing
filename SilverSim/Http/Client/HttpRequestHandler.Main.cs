@@ -226,7 +226,14 @@ namespace SilverSim.Http.Client
                         {
                             statusCode = 500;
                         }
-                        throw new HttpException(statusCode, splits[2]);
+                        if (statusCode == 404)
+                        {
+                            throw new HttpException(statusCode, splits[2] + " (" + url + ")");
+                        }
+                        else
+                        {
+                            throw new HttpException(statusCode, splits[2]);
+                        }
                     }
 
                     while (s.ReadHeaderLine().Length != 0)
@@ -282,7 +289,14 @@ namespace SilverSim.Http.Client
                 {
                     statusCode = 500;
                 }
-                throw new HttpException(statusCode, splits[2]);
+                if (statusCode == 404)
+                {
+                    throw new HttpException(statusCode, splits[2] + " (" + url + ")");
+                }
+                else
+                {
+                    throw new HttpException(statusCode, splits[2]);
+                }
             }
 
             ReadHeaderLines(s, headers);
