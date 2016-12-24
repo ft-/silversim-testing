@@ -11,7 +11,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
     {
         readonly Map m_MeshData;
         readonly int m_EndOfHeader;
-        byte[] m_AssetData;
+        readonly byte[] m_AssetData;
 
         public LLMesh(AssetData asset)
         {

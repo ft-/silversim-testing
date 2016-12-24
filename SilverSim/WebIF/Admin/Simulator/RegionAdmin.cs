@@ -132,12 +132,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                 ScriptEngineNameAttribute attr;
                 Type compilerType = compiler.GetType();
                 attr = Attribute.GetCustomAttribute(compilerType, typeof(ScriptEngineNameAttribute)) as ScriptEngineNameAttribute;
-                if(null != attr)
+                if(null == attr || attr.Name != name)
                 {
-                    if(attr.Name != name)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
                 DescriptionAttribute descAttr;
                 string desc;

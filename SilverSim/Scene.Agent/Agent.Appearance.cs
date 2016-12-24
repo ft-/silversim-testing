@@ -75,7 +75,6 @@ namespace SilverSim.Scene.Agent
         public UInt32 Serial = 1;
         public const int MaxVisualParams = 260;
         protected const int NUM_AVATAR_TEXTURES = 21;
-        private byte[] m_TextureEntry = new byte[0];
 
         public Action<IAgent> OnAppearanceUpdate;
 
@@ -247,19 +246,20 @@ namespace SilverSim.Scene.Agent
             AgentBakeAppearance.LoadAppearanceFromCurrentOutfit(this, AssetService, true, logOutput);
         }
 
-        private void ToUInt16Bytes(double val, double min, double max, byte[] buf, int pos)
+        private void ToUInt16Bytes(double value, double min, double max, byte[] buf, int pos)
         {
-            if (val < min)
+            double v = value;
+            if (v < min)
             {
-                val = min;
+                v = min;
             }
-            else if (val > max)
+            else if (v > max)
             {
-                val = max;
+                v = max;
             }
-            val -= min;
-            val = val * 65535 / (max - min);
-            byte[] b = BitConverter.GetBytes((UInt16)val);
+            v -= min;
+            v = v * 65535 / (max - min);
+            byte[] b = BitConverter.GetBytes((UInt16)v);
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(b);

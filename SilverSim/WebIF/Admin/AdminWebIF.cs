@@ -1097,11 +1097,8 @@ namespace SilverSim.WebIF.Admin
         {
             IValue ipara;
             AnArray paradata;
-            if(!jsondata.TryGetValue("parameters", out ipara))
-            {
-                ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
-            }
-            else if(null == (paradata = ipara as AnArray))
+            if(!jsondata.TryGetValue("parameters", out ipara) ||
+                null == (paradata = ipara as AnArray))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
