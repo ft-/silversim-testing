@@ -167,7 +167,7 @@ namespace SilverSim.Database.MySQL.Presence
                 else if (reportType == SetType.Login)
                 {
                     Dictionary<string, object> post = new Dictionary<string, object>();
-                    post["UserID"] = value.UserID;
+                    post["UserID"] = value.UserID.ID;
                     post["SessionID"] = value.SessionID;
                     post["SecureSessionID"] = value.SecureSessionID;
                     post["RegionID"] = UUID.Zero;
@@ -180,8 +180,9 @@ namespace SilverSim.Database.MySQL.Presence
                         {
                             conn.InsertInto("presence", post);
                         }
-                        catch
+                        catch(Exception e)
                         {
+                            m_Log.Debug("Presence update failed", e);
                             throw new PresenceUpdateFailedException();
                         }
                     }

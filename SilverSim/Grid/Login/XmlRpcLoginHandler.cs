@@ -379,6 +379,7 @@ namespace SilverSim.Grid.Login
                 m_Log.ErrorFormat("Request from {0} does not reference an enabled account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
                 return LoginFailResponse("key", "Could not authenticate your avatar. Account has been disabled.");
             }
+            loginData.Account.Principal.HomeURI = new Uri(m_HomeUri, UriKind.Absolute);
 
             AnArray optarray = null;
             if (structParam.TryGetValue<AnArray>("options", out optarray))
@@ -548,8 +549,9 @@ namespace SilverSim.Grid.Login
             {
                 m_PresenceService[pInfo.SessionID, pInfo.UserID.ID, PresenceServiceInterface.SetType.Login] = pInfo;
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Error("Error conntacting presence service", e);
                 throw new LoginFailResponseException("key", "Error connecting to the desired location. Try connecting to another region. (A)");
             }
 
