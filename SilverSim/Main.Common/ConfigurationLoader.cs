@@ -2624,8 +2624,8 @@ namespace SilverSim.Main.Common
 
         sealed class SystemIPv4Service : ExternalHostNameServiceInterface
         {
-            static string m_IPv4Cached = string.Empty;
-            static int m_IPv4LastCached;
+            string m_IPv4Cached = string.Empty;
+            int m_IPv4LastCached;
 
             public SystemIPv4Service()
             {
@@ -2684,7 +2684,7 @@ namespace SilverSim.Main.Common
         }
 
         static readonly SystemIPv4Service m_SystemIPv4 = new SystemIPv4Service();
-        static DomainNameResolveService m_DomainResolver;
+        DomainNameResolveService m_DomainResolver;
 
         public ExternalHostNameServiceInterface ExternalHostNameService
         {
