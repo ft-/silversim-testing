@@ -162,11 +162,11 @@ namespace SilverSim.Grid.Login
             list.Add("platform", "SilverSim");
             if (m_HttpsServer != null && !m_AllowLoginViaHttpWhenHttpsIsConfigured)
             {
-                list.Add("login", m_HttpsServer.ServerURI + "login");
+                list.Add("login", m_HttpsServer.ServerURI);
             }
             else
             {
-                list.Add("login", m_HttpServer.ServerURI + "login");
+                list.Add("login", m_HttpServer.ServerURI);
             }
             if (m_AboutPage != null)
             {
@@ -434,8 +434,9 @@ namespace SilverSim.Grid.Login
 #endif
                 return LoginFailResponse(e.Reason, e.Message);
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Debug("Unexpected error occured", e);
                 throw new LoginFailResponseException("key", "Unexpected errror occured");
             }
         }
