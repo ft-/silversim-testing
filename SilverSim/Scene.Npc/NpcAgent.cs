@@ -29,7 +29,6 @@ using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages.Agent;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SilverSim.Scene.Npc
 {
@@ -65,14 +64,14 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     return new UUI(m_NpcOwner);
                 }
             }
             set
             {
-                lock(this)
+                lock(m_DataLock)
                 {
                     m_NpcOwner = new UUI(value);
                 }
