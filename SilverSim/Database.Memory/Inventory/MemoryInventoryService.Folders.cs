@@ -265,7 +265,10 @@ namespace SilverSim.Database.Memory.Inventory
         void PurgeOrDelete(UUID principalID, UUID folderID, bool deleteFolder)
         {
             List<UUID> folders;
-            InventoryFolder thisfolder = Folder[principalID, folderID];
+            if(!Folder.ContainsKey(principalID, folderID))
+            {
+                throw new KeyNotFoundException();
+            }
 
             if (deleteFolder)
             {

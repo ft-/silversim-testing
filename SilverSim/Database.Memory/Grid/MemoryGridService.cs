@@ -340,7 +340,6 @@ namespace SilverSim.Database.MySQL.Grid
         public override List<RegionInfo> GetNeighbours(UUID scopeID, UUID regionID)
         {
             RegionInfo ri = this[scopeID, regionID];
-            List<RegionInfo> result = new List<RegionInfo>();
             IEnumerable<RegionInfo> res = from region in m_Data.Values
                                           where
                                           (

@@ -38,7 +38,6 @@ namespace SilverSim.Scene.RegionLoader.Basic
             m_GatekeeperUri = loader.GatekeeperURI;
             m_Scenes = loader.Scenes;
             m_ExternalHostNameService = loader.ExternalHostNameService;
-            IConfig config = loader.Config.Configs["Network"];
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
         }

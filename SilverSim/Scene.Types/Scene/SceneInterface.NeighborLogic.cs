@@ -143,7 +143,6 @@ namespace SilverSim.Scene.Types.Scene
         protected void ChatPassLocalNeighbors(ListenEvent le)
         {
             RwLockedList<UUID> activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
-            bool chatPassDefault = true;
             foreach (KeyValuePair<UUID, NeighborEntry> kvp in Neighbors)
             {
                 SceneInterface remoteScene;

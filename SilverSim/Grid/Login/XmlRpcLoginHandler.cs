@@ -356,7 +356,6 @@ namespace SilverSim.Grid.Login
             LoginData loginData = new LoginData();
             string firstName = loginParams["first"];
             string lastName = loginParams["last"];
-            string startLocation = loginParams["start"];
             string passwd = loginParams["passwd"];
             loginData.ClientInfo.Channel = loginParams["channel"];
             loginData.ClientInfo.ClientVersion = loginParams["version"];

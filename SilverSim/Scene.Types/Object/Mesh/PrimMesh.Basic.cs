@@ -539,9 +539,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(angle);
                     Vector3 innerDirectionalVec = outerDirectionalVec;
 
-                    double outerDirXabs = Math.Abs(outerDirectionalVec.X);
-                    double outerDirYabs = Math.Abs(outerDirectionalVec.Y);
-
                     /* outer normalize on single component to 0.5, simplifies algorithm */
                     outerDirectionalVec = outerDirectionalVec.CalcPointToSquareBoundary(1);
 

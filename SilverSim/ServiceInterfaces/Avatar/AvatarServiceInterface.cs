@@ -80,7 +80,6 @@ namespace SilverSim.ServiceInterfaces.Avatar
             Dictionary<string, string> vals = new Dictionary<string, string>();
             vals.Add("Serial", aInfo.Serial.ToString());
             vals.Add("AvatarHeight", aInfo.AvatarHeight.ToString(CultureInfo.InvariantCulture));
-            string visualParams = string.Empty;
             bool firstVp = true;
             StringBuilder sb = new StringBuilder();
             foreach(byte b in aInfo.VisualParams)

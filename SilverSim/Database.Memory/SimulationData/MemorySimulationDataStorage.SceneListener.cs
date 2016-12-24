@@ -170,7 +170,6 @@ namespace SilverSim.Database.Memory.SimulationData
 
                         if (knownInventories.Contains(req.Part.LocalID))
                         {
-                            string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
                             string partID = req.Part.ID.ToString();
                             foreach (UUID itemID in knownInventories[req.Part.LocalID])
                             {
