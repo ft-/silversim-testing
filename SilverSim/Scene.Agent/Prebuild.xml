@@ -30,7 +30,7 @@
   <Reference name="CSJ2K" path="../../bin/" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
-        <Exclude pattern="TemporaryGeneratedFile"/>
+      <Exclude pattern="TemporaryGeneratedFile"/>
     </Match>
     <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
     <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
