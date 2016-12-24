@@ -39,9 +39,15 @@ namespace SilverSim.Grid.Maptile
             }
         }
 
-        public override bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data)
+        public override bool TryGetValue(UUID scopeid, GridVector rawlocation, int zoomlevel, out MaptileData data)
         {
             data = null;
+            if (zoomlevel < 1)
+            {
+                return false;
+            }
+            GridVector location = rawlocation.AlignToZoomlevel(zoomlevel);
+
             if(m_MaptileService.TryGetValue(scopeid, location, zoomlevel, out data))
             {
                 return true;
@@ -57,8 +63,6 @@ namespace SilverSim.Grid.Maptile
             MaptileData map10;
             MaptileData map11;
             MaptileData outmap;
-
-            location = location.AlignToZoomlevel(zoomlevel);
 
             if (!TryGetValue(scopeid, location, zoomlevel - 1, out map00))
             {
