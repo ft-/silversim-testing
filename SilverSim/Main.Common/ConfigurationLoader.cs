@@ -2632,7 +2632,7 @@ namespace SilverSim.Main.Common
         sealed class SystemIPv4Service : ExternalHostNameServiceInterface
         {
             static string m_IPv4Cached = string.Empty;
-            static int m_IPv4LastCached = 0;
+            static int m_IPv4LastCached;
 
             public SystemIPv4Service()
             {

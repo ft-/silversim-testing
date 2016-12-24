@@ -44,7 +44,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return new QueueStat(count != 0 ? "PROCESSING" : "IDLE", count, (uint)m_ProcessedPrims);
             }
 
-            int m_ProcessedPrims = 0;
+            int m_ProcessedPrims;
 
             protected override void StorageMainThread()
             {

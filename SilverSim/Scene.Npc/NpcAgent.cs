@@ -37,11 +37,11 @@ namespace SilverSim.Scene.Npc
     {
         private static readonly ILog m_Log = LogManager.GetLogger("NPC AGENT");
 
-        InventoryServiceInterface m_InventoryService = null;
-        ProfileServiceInterface m_ProfileService = null;
-        GridUserServiceInterface m_GridUserService = null;
-        PresenceServiceInterface m_PresenceService = null;
-        NpcPresenceServiceInterface m_NpcPresenceService = null;
+        InventoryServiceInterface m_InventoryService;
+        ProfileServiceInterface m_ProfileService;
+        GridUserServiceInterface m_GridUserService;
+        PresenceServiceInterface m_PresenceService;
+        NpcPresenceServiceInterface m_NpcPresenceService;
 
         public NpcAgent(
             UUI npcID,

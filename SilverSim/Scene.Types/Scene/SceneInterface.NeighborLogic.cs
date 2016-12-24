@@ -39,11 +39,11 @@ namespace SilverSim.Scene.Types.Scene
 
         readonly RwLockedList<UUID> m_ChatPassInEnableLocal = new RwLockedList<UUID>();
         readonly RwLockedList<UUID> m_ChatPassInEnableGlobal = new RwLockedList<UUID>();
-        bool m_ChatPassInEnableSetToLocal = false;
+        bool m_ChatPassInEnableSetToLocal;
 
         readonly RwLockedList<UUID> m_ChatPassOutEnableLocal = new RwLockedList<UUID>();
         readonly RwLockedList<UUID> m_ChatPassOutEnableGlobal = new RwLockedList<UUID>();
-        bool m_ChatPassOutEnableSetToLocal = false;
+        bool m_ChatPassOutEnableSetToLocal;
 
         void ChatPassEnableUpdated(
            RwLockedList<UUID> locallist,
