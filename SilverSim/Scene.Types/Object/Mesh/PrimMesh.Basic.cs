@@ -60,6 +60,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     outvertex.Z = outvertex.X;
                     outvertex.X = 0;
                     break;
+
+                default:
+                    break;
             }
 
             return outvertex;
