@@ -21,7 +21,7 @@ namespace SilverSim.ServiceInterfaces
         {
             get
             {
-                IPAddress[] addresses = DnsNameCache.GetHostAddresses(ExternalHostName);
+                IPAddress[] addresses = DnsNameCache.GetHostAddresses(ExternalHostName, true);
                 return addresses[0].ToString();
             }
         }

@@ -180,7 +180,6 @@ namespace SilverSim.Grid.Login
             {
                 list.Add("welcome", m_WelcomePage.ToString());
             }
-            list.Add("WelcomeMessage", m_WelcomeMessage);
             list.Add("gridnick", m_GridNick);
             list.Add("gridname", m_GridName);
             return list;

@@ -834,7 +834,7 @@ namespace SilverSim.Main.Cmd.Region
 
                 try
                 {
-                    rInfo.Location = new GridVector(args[4], 1);
+                    rInfo.Location = new GridVector(args[4], 256);
                 }
                 catch (Exception e)
                 {
