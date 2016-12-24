@@ -239,11 +239,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
             else if(shape.ProfileBegin != shape.ProfileEnd)
             {
                 /* build a center point and connect all vertices with triangles */
-                double z1;
-                double z2;
-
-                z1 = mesh.Vertices[0].Z;
-                z2 = mesh.Vertices[verticeTotalCount - 1].Z;
                 int centerpointTop = mesh.Vertices.Count;
                 int bottomIndex = verticeTotalCount - verticeRowCount;
                 mesh.Vertices.Add(shape.CalcAdvancedCenterPrim(twistBegin, twistEnd, cutBegin));

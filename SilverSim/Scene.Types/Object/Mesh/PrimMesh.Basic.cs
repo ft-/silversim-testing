@@ -217,11 +217,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
             else
             {
                 /* build a center point and connect all vertexes with triangles */
-                double z1;
-                double z2;
-
-                z1 = mesh.Vertices[0].Z;
-                z2 = mesh.Vertices[verticeTotalCount - 1].Z;
                 int centerpointTop = mesh.Vertices.Count;
                 int bottomIndex = verticeTotalCount - verticeRowCount;
                 mesh.Vertices.Add(ApplyTortureParams(shape, new Vector3(0, 0, 0), twistBegin, twistEnd, cutBegin));
