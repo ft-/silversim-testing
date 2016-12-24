@@ -123,8 +123,8 @@ namespace SilverSim.Types
         {
             uint zoomborder = (uint)(256 << (zoomlevel - 1));
             GridVector res = new GridVector();
-            res.X = X - X % zoomborder;
-            res.Y = Y - Y & zoomborder;
+            res.X = X - (X % zoomborder);
+            res.Y = Y - (Y % zoomborder);
             return res;
         }
 
