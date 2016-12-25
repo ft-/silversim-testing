@@ -247,7 +247,7 @@ namespace SilverSim.Main.Common.HttpServer
 
                     if(args.AcceptSocket == null)
                     {
-
+                        /* we cannot do anything with it when the AcceptSocket is not set */
                     }
                     else if (args.AcceptSocket.Connected && !m_StoppingListeners)
                     {
@@ -271,7 +271,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             catch (NullReferenceException)
             {
-
+                /* intentionally ignored */
             }
             finally
             {
