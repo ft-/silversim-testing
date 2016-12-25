@@ -18,7 +18,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public virtual void Serialize(HttpRequest req)
         {
-            using (HttpResponse res = req.BeginResponse(HttpStatus, Message))
+            using (req.BeginResponse(HttpStatus, Message))
             {
                 /* intentionally left empty */
             }
