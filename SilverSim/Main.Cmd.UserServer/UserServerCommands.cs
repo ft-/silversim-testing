@@ -11,6 +11,7 @@ using SilverSim.Types.Account;
 using SilverSim.Types.AuthInfo;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text;
 
 namespace SilverSim.Main.Cmd.UserServer
 {
@@ -42,6 +43,7 @@ namespace SilverSim.Main.Cmd.UserServer
             loader.CommandRegistry.AddCreateCommand("user", CreateUserCommand);
             loader.CommandRegistry.AddDeleteCommand("user", DeleteUserCommand);
             loader.CommandRegistry.AddChangeCommand("user", ChangeUserCommand);
+            loader.CommandRegistry.AddShowCommand("user", ShowUserCommand);
         }
 
         bool IsNameValid(string s)
@@ -54,6 +56,36 @@ namespace SilverSim.Main.Cmd.UserServer
                 }
             }
             return true;
+        }
+
+        [Description("Show User")]
+        void ShowUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UserAccount account;
+            if(args[0] == "help" || args.Count != 4)
+            {
+                io.Write("show user <firstname> <lastname>");
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                io.Write("show user not allowed on limited console");
+            }
+            else if(m_UserAccountService.TryGetValue(UUID.Zero, args[2], args[3], out account))
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("ID: {0}\n", account.Principal.ID);
+                sb.AppendFormat("First Name: {0}\n", account.Principal.FirstName);
+                sb.AppendFormat("Last Name: {0}\n", account.Principal.LastName);
+                sb.AppendFormat("Level: {0}\n", account.UserLevel);
+                sb.AppendFormat("Title: {0}\n", account.UserTitle);
+                sb.AppendFormat("Created: {0}\n", account.Created.ToString());
+                sb.AppendFormat("Email: {0}\n", account.Email);
+                io.Write(sb.ToString());
+            }
+            else
+            {
+                io.WriteFormatted("Account {0} {1} does not exist", args[2], args[3]);
+            }
         }
 
         [Description("Change user")]
@@ -204,9 +236,13 @@ namespace SilverSim.Main.Cmd.UserServer
 
             io.WriteFormatted("Deleting user {0}.{1} (ID {2})", account.Principal.FirstName, account.Principal.LastName, account.Principal.ID);
 
+            int count = m_AccountDeleteServices.Count;
+            io.WriteFormatted("Processing {0} services", count);
+            int index = 1;
             foreach(IUserAccountDeleteServiceInterface delService in m_AccountDeleteServices)
             {
                 delService.Remove(account.ScopeID, account.Principal.ID);
+                io.WriteFormatted("{0}/{1} processed", index++, count);
             }
         }
     }
