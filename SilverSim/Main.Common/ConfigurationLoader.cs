@@ -1370,7 +1370,6 @@ namespace SilverSim.Main.Common
             if(startup.Contains("help"))
             {
                 System.Console.WriteLine("Usage: SilverSim.Main.exe switches...\n");
-                System.Console.WriteLine("-dumpconfig=filename\n  Dump resulting ini to file\n");
                 System.Console.WriteLine("-config=filename or -c filename\n  Use specific config file\n");
                 System.Console.WriteLine("-skipregions\n  Skip start of regions\n");
                 ShowModeHelp();
