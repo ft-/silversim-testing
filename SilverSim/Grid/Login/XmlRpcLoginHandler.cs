@@ -1035,14 +1035,8 @@ namespace SilverSim.Grid.Login
             }
             lock (m_ConfigUpdateLock)
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    m_GridLibraryEnabled = false;
-                }
-                else if (!bool.TryParse(value, out m_GridLibraryEnabled))
-                {
-                    m_GridLibraryEnabled = false;
-                }
+                bool val;
+                m_GridLibraryEnabled = !string.IsNullOrEmpty(value) && bool.TryParse(value, out val) && val;
             }
         }
 
@@ -1054,11 +1048,7 @@ namespace SilverSim.Grid.Login
                 return;
             }
             bool val;
-            if(!bool.TryParse(value, out val))
-            {
-                val = false;
-            }
-            m_AllowMultiplePresences = val;
+            m_AllowMultiplePresences = bool.TryParse(value, out val) && val;
         }
 
         [ServerParam("AboutPage")]
