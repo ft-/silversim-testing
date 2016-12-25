@@ -268,9 +268,12 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
             public byte[] DataNoAABBUpdate
             {
+                get
+                {
+                    return Data;
+                }
                 set
                 {
                     try
