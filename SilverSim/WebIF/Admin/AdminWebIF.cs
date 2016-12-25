@@ -662,17 +662,26 @@ namespace SilverSim.WebIF.Admin
                     }
                 }
             }
+            catch(DirectoryNotFoundException)
+            {
+                ServeFileNotFoundResponse(req);
+            }
             catch (FileNotFoundException)
             {
-                using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not Found"))
+                ServeFileNotFoundResponse(req);
+            }
+        }
+
+        void ServeFileNotFoundResponse(HttpRequest req)
+        {
+            using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not Found"))
+            {
+                res.ContentType = "text/html";
+                using (Stream o = res.GetOutputStream())
                 {
-                    res.ContentType = "text/html";
-                    using (Stream o = res.GetOutputStream())
+                    using (StreamWriter w = o.UTF8StreamWriter())
                     {
-                        using (StreamWriter w = o.UTF8StreamWriter())
-                        {
-                            w.Write("<html><head><title>Not Found</title><body>Not Found</body></html>");
-                        }
+                        w.Write("<html><head><title>Not Found</title><body>Not Found</body></html>");
                     }
                 }
             }
