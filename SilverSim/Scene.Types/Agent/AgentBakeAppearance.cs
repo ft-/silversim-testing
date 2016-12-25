@@ -496,35 +496,33 @@ namespace SilverSim.Scene.Types.Agent
             foreach (InventoryItem linkItem in items)
             {
                 InventoryItem actualItem;
-                if (actualItemsInDict.TryGetValue(linkItem.AssetID, out actualItem))
+                if (actualItemsInDict.TryGetValue(linkItem.AssetID, out actualItem) &&
+                    (actualItem.AssetType == AssetType.Clothing || actualItem.AssetType == AssetType.Bodypart))
                 {
-                    if (actualItem.AssetType == AssetType.Clothing || actualItem.AssetType == AssetType.Bodypart)
+                    AssetData outfitData;
+                    Wearable wearableData;
+                    if (assetService.TryGetValue(actualItem.AssetID, out outfitData))
                     {
-                        AssetData outfitData;
-                        Wearable wearableData;
-                        if (assetService.TryGetValue(actualItem.AssetID, out outfitData))
+                        try
                         {
-                            try
-                            {
-                                wearableData = new Wearable(outfitData);
-                            }
-                            catch (Exception e)
-                            {
-                                string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, agent.Owner.FullName, agent.Owner.ID);
-                                m_BakeLog.ErrorFormat(info, e);
-                                throw new BakingErrorException(info, e);
-                            }
-
-                            if (!wearables.ContainsKey(wearableData.Type))
-                            {
-                                wearables.Add(wearableData.Type, new List<AgentWearables.WearableInfo>());
-                            }
-
-                            AgentWearables.WearableInfo wearableInfo = new AgentWearables.WearableInfo();
-                            wearableInfo.ItemID = actualItem.ID;
-                            wearableInfo.AssetID = actualItem.AssetID;
-                            wearables[wearableData.Type].Add(wearableInfo);
+                            wearableData = new Wearable(outfitData);
                         }
+                        catch (Exception e)
+                        {
+                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, agent.Owner.FullName, agent.Owner.ID);
+                            m_BakeLog.ErrorFormat(info, e);
+                            throw new BakingErrorException(info, e);
+                        }
+
+                        if (!wearables.ContainsKey(wearableData.Type))
+                        {
+                            wearables.Add(wearableData.Type, new List<AgentWearables.WearableInfo>());
+                        }
+
+                        AgentWearables.WearableInfo wearableInfo = new AgentWearables.WearableInfo();
+                        wearableInfo.ItemID = actualItem.ID;
+                        wearableInfo.AssetID = actualItem.AssetID;
+                        wearables[wearableData.Type].Add(wearableInfo);
                     }
                 }
             }
@@ -564,12 +562,10 @@ namespace SilverSim.Scene.Types.Agent
                     for (int wearableType = 0; wearableType < (int)WearableType.NumWearables; ++wearableType)
                     {
                         List<AgentWearables.WearableInfo> wearablesList;
-                        if (wearables.TryGetValue((WearableType)wearableType, out wearablesList))
+                        if (wearables.TryGetValue((WearableType)wearableType, out wearablesList) &&
+                            wearablesList.Count > wearableIndex)
                         {
-                            if (wearablesList.Count > wearableIndex)
-                            {
-                                wearablesItemIds.Add(wearablesList[wearableIndex].ItemID);
-                            }
+                            wearablesItemIds.Add(wearablesList[wearableIndex].ItemID);
                         }
                     }
                 }
@@ -1007,29 +1003,27 @@ namespace SilverSim.Scene.Types.Agent
                         {
                             UUID texture;
                             Image img;
-                            if (null != item.WearableData && item.WearableData.Textures.TryGetValue(texIndex, out texture))
+                            if ((null != item.WearableData && item.WearableData.Textures.TryGetValue(texIndex, out texture)) &&
+                                status.TryGetTexture(bake, texture, out img))
                             {
-                                if (status.TryGetTexture(bake, texture, out img))
+                                /* duplicate texture */
+                                using (Bitmap bmp = new Bitmap(img))
                                 {
-                                    /* duplicate texture */
-                                    using (Bitmap bmp = new Bitmap(img))
+                                    switch (texIndex)
                                     {
-                                        switch (texIndex)
-                                        {
-                                            case AvatarTextureIndex.HeadBodypaint:
-                                            case AvatarTextureIndex.UpperBodypaint:
-                                            case AvatarTextureIndex.LowerBodypaint:
-                                                /* no tinting here */
-                                                break;
+                                        case AvatarTextureIndex.HeadBodypaint:
+                                        case AvatarTextureIndex.UpperBodypaint:
+                                        case AvatarTextureIndex.LowerBodypaint:
+                                            /* no tinting here */
+                                            break;
 
-                                            default:
-                                                ApplyTint(bmp, item.WearableData.GetTint());
-                                                break;
-                                        }
-
-                                        gfx.DrawImage(bmp, 0, 0, bakeDimensions, bakeDimensions);
-                                        AddAlpha(bitmap, bmp);
+                                        default:
+                                            ApplyTint(bmp, item.WearableData.GetTint());
+                                            break;
                                     }
+
+                                    gfx.DrawImage(bmp, 0, 0, bakeDimensions, bakeDimensions);
+                                    AddAlpha(bitmap, bmp);
                                 }
                             }
                         }

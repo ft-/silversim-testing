@@ -57,19 +57,15 @@ namespace SilverSim.Database.MySQL.Friends
                     break;
                 }
 
-                if(!fi.Friend.IsAuthoritative)
+                if(!fi.Friend.IsAuthoritative &&
+                    service.TryGetValue(fi.Friend, out uui))
                 {
-                    if(service.TryGetValue(fi.Friend, out uui))
-                    {
-                        fi.Friend = uui;
-                    }
+                    fi.Friend = uui;
                 }
-                if(!fi.User.IsAuthoritative)
+                if(!fi.User.IsAuthoritative &&
+                    service.TryGetValue(fi.User, out uui))
                 {
-                    if(service.TryGetValue(fi.User, out uui))
-                    {
-                        fi.User = uui;
-                    }
+                    fi.User = uui;
                 }
             }
         }

@@ -440,13 +440,10 @@ namespace SilverSim.Main.Cmd.Region
                     foreach(ObjectPartInventoryItem item in part.Inventory.Values)
                     {
                         ScriptInstance instance = item.ScriptInstance;
-                        if(instance != null)
+                        if(instance != null && !instance.IsRunning)
                         {
-                            if (!instance.IsRunning)
-                            {
-                                instance.IsRunning = true;
-                                ++count;
-                            }
+                            instance.IsRunning = true;
+                            ++count;
                         }
                     }
                 }

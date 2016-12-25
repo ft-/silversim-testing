@@ -366,13 +366,11 @@ namespace SilverSim.Grid.Login
 
             UUID scopeId = UUID.Zero;
             IValue iv;
-            if(structParam.TryGetValue("scope_id", out iv))
+            if(structParam.TryGetValue("scope_id", out iv) &&
+                !UUID.TryParse(iv.ToString(), out scopeId))
             {
-                if(!UUID.TryParse(iv.ToString(), out scopeId))
-                {
-                    m_Log.ErrorFormat("Request from {0} does not contain invalid parameter scope_id", req.CallerIP);
-                    throw new XmlRpc.XmlRpcFaultException(4, "Invalid parameter scope_id");
-                }
+                m_Log.ErrorFormat("Request from {0} does not contain invalid parameter scope_id", req.CallerIP);
+                throw new XmlRpc.XmlRpcFaultException(4, "Invalid parameter scope_id");
             }
 
             try

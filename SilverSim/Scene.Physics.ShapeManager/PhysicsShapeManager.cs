@@ -238,15 +238,12 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 {
                     convexShape = m.GetConvexPhysics();
                 }
-                if(null != convexShape && !convexShape.HasHullList)
+                if(null != convexShape && !convexShape.HasHullList && m.HasLOD(LLMesh.LodLevel.Physics))
                 {
                     /* check for physics mesh before giving out the single hull */
-                    if(m.HasLOD(LLMesh.LodLevel.Physics))
-                    {
-                        MeshLOD lod = m.GetLOD(LLMesh.LodLevel.Physics);
-                        lod.Optimize();
-                        convexShape = DecomposeConvex(lod);
-                    }
+                    MeshLOD lod = m.GetLOD(LLMesh.LodLevel.Physics);
+                    lod.Optimize();
+                    convexShape = DecomposeConvex(lod);
                 }
 
                 if(null == convexShape)

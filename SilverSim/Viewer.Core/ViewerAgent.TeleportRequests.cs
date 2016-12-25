@@ -62,13 +62,11 @@ namespace SilverSim.Viewer.Core
         {
             KeyValuePair<ulong, RegionInfo> dest;
             di = default(RegionInfo);
-            if (m_HypergridDestinations.TryGetValue(gv.RegionHandle, out dest))
+            if (m_HypergridDestinations.TryGetValue(gv.RegionHandle, out dest) &&
+                Date.GetUnixTime() - dest.Key <= 240)
             {
-                if (Date.GetUnixTime() - dest.Key <= 240)
-                {
-                    di = dest.Value;
-                    return true;
-                }
+                di = dest.Value;
+                return true;
             }
 
             CleanDestinationCache();

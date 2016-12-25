@@ -434,13 +434,11 @@ namespace SilverSim.Scene.Npc
             }
             UUID npcId = jsondata["id"].AsUUID;
 
-            if (jsondata.ContainsKey("regionid"))
+            if (jsondata.ContainsKey("regionid") &&
+                !m_KnownScenes.TryGetValue(jsondata["regionid"].AsUUID, out scene))
             {
-                if (!m_KnownScenes.TryGetValue(jsondata["regionid"].AsUUID, out scene))
-                {
-                    m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
-                    return;
-                }
+                m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+                return;
             }
 
             NpcAgent npc;
@@ -468,13 +466,11 @@ namespace SilverSim.Scene.Npc
         void HandleShowNpcs(HttpRequest req, Map jsondata)
         {
             SceneInterface scene = null;
-            if (jsondata.ContainsKey("regionid"))
+            if (jsondata.ContainsKey("regionid") &&
+                !m_KnownScenes.TryGetValue(jsondata["regionid"].AsUUID, out scene))
             {
-                if (!m_KnownScenes.TryGetValue(jsondata["regionid"].AsUUID, out scene))
-                {
-                    m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
-                    return;
-                }
+                m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
             }
 
             AnArray npcs = new AnArray();

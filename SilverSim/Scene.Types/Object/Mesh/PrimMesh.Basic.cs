@@ -463,12 +463,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 foreach (double angle in PrismAngles)
                 {
-                    if (startangle <= angle && endangle >= angle)
+                    if (startangle <= angle && endangle >= angle && !angles.Contains(angle))
                     {
-                        if (!angles.Contains(angle))
-                        {
-                            InsertAngle(angles, angle);
-                        }
+                        InsertAngle(angles, angle);
                     }
                 }
 
@@ -477,12 +474,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 foreach (double angle in PrismAngles)
                 {
-                    if (startangle <= angle && endangle >= angle)
+                    if (startangle <= angle && endangle >= angle && !angles.Contains(angle))
                     {
-                        if (!angles.Contains(angle))
-                        {
-                            InsertAngle(angles, angle);
-                        }
+                        InsertAngle(angles, angle);
                     }
                 }
             }
@@ -490,12 +484,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 foreach (double angle in CornerAngles)
                 {
-                    if (startangle <= angle && endangle >= angle)
+                    if (startangle <= angle && endangle >= angle && !angles.Contains(angle))
                     {
-                        if (!angles.Contains(angle))
-                        {
-                            InsertAngle(angles, angle);
-                        }
+                        InsertAngle(angles, angle);
                     }
                 }
             }

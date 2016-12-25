@@ -1154,13 +1154,11 @@ namespace SilverSim.Scene.Types.Object
                     if (preferedLinkNumber > 0)
                     {
                         ObjectPart part;
-                        if (m_Group.TryGetValue(preferedLinkNumber, out part))
+                        if (m_Group.TryGetValue(preferedLinkNumber, out part) &&
+                            !m_Group.m_SittingAgents.ContainsKey(part))
                         {
-                            if (!m_Group.m_SittingAgents.ContainsKey(part))
-                            {
-                                /* select prim */
-                                sitOnTarget = part;
-                            }
+                            /* select prim */
+                            sitOnTarget = part;
                         }
                     }
 
@@ -1168,14 +1166,12 @@ namespace SilverSim.Scene.Types.Object
                     {
                         foreach (ObjectPart part in m_Group.ValuesByKey1)
                         {
-                            if (!part.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
-                                !part.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
+                            if ((!part.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
+                                !part.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon)) &&
+                                !m_Group.m_SittingAgents.ContainsKey(part) && (!part.IsScriptedSitOnly))
                             {
-                                if (!m_Group.m_SittingAgents.ContainsKey(part) && (!part.IsScriptedSitOnly))
-                                {
-                                    /* select prim */
-                                    sitOnTarget = part;
-                                }
+                                /* select prim */
+                                sitOnTarget = part;
                             }
                         }
                     }
