@@ -185,7 +185,7 @@ namespace SilverSim.Types
 
         public UUI(string uuiString)
         {
-            string[] parts = uuiString.Split(Semicolon, 3);
+            string[] parts = uuiString.Split(Semicolon, 4); /* 4 allows for secret from friends entries */
             if (parts.Length < 2)
             {
                 ID = new UUID(parts[0]);
@@ -211,7 +211,7 @@ namespace SilverSim.Types
             string lastName = string.Empty;
             Uri homeURI;
             uui = default(UUI);
-            string[] parts = uuiString.Split(Semicolon, 3);
+            string[] parts = uuiString.Split(Semicolon, 4); /* 4 allows for secrets from friends entries */
             if (parts.Length < 2)
             {
                 if(!UUID.TryParse(parts[0], out id))
