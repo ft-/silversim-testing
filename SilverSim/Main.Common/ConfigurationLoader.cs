@@ -645,7 +645,10 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    return m_Name;
+                    string assembly = (m_Assembly.Length != 0) ?
+                        m_Assembly :
+                        GetType().Assembly.GetName().Name; 
+                    return "x-resource://"+ assembly + "/" + m_Name;
                 }
             }
 
@@ -729,7 +732,10 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    return m_Name;
+                    string assembly = (m_Assembly.Length != 0) ?
+                        m_Assembly :
+                        GetType().Assembly.GetName().Name;
+                    return "x-resource://" + assembly + "/" + m_Name;
                 }
             }
 
@@ -1257,11 +1263,21 @@ namespace SilverSim.Main.Common
 
         void ProcessConfigurations()
         {
+            IConfig importedInfo;
+            importedInfo = m_Config.Configs["ImportedConfigs"];
+            if (null == importedInfo)
+            {
+                importedInfo = m_Config.AddConfig("ImportedConfigs");
+            }
             while (m_Sources.Count != 0)
             {
                 ICFG_Source source = m_Sources.Dequeue();
                 try
                 {
+#if DEBUG
+                    System.Console.WriteLine("Processing config {0}", source.Name);
+#endif
+                    importedInfo.Set("Imported-" + importedInfo, true);
                     m_Config.Merge(source.ConfigSource);
                 }
                 catch
@@ -1340,15 +1356,29 @@ namespace SilverSim.Main.Common
             }
 
             ArgvConfigSource configSource = new ArgvConfigSource(otherargs.ToArray());
+            configSource.AddSwitch("Startup", "help", "h");
             configSource.AddSwitch("Startup", "mode", "m");
             configSource.AddSwitch("Startup", "config", "c");
-            configSource.AddSwitch("Startup", "skip-regions");
+            configSource.AddSwitch("Startup", "dumpconfig");
+            configSource.AddSwitch("Startup", "skipregions");
             IConfig startup = configSource.Configs["Startup"];
             mode = startup.GetString("mode", "simulator");
+            string dumpResultingIniName = startup.GetString("dumpconfig", string.Empty);
             string newmode = mode;
             IConfig modeConfig;
 
-            if(mode == "?" || mode == "help")
+            if(startup.Contains("help"))
+            {
+                System.Console.WriteLine("Usage: SilverSim.Main.exe switches...\n");
+                System.Console.WriteLine("-dumpconfig=filename\n  Dump resulting ini to file\n");
+                System.Console.WriteLine("-config=filename or -c filename\n  Use specific config file\n");
+                System.Console.WriteLine("-skipregions\n  Skip start of regions\n");
+                ShowModeHelp();
+                shutdownEvent.Set();
+                return;
+            }
+
+            if (mode == "?" || mode == "help")
             {
                 ShowModeHelp();
                 shutdownEvent.Set();
@@ -1358,12 +1388,12 @@ namespace SilverSim.Main.Common
                 List<string> loopCheck = new List<string>();
                 do
                 {
+                    mode = newmode;
                     if(loopCheck.Contains(mode))
                     {
                         throw new ArgumentException("Internal error with mode parameter");
                     }
                     loopCheck.Add(mode);
-                    mode = newmode;
                     try
                     {
                         IConfigSource modeParamsSource = new CFG_IniResourceSource("ModeConfig." + mode.ToLower() + ".ini").ConfigSource;
@@ -1469,6 +1499,22 @@ namespace SilverSim.Main.Common
                 }
             }
             ProcessConfigurations();
+
+            if (dumpResultingIniName.Length != 0)
+            {
+                using (TextWriter writer = new StreamWriter(dumpResultingIniName))
+                {
+                    foreach (IConfig cfg in m_Config.Configs)
+                    {
+                        writer.WriteLine("[{0}]", cfg.Name);
+                        foreach (string key in cfg.GetKeys())
+                        {
+                            writer.WriteLine("{0}={1}", key, cfg.GetString(key));
+                        }
+                        writer.WriteLine();
+                    }
+                }
+            }
 
             string logConfigFile = string.Empty;
             IConfig startupConfig = m_Config.Configs["Startup"];
@@ -1688,7 +1734,7 @@ namespace SilverSim.Main.Common
                 httpServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
 
                 m_Log.Info("Loading regions");
-                if (startup.Contains("skip-regions"))
+                if (startup.Contains("skipregions"))
                 {
                     m_Log.Warn("Skipping loading of regions");
                 }
