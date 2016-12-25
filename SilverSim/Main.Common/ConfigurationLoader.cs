@@ -1374,7 +1374,8 @@ namespace SilverSim.Main.Common
                         ShowModeHelp();
                         throw new ArgumentException("Invalid mode parameter");
                     }
-                } while (mode != (newmode = modeConfig.GetString("Mode", mode)));
+                    newmode = modeConfig.GetString("Mode", mode);
+                } while (mode != newmode);
             }
 
             defaultConfigName = modeConfig.GetString("DefaultConfigName", string.Empty);
