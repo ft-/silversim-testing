@@ -1380,6 +1380,7 @@ namespace SilverSim.Main.Common
 
             defaultConfigName = modeConfig.GetString("DefaultConfigName", string.Empty);
             defaultsIniName = modeConfig.GetString("DefaultsIniName", string.Empty);
+            string defaultLogConfigName = modeConfig.GetString("DefaultLogConfig", "default.log.config");
 
             string mainConfig = startup.GetString("config", defaultConfigName);
 
@@ -1483,6 +1484,19 @@ namespace SilverSim.Main.Common
                 m_Log = LogManager.GetLogger("MAIN");
                 m_Log.InfoFormat("configured log4net using \"{0}\" as configuration file",
                                  logConfigFile);
+            }
+            else if(defaultLogConfigName.Length != 0)
+            {
+                using (Stream s = GetType().Assembly.GetManifestResourceStream("SilverSim.Main.Common.Resources.log4net." + defaultLogConfigName))
+                {
+                    if(s == null)
+                    {
+                        throw new ConfigurationErrorException("Could not load log4net defaults named " + defaultLogConfigName);
+                    }
+                    XmlConfigurator.Configure(s);
+                    m_Log = LogManager.GetLogger("MAIN");
+                    m_Log.Info("configured log4net using defaults");
+                }
             }
             else
             {
