@@ -3,6 +3,7 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AuthInfo;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -26,6 +27,7 @@ namespace SilverSim.Main.Cmd.UserServer
         AuthInfoServiceInterface m_AuthInfoService;
         InventoryServiceInterface m_InventoryService;
         List<IUserAccountDeleteServiceInterface> m_AccountDeleteServices;
+        List<IServiceURLsGetInterface> m_ServiceURLsGetters;
 
         public UserServerCommands(IConfig ownSection)
         {
@@ -40,10 +42,12 @@ namespace SilverSim.Main.Cmd.UserServer
             m_InventoryService = loader.GetService<InventoryServiceInterface>(m_InventoryServiceName);
             m_AccountDeleteServices = loader.GetServicesByValue<IUserAccountDeleteServiceInterface>();
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
+            m_ServiceURLsGetters = loader.GetServicesByValue<IServiceURLsGetInterface>();
             loader.CommandRegistry.AddCreateCommand("user", CreateUserCommand);
             loader.CommandRegistry.AddDeleteCommand("user", DeleteUserCommand);
             loader.CommandRegistry.AddChangeCommand("user", ChangeUserCommand);
             loader.CommandRegistry.AddShowCommand("user", ShowUserCommand);
+            loader.CommandRegistry.AddShowCommand("serviceurls", ShowServiceUrlsCommand);
         }
 
         bool IsNameValid(string s)
@@ -56,6 +60,30 @@ namespace SilverSim.Main.Cmd.UserServer
                 }
             }
             return true;
+        }
+
+        [Description("Show service URLs")]
+        void ShowServiceUrlsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("show serviceurls");
+            }
+            else
+            {
+                Dictionary<string, string> serviceurls = new Dictionary<string, string>();
+                foreach(IServiceURLsGetInterface getter in m_ServiceURLsGetters)
+                {
+                    getter.GetServiceURLs(serviceurls);
+                }
+
+                StringBuilder sb = new StringBuilder("Service URLs:\n----------------------------------------\n");
+                foreach(KeyValuePair<string, string> kvp in serviceurls)
+                {
+                    sb.AppendFormat("{0}={1}\n", kvp.Key, kvp.Value);
+                }
+                io.Write(sb.ToString());
+            }
         }
 
         [Description("Show User")]
