@@ -223,12 +223,10 @@ namespace SilverSim.Viewer.Core
             m_ActiveAgentControlFlags = au.ControlFlags;
             DrawDistance = au.Far;
 
-            if (m_ActiveAgentControlFlags.HasStandUp())
+            if (m_ActiveAgentControlFlags.HasStandUp() &&
+                SittingOnObject != null && AllowUnsit)
             {
-                if (SittingOnObject != null && AllowUnsit)
-                {
-                    UnSit();
-                }
+                UnSit();
             }
 
             if (m_ActiveAgentControlFlags.HasSitOnGround())
