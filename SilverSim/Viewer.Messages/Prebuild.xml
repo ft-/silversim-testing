@@ -2,19 +2,19 @@
 <Project frameworkVersion="v4_5" name="SilverSim.Viewer.Messages" path="SilverSim/Viewer.Messages" type="Library">
   <Configuration name="Release">
     <Options>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
     <Options>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
-  <ReferencePath>../../bin/</ReferencePath>
+  <ReferencePath>../../bin</ReferencePath>
   <Reference name="System"/>
   <Reference name="System.Core"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
-  <Reference name="log4net" path="../../bin/" localCopy="false"/>
+  <Reference name="log4net" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
       <Exclude pattern="TemporaryGeneratedFile"/>

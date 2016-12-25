@@ -2,23 +2,23 @@
 <Project frameworkVersion="v4_5" name="SilverSim.Scene.Types" path="SilverSim/Scene.Types" type="Library">
   <Configuration name="Release">
     <Options>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
     <Options>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
-  <ReferencePath>../../bin/</ReferencePath>
-  <Reference name="log4net" path="../../bin/" localCopy="false"/>
+  <ReferencePath>../../bin</ReferencePath>
+  <Reference name="log4net" localCopy="false"/>
   <Reference name="System"/>
   <Reference name="System.Core"/>
   <Reference name="System.Xml"/>
   <Reference name="System.Drawing"/>
   <Reference name="Paloma.TargaImage" localCopy="false"/>
   <Reference name="OpenJp2.Net" localCopy="false"/>
-  <Reference name="CSJ2K" path="../../bin/" localCopy="false"/>
+  <Reference name="CSJ2K" localCopy="false"/>
   <Reference name="SilverSim.Viewer.Messages" localCopy="false"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
   <Reference name="SilverSim.Http" localCopy="false"/>

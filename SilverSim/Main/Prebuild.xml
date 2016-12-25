@@ -3,16 +3,16 @@
   <Configuration name="Release">
     <Options>
       <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
     <Options>
       <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
-  <ReferencePath>../../bin/</ReferencePath>
+  <ReferencePath>../../bin</ReferencePath>
   <Reference name="System"/>
   <Files>
     <Match pattern="*.cs" recurse="true">

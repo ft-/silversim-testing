@@ -2,15 +2,15 @@
 <Project frameworkVersion="v4_5" name="SilverSim.ServiceInterfaces" path="SilverSim/ServiceInterfaces" type="Library">
   <Configuration name="Release">
     <Options>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
     <Options>
-      <OutputPath>../../bin/</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
-  <ReferencePath>../../bin/</ReferencePath>
+  <ReferencePath>../../bin</ReferencePath>
   <Reference name="System"/>
   <Reference name="System.Core"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
