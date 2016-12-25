@@ -999,6 +999,8 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Thread control logic
+        bool m_EventQueueEnabled;
+
         protected override void StartSpecificThreads()
         {
             if(!m_TextureDownloadThreadRunning)
