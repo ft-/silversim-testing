@@ -333,11 +333,7 @@ namespace SilverSim.Types.StructuredData.Json
             {
                 SerializeStruct(io, (Map)val);
             }
-            else if(t == typeof(URI))
-            {
-                io.Write("\"" + SerializeString(val.ToString()) + "\"");
-            }
-            else if(t == typeof(UUID))
+            else if(t == typeof(URI) || t == typeof(UUID) || t == typeof(AString))
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
@@ -352,21 +348,13 @@ namespace SilverSim.Types.StructuredData.Json
                 ABoolean boolean = (ABoolean)val;
                 io.Write(boolean ? "true" : "false");
             }
-            else if(t == typeof(Real))
-            {
-                io.Write(val.ToString());
-            }
-            else if(t == typeof(Integer))
+            else if(t == typeof(Real) || t == typeof(Integer))
             {
                 io.Write(val.ToString());
             }
             else if(t == typeof(Undef))
             {
                 io.Write("null");
-            }
-            else if(t == typeof(AString))
-            {
-                io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
             else if(t == typeof(AnArray))
             {

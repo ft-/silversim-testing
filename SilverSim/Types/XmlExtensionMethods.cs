@@ -601,13 +601,9 @@ namespace SilverSim.Types
                             {
                                 return false;
                             }
-                            else if(int.TryParse(val, out ival))
-                            {
-                                return ival != 0;
-                            }
                             else
                             {
-                                return false;
+                                return int.TryParse(val, out ival) && ival != 0;
                             }
                         }
 

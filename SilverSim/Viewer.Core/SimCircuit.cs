@@ -75,12 +75,8 @@ namespace SilverSim.Viewer.Core
             {
                 case MessageType.ScriptDialogReply:
                     /* nothing to do */
-                    break;
-
                 case MessageType.ChatFromViewer:
                     /* nothing to do */
-                    break;
-
                 case MessageType.TransferRequest:
                     /* nothing to do */
                     break;

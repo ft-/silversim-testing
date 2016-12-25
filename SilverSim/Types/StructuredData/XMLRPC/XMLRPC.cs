@@ -734,7 +734,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
         {
             Type t = iv.GetType();
 
-            if(t == typeof(UUID))
+            if(t == typeof(UUID) || t == typeof(AString))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("string", iv.ToString());
@@ -744,12 +744,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("dateTime.iso8601", ((Date)iv).Iso8601);
-                w.WriteEndElement();
-            }
-            else if(t == typeof(AString))
-            {
-                w.WriteStartElement("value");
-                w.WriteNamedValue("string", iv.ToString());
                 w.WriteEndElement();
             }
             else if(t == typeof(Map))

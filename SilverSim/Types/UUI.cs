@@ -36,11 +36,8 @@ namespace SilverSim.Types
 
         public bool EqualsGrid(UUI uui)
         {
-            if(uui.HomeURI != null && HomeURI == null)
-            {
-                return false;
-            }
-            else if (uui.HomeURI == null && HomeURI != null)
+            if((uui.HomeURI != null && HomeURI == null) ||
+                (uui.HomeURI == null && HomeURI != null))
             {
                 return false;
             }
