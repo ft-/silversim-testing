@@ -12,11 +12,13 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
+using System.ComponentModel;
 using System.Threading;
 
 namespace SilverSim.Scene.Physics.ShapeManager
 {
     /** <summary>PhysicsShapeManager provides a common accessor to Convex Hull generation from primitives</summary> */
+    [Description("Physics Shape Manager")]
     public sealed class PhysicsShapeManager : IPlugin, IPhysicsHacdCleanCache
     {
         AssetServiceInterface m_AssetService;
