@@ -19,7 +19,7 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("JSON2.0RPC SERVER");
 
-        internal RwLockedDictionary<string, Func<string, IValue, IValue>> Json20RpcMethods = new RwLockedDictionary<string, Func<string, IValue, IValue>>();
+        public RwLockedDictionary<string, Func<string, IValue, IValue>> Json20RpcMethods = new RwLockedDictionary<string, Func<string, IValue, IValue>>();
 
         [Serializable]
         public class JSON20RpcException : Exception
