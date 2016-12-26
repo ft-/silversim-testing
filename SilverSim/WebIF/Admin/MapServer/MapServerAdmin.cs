@@ -8,20 +8,16 @@ using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace SilverSim.WebIF.Admin.MapServer
 {
+    [Description("WebIF MapServer Admin Support")]
     public class MapServerAdmin : IPlugin
     {
         readonly string m_GridServiceName;
-        readonly string m_AvatarNameServicesNames;
         readonly string m_RegionDefaultFlagsServiceName;
-        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         GridServiceInterface m_GridService;
         RegionDefaultFlagsServiceInterface m_RegionDefaultFlagsService;
         IAdminWebIF m_WebIF;
@@ -32,7 +28,6 @@ namespace SilverSim.WebIF.Admin.MapServer
             m_ScopeID = new UUID(ownSection.GetString("ScopeID", UUID.Zero.ToString()));
             m_GridServiceName = ownSection.GetString("GridService", "GridService");
             m_RegionDefaultFlagsServiceName = ownSection.GetString("RegionDefaultFlagsService", "RegionDefaultFlagsService");
-            m_AvatarNameServicesNames = ownSection.GetString("AvatarNameServices", "AvatarNameStorage").Trim();
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -40,38 +35,13 @@ namespace SilverSim.WebIF.Admin.MapServer
             m_WebIF = loader.GetAdminWebIF();
             m_RegionDefaultFlagsService = loader.GetService<RegionDefaultFlagsServiceInterface>(m_RegionDefaultFlagsServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
-            if (0 != m_AvatarNameServicesNames.Length)
-            {
-                string[] names = m_AvatarNameServicesNames.Split(',');
-                foreach(string name in names)
-                {
-                    m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(name.Trim()));
-                }
-            }
 
-            m_WebIF.AutoGrantRights["mapserver.manage"].Add("mapserver.view");
+            m_WebIF.AutoGrantRights["mapserver.unregister"].Add("mapserver.view");
             m_WebIF.JsonMethods.Add("mapserver.search", HandleMapServerSearch);
             m_WebIF.JsonMethods.Add("mapserver.getdefaultregions", HandleMapServerGetDefaultRegions);
             m_WebIF.JsonMethods.Add("mapserver.getdefaulthgregions", HandleMapServerGetDefaultHGRegions);
             m_WebIF.JsonMethods.Add("mapserver.getfallbackregions", HandleMapServerGetFallbackRegions);
             m_WebIF.JsonMethods.Add("mapserver.unregister", HandleMapServerUnregisterRegion);
-        }
-
-        public UUI ResolveUUI(UUI id)
-        {
-            UUI foundid;
-            foreach(AvatarNameServiceInterface service in m_AvatarNameServices)
-            {
-                if(service.TryGetValue(id, out foundid))
-                {
-                    id = foundid;
-                    if(id.IsAuthoritative)
-                    {
-                        break;
-                    }
-                }
-            }
-            return id;
         }
 
         void ReturnRegionsResult(HttpRequest req, List<RegionInfo> regions)
@@ -85,7 +55,7 @@ namespace SilverSim.WebIF.Admin.MapServer
                 regiondata.Add("location_y", ri.Location.GridY);
                 regiondata.Add("size_x", ri.Size.GridX);
                 regiondata.Add("size_y", ri.Size.GridY);
-                UUI owner = ResolveUUI(ri.Owner);
+                UUI owner = m_WebIF.ResolveName(ri.Owner);
                 regiondata.Add("owner", owner.ToString());
                 regiondata.Add("flags", (int)ri.Flags);
                 resdata.Add(ri.ID.ToString(), regiondata);

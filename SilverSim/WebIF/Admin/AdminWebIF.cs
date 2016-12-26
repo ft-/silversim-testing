@@ -37,6 +37,7 @@ namespace SilverSim.WebIF.Admin
         RwLockedList<string> m_KnownConfigurationIssues;
         ConfigurationLoader m_Loader;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        readonly string m_AvatarNameServiceNames;
 
         class SessionInfo
         {
@@ -105,8 +106,9 @@ namespace SilverSim.WebIF.Admin
         }
         #endregion
 
-        public AdminWebIF(string basepath, bool enablesetpasscommand)
+        public AdminWebIF(string basepath, bool enablesetpasscommand, string avatarnameservicenames)
         {
+            m_AvatarNameServiceNames = avatarnameservicenames;
             m_EnableSetPasswordCommand = enablesetpasscommand;
             m_BasePath = basepath;
             m_Timer.Elapsed += HandleTimer;
@@ -214,16 +216,11 @@ namespace SilverSim.WebIF.Admin
         public void Startup(ConfigurationLoader loader)
         {
             m_Loader = loader;
-            IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
-            if (null != sceneConfig)
+            if (!string.IsNullOrEmpty(m_AvatarNameServiceNames))
             {
-                string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
-                if (!string.IsNullOrEmpty(avatarNameServices))
+                foreach (string p in m_AvatarNameServiceNames.Split(','))
                 {
-                    foreach (string p in avatarNameServices.Split(','))
-                    {
-                        m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
-                    }
+                    m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
                 }
             }
 
@@ -1323,7 +1320,8 @@ namespace SilverSim.WebIF.Admin
             }
             return new AdminWebIF(
                 ownSection.GetString("BasePath", ""),
-                enableSetPasswordCommand);
+                enableSetPasswordCommand,
+                ownSection.GetString("AvatarNameServices", "AvatarNameStorage").Trim());
         }
     }
 #endregion

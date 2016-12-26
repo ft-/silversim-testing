@@ -23,6 +23,7 @@
   <Reference name="SilverSim.ServiceInterfaces"/>
   <Reference name="SilverSim.Scene.ServiceInterfaces"/>
   <Reference name="SilverSim.Scene.Management"/>
+  <Reference name="SilverSim.Scene.Npc"/>
   <Reference name="SilverSim.Http"/>
   <Reference name="log4net" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
