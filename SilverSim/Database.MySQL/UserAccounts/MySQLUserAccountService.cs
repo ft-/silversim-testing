@@ -333,8 +333,23 @@ namespace SilverSim.Database.MySQL.UserAccounts
         {
             string[] words = query.Split(new char[] {' '}, 2);
             List<UserAccount> accounts = new List<UserAccount>();
-            if(words.Length == 0)
+            if(query.Trim().Length == 0)
             {
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts", connection))
+                    {
+                        cmd.Parameters.AddParameter("?ScopeID", scopeID);
+                        using (MySqlDataReader dbreader = cmd.ExecuteReader())
+                        {
+                            while (dbreader.Read())
+                            {
+                                accounts.Add(dbreader.ToUserAccount());
+                            }
+                        }
+                    }
+                }
                 return accounts;
             }
 

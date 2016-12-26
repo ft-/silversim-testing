@@ -159,16 +159,17 @@ namespace SilverSim.Database.Memory.UserAccounts
         {
             string[] words = query.Split(new char[] {' '}, 2);
             List<UserAccount> accounts = new List<UserAccount>();
-            if(words.Length == 0)
-            {
-                return accounts;
-            }
-
             IEnumerable<UserAccount> res;
-            res = (words.Length == 1) ?
-                from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) || data.Principal.LastName.ToLower().Equals(words[0].ToLower()) select new UserAccount(data) :
-                from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) && data.Principal.LastName.ToLower().Equals(words[1].ToLower()) select new UserAccount(data);
-
+            if (query.Trim().Length == 0)
+            {
+                res = from data in m_Data.Values where true select new UserAccount(data);
+            }
+            else
+            {
+                res = (words.Length == 1) ?
+                    from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) || data.Principal.LastName.ToLower().Equals(words[0].ToLower()) select new UserAccount(data) :
+                    from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) && data.Principal.LastName.ToLower().Equals(words[1].ToLower()) select new UserAccount(data);
+            }
             foreach(UserAccount acc in res)
             {
                 accounts.Add(acc);
