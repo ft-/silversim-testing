@@ -76,5 +76,10 @@ namespace SilverSim.ServiceInterfaces.Profile
         public abstract IPropertiesInterface Properties { get; }
 
         public abstract void Remove(UUID scopeID, UUID accountID);
+
+        public virtual List<UUID> GetUserImageAssets(UUI userId)
+        {
+            return new List<UUID>();
+        }
     }
 }
