@@ -698,7 +698,8 @@ namespace SilverSim.WebIF.Admin
                 chgpwcmd +
                 "admin-webif delete user <user>\n" +
                 "admin-webif grant <user> <right>\n" +
-                "admin-webif revoke <user> <right>");
+                "admin-webif revoke <user> <right>\n" +
+                "admin-webif show json-methods");
         }
 
         public void AdminWebIFCmd(List<string> args, TTY io, UUID limitedToScene)
@@ -765,6 +766,18 @@ namespace SilverSim.WebIF.Admin
                                         {
                                             io.WriteFormatted("User '{0}' does not exist", args[3]);
                                         }
+                                    }
+                                    break;
+
+                                case "json-methods":
+                                    {
+                                        StringBuilder output = new StringBuilder("Json Methods: --------------------");
+                                        foreach (KeyValuePair<string, Action<HttpRequest, Map>> kvp in m_JsonMethods)
+                                        {
+                                            output.Append("\n");
+                                            output.Append(kvp.Key);
+                                        }
+                                        io.Write(output.ToString());
                                     }
                                     break;
 

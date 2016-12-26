@@ -205,9 +205,9 @@ namespace SilverSim.Database.MySQL.Profile
             new ChangeColumn<bool>("profileMaturePublish") { IsNullAllowed = false },
 
             new SqlTable("usersettings"),
-            new ChangeColumn<UUID>("useruuid") { IsNullAllowed = false, Default = UUID.Zero },
-            new ChangeColumn<bool>("imviaemail") { IsNullAllowed = false, Default = false },
-            new ChangeColumn<bool>("visible") { IsNullAllowed = false, Default = true },
+            new AddColumn<UUID>("useruuid") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<bool>("imviaemail") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("visible") { IsNullAllowed = false, Default = true },
             new PrimaryKeyInfo("useruuid")
         };
     }

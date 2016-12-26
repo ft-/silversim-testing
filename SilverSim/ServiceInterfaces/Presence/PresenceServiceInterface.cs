@@ -114,6 +114,7 @@ namespace SilverSim.ServiceInterfaces.Presence
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract PresenceInfo this[UUID sessionID, UUID userID]
         {
+            /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */
             get;
             set; /* setting null means logout, != null not allowed */
         }
@@ -122,6 +123,7 @@ namespace SilverSim.ServiceInterfaces.Presence
         [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public abstract PresenceInfo this[UUID sessionID, UUID userID, SetType reportType]
         {
+            /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */
             set; /* setting null means logout, != null login message */
         }
 

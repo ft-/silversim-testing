@@ -37,11 +37,14 @@ namespace SilverSim.WebIF.Admin.MapServer
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
 
             m_WebIF.AutoGrantRights["mapserver.unregister"].Add("mapserver.view");
+            m_WebIF.AutoGrantRights["mapserver.manage"].Add("mapserver.view");
             m_WebIF.JsonMethods.Add("mapserver.search", HandleMapServerSearch);
             m_WebIF.JsonMethods.Add("mapserver.getdefaultregions", HandleMapServerGetDefaultRegions);
             m_WebIF.JsonMethods.Add("mapserver.getdefaulthgregions", HandleMapServerGetDefaultHGRegions);
             m_WebIF.JsonMethods.Add("mapserver.getfallbackregions", HandleMapServerGetFallbackRegions);
             m_WebIF.JsonMethods.Add("mapserver.unregister", HandleMapServerUnregisterRegion);
+            m_WebIF.JsonMethods.Add("mapserver.defaultregionflags.list", HandleMapServerGetDefaultRegionFlags);
+            m_WebIF.JsonMethods.Add("mapserver.defaultregionflags.change", HandleMapServerChangeDefaultRegionFlags);
         }
 
         void ReturnRegionsResult(HttpRequest req, List<RegionInfo> regions)
@@ -81,6 +84,91 @@ namespace SilverSim.WebIF.Admin.MapServer
                 m_GridService.UnregisterRegion(m_ScopeID, regionId);
                 m_WebIF.SuccessResponse(req, new Map());
             }
+        }
+
+        [AdminWebIfRequiredRight("mapserver.manage")]
+        void HandleMapServerChangeDefaultRegionFlags(HttpRequest req, Map jsondata)
+        {
+            UUID id;
+            if (!jsondata.TryGetValue("id", out id))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+            }
+            else
+            {
+                RegionFlags setFlags = RegionFlags.None;
+                RegionFlags removeFlags = RegionFlags.None;
+
+                IValue iv;
+                if(jsondata.TryGetValue("fallback", out iv))
+                {
+                    if(iv.AsBoolean)
+                    {
+                        setFlags |= RegionFlags.FallbackRegion;
+                    }
+                    else
+                    {
+                        removeFlags |= RegionFlags.FallbackRegion;
+                    }
+                }
+                if (jsondata.TryGetValue("default", out iv))
+                {
+                    if (iv.AsBoolean)
+                    {
+                        setFlags |= RegionFlags.DefaultRegion;
+                    }
+                    else
+                    {
+                        removeFlags |= RegionFlags.DefaultRegion;
+                    }
+                }
+                if (jsondata.TryGetValue("defaulthg", out iv))
+                {
+                    if (iv.AsBoolean)
+                    {
+                        setFlags |= RegionFlags.DefaultHGRegion;
+                    }
+                    else
+                    {
+                        removeFlags |= RegionFlags.DefaultHGRegion;
+                    }
+                }
+                if (jsondata.TryGetValue("persistent", out iv))
+                {
+                    if (iv.AsBoolean)
+                    {
+                        setFlags |= RegionFlags.Persistent;
+                    }
+                    else
+                    {
+                        removeFlags |= RegionFlags.Persistent;
+                    }
+                }
+
+                try
+                {
+                    m_GridService.AddRegionFlags(id, setFlags);
+                    m_GridService.RemoveRegionFlags(id, removeFlags);
+                    m_RegionDefaultFlagsService.ChangeRegionDefaultFlags(id, setFlags, removeFlags);
+                }
+                catch
+                {
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
+                    return;
+                }
+                m_WebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIfRequiredRight("mapserver.manage")]
+        void HandleMapServerGetDefaultRegionFlags(HttpRequest req, Map jsondata)
+        {
+            Map resdata = new Map();
+            foreach (KeyValuePair<UUID, RegionFlags> kvp in m_RegionDefaultFlagsService.GetAllRegionDefaultFlags())
+            {
+                resdata.Add(kvp.Key.ToString(), (int)kvp.Value);
+            }
+            m_WebIF.SuccessResponse(req, resdata);
         }
 
         [AdminWebIfRequiredRight("mapserver.view")]
