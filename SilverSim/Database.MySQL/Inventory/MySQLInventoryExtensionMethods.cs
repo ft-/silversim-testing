@@ -77,7 +77,7 @@ namespace SilverSim.Database.MySQL.Inventory
             dict["Name"] = item.Name;
             dict["Description"] = item.Description;
             dict["InventoryType"] = item.InventoryType;
-            dict["InventoryFlags"] = item.Flags;
+            dict["Flags"] = item.Flags;
             dict["OwnerID"] = item.Owner.ID;
             dict["CreatorID"] = item.Creator.ID;
             dict["CreationDate"] = item.CreationDate.DateTimeToUnixTime();
