@@ -537,7 +537,7 @@ namespace SilverSim.WebIF.Admin
 
             public override void Write(string text)
             {
-                m_Socket.WriteText(text);
+                m_Socket.WriteText(text + "\n");
             }
 
             public override string ReadLine(string p, bool echoInput)
@@ -593,7 +593,8 @@ namespace SilverSim.WebIF.Admin
                     }
 
                     SessionInfo sessionInfo;
-                    if (!m_Sessions.TryGetValue(req.RawUrl.Substring(11), out sessionInfo) ||
+                    string sessionKey = req.CallerIP + "+" + req.RawUrl.Substring(11);
+                    if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
                                     !sessionInfo.IsAuthenticated ||
                                     (!sessionInfo.Rights.Contains("log.view") &&
                                     !sessionInfo.Rights.Contains("admin.all")))
@@ -608,6 +609,7 @@ namespace SilverSim.WebIF.Admin
 
                     using (HttpWebSocket sock = req.BeginWebSocket("log"))
                     {
+                        sock.WriteText("Active");
                         m_LogReceivers.Add(sock);
                         try
                         {
@@ -615,6 +617,15 @@ namespace SilverSim.WebIF.Admin
                             {
                                 sock.Receive();
                             }
+                        }
+                        catch(WebSocketClosedException)
+                        {
+
+                        }
+                        catch(Exception e)
+                        {
+                            m_LogReceivers.Remove(sock);
+                            m_Log.Error("Exception during providing real-time log data", e);
                         }
                         finally
                         {
@@ -630,7 +641,8 @@ namespace SilverSim.WebIF.Admin
                     }
 
                     SessionInfo sessionInfo;
-                    if (!m_Sessions.TryGetValue(req.RawUrl.Substring(15), out sessionInfo) ||
+                    string sessionKey = req.CallerIP + "+" + req.RawUrl.Substring(11);
+                    if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
                                     !sessionInfo.IsAuthenticated ||
                                     (!sessionInfo.Rights.Contains("console.access") &&
                                     !sessionInfo.Rights.Contains("admin.all")))

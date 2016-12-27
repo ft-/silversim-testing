@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using SilverSim.Types;
+using SilverSim.Http;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -38,7 +39,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 try
                 {
-                    SendFrame(OpCode.Close, true, new byte[0], 0, 0);
+                    SendClose(1006);
                 }
                 catch
                 {
@@ -81,19 +82,26 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     throw new WebSocketClosedException();
                 }
-                if (2 != m_WebSocketStream.Read(hdr, 0, 2))
+                try
                 {
-                    m_IsClosed = true;
-                    throw new WebSocketClosedException();
+                    if (2 != m_WebSocketStream.Read(hdr, 0, 2))
+                    {
+                        m_IsClosed = true;
+                        throw new WebSocketClosedException();
+                    }
+                }
+                catch(HttpStream.TimeoutException)
+                {
+                    continue;
                 }
 
-                OpCode opcode = (OpCode)(hdr[0] >> 4);
+                OpCode opcode = (OpCode)(hdr[0] & 0xF);
                 if (opcode == OpCode.Close)
                 {
                     m_IsClosed = true;
                     throw new WebSocketClosedException();
                 }
-                int payloadlen = hdr[1] >> 1;
+                int payloadlen = hdr[1] & 0x7F;
                 if (payloadlen == 127)
                 {
                     byte[] leninfo = new byte[8];
@@ -124,10 +132,10 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 else
                 {
-                    payloadlen = hdr[1] >> 1;
+                    payloadlen = hdr[1] & 0x7F;
                 }
                 byte[] maskingkey = new byte[4] { 0, 0, 0, 0 };
-                if ((hdr[1] & 1) != 0)
+                if ((hdr[1] & 128) != 0)
                 {
                     if (4 != m_WebSocketStream.Read(maskingkey, 0, 4))
                     {
@@ -165,7 +173,7 @@ namespace SilverSim.Main.Common.HttpServer
                     Message msg = new Message();
                     msg.Data = payload;
                     msg.Type = MessageType.Binary;
-                    msg.IsLastSegment = (hdr[0] & 1) != 0;
+                    msg.IsLastSegment = (hdr[0] & 128) != 0;
                     return msg;
                 }
                 else if (opcode == OpCode.Text)
@@ -173,7 +181,7 @@ namespace SilverSim.Main.Common.HttpServer
                     Message msg = new Message();
                     msg.Data = payload;
                     msg.Type = MessageType.Text;
-                    msg.IsLastSegment = (hdr[0] & 1) != 0;
+                    msg.IsLastSegment = (hdr[0] & 128) != 0;
                     return msg;
                 }
                 else if (opcode == OpCode.Ping)
@@ -194,6 +202,16 @@ namespace SilverSim.Main.Common.HttpServer
             SendFrame(OpCode.Binary, fin, data, offset, length, masked);
         }
 
+        void SendClose(ushort reason)
+        {
+            byte[] res = BitConverter.GetBytes(reason);
+            if(BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(res);
+            }
+            SendFrame(OpCode.Close, true, res, 0, 2);
+        }
+
         void SendFrame(OpCode opcode, bool fin, byte[] payload, int offset, int length, bool masked = false)
         {
             lock (m_SendLock)
@@ -209,19 +227,19 @@ namespace SilverSim.Main.Common.HttpServer
                 if (length < 126)
                 {
                     frame = new byte[2];
-                    frame[1] = (byte)((length << 1) | 1);
+                    frame[1] = (byte)length;
                 }
                 else if (payload.Length < 65536)
                 {
                     frame = new byte[4];
-                    frame[1] = 0xFC;
+                    frame[1] = 126;
                     frame[2] = (byte)(payload.Length >> 8);
                     frame[3] = (byte)(payload.Length & 0xFF);
                 }
                 else
                 {
                     frame = new byte[10];
-                    frame[1] = 0xFE;
+                    frame[1] = 127;
                     frame[2] = 0;
                     frame[3] = 0;
                     frame[4] = 0;
@@ -231,14 +249,14 @@ namespace SilverSim.Main.Common.HttpServer
                     frame[8] = (byte)((payload.Length >> 8) & 0xFF);
                     frame[9] = (byte)(payload.Length & 0xFF);
                 }
-                frame[0] = (byte)((int)opcode << 4);
+                frame[0] = (byte)(int)opcode;
                 if (fin)
                 {
-                    frame[0] |= 1;
+                    frame[0] |= 128;
                 }
                 if (masked)
                 {
-                    frame[1] |= 1;
+                    frame[1] |= 128;
                     maskingkey = MaskingKey;
                 }
                 else

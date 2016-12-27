@@ -441,7 +441,7 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     return false;
                 }
-                if(!(MajorVersion > 1 || (MajorVersion == 1 && MinorVersion > 1)))
+                if(!(MajorVersion > 1 || (MajorVersion == 1 && MinorVersion >= 1)))
                 {
                     return false;
                 }
@@ -452,10 +452,6 @@ namespace SilverSim.Main.Common.HttpServer
                     return false;
                 }
 
-                if(!m_Headers.TryGetValue("Connection", out val) || val.ToLower() != "upgrade")
-                {
-                    return false;
-                }
                 if(!m_Headers.ContainsKey("Sec-WebSocket-Key"))
                 {
                     return false;
@@ -464,7 +460,22 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     return false;
                 }
-                return true;
+
+                /* Connection header is checked last */
+                if (!m_Headers.TryGetValue("Connection", out val))
+                {
+                    return false;
+                }
+
+                foreach (string valitem in val.Split(','))
+                {
+                    if (valitem.ToLower().Trim() == "upgrade")
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
 
