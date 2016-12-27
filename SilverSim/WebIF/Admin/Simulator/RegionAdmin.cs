@@ -69,6 +69,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             IAdminWebIF webif = loader.GetAdminWebIF();
             m_WebIF = webif;
+            webif.ModuleNames.Add("regions");
             webif.JsonMethods.Add("region.create", HandleCreate);
             webif.JsonMethods.Add("region.change", HandleChange);
             webif.JsonMethods.Add("region.delete", HandleDelete);

@@ -86,6 +86,7 @@ namespace SilverSim.Scene.Npc
                 m_AdminWebIF.JsonMethods.Add("npcs.show", HandleShowNpcs);
                 m_AdminWebIF.JsonMethods.Add("npc.remove", HandleRemoveNpc);
                 m_AdminWebIF.AutoGrantRights["npcs.manage"].Add("npcs.view");
+                m_AdminWebIF.ModuleNames.Add("npcs");
             }
             /* non persistent inventory is needed for baking logic */
             m_NonpersistentInventoryService = loader.GetService<InventoryServiceInterface>(m_NonpersistentInventoryServiceName);

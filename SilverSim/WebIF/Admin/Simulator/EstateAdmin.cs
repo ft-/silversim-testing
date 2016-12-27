@@ -41,6 +41,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m_RegionStorageService = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             IAdminWebIF webif = loader.GetAdminWebIF();
             m_WebIF = webif;
+            webif.ModuleNames.Add("estates");
             webif.JsonMethods.Add("estates.list", HandleList);
             webif.JsonMethods.Add("estate.get", HandleGet);
             webif.JsonMethods.Add("estate.update", HandleUpdate);

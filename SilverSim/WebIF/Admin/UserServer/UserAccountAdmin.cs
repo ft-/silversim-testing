@@ -41,7 +41,7 @@ namespace SilverSim.WebIF.Admin.UserServer
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             IAdminWebIF webif = loader.GetAdminWebIF();
             m_WebIF = webif;
-
+            webif.ModuleNames.Add("useraccounts");
             webif.AutoGrantRights["useraccounts.manage"].Add("useraccounts.view");
             webif.AutoGrantRights["useraccounts.delete"].Add("useraccounts.view");
             webif.AutoGrantRights["useraccounts.create"].Add("useraccounts.view");

@@ -42,6 +42,11 @@ namespace SilverSim.Main.Common
             get;
         }
 
+        RwLockedList<string> ModuleNames
+        {
+            get;
+        }
+
         void SuccessResponse(HttpRequest req, Map m);
         void ErrorResponse(HttpRequest req, AdminWebIfErrorResult reason);
 

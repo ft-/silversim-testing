@@ -58,6 +58,7 @@ namespace SilverSim.WebIF.Admin
         readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
         readonly public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> m_AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(delegate () { return new RwLockedList<string>(); });
         public readonly RwLockedDictionary<string, Action<HttpRequest, Map>> m_JsonMethods = new RwLockedDictionary<string, Action<HttpRequest, Map>>();
+        public readonly RwLockedList<string> m_Modules = new RwLockedList<string>();
 
         public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights
         {
@@ -72,6 +73,14 @@ namespace SilverSim.WebIF.Admin
             get
             {
                 return m_JsonMethods;
+            }
+        }
+
+        public RwLockedList<string> ModuleNames
+        {
+            get
+            {
+                return m_Modules;
             }
         }
 
@@ -125,6 +134,7 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("module.get", ModuleGet);
             JsonMethods.Add("dnscache.list", DnsCacheList);
             JsonMethods.Add("dnscache.delete", DnsCacheRemove);
+            JsonMethods.Add("webif.modules", AvailableModulesList);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -916,6 +926,17 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
+        void AvailableModulesList(HttpRequest req, Map jsondata)
+        {
+            AnArray res = new AnArray();
+            foreach(string module in m_Modules)
+            {
+                res.Add(module);
+            }
+            Map m = new Map();
+            m.Add("modules", res);
+            SuccessResponse(req, m);
+        }
 
         [AdminWebIfRequiredRight("dnscache.manage")]
         void DnsCacheList(HttpRequest req, Map jsondata)

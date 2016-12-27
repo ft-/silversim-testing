@@ -35,7 +35,7 @@ namespace SilverSim.WebIF.Admin.MapServer
             m_WebIF = loader.GetAdminWebIF();
             m_RegionDefaultFlagsService = loader.GetService<RegionDefaultFlagsServiceInterface>(m_RegionDefaultFlagsServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
-
+            m_WebIF.ModuleNames.Add("mapserver");
             m_WebIF.AutoGrantRights["mapserver.unregister"].Add("mapserver.view");
             m_WebIF.AutoGrantRights["mapserver.manage"].Add("mapserver.view");
             m_WebIF.JsonMethods.Add("mapserver.search", HandleMapServerSearch);

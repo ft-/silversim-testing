@@ -28,6 +28,7 @@ namespace SilverSim.WebIF.Admin
         {
             m_Commands = loader.CommandRegistry;
             m_WebIF = loader.GetAdminWebIF();
+            m_WebIF.ModuleNames.Add("console");
             m_WebIF.JsonMethods.Add("console.command", ConsoleCommand);
         }
 
