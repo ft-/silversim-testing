@@ -2,12 +2,14 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Http;
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace SilverSim.Main.Common.HttpServer
@@ -22,7 +24,7 @@ namespace SilverSim.Main.Common.HttpServer
     public sealed class HttpRequest
     {
         #region Private Fields
-        readonly Stream m_HttpStream;
+        Stream m_HttpStream;
         readonly Dictionary<string, string> m_Headers = new Dictionary<string, string>();
         #endregion
 
@@ -85,6 +87,10 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void Close()
         {
+            if(m_HttpStream == null)
+            {
+                return;
+            }
             if (Response == null)
             {
                 using(BeginResponse(HttpStatusCode.InternalServerError, "Internal Server Error"))
@@ -425,6 +431,82 @@ namespace SilverSim.Main.Common.HttpServer
             Response = new HttpResponse(m_HttpStream, this, HttpStatusCode.OK, "OK");
             Response.Headers["Transfer-Encoding"] = "chunked";
             return Response;
+        }
+
+        public bool IsWebSocket
+        {
+            get
+            {
+                if(Method != "GET")
+                {
+                    return false;
+                }
+                if(!(MajorVersion > 1 || (MajorVersion == 1 && MinorVersion > 1)))
+                {
+                    return false;
+                }
+
+                string val;
+                if(!m_Headers.TryGetValue("Upgrade", out val) || val.ToLower() != "websocket")
+                {
+                    return false;
+                }
+
+                if(!m_Headers.TryGetValue("Connection", out val) || val.ToLower() != "upgrade")
+                {
+                    return false;
+                }
+                if(!m_Headers.ContainsKey("Sec-WebSocket-Key"))
+                {
+                    return false;
+                }
+                if(!m_Headers.TryGetValue("Sec-WebSocket-Version", out val) || val != "13")
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        public HttpWebSocket BeginWebSocket(string websocketprotocol = "")
+        {
+            Stream websocketStream;
+            if(!IsWebSocket)
+            {
+                throw new NotAWebSocketRequestException();
+            }
+
+            string websocketkeyuuid;
+            websocketkeyuuid = m_Headers["Sec-WebSocket-Key"].Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            byte[] websocketacceptdata = websocketkeyuuid.ToUTF8Bytes();
+            string websocketaccept;
+            using (SHA1 sha1 = SHA1.Create())
+            {
+                websocketaccept = Convert.ToBase64String(sha1.ComputeHash(websocketacceptdata));
+            }
+            SetConnectionClose();
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (TextWriter w = ms.UTF8StreamWriter())
+                {
+                    w.Write(string.Format("HTTP/{0}.{1} 101 Switching Protocols\r\n", MajorVersion, MinorVersion));
+                    w.Write("Upgrade: websocket\r\nConnection: Upgrade\r\n");
+                    w.Write(string.Format("Sec-WebSocket-Accept: {0}\r\n", websocketaccept));
+                    if (!string.IsNullOrEmpty(websocketprotocol))
+                    {
+                        w.Write(string.Format("Sec-WebSocket-Protocol: {0}\r\n", websocketprotocol));
+                    }
+                    w.Write("\r\n");
+                    w.Flush();
+                    byte[] b = ms.ToArray();
+                    m_HttpStream.Write(b, 0, b.Length);
+                    m_HttpStream.Flush();
+                }
+            }
+            websocketStream = m_HttpStream;
+            m_HttpStream = null;
+            return new HttpWebSocket(websocketStream);
         }
     }
 }

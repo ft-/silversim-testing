@@ -2,10 +2,12 @@
 // GNU Affero General Public License v3
 
 using log4net;
+using log4net.Core;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Main.Common.Log;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
@@ -39,6 +41,7 @@ namespace SilverSim.WebIF.Admin
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         readonly string m_AvatarNameServiceNames;
         readonly string m_Title;
+        readonly BlockingQueue<LoggingEvent> m_LogEventQueue = new BlockingQueue<LoggingEvent>();
 
         class SessionInfo
         {
@@ -60,6 +63,7 @@ namespace SilverSim.WebIF.Admin
         readonly public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> m_AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(delegate () { return new RwLockedList<string>(); });
         public readonly RwLockedDictionary<string, Action<HttpRequest, Map>> m_JsonMethods = new RwLockedDictionary<string, Action<HttpRequest, Map>>();
         public readonly RwLockedList<string> m_Modules = new RwLockedList<string>();
+        public readonly RwLockedList<HttpWebSocket> m_LogReceivers = new RwLockedList<HttpWebSocket>();
 
         public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights
         {
@@ -87,6 +91,48 @@ namespace SilverSim.WebIF.Admin
 
         readonly Timer m_Timer = new Timer(1);
         readonly bool m_EnableSetPasswordCommand;
+
+        bool m_ShutdownLogThread;
+
+        void LogThread()
+        {
+            while(!m_ShutdownLogThread)
+            {
+                LoggingEvent logevent;
+                try
+                {
+                    logevent = m_LogEventQueue.Dequeue(500);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                List<HttpWebSocket> conns = new List<HttpWebSocket>();
+                m_LogReceivers.ForEach(delegate (HttpWebSocket sock)
+                {
+                    conns.Add(sock);
+                });
+
+                LoggingEventData data = logevent.GetLoggingEventData();
+                string msg = string.Format("{0} - {1:5} [{2}]: {3}",
+                    data.TimeStamp.ToString(),
+                    data.Level.Name,
+                    data.LoggerName,
+                    data.Message);
+                foreach(HttpWebSocket conn in conns)
+                {
+                    try
+                    {
+                        conn.WriteText(msg);
+                    }
+                    catch
+                    {
+                        /* intentionally ignored */
+                    }
+                }
+            }
+        }
 
         #region Helpers
         public void SuccessResponse(HttpRequest req, Map m)
@@ -137,6 +183,8 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("dnscache.list", DnsCacheList);
             JsonMethods.Add("dnscache.delete", DnsCacheRemove);
             JsonMethods.Add("webif.modules", AvailableModulesList);
+            LogController.Queues.Add(m_LogEventQueue);
+            new System.Threading.Thread(LogThread).Start();
         }
 
         public ShutdownOrder ShutdownOrder
@@ -285,6 +333,8 @@ namespace SilverSim.WebIF.Admin
 
         public void Shutdown()
         {
+            LogController.Queues.Remove(m_LogEventQueue);
+            m_ShutdownLogThread = true;
             m_Loader = null;
             JsonMethods.Clear();
             m_HttpServer.StartsWithUriHandlers.Remove("/admin");
@@ -472,11 +522,130 @@ namespace SilverSim.WebIF.Admin
             SuccessResponse(req, resdata);
         }
 
+        sealed class WebSocketTTY : TTY, IDisposable
+        {
+            readonly HttpWebSocket m_Socket;
+            public WebSocketTTY(HttpWebSocket sock)
+            {
+                m_Socket = sock;
+            }
+
+            public void Dispose()
+            {
+                m_Socket.Dispose();
+            }
+
+            public override void Write(string text)
+            {
+                m_Socket.WriteText(text);
+            }
+
+            public override string ReadLine(string p, bool echoInput)
+            {
+                string text = string.Empty;
+                if (!string.IsNullOrEmpty(p))
+                {
+                    Write(p);
+                }
+                HttpWebSocket.Message msg;
+                do
+                {
+                    msg = m_Socket.Receive();
+                    if (msg.Type == HttpWebSocket.MessageType.Text)
+                    {
+                        text += msg.Data.FromUTF8Bytes();
+                    }
+                } while (!msg.IsLastSegment || msg.Type != HttpWebSocket.MessageType.Text);
+                return text;
+            }
+        }
+
+        void HandleWebSocketConsole(HttpRequest req, string sessionid)
+        {
+            Map jsondata = new Map();
+            jsondata.Add("sessionid", sessionid);
+            using (WebSocketTTY tty = new WebSocketTTY(req.BeginWebSocket("console")))
+            {
+                for (;;)
+                {
+                    string cmd = tty.ReadLine("", false);
+                    tty.SelectedScene = GetSelectedRegion(req, jsondata);
+                    m_Loader.CommandRegistry.ExecuteCommand(tty.GetCmdLine(cmd), tty);
+                    SetSelectedRegion(req, jsondata, tty.SelectedScene);
+                }
+            }
+        }
+
         public void HandleHttp(HttpRequest req)
         {
             try
             {
-                if (req.RawUrl.StartsWith("/admin/json"))
+                if(req.RawUrl == "/admin/log" ||req.RawUrl == "/admin/console")
+                {
+                    req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                    return;
+                }
+                else if(req.RawUrl.StartsWith("/admin/log/"))
+                {
+                    if (!req.IsWebSocket)
+                    {
+                        req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                    }
+
+                    SessionInfo sessionInfo;
+                    if (!m_Sessions.TryGetValue(req.RawUrl.Substring(11), out sessionInfo) ||
+                                    !sessionInfo.IsAuthenticated ||
+                                    (!sessionInfo.Rights.Contains("log.view") &&
+                                    !sessionInfo.Rights.Contains("admin.all")))
+                    {
+                        req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                        return;
+                    }
+                    else
+                    {
+                        sessionInfo.LastSeenTickCount = Environment.TickCount;
+                    }
+
+                    using (HttpWebSocket sock = req.BeginWebSocket("log"))
+                    {
+                        m_LogReceivers.Add(sock);
+                        try
+                        {
+                            for(;;)
+                            {
+                                sock.Receive();
+                            }
+                        }
+                        finally
+                        {
+                            m_LogReceivers.Remove(sock);
+                        }
+                    }
+                }
+                else if(req.RawUrl.StartsWith("/admin/console/"))
+                {
+                    if (!req.IsWebSocket)
+                    {
+                        req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                    }
+
+                    SessionInfo sessionInfo;
+                    if (!m_Sessions.TryGetValue(req.RawUrl.Substring(15), out sessionInfo) ||
+                                    !sessionInfo.IsAuthenticated ||
+                                    (!sessionInfo.Rights.Contains("console.access") &&
+                                    !sessionInfo.Rights.Contains("admin.all")))
+                    {
+                        req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                        return;
+                    }
+                    else
+                    {
+                        sessionInfo.LastSeenTickCount = Environment.TickCount;
+                    }
+
+                    HandleWebSocketConsole(req, req.RawUrl.Substring(15));
+                }
+                else if (req.RawUrl.StartsWith("/admin/json"))
                 {
                     if (req.Method != "POST")
                     {
@@ -618,6 +787,10 @@ namespace SilverSim.WebIF.Admin
             catch(HttpResponse.ConnectionCloseException)
             {
                 throw;
+            }
+            catch(WebSocketClosedException)
+            {
+                /* ignore this one as it results from WebSocket close */
             }
             catch(Exception e)
             {

@@ -43,4 +43,20 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
     }
+
+    [Serializable]
+    public class NotAWebSocketRequestException : Exception
+    {
+        public NotAWebSocketRequestException()
+        {
+        }
+    }
+
+    [Serializable]
+    public class WebSocketClosedException : Exception
+    {
+        public WebSocketClosedException()
+        {
+        }
+    }
 }
