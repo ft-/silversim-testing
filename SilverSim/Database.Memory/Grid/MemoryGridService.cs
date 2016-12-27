@@ -247,7 +247,7 @@ namespace SilverSim.Database.MySQL.Grid
                                            region.Location.Y + region.Size.Y > regionInfo.Location.Y &&
                                            region.Location.X + region.Size.X < regionInfo.Location.X + regionInfo.Size.X &&
                                            region.Location.Y + region.Size.Y < regionInfo.Location.Y + regionInfo.Size.Y) &&
-                                           region.ID != regionInfo.ID && region.ID == regionInfo.ScopeID
+                                           region.ID != regionInfo.ID && region.ScopeID == regionInfo.ScopeID
                                     select true;
 
             foreach(bool f in res)
