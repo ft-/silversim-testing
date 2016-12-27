@@ -1,4 +1,7 @@
-﻿using log4net;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+
+using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
@@ -7,12 +10,8 @@ using SilverSim.ServiceInterfaces.AuthInfo;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.AuthInfo;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.WebIF.Admin.UserServer
 {
@@ -142,7 +141,14 @@ namespace SilverSim.WebIF.Admin.UserServer
             {
                 foreach (IUserAccountDeleteServiceInterface delService in m_AccountDeleteServices)
                 {
-                    delService.Remove(scopeid.AsUUID, id.AsUUID);
+                    try
+                    {
+                        delService.Remove(scopeid.AsUUID, id.AsUUID);
+                    }
+                    catch
+                    {
+                        /* intentionally ignored */
+                    }
                 }
                 m_WebIF.SuccessResponse(req, new Map());
             }

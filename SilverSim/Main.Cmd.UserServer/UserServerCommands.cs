@@ -269,7 +269,14 @@ namespace SilverSim.Main.Cmd.UserServer
             int index = 1;
             foreach(IUserAccountDeleteServiceInterface delService in m_AccountDeleteServices)
             {
-                delService.Remove(account.ScopeID, account.Principal.ID);
+                try
+                {
+                    delService.Remove(account.ScopeID, account.Principal.ID);
+                }
+                catch
+                {
+                    /* intentionally ignored */
+                }
                 io.WriteFormatted("{0}/{1} processed", index++, count);
             }
         }
