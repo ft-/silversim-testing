@@ -85,6 +85,7 @@ namespace SilverSim.Scene.Npc
                 m_AdminWebIF = webifs[0];
                 m_AdminWebIF.JsonMethods.Add("npcs.show", HandleShowNpcs);
                 m_AdminWebIF.JsonMethods.Add("npc.remove", HandleRemoveNpc);
+                m_AdminWebIF.JsonMethods.Add("npc.get", HandleGetNpc);
                 m_AdminWebIF.AutoGrantRights["npcs.manage"].Add("npcs.view");
                 m_AdminWebIF.ModuleNames.Add("npcs");
             }
@@ -463,11 +464,52 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        [AdminWebIfRequiredRight("npcs.show")]
+        [AdminWebIfRequiredRight("npcs.view")]
+        void HandleGetNpc(HttpRequest req,Map jsondata)
+        {
+            if (!jsondata.ContainsKey("npcid"))
+            {
+                m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+
+            NpcAgent agent;
+            if(!m_NpcAgents.TryGetValue(jsondata["npcid"].AsUUID, out agent))
+            {
+                m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+                return;
+            }
+
+            UUI uui;
+            Map npcid = new Map();
+            uui = agent.Owner;
+            npcid.Add("firstname", uui.FirstName);
+            npcid.Add("lastname", uui.LastName);
+            npcid.Add("id", uui.ID);
+
+            Map npcowner = new Map();
+            uui = agent.NpcOwner;
+            npcowner.Add("fullname", uui.FullName);
+            npcowner.Add("firstname", uui.FirstName);
+            npcowner.Add("lastname", uui.LastName);
+            npcowner.Add("id", uui.ID);
+            if (uui.HomeURI != null)
+            {
+                npcowner.Add("homeuri", uui.HomeURI);
+            }
+
+            Map npcdata = new Map();
+            npcdata.Add("uui", npcid);
+            npcdata.Add("owner", npcowner);
+            npcdata.Add("persistent", (m_NpcPresenceService != null && m_NpcPresenceService[agent.Owner.ID].Count != 0));
+            m_AdminWebIF.SuccessResponse(req, npcdata);
+        }
+
+        [AdminWebIfRequiredRight("npcs.view")]
         void HandleShowNpcs(HttpRequest req, Map jsondata)
         {
             SceneInterface scene = null;
-            if (jsondata.ContainsKey("regionid") &&
+            if (!jsondata.ContainsKey("regionid") ||
                 !m_KnownScenes.TryGetValue(jsondata["regionid"].AsUUID, out scene))
             {
                 m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
