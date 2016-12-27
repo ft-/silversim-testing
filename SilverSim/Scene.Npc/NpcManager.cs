@@ -39,6 +39,17 @@ namespace SilverSim.Scene.Npc
                 }
             }
 
+            public override bool ContainsKey(UUID npcid)
+            {
+                return false;
+            }
+
+            public override bool TryGetValue(UUID npcid, out NpcPresenceInfo presence)
+            {
+                presence = default(NpcPresenceInfo);
+                return false;
+            }
+
             public override void Remove(UUID scopeID, UUID npcID)
             {
                 /* nothing to do */

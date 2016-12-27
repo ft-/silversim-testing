@@ -100,6 +100,54 @@ namespace SilverSim.Database.MySQL.Presence
             new PrimaryKeyInfo("NpcID"),
         };
 
+        public override bool ContainsKey(UUID npcid)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE ?npcid", conn))
+                {
+                    cmd.Parameters.AddParameter("?npcid", npcid);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        return reader.Read();
+                    }
+                }
+            }
+        }
+
+        public override bool TryGetValue(UUID npcid, out NpcPresenceInfo presence)
+        {
+            presence = default(NpcPresenceInfo);
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE ?regionID", conn))
+                {
+                    cmd.Parameters.AddParameter("?regionID", npcid);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            presence = new NpcPresenceInfo();
+                            presence.Npc.ID = reader.GetUUID("NpcID");
+                            presence.Npc.FirstName = reader.GetString("FirstName");
+                            presence.Npc.LastName = reader.GetString("LastName");
+                            presence.Owner = reader.GetUUI("Owner");
+                            presence.Group = reader.GetUGI("Group");
+                            presence.Options = reader.GetEnum<NpcOptions>("Options");
+                            presence.RegionID = reader.GetUUID("RegionID");
+                            presence.Position = reader.GetVector3("Position");
+                            presence.LookAt = reader.GetVector3("LookAt");
+                            presence.SittingOnObjectID = reader.GetUUID("SittingOnObjectID");
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         public override List<NpcPresenceInfo> this[UUID regionID]
         {
             get

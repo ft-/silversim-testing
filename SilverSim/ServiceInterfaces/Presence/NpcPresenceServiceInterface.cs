@@ -39,6 +39,10 @@ namespace SilverSim.ServiceInterfaces.Presence
             get;
         }
 
+        public abstract bool ContainsKey(UUID npcid);
+
+        public abstract bool TryGetValue(UUID npcid, out NpcPresenceInfo presence);
+
         public abstract void Store(NpcPresenceInfo presenceInfo);
 
         public abstract void Remove(UUID scopeID, UUID npcID);
