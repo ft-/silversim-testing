@@ -149,12 +149,16 @@ namespace SilverSim.WebIF.Admin
 
         public UUI ResolveName(UUI uui)
         {
-            UUI resultUui;
+            UUI resultUui = uui;
             foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
             {
                 if (service.TryGetValue(uui, out resultUui))
                 {
-                    return resultUui;
+                    if (resultUui.IsAuthoritative)
+                    {
+                        break;
+                    }
+                    uui = resultUui;
                 }
             }
             return uui;
@@ -711,7 +715,8 @@ namespace SilverSim.WebIF.Admin
                 "admin-webif delete user <user>\n" +
                 "admin-webif grant <user> <right>\n" +
                 "admin-webif revoke <user> <right>\n" +
-                "admin-webif show json-methods");
+                "admin-webif show json-methods\n" +
+                "admin-webif show modules");
         }
 
         public void AdminWebIFCmd(List<string> args, TTY io, UUID limitedToScene)
@@ -788,6 +793,18 @@ namespace SilverSim.WebIF.Admin
                                         {
                                             output.Append("\n");
                                             output.Append(kvp.Key);
+                                        }
+                                        io.Write(output.ToString());
+                                    }
+                                    break;
+
+                                case "modules":
+                                    {
+                                        StringBuilder output = new StringBuilder("Modules: --------------------");
+                                        foreach (string id in m_Modules)
+                                        {
+                                            output.Append("\n");
+                                            output.Append(id);
                                         }
                                         io.Write(output.ToString());
                                     }

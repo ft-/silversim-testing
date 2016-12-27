@@ -48,6 +48,7 @@ namespace SilverSim.WebIF.Admin.UserServer
 
             webif.JsonMethods.Add("useraccounts.search", HandleUserAccountSearch);
             webif.JsonMethods.Add("useraccount.get", HandleUserAccountGet);
+            webif.JsonMethods.Add("useraccount.change", HandleUserAccountChange);
             webif.JsonMethods.Add("useraccount.delete", HandleUserAccountDelete);
             webif.JsonMethods.Add("useraccount.changepassword", HandleUserAccountChangePassword);
             webif.JsonMethods.Add("useraccount.create", HandleUserAccountCreate);
@@ -74,6 +75,11 @@ namespace SilverSim.WebIF.Admin.UserServer
             if (jsondata.ContainsKey("userlevel"))
             {
                 account.UserLevel = jsondata["userlevel"].AsInt;
+                if (account.UserLevel > 255)
+                {
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
+                    return;
+                }
             }
             if (jsondata.ContainsKey("usertitle"))
             {
@@ -116,6 +122,54 @@ namespace SilverSim.WebIF.Admin.UserServer
             Map resdata = new Map();
             resdata.Add("account", res);
             m_WebIF.SuccessResponse(req, resdata);
+        }
+
+        [AdminWebIfRequiredRight("useraccounts.manage")]
+        void HandleUserAccountChange(HttpRequest req, Map jsondata)
+        {
+            UserAccount account;
+            if (!jsondata.ContainsKey("id"))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+            if(!m_UserAccountService.TryGetValue(UUID.Zero, jsondata["id"].AsUUID, out account))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+                return;
+            }
+
+            if (jsondata.ContainsKey("userlevel"))
+            {
+                account.UserLevel = jsondata["userlevel"].AsInt;
+                if(account.UserLevel > 255)
+                {
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
+                    return;
+                }
+            }
+            if (jsondata.ContainsKey("usertitle"))
+            {
+                account.UserTitle = jsondata["usertitle"].ToString();
+            }
+            if (jsondata.ContainsKey("userflags"))
+            {
+                account.UserFlags = jsondata["userflags"].AsUInt;
+            }
+            if (jsondata.ContainsKey("email"))
+            {
+                account.Email = jsondata["email"].ToString();
+            }
+            try
+            {
+                m_UserAccountService.Update(account);
+            }
+            catch
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.AlreadyExists);
+                return;
+            }
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIfRequiredRight("useraccounts.delete")]
