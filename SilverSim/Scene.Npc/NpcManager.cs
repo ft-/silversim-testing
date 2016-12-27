@@ -50,6 +50,12 @@ namespace SilverSim.Scene.Npc
                 return false;
             }
 
+            public override bool TryGetValue(UUID regionID, string firstname, string lastname, out NpcPresenceInfo info)
+            {
+                info = default(NpcPresenceInfo);
+                return false;
+            }
+
             public override void Remove(UUID scopeID, UUID npcID)
             {
                 /* nothing to do */

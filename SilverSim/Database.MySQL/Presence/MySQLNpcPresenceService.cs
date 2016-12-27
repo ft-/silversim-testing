@@ -98,6 +98,10 @@ namespace SilverSim.Database.MySQL.Presence
             new AddColumn<Vector3>("LookAt") { IsNullAllowed = false, Default = Vector3.UnitX },
             new AddColumn<UUID>("SittingOnObjectID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo("NpcID"),
+            new TableRevision(2),
+            new NamedKeyInfo("FirstLast", "FirstName", "LastName"),
+            new NamedKeyInfo("Region", "RegionID"),
+            new NamedKeyInfo("FirstLastRegion", "FirstName", "LastName", "RegionID") { IsUnique = true }
         };
 
         public override bool ContainsKey(UUID npcid)
@@ -116,30 +120,60 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
 
+        NpcPresenceInfo ReaderToPresenceInfo(MySqlDataReader reader)
+        {
+            NpcPresenceInfo presence = new NpcPresenceInfo();
+            presence.Npc.ID = reader.GetUUID("NpcID");
+            presence.Npc.FirstName = reader.GetString("FirstName");
+            presence.Npc.LastName = reader.GetString("LastName");
+            presence.Owner = reader.GetUUI("Owner");
+            presence.Group = reader.GetUGI("Group");
+            presence.Options = reader.GetEnum<NpcOptions>("Options");
+            presence.RegionID = reader.GetUUID("RegionID");
+            presence.Position = reader.GetVector3("Position");
+            presence.LookAt = reader.GetVector3("LookAt");
+            presence.SittingOnObjectID = reader.GetUUID("SittingOnObjectID");
+            return presence;
+        }
+
+        public override bool TryGetValue(UUID regionID, string firstname, string lastname, out NpcPresenceInfo presence)
+        {
+            presence = default(NpcPresenceInfo);
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE ?regionID AND FirstName LIKE ?first AND LastName LIKE ?last", conn))
+                {
+                    cmd.Parameters.AddParameter("?regionID", regionID);
+                    cmd.Parameters.AddParameter("?first", firstname);
+                    cmd.Parameters.AddParameter("?last", lastname);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            presence = ReaderToPresenceInfo(reader);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         public override bool TryGetValue(UUID npcid, out NpcPresenceInfo presence)
         {
             presence = default(NpcPresenceInfo);
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE ?regionID", conn))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE ?npcid", conn))
                 {
-                    cmd.Parameters.AddParameter("?regionID", npcid);
+                    cmd.Parameters.AddParameter("?npcid", npcid);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            presence = new NpcPresenceInfo();
-                            presence.Npc.ID = reader.GetUUID("NpcID");
-                            presence.Npc.FirstName = reader.GetString("FirstName");
-                            presence.Npc.LastName = reader.GetString("LastName");
-                            presence.Owner = reader.GetUUI("Owner");
-                            presence.Group = reader.GetUGI("Group");
-                            presence.Options = reader.GetEnum<NpcOptions>("Options");
-                            presence.RegionID = reader.GetUUID("RegionID");
-                            presence.Position = reader.GetVector3("Position");
-                            presence.LookAt = reader.GetVector3("LookAt");
-                            presence.SittingOnObjectID = reader.GetUUID("SittingOnObjectID");
+                            presence = ReaderToPresenceInfo(reader);
                             return true;
                         }
                     }
@@ -163,18 +197,7 @@ namespace SilverSim.Database.MySQL.Presence
                         {
                             while (reader.Read())
                             {
-                                NpcPresenceInfo pi = new NpcPresenceInfo();
-                                pi.Npc.ID = reader.GetUUID("NpcID");
-                                pi.Npc.FirstName = reader.GetString("FirstName");
-                                pi.Npc.LastName = reader.GetString("LastName");
-                                pi.Owner = reader.GetUUI("Owner");
-                                pi.Group = reader.GetUGI("Group");
-                                pi.Options = reader.GetEnum<NpcOptions>("Options");
-                                pi.RegionID = reader.GetUUID("RegionID");
-                                pi.Position = reader.GetVector3("Position");
-                                pi.LookAt = reader.GetVector3("LookAt");
-                                pi.SittingOnObjectID = reader.GetUUID("SittingOnObjectID");
-                                presences.Add(pi);
+                                presences.Add(ReaderToPresenceInfo(reader));
                             }
                         }
                     }

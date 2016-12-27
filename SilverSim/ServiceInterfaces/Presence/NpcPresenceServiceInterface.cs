@@ -39,6 +39,8 @@ namespace SilverSim.ServiceInterfaces.Presence
             get;
         }
 
+        public abstract bool TryGetValue(UUID regionID, string firstname, string lastname, out NpcPresenceInfo info);
+
         public abstract bool ContainsKey(UUID npcid);
 
         public abstract bool TryGetValue(UUID npcid, out NpcPresenceInfo presence);
