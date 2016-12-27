@@ -240,13 +240,13 @@ namespace SilverSim.Database.MySQL.Grid
 
             /* we have to give checks for all intersection variants */
             IEnumerable<bool> res = from region in m_Data.Values
-                                    where (region.Location.X >= regionInfo.Location.X && region.Location.Y >= regionInfo.Location.Y &&
+                                    where ((region.Location.X >= regionInfo.Location.X && region.Location.Y >= regionInfo.Location.Y &&
                                             region.Location.X < regionInfo.Location.X + regionInfo.Size.X &&
                                             region.Location.Y < regionInfo.Location.Y + regionInfo.Size.Y) ||
                                             (region.Location.X + region.Size.X > regionInfo.Location.X &&
                                            region.Location.Y + region.Size.Y > regionInfo.Location.Y &&
                                            region.Location.X + region.Size.X < regionInfo.Location.X + regionInfo.Size.X &&
-                                           region.Location.Y + region.Size.Y < regionInfo.Location.Y + regionInfo.Size.Y) &&
+                                           region.Location.Y + region.Size.Y < regionInfo.Location.Y + regionInfo.Size.Y)) &&
                                            region.ID != regionInfo.ID && region.ScopeID == regionInfo.ScopeID
                                     select true;
 
