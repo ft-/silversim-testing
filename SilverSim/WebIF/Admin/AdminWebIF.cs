@@ -154,11 +154,11 @@ namespace SilverSim.WebIF.Admin
             {
                 if (service.TryGetValue(uui, out resultUui))
                 {
+                    uui = resultUui;
                     if (resultUui.IsAuthoritative)
                     {
                         break;
                     }
-                    uui = resultUui;
                 }
             }
             return uui;
