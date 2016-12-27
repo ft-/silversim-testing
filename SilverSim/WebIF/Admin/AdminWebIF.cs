@@ -38,6 +38,7 @@ namespace SilverSim.WebIF.Admin
         ConfigurationLoader m_Loader;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         readonly string m_AvatarNameServiceNames;
+        readonly string m_Title;
 
         class SessionInfo
         {
@@ -115,10 +116,11 @@ namespace SilverSim.WebIF.Admin
         }
         #endregion
 
-        public AdminWebIF(string basepath, bool enablesetpasscommand, string avatarnameservicenames)
+        public AdminWebIF(string basepath, bool enablesetpasscommand, string avatarnameservicenames, string title)
         {
             m_AvatarNameServiceNames = avatarnameservicenames;
             m_EnableSetPasswordCommand = enablesetpasscommand;
+            m_Title = title;
             m_BasePath = basepath;
             m_Timer.Elapsed += HandleTimer;
             JsonMethods.Add("webif.admin.user.grantright", GrantRight);
@@ -934,6 +936,7 @@ namespace SilverSim.WebIF.Admin
                 res.Add(module);
             }
             Map m = new Map();
+            m.Add("title", m_Title);
             m.Add("modules", res);
             SuccessResponse(req, m);
         }
@@ -1355,7 +1358,8 @@ namespace SilverSim.WebIF.Admin
             return new AdminWebIF(
                 ownSection.GetString("BasePath", ""),
                 enableSetPasswordCommand,
-                ownSection.GetString("AvatarNameServices", "AvatarNameStorage").Trim());
+                ownSection.GetString("AvatarNameServices", "AvatarNameStorage").Trim(),
+                ownSection.GetString("Title", "SilverSim"));
         }
     }
 #endregion
