@@ -535,6 +535,11 @@ namespace SilverSim.WebIF.Admin
                 m_Socket.Dispose();
             }
 
+            public void Close(HttpWebSocket.CloseReason reason)
+            {
+                m_Socket.Close(reason);
+            }
+
             public override void Write(string text)
             {
                 m_Socket.WriteText(text + "\n");
@@ -594,6 +599,10 @@ redo:
                     m_Loader.CommandRegistry.ExecuteCommand(tty.GetCmdLine(cmd), tty);
                     SetSelectedRegion(req, jsondata, tty.SelectedScene);
                 }
+                if (m_ShutdownHandlerThreads)
+                {
+                    tty.Close(HttpWebSocket.CloseReason.GoingAway);
+                }
             }
         }
 
@@ -644,6 +653,10 @@ redo:
                                 {
                                     /* ignore this exception */
                                 }
+                            }
+                            if(m_ShutdownHandlerThreads)
+                            {
+                                sock.Close(HttpWebSocket.CloseReason.GoingAway);
                             }
                         }
                         catch(WebSocketClosedException)
