@@ -16,9 +16,7 @@ namespace SilverSim.Main.Common.HttpServer
             GoingAway = 1001,
             ProtocolError = 1002,
             UnsupportedData = 1003,
-            Reserved = 1004,
             NoStatusReceived = 1005,
-            AbnormalClosure = 1006,
             InvalidFramePayloadData = 1007,
             PolicyViolation = 1008,
             MessageTooBig = 1009,
@@ -27,7 +25,6 @@ namespace SilverSim.Main.Common.HttpServer
             ServiceRestart = 1012,
             TryAgainLater = 1013,
             BadGateway = 1014,
-            TLSHandshake = 1015,
         }
         [Serializable]
         public class MessageTimeoutException : Exception
