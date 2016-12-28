@@ -11,6 +11,25 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public class HttpWebSocket : IDisposable
     {
+        public enum CloseReason
+        {
+            NormalClosure = 1000,
+            GoingAway = 1001,
+            ProtocolError = 1002,
+            UnsupportedData = 1003,
+            Reserved = 1004,
+            NoStatusReceived = 1005,
+            AbnormalClosure = 1006,
+            InvalidFramePayloadData = 1007,
+            PolicyViolation = 1008,
+            MessageTooBig = 1009,
+            MandatoryExtension = 1010,
+            InternalError = 1011,
+            ServiceRestart = 1012,
+            TryAgainLater = 1013,
+            BadGateway = 1014,
+            TLSHandshake = 1015,
+        }
         [Serializable]
         public class MessageTimeoutException : Exception
         {
@@ -43,13 +62,30 @@ namespace SilverSim.Main.Common.HttpServer
             m_WebSocketStream = o;
         }
 
+        public void Close(CloseReason reason = CloseReason.NormalClosure)
+        {
+            if (!m_IsDisposed)
+            {
+                try
+                {
+                    SendClose(CloseReason.NormalClosure);
+                }
+                catch
+                {
+                    /* intentionally ignore errors */
+                }
+            }
+            m_WebSocketStream.Dispose();
+            m_IsDisposed = true;
+        }
+
         public void Dispose()
         {
             if (!m_IsDisposed)
             {
                 try
                 {
-                    SendClose(1006);
+                    SendClose(CloseReason.NormalClosure);
                 }
                 catch
                 {
@@ -200,9 +236,9 @@ namespace SilverSim.Main.Common.HttpServer
             SendFrame(OpCode.Binary, fin, data, offset, length, masked);
         }
 
-        void SendClose(ushort reason)
+        void SendClose(CloseReason reason)
         {
-            byte[] res = BitConverter.GetBytes(reason);
+            byte[] res = BitConverter.GetBytes((ushort)reason);
             if(BitConverter.IsLittleEndian)
             {
                 Array.Reverse(res);
