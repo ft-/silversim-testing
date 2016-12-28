@@ -1424,7 +1424,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                KnownConfigurationIssues.Add("Control-C is not set as input");
+                KnownConfigurationIssues.Add("Control-C is not set as input. Do not use -m=testing for production use.");
             }
 
             string mainConfig = startup.GetString("config", defaultConfigName);
