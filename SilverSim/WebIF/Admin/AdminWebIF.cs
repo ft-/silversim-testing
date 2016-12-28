@@ -545,35 +545,65 @@ namespace SilverSim.WebIF.Admin
                 m_Socket.WriteText(text + "\n");
             }
 
+            void DisableEcho()
+            {
+                byte[] echoOff = "disable echo".ToUTF8Bytes();
+                m_Socket.WriteBinary(echoOff, 0, echoOff.Length);
+            }
+
+            void EnableEcho()
+            {
+                byte[] echoOn = "enable echo".ToUTF8Bytes();
+                m_Socket.WriteBinary(echoOn, 0, echoOn.Length);
+            }
+
             public override string ReadLine(string p, bool echoInput)
             {
                 string text = string.Empty;
+                if(!echoInput)
+                {
+                    DisableEcho();
+                }
                 if (!string.IsNullOrEmpty(p))
                 {
                     Write(p);
                 }
                 HttpWebSocket.Message msg;
-                do
+                try
                 {
-redo:
-                    try
+                    do
                     {
-                        msg = m_Socket.Receive();
-                    }
-                    catch (HttpWebSocket.MessageTimeoutException)
-                    {
-                        /* only ignore this if text is not set to anything yet */
-                        if(text.Length == 0)
+                    redo:
+                        try
                         {
-                            throw;
+                            msg = m_Socket.Receive();
                         }
-                        goto redo;
-                    }
-                    if (msg.Type == HttpWebSocket.MessageType.Text)
+                        catch (HttpWebSocket.MessageTimeoutException)
+                        {
+                            /* only ignore this if text is not set to anything yet */
+                            if (text.Length == 0)
+                            {
+                                throw;
+                            }
+                            goto redo;
+                        }
+                        if (msg.Type == HttpWebSocket.MessageType.Text)
+                        {
+                            text += msg.Data.FromUTF8Bytes();
+                        }
+                    } while (!msg.IsLastSegment || msg.Type != HttpWebSocket.MessageType.Text);
+                    if (!echoInput)
                     {
-                        text += msg.Data.FromUTF8Bytes();
+                        EnableEcho();
                     }
-                } while (!msg.IsLastSegment || msg.Type != HttpWebSocket.MessageType.Text);
+                }
+                finally
+                {
+                    if (!echoInput)
+                    {
+                        EnableEcho();
+                    }
+                }
                 return text;
             }
         }
