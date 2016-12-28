@@ -85,7 +85,7 @@ namespace SilverSim.Http
             if(m_BufferFill == m_BufferPos)
             {
                 m_BufferPos = 0;
-                m_BufferFill = 0; /* reset buffer fill first */
+                m_BufferFill = 0; /* reset buffer fill first, we may leave by exception in ReadBytesInternal */
                 m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
             }
             return (m_BufferPos < m_BufferFill) ? (int)m_Buffer[m_BufferPos++] : -1;
@@ -99,7 +99,7 @@ namespace SilverSim.Http
                 if (m_BufferFill == m_BufferPos)
                 {
                     m_BufferPos = 0;
-                    m_BufferFill = 0; /* reset buffer fill first */
+                    m_BufferFill = 0; /* reset buffer fill first, we may leave by exception in ReadBytesInternal */
                     m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
                     if (m_BufferFill == 0)
                     {
@@ -133,7 +133,7 @@ namespace SilverSim.Http
                 if(m_BufferFill == m_BufferPos)
                 {
                     m_BufferPos = 0;
-                    m_BufferFill = 0; /* reset buffer fill first */
+                    m_BufferFill = 0; /* reset buffer fill first, we may leave by exception in ReadBytesInternal */
                     m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
                     if(m_BufferFill == 0)
                     {
