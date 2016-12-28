@@ -11,7 +11,6 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public class HttpWebSocket : IDisposable
     {
-        readonly static ILog m_Log = LogManager.GetLogger("WEBSOCKET");
         static Random Random = new Random();
         static byte[] MaskingKey
         {
@@ -90,7 +89,6 @@ namespace SilverSim.Main.Common.HttpServer
                     if (2 != m_WebSocketStream.Read(hdr, 0, 2))
                     {
                         m_IsClosed = true;
-                        m_Log.Debug("Failed to read header");
                         throw new WebSocketClosedException();
                     }
                 }
@@ -112,7 +110,6 @@ namespace SilverSim.Main.Common.HttpServer
                     if (8 != m_WebSocketStream.Read(leninfo, 0, 8))
                     {
                         m_IsClosed = true;
-                        m_Log.Debug("Failed to read 64 bit length");
                         throw new WebSocketClosedException();
                     }
                     if (BitConverter.IsLittleEndian)
@@ -127,7 +124,6 @@ namespace SilverSim.Main.Common.HttpServer
                     if (2 != m_WebSocketStream.Read(leninfo, 0, 2))
                     {
                         m_IsClosed = true;
-                        m_Log.Debug("Failed to read 16 bit length");
                         throw new WebSocketClosedException();
                     }
                     if (BitConverter.IsLittleEndian)
@@ -140,14 +136,12 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     payloadlen = hdr[1] & 0x7F;
                 }
-                m_Log.DebugFormat("Received ws message op={0} len={1} mask={2}", opcode.ToString(), payloadlen, ((hdr[1] & 128) != 0).ToString());
                 byte[] maskingkey = new byte[4] { 0, 0, 0, 0 };
                 if ((hdr[1] & 128) != 0)
                 {
                     if (4 != m_WebSocketStream.Read(maskingkey, 0, 4))
                     {
                         m_IsClosed = true;
-                        m_Log.Debug("Failed to read masking bytes");
                         throw new WebSocketClosedException();
                     }
                 }
@@ -156,7 +150,6 @@ namespace SilverSim.Main.Common.HttpServer
                 if (payloadlen != m_WebSocketStream.Read(payload, 0, payloadlen))
                 {
                     m_IsClosed = true;
-                    m_Log.DebugFormat("Failed to read payload (bytes={0})", payloadlen);
                     throw new WebSocketClosedException();
                 }
                 for (int offset = 0; offset < payloadlen; ++offset)
