@@ -1,11 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Http;
+using SilverSim.Types;
 using System;
 using System.IO;
-using SilverSim.Types;
-using SilverSim.Http;
-using log4net;
 
 namespace SilverSim.Main.Common.HttpServer
 {
