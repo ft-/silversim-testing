@@ -162,6 +162,17 @@ namespace SilverSim.Main.Common
 
         ~ConfigurationLoader()
         {
+            if (!string.IsNullOrEmpty(m_PIDFile))
+            {
+                try
+                {
+                    File.Delete(m_PIDFile);
+                }
+                catch (Exception e)
+                {
+                    m_Log.Error(string.Format("Error removing PID file \"{0}\"", m_PIDFile), e);
+                }
+            }
             m_ShutdownEvent.Dispose();
         }
 
@@ -1331,6 +1342,8 @@ namespace SilverSim.Main.Common
             }
         }
 
+        string m_PIDFile = string.Empty;
+
         void CtrlCHandler(object o, ConsoleCancelEventArgs e)
         {
             m_ShutdownEvent.Set();
@@ -1527,6 +1540,7 @@ namespace SilverSim.Main.Common
             if(startupConfig != null)
             {
                 logConfigFile = startupConfig.GetString("LogConfig", string.Empty);
+
             }
 
             try
@@ -1551,8 +1565,6 @@ namespace SilverSim.Main.Common
             {
                 XmlConfigurator.Configure(new System.IO.FileInfo(logConfigFile));
                 m_Log = LogManager.GetLogger("MAIN");
-                m_Log.InfoFormat("configured log4net using \"{0}\" as configuration file",
-                                 logConfigFile);
             }
             else if(defaultLogConfigName.Length != 0)
             {
@@ -1564,14 +1576,12 @@ namespace SilverSim.Main.Common
                     }
                     XmlConfigurator.Configure(s);
                     m_Log = LogManager.GetLogger("MAIN");
-                    m_Log.Info("configured log4net using defaults");
                 }
             }
             else
             {
                 XmlConfigurator.Configure();
                 m_Log = LogManager.GetLogger("MAIN");
-                m_Log.Info("configured log4net using defaults");
             }
 
             IConfig heloConfig = m_Config.Configs["Helo.Headers"];
@@ -1598,6 +1608,42 @@ namespace SilverSim.Main.Common
             else if (null == consoleConfig || consoleConfig.GetBoolean("EnableLogConsole", false) && localConsoleControl == LocalConsole.Allowed)
             {
                 PluginInstances.Add("LogConsole", new Console.LogConsole(consoleTitle));
+            }
+
+            if (startupConfig != null)
+            {
+                string pidFile = startupConfig.GetString("PIDFile", string.Empty);
+
+                if (pidFile.Length != 0)
+                {
+                    pidFile = Path.GetFullPath(pidFile);
+
+                    if (File.Exists(pidFile))
+                    {
+                        m_Log.ErrorFormat(
+                            "Old pid file {0} still exists on startup.  May be a previous unclean shutdown.",
+                            pidFile);
+                    }
+
+                    try
+                    {
+                        string pidstring = Process.GetCurrentProcess().Id.ToString();
+
+                        using (FileStream fs = File.Create(pidFile))
+                        {
+                            byte[] buf = pidstring.ToUTF8Bytes();
+                            fs.Write(buf, 0, buf.Length);
+                        }
+
+                        m_PIDFile = pidFile;
+
+                        m_Log.InfoFormat("Created pid file {0}", pidFile);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Warn(string.Format("Could not create PID file \"{0}\"", pidFile), e);
+                    }
+                }
             }
 
             m_Log.InfoFormat("Product: {0}", VersionInfo.ProductName);
