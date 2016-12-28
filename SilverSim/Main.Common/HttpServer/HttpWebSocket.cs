@@ -11,6 +11,15 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public class HttpWebSocket : IDisposable
     {
+        [Serializable]
+        public class MessageTimeoutException : Exception
+        {
+            public MessageTimeoutException()
+            {
+
+            }
+        }
+
         static Random Random = new Random();
         static byte[] MaskingKey
         {
@@ -94,7 +103,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch(HttpStream.TimeoutException)
                 {
-                    continue;
+                    throw new MessageTimeoutException();
                 }
 
                 OpCode opcode = (OpCode)(hdr[0] & 0xF);

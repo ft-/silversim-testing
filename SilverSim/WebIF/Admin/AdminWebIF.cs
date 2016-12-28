@@ -550,7 +550,20 @@ namespace SilverSim.WebIF.Admin
                 HttpWebSocket.Message msg;
                 do
                 {
-                    msg = m_Socket.Receive();
+redo:
+                    try
+                    {
+                        msg = m_Socket.Receive();
+                    }
+                    catch (HttpWebSocket.MessageTimeoutException)
+                    {
+                        /* only ignore this if text is not set to anything yet */
+                        if(text.Length == 0)
+                        {
+                            throw;
+                        }
+                        goto redo;
+                    }
                     if (msg.Type == HttpWebSocket.MessageType.Text)
                     {
                         text += msg.Data.FromUTF8Bytes();
@@ -568,7 +581,15 @@ namespace SilverSim.WebIF.Admin
             {
                 while(!m_ShutdownHandlerThreads)
                 {
-                    string cmd = tty.ReadLine("", false);
+                    string cmd;
+                    try
+                    {
+                        cmd = tty.ReadLine(string.Empty, false);
+                    }
+                    catch (HttpWebSocket.MessageTimeoutException)
+                    {
+                        continue;
+                    }
                     tty.SelectedScene = GetSelectedRegion(req, jsondata);
                     m_Loader.CommandRegistry.ExecuteCommand(tty.GetCmdLine(cmd), tty);
                     SetSelectedRegion(req, jsondata, tty.SelectedScene);
@@ -615,7 +636,14 @@ namespace SilverSim.WebIF.Admin
                         {
                             while(!m_ShutdownHandlerThreads)
                             {
-                                sock.Receive();
+                                try
+                                {
+                                    sock.Receive();
+                                }
+                                catch(HttpWebSocket.MessageTimeoutException)
+                                {
+                                    /* ignore this exception */
+                                }
                             }
                         }
                         catch(WebSocketClosedException)
