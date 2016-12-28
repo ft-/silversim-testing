@@ -63,7 +63,8 @@ namespace SilverSim.WebIF.Admin
         readonly public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> m_AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(delegate () { return new RwLockedList<string>(); });
         public readonly RwLockedDictionary<string, Action<HttpRequest, Map>> m_JsonMethods = new RwLockedDictionary<string, Action<HttpRequest, Map>>();
         public readonly RwLockedList<string> m_Modules = new RwLockedList<string>();
-        public readonly RwLockedList<HttpWebSocket> m_LogReceivers = new RwLockedList<HttpWebSocket>();
+        public readonly RwLockedList<HttpWebSocket> m_LogPlainReceivers = new RwLockedList<HttpWebSocket>();
+        public readonly RwLockedList<HttpWebSocket> m_LogHtmlReceivers = new RwLockedList<HttpWebSocket>();
 
         public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights
         {
@@ -94,6 +95,15 @@ namespace SilverSim.WebIF.Admin
 
         bool m_ShutdownHandlerThreads;
 
+        private static readonly string[] LogColors =
+        {
+            "blue",
+            "green",
+            "cyan",
+            "magenta",
+            "yellow"
+        };
+
         void LogThread()
         {
             while(!m_ShutdownHandlerThreads)
@@ -108,19 +118,62 @@ namespace SilverSim.WebIF.Admin
                     continue;
                 }
 
-                List<HttpWebSocket> conns = new List<HttpWebSocket>();
-                m_LogReceivers.ForEach(delegate (HttpWebSocket sock)
+                List<HttpWebSocket> plaintext_conns = new List<HttpWebSocket>();
+                m_LogPlainReceivers.ForEach(delegate (HttpWebSocket sock)
                 {
-                    conns.Add(sock);
+                    plaintext_conns.Add(sock);
                 });
 
-                LoggingEventData data = logevent.GetLoggingEventData();
-                string msg = string.Format("{0} - {1:5} [{2}]: {3}",
-                    data.TimeStamp.ToString(),
-                    data.Level.Name,
-                    data.LoggerName,
-                    data.Message);
-                foreach(HttpWebSocket conn in conns)
+                List<HttpWebSocket> html_conns = new List<HttpWebSocket>();
+                m_LogHtmlReceivers.ForEach(delegate (HttpWebSocket sock)
+                {
+                    html_conns.Add(sock);
+                });
+
+                string colorbegin = string.Empty;
+                string colorend = string.Empty;
+                string fullcolorbegin = string.Empty;
+                string fullcolorend = string.Empty;
+                if(logevent.Level == Level.Error)
+                {
+                    fullcolorbegin = "<span style=\"color: red;\">";
+                    fullcolorend = "</span>";
+                }
+                else if(logevent.Level == Level.Warn)
+                {
+                    fullcolorbegin = "<span style=\"color: yellow;\">";
+                    fullcolorend = "</span>";
+                }
+                else
+                {
+                    colorbegin = "<span style=\"color: " + LogColors[(Math.Abs(logevent.LoggerName.ToUpper().GetHashCode()) % LogColors.Length)] + "\">";
+                    colorend = "</span>";
+                }
+                string msg = string.Format("{0}{1} - [{2}{3}{4}]: {5}{6}",
+                    fullcolorbegin,
+                    System.Web.HttpUtility.HtmlEncode(logevent.TimeStamp.ToString()),
+                    colorbegin,
+                    System.Web.HttpUtility.HtmlEncode(logevent.LoggerName),
+                    colorend,
+                    System.Web.HttpUtility.HtmlEncode(logevent.RenderedMessage.ToString()),
+                    fullcolorend);
+                foreach(HttpWebSocket conn in html_conns)
+                {
+                    try
+                    {
+                        conn.WriteText(msg);
+                    }
+                    catch
+                    {
+                        /* intentionally ignored */
+                    }
+                }
+                msg = string.Format("{0} - {1:-5} [{2}]: {3}",
+                    logevent.TimeStamp.ToString(),
+                    logevent.Level.Name,
+                    logevent.LoggerName,
+                    logevent.RenderedMessage.ToString());
+                foreach (HttpWebSocket conn in plaintext_conns)
                 {
                     try
                     {
@@ -636,11 +689,50 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
+        void HandleWebSocketLog(HttpRequest req, RwLockedList<HttpWebSocket> logreceivers)
+        {
+            using (HttpWebSocket sock = req.BeginWebSocket("log"))
+            {
+                sock.WriteText("Active");
+                logreceivers.Add(sock);
+                try
+                {
+                    while (!m_ShutdownHandlerThreads)
+                    {
+                        try
+                        {
+                            sock.Receive();
+                        }
+                        catch (HttpWebSocket.MessageTimeoutException)
+                        {
+                            /* ignore this exception */
+                        }
+                    }
+                    if (m_ShutdownHandlerThreads)
+                    {
+                        sock.Close(HttpWebSocket.CloseReason.GoingAway);
+                    }
+                }
+                catch (WebSocketClosedException)
+                {
+
+                }
+                catch (Exception e)
+                {
+                    m_Log.Error("Exception during providing real-time log data", e);
+                }
+                finally
+                {
+                    logreceivers.Remove(sock);
+                }
+            }
+        }
+
         public void HandleHttp(HttpRequest req)
         {
             try
             {
-                if(req.RawUrl == "/admin/log" ||req.RawUrl == "/admin/console")
+                if(req.RawUrl == "/admin/log" || req.RawUrl == "/admin/console" || req.RawUrl == "/admin/loghtml")
                 {
                     req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                     return;
@@ -667,44 +759,33 @@ namespace SilverSim.WebIF.Admin
                         sessionInfo.LastSeenTickCount = Environment.TickCount;
                     }
 
-                    using (HttpWebSocket sock = req.BeginWebSocket("log"))
-                    {
-                        sock.WriteText("Active");
-                        m_LogReceivers.Add(sock);
-                        try
-                        {
-                            while(!m_ShutdownHandlerThreads)
-                            {
-                                try
-                                {
-                                    sock.Receive();
-                                }
-                                catch(HttpWebSocket.MessageTimeoutException)
-                                {
-                                    /* ignore this exception */
-                                }
-                            }
-                            if(m_ShutdownHandlerThreads)
-                            {
-                                sock.Close(HttpWebSocket.CloseReason.GoingAway);
-                            }
-                        }
-                        catch(WebSocketClosedException)
-                        {
-
-                        }
-                        catch(Exception e)
-                        {
-                            m_LogReceivers.Remove(sock);
-                            m_Log.Error("Exception during providing real-time log data", e);
-                        }
-                        finally
-                        {
-                            m_LogReceivers.Remove(sock);
-                        }
-                    }
+                    HandleWebSocketLog(req, m_LogPlainReceivers);
                 }
-                else if(req.RawUrl.StartsWith("/admin/console/"))
+                else if (req.RawUrl.StartsWith("/admin/loghtml/"))
+                {
+                    if (!req.IsWebSocket)
+                    {
+                        req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                    }
+
+                    SessionInfo sessionInfo;
+                    string sessionKey = req.CallerIP + "+" + req.RawUrl.Substring(15);
+                    if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
+                                    !sessionInfo.IsAuthenticated ||
+                                    (!sessionInfo.Rights.Contains("log.view") &&
+                                    !sessionInfo.Rights.Contains("admin.all")))
+                    {
+                        req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                        return;
+                    }
+                    else
+                    {
+                        sessionInfo.LastSeenTickCount = Environment.TickCount;
+                    }
+
+                    HandleWebSocketLog(req, m_LogHtmlReceivers);
+                }
+                else if (req.RawUrl.StartsWith("/admin/console/"))
                 {
                     if (!req.IsWebSocket)
                     {
