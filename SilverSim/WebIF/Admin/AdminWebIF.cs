@@ -92,11 +92,11 @@ namespace SilverSim.WebIF.Admin
         readonly Timer m_Timer = new Timer(1);
         readonly bool m_EnableSetPasswordCommand;
 
-        bool m_ShutdownLogThread;
+        bool m_ShutdownHandlerThreads;
 
         void LogThread()
         {
-            while(!m_ShutdownLogThread)
+            while(!m_ShutdownHandlerThreads)
             {
                 LoggingEvent logevent;
                 try
@@ -334,7 +334,7 @@ namespace SilverSim.WebIF.Admin
         public void Shutdown()
         {
             LogController.Queues.Remove(m_LogEventQueue);
-            m_ShutdownLogThread = true;
+            m_ShutdownHandlerThreads = true;
             m_Loader = null;
             JsonMethods.Clear();
             m_HttpServer.StartsWithUriHandlers.Remove("/admin");
@@ -566,7 +566,7 @@ namespace SilverSim.WebIF.Admin
             jsondata.Add("sessionid", sessionid);
             using (WebSocketTTY tty = new WebSocketTTY(req.BeginWebSocket("console")))
             {
-                for (;;)
+                while(!m_ShutdownHandlerThreads)
                 {
                     string cmd = tty.ReadLine("", false);
                     tty.SelectedScene = GetSelectedRegion(req, jsondata);
@@ -613,7 +613,7 @@ namespace SilverSim.WebIF.Admin
                         m_LogReceivers.Add(sock);
                         try
                         {
-                            for(;;)
+                            while(!m_ShutdownHandlerThreads)
                             {
                                 sock.Receive();
                             }

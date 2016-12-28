@@ -5,11 +5,13 @@ using System;
 using System.IO;
 using SilverSim.Types;
 using SilverSim.Http;
+using log4net;
 
 namespace SilverSim.Main.Common.HttpServer
 {
     public class HttpWebSocket : IDisposable
     {
+        readonly static ILog m_Log = LogManager.GetLogger("WEBSOCKET");
         static Random Random = new Random();
         static byte[] MaskingKey
         {
@@ -75,6 +77,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public Message Receive()
         {
+            m_WebSocketStream.ReadTimeout = 1000;
             for (;;)
             {
                 byte[] hdr = new byte[2];
@@ -87,6 +90,7 @@ namespace SilverSim.Main.Common.HttpServer
                     if (2 != m_WebSocketStream.Read(hdr, 0, 2))
                     {
                         m_IsClosed = true;
+                        m_Log.Debug("Failed to read header");
                         throw new WebSocketClosedException();
                     }
                 }
@@ -108,6 +112,7 @@ namespace SilverSim.Main.Common.HttpServer
                     if (8 != m_WebSocketStream.Read(leninfo, 0, 8))
                     {
                         m_IsClosed = true;
+                        m_Log.Debug("Failed to read 64 bit length");
                         throw new WebSocketClosedException();
                     }
                     if (BitConverter.IsLittleEndian)
@@ -122,6 +127,7 @@ namespace SilverSim.Main.Common.HttpServer
                     if (2 != m_WebSocketStream.Read(leninfo, 0, 2))
                     {
                         m_IsClosed = true;
+                        m_Log.Debug("Failed to read 16 bit length");
                         throw new WebSocketClosedException();
                     }
                     if (BitConverter.IsLittleEndian)
@@ -134,36 +140,26 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     payloadlen = hdr[1] & 0x7F;
                 }
+                m_Log.DebugFormat("Received ws message op={0} len={1} mask={2}", opcode.ToString(), payloadlen, ((hdr[1] & 128) != 0).ToString());
                 byte[] maskingkey = new byte[4] { 0, 0, 0, 0 };
                 if ((hdr[1] & 128) != 0)
                 {
                     if (4 != m_WebSocketStream.Read(maskingkey, 0, 4))
                     {
                         m_IsClosed = true;
+                        m_Log.Debug("Failed to read masking bytes");
                         throw new WebSocketClosedException();
                     }
                 }
 
                 byte[] payload = new byte[payloadlen];
-                int offset = 0;
-                while (payloadlen - offset > 10240)
+                if (payloadlen != m_WebSocketStream.Read(payload, 0, payloadlen))
                 {
-                    if (10240 != m_WebSocketStream.Read(payload, offset, 10240))
-                    {
-                        m_IsClosed = true;
-                        throw new WebSocketClosedException();
-                    }
-                    offset += 10240;
+                    m_IsClosed = true;
+                    m_Log.DebugFormat("Failed to read payload (bytes={0})", payloadlen);
+                    throw new WebSocketClosedException();
                 }
-                if (payloadlen > offset)
-                {
-                    if (payloadlen - offset != m_WebSocketStream.Read(payload, offset, payloadlen - offset))
-                    {
-                        m_IsClosed = true;
-                        throw new WebSocketClosedException();
-                    }
-                }
-                for (offset = 0; offset < payloadlen; ++offset)
+                for (int offset = 0; offset < payloadlen; ++offset)
                 {
                     payload[offset] ^= maskingkey[offset % 4];
                 }
