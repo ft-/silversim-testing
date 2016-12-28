@@ -1331,6 +1331,12 @@ namespace SilverSim.Main.Common
             }
         }
 
+        void CtrlCHandler(object o, ConsoleCancelEventArgs e)
+        {
+            m_ShutdownEvent.Set();
+            e.Cancel = true;
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
@@ -1411,21 +1417,6 @@ namespace SilverSim.Main.Common
             defaultConfigName = modeConfig.GetString("DefaultConfigName", string.Empty);
             defaultsIniName = modeConfig.GetString("DefaultsIniName", string.Empty);
             string defaultLogConfigName = modeConfig.GetString("DefaultLogConfig", "default.log.config");
-            if (modeConfig.GetBoolean("TreatControlCAsInput", true))
-            {
-                try
-                {
-                    System.Console.TreatControlCAsInput = true;
-                }
-                catch
-                {
-                    /* intentionally ignored */
-                }
-            }
-            else
-            {
-                KnownConfigurationIssues.Add("Control-C is not set as input. Do not use -m=testing for production use.");
-            }
 
             string mainConfig = startup.GetString("config", defaultConfigName);
 
@@ -1537,6 +1528,23 @@ namespace SilverSim.Main.Common
             {
                 logConfigFile = startupConfig.GetString("LogConfig", string.Empty);
             }
+
+            try
+            {
+                if (startupConfig == null || startupConfig.GetBoolean("TreatControlCAsInput", true))
+                {
+                    System.Console.TreatControlCAsInput = true;
+                }
+                else
+                {
+                    System.Console.CancelKeyPress += CtrlCHandler;
+                }
+            }
+            catch
+            {
+                /* intentionally ignored */
+            }
+
 
             /* Initialize Log system */
             if (logConfigFile.Length != 0)
