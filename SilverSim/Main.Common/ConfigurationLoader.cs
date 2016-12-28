@@ -1411,6 +1411,21 @@ namespace SilverSim.Main.Common
             defaultConfigName = modeConfig.GetString("DefaultConfigName", string.Empty);
             defaultsIniName = modeConfig.GetString("DefaultsIniName", string.Empty);
             string defaultLogConfigName = modeConfig.GetString("DefaultLogConfig", "default.log.config");
+            if (modeConfig.GetBoolean("TreatControlCAsInput", true))
+            {
+                try
+                {
+                    System.Console.TreatControlCAsInput = true;
+                }
+                catch
+                {
+                    /* intentionally ignored */
+                }
+            }
+            else
+            {
+                KnownConfigurationIssues.Add("Control-C is not set as input");
+            }
 
             string mainConfig = startup.GetString("config", defaultConfigName);
 

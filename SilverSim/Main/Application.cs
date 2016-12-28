@@ -13,8 +13,6 @@ namespace SilverSim.Main
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         static void Main(string[] args)
         {
-            Console.TreatControlCAsInput = true;
-
             Thread.CurrentThread.Name = "SilverSim:Main";
 
             /* by not hard referencing the assembly we can actually implement an updater concept here */
