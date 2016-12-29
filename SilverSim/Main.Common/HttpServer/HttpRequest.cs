@@ -258,7 +258,8 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 Expect100Continue = true;
             }
-            
+
+            bool havePostData = false;
             if (ContainsHeader("Content-Length"))
             {
                 /* there is a body */
@@ -290,36 +291,7 @@ namespace SilverSim.Main.Common.HttpServer
                     }
                 }
 
-                string contentEncoding = string.Empty;
-                if(m_Headers.ContainsKey("Content-Encoding"))
-                {
-                    contentEncoding = m_Headers["Content-Encoding"];
-                }
-                else if (m_Headers.ContainsKey("X-Content-Encoding"))
-                {
-                    contentEncoding = m_Headers["X-Content-Encoding"];
-                }
-                else
-                {
-                    contentEncoding = "identity";
-                }
-
-                /* check for gzip encoding */
-                if (contentEncoding == "gzip" || contentEncoding == "x-gzip") /* x-gzip is deprecated as per RFC7230 but better accept it if sent */
-                {
-                    Body = new GZipStream(Body, CompressionMode.Decompress);
-                }
-                else if(contentEncoding == "identity")
-                {
-                    /* word is a synomyn for no-encoding so we use it for code simplification */
-                    /* no additional action required, identity is simply transfer as-is */
-                }
-                else
-                {
-                    ConnectionMode = HttpConnectionMode.Close;
-                    ErrorResponse(HttpStatusCode.NotImplemented, "Content-Encoding not accepted");
-                    throw new InvalidDataException();
-                }
+                havePostData = true;
             }
             else if(ContainsHeader("Transfer-Encoding"))
             {
@@ -352,6 +324,42 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
                     m_HttpStream.Write(b, 0, b.Length);
+                }
+
+                havePostData = true;
+            }
+
+            if(havePostData)
+            {
+                string contentEncoding = string.Empty;
+                if (m_Headers.ContainsKey("Content-Encoding"))
+                {
+                    contentEncoding = m_Headers["Content-Encoding"];
+                }
+                else if (m_Headers.ContainsKey("X-Content-Encoding"))
+                {
+                    contentEncoding = m_Headers["X-Content-Encoding"];
+                }
+                else
+                {
+                    contentEncoding = "identity";
+                }
+
+                /* check for gzip encoding */
+                if (contentEncoding == "gzip" || contentEncoding == "x-gzip") /* x-gzip is deprecated as per RFC7230 but better accept it if sent */
+                {
+                    Body = new GZipStream(Body, CompressionMode.Decompress);
+                }
+                else if (contentEncoding == "identity")
+                {
+                    /* word is a synomyn for no-encoding so we use it for code simplification */
+                    /* no additional action required, identity is simply transfer as-is */
+                }
+                else
+                {
+                    ConnectionMode = HttpConnectionMode.Close;
+                    ErrorResponse(HttpStatusCode.NotImplemented, "Content-Encoding not accepted");
+                    throw new InvalidDataException();
                 }
             }
 
