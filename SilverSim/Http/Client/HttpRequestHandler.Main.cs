@@ -142,7 +142,21 @@ namespace SilverSim.Http.Client
                 string.Format("{0} {1} HTTP/1.1\r\nHost: {2}:{3}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host, uri.Port);
 
             bool doPost = false;
-            if (content_type.Length != 0)
+            bool doChunked = false;
+            string encval;
+            if(headers.TryGetValue("Transfer-Encoding", out encval) && encval == "chunked")
+            {
+                doPost = true;
+                doChunked = true;
+                reqdata += string.Format("Content-Type: {0}\r\n", content_type);
+                if (compressed && content_type != "application/x-gzip")
+                {
+                    reqdata += "X-Content-Encoding: gzip\r\n";
+                }
+
+                reqdata += "Expect: 100-continue\r\n";
+            }
+            else if (content_type.Length != 0)
             {
                 doPost = true;
                 reqdata += string.Format("Content-Type: {0}\r\nContent-Length: {1}\r\n", content_type, content_length);
@@ -150,7 +164,6 @@ namespace SilverSim.Http.Client
                 {
                     reqdata += "X-Content-Encoding: gzip\r\n";
                 }
-
 
                 reqdata += "Expect: 100-continue\r\n";
             }
@@ -255,10 +268,21 @@ namespace SilverSim.Http.Client
                     /* keep caller from being exceptioned */
                 }
 
-                /* append request POST data */
-                using (RequestBodyStream reqbody = new RequestBodyStream(s, content_length))
+                if (doChunked)
                 {
-                    postdelegate(reqbody);
+                    /* append request POST data */
+                    using (HttpWriteChunkedBodyStream reqbody = new HttpWriteChunkedBodyStream(s))
+                    {
+                        postdelegate(reqbody);
+                    }
+                }
+                else
+                {
+                    /* append request POST data */
+                    using (RequestBodyStream reqbody = new RequestBodyStream(s, content_length))
+                    {
+                        postdelegate(reqbody);
+                    }
                 }
                 s.Flush();
             }

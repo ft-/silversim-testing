@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 
 namespace SilverSim.Viewer.Friends
@@ -522,7 +523,7 @@ namespace SilverSim.Viewer.Friends
                 return false;
             }
 
-            string handlerType;
+            string[] handlerType;
             string homeURI = agent.HomeURI.ToString();
             try
             {
@@ -537,7 +538,7 @@ namespace SilverSim.Viewer.Friends
 
             foreach(IUserAgentServicePlugin service in m_UserAgentPlugins)
             {
-                if(service.Name == handlerType)
+                if(handlerType.Contains(service.Name))
                 {
                     userAgentService = service.Instantiate(homeURI);
                     break;
@@ -576,7 +577,7 @@ namespace SilverSim.Viewer.Friends
 
             foreach (IFriendsServicePlugin service in m_FriendsPlugins)
             {
-                if (service.Name == handlerType)
+                if (handlerType.Contains(service.Name))
                 {
                     friendsService = service.Instantiate(friendsUri);
                     return true;

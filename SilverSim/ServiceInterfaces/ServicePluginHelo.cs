@@ -5,6 +5,7 @@ using SilverSim.Http.Client;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 
 namespace SilverSim.ServiceInterfaces
 {
@@ -50,21 +51,23 @@ namespace SilverSim.ServiceInterfaces
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public static string HeloRequest_HandleType(string uri)
+        public static string[] HeloRequest_HandleType(string uri)
         {
             Dictionary<string, string> headers = HeloRequest(uri);
-            if (!headers.ContainsKey("X-Handlers-Provided"))
+            string protocols;
+            if(!headers.TryGetValue("X-Protocols-Provided", out protocols) &&
+                !headers.TryGetValue("X-Handlers-Provided",out protocols))
             {
-                return "opensim-robust"; /* let us assume Robust API */
+                protocols = "opensim-robust";
             }
-            return headers["X-Handlers-Provided"];
+            return protocols.Split(',');
         }
 
         public abstract string Name { get; }
 
         public bool IsProtocolSupported(string url)
         {
-            return HeloRequest_HandleType(url) == Name;
+            return HeloRequest_HandleType(url).Contains(Name);
         }
     }
 }
