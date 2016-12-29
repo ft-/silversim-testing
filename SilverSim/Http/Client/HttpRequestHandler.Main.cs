@@ -144,7 +144,7 @@ namespace SilverSim.Http.Client
             bool doPost = false;
             bool doChunked = false;
             string encval;
-            if(headers.TryGetValue("Transfer-Encoding", out encval) && encval == "chunked")
+            if(headers != null && headers.TryGetValue("Transfer-Encoding", out encval) && encval == "chunked")
             {
                 doPost = true;
                 doChunked = true;
