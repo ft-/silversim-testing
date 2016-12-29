@@ -281,10 +281,6 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             Body = new GZipStream(Body, CompressionMode.Decompress);
                         }
-                        else if(transferEncoding == "chunked")
-                        {
-                            Body = new HttpReadChunkedBodyStream(Body);
-                        }
                         else
                         {
                             ConnectionMode = HttpConnectionMode.Close;
@@ -351,6 +347,11 @@ namespace SilverSim.Main.Common.HttpServer
                         ErrorResponse(HttpStatusCode.NotImplemented, "Transfer-Encoding " + transferEncoding + " not implemented");
                         throw new InvalidDataException();
                     }
+                }
+                if (Expect100Continue)
+                {
+                    byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
+                    m_HttpStream.Write(b, 0, b.Length);
                 }
             }
 

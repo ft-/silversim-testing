@@ -175,12 +175,13 @@ namespace SilverSim.Http.Client
 
                 while (count > 0)
                 {
-                    if (count > m_RemainingLength)
+                    int remcount = count;
+                    if (remcount > m_RemainingLength)
                     {
-                        count = (int)m_RemainingLength;
+                        remcount = (int)m_RemainingLength;
                     }
                     
-                    result = m_Input.Read(buffer, offset, count > 10240 ? 10240 : count);
+                    result = m_Input.Read(buffer, offset, remcount > 10240 ? 10240 : remcount);
 
                     if (result > 0)
                     {
