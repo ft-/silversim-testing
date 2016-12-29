@@ -465,10 +465,12 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         if (req.MajorVersion != 2 || req.MinorVersion != 0 || req.IsSsl)
                         {
+                            req.SetConnectionClose();
                             req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                         }
                         else
                         {
+                            req.SetConnectionClose();
                             req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                         }
                         return;
@@ -476,8 +478,9 @@ namespace SilverSim.Main.Common.HttpServer
 
                     if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
                     {
+                        req.SetConnectionClose();
                         req.ErrorResponse(HttpStatusCode.LengthRequired, "Length Required");
-                        continue;
+                        return;
                     }
 
                     Action<HttpRequest> del;
