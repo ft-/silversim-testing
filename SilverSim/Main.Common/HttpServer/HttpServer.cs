@@ -460,10 +460,24 @@ namespace SilverSim.Main.Common.HttpServer
                         return;
                     }
 
+                    /* Recognition for plaintext HTTP/2.0 connection */
+                    if(req.Method == "PRI")
+                    {
+                        if (req.MajorVersion != 2 || req.MinorVersion != 0 || req.IsSsl)
+                        {
+                            req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                        }
+                        else
+                        {
+                            req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                        }
+                        return;
+                    }
+
                     if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
                     {
-                        HttpResponse res = req.BeginResponse(HttpStatusCode.LengthRequired, "Length Required");
-                        res.Close();
+                        req.ErrorResponse(HttpStatusCode.LengthRequired, "Length Required");
+                        continue;
                     }
 
                     Action<HttpRequest> del;
