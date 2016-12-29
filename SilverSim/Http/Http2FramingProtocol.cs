@@ -6,7 +6,7 @@ using System.IO;
 
 namespace SilverSim.Http
 {
-    public class Http2Framing : IDisposable
+    public abstract class Http2FramingProtocol : IDisposable
     {
         Stream m_OriginalStream;
         bool m_DisposeFlag;
@@ -20,7 +20,7 @@ namespace SilverSim.Http
             }
         }
 
-        public Http2Framing(Stream originalStream, bool dispose = true)
+        protected Http2FramingProtocol(Stream originalStream, bool dispose = true)
         {
             m_OriginalStream = originalStream;
             m_DisposeFlag = dispose;
@@ -35,7 +35,7 @@ namespace SilverSim.Http
             }
         }
 
-        public enum GoAwayReasonCode
+        protected enum GoAwayReasonCode
         {
             NoError = 0,
             ProtocolError = 1,
@@ -53,7 +53,7 @@ namespace SilverSim.Http
             Http11Required = 13
         }
 
-        public enum Http2FrameType
+        protected enum Http2FrameType : byte
         {
             Data = 0x0,
             Headers = 0x1,
@@ -67,6 +67,46 @@ namespace SilverSim.Http
             Continuation = 0x9
         }
 
+        [Flags]
+        protected enum DataFrameFlags : byte
+        {
+            EndStream = 0x1,
+            Padded = 0x8
+        }
+
+        [Flags]
+        protected enum HeadersFrameFlags : byte
+        {
+            EndStream = 0x1,
+            EndHeaders = 0x4,
+            Padded = 0x8,
+            Priority = 0x20
+        }
+
+        [Flags]
+        protected enum SettingsFrameFlags : byte
+        {
+            Ack = 0x01
+        }
+
+        [Flags]
+        protected enum PushPromiseFrameFlags : byte
+        {
+            EndHeaders = 0x4,
+            Padded = 0x8
+        }
+
+        [Flags]
+        protected enum PingFrameFlags : byte
+        {
+            Ack = 0x1
+        }
+
+        [Flags]
+        protected enum ContinuationFrameFlags : byte
+        {
+            EndHeaders = 0x4
+        }
         protected sealed class Http2Frame
         {
             public int Length;
@@ -124,37 +164,56 @@ namespace SilverSim.Http
             }
         }
 
-        protected Http2Frame Receive()
+        protected Http2Frame ReceiveFrame()
         {
-            Http2Frame frame = new Http2Frame();
-            byte[] hdr = new byte[9];
-            if(9 != m_OriginalStream.Read(hdr, 0, 9))
+            Http2Frame frame;
+            do
             {
-                SendGoAway(GoAwayReasonCode.ProtocolError);
-                throw new ProtocolErrorException();
-            }
+                frame = new Http2Frame();
+                byte[] hdr = new byte[9];
+                if (9 != m_OriginalStream.Read(hdr, 0, 9))
+                {
+                    SendGoAway(GoAwayReasonCode.ProtocolError);
+                    throw new ProtocolErrorException();
+                }
 
-            frame.Length = (hdr[0] << 16) | (hdr[1] << 8) | (hdr[2]);
-            frame.Type = (Http2FrameType)hdr[3];
-            frame.Flags = hdr[4];
-            frame.StreamIdentifier = ((hdr[5] & 0x7F) << 24) | (hdr[6] << 16) | (hdr[7] << 8) | hdr[8];
-            frame.Data = new byte[frame.Length];
+                frame.Length = (hdr[0] << 16) | (hdr[1] << 8) | (hdr[2]);
+                frame.Type = (Http2FrameType)hdr[3];
+                frame.Flags = hdr[4];
+                frame.StreamIdentifier = ((hdr[5] & 0x7F) << 24) | (hdr[6] << 16) | (hdr[7] << 8) | hdr[8];
+                frame.Data = new byte[frame.Length];
 
-            int rcvdbytes;
-            try
-            {
-                rcvdbytes = m_OriginalStream.Read(frame.Data, 0, frame.Length);
-            }
-            catch
-            {
-                SendGoAway(GoAwayReasonCode.ProtocolError);
-                throw new ProtocolErrorException();
-            }
+                int rcvdbytes;
+                try
+                {
+                    rcvdbytes = m_OriginalStream.Read(frame.Data, 0, frame.Length);
+                }
+                catch
+                {
+                    SendGoAway(GoAwayReasonCode.ProtocolError);
+                    throw new ProtocolErrorException();
+                }
 
-            if (frame.Length != rcvdbytes)
-            {
-                SendGoAway(GoAwayReasonCode.ProtocolError);
-            }
+                if (frame.Length != rcvdbytes)
+                {
+                    SendGoAway(GoAwayReasonCode.ProtocolError);
+                    throw new ProtocolErrorException();
+                }
+                if(frame.Type == Http2FrameType.Ping)
+                {
+                    if(frame.StreamIdentifier != 0)
+                    {
+                        SendGoAway(GoAwayReasonCode.ProtocolError);
+                        throw new ProtocolErrorException();
+                    }
+                    if(frame.Length != 8)
+                    {
+                        SendGoAway(GoAwayReasonCode.FrameSizeError);
+                        throw new ProtocolErrorException();
+                    }
+                    SendFrame(Http2FrameType.Ping, (byte)PingFrameFlags.Ack, 0, frame.Data, 0, frame.Length);
+                }
+            } while (frame.Type == Http2FrameType.Ping);
             m_LastReceivedStreamId = frame.StreamIdentifier;
             return frame;
         }

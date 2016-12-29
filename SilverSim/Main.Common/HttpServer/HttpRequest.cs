@@ -433,6 +433,24 @@ namespace SilverSim.Main.Common.HttpServer
             return Response;
         }
 
+        public HttpResponse BeginChunkedResponse(string contentType)
+        {
+            if (Body != null)
+            {
+                Body.Close();
+                Body = null;
+            }
+            if (RawBody != null)
+            {
+                RawBody.Close();
+                RawBody = null;
+            }
+            Response = new HttpResponse(m_HttpStream, this, HttpStatusCode.OK, "OK");
+            Response.Headers["Transfer-Encoding"] = "chunked";
+            Response.Headers["Content-Type"] = contentType;
+            return Response;
+        }
+
         public bool IsWebSocket
         {
             get
