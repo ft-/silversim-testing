@@ -150,11 +150,13 @@ namespace SilverSim.Http
                     Buffer.BlockCopy(buffer, offset, StreamBuffer, BufferFill, StreamBuffer.Length - BufferFill);
                     count -= (StreamBuffer.Length - BufferFill);
                     offset += (StreamBuffer.Length - BufferFill);
+                    BufferFill = StreamBuffer.Length;
                     FlushBuffer();
                 }
                 else
                 {
                     Buffer.BlockCopy(buffer, offset, StreamBuffer, BufferFill, count);
+                    BufferFill += count;
                     count = 0;
                 }
             }

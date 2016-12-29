@@ -144,6 +144,15 @@ namespace SilverSim.Http.Client
             bool doPost = false;
             bool doChunked = false;
             string encval;
+            if(headers != null)
+            {
+                headers.Remove("Content-Length");
+                headers.Remove("Content-Type");
+                foreach (KeyValuePair<string, string> kvp in headers)
+                {
+                    reqdata += string.Format("{0}: {1}\r\n", kvp.Key, kvp.Value);
+                }
+            }
             if(headers != null && headers.TryGetValue("Transfer-Encoding", out encval) && encval == "chunked")
             {
                 doPost = true;
@@ -303,6 +312,10 @@ namespace SilverSim.Http.Client
             if (headers == null)
             {
                 headers = new Dictionary<string, string>();
+            }
+            else
+            {
+                headers.Clear();
             }
 
             if (splits[1] != "200")
