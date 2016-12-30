@@ -1718,7 +1718,7 @@ namespace SilverSim.Main.Common
 
             httpServer = new BaseHttpServer(httpConfig, this);
             PluginInstances.Add("HttpServer", httpServer);
-            httpServer.UriHandlers.Add("/helo", HeloResponseHandler);
+            httpServer.StartsWithUriHandlers.Add("/helo", HeloResponseHandler);
 
             IConfig httpsConfig = m_Config.Configs["HTTPS"];
             if(null != httpsConfig)
