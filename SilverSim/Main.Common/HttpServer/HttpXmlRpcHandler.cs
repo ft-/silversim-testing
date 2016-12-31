@@ -89,9 +89,19 @@ namespace SilverSim.Main.Common.HttpServer
         public void Startup(ConfigurationLoader loader)
         {
             m_Log.Info("Initializing XMLRPC Handler");
-            BaseHttpServer server = loader.GetService<BaseHttpServer>("HttpServer");
+            BaseHttpServer server = loader.HttpServer;
             server.RootUriContentTypeHandlers["text/xml"] = RequestHandler;
             server.RootUriContentTypeHandlers["application/xml"] = RequestHandler;
+            try
+            {
+                server = loader.HttpsServer;
+                server.RootUriContentTypeHandlers["text/xml"] = RequestHandler;
+                server.RootUriContentTypeHandlers["application/xml"] = RequestHandler;
+            }
+            catch
+            {
+                /* intentionally left empty */
+            }
         }
 
         public void Shutdown()

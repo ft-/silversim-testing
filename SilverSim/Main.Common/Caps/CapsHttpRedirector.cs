@@ -109,8 +109,16 @@ namespace SilverSim.Main.Common.Caps
         public void Startup(ConfigurationLoader loader)
         {
             m_Log.Info("Initializing Caps Http Redirector");
-            m_HttpServer = loader.GetService<BaseHttpServer>("HttpServer");
+            m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers["/CAPS/"] = RequestHandler;
+            try
+            {
+                loader.HttpsServer.StartsWithUriHandlers["/CAPS/"] = RequestHandler;
+            }
+            catch
+            {
+                /* intentionally left empty */
+            }
         }
 
         public void Shutdown()
