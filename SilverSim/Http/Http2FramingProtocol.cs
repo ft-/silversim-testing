@@ -8,8 +8,8 @@ namespace SilverSim.Http
 {
     public abstract class Http2FramingProtocol : IDisposable
     {
-        Stream m_OriginalStream;
-        bool m_DisposeFlag;
+        readonly Stream m_OriginalStream;
+        readonly bool m_DisposeFlag;
 
         [Serializable]
         public class ProtocolErrorException : Exception

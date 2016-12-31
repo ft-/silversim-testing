@@ -21,7 +21,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         GridServiceInterface m_GridService;
         RegionDefaultFlagsServiceInterface m_RegionDefaultFlagsService;
         IAdminWebIF m_WebIF;
-        UUID m_ScopeID;
+        readonly UUID m_ScopeID;
 
         public MapServerAdmin(IConfig ownSection)
         {

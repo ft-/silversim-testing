@@ -1345,7 +1345,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        string m_PIDFile = string.Empty;
+        readonly string m_PIDFile = string.Empty;
 
         void CtrlCHandler(object o, ConsoleCancelEventArgs e)
         {
