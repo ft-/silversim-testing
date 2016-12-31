@@ -15,7 +15,7 @@ using System.Timers;
 
 namespace SilverSim.Http.Client
 {
-    public static partial class HttpRequestHandler
+    public static partial class HttpClient
     {
 #if SUPPORT_PIPELINING
         public static readonly bool SupportsPipelining = true;
@@ -69,7 +69,7 @@ namespace SilverSim.Http.Client
             }
         }
 
-        static HttpRequestHandler()
+        static HttpClient()
         {
             m_Timer = new Timer(1000);
             m_Timer.Elapsed += CleanUpTimer;

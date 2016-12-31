@@ -234,7 +234,7 @@ namespace SilverSim.Scene.Types.Scene
             Dictionary<string, string> headers = new Dictionary<string,string>();
             try
             {
-                using (Stream responseStream = HttpRequestHandler.DoStreamRequest("HEAD", rinfo.ServerURI + "helo", null, string.Empty, string.Empty, false, 20000, headers))
+                using (Stream responseStream = HttpClient.DoStreamRequest("HEAD", rinfo.ServerURI + "helo", null, string.Empty, string.Empty, false, 20000, headers))
                 {
                     using (StreamReader reader = new StreamReader(responseStream))
                     {
@@ -283,7 +283,7 @@ namespace SilverSim.Scene.Types.Scene
 
             Map resmap;
             using(Stream responseStream = 
-                HttpRequestHandler.DoStreamRequest(
+                HttpClient.DoStreamRequest(
                     "POST", 
                     destinationInfo.ServerURI + "circuit",
                     null,

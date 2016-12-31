@@ -9,7 +9,7 @@ using System.Web;
 
 namespace SilverSim.Http.Client
 {
-    public static partial class HttpRequestHandler
+    public static partial class HttpClient
     {
         private static string BuildQueryString(IDictionary<string, string> parameters)
         {

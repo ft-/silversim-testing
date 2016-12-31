@@ -606,7 +606,7 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    using (XmlReader r = new XmlTextReader(HttpRequestHandler.DoStreamGetRequest(m_Uri, null, 20000)))
+                    using (XmlReader r = new XmlTextReader(HttpClient.DoStreamGetRequest(m_Uri, null, 20000)))
                     {
                         return new XmlConfigSource(r);
                     }

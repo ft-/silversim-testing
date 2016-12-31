@@ -681,7 +681,7 @@ namespace SilverSim.Main.Cmd.Region
                 {
                     if (Uri.IsWellFormedUriString(args[4], UriKind.Absolute))
                     {
-                        using (Stream s = Http.Client.HttpRequestHandler.DoStreamGetRequest(args[4], null, 20000))
+                        using (Stream s = Http.Client.HttpClient.DoStreamGetRequest(args[4], null, 20000))
                         {
                             using (XmlReader r = XmlReader.Create(s))
                             {

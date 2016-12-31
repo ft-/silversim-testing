@@ -13,7 +13,7 @@ using System.Web;
 
 namespace SilverSim.Http.Client
 {
-    public static partial class HttpRequestHandler
+    public static partial class HttpClient
     {
         /*---------------------------------------------------------------------*/
         [Serializable]
