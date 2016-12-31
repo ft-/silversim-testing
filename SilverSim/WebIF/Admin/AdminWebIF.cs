@@ -767,6 +767,7 @@ namespace SilverSim.WebIF.Admin
                     if (!req.IsWebSocket)
                     {
                         req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                        return;
                     }
 
                     SessionInfo sessionInfo;
@@ -791,10 +792,11 @@ namespace SilverSim.WebIF.Admin
                     if (!req.IsWebSocket)
                     {
                         req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                        return;
                     }
 
                     SessionInfo sessionInfo;
-                    string sessionKey = req.CallerIP + "+" + req.RawUrl.Substring(11);
+                    string sessionKey = req.CallerIP + "+" + req.RawUrl.Substring(15);
                     if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
                                     !sessionInfo.IsAuthenticated ||
                                     (!sessionInfo.Rights.Contains("console.access") &&
