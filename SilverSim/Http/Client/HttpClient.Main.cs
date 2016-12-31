@@ -119,7 +119,7 @@ namespace SilverSim.Http.Client
         }
 
         /*---------------------------------------------------------------------*/
-        public static Stream DoStreamRequest(
+        public static Stream DoChunkedStreamRequest(
             string method,
             string url,
             IDictionary<string, string> getValues,
