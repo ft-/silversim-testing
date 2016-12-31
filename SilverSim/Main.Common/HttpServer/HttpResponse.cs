@@ -106,6 +106,10 @@ namespace SilverSim.Main.Common.HttpServer
             StatusCode = statusCode;
             StatusDescription = statusDescription;
             IsChunkedAccepted = request.ContainsHeader("TE");
+            if(MinorVersion >= 1 || MajorVersion > 1)
+            {
+                IsChunkedAccepted = true;
+            }
             if(request.ContainsHeader("Accept"))
             {
                 string[] parts = request["Accept"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -180,6 +184,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 IsCloseConnection = true;
                 Headers["Connection"] = "close";
+                Headers.Remove("Content-Length");
                 if(!disableCompression && AcceptedEncodings != null && AcceptedEncodings.Contains("gzip"))
                 {
                     gzipEnable = true;
