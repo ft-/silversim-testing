@@ -133,6 +133,10 @@ namespace SilverSim.Main.Common.HttpServer
                         throw new WebSocketClosedException();
                     }
                 }
+                catch(IOException)
+                {
+                    throw new MessageTimeoutException();
+                }
                 catch(HttpStream.TimeoutException)
                 {
                     throw new MessageTimeoutException();
