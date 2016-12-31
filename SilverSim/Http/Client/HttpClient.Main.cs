@@ -120,6 +120,28 @@ namespace SilverSim.Http.Client
 
         /*---------------------------------------------------------------------*/
         public static Stream DoStreamRequest(
+            string method,
+            string url,
+            IDictionary<string, string> getValues,
+            string content_type,
+            Action<Stream> postdelegate,
+            bool compressed,
+            int timeoutms,
+            IDictionary<string, string> headers = null)
+        {
+            if(null == headers)
+            {
+                headers = new Dictionary<string, string>();
+            }
+            if (method != "GET" && method != "HEAD")
+            {
+                headers.Add("Transfer-Encoding", "chunked");
+            }
+            return DoStreamRequest(method, url, getValues, content_type, postdelegate, compressed, timeoutms, headers);
+        }
+
+        /*---------------------------------------------------------------------*/
+        public static Stream DoStreamRequest(
             string method, 
             string url, 
             IDictionary<string, string> getValues, 
