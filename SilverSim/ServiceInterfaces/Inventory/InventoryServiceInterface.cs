@@ -37,7 +37,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             {
                 folder = Folder[principalID, type];
             }
-            catch
+            catch(KeyNotFoundException)
             {
                 folder = new InventoryFolder();
                 folder.Owner.ID = principalID;
@@ -62,7 +62,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             {
                 rootFolder = Folder[principalID, AssetType.RootFolder];
             }
-            catch
+            catch(KeyNotFoundException)
             {
                 rootFolder = new InventoryFolder();
                 rootFolder.Owner.ID = principalID;
