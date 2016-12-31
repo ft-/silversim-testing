@@ -137,7 +137,7 @@ namespace SilverSim.Http.Client
             {
                 headers.Add("Transfer-Encoding", "chunked");
             }
-            return DoStreamRequest(method, url, getValues, content_type, postdelegate, compressed, timeoutms, headers);
+            return DoStreamRequest(method, url, getValues, content_type, 0, postdelegate, compressed, timeoutms, headers);
         }
 
         /*---------------------------------------------------------------------*/
