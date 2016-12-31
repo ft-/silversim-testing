@@ -140,7 +140,7 @@ namespace SilverSim.Http.Client
             {
                 if (count > m_RemainingLength)
                 {
-                    count = (int)m_RemainingLength;
+                    throw new EndOfStreamException();
                 }
                 m_Output.Write(buffer, offset, count);
                 m_RemainingLength -= count;
