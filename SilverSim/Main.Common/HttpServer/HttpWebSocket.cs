@@ -52,6 +52,7 @@ namespace SilverSim.Main.Common.HttpServer
         bool m_IsClosed;
         readonly object m_SendLock = new object();
         bool m_IsDisposed;
+        CloseReason m_CloseReason = CloseReason.NormalClosure;
 
         internal HttpWebSocket(Stream o)
         {
@@ -60,19 +61,8 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void Close(CloseReason reason = CloseReason.NormalClosure)
         {
-            if (!m_IsDisposed)
-            {
-                try
-                {
-                    SendClose(CloseReason.NormalClosure);
-                }
-                catch
-                {
-                    /* intentionally ignore errors */
-                }
-            }
-            m_WebSocketStream.Dispose();
-            m_IsDisposed = true;
+            m_CloseReason = reason;
+            Dispose();
         }
 
         public void Dispose()
@@ -81,7 +71,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 try
                 {
-                    SendClose(CloseReason.NormalClosure);
+                    SendClose(m_CloseReason);
                 }
                 catch
                 {
