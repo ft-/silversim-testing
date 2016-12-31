@@ -1718,6 +1718,7 @@ namespace SilverSim.Main.Common
             }
 
             BaseHttpServer httpServer;
+            BaseHttpServer httpsServer = null;
 
             httpServer = new BaseHttpServer(httpConfig, this);
             PluginInstances.Add("HttpServer", httpServer);
@@ -1726,7 +1727,7 @@ namespace SilverSim.Main.Common
             IConfig httpsConfig = m_Config.Configs["HTTPS"];
             if(null != httpsConfig)
             {
-                BaseHttpServer httpsServer = new BaseHttpServer(httpsConfig, this, true);
+                httpsServer = new BaseHttpServer(httpsConfig, this, true);
                 httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
                 PluginInstances.Add("HttpsServer", httpsServer);
             }
@@ -1804,6 +1805,10 @@ namespace SilverSim.Main.Common
                 MethodInfo m = t.GetMethod("HandleSimCircuitRequest");
                 m_SimCircuitRequest = (Action<HttpRequest, ConfigurationLoader>)Delegate.CreateDelegate(typeof(Action<HttpRequest, ConfigurationLoader>), m);
                 httpServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
+                if(null != httpsServer)
+                {
+                    httpsServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
+                }
 
                 m_Log.Info("Loading regions");
                 if (startup.Contains("skipregions"))

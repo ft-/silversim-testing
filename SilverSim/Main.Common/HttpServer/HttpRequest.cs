@@ -282,6 +282,10 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             Body = new GZipStream(Body, CompressionMode.Decompress);
                         }
+                        else if(transferEncoding == "deflate")
+                        {
+                            Body = new DeflateStream(Body, CompressionMode.Decompress);
+                        }
                         else
                         {
                             ConnectionMode = HttpConnectionMode.Close;
@@ -349,6 +353,10 @@ namespace SilverSim.Main.Common.HttpServer
                 if (contentEncoding == "gzip" || contentEncoding == "x-gzip") /* x-gzip is deprecated as per RFC7230 but better accept it if sent */
                 {
                     Body = new GZipStream(Body, CompressionMode.Decompress);
+                }
+                else if(contentEncoding == "deflate")
+                {
+                    Body = new DeflateStream(Body, CompressionMode.Decompress);
                 }
                 else if (contentEncoding == "identity")
                 {
