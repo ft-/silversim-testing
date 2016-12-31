@@ -248,8 +248,9 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        public UUI ResolveName(UUI uui)
+        public UUI ResolveName(UUI resolveuui)
         {
+            UUI uui = resolveuui;
             UUI resultUui = uui;
             foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
             {
