@@ -172,13 +172,10 @@ namespace SilverSim.Main.Common.HttpServer
                     payloadlen = hdr[1] & 0x7F;
                 }
                 byte[] maskingkey = new byte[4] { 0, 0, 0, 0 };
-                if ((hdr[1] & 128) != 0)
+                if ((hdr[1] & 128) != 0 && 4 != m_WebSocketStream.Read(maskingkey, 0, 4))
                 {
-                    if (4 != m_WebSocketStream.Read(maskingkey, 0, 4))
-                    {
-                        m_IsClosed = true;
-                        throw new WebSocketClosedException();
-                    }
+                    m_IsClosed = true;
+                    throw new WebSocketClosedException();
                 }
 
                 byte[] payload = new byte[payloadlen];

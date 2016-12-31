@@ -612,7 +612,7 @@ namespace SilverSim.WebIF.Admin
 
             public override string ReadLine(string p, bool echoInput)
             {
-                string text = string.Empty;
+                StringBuilder text = new StringBuilder();
                 if(!echoInput)
                 {
                     DisableEcho();
@@ -642,7 +642,7 @@ namespace SilverSim.WebIF.Admin
                         }
                         if (msg.Type == HttpWebSocket.MessageType.Text)
                         {
-                            text += msg.Data.FromUTF8Bytes();
+                            text.Append(msg.Data.FromUTF8Bytes());
                         }
                     } while (!msg.IsLastSegment || msg.Type != HttpWebSocket.MessageType.Text);
                     if (!echoInput)
@@ -657,7 +657,7 @@ namespace SilverSim.WebIF.Admin
                         EnableEcho();
                     }
                 }
-                return text;
+                return text.ToString();
             }
         }
 
