@@ -313,5 +313,109 @@ namespace SilverSim.ServiceInterfaces.Groups
 
             }
         }
+
+        public GroupInfo CreateGroup(UUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
+        {
+            GroupRole role_everyone = new GroupRole();
+            role_everyone.ID = UUID.Zero;
+            role_everyone.Group = ginfo.ID;
+            role_everyone.Name = "Everyone";
+            role_everyone.Description = "Everyone in the group";
+            role_everyone.Title = "Member of " + ginfo.ID.GroupName;
+            role_everyone.Powers = everyonePowers;
+
+            GroupRole role_owner = new GroupRole();
+            role_owner.ID = UUID.Random;
+            role_owner.Group = ginfo.ID;
+            role_owner.Name = "Owners";
+            role_owner.Description = "Owners of the group";
+            role_owner.Title = "Owner of " + ginfo.ID.GroupName;
+            role_owner.Powers = ownerPowers;
+            ginfo.OwnerRoleID = role_owner.ID;
+
+            GroupRolemember gmemrole_owner = new GroupRolemember();
+            gmemrole_owner.Group = ginfo.ID;
+            gmemrole_owner.RoleID = role_owner.ID;
+            gmemrole_owner.Principal = ginfo.Founder;
+
+            GroupRolemember gmemrole_everyone = new GroupRolemember();
+            gmemrole_everyone.Group = ginfo.ID;
+            gmemrole_everyone.RoleID = role_everyone.ID;
+            gmemrole_everyone.Principal = ginfo.Founder;
+
+            Groups.Create(requestingAgent, ginfo);
+
+            try
+            {
+                Roles.Add(requestingAgent, role_everyone);
+                Roles.Add(requestingAgent, role_owner);
+                Members.Add(requestingAgent, ginfo.ID, ginfo.Founder, role_owner.ID, UUID.Random.ToString());
+                Rolemembers.Add(requestingAgent, gmemrole_owner);
+                Rolemembers.Add(requestingAgent, gmemrole_everyone);
+                ginfo.RoleCount = 2;
+                ginfo.MemberCount = 1;
+            }
+            catch
+            {
+                Groups.Delete(requestingAgent, ginfo);
+                throw;
+            }
+            return ginfo;
+        }
+
+        public GroupMember AddAgentToGroup(UUI requestingAgent, UGI group, UUID roleid, UUI agent, string accessToken)
+        {
+            bool alreadyInGroup = false;
+
+            GroupMember gmem;
+            alreadyInGroup = Members.TryGetValue(requestingAgent, group, agent, out gmem);
+            if(!alreadyInGroup)
+            {
+                gmem = Members.Add(requestingAgent, group, agent, roleid, accessToken);
+            }
+
+            try
+            {
+                if (!Rolemembers.ContainsKey(requestingAgent, group, UUID.Zero, agent))
+                {
+                    GroupRolemember rolemember = new GroupRolemember();
+                    rolemember.Group = group;
+                    rolemember.Principal = agent;
+                    rolemember.RoleID = UUID.Zero;
+                    Rolemembers.Add(requestingAgent, rolemember);
+                }
+
+                if(UUID.Zero != roleid)
+                {
+                    GroupRolemember rolemember = new GroupRolemember();
+                    rolemember.Group = group;
+                    rolemember.Principal = agent;
+                    rolemember.RoleID = roleid;
+                    Rolemembers.Add(requestingAgent, rolemember);
+                }
+
+                try
+                {
+                    List<GroupInvite> invites = Invites[requestingAgent, group, roleid, agent];
+                    foreach(GroupInvite invite in invites)
+                    {
+                        invites.Remove(invite);
+                    }
+                }
+                catch
+                {
+                    /* intentionally ignored */
+                }
+            }
+            catch
+            {
+                if(!alreadyInGroup)
+                {
+                    Members.Delete(requestingAgent, group, agent);
+                }
+            }
+
+            return gmem;
+        }
     }
 }
