@@ -19,7 +19,6 @@ namespace SilverSim.Types.Groups
     {
         public UGI ID = UGI.Unknown;
         public string Charter = string.Empty;
-        public string Location = string.Empty;
         public UUID InsigniaID = UUID.Zero;
         public UUI Founder = UUI.Unknown;
         public int MembershipFee;
