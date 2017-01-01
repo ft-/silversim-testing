@@ -198,6 +198,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
 
             bool TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite);
+            bool ContainsKey(UUI requestingAgent, UUID groupInviteID);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
@@ -416,6 +417,35 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
 
             return gmem;
+        }
+
+        public abstract GroupPowers GetAgentPowers(UGI group, UUI agent);
+
+        public void VerifyAgentPowers(UGI group, UUI agent, GroupPowers powers)
+        {
+            VerifyAgentPowers(group, agent, new GroupPowers[] { powers });
+        }
+
+        public void VerifyAgentPowers(UGI group, UUI agent, GroupPowers[] powers)
+        {
+            GroupPowers agentPowers = GetAgentPowers(group, agent);
+
+            foreach(GroupPowers power in powers)
+            {
+                if(!agentPowers.HasFlag(power))
+                {
+                    throw new GroupInsufficientPowersException(power);
+                }
+            }
+        }
+
+        public class GroupInsufficientPowersException : Exception
+        {
+            public GroupInsufficientPowersException(GroupPowers power)
+                : base(string.Format("Missing group permission {0}", power.ToString()))
+            {
+
+            }
         }
     }
 }
