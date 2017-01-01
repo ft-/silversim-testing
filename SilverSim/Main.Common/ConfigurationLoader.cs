@@ -1345,6 +1345,18 @@ namespace SilverSim.Main.Common
             }
         }
 
+        void HandleRobotsTxt(HttpRequest req)
+        {
+            using (HttpResponse res = req.BeginResponse("text/plain"))
+            {
+                using (StreamWriter writer = res.GetOutputStream().UTF8StreamWriter())
+                {
+                    writer.WriteLine("User-agent: *");
+                    writer.WriteLine("Disallow: /");
+                }
+            }
+        }
+
         readonly string m_PIDFile = string.Empty;
 
         void CtrlCHandler(object o, ConsoleCancelEventArgs e)
@@ -1543,7 +1555,6 @@ namespace SilverSim.Main.Common
             if(startupConfig != null)
             {
                 logConfigFile = startupConfig.GetString("LogConfig", string.Empty);
-
             }
 
             try
@@ -1723,13 +1734,15 @@ namespace SilverSim.Main.Common
             httpServer = new BaseHttpServer(httpConfig, this);
             PluginInstances.Add("HttpServer", httpServer);
             httpServer.StartsWithUriHandlers.Add("/helo", HeloResponseHandler);
+            httpServer.UriHandlers.Add("/robots.txt", HandleRobotsTxt);
 
             IConfig httpsConfig = m_Config.Configs["HTTPS"];
             if(null != httpsConfig)
             {
                 httpsServer = new BaseHttpServer(httpsConfig, this, true);
-                httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
                 PluginInstances.Add("HttpsServer", httpsServer);
+                httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
+                httpsServer.UriHandlers.Add("/robots.txt", HandleRobotsTxt);
             }
             else
             {
