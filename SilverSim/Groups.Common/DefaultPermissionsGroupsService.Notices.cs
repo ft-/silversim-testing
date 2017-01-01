@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Groups.Common
 {
-    partial class DefaultPermissionsGroupService : GroupsServiceInterface.IGroupNoticesInterface
+    partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupNoticesInterface
     {
         List<GroupNotice> IGroupNoticesInterface.GetNotices(UUI requestingAgent, UGI group)
         {

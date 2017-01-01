@@ -9,12 +9,12 @@ using SilverSim.Types.Groups;
 
 namespace SilverSim.Groups.Common
 {
-    public partial class DefaultPermissionsGroupService : GroupsServiceInterface, IPlugin
+    public partial class DefaultPermissionsGroupsService : GroupsServiceInterface, IPlugin
     {
         GroupsServiceInterface m_InnerService;
         readonly string m_GroupsServiceName;
 
-        public DefaultPermissionsGroupService(IConfig ownSection)
+        public DefaultPermissionsGroupsService(IConfig ownSection)
         {
             m_GroupsServiceName = ownSection.GetString("GroupsStorage", "GroupsStorage");
         }
@@ -129,7 +129,7 @@ namespace SilverSim.Groups.Common
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new DefaultPermissionsGroupService(ownSection);
+            return new DefaultPermissionsGroupsService(ownSection);
         }
     }
 }

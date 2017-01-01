@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Groups.Common
 {
-    partial class DefaultPermissionsGroupService : GroupsServiceInterface.IGroupInvitesInterface
+    partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupInvitesInterface
     {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         GroupInvite IGroupInvitesInterface.this[UUI requestingAgent, UUID groupInviteID]

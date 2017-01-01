@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Groups.Common
 {
-    partial class DefaultPermissionsGroupService : GroupsServiceInterface.IGroupsInterface
+    partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupsInterface
     {
         GroupInfo IGroupsInterface.this[UUI requestingAgent, string groupName]
         {
