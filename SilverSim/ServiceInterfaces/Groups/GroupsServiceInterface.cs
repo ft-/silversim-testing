@@ -419,7 +419,20 @@ namespace SilverSim.ServiceInterfaces.Groups
             return gmem;
         }
 
-        public abstract GroupPowers GetAgentPowers(UGI group, UUI agent);
+        public virtual GroupPowers GetAgentPowers(UGI group, UUI agent)
+        {
+            List<GroupRolemember> rolemembers = Rolemembers[agent, group];
+            GroupPowers powers = GroupPowers.None;
+            foreach(GroupRolemember rolemember in rolemembers)
+            {
+                GroupRole role;
+                if(Roles.TryGetValue(agent, group, rolemember.RoleID, out role))
+                {
+                    powers |= role.Powers;
+                }
+            }
+            return powers;
+        }
 
         public void VerifyAgentPowers(UGI group, UUI agent, GroupPowers powers)
         {
