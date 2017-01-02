@@ -99,7 +99,9 @@ namespace SilverSim.Types
                 return true;
             }
 
-            return ugi.ID == ID && ugi.GroupName == GroupName && ugi.HomeURI.Equals(HomeURI);
+            return ugi.ID == ID && ugi.GroupName == GroupName && 
+                ((ugi.HomeURI == null && HomeURI == null) ||
+                (ugi.HomeURI != null && HomeURI != null && ugi.HomeURI.Equals(HomeURI)));
         }
 
         public override int GetHashCode()
@@ -149,6 +151,38 @@ namespace SilverSim.Types
             {
                 return new UGI();
             }
+        }
+
+        public static bool operator ==(UGI l, UGI r)
+        {
+            /* get rid of type specifics */
+            object lo = l;
+            object ro = r;
+            if (lo == null && ro == null)
+            {
+                return true;
+            }
+            else if (lo == null || ro == null)
+            {
+                return false;
+            }
+            return l.Equals(r);
+        }
+
+        public static bool operator !=(UGI l, UGI r)
+        {
+            /* get rid of type specifics */
+            object lo = l;
+            object ro = r;
+            if (lo == null && ro == null)
+            {
+                return false;
+            }
+            else if (lo == null || ro == null)
+            {
+                return true;
+            }
+            return !l.Equals(r);
         }
     }
 }

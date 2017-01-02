@@ -27,10 +27,10 @@ namespace SilverSim.Database.MySQL.Groups
             info.ID.GroupName = reader.GetString("Name");
             info.Charter = reader.GetString("Charter");
             info.InsigniaID = reader.GetUUID("InsigniaID");
-            info.Founder = reader.GetUUI("Founder");
+            info.Founder.ID = reader.GetUUID("FounderID");
             info.MembershipFee = reader.GetInt32("MembershipFee");
             info.IsOpenEnrollment = reader.GetBool("OpenEnrollment");
-            info.IsShownInList = reader.GetBool("ShownInList");
+            info.IsShownInList = reader.GetBool("ShowInList");
             info.IsAllowPublish = reader.GetBool("AllowPublish");
             info.IsMaturePublish = reader.GetBool("MaturePublish");
             info.OwnerRoleID = reader.GetUUID("OwnerRoleID");
@@ -61,7 +61,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             GroupMember groupmem = new GroupMember();
             groupmem.Group.ID = reader.GetUUID("GroupID");
-            groupmem.Principal = reader.GetUUI("Principal");
+            groupmem.Principal.ID = reader.GetUUID("PrincipalID");
             groupmem.SelectedRoleID = reader.GetUUID("SelectedRoleID");
             groupmem.Contribution = reader.GetInt32("Contribution");
             groupmem.IsListInProfile = reader.GetBool("ListInProfile");
@@ -76,7 +76,7 @@ namespace SilverSim.Database.MySQL.Groups
             GroupRolemember grouprolemem = new GroupRolemember();
             grouprolemem.Group.ID = reader.GetUUID("GroupID");
             grouprolemem.RoleID = reader.GetUUID("RoleID");
-            grouprolemem.Principal = reader.GetUUI("Principal");
+            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
             grouprolemem.Powers = reader.GetEnum<GroupPowers>("Powers");
 
             return grouprolemem;
@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.Groups
             GroupRolemember grouprolemem = new GroupRolemember();
             grouprolemem.Group.ID = reader.GetUUID("GroupID");
             grouprolemem.RoleID = UUID.Zero;
-            grouprolemem.Principal = reader.GetUUI("Principal");
+            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
             grouprolemem.Powers = powers;
 
             return grouprolemem;
@@ -98,7 +98,7 @@ namespace SilverSim.Database.MySQL.Groups
             GroupRolemembership grouprolemem = new GroupRolemembership();
             grouprolemem.Group.ID = reader.GetUUID("GroupID");
             grouprolemem.RoleID = reader.GetUUID("RoleID");
-            grouprolemem.Principal = reader.GetUUI("Principal");
+            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
             grouprolemem.Powers = reader.GetEnum<GroupPowers>("Powers");
             grouprolemem.GroupTitle = reader.GetString("Title");
 
@@ -110,7 +110,7 @@ namespace SilverSim.Database.MySQL.Groups
             GroupRolemembership grouprolemem = new GroupRolemembership();
             grouprolemem.Group.ID = reader.GetUUID("GroupID");
             grouprolemem.RoleID = UUID.Zero;
-            grouprolemem.Principal = reader.GetUUI("Principal");
+            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
             grouprolemem.Powers = powers;
 
             return grouprolemem;
@@ -122,7 +122,7 @@ namespace SilverSim.Database.MySQL.Groups
             inv.ID = reader.GetUUID("InviteID");
             inv.Group.ID = reader.GetUUID("GroupID");
             inv.RoleID = reader.GetUUID("RoleID");
-            inv.Principal = reader.GetUUI("Principal");
+            inv.Principal.ID = reader.GetUUID("PrincipalID");
             inv.Timestamp = reader.GetDate("Timestamp");
 
             return inv;

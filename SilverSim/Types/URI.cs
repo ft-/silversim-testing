@@ -68,6 +68,39 @@ namespace SilverSim.Types
             }
             return new Uri(v.m_Value.ToString());
         }
+
+        public static bool operator ==(URI l, URI r)
+        {
+            /* get rid of type specifics */
+            object lo = l;
+            object ro = r;
+            if (lo == null && ro == null)
+            {
+                return true;
+            }
+            else if (lo == null || ro == null)
+            {
+                return false;
+            }
+            return l.m_Value == r.m_Value;
+        }
+
+        public static bool operator !=(URI l, URI r)
+        {
+            /* get rid of type specifics */
+            object lo = l;
+            object ro = r;
+            if (lo == null && ro == null)
+            {
+                return true;
+            }
+            else if (lo == null || ro == null)
+            {
+                return false;
+            }
+            return l.m_Value != r.m_Value;
+        }
+
         #endregion Operators
 
         #region LSL Helpers

@@ -259,5 +259,37 @@ namespace SilverSim.Types
                 return new UUI();
             }
         }
+
+        public static bool operator ==(UUI l, UUI r)
+        {
+            /* get rid of type specifics */
+            object lo = l;
+            object ro = r;
+            if(lo == null && ro == null)
+            {
+                return true;
+            }
+            else if(lo == null || ro == null)
+            {
+                return false;
+            }
+            return l.Equals(r);
+        }
+
+        public static bool operator !=(UUI l, UUI r)
+        {
+            /* get rid of type specifics */
+            object lo = l;
+            object ro = r;
+            if (lo == null && ro == null)
+            {
+                return false;
+            }
+            else if (lo == null || ro == null)
+            {
+                return true;
+            }
+            return !l.Equals(r);
+        }
     }
 }
