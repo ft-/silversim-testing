@@ -4,7 +4,6 @@
 using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
-using System;
 
 namespace SilverSim.Database.MySQL.Groups
 {
@@ -65,7 +64,17 @@ namespace SilverSim.Database.MySQL.Groups
 
             set
             {
-                throw new NotImplementedException();
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=?roleid WHERE PrincipalID LIKE ?principalid AND GroupID LIKE ?groupid", conn))
+                    {
+                        cmd.Parameters.AddParameter("?roleid", value);
+                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
             }
         }
 
@@ -94,7 +103,25 @@ namespace SilverSim.Database.MySQL.Groups
 
         bool IGroupSelectInterface.TryGetValue(UUI requestingAgent, UGI group, UUI principal, out UUID id)
         {
-            throw new NotImplementedException();
+            id = UUID.Zero;
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT SelectedRoleID FROM groupmemberships WHERE PrincipalID LIKE ?principalid AND GroupID LIKE ?groupid", conn))
+                {
+                    cmd.Parameters.AddParameter("?groupid", group.ID);
+                    cmd.Parameters.AddParameter("?principalid", principal.ID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if(reader.Read())
+                        {
+                            id = reader.GetUUID("SelectedRoleID");
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 }

@@ -2,13 +2,9 @@
 // GNU Affero General Public License v3
 
 using SilverSim.ServiceInterfaces.Groups;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {
