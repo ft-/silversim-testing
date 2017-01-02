@@ -221,7 +221,7 @@ namespace SilverSim.Database.MySQL.Groups
         public MySQLGroupsService(IConfig ownSection)
         {
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
-            m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", "UserAccountNameService,AvatarNameStorage");
+            m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", "AvatarNameStorage");
         }
     }
 
