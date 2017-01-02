@@ -16,7 +16,7 @@ namespace SilverSim.ServiceInterfaces.Groups
         {
             GroupInfo Create(UUI requestingAgent, GroupInfo group);
             GroupInfo Update(UUI requestingAgent, GroupInfo group);
-            void Delete(UUI requestingAgent, GroupInfo group);
+            void Delete(UUI requestingAgent, UGI group);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             UGI this[UUI requestingAgent, UUID groupID]
@@ -358,7 +358,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
             catch
             {
-                Groups.Delete(requestingAgent, ginfo);
+                Groups.Delete(requestingAgent, ginfo.ID);
                 throw;
             }
             return ginfo;

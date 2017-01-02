@@ -54,9 +54,9 @@ namespace SilverSim.Groups.Common
             return m_InnerService.Groups.Create(requestingAgent, group);
         }
 
-        void IGroupsInterface.Delete(UUI requestingAgent, GroupInfo group)
+        void IGroupsInterface.Delete(UUI requestingAgent, UGI group)
         {
-            if(!IsGroupOwner(group.ID, requestingAgent))
+            if(!IsGroupOwner(group, requestingAgent))
             {
                 throw new GroupInsufficientPowersException(GroupPowers.OwnerPowers);
             }

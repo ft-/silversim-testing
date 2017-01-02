@@ -1,18 +1,17 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
+using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Account;
+using SilverSim.ServiceInterfaces.AvatarName;
+using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
-using System;
-using Nini.Config;
-using log4net;
-using SilverSim.ServiceInterfaces.Database;
-using SilverSim.ServiceInterfaces.Account;
 using System.Collections.Generic;
-using SilverSim.ServiceInterfaces.AvatarName;
-using MySql.Data.MySqlClient;
 
 namespace SilverSim.Database.MySQL.Groups
 {
@@ -177,26 +176,52 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            foreach(string name in m_AvatarNameServiceNames.Trim().Split(','))
+            {
+                m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(name));
+            }
         }
 
         public void Remove(UUID scopeID, UUID accountID)
         {
-            throw new NotImplementedException();
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.InsideTransaction(delegate ()
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM groupinvites WHERE PrincipalID LIKE ?id", conn))
+                    {
+                        cmd.Parameters.AddParameter("?id", accountID);
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE PrincipalID LIKE ?id", conn))
+                    {
+                        cmd.Parameters.AddParameter("?id", accountID);
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM activegroup WHERE PrincipalID LIKE ?id", conn))
+                    {
+                        cmd.Parameters.AddParameter("?id", accountID);
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM grouprolememberships WHERE PrincipalID LIKE ?id", conn))
+                    {
+                        cmd.Parameters.AddParameter("?id", accountID);
+                    }
+                });
+            }
         }
 
         readonly string m_ConnectionString;
+        readonly string m_AvatarNameServiceNames;
 
-        public MySQLGroupsService(string connectionString)
+        public MySQLGroupsService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
+            m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", "UserAccountNameService,AvatarNameStorage");
         }
     }
 
     [PluginName("Groups")]
     public class MySQLGroupsServiceFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUPS SERVICE");
         public MySQLGroupsServiceFactory()
         {
 
@@ -204,7 +229,7 @@ namespace SilverSim.Database.MySQL.Groups
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new MySQLGroupsService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
+            return new MySQLGroupsService(ownSection);
         }
     }
 }
