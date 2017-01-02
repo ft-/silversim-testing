@@ -10,18 +10,48 @@ using Nini.Config;
 using log4net;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Account;
+using System.Collections.Generic;
+using SilverSim.ServiceInterfaces.AvatarName;
+using MySql.Data.MySqlClient;
 
 namespace SilverSim.Database.MySQL.Groups
 {
     public partial class MySQLGroupsService : GroupsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUPS SERVICE");
+        private readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+
+        const string GCountQuery = "(SELECT COUNT(m.PrincipalID) FROM groupmemberships AS m WHERE m.GroupID LIKE g.GroupID) AS MemberCount," +
+				"(SELECT COUNT(r.RoleID) FROM grouproles AS r WHERE r.GroupID LIKE g.GroupID) AS RoleCount";
+
+        const string MCountQuery = "(SELECT COUNT(xr.RoleID) FROM grouproles AS xr WHERE xr.GroupID LIKE g.GroupID) AS RoleCount";
+
+        const string RCountQuery = "(SELECT COUNT(xrm.PrincipalID) FROM grouprolemembers AS xrm WHERE xrm.RoleID LIKE r.RoleID) AS RoleMembers," +
+					"(SELECT COUNT(xm.PrincipalID) FROM groupmemberships AS xm WHERE xm.GroupID LIKE r.GroupID) AS GroupMembers";
+
+        UUI ResolveName(UUI uui)
+        {
+            UUI searchuui = uui;
+            foreach(AvatarNameServiceInterface service in m_AvatarNameServices)
+            {
+                UUI resultuui;
+                if (service.TryGetValue(searchuui, out resultuui))
+                {
+                    searchuui = resultuui;
+                    if(resultuui.IsAuthoritative)
+                    {
+                        break;
+                    }
+                }
+            }
+            return searchuui;
+        }
 
         public override IGroupSelectInterface ActiveGroup
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -29,7 +59,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -37,7 +67,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -45,7 +75,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -53,7 +83,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -61,7 +91,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -69,7 +99,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -77,7 +107,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
         }
 
@@ -85,13 +115,64 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                return this;
             }
+        }
+
+        bool TryGetGroupRoleRights(UUI requestingAgent, UGI group, UUID roleID, out GroupPowers powers)
+        {
+            powers = GroupPowers.None;
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT Powers FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?grouproleid", conn))
+                {
+                    cmd.Parameters.AddParameter("?groupid", group.ID);
+                    cmd.Parameters.AddParameter("?grouproleid", roleID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if(reader.Read())
+                        {
+                            powers = reader.GetEnum<GroupPowers>("Powers");
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public override GroupPowers GetAgentPowers(UGI group, UUI agent)
         {
-            throw new NotImplementedException();
+            if(!Members.ContainsKey(agent, group, agent))
+            {
+                return GroupPowers.None;
+            }
+
+            GroupPowers powers;
+            if (!TryGetGroupRoleRights(agent, group, UUID.Zero, out powers))
+            {
+                return GroupPowers.None;
+            }
+
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(
+                    "SELECT Powers FROM roles AS r INNER JOIN " +
+                    "((grouprolemembers AS rm INNER JOIN groupmembers AS m ON rm.GroupID LIKE m.GroupID AND rm.PrincipalID LIKE m.PrincipalID) ON " +
+                    "r.RoleID LIKE rm.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.PrincipalID LIKE ?principalid", conn))
+                {
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            powers |= reader.GetEnum<GroupPowers>("Powers");
+                        }
+                    }
+                }
+            }
+            return powers;
         }
 
         public void Startup(ConfigurationLoader loader)

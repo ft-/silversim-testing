@@ -9,6 +9,9 @@ namespace SilverSim.Types.Groups
         public UUID RoleID = UUID.Zero;
         public UUI Principal = UUI.Unknown;
 
+        /* informative field */
+        public GroupPowers Powers;
+
         public GroupRolemember()
         {
 
