@@ -99,7 +99,7 @@ namespace SilverSim.Types
                 return true;
             }
 
-            return ugi.ID == ID && ugi.GroupName == GroupName && 
+            return ugi.ID == ID && 
                 ((ugi.HomeURI == null && HomeURI == null) ||
                 (ugi.HomeURI != null && HomeURI != null && ugi.HomeURI.Equals(HomeURI)));
         }

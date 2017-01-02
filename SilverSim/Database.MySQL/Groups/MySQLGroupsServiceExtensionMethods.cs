@@ -53,6 +53,10 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 role.Members = reader.GetUInt32("GroupMembers");
             }
+            else
+            {
+                role.Members = reader.GetUInt32("RoleMembers");
+            }
 
             return role;
         }
