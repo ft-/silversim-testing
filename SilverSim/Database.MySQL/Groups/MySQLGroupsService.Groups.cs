@@ -90,7 +90,26 @@ namespace SilverSim.Database.MySQL.Groups
 
         GroupInfo IGroupsInterface.Create(UUI requestingAgent, GroupInfo group)
         {
-            throw new NotImplementedException();
+            Dictionary<string, object> vals = new Dictionary<string, object>();
+            vals.Add("GroupID", group.ID.ID);
+            vals.Add("Location", group.ID.HomeURI != null ? group.ID.HomeURI.ToString() : string.Empty);
+            vals.Add("Name", group.ID.GroupName);
+            vals.Add("Charter", group.Charter);
+            vals.Add("InsigniaID", group.InsigniaID);
+            vals.Add("FounderID", group.Founder.ID);
+            vals.Add("MembershipFee", group.MembershipFee);
+            vals.Add("OpenEnrollment", group.IsOpenEnrollment);
+            vals.Add("ShowInList", group.IsShownInList);
+            vals.Add("AllowPublish", group.IsAllowPublish);
+            vals.Add("MaturePublish", group.IsMaturePublish);
+            vals.Add("OwnerRoleID", group.OwnerRoleID);
+
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.InsertInto("groups", vals);
+            }
+            return group;
         }
 
         void IGroupsInterface.Delete(UUI requestingAgent, UGI group)
@@ -162,6 +181,7 @@ namespace SilverSim.Database.MySQL.Groups
                         if (reader.Read())
                         {
                             groupInfo = reader.ToGroupInfo();
+                            groupInfo.Founder = ResolveName(groupInfo.Founder);
                             return true;
                         }
                     }
@@ -184,6 +204,7 @@ namespace SilverSim.Database.MySQL.Groups
                         if (reader.Read())
                         {
                             groupInfo = reader.ToGroupInfo();
+                            groupInfo.Founder = ResolveName(groupInfo.Founder);
                             return true;
                         }
                     }
@@ -223,7 +244,23 @@ namespace SilverSim.Database.MySQL.Groups
 
         GroupInfo IGroupsInterface.Update(UUI requestingAgent, GroupInfo group)
         {
-            throw new NotImplementedException();
+            Dictionary<string, object> vals = new Dictionary<string, object>();
+            vals.Add("Charter", group.Charter);
+            vals.Add("InsigniaID", group.InsigniaID);
+            vals.Add("FounderID", group.Founder.ID);
+            vals.Add("MembershipFee", group.MembershipFee);
+            vals.Add("OpenEnrollment", group.IsOpenEnrollment);
+            vals.Add("ShowInList", group.IsShownInList);
+            vals.Add("AllowPublish", group.IsAllowPublish);
+            vals.Add("MaturePublish", group.IsMaturePublish);
+            vals.Add("OwnerRoleID", group.OwnerRoleID);
+
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.UpdateSet("groups", vals, "GroupID LIKE \"" + group.ID.ID.ToString() + "\"");
+            }
+            return group;
         }
     }
 }

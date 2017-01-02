@@ -18,18 +18,52 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                GroupActiveMembership gam;
+                if(!ActiveMembership.TryGetValue(requestingAgent, principal, out gam))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return gam;
             }
         }
 
         bool IActiveGroupMembershipInterface.ContainsKey(UUI requestingAgent, UUI principal)
         {
-            throw new NotImplementedException();
+            GroupActiveMembership gam;
+            return ActiveMembership.TryGetValue(requestingAgent, principal, out gam);
         }
 
         bool IActiveGroupMembershipInterface.TryGetValue(UUI requestingAgent, UUI principal, out GroupActiveMembership gam)
         {
-            throw new NotImplementedException();
+            gam = default(GroupActiveMembership);
+            UGI activegroup;
+            if(!ActiveGroup.TryGetValue(requestingAgent, principal, out activegroup))
+            {
+                return false;
+            }
+            GroupInfo group;
+            if(!Groups.TryGetValue(requestingAgent, activegroup, out group))
+            {
+                return false;
+            }
+
+            GroupMember gmem;
+            if(!Members.TryGetValue(requestingAgent, activegroup, principal, out gmem))
+            {
+                return false;
+            }
+
+            GroupRole role;
+            if(!Roles.TryGetValue(requestingAgent, activegroup, gmem.SelectedRoleID, out role))
+            {
+                return false;
+            }
+
+            gam = new GroupActiveMembership();
+            gam.Group = group.ID;
+            gam.SelectedRoleID = gmem.SelectedRoleID;
+            gam.User = gmem.Principal;
+            return true;
         }
     }
 }

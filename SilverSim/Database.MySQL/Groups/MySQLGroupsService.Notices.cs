@@ -75,7 +75,9 @@ namespace SilverSim.Database.MySQL.Groups
                     {
                         while (reader.Read())
                         {
-                            notices.Add(reader.ToGroupNotice());
+                            GroupNotice notice = reader.ToGroupNotice();
+                            notice.Group = ResolveName(requestingAgent, notice.Group);
+                            notices.Add(notice);
                         }
                     }
                 }
@@ -101,6 +103,7 @@ namespace SilverSim.Database.MySQL.Groups
                             return false;
                         }
                         notice = reader.ToGroupNotice();
+                        notice.Group = ResolveName(requestingAgent, notice.Group);
                     }
                 }
             }

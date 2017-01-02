@@ -46,6 +46,12 @@ namespace SilverSim.Database.MySQL.Groups
             return searchuui;
         }
 
+        UGI ResolveName(UUI requestingAgent, UGI group)
+        {
+            UGI resolved;
+            return Groups.TryGetValue(requestingAgent, group.ID, out resolved) ? resolved : group;
+        }
+
         public override IGroupSelectInterface ActiveGroup
         {
             get

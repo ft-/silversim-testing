@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
@@ -15,7 +16,47 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                List<GroupRolemember> rolemembers = new List<GroupRolemember>();
+
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid", conn))
+                    {
+                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                GroupRolemember grolemem = reader.ToGroupRolemember();
+                                grolemem.Principal = ResolveName(grolemem.Principal);
+                                grolemem.Group = ResolveName(requestingAgent, grolemem.Group);
+                                rolemembers.Add(grolemem);
+                            }
+                        }
+                    }
+
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.PrincipalID LIKE ?principalid", conn))
+                    {
+                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                GroupRole groupRole;
+                                if (Roles.TryGetValue(requestingAgent, group, UUID.Zero, out groupRole))
+                                {
+                                    GroupRolemember grolemem = reader.ToGroupRolememberEveryone(groupRole.Powers);
+                                    grolemem.Principal = ResolveName(grolemem.Principal);
+                                    grolemem.Group = ResolveName(requestingAgent, grolemem.Group);
+                                    rolemembers.Add(grolemem);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return rolemembers;
             }
         }
 
@@ -23,7 +64,48 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                List<GroupRolemembership> rolemembers = new List<GroupRolemembership>();
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT rm.*, r.Powers, r.Title FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.PrincipalID LIKE ?principalid", conn))
+                    {
+                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                GroupRolemembership grolemem = reader.ToGroupRolemembership();
+                                grolemem.Principal = ResolveName(grolemem.Principal);
+                                grolemem.Group = ResolveName(requestingAgent, grolemem.Group);
+                                rolemembers.Add(grolemem);
+                            }
+                        }
+                    }
+
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.PrincipalID LIKE ?principalid", conn))
+                    {
+                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                UGI group = new UGI(reader.GetUUID("GroupID"));
+                                GroupRole groupRole;
+                                if (Roles.TryGetValue(requestingAgent, group, UUID.Zero, out groupRole))
+                                {
+                                    GroupRolemembership grolemem = reader.ToGroupRolemembershipEveryone(groupRole.Powers);
+                                    grolemem.Principal = ResolveName(grolemem.Principal);
+                                    grolemem.Group = ResolveName(requestingAgent, grolemem.Group);
+                                    grolemem.GroupTitle = groupRole.Title;
+                                    rolemembers.Add(grolemem);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return rolemembers;
             }
         }
 
@@ -31,7 +113,58 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                List<GroupRolemember> rolemembers = new List<GroupRolemember>();
+
+                if(UUID.Zero == roleID)
+                {
+                    GroupRole groupRole;
+                    if(!Roles.TryGetValue(requestingAgent, group, roleID, out groupRole))
+                    {
+                        return rolemembers;
+                    }
+
+                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.GroupID LIKE ?groupid", conn))
+                        {
+                            cmd.Parameters.AddParameter("?groupid", group.ID);
+                            using (MySqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    GroupRolemember grolemem = reader.ToGroupRolememberEveryone(groupRole.Powers);
+                                    grolemem.Principal = ResolveName(grolemem.Principal);
+                                    grolemem.Group = ResolveName(requestingAgent, grolemem.Group);
+                                    rolemembers.Add(grolemem);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.RoleID LIKE ?roleid", conn))
+                        {
+                            cmd.Parameters.AddParameter("?groupid", group.ID);
+                            cmd.Parameters.AddParameter("?roleid", roleID);
+                            using (MySqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    GroupRolemember grolemem = reader.ToGroupRolemember();
+                                    grolemem.Principal = ResolveName(grolemem.Principal);
+                                    grolemem.Group = ResolveName(requestingAgent, grolemem.Group);
+                                    rolemembers.Add(grolemem);
+                                }
+                            }
+                        }
+                    }
+                }
+                return rolemembers;
             }
         }
 
@@ -39,28 +172,139 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                throw new NotImplementedException();
+                GroupRolemember rolemem;
+                if(!Rolemembers.TryGetValue(requestingAgent, group, roleID, principal, out rolemem))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return rolemem;
             }
         }
 
         void IGroupRolemembersInterface.Add(UUI requestingAgent, GroupRolemember rolemember)
         {
-            throw new NotImplementedException();
+            if(rolemember.RoleID == UUID.Zero)
+            {
+                return; /* ignore those */
+            }
+            Dictionary<string, object> vals = new Dictionary<string, object>();
+            vals.Add("GroupID", rolemember.Group.ID);
+            vals.Add("RoleID", rolemember.RoleID);
+            vals.Add("PrincipalID", rolemember.Principal.ID);
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.InsertInto("grouprolememberships", vals);
+            }
         }
 
         bool IGroupRolemembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
         {
-            throw new NotImplementedException();
+            if(UUID.Zero == roleID)
+            {
+                return Members.ContainsKey(requestingAgent, group, principal);
+            }
+            else
+            {
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT rm.GroupID FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.RoleID LIKE ?roleid and rm.PrincipalID LIKE ?principalid", conn))
+                    {
+                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("?roleid", roleID);
+                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            return reader.Read();
+                        }
+                    }
+                }
+            }
         }
 
         void IGroupRolemembersInterface.Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
         {
-            throw new NotImplementedException();
+            if(UUID.Zero == roleID)
+            {
+                throw new NotSupportedException();
+            }
+            else
+            {
+                string[] tablenames = new string[] { "groupinvites", "grouprolememberships" };
+
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    conn.InsideTransaction(delegate ()
+                    {
+                        using (MySqlCommand cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=?zeroid WHERE SelectedRoleID LIKE ?roleid AND GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                        {
+                            cmd.Parameters.AddParameter("?zeroid", UUID.Zero);
+                            cmd.Parameters.AddParameter("?principalid", principal.ID);
+                            cmd.Parameters.AddParameter("?groupid", group.ID);
+                            cmd.Parameters.AddParameter("?roleid", roleID);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        foreach(string table in tablenames)
+                        {
+                            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid AND PrincipalID LIKE ?principalid", conn))
+                            {
+                                cmd.Parameters.AddParameter("?principalid", principal.ID);
+                                cmd.Parameters.AddParameter("?groupid", group.ID);
+                                cmd.Parameters.AddParameter("?roleid", roleID);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    });
+                }
+            }
         }
 
         bool IGroupRolemembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, UUI principal, out GroupRolemember grolemem)
         {
-            throw new NotImplementedException();
+            grolemem = null;
+            if(UUID.Zero == roleID)
+            {
+                GroupMember gmem;
+                GroupRole role;
+                if(Members.TryGetValue(requestingAgent, group, principal, out gmem) &&
+                    Roles.TryGetValue(requestingAgent, group, UUID.Zero, out role))
+                {
+                    grolemem = new GroupRolemember();
+                    grolemem.Powers = role.Powers;
+                    grolemem.Principal = ResolveName(principal);
+                    grolemem.RoleID = UUID.Zero;
+                    grolemem.Group = gmem.Group;
+
+                    return true;
+                }
+            }
+            else
+            {
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.RoleID LIKE ?roleid and rm.PrincipalID LIKE ?principalid", conn))
+                    {
+                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("?roleid", roleID);
+                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if(reader.Read())
+                            {
+                                grolemem = reader.ToGroupRolemember();
+                                grolemem.Principal = ResolveName(grolemem.Principal);
+                                grolemem.Group = ResolveName(requestingAgent, grolemem.Group);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 }

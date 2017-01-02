@@ -82,13 +82,36 @@ namespace SilverSim.Database.MySQL.Groups
             return grouprolemem;
         }
 
-        public static GroupRolemember ToGroupRolememberEveryone(this MySqlDataReader reader)
+        public static GroupRolemember ToGroupRolememberEveryone(this MySqlDataReader reader, GroupPowers powers)
         {
             GroupRolemember grouprolemem = new GroupRolemember();
             grouprolemem.Group.ID = reader.GetUUID("GroupID");
             grouprolemem.RoleID = UUID.Zero;
             grouprolemem.Principal = reader.GetUUI("Principal");
+            grouprolemem.Powers = powers;
+
+            return grouprolemem;
+        }
+
+        public static GroupRolemembership ToGroupRolemembership(this MySqlDataReader reader)
+        {
+            GroupRolemembership grouprolemem = new GroupRolemembership();
+            grouprolemem.Group.ID = reader.GetUUID("GroupID");
+            grouprolemem.RoleID = reader.GetUUID("RoleID");
+            grouprolemem.Principal = reader.GetUUI("Principal");
             grouprolemem.Powers = reader.GetEnum<GroupPowers>("Powers");
+            grouprolemem.GroupTitle = reader.GetString("Title");
+
+            return grouprolemem;
+        }
+
+        public static GroupRolemembership ToGroupRolemembershipEveryone(this MySqlDataReader reader, GroupPowers powers)
+        {
+            GroupRolemembership grouprolemem = new GroupRolemembership();
+            grouprolemem.Group.ID = reader.GetUUID("GroupID");
+            grouprolemem.RoleID = UUID.Zero;
+            grouprolemem.Principal = reader.GetUUI("Principal");
+            grouprolemem.Powers = powers;
 
             return grouprolemem;
         }
