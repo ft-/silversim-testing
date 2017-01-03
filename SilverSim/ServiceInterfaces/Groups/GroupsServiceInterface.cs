@@ -315,7 +315,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
         }
 
-        public GroupInfo CreateGroup(UUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
+        public virtual GroupInfo CreateGroup(UUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
         {
             GroupRole role_everyone = new GroupRole();
             role_everyone.ID = UUID.Zero;

@@ -19,7 +19,7 @@ namespace SilverSim.Database.MySQL.Groups
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid"))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid", conn))
                     {
                         cmd.Parameters.AddParameter("?groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -45,7 +45,7 @@ namespace SilverSim.Database.MySQL.Groups
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID LIKE r.RoleID WHERE r.GroupID LIKE ?groupid AND rm.PrincipalID LIKE ?principalid"))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID LIKE r.RoleID WHERE r.GroupID LIKE ?groupid AND rm.PrincipalID LIKE ?principalid", conn))
                     {
                         cmd.Parameters.AddParameter("?groupid", group.ID);
                         cmd.Parameters.AddParameter("?principalid", principal.ID);
@@ -116,6 +116,7 @@ namespace SilverSim.Database.MySQL.Groups
 
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
+                conn.Open();
                 conn.InsideTransaction(delegate ()
                 {
                     using (MySqlCommand cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=?zeroid WHERE SelectedRoleID LIKE ?roleid", conn))
