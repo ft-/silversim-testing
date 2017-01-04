@@ -10,6 +10,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using System;
@@ -27,7 +28,7 @@ namespace SilverSim.Main.Cmd.Estate
         readonly string m_EstateServiceName;
         GridServiceInterface m_RegionStorage;
         EstateServiceInterface m_EstateService;
-        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        AggregatingAvatarNameService m_AvatarNameService;
         private static readonly ILog m_Log = LogManager.GetLogger("ESTATE COMMANDS");
         SceneList m_Scenes;
 
@@ -48,6 +49,7 @@ namespace SilverSim.Main.Cmd.Estate
             loader.CommandRegistry.AddDeleteCommand("estate", DeleteEstateCmd);
             loader.CommandRegistry.AddAlertCommand("estate", AlertEstateCmd);
 
+            RwLockedList<AvatarNameServiceInterface> avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if(null != sceneConfig)
             {
@@ -56,68 +58,21 @@ namespace SilverSim.Main.Cmd.Estate
                 {
                     foreach (string p in avatarNameServices.Split(','))
                     {
-                        m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
+                        avatarNameServicesList.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
                     }
                 }
             }
+            m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServicesList);
         }
 
         UUI ResolveName(UUI uui)
         {
             UUI resultUui;
-            foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+            if (m_AvatarNameService.TryGetValue(uui, out resultUui))
             {
-                if (service.TryGetValue(uui, out resultUui))
-                {
-                    return resultUui;
-                }
+                return resultUui;
             }
             return uui;
-        }
-
-        bool TranslateToUUI(string arg, out UUI uui)
-        {
-            uui = UUI.Unknown;
-            if (arg.Contains("."))
-            {
-                bool found = false;
-                string[] names = arg.Split(new char[] { '.' }, 2);
-                if(names.Length == 1)
-                {
-                    names = new string[] { names[0], string.Empty };
-                }
-                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
-                {
-                    UUI founduui;
-                    if (service.TryGetValue(names[0], names[1], out founduui))
-                    {
-                        uui = founduui;
-                        found = true;
-                        break;
-                    }
-                }
-                return found;
-            }
-            else if (UUID.TryParse(arg, out uui.ID))
-            {
-                bool found = false;
-                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
-                {
-                    UUI founduui;
-                    if (service.TryGetValue(uui.ID, out founduui))
-                    {
-                        uui = founduui;
-                        found = true;
-                        break;
-                    }
-                }
-                return found;
-            }
-            else if (!UUI.TryParse(arg, out uui))
-            {
-                return false;
-            }
-            return true;
         }
 
         public void ShowEstatesCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -196,7 +151,7 @@ namespace SilverSim.Main.Cmd.Estate
                             break;
 
                         case "owner":
-                            if(!TranslateToUUI(args[argi + 1], out estateInfo.Owner))
+                            if(!m_AvatarNameService.TranslateToUUI(args[argi + 1], out estateInfo.Owner))
                             {
                                 io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
                                 return;
@@ -308,7 +263,7 @@ namespace SilverSim.Main.Cmd.Estate
                             break;
 
                         case "owner":
-                            if (!TranslateToUUI(args[argi + 1], out estateInfo.Owner))
+                            if (!m_AvatarNameService.TranslateToUUI(args[argi + 1], out estateInfo.Owner))
                             {
                                 io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
                                 return;

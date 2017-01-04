@@ -35,11 +35,16 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 return uui;
             }
+        }
 
-            set
-            {
-                throw new NotSupportedException();
-            }
+        public override void Store(UUI uui)
+        {
+            /* intentionally ignored */
+        }
+
+        public override bool Remove(UUID key)
+        {
+            return false;
         }
 
         public override UUI this[string firstName, string lastName]

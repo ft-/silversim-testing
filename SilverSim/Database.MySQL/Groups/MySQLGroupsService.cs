@@ -9,6 +9,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace SilverSim.Database.MySQL.Groups
     public partial class MySQLGroupsService : GroupsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUPS SERVICE");
-        private readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        AggregatingAvatarNameService m_AvatarNameService;
 
         const string GCountQuery = "(SELECT COUNT(m.PrincipalID) FROM groupmemberships AS m WHERE m.GroupID LIKE g.GroupID) AS MemberCount," +
 				"(SELECT COUNT(r.RoleID) FROM grouproles AS r WHERE r.GroupID LIKE g.GroupID) AS RoleCount";
@@ -30,20 +31,12 @@ namespace SilverSim.Database.MySQL.Groups
 
         UUI ResolveName(UUI uui)
         {
-            UUI searchuui = uui;
-            foreach(AvatarNameServiceInterface service in m_AvatarNameServices)
+            UUI resultuui;
+            if (m_AvatarNameService.TryGetValue(uui, out resultuui))
             {
-                UUI resultuui;
-                if (service.TryGetValue(searchuui, out resultuui))
-                {
-                    searchuui = resultuui;
-                    if(resultuui.IsAuthoritative)
-                    {
-                        break;
-                    }
-                }
+                return resultuui;
             }
-            return searchuui;
+            return uui;
         }
 
         UGI ResolveName(UUI requestingAgent, UGI group)
@@ -182,10 +175,12 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void Startup(ConfigurationLoader loader)
         {
+            RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
             foreach(string name in m_AvatarNameServiceNames.Trim().Split(','))
             {
-                m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(name));
+                avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(name));
             }
+            m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServices);
         }
 
         public void Remove(UUID scopeID, UUID accountID)

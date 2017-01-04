@@ -73,19 +73,22 @@ namespace SilverSim.Database.Memory.AvatarName
                 }
                 return uui;
             }
-            set
-            {
-                if(value == null)
-                {
-                    m_Data.Remove(key);
-                }
-                else if(value.IsAuthoritative) /* do not store non-authoritative entries */
-                {
-                    m_Data[value.ID] = new UUI(value);
-                }
-            }
         }
         #endregion
+
+        public override void Store(UUI value)
+        {
+            if (value.IsAuthoritative) /* do not store non-authoritative entries */
+            {
+                m_Data[value.ID] = new UUI(value);
+            }
+        }
+
+        public override bool Remove(UUID key)
+        {
+            return m_Data.Remove(key);
+        }
+
 
         public override List<UUI> Search(string[] names)
         {

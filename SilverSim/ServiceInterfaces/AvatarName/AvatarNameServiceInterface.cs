@@ -43,10 +43,13 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
         }
 
-        public abstract UUI this[UUID key] { get; set; } /* setting to null clears an entry if supported */
+        public abstract UUI this[UUID key] { get; }
         public abstract bool TryGetValue(UUID key, out UUI uui);
 
-        /* if setting is not supported, the set access is ignored */
+        /** <summary>if setting is not supported, ignore the details and return without exception. Only store authoritative information</summary> */
+        public abstract void Store(UUI uui);
+        public abstract bool Remove(UUID key);
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UUI this[string firstName, string lastName] { get; }
 
@@ -77,6 +80,39 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                 }
                 return input;
             }
+        }
+
+        public bool TranslateToUUI(string arg, out UUI uui)
+        {
+            uui = UUI.Unknown;
+            if (arg.Contains("."))
+            {
+                string[] names = arg.Split(new char[] { '.' }, 2);
+                if (names.Length == 1)
+                {
+                    names = new string[] { names[0], string.Empty };
+                }
+                UUI founduui;
+                if (TryGetValue(names[0], names[1], out founduui))
+                {
+                    uui = founduui;
+                    return true;
+                }
+            }
+            else if (UUID.TryParse(arg, out uui.ID))
+            {
+                UUI founduui;
+                if (TryGetValue(uui.ID, out founduui))
+                {
+                    uui = founduui;
+                    return true;
+                }
+            }
+            else if (UUI.TryParse(arg, out uui))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

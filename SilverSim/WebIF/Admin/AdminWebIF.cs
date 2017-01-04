@@ -38,7 +38,7 @@ namespace SilverSim.WebIF.Admin
         const string JsonContentType = "application/json";
         RwLockedList<string> m_KnownConfigurationIssues;
         ConfigurationLoader m_Loader;
-        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        AggregatingAvatarNameService m_AvatarNameService;
         readonly string m_AvatarNameServiceNames;
         readonly string m_Title;
         readonly BlockingQueue<LoggingEvent> m_LogEventQueue = new BlockingQueue<LoggingEvent>();
@@ -252,63 +252,16 @@ namespace SilverSim.WebIF.Admin
         {
             UUI uui = resolveuui;
             UUI resultUui = uui;
-            foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+            if (m_AvatarNameService.TryGetValue(uui, out resultUui))
             {
-                if (service.TryGetValue(uui, out resultUui))
-                {
-                    uui = resultUui;
-                    if (resultUui.IsAuthoritative)
-                    {
-                        break;
-                    }
-                }
+                uui = resultUui;
             }
             return uui;
         }
 
         public bool TranslateToUUI(string arg, out UUI uui)
         {
-            uui = UUI.Unknown;
-            if (arg.Contains("."))
-            {
-                bool found = false;
-                string[] names = arg.Split(new char[] { '.' }, 2);
-                if (names.Length == 1)
-                {
-                    names = new string[] { names[0], string.Empty };
-                }
-                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
-                {
-                    UUI founduui;
-                    if (service.TryGetValue(names[0], names[1], out founduui))
-                    {
-                        uui = founduui;
-                        found = true;
-                        break;
-                    }
-                }
-                return found;
-            }
-            else if (UUID.TryParse(arg, out uui.ID))
-            {
-                bool found = false;
-                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
-                {
-                    UUI founduui;
-                    if (service.TryGetValue(uui.ID, out founduui))
-                    {
-                        uui = founduui;
-                        found = true;
-                        break;
-                    }
-                }
-                return found;
-            }
-            else if (!UUI.TryParse(arg, out uui))
-            {
-                return false;
-            }
-            return true;
+            return m_AvatarNameService.TranslateToUUI(arg, out uui);
         }
 
         void HandleTimer(object o, EventArgs args)
@@ -334,13 +287,15 @@ namespace SilverSim.WebIF.Admin
         public void Startup(ConfigurationLoader loader)
         {
             m_Loader = loader;
+            RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
             if (!string.IsNullOrEmpty(m_AvatarNameServiceNames))
             {
                 foreach (string p in m_AvatarNameServiceNames.Split(','))
                 {
-                    m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
+                    avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
                 }
             }
+            m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServices);
 
             m_KnownConfigurationIssues = loader.KnownConfigurationIssues;
             m_ServerParams = loader.GetServerParamStorage();

@@ -10,6 +10,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Friends;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Friends;
 using System.Collections.Generic;
@@ -36,8 +37,8 @@ namespace SilverSim.Database.MySQL.Friends
     {
         readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL FRIENDS SERVICE");
-        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         readonly string[] m_AvatarNameServiceNames;
+        AggregatingAvatarNameService m_AvatarNameService;
 
         public MySQLFriendsService(string connectionString, string avatarNameServices)
         {
@@ -49,24 +50,16 @@ namespace SilverSim.Database.MySQL.Friends
 
         public void ResolveUUI(FriendInfo fi)
         {
-            foreach(AvatarNameServiceInterface service in m_AvatarNameServices)
+            UUI uui;
+            if(!fi.Friend.IsAuthoritative &&
+                m_AvatarNameService.TryGetValue(fi.Friend, out uui))
             {
-                UUI uui;
-                if(fi.Friend.IsAuthoritative && fi.User.IsAuthoritative)
-                {
-                    break;
-                }
-
-                if(!fi.Friend.IsAuthoritative &&
-                    service.TryGetValue(fi.Friend, out uui))
-                {
-                    fi.Friend = uui;
-                }
-                if(!fi.User.IsAuthoritative &&
-                    service.TryGetValue(fi.User, out uui))
-                {
-                    fi.User = uui;
-                }
+                fi.Friend = uui;
+            }
+            if(!fi.User.IsAuthoritative &&
+                m_AvatarNameService.TryGetValue(fi.User, out uui))
+            {
+                fi.User = uui;
             }
         }
 
@@ -149,10 +142,12 @@ namespace SilverSim.Database.MySQL.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
+            RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
             foreach(string avatarnameservicename in m_AvatarNameServiceNames)
             {
-                m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(avatarnameservicename));
+                avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(avatarnameservicename));
             }
+            m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServices);
         }
 
         public override void Store(FriendInfo fi)

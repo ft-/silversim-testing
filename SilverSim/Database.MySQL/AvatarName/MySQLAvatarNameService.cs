@@ -108,42 +108,40 @@ namespace SilverSim.Database.MySQL.AvatarName
                 }
                 return uui;
             }
-            set
+        }
+        #endregion
+
+        public override void Store(UUI value)
+        {
+            if (value.IsAuthoritative) /* do not store non-authoritative entries */
             {
-                if(value == null)
+                Dictionary<string, object> data = new Dictionary<string, object>();
+                data["AvatarID"] = value.ID;
+                data["HomeURI"] = value.HomeURI;
+                data["FirstName"] = value.FirstName;
+                data["LastName"] = value.LastName;
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
-                    using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                    {
-                        connection.Open();
+                    connection.Open();
 
-                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
-                        {
-                            cmd.Parameters.AddParameter("?id", key);
-                            if(cmd.ExecuteNonQuery() < 1)
-                            {
-                                throw new KeyNotFoundException();
-                            }
-                        }
-                    }
-
-                }
-                else if(value.IsAuthoritative) /* do not store non-authoritative entries */
-                {
-                    Dictionary<string, object> data = new Dictionary<string, object>();
-                    data["AvatarID"] = value.ID;
-                    data["HomeURI"] = value.HomeURI;
-                    data["FirstName"] = value.FirstName;
-                    data["LastName"] = value.LastName;
-                    using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                    {
-                        connection.Open();
-
-                        connection.ReplaceInto("avatarnames", data);
-                    }
+                    connection.ReplaceInto("avatarnames", data);
                 }
             }
         }
-        #endregion
+
+        public override bool Remove(UUID key)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddParameter("?id", key);
+                    return cmd.ExecuteNonQuery() == 1;
+                }
+            }
+        }
 
         public override List<UUI> Search(string[] names)
         {

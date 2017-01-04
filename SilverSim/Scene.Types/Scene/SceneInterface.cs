@@ -358,7 +358,7 @@ namespace SilverSim.Scene.Types.Scene
             SizeY = sizeY;
             Owner = UUI.Unknown;
             AssetService = new DefaultAssetService(this);
-            AvatarNameService = new DefaultAvatarNameService(AvatarNameServices);
+            AvatarNameService = new AggregatingAvatarNameService(AvatarNameServices);
             CapabilitiesConfig = new Dictionary<string, string>();
             RegionSecret = UUID.Random;
             m_NotecardCache = new NotecardCache(this);
