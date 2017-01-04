@@ -4,6 +4,7 @@
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -30,12 +31,20 @@ namespace SilverSim.Groups.Common
             return m_InnerService.Invites.ContainsKey(requestingAgent, groupInviteID);
         }
 
+        bool IGroupInvitesInterface.DoesSupportListGetters
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
         {
             get
             {
-                return m_InnerService.Invites[requestingAgent, group, roleID, principal];
+                throw new NotSupportedException();
             }
         }
 
@@ -44,13 +53,13 @@ namespace SilverSim.Groups.Common
         {
             get
             {
-                return m_InnerService.Invites[requestingAgent, principal];
+                throw new NotSupportedException();
             }
         }
 
         List<GroupInvite> IGroupInvitesInterface.GetByGroup(UUI requestingAgent, UGI group)
         {
-            return m_InnerService.Invites.GetByGroup(requestingAgent, group);
+            throw new NotSupportedException();
         }
 
         void IGroupInvitesInterface.Add(UUI requestingAgent, GroupInvite invite)

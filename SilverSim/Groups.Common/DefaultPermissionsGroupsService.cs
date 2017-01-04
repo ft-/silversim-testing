@@ -94,6 +94,10 @@ namespace SilverSim.Groups.Common
         public void Startup(ConfigurationLoader loader)
         {
             m_InnerService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
+            if(!m_InnerService.Invites.DoesSupportListGetters)
+            {
+                throw new ConfigurationLoader.ConfigurationErrorException("Inner service must support list getters");
+            }
         }
 
         public override GroupPowers GetAgentPowers(UGI group, UUI agent)

@@ -52,6 +52,14 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
+        bool IGroupInvitesInterface.DoesSupportListGetters
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
         {
             get

@@ -200,18 +200,23 @@ namespace SilverSim.ServiceInterfaces.Groups
             bool TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite);
             bool ContainsKey(UUI requestingAgent, UUID groupInviteID);
 
+            bool DoesSupportListGetters { get; }
+
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+            /** <summary>Only for use of Permission modules</summary> */
             List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
             {
                 get;
             }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+            /** <summary>Only for use of Permission modules</summary> */
             List<GroupInvite> this[UUI requestingAgent, UUI principal]
             {
                 get;
             }
 
+            /** <summary>Only for use of Permission modules</summary> */
             List<GroupInvite> GetByGroup(UUI requestingAgent, UGI group);
 
             void Add(UUI requestingAgent, GroupInvite invite);
