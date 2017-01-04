@@ -60,13 +60,28 @@ namespace SilverSim.Types
             return v.ToString();
         }
 
-        public static implicit operator Uri(URI v)
+        public static explicit operator Uri(URI v)
         {
             if(v.m_Value == null)
             {
                 return null;
             }
             return new Uri(v.m_Value.ToString());
+        }
+
+        public override bool Equals(object o)
+        {
+            URI u = o as URI;
+            if((object)u == null)
+            {
+                return false;
+            }
+            return m_Value == u.m_Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_Value.GetHashCode();
         }
 
         public static bool operator ==(URI l, URI r)
@@ -92,11 +107,11 @@ namespace SilverSim.Types
             object ro = r;
             if (lo == null && ro == null)
             {
-                return true;
+                return false;
             }
             else if (lo == null || ro == null)
             {
-                return false;
+                return true;
             }
             return l.m_Value != r.m_Value;
         }
