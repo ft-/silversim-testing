@@ -45,6 +45,17 @@ namespace SilverSim.Groups.Common
             return false;
         }
 
+        bool IGroupNoticesInterface.ContainsKey(UUI requestingAgent, UUID groupNoticeID)
+        {
+            GroupNotice gnot;
+            if (m_InnerService.Notices.TryGetValue(requestingAgent, groupNoticeID, out gnot))
+            {
+                VerifyAgentPowers(gnot.Group, requestingAgent, GroupPowers.ReceiveNotices);
+                return true;
+            }
+            return false;
+        }
+
         void IGroupNoticesInterface.Add(UUI requestingAgent, GroupNotice notice)
         {
             VerifyAgentPowers(notice.Group, requestingAgent, GroupPowers.SendNotices);

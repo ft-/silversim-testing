@@ -111,5 +111,21 @@ namespace SilverSim.Database.MySQL.Groups
             groupNotice = notice;
             return true;
         }
+
+        bool IGroupNoticesInterface.ContainsKey(UUI requestingAgent, UUID groupNoticeID)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT NoticeID FROM groupnotices WHERE NoticeID LIKE ?noticeid", conn))
+                {
+                    cmd.Parameters.AddParameter("?noticeid", groupNoticeID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        return reader.Read();
+                    }
+                }
+            }
+        }
     }
 }

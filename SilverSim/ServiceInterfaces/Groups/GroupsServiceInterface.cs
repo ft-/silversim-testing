@@ -235,6 +235,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
 
             bool TryGetValue(UUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice);
+            bool ContainsKey(UUI requestingAgent, UUID groupNoticeID);
 
             void Add(UUI requestingAgent, GroupNotice notice);
 
