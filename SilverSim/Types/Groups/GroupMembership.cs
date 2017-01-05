@@ -8,11 +8,20 @@ namespace SilverSim.Types.Groups
         public UGI Group = UGI.Unknown;
         public UUI Principal = UUI.Unknown;
         public GroupPowers GroupPowers = GroupPowers.None;
-        public bool AcceptNotices;
+        public bool IsAcceptNotices;
         public UUID GroupInsigniaID = UUID.Zero;
         public int Contribution;
         public string GroupTitle = string.Empty;
-        public bool ListInProfile;
+        public bool IsListInProfile;
+        public bool IsAllowPublish;
+        public string Charter;
+        public UUID ActiveRoleID;
+        public UUI Founder;
+        public string AccessToken;
+        public bool IsMaturePublish;
+        public bool IsOpenEnrollment;
+        public int MembershipFee;
+        public bool IsShownInList;
 
         public GroupMembership()
         {

@@ -14,16 +14,27 @@ namespace SilverSim.Database.MySQL.Groups
         GroupMembership MembershipFromReader(MySqlDataReader reader, UUI requestingAgent)
         {
             GroupMembership membership = new GroupMembership();
-            membership.AcceptNotices = reader.GetBool("AcceptNotices");
+            membership.IsAcceptNotices = reader.GetBool("AcceptNotices");
             membership.Contribution = reader.GetInt32("Contribution");
             membership.Group.ID = reader.GetUUID("GroupID");
             membership.GroupInsigniaID = reader.GetUUID("GroupInsigniaID");
             membership.GroupPowers = reader.GetEnum<GroupPowers>("RolePowers");
             membership.GroupTitle = reader.GetString("RoleTitle");
-            membership.ListInProfile = reader.GetBool("ListInProfile");
+            membership.IsListInProfile = reader.GetBool("ListInProfile");
             membership.Principal.ID = reader.GetUUID("PrincipalID");
             membership.Group = ResolveName(requestingAgent, membership.Group);
             membership.Principal = ResolveName(membership.Principal);
+
+            membership.IsAllowPublish = reader.GetBool("AllowPublish");
+            membership.Charter = reader.GetString("Charter");
+            membership.ActiveRoleID = reader.GetUUID("ActiveRoleID");
+            membership.Founder.ID = reader.GetUUID("FounderID");
+            membership.AccessToken = reader.GetString("AccessToken");
+            membership.IsMaturePublish = reader.GetBool("MaturePublish");
+            membership.IsOpenEnrollment = reader.GetBool("OpenEnrollment");
+            membership.MembershipFee = reader.GetInt32("MembershipFee");
+            membership.IsShownInList = reader.GetBool("ShowInList");
+
             return membership;
         }
 
@@ -36,7 +47,7 @@ namespace SilverSim.Database.MySQL.Groups
                 {
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand(
-                            "SELECT g.*, m.PrincipalID, m.SelectedRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " + 
+                            "SELECT g.*, m.AccessToken as AccessToken, m.SelectedRoleID AS ActiveRoleID, m.PrincipalID, m.SelectedRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " + 
                             "r.RoleID, r.Name AS RoleName, r.Description AS RoleDescription, r.Title as RoleTitle, r.Powers as RolePowers, " +
                             RCountQuery + "," + MCountQuery + " FROM (groupmemberships AS m INNER JOIN groups AS g ON m.GroupID = g.GroupID) " +
                             "INNER JOIN grouproles AS r ON m.SelectedRoleID = r.RoleID " +

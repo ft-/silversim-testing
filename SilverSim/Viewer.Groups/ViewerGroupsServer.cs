@@ -405,10 +405,10 @@ namespace SilverSim.Viewer.Groups
                     foreach (GroupMembership gmem in gmems)
                     {
                         AgentGroupDataUpdate.GroupDataEntry d = new AgentGroupDataUpdate.GroupDataEntry();
-                        d.ListInProfile = gmem.ListInProfile;
+                        d.ListInProfile = gmem.IsListInProfile;
                         d.GroupID = gmem.Group.ID;
                         d.GroupPowers = gmem.GroupPowers;
-                        d.AcceptNotices = gmem.AcceptNotices;
+                        d.AcceptNotices = gmem.IsAcceptNotices;
                         d.GroupInsigniaID = gmem.GroupInsigniaID;
                         d.Contribution = gmem.Contribution;
                         d.GroupName = gmem.Group.GroupName;

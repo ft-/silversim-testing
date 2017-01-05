@@ -1001,11 +1001,11 @@ namespace SilverSim.Viewer.Profile
                     {
                         AvatarGroupsReply.GroupDataEntry d = new AvatarGroupsReply.GroupDataEntry();
                         d.GroupPowers = gmem.GroupPowers;
-                        d.AcceptNotices = gmem.AcceptNotices;
+                        d.AcceptNotices = gmem.IsAcceptNotices;
                         d.GroupTitle = gmem.GroupTitle;
                         d.GroupName = gmem.Group.GroupName;
                         d.GroupInsigniaID = gmem.GroupInsigniaID;
-                        d.ListInProfile = gmem.ListInProfile;
+                        d.ListInProfile = gmem.IsListInProfile;
                         res3.GroupData.Add(d);
                     }
 
