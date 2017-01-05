@@ -17,7 +17,7 @@ namespace SilverSim.Database.MySQL.Groups
             membership.IsAcceptNotices = reader.GetBool("AcceptNotices");
             membership.Contribution = reader.GetInt32("Contribution");
             membership.Group.ID = reader.GetUUID("GroupID");
-            membership.GroupInsigniaID = reader.GetUUID("GroupInsigniaID");
+            membership.GroupInsigniaID = reader.GetUUID("InsigniaID");
             membership.GroupPowers = reader.GetEnum<GroupPowers>("RolePowers");
             membership.GroupTitle = reader.GetString("RoleTitle");
             membership.IsListInProfile = reader.GetBool("ListInProfile");
@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand(
-                        "SELECT g.*, m.PrincipalID, m.SelectedRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " +
+                        "SELECT g.*, m.PrincipalID, m.SelectedRoleID AS ActiveRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " +
                         "r.RoleID, r.Name AS RoleName, r.Description AS RoleDescription, r.Title as RoleTitle, r.Powers as RolePowers, " +
                         RCountQuery + "," + MCountQuery + " FROM (groupmemberships AS m INNER JOIN groups AS g ON m.GroupID = g.GroupID) " +
                         "INNER JOIN grouproles AS r ON m.SelectedRoleID = r.RoleID " +
@@ -109,7 +109,7 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand(
-                        "SELECT g.*, m.PrincipalID, m.SelectedRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " +
+                        "SELECT g.*, m.PrincipalID, m.SelectedRoleID AS ActiveRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " +
                         "r.RoleID, r.Name AS RoleName, r.Description AS RoleDescription, r.Title as RoleTitle, r.Powers as RolePowers, " +
                         RCountQuery + "," + MCountQuery + " FROM (groupmemberships AS m INNER JOIN groups AS g ON m.GroupID = g.GroupID) " +
                         "INNER JOIN grouproles AS r ON m.SelectedRoleID = r.RoleID " +

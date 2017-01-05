@@ -16,7 +16,7 @@ namespace SilverSim.Types.Groups
         public bool IsAllowPublish;
         public string Charter;
         public UUID ActiveRoleID;
-        public UUI Founder;
+        public UUI Founder = UUI.Unknown;
         public string AccessToken;
         public bool IsMaturePublish;
         public bool IsOpenEnrollment;
