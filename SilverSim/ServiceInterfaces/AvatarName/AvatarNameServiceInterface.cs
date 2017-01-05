@@ -82,6 +82,12 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
         }
 
+        public UUI ResolveName(UUI uui)
+        {
+            UUI resultuui;
+            return TryGetValue(uui, out resultuui) ? resultuui : uui;
+        }
+
         public bool TranslateToUUI(string arg, out UUI uui)
         {
             uui = UUI.Unknown;

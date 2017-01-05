@@ -29,6 +29,7 @@ namespace SilverSim.Database.MySQL.Groups
             membership.Charter = reader.GetString("Charter");
             membership.ActiveRoleID = reader.GetUUID("ActiveRoleID");
             membership.Founder.ID = reader.GetUUID("FounderID");
+            membership.Founder = ResolveName(membership.Founder);
             membership.AccessToken = reader.GetString("AccessToken");
             membership.IsMaturePublish = reader.GetBool("MaturePublish");
             membership.IsOpenEnrollment = reader.GetBool("OpenEnrollment");
