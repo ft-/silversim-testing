@@ -6,10 +6,17 @@ using EnvironmentController = SilverSim.Scene.Types.SceneEnvironment.Environment
 
 namespace SilverSim.Scene.Types.Scene
 {
+    public interface IWindModelPreset
+    {
+        Vector3 this[Vector3 pos] { get; set; }
+    }
+
     public interface IWindModel
     {
         Vector3 this[Vector3 pos] { get; set; }
         Vector3 PrevailingWind { get; }
+
+        IWindModelPreset PresetWind { get; }
 
         void UpdateModel(EnvironmentController.SunData sunData, double dt);
     }

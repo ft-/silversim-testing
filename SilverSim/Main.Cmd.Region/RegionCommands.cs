@@ -93,6 +93,8 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.AddClearCommand("region", ClearRegionCmd);
             loader.CommandRegistry.AddSelectCommand("region", SelectRegionCmd);
             loader.CommandRegistry.AddShowCommand("parcels", ShowParcelsCmd);
+            loader.CommandRegistry.AddShowCommand("windvelocity", ShowWindVelocityCmd);
+            loader.CommandRegistry.AddSetCommand("windvelocity", SetWindVelocityCmd);
             loader.CommandRegistry.AddGetCommand("sunparam", GetSunParamCmd);
             loader.CommandRegistry.AddSetCommand("sunparam", SetSunParamCmd);
             loader.CommandRegistry.AddResetCommand("sunparam", ResetSunParamCmd);
@@ -1535,6 +1537,98 @@ namespace SilverSim.Main.Cmd.Region
             }
             io.Write(output.ToString());
 
+        }
+
+        void SetWindVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help" || args.Count != 4)
+            {
+                io.Write("set windvelocity <x,y,z> <velx,vely,velz> - Set wind at position x,y,z to <velx,vely,velz>");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("set windvelocity needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            Vector3 pos;
+            Vector3 vel;
+            if (!Vector3.TryParse("<" + args[2] + ">", out pos))
+            {
+                io.Write("invalid position specified");
+                return;
+            }
+            if (!Vector3.TryParse("<" + args[3] + ">", out vel))
+            {
+                io.Write("invalid velocity specified");
+                return;
+            }
+
+            scene.Environment.Wind[pos] = vel;
+            io.WriteFormatted("Set wind velocity at {0}: {1}", pos.ToString(), vel.ToString());
+        }
+
+        void ShowWindVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help" || args.Count > 3)
+            {
+                io.Write("show windvelocity - Show prevailing wind\nshow windvelocity <x,y,z> - Show wind at position x,y,z");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("show windvelocity needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            if (args.Count == 3)
+            {
+                Vector3 pos;
+                if(!Vector3.TryParse("<" + args[2] + ">", out pos))
+                {
+                    io.Write("invalid position specified");
+                    return;
+                }
+
+                io.WriteFormatted("Wind velocity at {0}: {1}", pos.ToString(), scene.Environment.Wind[pos].ToString());
+            }
+            else
+            {
+                io.WriteFormatted("Prevailing wind velocity: {0}", scene.Environment.Wind.PrevailingWind.ToString());
+            }
         }
 
         void ShowAgentsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
