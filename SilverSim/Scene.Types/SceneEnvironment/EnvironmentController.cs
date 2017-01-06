@@ -186,10 +186,12 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     SendSimulatorTimeMessageToAllClients();
                 }
             }
-            if (null != Wind && newTickCount - m_LastWindModelUpdateTickCount >= m_UpdateWindModelEveryMsecs)
+
+            int lastwinddt = newTickCount - m_LastWindModelUpdateTickCount;
+            if (null != Wind && lastwinddt >= m_UpdateWindModelEveryMsecs)
             {
                 m_LastWindModelUpdateTickCount = newTickCount;
-                Wind.UpdateModel(m_SunData, (newTickCount - m_LastWindModelUpdateTickCount) / 1000.0);
+                Wind.UpdateModel(m_SunData, lastwinddt / 1000.0);
             }
 
             UpdateMoonPhase();
