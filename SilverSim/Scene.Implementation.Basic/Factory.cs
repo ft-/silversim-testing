@@ -79,7 +79,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_EstateServiceName = ownConfig.GetString("EstateService", "EstateService");
             m_PhysicsName = ownConfig.GetString("Physics", string.Empty);
             m_NeighborServiceName = ownConfig.GetString("NeighborService", "NeighborService");
-            m_WindModelFactoryName = ownConfig.GetString("WindModel", string.Empty);
+            m_WindModelFactoryName = ownConfig.GetString("WindPlugin", string.Empty);
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
             if (!string.IsNullOrEmpty(avatarNameServices))
             {
