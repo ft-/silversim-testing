@@ -42,6 +42,7 @@ namespace SilverSim.Scene.Implementation.Basic
         readonly string m_SimulationDataStorageName;
         readonly string m_PhysicsName;
         readonly string m_NeighborServiceName;
+        readonly string m_WindModelFactoryName;
         readonly List<string> m_AvatarNameServiceNames = new List<string>();
 
         GroupsNameServiceInterface m_GroupsNameService;
@@ -62,6 +63,7 @@ namespace SilverSim.Scene.Implementation.Basic
         IMRouter m_IMRouter;
         BaseHttpServer m_HttpServer;
         List<IPortControlServiceInterface> m_PortControlServices;
+        IWindModelFactory m_WindModelFactory;
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -77,6 +79,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_EstateServiceName = ownConfig.GetString("EstateService", "EstateService");
             m_PhysicsName = ownConfig.GetString("Physics", string.Empty);
             m_NeighborServiceName = ownConfig.GetString("NeighborService", "NeighborService");
+            m_WindModelFactoryName = ownConfig.GetString("WindModel", string.Empty);
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
             if (!string.IsNullOrEmpty(avatarNameServices))
             {
@@ -98,6 +101,10 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public void Startup(ConfigurationLoader loader)
         {
+            if(!string.IsNullOrEmpty(m_WindModelFactoryName))
+            {
+                m_WindModelFactory = loader.GetService<IWindModelFactory>(m_WindModelFactoryName);
+            }
             m_HttpServer = loader.HttpServer;
             m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
             m_ExternalHostNameService = loader.ExternalHostNameService;
@@ -156,7 +163,8 @@ namespace SilverSim.Scene.Implementation.Basic
                 this,
                 m_ExternalHostNameService,
                 m_HttpServer,
-                m_PortControlServices);
+                m_PortControlServices,
+                m_WindModelFactory);
             return scene;
         }
     }

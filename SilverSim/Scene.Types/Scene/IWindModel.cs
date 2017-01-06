@@ -11,6 +11,11 @@ namespace SilverSim.Scene.Types.Scene
         Vector3 this[Vector3 pos] { get; set; }
         Vector3 PrevailingWind { get; }
 
-        void UpdateModel(EnvironmentController.SunData sunData);
+        void UpdateModel(EnvironmentController.SunData sunData, double dt);
+    }
+
+    public interface IWindModelFactory
+    {
+        IWindModel Instantiate(SceneInterface scene);
     }
 }

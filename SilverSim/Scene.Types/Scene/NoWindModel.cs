@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public void UpdateModel(EnvironmentController.SunData sunData)
+        public void UpdateModel(EnvironmentController.SunData sunData, double dt)
         {
             /* intentionally left empty */
         }

@@ -90,10 +90,17 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         }
         #endregion
 
-        public EnvironmentController(SceneInterface scene)
+        public EnvironmentController(SceneInterface scene, IWindModelFactory factory = null)
         {
             m_Scene = scene;
-            Wind = new NoWindModel();
+            if (factory != null)
+            {
+                Wind = factory.Instantiate(scene);
+            }
+            else
+            {
+                Wind = new NoWindModel();
+            }
             m_SunData.SunDirection = new Vector3();
             ResetToDefaults();
         }
@@ -182,7 +189,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             if (null != Wind && newTickCount - m_LastWindModelUpdateTickCount >= m_UpdateWindModelEveryMsecs)
             {
                 m_LastWindModelUpdateTickCount = newTickCount;
-                Wind.UpdateModel(m_SunData);
+                Wind.UpdateModel(m_SunData, (newTickCount - m_LastWindModelUpdateTickCount) / 1000.0);
             }
 
             UpdateMoonPhase();

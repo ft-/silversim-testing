@@ -499,7 +499,8 @@ namespace SilverSim.Scene.Implementation.Basic
             SceneFactory myFactory,
             ExternalHostNameServiceInterface externalHostNameService,
             BaseHttpServer httpServer,
-            List<IPortControlServiceInterface> portControlServices)
+            List<IPortControlServiceInterface> portControlServices,
+            IWindModelFactory windModelFactory)
         : base(ri.Size.X, ri.Size.Y)
         {
             m_Scenes = scenes;
@@ -595,7 +596,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
 
             Terrain = new TerrainController(this);
-            Environment = new EnvironmentController(this);
+            Environment = new EnvironmentController(this, windModelFactory);
 
             m_IMRouter = imrouter;
             m_IMRouter.SceneIM.Add(IMSend);
