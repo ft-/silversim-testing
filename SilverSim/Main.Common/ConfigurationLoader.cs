@@ -1291,7 +1291,7 @@ namespace SilverSim.Main.Common
 #if DEBUG
                     System.Console.WriteLine("Processing config {0}", source.Name);
 #endif
-                    importedInfo.Set("Imported-" + importedInfo, true);
+                    importedInfo.Set("Imported-" + source.Name, true);
                     m_Config.Merge(source.ConfigSource);
                 }
                 catch
