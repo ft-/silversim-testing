@@ -21,14 +21,17 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     GroupRole gr;
-                    GroupActiveMembership gm = groupsService.ActiveMembership[Owner, Owner];
-                    adu.ActiveGroupID = groupsService.ActiveGroup[Owner, Owner].ID;
-                    if (adu.ActiveGroupID != UUID.Zero)
+                    GroupActiveMembership gm;
+                    if (groupsService.ActiveMembership.TryGetValue(Owner, Owner, out gm))
                     {
-                        gr = groupsService.Roles[Owner, gm.Group, gm.SelectedRoleID];
-                        adu.GroupName = gm.Group.GroupName;
-                        adu.GroupTitle = gr.Title;
-                        adu.GroupPowers = gr.Powers;
+                        adu.ActiveGroupID = groupsService.ActiveGroup[Owner, Owner].ID;
+                        if (adu.ActiveGroupID != UUID.Zero)
+                        {
+                            gr = groupsService.Roles[Owner, gm.Group, gm.SelectedRoleID];
+                            adu.GroupName = gm.Group.GroupName;
+                            adu.GroupTitle = gr.Title;
+                            adu.GroupPowers = gr.Powers;
+                        }
                     }
                 }
                 catch
@@ -39,10 +42,6 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                     m_Log.Debug("HandleAgentDataUpdateRequest", e);
 #endif
-                    adu.ActiveGroupID = UUID.Zero;
-                    adu.GroupName = string.Empty;
-                    adu.GroupTitle = string.Empty;
-                    adu.GroupPowers = GroupPowers.None;
                 }
             }
             adu.AgentID = ID;
