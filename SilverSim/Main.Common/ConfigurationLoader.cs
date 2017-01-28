@@ -1275,7 +1275,7 @@ namespace SilverSim.Main.Common
             Allowed
         }
 
-        void ProcessConfigurations()
+        void ProcessConfigurations(bool processParameterMap = true)
         {
             IConfig importedInfo;
             importedInfo = m_Config.Configs["ImportedConfigs"];
@@ -1303,11 +1303,17 @@ namespace SilverSim.Main.Common
                 LoadGridsXml();
                 AddIncludes(source);
                 ProcessImportResources();
-                ProcessParameterMap();
+                if (processParameterMap)
+                {
+                    ProcessParameterMap();
+                }
                 ProcessResourceMap();
             }
             LoadGridsXml();
-            ProcessParameterMap();
+            if (processParameterMap)
+            {
+                ProcessParameterMap();
+            }
             ProcessUseTemplates();
         }
 
@@ -1461,7 +1467,7 @@ namespace SilverSim.Main.Common
             }
 
             /* pre-process defaults ini before adding the final configuration */
-            ProcessConfigurations();
+            ProcessConfigurations(false);
 
             /* make the resource assets available for all users not just scene */
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
