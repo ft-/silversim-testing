@@ -16,9 +16,9 @@ namespace SilverSim.Database.MySQL.Groups
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE Principal LIKE ?principal", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID LIKE ?principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?principal", principalID);
+                        cmd.Parameters.AddParameter("?principalid", principalID.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())
@@ -38,9 +38,9 @@ namespace SilverSim.Database.MySQL.Groups
                     using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand("INSERT INTO activegroup (Principal, ActiveGroupID) VALUES (?principal, ?activegroupid) ON DUPLICATE KEY UPDATE ActiveGroupID=?activegroupid", conn))
+                        using (MySqlCommand cmd = new MySqlCommand("INSERT INTO activegroup (PrincipalID, ActiveGroupID) VALUES (?principalid, ?activegroupid) ON DUPLICATE KEY UPDATE ActiveGroupID=?activegroupid", conn))
                         {
-                            cmd.Parameters.AddParameter("?principal", principalID);
+                            cmd.Parameters.AddParameter("?principalid", principalID.ID);
                             cmd.Parameters.AddParameter("?activegroupid", value.ID);
                             cmd.ExecuteNonQuery();
                         }
@@ -83,9 +83,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE Principal LIKE ?principal", conn))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID LIKE ?principalid", conn))
                 {
-                    cmd.Parameters.AddParameter("?principal", principalID);
+                    cmd.Parameters.AddParameter("?principalid", principalID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
