@@ -1071,10 +1071,17 @@ namespace SilverSim.Main.Common
                 return;
             }
 
+            IConfig processedParameterMaps = m_Config.Configs["ProcessedParameterMaps"];
+            if(null == processedParameterMaps)
+            {
+                processedParameterMaps = m_Config.AddConfig("ProcessedParameterMaps");
+            }
+
             foreach (string key in parameterMap.GetKeys())
             {
+                string val = parameterMap.GetString(key);
                 string[] toparts = key.Split(new char[] { '.' }, 2, StringSplitOptions.None);
-                string[] fromparts = parameterMap.GetString(key).Split(new char[] { '.' }, 2, StringSplitOptions.None);
+                string[] fromparts = val.Split(new char[] { '.' }, 2, StringSplitOptions.None);
                 if (fromparts.Length < 2 || toparts.Length < 2)
                 {
                     continue;
@@ -1103,6 +1110,8 @@ namespace SilverSim.Main.Common
                     continue;
                 }
 
+
+                processedParameterMaps.Set(key, val);
                 toconfig.Set(toparts[1], fromconfig.Get(fromparts[1]));
                 parameterMap.Remove(key);
             }
