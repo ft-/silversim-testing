@@ -7,7 +7,7 @@
   </Configuration>
   <Configuration name="DebugRel">
     <Options>
-      <OutputPath>../../bin/plugins</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
