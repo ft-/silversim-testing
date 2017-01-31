@@ -6,6 +6,12 @@
       <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
+  <Configuration name="DebugRel">
+    <Options>
+      <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
+      <OutputPath>../../bin</OutputPath>
+    </Options>
+  </Configuration>
   <Configuration name="Debug">
     <Options>
       <CompilerDefines>NO_SILVERSIM_TYPES</CompilerDefines>
