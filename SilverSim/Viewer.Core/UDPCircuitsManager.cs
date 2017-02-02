@@ -105,7 +105,7 @@ namespace SilverSim.Viewer.Core
                 portControl.EnablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Udp, port);
             }
 
-            m_ChatThread = new Thread(ChatSendHandler);
+            m_ChatThread = ThreadManager.CreateThread(ChatSendHandler);
             m_ChatThread.Start();
             m_Log.InfoFormat("Initialized UDP Circuits Manager at {0}:{1}", bindAddress.ToString(), port);
         }

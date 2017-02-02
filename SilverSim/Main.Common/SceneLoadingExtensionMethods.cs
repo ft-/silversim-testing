@@ -20,6 +20,7 @@ using SilverSim.Scripting.Common;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Threading;
 
 namespace SilverSim.Main.Common
 {
@@ -42,7 +43,7 @@ namespace SilverSim.Main.Common
                     SceneLoadingParams loadparams = new SceneLoadingParams();
                     loadparams.Scene = scene;
                     loadparams.SimulationDataStorage = simulationDataStorage;
-                    scene.m_LoaderThread = new Thread(LoadSceneThread);
+                    scene.m_LoaderThread = ThreadManager.CreateThread(LoadSceneThread);
                     scene.m_LoaderThread.Start(loadparams);
                 }
             }
@@ -59,7 +60,7 @@ namespace SilverSim.Main.Common
                     SceneLoadingParams loadparams = new SceneLoadingParams();
                     loadparams.Scene = scene;
                     loadparams.SimulationDataStorage = simulationDataStorage;
-                    scene.m_LoaderThread = new Thread(LoadSceneThread);
+                    scene.m_LoaderThread = ThreadManager.CreateThread(LoadSceneThread);
                     /* we put a thread in there for ensuring correct sequence but we do not start it */
                     LoadSceneMain(loadparams);
                 }

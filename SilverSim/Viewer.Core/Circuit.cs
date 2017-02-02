@@ -362,7 +362,7 @@ namespace SilverSim.Viewer.Core
             {
                 if (!m_TxRunning)
                 {
-                    m_TxThread = new Thread(TransmitThread);
+                    m_TxThread = ThreadManager.CreateThread(TransmitThread);
                     m_TxThread.Start(this);
                     m_TxRunning = true;
                 }

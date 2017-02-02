@@ -72,7 +72,7 @@ namespace SilverSim.Main.IM
             {
                 if(m_Queue.Count > m_Threads.Count && m_Threads.Count < m_MaxThreads)
                 {
-                    new Thread(IMSendThread).Start(this);
+                    ThreadManager.CreateThread(IMSendThread).Start(this);
                 }
             }
         }

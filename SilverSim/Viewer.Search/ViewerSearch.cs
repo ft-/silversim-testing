@@ -44,7 +44,7 @@ namespace SilverSim.Viewer.Search
 
         public void Startup(ConfigurationLoader loader)
         {
-            new Thread(HandlerThread).Start();
+            ThreadManager.CreateThread(HandlerThread).Start();
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

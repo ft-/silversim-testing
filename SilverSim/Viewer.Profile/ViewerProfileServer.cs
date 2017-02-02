@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Profile
             m_ProfileServices = loader.GetServicesByValue<IProfileServicePlugin>();
             m_CleanupTimer.Elapsed += CleanupTimer;
             m_CleanupTimer.Start();
-            new Thread(HandlerThread).Start();
+            ThreadManager.CreateThread(HandlerThread).Start();
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

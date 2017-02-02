@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.OfflineIM
 
         public void Startup(ConfigurationLoader loader)
         {
-            new Thread(HandlerThread).Start();
+            ThreadManager.CreateThread(HandlerThread).Start();
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

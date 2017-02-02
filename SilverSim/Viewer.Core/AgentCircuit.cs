@@ -1005,19 +1005,19 @@ namespace SilverSim.Viewer.Core
         {
             if(!m_TextureDownloadThreadRunning)
             {
-                m_TextureDownloadThread = new Thread(TextureDownloadThread);
+                m_TextureDownloadThread = ThreadManager.CreateThread(TextureDownloadThread);
                 m_TextureDownloadThreadRunning = true;
                 m_TextureDownloadThread.Start(this);
             }
             if(!m_InventoryThreadRunning)
             {
-                m_InventoryThread = new Thread(FetchInventoryThread);
+                m_InventoryThread = ThreadManager.CreateThread(FetchInventoryThread);
                 m_InventoryThreadRunning = true;
                 m_InventoryThread.Start(this);
             }
             if (!m_ObjectUpdateThreadRunning)
             {
-                m_ObjectUpdateThread = new Thread(HandleObjectUpdates);
+                m_ObjectUpdateThread = ThreadManager.CreateThread(HandleObjectUpdates);
                 m_ObjectUpdateThreadRunning = true;
                 m_ObjectUpdateThread.Start();
             }

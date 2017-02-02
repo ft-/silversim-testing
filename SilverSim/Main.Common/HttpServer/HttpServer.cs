@@ -120,7 +120,7 @@ namespace SilverSim.Main.Common.HttpServer
                 iface.EnablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Tcp, (int)Port);
             }
 
-            m_ListenerThread = new Thread(AcceptThread);
+            m_ListenerThread = ThreadManager.CreateThread(AcceptThread);
             m_ListenerThread.Start();
 
             if (Scheme == Uri.UriSchemeHttps)
@@ -253,8 +253,8 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         Interlocked.Increment(ref m_ActiveThreadCount);
                         Thread t = m_ServerCertificate != null ?
-                            new Thread(AcceptedConnectionSsl) :
-                            new Thread(AcceptedConnectionPlain);
+                            ThreadManager.CreateThread(AcceptedConnectionSsl) :
+                            ThreadManager.CreateThread(AcceptedConnectionPlain);
                         t.Start(args.AcceptSocket);
                         args.AcceptSocket = null;
                         while (m_ActiveThreadCount > 200 && !m_StoppingListeners)

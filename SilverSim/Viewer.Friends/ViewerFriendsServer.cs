@@ -62,7 +62,7 @@ namespace SilverSim.Viewer.Friends
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_FriendsPlugins = loader.GetServicesByValue<IFriendsServicePlugin>();
             m_UserAgentPlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
-            new Thread(HandlerThread).Start();
+            ThreadManager.CreateThread(HandlerThread).Start();
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

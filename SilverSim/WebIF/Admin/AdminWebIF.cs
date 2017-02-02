@@ -237,7 +237,7 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("dnscache.delete", DnsCacheRemove);
             JsonMethods.Add("webif.modules", AvailableModulesList);
             LogController.Queues.Add(m_LogEventQueue);
-            new System.Threading.Thread(LogThread).Start();
+            ThreadManager.CreateThread(LogThread).Start();
         }
 
         public ShutdownOrder ShutdownOrder

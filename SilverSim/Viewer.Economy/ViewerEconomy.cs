@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Economy
 
         public void Startup(ConfigurationLoader loader)
         {
-            new Thread(HandlerThread).Start();
+            ThreadManager.CreateThread(HandlerThread).Start();
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

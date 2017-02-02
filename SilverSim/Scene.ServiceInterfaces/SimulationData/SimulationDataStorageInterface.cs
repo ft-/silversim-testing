@@ -84,7 +84,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
             public void StartStorageThread()
             {
-                new Thread(StorageMainThread).Start();
+                ThreadManager.CreateThread(StorageMainThread).Start();
             }
 
             protected abstract void StorageMainThread();
@@ -109,7 +109,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
             public void StartStorageThread()
             {
-                new Thread(StorageTerrainThread).Start();
+                ThreadManager.CreateThread(StorageTerrainThread).Start();
             }
 
             protected abstract void StorageTerrainThread();

@@ -51,8 +51,8 @@ namespace SilverSim.Viewer.Map
             m_Scenes = loader.Scenes;
             m_ForeignGridConnectorPlugins = loader.GetServicesByValue<IForeignGridConnectorPlugin>();
 
-            new Thread(HandlerThread).Start(MapBlocksRequestQueue);
-            new Thread(HandlerThread).Start(MapDetailsRequestQueue);
+            ThreadManager.CreateThread(HandlerThread).Start(MapBlocksRequestQueue);
+            ThreadManager.CreateThread(HandlerThread).Start(MapDetailsRequestQueue);
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

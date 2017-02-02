@@ -83,9 +83,9 @@ namespace SilverSim.Viewer.Groups
         public void Startup(ConfigurationLoader loader)
         {
             m_IMRouter = loader.IMRouter;
-            new Thread(HandlerThread).Start();
-            new Thread(IMThread).Start();
-            new Thread(AgentGroupDataUpdateQueueThread).Start();
+            ThreadManager.CreateThread(HandlerThread).Start();
+            ThreadManager.CreateThread(IMThread).Start();
+            ThreadManager.CreateThread(AgentGroupDataUpdateQueueThread).Start();
         }
 
         void SendAgentDataUpdate(IAgent agent, GroupsServiceInterface groupsService, SceneInterface scene)

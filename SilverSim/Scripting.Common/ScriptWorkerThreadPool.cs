@@ -77,7 +77,7 @@ namespace SilverSim.Scripting.Common
             for (int threadCount = 0; threadCount < m_MinimumThreads; ++threadCount)
             {
                 ScriptThreadContext tc = new ScriptThreadContext();
-                tc.ScriptThread = new Thread(ThreadMain);
+                tc.ScriptThread = ThreadManager.CreateThread(ThreadMain);
                 tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
                 tc.ScriptThread.IsBackground = true;
                 tc.ThreadPool = this;
@@ -120,7 +120,7 @@ namespace SilverSim.Scripting.Common
                         try
                         {
                             ScriptThreadContext tc = new ScriptThreadContext();
-                            tc.ScriptThread = new Thread(ThreadMain);
+                            tc.ScriptThread = ThreadManager.CreateThread(ThreadMain);
                             tc.ThreadPool = this;
                             tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
                             tc.ScriptThread.IsBackground = true;

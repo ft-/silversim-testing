@@ -30,7 +30,7 @@ namespace SilverSim.Main.Common.Console
             {
                 /* intentionally left empty */
             }
-            m_LogThread = new Thread(LogThread);
+            m_LogThread = ThreadManager.CreateThread(LogThread);
             m_LogThread.Start();
             Log.LogController.Queues.Add(m_LogQueue);
         }

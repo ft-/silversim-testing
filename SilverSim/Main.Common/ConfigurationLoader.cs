@@ -1494,6 +1494,7 @@ namespace SilverSim.Main.Common
             CommandRegistry.Commands.Add("execute", ExecuteCommand);
             CommandRegistry.AddShowCommand("memory", ShowMemoryCommand);
             CommandRegistry.AddShowCommand("threadcount", ShowThreadCountCommand);
+            CommandRegistry.AddShowCommand("threads", ShowThreadsCommand);
             CommandRegistry.AddShowCommand("queues", ShowQueuesCommand);
             CommandRegistry.AddShowCommand("modules", ShowModulesCommand);
             CommandRegistry.AddGetCommand("serverparam", GetServerParamCommand);
@@ -2222,6 +2223,28 @@ namespace SilverSim.Main.Common
             foreach (KeyValuePair<string, Action<HttpRequest>> kvp in server.RootUriContentTypeHandlers)
             {
                 sb.AppendFormat("Content-Type: {0}\n", kvp.Key);
+            }
+        }
+
+        void ShowThreadsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(UUID.Zero != limitedToScene)
+            {
+                io.Write("Not allowed on limited console");
+            }
+            else if(args[0] == "help")
+            {
+                io.Write("Show existing threads");
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("Threads:\n----------------------------------------------\n");
+                foreach(Thread t in ThreadManager.Threads)
+                {
+                    sb.AppendFormat("Thread({0}): {1}\n", t.ManagedThreadId, t.Name);
+                    sb.AppendFormat("- State: {0}\n", t.ThreadState.ToString());
+                }
+                io.Write(sb.ToString());
             }
         }
 
