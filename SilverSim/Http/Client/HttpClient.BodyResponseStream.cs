@@ -170,7 +170,7 @@ namespace SilverSim.Http.Client
                 int result;
                 if (m_RemainingLength == 0 || m_Input == null)
                 {
-                    return -1;
+                    return 0;
                 }
 
                 while (count > 0 && m_RemainingLength != 0)

@@ -206,7 +206,10 @@ namespace SilverSim.Http.Client
 #if DEBUG
             /* disable gzip encoding for debugging */
 #else
-            reqdata += "Accept-Encoding: gzip\r\n";
+            if(method != "HEAD")
+            {
+                reqdata += "Accept-Encoding: gzip\r\n";
+            }
 #endif
             reqdata += "\r\n";
             outdata = Encoding.ASCII.GetBytes(reqdata);
