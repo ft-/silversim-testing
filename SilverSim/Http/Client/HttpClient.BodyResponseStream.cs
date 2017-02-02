@@ -170,7 +170,7 @@ namespace SilverSim.Http.Client
                 int result;
                 if (m_RemainingLength == 0 || m_Input == null)
                 {
-                    return 0;
+                    return -1;
                 }
 
                 while (count > 0 && m_RemainingLength != 0)
@@ -214,7 +214,7 @@ namespace SilverSim.Http.Client
                 {
                     return -1;
                 }
-                return (int)b[0];
+                return b[0];
             }
 
             public override long Seek(long offset, SeekOrigin origin)
