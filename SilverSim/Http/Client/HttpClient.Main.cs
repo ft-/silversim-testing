@@ -398,7 +398,12 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            if (headers.TryGetValue("Content-Length", out value))
+            if (method == "HEAD")
+            {
+                /* HEAD does not have any response data */
+                return new ResponseBodyStream(s, 0, keepalive, uri.Scheme, uri.Host, uri.Port);
+            }
+            else if (headers.TryGetValue("Content-Length", out value))
             {
                 long contentLength;
                 if(!long.TryParse(value, out contentLength))
