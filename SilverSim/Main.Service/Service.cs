@@ -91,11 +91,11 @@ namespace SilverSim.Main.Service
             Type t = assembly.GetType("SilverSim.Main.Common.Startup");
             object startup = Activator.CreateInstance(t);
             MethodInfo mi = t.GetMethod("Run");
-            m_ShutdownDelegate = (Action)Delegate.CreateDelegate(t, startup, t.GetMethod("Shutdown"));
+            m_ShutdownDelegate = (Action)Delegate.CreateDelegate(typeof(Action), startup, t.GetMethod("Shutdown"));
             Action<string> del = eventLog.WriteEntry;
             if (!(bool)mi.Invoke(startup, new object[] { args, del }))
             {
-#warning What to do with service when it fails here 
+                Stop();
             }
 
             m_ShutdownCompleteEvent.Set();
