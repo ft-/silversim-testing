@@ -1382,7 +1382,7 @@ namespace SilverSim.Main.Common
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
+        public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed, bool disableShutdownCommand = false)
         {
             string defaultConfigName;
             string defaultsIniName;
@@ -1490,7 +1490,10 @@ namespace SilverSim.Main.Common
                 cfg.Set("ListenerPort", "9000");
             }
 
-            CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
+            if (!disableShutdownCommand)
+            {
+                CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
+            }
             CommandRegistry.Commands.Add("execute", ExecuteCommand);
             CommandRegistry.AddShowCommand("memory", ShowMemoryCommand);
             CommandRegistry.AddShowCommand("threadcount", ShowThreadCountCommand);

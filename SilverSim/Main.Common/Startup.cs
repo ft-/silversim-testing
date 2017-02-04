@@ -18,7 +18,7 @@ namespace SilverSim.Main.Common
         {
             try
             {
-                m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent, IsRunningAsService ? ConfigurationLoader.LocalConsole.Disallowed : ConfigurationLoader.LocalConsole.Allowed);
+                m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent, IsRunningAsService ? ConfigurationLoader.LocalConsole.Disallowed : ConfigurationLoader.LocalConsole.Allowed, IsRunningAsService);
             }
             catch (ConfigurationLoader.ConfigurationErrorException e)
             {
