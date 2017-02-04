@@ -91,6 +91,8 @@ namespace SilverSim.Main.Service
             Type t = assembly.GetType("SilverSim.Main.Common.Startup");
             object startup = Activator.CreateInstance(t);
             MethodInfo mi = t.GetMethod("Run");
+            PropertyInfo pi = t.GetProperty("IsRunningAsService");
+            pi.SetMethod.Invoke(startup, new object[] { true });
             m_ShutdownDelegate = (Action)Delegate.CreateDelegate(typeof(Action), startup, t.GetMethod("Shutdown"));
             Action<string> del = eventLog.WriteEntry;
             if (!(bool)mi.Invoke(startup, new object[] { args, del }))

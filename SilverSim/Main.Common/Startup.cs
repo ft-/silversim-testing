@@ -12,11 +12,13 @@ namespace SilverSim.Main.Common
         ConfigurationLoader m_ConfigLoader;
         readonly ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
+        public bool IsRunningAsService { get; set; }
+
         public bool Run(string[] args, Action<string> writeLine)
         {
             try
             {
-                m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent);
+                m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent, IsRunningAsService ? ConfigurationLoader.LocalConsole.Disallowed : ConfigurationLoader.LocalConsole.Allowed);
             }
             catch (ConfigurationLoader.ConfigurationErrorException e)
             {
