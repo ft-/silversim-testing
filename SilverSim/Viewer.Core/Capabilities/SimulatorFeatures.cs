@@ -26,6 +26,11 @@ namespace SilverSim.Viewer.Core.Capabilities
             Features.Add("MeshRezEnabled", true);
             Features.Add("MeshUploadEnabled", true);
             Features.Add("MeshXferEnabled", true);
+            Features.Add("PhysicsMaterialsEnabled", true);
+            Features.Add("RenderMaterialsCapability", 1.0);
+            Features.Add("MaxMaterialsPerTransaction", 50);
+            Features.Add("DynamicPathfindingEnabled", false);
+            Features.Add("AvatarHoverHeightEnabled", true);
             Map typesMap = new Map();
             typesMap.Add("convex", true);
             typesMap.Add("none", true);

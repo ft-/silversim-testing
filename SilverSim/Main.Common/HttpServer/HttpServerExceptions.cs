@@ -52,11 +52,4 @@ namespace SilverSim.Main.Common.HttpServer
         }
     }
 
-    [Serializable]
-    public class WebSocketClosedException : Exception
-    {
-        public WebSocketClosedException()
-        {
-        }
-    }
 }

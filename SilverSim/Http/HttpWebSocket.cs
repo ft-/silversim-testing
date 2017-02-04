@@ -1,13 +1,20 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Http;
 using SilverSim.Types;
 using System;
 using System.IO;
 
-namespace SilverSim.Main.Common.HttpServer
+namespace SilverSim.Http
 {
+    [Serializable]
+    public class WebSocketClosedException : Exception
+    {
+        public WebSocketClosedException()
+        {
+        }
+    }
+
     public class HttpWebSocket : IDisposable
     {
         public enum CloseReason
@@ -48,13 +55,14 @@ namespace SilverSim.Main.Common.HttpServer
                 return BitConverter.GetBytes(mask);
             }
         }
-        readonly Stream m_WebSocketStream;
+
+        protected readonly Stream m_WebSocketStream;
         bool m_IsClosed;
         readonly object m_SendLock = new object();
         bool m_IsDisposed;
         CloseReason m_CloseReason = CloseReason.NormalClosure;
 
-        internal HttpWebSocket(Stream o)
+        public HttpWebSocket(Stream o)
         {
             m_WebSocketStream = o;
         }

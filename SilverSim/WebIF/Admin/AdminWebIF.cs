@@ -4,6 +4,7 @@
 using log4net;
 using log4net.Core;
 using Nini.Config;
+using SilverSim.Http;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
