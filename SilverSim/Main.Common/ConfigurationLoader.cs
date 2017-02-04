@@ -1631,11 +1631,11 @@ namespace SilverSim.Main.Common
             }
 
             consoleTitle += ": " + VersionInfo.ProductName + " (" + VersionInfo.Version + ")";
-            if (null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true) && localConsoleControl == LocalConsole.Allowed)
+            if ((null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true)) && localConsoleControl == LocalConsole.Allowed)
             {
                 PluginInstances.Add("LocalConsole", new Console.LocalConsole(consoleTitle, Scenes, CommandRegistry));
             }
-            else if (null == consoleConfig || consoleConfig.GetBoolean("EnableLogConsole", false) && localConsoleControl == LocalConsole.Allowed)
+            else if ((null == consoleConfig || consoleConfig.GetBoolean("EnableLogConsole", false)) && localConsoleControl == LocalConsole.Allowed)
             {
                 PluginInstances.Add("LogConsole", new Console.LogConsole(consoleTitle));
             }
