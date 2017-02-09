@@ -8,6 +8,7 @@ using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
@@ -27,10 +28,12 @@ namespace SilverSim.Database.MySQL.Asset
 
         readonly string m_ConnectionString;
         readonly DefaultAssetReferencesService m_ReferencesService;
+        readonly RwLockedList<string> m_ConfigurationIssues;
 
         #region Constructor
-        public MySQLAssetService(string connectionString)
+        public MySQLAssetService(string connectionString, RwLockedList<string> configurationIssues)
         {
+            m_ConfigurationIssues = configurationIssues;
             m_ConnectionString = connectionString;
             m_ReferencesService = new DefaultAssetReferencesService(this);
         }
@@ -385,6 +388,11 @@ namespace SilverSim.Database.MySQL.Asset
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
+                int maxallowedPacket = conn.GetMaxAllowedPacketSize();
+                if(maxallowedPacket < 128 * 1024 * 1024)
+                {
+                    m_ConfigurationIssues.Add(string.Format("Please set max_allowed_packet = 128M in [mysqld] in MySQL/MariaDB. Found {0}", maxallowedPacket));
+                }
             }
         }
 
@@ -434,7 +442,7 @@ namespace SilverSim.Database.MySQL.Asset
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new MySQLAssetService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
+            return new MySQLAssetService(MySQLUtilities.BuildConnectionString(ownSection, m_Log), loader.KnownConfigurationIssues);
         }
     }
     #endregion

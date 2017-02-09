@@ -162,6 +162,21 @@ namespace SilverSim.Database.MySQL
         }
         #endregion
 
+        public static int GetMaxAllowedPacketSize(this MySqlConnection conn)
+        {
+            using (MySqlCommand cmd = new MySqlCommand("SELECT @@max_allowed_packet", conn))
+            {
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if(!reader.Read())
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    return reader.GetInt32(0);
+                }
+            }
+        }
+
         #region Push parameters
         public static void AddParameter(this MySqlParameterCollection mysqlparam, string key, object value)
         {
