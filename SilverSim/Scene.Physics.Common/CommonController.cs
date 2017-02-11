@@ -90,6 +90,18 @@ namespace SilverSim.Scene.Physics.Common
         }
         #endregion
 
+        #region Restitution Motor
+        protected Vector3 LinearRestitutionMotor(IPhysicalObject obj, double factor)
+        {
+            return -obj.Velocity * factor;
+        }
+
+        protected Vector3 RotationalRestitutionMotor(IPhysicalObject obj, double factor)
+        {
+            return -obj.AngularVelocity * factor;
+        }
+        #endregion
+
         #region Target Velocity Motor
         protected Vector3 TargetVelocityMotor(IPhysicalObject obj, Vector3 targetvel, double factor)
         {

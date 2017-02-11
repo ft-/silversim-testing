@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.Physics
             /* intentionally left empty */
         }
 
-        public void SetControlTargetVelocity(Vector3 value)
+        public void SetControlDirectionalInput(Vector3 value)
         {
             /* intentionally left empty */
         }

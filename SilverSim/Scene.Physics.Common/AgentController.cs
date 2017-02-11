@@ -25,8 +25,9 @@ namespace SilverSim.Scene.Physics.Common
 
         protected AgentController(IAgent agent, UUID sceneID)
         {
-            ControlTargetVelocityInputFactor = 10;
-            ControlTargetRotationInputFactor = 10;
+            ControlLinearInputFactor = 10;
+            ControlRotationalInputFactor = 10;
+            RestitutionInputFactor = 0.8;
             m_Agent = agent;
             m_StateData = new PhysicsStateData(agent, sceneID);
         }
@@ -86,29 +87,29 @@ namespace SilverSim.Scene.Physics.Common
         public abstract bool IsRotateYEnabled { get; set; }
         public abstract bool IsRotateZEnabled { get; set; }
 
-        Vector3 m_ControlTargetVelocity = Vector3.Zero;
-        public void SetControlTargetVelocity(Vector3 value)
+        Vector3 m_ControlDirectionalInput = Vector3.Zero;
+        public void SetControlDirectionalInput(Vector3 value)
         {
             lock (m_Lock)
             {
 #if DEBUG
-                if(!value.ApproxEquals(m_ControlTargetVelocity, double.Epsilon))
+                if(!value.ApproxEquals(m_ControlDirectionalInput, double.Epsilon))
                 {
                     m_Log.DebugFormat("Agent control velocity for {0}: {1}", m_Agent.Owner.FullName, value.ToString());
                 }
 #endif
-                m_ControlTargetVelocity = value;
+                m_ControlDirectionalInput = value;
             }
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        Vector3 ControlTargetVelocityInput
+        Vector3 ControlLinearInput
         {
             get
             {
                 lock(m_Lock)
                 {
-                    return m_ControlTargetVelocity;
+                    return m_ControlDirectionalInput;
                 }
             }
         }
@@ -220,8 +221,9 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        protected double ControlTargetVelocityInputFactor { get; set; }
-        protected double ControlTargetRotationInputFactor { get; set; }
+        protected double ControlLinearInputFactor { get; set; }
+        protected double ControlRotationalInputFactor { get; set; }
+        protected double RestitutionInputFactor { get; set; }
 
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {
@@ -235,7 +237,8 @@ namespace SilverSim.Scene.Physics.Common
             forces.Add(new PositionalForce(BuoyancyMotor(m_Agent), Vector3.Zero));
             forces.Add(new PositionalForce(GravityMotor(m_Agent), Vector3.Zero));
             forces.Add(new PositionalForce(HoverMotor(m_Agent), Vector3.Zero));
-            forces.Add(new PositionalForce(TargetVelocityMotor(m_Agent, ControlTargetVelocityInput, ControlTargetVelocityInputFactor), Vector3.Zero));
+            forces.Add(new PositionalForce(TargetVelocityMotor(m_Agent, ControlLinearInput, ControlLinearInputFactor), Vector3.Zero));
+            forces.Add(new PositionalForce(LinearRestitutionMotor(m_Agent, RestitutionInputFactor), Vector3.Zero));
 
             /* let us allow advanced physics force input to be used on agents */
             foreach (ObjectGroup grp in m_Agent.Attachments.All)
@@ -250,7 +253,7 @@ namespace SilverSim.Scene.Physics.Common
                 }
             }
 
-            agentTorque = TargetRotationMotor(m_Agent, m_Agent.BodyRotation, ControlTargetRotationInputFactor);
+            agentTorque = TargetRotationMotor(m_Agent, m_Agent.BodyRotation, ControlRotationalInputFactor);
 
             lock(m_Lock)
             {

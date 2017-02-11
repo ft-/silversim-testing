@@ -8,6 +8,6 @@ namespace SilverSim.Scene.Types.Physics
     public interface IAgentPhysicsObject : IPhysicsObject
     {
         bool IsAgentCollisionActive { get; set; }
-        void SetControlTargetVelocity(Vector3 value);
+        void SetControlDirectionalInput(Vector3 value);
     }
 }
