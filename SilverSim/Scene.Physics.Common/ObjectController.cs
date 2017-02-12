@@ -189,16 +189,16 @@ namespace SilverSim.Scene.Physics.Common
                 return forces;
             }
 
-            forces.Add(new PositionalForce(BuoyancyMotor(m_Part), Vector3.Zero));
-            forces.Add(new PositionalForce(GravityMotor(m_Part), Vector3.Zero));
-            forces.Add(new PositionalForce(HoverMotor(m_Part), Vector3.Zero));
+            forces.Add(BuoyancyMotor(m_Part, Vector3.Zero));
+            forces.Add(GravityMotor(m_Part, Vector3.Zero));
+            forces.Add(HoverMotor(m_Part, Vector3.Zero));
 
             foreach (KeyValuePair<UUID, Vector3> kvp in grp.AttachedForces)
             {
                 ObjectPart part;
                 if (grp.TryGetValue(kvp.Key, out part))
                 {
-                    forces.Add(new PositionalForce(kvp.Value, part.LocalPosition));
+                    forces.Add(new PositionalForce("AttachedForces", kvp.Value, part.LocalPosition));
                 }
             }
 
@@ -207,17 +207,17 @@ namespace SilverSim.Scene.Physics.Common
             {
 
                 m_Vehicle.Process(dt, m_StateData, grp.Scene, Mass, m_Part.PhysicsGravityMultiplier * CombinedGravityAccelerationConstant);
-                forces.Add(new PositionalForce(m_Vehicle.LinearForce, Vector3.Zero));
+                forces.Add(new PositionalForce("LinearForce", m_Vehicle.LinearForce, Vector3.Zero));
                 vehicleTorque = m_Vehicle.AngularTorque;
             }
 
             lock (m_Lock)
             {
-                forces.Add(new PositionalForce(m_LinearImpulse, Vector3.Zero));
+                forces.Add(new PositionalForce("LinearImpulse", m_LinearImpulse, Vector3.Zero));
                 m_LinearImpulse = Vector3.Zero;
                 vehicleTorque += m_AngularImpulse;
                 m_AngularImpulse = Vector3.Zero;
-                forces.Add(new PositionalForce(m_AppliedForce, Vector3.Zero));
+                forces.Add(new PositionalForce("AppliedForce", m_AppliedForce, Vector3.Zero));
                 vehicleTorque += m_AppliedTorque;
             }
 

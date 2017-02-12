@@ -95,7 +95,7 @@ namespace SilverSim.Scene.Physics.Common
 #if DEBUG
                 if(!value.ApproxEquals(m_ControlDirectionalInput, double.Epsilon))
                 {
-                    m_Log.DebugFormat("Agent control velocity for {0}: {1}", m_Agent.Owner.FullName, value.ToString());
+                    m_Log.DebugFormat("Agent control input for {0}: {1}", m_Agent.Owner.FullName, value.ToString());
                 }
 #endif
                 m_ControlDirectionalInput = value;
@@ -234,11 +234,11 @@ namespace SilverSim.Scene.Physics.Common
                 return forces;
             }
 
-            forces.Add(new PositionalForce(BuoyancyMotor(m_Agent), Vector3.Zero));
-            forces.Add(new PositionalForce(GravityMotor(m_Agent), Vector3.Zero));
-            forces.Add(new PositionalForce(HoverMotor(m_Agent), Vector3.Zero));
-            forces.Add(new PositionalForce(TargetVelocityMotor(m_Agent, ControlLinearInput, ControlLinearInputFactor), Vector3.Zero));
-            forces.Add(new PositionalForce(LinearRestitutionMotor(m_Agent, RestitutionInputFactor), Vector3.Zero));
+            forces.Add(BuoyancyMotor(m_Agent, Vector3.Zero));
+            forces.Add(GravityMotor(m_Agent, Vector3.Zero));
+            forces.Add(HoverMotor(m_Agent, Vector3.Zero));
+            forces.Add(new PositionalForce("ControlInput", ControlLinearInput * ControlLinearInputFactor, Vector3.Zero));
+            forces.Add(LinearRestitutionMotor(m_Agent, RestitutionInputFactor, Vector3.Zero));
 
             /* let us allow advanced physics force input to be used on agents */
             foreach (ObjectGroup grp in m_Agent.Attachments.All)
@@ -248,7 +248,7 @@ namespace SilverSim.Scene.Physics.Common
                     ObjectPart part;
                     if (grp.TryGetValue(kvp.Key, out part))
                     {
-                        forces.Add(new PositionalForce(kvp.Value, part.LocalPosition + grp.Position));
+                        forces.Add(new PositionalForce("AdvPhysics", kvp.Value, part.LocalPosition + grp.Position));
                     }
                 }
             }
@@ -257,11 +257,11 @@ namespace SilverSim.Scene.Physics.Common
 
             lock(m_Lock)
             {
-                forces.Add(new PositionalForce(m_LinearImpulse, Vector3.Zero));
+                forces.Add(new PositionalForce("LinearImpulse", m_LinearImpulse, Vector3.Zero));
                 m_LinearImpulse = Vector3.Zero;
                 agentTorque += m_AngularImpulse;
                 m_AngularImpulse = Vector3.Zero;
-                forces.Add(new PositionalForce(m_AppliedForce, Vector3.Zero));
+                forces.Add(new PositionalForce("AppliedForce", m_AppliedForce, Vector3.Zero));
                 agentTorque += m_AppliedTorque;
             }
 

@@ -166,9 +166,7 @@ namespace SilverSim.Scene.Agent
                 {
                     m_VisualParamsLock.ReleaseWriterLock();
                 }
-#if DEBUG
-                m_Log.DebugFormat("VisualParams property setter called for {0}: updated={1}", Owner.FullName, updated);
-#endif
+
                 if (updated)
                 {
                     InvokeOnAppearanceUpdate();

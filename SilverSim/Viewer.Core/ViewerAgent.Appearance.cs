@@ -29,9 +29,6 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-#if DEBUG
-            m_Log.DebugFormat("Processing SetAgentAppearance for {0}", Owner.FullName);
-#endif
 
             foreach(Messages.Appearance.AgentSetAppearance.WearableDataEntry d in m.WearableData)
             {

@@ -29,11 +29,13 @@ namespace SilverSim.Scene.Physics.Common
 
         public struct PositionalForce
         {
+            public string Name;
             public Vector3 Force;
             public Vector3 LocalPosition;
 
-            public PositionalForce(Vector3 force, Vector3 localpos)
+            public PositionalForce(string name, Vector3 force, Vector3 localpos)
             {
+                Name = name;
                 Force = force;
                 LocalPosition = localpos;
             }
@@ -45,9 +47,9 @@ namespace SilverSim.Scene.Physics.Common
             return obj.PhysicsActor.Mass * CombinedGravityAccelerationConstant * obj.PhysicsGravityMultiplier;
         }
 
-        protected Vector3 GravityMotor(IPhysicalObject obj)
+        protected PositionalForce GravityMotor(IPhysicalObject obj, Vector3 pos)
         {
-            return new Vector3(0, 0, -GravityConstant(obj));
+            return new PositionalForce("GravityMotor", new Vector3(0, 0, -GravityConstant(obj)), pos);
         }
 
         double m_Buoyancy;
@@ -66,46 +68,41 @@ namespace SilverSim.Scene.Physics.Common
         }
 
 
-        protected Vector3 BuoyancyMotor(IPhysicalObject obj)
+        protected PositionalForce BuoyancyMotor(IPhysicalObject obj, Vector3 pos)
         {
-            return new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
+            return new PositionalForce("BuoyancyMotor", new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj)), pos);
         }
         #endregion
 
         #region Hover Motor
         double m_HoverHeight;
         bool m_HoverEnabled;
-        protected Vector3 HoverMotor(IPhysicalObject obj)
+        protected PositionalForce HoverMotor(IPhysicalObject obj, Vector3 pos)
         {
             if (m_HoverEnabled)
             {
                 Vector3 v = new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
                 v.Z += (m_HoverHeight - obj.Position.Z);
-                return v;
+                return new PositionalForce("HoverMotor", v, pos);
             }
             else
             {
-                return Vector3.Zero;
+                return new PositionalForce("HoverMotor", Vector3.Zero, pos);
             }
         }
         #endregion
 
         #region Restitution Motor
-        protected Vector3 LinearRestitutionMotor(IPhysicalObject obj, double factor)
+        protected PositionalForce LinearRestitutionMotor(IPhysicalObject obj, double factor, Vector3 pos)
         {
-            return -obj.Velocity * factor;
-        }
-
-        protected Vector3 RotationalRestitutionMotor(IPhysicalObject obj, double factor)
-        {
-            return -obj.AngularVelocity * factor;
+            return new PositionalForce("LinearResitutionMotor", - obj.Velocity * factor, pos);
         }
         #endregion
 
         #region Target Velocity Motor
-        protected Vector3 TargetVelocityMotor(IPhysicalObject obj, Vector3 targetvel, double factor)
+        protected PositionalForce TargetVelocityMotor(IPhysicalObject obj, Vector3 targetvel, double factor, Vector3 pos)
         {
-            return (targetvel - obj.Velocity) * factor;
+            return new PositionalForce("TargetVelocityMotor", (targetvel - obj.Velocity) * factor, pos);
         }
         #endregion
 
