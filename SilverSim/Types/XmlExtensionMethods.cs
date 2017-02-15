@@ -320,7 +320,7 @@ namespace SilverSim.Types
             {
                 return 0;
             }
-            return float.Parse(ReadElementValueAsString(reader), CultureInfo.InvariantCulture);
+            return float.Parse(ReadElementValueAsString(reader), NumberStyles.Float, CultureInfo.InvariantCulture);
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
