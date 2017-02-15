@@ -330,7 +330,7 @@ namespace SilverSim.Types
             {
                 return 0;
             }
-            return double.Parse(ReadElementValueAsString(reader), CultureInfo.InvariantCulture);
+            return double.Parse(ReadElementValueAsString(reader), NumberStyles.Float, CultureInfo.InvariantCulture);
         }
 
         public static ColorAlpha ReadElementChildsAsColorAlpha(this XmlTextReader reader)
