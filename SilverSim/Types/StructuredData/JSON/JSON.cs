@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
@@ -131,7 +132,7 @@ namespace SilverSim.Types.StructuredData.Json
                         if(input.IndexOf('.') >= 0)
                         {
                             double f;
-                            if(!Double.TryParse(input, out f))
+                            if(!double.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
                             {
                                 throw new InvalidJsonSerializationException();
                             }
@@ -140,7 +141,7 @@ namespace SilverSim.Types.StructuredData.Json
                         else
                         {
                             Int32 i;
-                            if(!Int32.TryParse(input, out i))
+                            if(!int.TryParse(input, out i))
                             {
                                 throw new InvalidJsonSerializationException();
                             }
