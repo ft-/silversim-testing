@@ -65,7 +65,7 @@ namespace SilverSim.Http.Client
                     {
                         throw new BadHttpResponseException();
                     }
-                    lastHeader = splits[0].Trim();
+                    lastHeader = splits[0].Trim().ToLowerInvariant();
                     headers[lastHeader] = splits[1].Trim();
                 }
             }
@@ -366,7 +366,7 @@ namespace SilverSim.Http.Client
 
             string value;
             bool compressedresult = false;
-            if (headers.TryGetValue("Content-Encoding", out value) || headers.TryGetValue("X-Content-Encoding", out value))
+            if (headers.TryGetValue("content-encoding", out value) || headers.TryGetValue("x-content-encoding", out value))
             {
                 /* Content-Encoding */
                 /* x-gzip is deprecated but better feel safe about having that */
@@ -386,7 +386,7 @@ namespace SilverSim.Http.Client
                 keepalive = false;
             }
 
-            if(headers.TryGetValue("Connection", out value))
+            if(headers.TryGetValue("connection", out value))
             {
                 if(value.ToLower() == "keep-alive")
                 {
@@ -403,7 +403,7 @@ namespace SilverSim.Http.Client
                 /* HEAD does not have any response data */
                 return new ResponseBodyStream(s, 0, keepalive, uri.Scheme, uri.Host, uri.Port);
             }
-            else if (headers.TryGetValue("Content-Length", out value))
+            else if (headers.TryGetValue("content-length", out value))
             {
                 long contentLength;
                 if(!long.TryParse(value, out contentLength))
@@ -411,7 +411,7 @@ namespace SilverSim.Http.Client
                     throw new BadHttpResponseException();
                 }
                 Stream bs = new ResponseBodyStream(s, contentLength, keepalive, uri.Scheme, uri.Host, uri.Port);
-                if(headers.TryGetValue("Transfer-Encoding", out value) && value == "chunked")
+                if(headers.TryGetValue("transfer-encoding", out value) && value == "chunked")
                 {
                     bs = new HttpReadChunkedBodyStream(bs);
                 }
@@ -424,7 +424,7 @@ namespace SilverSim.Http.Client
             else
             {
                 Stream bs = s;
-                if (headers.TryGetValue("Transfer-Encoding", out value) && value == "chunked")
+                if (headers.TryGetValue("transfer-encoding", out value) && value == "chunked")
                 {
                     bs = new HttpReadChunkedBodyStream(bs);
                 }

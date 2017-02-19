@@ -45,7 +45,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
             get
             {
-                return ContainsHeader("TE");
+                return m_Headers.ContainsKey("te");
             }
         }
 
@@ -53,26 +53,26 @@ namespace SilverSim.Main.Common.HttpServer
         {
             get
             {
-                return m_Headers[fieldName];
+                return m_Headers[fieldName.ToLowerInvariant()];
             }
             set
             {
-                m_Headers[fieldName] = value;
+                m_Headers[fieldName.ToLowerInvariant()] = value;
             }
         }
 
         public bool ContainsHeader(string fieldName)
         {
-            return m_Headers.ContainsKey(fieldName);
+            return m_Headers.ContainsKey(fieldName.ToLowerInvariant());
         }
 
         public string ContentType
         {
             get
             {
-                if (m_Headers.ContainsKey("Content-Type"))
+                if (m_Headers.ContainsKey("content-type"))
                 {
-                    string contentType = m_Headers["Content-Type"];
+                    string contentType = m_Headers["content-type"];
                     int semi = contentType.IndexOf(';');
                     return semi >= 0 ? contentType.Substring(0, semi).Trim() : contentType;
                 }
@@ -80,7 +80,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             set
             {
-                m_Headers["Content-Type"] = value;
+                m_Headers["content-type"] = value;
             }
         }
         #endregion
@@ -236,35 +236,35 @@ namespace SilverSim.Main.Common.HttpServer
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     throw new InvalidDataException();
                 }
-                lastHeader = headerData[0];
+                lastHeader = headerData[0].ToLowerInvariant();
                 m_Headers[lastHeader] = headerData[1].Trim();
             }
 
-            if(m_Headers.ContainsKey("Connection"))
+            if(m_Headers.ContainsKey("connection"))
             {
-                if(m_Headers["Connection"] == "keep-alive")
+                if(m_Headers["connection"] == "keep-alive")
                 {
                     ConnectionMode = HttpConnectionMode.KeepAlive;
                 }
-                else if(m_Headers["Connection"] == "close")
+                else if(m_Headers["connection"] == "close")
                 {
                     ConnectionMode = HttpConnectionMode.Close;
                 }
             }
 
             Expect100Continue = false;
-            if (ContainsHeader("Expect") &&
-                m_Headers["Expect"] == "100-continue")
+            if (m_Headers.ContainsKey("expect") &&
+                m_Headers["expect"] == "100-continue")
             {
                 Expect100Continue = true;
             }
 
             bool havePostData = false;
-            if (ContainsHeader("Content-Length"))
+            if (m_Headers.ContainsKey("content-length"))
             {
                 /* there is a body */
                 long contentLength;
-                if(!long.TryParse(m_Headers["Content-Length"], out contentLength))
+                if(!long.TryParse(m_Headers["content-length"], out contentLength))
                 {
                     ConnectionMode = HttpConnectionMode.Close;
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
@@ -273,9 +273,9 @@ namespace SilverSim.Main.Common.HttpServer
                 RawBody = new HttpRequestBodyStream(m_HttpStream, contentLength, Expect100Continue);
                 Body = RawBody;
 
-                if(ContainsHeader("Transfer-Encoding"))
+                if(m_Headers.ContainsKey("transfer-encoding"))
                 {
-                    string[] transferEncodings = this["Transfer-Encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] transferEncodings = m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach(string transferEncoding in transferEncodings)
                     {
                         if(transferEncoding == "gzip" || transferEncoding == "x-gzip")
@@ -297,11 +297,11 @@ namespace SilverSim.Main.Common.HttpServer
 
                 havePostData = true;
             }
-            else if(ContainsHeader("Transfer-Encoding"))
+            else if(m_Headers.ContainsKey("transfer-encoding"))
             {
                 bool HaveChunkedInFront = false;
                 Body = m_HttpStream;
-                string[] transferEncodings = this["Transfer-Encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] transferEncodings = m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string transferEncoding in transferEncodings)
                 {
                     if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
@@ -336,13 +336,13 @@ namespace SilverSim.Main.Common.HttpServer
             if(havePostData)
             {
                 string contentEncoding = string.Empty;
-                if (m_Headers.ContainsKey("Content-Encoding"))
+                if (m_Headers.ContainsKey("content-encoding"))
                 {
-                    contentEncoding = m_Headers["Content-Encoding"];
+                    contentEncoding = m_Headers["content-encoding"];
                 }
-                else if (m_Headers.ContainsKey("X-Content-Encoding"))
+                else if (m_Headers.ContainsKey("x-content-encoding"))
                 {
-                    contentEncoding = m_Headers["X-Content-Encoding"];
+                    contentEncoding = m_Headers["x-content-encoding"];
                 }
                 else
                 {
@@ -371,8 +371,8 @@ namespace SilverSim.Main.Common.HttpServer
                 }
             }
 
-            CallerIP = (m_Headers.ContainsKey("X-Forwarded-For") && isBehindProxy) ?
-                m_Headers["X-Forwarded-For"] : 
+            CallerIP = (m_Headers.ContainsKey("x-forwarded-for") && isBehindProxy) ?
+                m_Headers["x-forwarded-for"] : 
                 callerIP;
         }
 
@@ -622,29 +622,29 @@ namespace SilverSim.Main.Common.HttpServer
                 }
 
                 string val;
-                if(!m_Headers.TryGetValue("Upgrade", out val) || val.ToLower() != "websocket")
+                if(!m_Headers.TryGetValue("upgrade", out val) || val.ToLower() != "websocket")
                 {
                     return false;
                 }
 
-                if(!m_Headers.ContainsKey("Sec-WebSocket-Key"))
+                if(!m_Headers.ContainsKey("sec-websocket-key"))
                 {
                     return false;
                 }
-                if(!m_Headers.TryGetValue("Sec-WebSocket-Version", out val) || val != "13")
+                if(!m_Headers.TryGetValue("sec-websocket-version", out val) || val != "13")
                 {
                     return false;
                 }
 
                 /* Connection header is checked last */
-                if (!m_Headers.TryGetValue("Connection", out val))
+                if (!m_Headers.TryGetValue("connection", out val))
                 {
                     return false;
                 }
 
                 foreach (string valitem in val.Split(','))
                 {
-                    if (valitem.ToLower().Trim() == "upgrade")
+                    if (valitem.ToLowerInvariant().Trim() == "upgrade")
                     {
                         return true;
                     }
@@ -663,7 +663,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             string websocketkeyuuid;
-            websocketkeyuuid = m_Headers["Sec-WebSocket-Key"].Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            websocketkeyuuid = m_Headers["sec-websocket-key"].Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
             byte[] websocketacceptdata = websocketkeyuuid.ToUTF8Bytes();
             string websocketaccept;
             using (SHA1 sha1 = SHA1.Create())

@@ -55,8 +55,8 @@ namespace SilverSim.ServiceInterfaces
         {
             Dictionary<string, string> headers = HeloRequest(uri);
             string protocols;
-            if(!headers.TryGetValue("X-Protocols-Provided", out protocols) &&
-                !headers.TryGetValue("X-Handlers-Provided",out protocols))
+            if(!headers.TryGetValue("x-protocols-provided", out protocols) &&
+                !headers.TryGetValue("x-handlers-provided",out protocols))
             {
                 protocols = "opensim-robust";
             }

@@ -143,7 +143,7 @@ namespace SilverSim.Http
                 /* a white space designates a continuation , RFC7230 deprecates is use for anything else than Content-Type but we stay more permissive here */
                 else if (char.IsWhiteSpace(headerLine[0]))
                 {
-                    headers[lastHeader] += headerLine.Trim();
+                    headers[lastHeader] += headerLine.Trim().ToLowerInvariant();
                     continue;
                 }
 
@@ -157,23 +157,23 @@ namespace SilverSim.Http
                 headers[lastHeader] = headerData[1].Trim();
             }
 
-            if(!headers.TryGetValue("Connection", out headerLine) || headerLine.Trim() != "upgrade")
+            if(!headers.TryGetValue("connection", out headerLine) || headerLine.Trim() != "upgrade")
             {
                 stream.Close();
                 throw new NotAWebSocketConnectionException();
             }
-            if(!headers.TryGetValue("Upgrade", out headerLine) || headerLine.Trim() != "websocket")
+            if(!headers.TryGetValue("upgrade", out headerLine) || headerLine.Trim() != "websocket")
             {
                 stream.Close();
                 throw new NotAWebSocketConnectionException();
             }
-            if(!headers.TryGetValue("Sec-WebSocket-Accept", out headerLine) || headerLine.Trim() != websocketaccept)
+            if(!headers.TryGetValue("sec-websocket-accept", out headerLine) || headerLine.Trim() != websocketaccept)
             {
                 stream.Close();
                 throw new NotAWebSocketConnectionException();
             }
 
-            if(headers.TryGetValue("Sec-WebSocket-Protocol", out headerLine))
+            if(headers.TryGetValue("sec-websocket-protocol", out headerLine))
             {
                 selectedProtocol = headerLine;
             }
