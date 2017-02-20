@@ -903,8 +903,6 @@ namespace SilverSim.Grid.Login
         const string Option_GlobalTextures = "global-textures";
         const string Option_AdultCompliant = "adult_compliant";
 
-
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
         readonly string[] RequiredParameters = new string[] { "first", "last", "start", "passwd", "channel", "version", "mac", "id0" };
 
         class LoginFailResponseException : Exception
