@@ -57,6 +57,7 @@ namespace SilverSim.Main.Common.HttpServer
         bool m_StoppingListeners;
 
         X509Certificate2 m_ServerCertificate;
+        SslProtocols m_SslProtocols = SslProtocols.Tls12;
         readonly string m_CertificateFileName;
         readonly Type m_SslStreamPreload;
         readonly Socket m_ListenerSocket;
@@ -126,6 +127,16 @@ namespace SilverSim.Main.Common.HttpServer
 
             if (Scheme == Uri.UriSchemeHttps)
             {
+                if(httpConfig.GetBoolean("EnableTls1.0", false))
+                {
+                    m_SslProtocols |= SslProtocols.Tls;
+                    loader.KnownConfigurationIssues.Add("Please set EnableTls1.0 in [HTTPS] to false. TLS V1.0 is susceptible to POODLE attack. Only enable if explicitly needed for certain old applications.");
+                }
+                if (httpConfig.GetBoolean("EnableTls1.1", false))
+                {
+                    m_SslProtocols |= SslProtocols.Tls11;
+                    loader.KnownConfigurationIssues.Add("Please set EnableTls1.0 in [HTTPS] to false. TLS V1.1 is susceptible to POODLE attack. Only enable if explicitly needed for certain old applications.");
+                }
                 m_Log.InfoFormat("Adding HTTPS Server at port {0}", Port);
             }
             else
@@ -369,7 +380,7 @@ namespace SilverSim.Main.Common.HttpServer
 
                     /* Start SSL handshake */
                     SslStream sslstream = new SslStream(new NetworkStream(socket));
-                    sslstream.AuthenticateAsServer(m_ServerCertificate, false, SslProtocols.Tls11 | SslProtocols.Tls12, false);
+                    sslstream.AuthenticateAsServer(m_ServerCertificate, false, m_SslProtocols, false);
 
                     AcceptedConnection_Internal(sslstream, remoteAddr, true);
                 }
