@@ -17,6 +17,7 @@ using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -368,7 +369,7 @@ namespace SilverSim.Main.Common.HttpServer
 
                     /* Start SSL handshake */
                     SslStream sslstream = new SslStream(new NetworkStream(socket));
-                    sslstream.AuthenticateAsServer(m_ServerCertificate);
+                    sslstream.AuthenticateAsServer(m_ServerCertificate, false, SslProtocols.Tls11 | SslProtocols.Tls12, false);
 
                     AcceptedConnection_Internal(sslstream, remoteAddr, true);
                 }

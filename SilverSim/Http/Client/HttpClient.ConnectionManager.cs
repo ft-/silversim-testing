@@ -99,7 +99,7 @@ namespace SilverSim.Http.Client
         {
             return OpenStream(scheme, host, port,
                 null,
-                SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
+                SslProtocols.Tls11 | SslProtocols.Tls12,
                 false);
         }
 
