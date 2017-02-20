@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -225,7 +226,7 @@ namespace SilverSim.Http
         static Stream OpenSslStream(string host, int port)
         {
             SslStream ssl = new SslStream(OpenPlainStream(host, port));
-            ssl.AuthenticateAsClient(host);
+            ssl.AuthenticateAsClient(host, null, SslProtocols.Tls12, true);
             return ssl;
         }
     }
