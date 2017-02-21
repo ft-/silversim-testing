@@ -380,7 +380,15 @@ namespace SilverSim.Main.Common.HttpServer
 
                     /* Start SSL handshake */
                     SslStream sslstream = new SslStream(new NetworkStream(socket));
-                    sslstream.AuthenticateAsServer(m_ServerCertificate, false, m_SslProtocols, false);
+                    try
+                    {
+                        sslstream.AuthenticateAsServer(m_ServerCertificate, false, m_SslProtocols, false);
+                    }
+                    catch
+                    {
+                        /* not correctly authenticated */
+                        return;
+                    }
 
                     AcceptedConnection_Internal(sslstream, remoteAddr, true);
                 }
