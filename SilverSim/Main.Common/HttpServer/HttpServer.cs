@@ -387,6 +387,10 @@ namespace SilverSim.Main.Common.HttpServer
                     catch
                     {
                         /* not correctly authenticated */
+                        if (m_Log.IsDebugEnabled)
+                        {
+                            m_Log.DebugFormat("SSL AuthenticateAsServer failed for client {0}", remoteAddr.ToString());
+                        }
                         return;
                     }
 
