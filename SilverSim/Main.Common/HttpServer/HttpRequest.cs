@@ -41,6 +41,43 @@ namespace SilverSim.Main.Common.HttpServer
         public bool Expect100Continue { get; private set; }
         public bool IsSsl { get; private set; }
 
+        static readonly Dictionary<HttpStatusCode, string> m_StatusCodeMap = new Dictionary<HttpStatusCode, string>();
+        static HttpRequest()
+        {
+            m_StatusCodeMap.Add(HttpStatusCode.BadGateway, "Bad gateway");
+            m_StatusCodeMap.Add(HttpStatusCode.BadRequest, "Bad request");
+            m_StatusCodeMap.Add(HttpStatusCode.ExpectationFailed, "Expectation failed");
+            m_StatusCodeMap.Add(HttpStatusCode.GatewayTimeout, "Gateway timeout");
+            m_StatusCodeMap.Add(HttpStatusCode.HttpVersionNotSupported, "Http version not supported");
+            m_StatusCodeMap.Add(HttpStatusCode.InternalServerError, "Internal server error");
+            m_StatusCodeMap.Add(HttpStatusCode.LengthRequired, "Length required");
+            m_StatusCodeMap.Add(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+            m_StatusCodeMap.Add(HttpStatusCode.MovedPermanently, "Moved permanently");
+            m_StatusCodeMap.Add(HttpStatusCode.MultipleChoices, "Multiple choices");
+            m_StatusCodeMap.Add(HttpStatusCode.NoContent, "No content");
+            m_StatusCodeMap.Add(HttpStatusCode.NonAuthoritativeInformation, "Non authoritative information");
+            m_StatusCodeMap.Add(HttpStatusCode.NotAcceptable, "Not acceptable");
+            m_StatusCodeMap.Add(HttpStatusCode.NotFound, "Not found");
+            m_StatusCodeMap.Add(HttpStatusCode.NotImplemented, "Not implemented");
+            m_StatusCodeMap.Add(HttpStatusCode.NotModified, "Not modified");
+            m_StatusCodeMap.Add(HttpStatusCode.PartialContent, "Partial content");
+            m_StatusCodeMap.Add(HttpStatusCode.PaymentRequired, "Payment required");
+            m_StatusCodeMap.Add(HttpStatusCode.PreconditionFailed, "Precondition failed");
+            m_StatusCodeMap.Add(HttpStatusCode.ProxyAuthenticationRequired, "Proxy authentication required");
+            m_StatusCodeMap.Add(HttpStatusCode.RedirectMethod, "Redirect method");
+            m_StatusCodeMap.Add(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+            m_StatusCodeMap.Add(HttpStatusCode.RequestEntityTooLarge, "Request entity too large");
+            m_StatusCodeMap.Add(HttpStatusCode.RequestTimeout, "Request timeout");
+            m_StatusCodeMap.Add(HttpStatusCode.RequestUriTooLong, "Request uri too long");
+            m_StatusCodeMap.Add(HttpStatusCode.ResetContent, "Reset content");
+            m_StatusCodeMap.Add(HttpStatusCode.ServiceUnavailable, "Service unavailable");
+            m_StatusCodeMap.Add(HttpStatusCode.SwitchingProtocols, "Switching protocols");
+            m_StatusCodeMap.Add(HttpStatusCode.TemporaryRedirect, "Temporary redirect");
+            m_StatusCodeMap.Add(HttpStatusCode.UnsupportedMediaType, "Unsupported media type");
+            m_StatusCodeMap.Add(HttpStatusCode.UpgradeRequired, "Upgrade required");
+            m_StatusCodeMap.Add(HttpStatusCode.UseProxy, "Use proxy");
+        }
+
         public bool IsChunkedAccepted
         {
             get
@@ -421,139 +458,9 @@ namespace SilverSim.Main.Common.HttpServer
         public void ErrorResponse(HttpStatusCode statuscode)
         {
             string msg;
-            switch(statuscode)
+            if(!m_StatusCodeMap.TryGetValue(statuscode, out msg))
             {
-                case HttpStatusCode.BadGateway:
-                    msg = "Bad gateway";
-                    break;
-
-                case HttpStatusCode.BadRequest:
-                    msg = "Bad request";
-                    break;
-
-                case HttpStatusCode.ExpectationFailed:
-                    msg = "Expectation failed";
-                    break;
-
-                case HttpStatusCode.GatewayTimeout:
-                    msg = "Gateway timeout";
-                    break;
-
-                case HttpStatusCode.HttpVersionNotSupported:
-                    msg = "HTTP version not supported";
-                    break;
-
-                case HttpStatusCode.InternalServerError:
-                    msg = "Internal server error";
-                    break;
-
-                case HttpStatusCode.LengthRequired:
-                    msg = "Length required";
-                    break;
-
-                case HttpStatusCode.MethodNotAllowed:
-                    msg = "Method not allowed";
-                    break;
-
-                case HttpStatusCode.MovedPermanently:
-                    msg = "Moved permanently";
-                    break;
-
-                case HttpStatusCode.MultipleChoices:
-                    msg = "Multiple choices";
-                    break;
-
-                case HttpStatusCode.NoContent:
-                    msg = "No content";
-                    break;
-
-                case HttpStatusCode.NonAuthoritativeInformation:
-                    msg = "Non authoritative information";
-                    break;
-
-                case HttpStatusCode.NotAcceptable:
-                    msg = "Not acceptable";
-                    break;
-
-                case HttpStatusCode.NotFound:
-                    msg = "Not found";
-                    break;
-
-                case HttpStatusCode.NotImplemented:
-                    msg = "Not implemented";
-                    break;
-
-                case HttpStatusCode.NotModified:
-                    msg = "Not modified";
-                    break;
-
-                case HttpStatusCode.PartialContent:
-                    msg = "Partial content";
-                    break;
-
-                case HttpStatusCode.PaymentRequired:
-                    msg = "Payment required";
-                    break;
-
-                case HttpStatusCode.PreconditionFailed:
-                    msg = "Precondition failed";
-                    break;
-
-                case HttpStatusCode.ProxyAuthenticationRequired:
-                    msg = "Proxy authentication required";
-                    break;
-
-                case HttpStatusCode.RedirectMethod:
-                    msg = "Redirect method";
-                    break;
-
-                case HttpStatusCode.RequestedRangeNotSatisfiable:
-                    msg = "Requested range not satisfiable";
-                    break;
-
-                case HttpStatusCode.RequestEntityTooLarge:
-                    msg = "Request entity too large";
-                    break;
-
-                case HttpStatusCode.RequestTimeout:
-                    msg = "Request timeout";
-                    break;
-
-                case HttpStatusCode.RequestUriTooLong:
-                    msg = "Request uri too long";
-                    break;
-
-                case HttpStatusCode.ResetContent:
-                    msg = "Reset content";
-                    break;
-
-                case HttpStatusCode.ServiceUnavailable:
-                    msg = "Service unavailable";
-                    break;
-
-                case HttpStatusCode.SwitchingProtocols:
-                    msg = "Switching protocols";
-                    break;
-
-                case HttpStatusCode.TemporaryRedirect:
-                    msg = "Temporary redirect";
-                    break;
-
-                case HttpStatusCode.UnsupportedMediaType:
-                    msg = "Unsupported media type";
-                    break;
-
-                case HttpStatusCode.UpgradeRequired:
-                    msg = "Upgrade required";
-                    break;
-
-                case HttpStatusCode.UseProxy:
-                    msg = "Use proxy";
-                    break;
-
-                default:
-                    msg = statuscode.ToString();
-                    break;
+                msg = statuscode.ToString();
             }
             ErrorResponse(statuscode, msg);
         }
