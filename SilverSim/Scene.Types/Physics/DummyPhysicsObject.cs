@@ -123,6 +123,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -135,6 +136,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -147,6 +149,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
+                /* intentionally left empty */
             }
         }
 

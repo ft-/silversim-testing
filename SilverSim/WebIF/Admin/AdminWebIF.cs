@@ -672,7 +672,7 @@ namespace SilverSim.WebIF.Admin
                 }
                 catch (WebSocketClosedException)
                 {
-
+                    /* intentionally ignored */
                 }
                 catch (Exception e)
                 {

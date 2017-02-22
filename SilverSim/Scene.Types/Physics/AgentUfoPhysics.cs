@@ -5,7 +5,6 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using System.Diagnostics.CodeAnalysis;
 using System.Timers;
-using System;
 
 namespace SilverSim.Scene.Types.Physics
 {
@@ -44,7 +43,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
-
+                /* intentionally left empty */
             }
         }
 
@@ -135,6 +134,7 @@ namespace SilverSim.Scene.Types.Physics
             }
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -146,6 +146,7 @@ namespace SilverSim.Scene.Types.Physics
             }
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -157,6 +158,7 @@ namespace SilverSim.Scene.Types.Physics
             }
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -176,6 +178,7 @@ namespace SilverSim.Scene.Types.Physics
             }
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -188,6 +191,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -200,6 +204,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
+                /* intentionally left empty */
             }
         }
 
@@ -212,6 +217,7 @@ namespace SilverSim.Scene.Types.Physics
 
             set
             {
+                /* intentionally left empty */
             }
         }
     }
