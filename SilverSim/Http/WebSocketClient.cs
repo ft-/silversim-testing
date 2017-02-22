@@ -174,14 +174,8 @@ namespace SilverSim.Http
                 throw new NotAWebSocketConnectionException();
             }
 
-            if(headers.TryGetValue("sec-websocket-protocol", out headerLine))
-            {
-                selectedProtocol = headerLine;
-            }
-            else
-            {
-                selectedProtocol = string.Empty;
-            }
+            selectedProtocol = headers.TryGetValue("sec-websocket-protocol", out headerLine) ?
+                headerLine : string.Empty;
 
             return stream;
         }
