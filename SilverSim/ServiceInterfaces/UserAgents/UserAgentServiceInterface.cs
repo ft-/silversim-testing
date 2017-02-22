@@ -43,6 +43,8 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract DestinationInfo GetHomeRegion(UUI user);
 
+        public abstract bool IsOnline(UUI user);
+
         [Serializable]
         public class RequestFailedException : Exception
         {
