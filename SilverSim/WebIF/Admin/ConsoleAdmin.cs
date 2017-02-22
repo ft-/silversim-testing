@@ -47,8 +47,6 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
-
         public ShutdownOrder ShutdownOrder
         {
             get
@@ -71,7 +69,7 @@ namespace SilverSim.WebIF.Admin
             {
                 using (Stream o = res.GetOutputStream())
                 {
-                    using (StreamWriter w = new StreamWriter(o, UTF8NoBOM))
+                    using (StreamWriter w = o.UTF8StreamWriter())
                     {
                         IAdminWebIF webif = m_WebIF;
                         if (webif != null)
