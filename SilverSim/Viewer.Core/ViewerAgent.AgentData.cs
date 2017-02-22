@@ -39,6 +39,7 @@ namespace SilverSim.Viewer.Core
                             (Exception e)
 #endif
                 {
+                    /* only needed for debugging purposes to show. Otherwise, it gets pretty spammy during normal operation */
 #if DEBUG
                     m_Log.Debug("HandleAgentDataUpdateRequest", e);
 #endif
