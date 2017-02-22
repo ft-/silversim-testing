@@ -34,6 +34,11 @@ namespace SilverSim.Viewer.Profile
             throw new NotSupportedException();
         }
 
+        public override bool IsOnline(UUI user)
+        {
+            return false;
+        }
+
         public override DestinationInfo GetHomeRegion(UUI user)
         {
             throw new NotSupportedException();
