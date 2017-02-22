@@ -22,12 +22,12 @@ namespace SilverSim.Database.MySQL.Groups
         AggregatingAvatarNameService m_AvatarNameService;
 
         const string GCountQuery = "(SELECT COUNT(m.PrincipalID) FROM groupmemberships AS m WHERE m.GroupID LIKE g.GroupID) AS MemberCount," +
-				"(SELECT COUNT(r.RoleID) FROM grouproles AS r WHERE r.GroupID LIKE g.GroupID) AS RoleCount";
+                                    "(SELECT COUNT(r.RoleID) FROM grouproles AS r WHERE r.GroupID LIKE g.GroupID) AS RoleCount";
 
         const string MCountQuery = "(SELECT COUNT(xr.RoleID) FROM grouproles AS xr WHERE xr.GroupID LIKE g.GroupID) AS RoleCount";
 
         const string RCountQuery = "(SELECT COUNT(xrm.PrincipalID) FROM grouprolememberships AS xrm WHERE xrm.RoleID LIKE r.RoleID AND xrm.GroupID LIKE r.GroupID) AS RoleMembers," +
-					"(SELECT COUNT(xm.PrincipalID) FROM groupmemberships AS xm WHERE xm.GroupID LIKE r.GroupID) AS GroupMembers";
+                                    "(SELECT COUNT(xm.PrincipalID) FROM groupmemberships AS xm WHERE xm.GroupID LIKE r.GroupID) AS GroupMembers";
 
         UUI ResolveName(UUI uui)
         {

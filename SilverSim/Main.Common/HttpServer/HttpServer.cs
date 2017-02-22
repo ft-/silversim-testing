@@ -57,7 +57,7 @@ namespace SilverSim.Main.Common.HttpServer
         bool m_StoppingListeners;
 
         X509Certificate2 m_ServerCertificate;
-        SslProtocols m_SslProtocols = SslProtocols.Tls12;
+        readonly SslProtocols m_SslProtocols = SslProtocols.Tls12;
         readonly string m_CertificateFileName;
         readonly Type m_SslStreamPreload;
         readonly Socket m_ListenerSocket;

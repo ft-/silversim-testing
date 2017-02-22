@@ -21,8 +21,8 @@ namespace SilverSim.Threading
         class ThreadStartContext
         {
             internal Thread Thread;
-            ThreadStart m_Start;
-            ParameterizedThreadStart m_ParameterizedStart;
+            readonly ThreadStart m_Start;
+            readonly ParameterizedThreadStart m_ParameterizedStart;
 
             public ThreadStartContext(ThreadStart start)
             {
