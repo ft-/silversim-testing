@@ -448,7 +448,7 @@ namespace SilverSim.Main.Common.HttpServer
                     HttpRequest req;
                     try
                     {
-                        req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy, isSsl);
+                        req = new Http1Request(httpstream, remoteAddr, m_IsBehindProxy, isSsl);
                     }
                     catch (HttpResponse.ConnectionCloseException)
                     {
