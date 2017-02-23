@@ -91,6 +91,11 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        public bool TryGetHeader(string fieldName, out string value)
+        {
+            return m_Headers.TryGetValue(fieldName.ToLowerInvariant(), out value);
+        }
+
         public bool ContainsHeader(string fieldName)
         {
             return m_Headers.ContainsKey(fieldName.ToLowerInvariant());
