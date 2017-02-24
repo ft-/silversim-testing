@@ -425,15 +425,7 @@ namespace SilverSim.WebIF.Admin
             {
                 using (HttpResponse res = req.BeginResponse(HttpStatusCode.MovedPermanently, "Moved Permanently"))
                 {
-                    string host;
-                    if (req.TryGetHeader("Host", out host) && host.Length != 0)
-                    {
-                        res.Headers.Add("Location", "https://" + host + ":" + m_HttpsServer.Port.ToString() + "/admin");
-                    }
-                    else
-                    {
-                        res.Headers.Add("Location", m_HttpsServer.ServerURI + "admin");
-                    }
+                    res.Headers.Add("Location", m_HttpsServer.ServerURI + "admin");
                 }
             }
         }
