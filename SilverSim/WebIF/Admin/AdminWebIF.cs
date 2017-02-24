@@ -423,9 +423,20 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
+                string host;
+                string relocation_uri = m_HttpsServer.ServerURI + "admin";
+                if (req.TryGetHeader("Host", out host))
+                {
+                    Uri uri;
+                    if(Uri.TryCreate("http://" + host, UriKind.Absolute, out uri))
+                    {
+                        relocation_uri = "https://" + uri.Host + ":" + m_HttpsServer.Port.ToString() + "/admin";
+                    }
+                }
+
                 using (HttpResponse res = req.BeginResponse(HttpStatusCode.MovedPermanently, "Moved Permanently"))
                 {
-                    res.Headers.Add("Location", m_HttpsServer.ServerURI + "admin");
+                    res.Headers.Add("Location", relocation_uri);
                 }
             }
         }
