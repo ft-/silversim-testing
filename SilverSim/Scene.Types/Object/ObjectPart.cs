@@ -1591,6 +1591,7 @@ namespace SilverSim.Scene.Types.Object
                     case ObjectDetailsType.PathfindingType:
                     case ObjectDetailsType.RenderWeight:
                     case ObjectDetailsType.HoverHeight:
+                    case ObjectDetailsType.AttachedSlotsAvailable:
                         paramList.Add(0);
                         break;
 
@@ -1654,6 +1655,10 @@ namespace SilverSim.Scene.Types.Object
 
                     case ObjectDetailsType.RezzerKey:
                         paramList.Add(ObjectGroup.RezzingObjectID);
+                        break;
+
+                    case ObjectDetailsType.GroupTag:
+                        paramList.Add(string.Empty);
                         break;
 
                     case ObjectDetailsType.BodyShapeType:

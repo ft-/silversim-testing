@@ -34,6 +34,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using log4net;
+using SilverSim.Types.Groups;
 
 namespace SilverSim.Scene.Agent
 {
@@ -729,11 +730,35 @@ namespace SilverSim.Scene.Agent
                     case ObjectDetailsType.Owner:
                     case ObjectDetailsType.Creator:
                     case ObjectDetailsType.Root:
+                    case ObjectDetailsType.RezzerKey:
                         paramList.Add(ID);
                         break;
 
                     case ObjectDetailsType.Group:
                         paramList.Add(Group.ID);
+                        break;
+
+                    case ObjectDetailsType.GroupTag:
+                        if(null != GroupsService)
+                        {
+                            string title = string.Empty;
+                            GroupActiveMembership gam;
+                            GroupRole role;
+                            if(GroupsService.ActiveMembership.TryGetValue(Owner, Owner, out gam) &&
+                                GroupsService.Roles.TryGetValue(Owner, gam.Group, gam.SelectedRoleID, out role))
+                            {
+                                title = role.Title;
+                            }
+                            paramList.Add(title);
+                        }
+                        else
+                        {
+                            paramList.Add(string.Empty);
+                        }
+                        break;
+
+                    case ObjectDetailsType.AttachedSlotsAvailable:
+                        paramList.Add(Attachments.AvailableSlots);
                         break;
 
                     case ObjectDetailsType.RunningScriptCount:
@@ -788,6 +813,7 @@ namespace SilverSim.Scene.Agent
 
                     case ObjectDetailsType.Phantom:
                     case ObjectDetailsType.TempOnRez:
+                    case ObjectDetailsType.TempAttached:
                         paramList.Add(false);
                         break;
 

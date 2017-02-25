@@ -102,15 +102,44 @@ namespace SilverSim.Scene.Types.Agent
         {
             get
             {
-                m_AttachmentsRwLock.AcquireWriterLock(-1);
+                m_AttachmentsRwLock.AcquireReaderLock(-1);
                 try
                 {
                     return new List<ObjectGroup>(m_AllAttachments.Values);
                 }
                 finally
                 {
-                    m_AttachmentsRwLock.ReleaseWriterLock();
+                    m_AttachmentsRwLock.ReleaseReaderLock();
                 }
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                m_AttachmentsRwLock.AcquireReaderLock(-1);
+                try
+                {
+                    return m_AllAttachments.Count;
+                }
+                finally
+                {
+                    m_AttachmentsRwLock.ReleaseReaderLock();
+                }
+            }
+        }
+
+        public int AvailableSlots
+        {
+            get
+            {
+                int avail = 55 - Count;
+                if(avail < 0)
+                {
+                    avail = 0;
+                }
+                return avail;
             }
         }
 

@@ -45,7 +45,10 @@ namespace SilverSim.Scene.Types.Object
         Omega = 29,
         PrimCount = 30,
         TotalInventoryCount = 31,
-        RezzerKey = 32
+        RezzerKey = 32,
+        GroupTag = 33,
+        TempAttached = 34,
+        AttachedSlotsAvailable = 35
     }
 
     public interface IPrimitiveParamsInterface
