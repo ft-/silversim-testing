@@ -739,22 +739,7 @@ namespace SilverSim.Scene.Agent
                         break;
 
                     case ObjectDetailsType.GroupTag:
-                        if(null != GroupsService)
-                        {
-                            string title = string.Empty;
-                            GroupActiveMembership gam;
-                            GroupRole role;
-                            if(GroupsService.ActiveMembership.TryGetValue(Owner, Owner, out gam) &&
-                                GroupsService.Roles.TryGetValue(Owner, gam.Group, gam.SelectedRoleID, out role))
-                            {
-                                title = role.Title;
-                            }
-                            paramList.Add(title);
-                        }
-                        else
-                        {
-                            paramList.Add(string.Empty);
-                        }
+                        paramList.Add(GetGroupTag());
                         break;
 
                     case ObjectDetailsType.AttachedSlotsAvailable:
@@ -847,6 +832,23 @@ namespace SilverSim.Scene.Agent
                         break;
                 }
             }
+        }
+
+        public virtual string GetGroupTag()
+        {
+            if (null != GroupsService)
+            {
+                string title = string.Empty;
+                GroupActiveMembership gam;
+                GroupRole role;
+                if (GroupsService.ActiveMembership.TryGetValue(Owner, Owner, out gam) &&
+                    GroupsService.Roles.TryGetValue(Owner, gam.Group, gam.SelectedRoleID, out role))
+                {
+                    return role.Title;
+                }
+            }
+
+            return string.Empty;
         }
 
         public void PostEvent(IScriptEvent ev)
