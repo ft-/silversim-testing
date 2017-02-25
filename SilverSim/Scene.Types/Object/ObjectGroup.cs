@@ -535,6 +535,14 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool IsTempAttached
+        {
+            get
+            {
+                return IsAttached && FromItemID == UUID.Zero;
+            }
+        }
+
         public Vector3 Acceleration
         {
             get

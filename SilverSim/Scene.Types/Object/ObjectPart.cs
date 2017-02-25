@@ -1661,6 +1661,10 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(string.Empty);
                         break;
 
+                    case ObjectDetailsType.TempAttached:
+                        paramList.Add(ObjectGroup.IsTempAttached);
+                        break;
+
                     case ObjectDetailsType.BodyShapeType:
                     default:
                         paramList.Add(-1);
