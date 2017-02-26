@@ -341,11 +341,18 @@ namespace SilverSim.Viewer.Core
                 }
 
                 KillObject ko = null;
-                UDPPacket terse_packet = null;
-                byte terse_packet_count = 0;
-                List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data = null;
+
+                UDPPacket phys_terse_packet = null;
+                byte phys_terse_packet_count = 0;
+                List<KeyValuePair<ObjectUpdateInfo, byte[]>> phys_full_packet_data = null;
+                int phys_full_packet_data_length = 0;
+
+                UDPPacket nonphys_terse_packet = null;
+                byte nonphys_terse_packet_count = 0;
+                List<KeyValuePair<ObjectUpdateInfo, byte[]>> nonphys_full_packet_data = null;
+                int nonphys_full_packet_data_length = 0;
+
                 ObjectPropertiesTriggerMessage full_packet_objprop = null;
-                int full_packet_data_length = 0;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
@@ -422,30 +429,58 @@ namespace SilverSim.Viewer.Core
 
                                 if (null != fullUpdate)
                                 {
-
-                                    if (full_packet_data != null && fullUpdate.Length + full_packet_data_length > 1400)
+                                    if (ui.IsPhysics)
                                     {
-                                        UDPPacket full_packet = GetTxObjectPoolPacket();
-                                        if (full_packet == null)
+                                        if (phys_full_packet_data != null && fullUpdate.Length + phys_full_packet_data_length > 1400)
                                         {
-                                            break;
+                                            UDPPacket full_packet = GetTxObjectPoolPacket();
+                                            if (full_packet == null)
+                                            {
+                                                break;
+                                            }
+                                            full_packet.IsReliable = false;
+                                            full_packet.AckMessage = full_packet_objprop;
+                                            full_packet_objprop = null;
+                                            SendFullUpdateMsg(full_packet, phys_full_packet_data);
+                                            phys_full_packet_data = null;
                                         }
-                                        full_packet.IsReliable = true;
-                                        full_packet.AckMessage = full_packet_objprop;
-                                        full_packet_objprop = null;
-                                        SendFullUpdateMsg(full_packet, full_packet_data);
-                                        full_packet_data = null;
-                                    }
 
-                                    if (null == full_packet_data)
+                                        if (null == phys_full_packet_data)
+                                        {
+                                            phys_full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
+                                            phys_full_packet_data_length = 0;
+                                        }
+
+
+                                        phys_full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
+                                        phys_full_packet_data_length += fullUpdate.Length;
+                                    }
+                                    else
                                     {
-                                        full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
-                                        full_packet_data_length = 0;
+                                        if (nonphys_full_packet_data != null && fullUpdate.Length + nonphys_full_packet_data_length > 1400)
+                                        {
+                                            UDPPacket full_packet = GetTxObjectPoolPacket();
+                                            if (full_packet == null)
+                                            {
+                                                break;
+                                            }
+                                            full_packet.IsReliable = true;
+                                            full_packet.AckMessage = full_packet_objprop;
+                                            full_packet_objprop = null;
+                                            SendFullUpdateMsg(full_packet, nonphys_full_packet_data);
+                                            nonphys_full_packet_data = null;
+                                        }
+
+                                        if (null == nonphys_full_packet_data)
+                                        {
+                                            nonphys_full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
+                                            nonphys_full_packet_data_length = 0;
+                                        }
+
+
+                                        nonphys_full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
+                                        nonphys_full_packet_data_length += fullUpdate.Length;
                                     }
-
-
-                                    full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
-                                    full_packet_data_length += fullUpdate.Length;
                                 }
                             }
                             else
@@ -454,36 +489,83 @@ namespace SilverSim.Viewer.Core
 
                                 if (null != terseUpdate)
                                 {
-                                    if (terse_packet != null && terseUpdate.Length + terse_packet.DataLength > 1400)
+                                    if (ui.IsPhysics)
                                     {
-                                        terse_packet.Data[17] = terse_packet_count;
-                                        SendObjectUpdateMsg(terse_packet);
-                                        terse_packet = null;
-                                        terse_packet_count = 0;
-                                    }
-
-                                    if (null == terse_packet)
-                                    {
-                                        terse_packet = GetTxObjectPoolPacket();
-                                        if (terse_packet == null)
+                                        if (phys_terse_packet != null && terseUpdate.Length + phys_terse_packet.DataLength > 1400)
                                         {
-                                            break;
+                                            phys_terse_packet.Data[17] = phys_terse_packet_count;
+                                            SendObjectUpdateMsg(phys_terse_packet);
+                                            phys_terse_packet = null;
+                                            phys_terse_packet_count = 0;
                                         }
-                                        terse_packet.IsReliable = true;
-                                        terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
-                                        terse_packet.WriteUInt64(regionHandle);
-                                        terse_packet.WriteUInt16(65535); /* dilation */
-                                        terse_packet.WriteUInt8(0);
+
+                                        if (null == phys_terse_packet)
+                                        {
+                                            phys_terse_packet = GetTxObjectPoolPacket();
+                                            if (phys_terse_packet == null)
+                                            {
+                                                break;
+                                            }
+                                            phys_terse_packet.IsReliable = false;
+                                            phys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
+                                            phys_terse_packet.WriteUInt64(regionHandle);
+                                            phys_terse_packet.WriteUInt16(65535); /* dilation */
+                                            phys_terse_packet.WriteUInt8(0);
+                                        }
+                                        phys_terse_packet.WriteBytes(terseUpdate);
+                                        ++phys_terse_packet_count;
                                     }
-                                    terse_packet.WriteBytes(terseUpdate);
-                                    ++terse_packet_count;
+                                    else
+                                    {
+                                        if (nonphys_terse_packet != null && terseUpdate.Length + nonphys_terse_packet.DataLength > 1400)
+                                        {
+                                            nonphys_terse_packet.Data[17] = nonphys_terse_packet_count;
+                                            SendObjectUpdateMsg(nonphys_terse_packet);
+                                            nonphys_terse_packet = null;
+                                            nonphys_terse_packet_count = 0;
+                                        }
+
+                                        if (null == nonphys_terse_packet)
+                                        {
+                                            nonphys_terse_packet = GetTxObjectPoolPacket();
+                                            if (nonphys_terse_packet == null)
+                                            {
+                                                break;
+                                            }
+                                            nonphys_terse_packet.IsReliable = true;
+                                            nonphys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
+                                            nonphys_terse_packet.WriteUInt64(regionHandle);
+                                            nonphys_terse_packet.WriteUInt16(65535); /* dilation */
+                                            nonphys_terse_packet.WriteUInt8(0);
+                                        }
+                                        nonphys_terse_packet.WriteBytes(terseUpdate);
+                                        ++nonphys_terse_packet_count;
+                                    }
                                 }
                             }
                         }
                     }
+
+                    if (phys_full_packet_data != null && physicalOutQueue.Count == 0)
+                    {
+                        UDPPacket full_packet = GetTxObjectPoolPacket();
+                        if (full_packet == null)
+                        {
+                            break;
+                        }
+                        full_packet.IsReliable = true;
+                        full_packet.AckMessage = full_packet_objprop;
+                        SendFullUpdateMsg(full_packet, phys_full_packet_data);
+                    }
+
+                    if (phys_terse_packet != null && physicalOutQueue.Count == 0)
+                    {
+                        phys_terse_packet.Data[17] = phys_terse_packet_count;
+                        SendObjectUpdateMsg(phys_terse_packet);
+                    }
                 }
 
-                if(full_packet_data != null)
+                if (nonphys_full_packet_data != null)
                 {
                     UDPPacket full_packet = GetTxObjectPoolPacket();
                     if (full_packet == null)
@@ -492,13 +574,13 @@ namespace SilverSim.Viewer.Core
                     }
                     full_packet.IsReliable = true;
                     full_packet.AckMessage = full_packet_objprop;
-                    SendFullUpdateMsg(full_packet, full_packet_data);
+                    SendFullUpdateMsg(full_packet, nonphys_full_packet_data);
                 }
 
-                if (terse_packet != null)
+                if (nonphys_terse_packet != null)
                 {
-                    terse_packet.Data[17] = terse_packet_count;
-                    SendObjectUpdateMsg(terse_packet);
+                    nonphys_terse_packet.Data[17] = nonphys_terse_packet_count;
+                    SendObjectUpdateMsg(nonphys_terse_packet);
                 }
 
                 if(ko != null)
