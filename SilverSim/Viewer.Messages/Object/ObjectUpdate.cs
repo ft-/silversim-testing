@@ -9,9 +9,8 @@ using System.Collections.Generic;
 namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.ObjectUpdate)]
-    [Reliable]
     [Trusted]
-    public class ObjectUpdate : Message
+    public class UnreliableObjectUpdate : Message
     {
         public class ObjData
         {
@@ -73,7 +72,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjData> ObjectData = new List<ObjData>();
 
-        public ObjectUpdate()
+        public UnreliableObjectUpdate()
         {
 
         }
@@ -149,7 +148,13 @@ namespace SilverSim.Viewer.Messages.Object
                 p.WriteVector3f(d.JointAxisOrAnchor);
             }
         }
+    }
 
+    [UDPMessage(MessageType.ObjectUpdate)]
+    [Reliable]
+    [Trusted]
+    public class ObjectUpdate : UnreliableObjectUpdate
+    {
         public static Message Decode(UDPPacket p)
         {
             ObjectUpdate m = new ObjectUpdate();

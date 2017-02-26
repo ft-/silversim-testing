@@ -3,11 +3,10 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using SilverSim.Types.ServerURIs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace SilverSim.ServiceInterfaces.UserAgents
 {
@@ -35,7 +34,7 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract UserInfo GetUserInfo(UUI user);
 
-        public abstract Dictionary<string, string> GetServerURLs(UUI user);
+        public abstract ServerURIs GetServerURLs(UUI user);
 
         public abstract string LocateUser(UUI user);
 

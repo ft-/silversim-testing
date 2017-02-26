@@ -25,10 +25,19 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private SilverSim.Viewer.Messages.Object.ObjectUpdate AgentToObjectUpdate(IAgent agent)
+        private Viewer.Messages.Message AgentToObjectUpdate(IAgent agent)
         {
-            SilverSim.Viewer.Messages.Object.ObjectUpdate m = new Viewer.Messages.Object.ObjectUpdate();
-            SilverSim.Viewer.Messages.Object.ObjectUpdate.ObjData d = new Viewer.Messages.Object.ObjectUpdate.ObjData();
+            Viewer.Messages.Object.UnreliableObjectUpdate m;
+            ObjectGroup sittingOn = agent.SittingOnObject;
+            if (sittingOn != null)
+            {
+                m = new Viewer.Messages.Object.ObjectUpdate();
+            }
+            else
+            {
+                m = new Viewer.Messages.Object.UnreliableObjectUpdate();
+            }
+            Viewer.Messages.Object.UnreliableObjectUpdate.ObjData d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData();
             d.Data = new byte[0];
             d.ExtraParams = new byte[1];
             d.FullID = agent.ID;
@@ -79,13 +88,13 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAgentObjectToAgent(IAgent agent, IAgent targetAgent)
         {
-            SilverSim.Viewer.Messages.Object.ObjectUpdate m = AgentToObjectUpdate(agent);
+            SilverSim.Viewer.Messages.Message m = AgentToObjectUpdate(agent);
             targetAgent.SendMessageAlways(m, ID);
         }
 
         public void SendAgentObjectToAllAgents(IAgent agent)
         {
-            SilverSim.Viewer.Messages.Object.ObjectUpdate m = AgentToObjectUpdate(agent);
+            SilverSim.Viewer.Messages.Message m = AgentToObjectUpdate(agent);
             foreach (IAgent a in Agents)
             {
                 a.SendMessageAlways(m, ID);

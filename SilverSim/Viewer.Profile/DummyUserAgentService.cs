@@ -4,6 +4,7 @@
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using SilverSim.Types.ServerURIs;
 using System;
 using System.Collections.Generic;
 
@@ -53,7 +54,7 @@ namespace SilverSim.Viewer.Profile
             return dummyInfo;
         }
 
-        public override Dictionary<string, string> GetServerURLs(UUI user)
+        public override ServerURIs GetServerURLs(UUI user)
         {
             throw new NotSupportedException();
         }
