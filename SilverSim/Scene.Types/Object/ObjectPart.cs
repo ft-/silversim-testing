@@ -2341,10 +2341,15 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "CreatorData":
+                                try
                                 {
                                     UUI creator = part.Creator;
                                     creator.CreatorData = reader.ReadElementValueAsString();
                                     part.Creator = creator;
+                                }
+                                catch
+                                {
+                                    /* if it fails, we have to skip it and leave it partial */
                                 }
                                 break;
 
