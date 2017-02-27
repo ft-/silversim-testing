@@ -26,6 +26,8 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         }
 
+        public abstract IDisplayNameAccessor DisplayName { get; }
+
         public abstract void VerifyAgent(UUID sessionID, string token);
 
         public abstract void VerifyClient(UUID sessionID, string token);

@@ -10,13 +10,33 @@ using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Profile
 {
-    sealed class DummyUserAgentService : UserAgentServiceInterface
+    sealed class DummyUserAgentService : UserAgentServiceInterface, IDisplayNameAccessor
     {
         public DummyUserAgentService()
         {
 
         }
 
+        public override IDisplayNameAccessor DisplayName
+        {
+            get
+            {
+                return this;
+            }
+        }
+
+        string IDisplayNameAccessor.this[UUI agent]
+        {
+            get
+            {
+                return string.Empty;
+            }
+
+            set
+            {
+                throw new NotSupportedException();
+            }
+        }
 
         public override void VerifyAgent(UUID sessionID, string token)
         {
@@ -67,6 +87,17 @@ namespace SilverSim.Viewer.Profile
         public override UUI GetUUI(UUI user, UUI targetUserID)
         {
             throw new NotSupportedException();
+        }
+
+        bool IDisplayNameAccessor.TryGetValue(UUI agent, out string displayname)
+        {
+            displayname = string.Empty;
+            return false;
+        }
+
+        bool IDisplayNameAccessor.ContainsKey(UUI agent)
+        {
+            return false;
         }
     }
 }
