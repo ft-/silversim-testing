@@ -11,6 +11,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         string Name { get; }
         string DisplayName { get; } /* name for display in error messages */
         bool IsProtocolSupported(string url);
+        bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
         bool IsAgentSupported(List<GridType> gridTypes);
     }
 }
