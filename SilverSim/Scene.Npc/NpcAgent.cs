@@ -3,12 +3,14 @@
 
 using log4net;
 using SilverSim.Main.Common;
+using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
@@ -41,6 +43,44 @@ namespace SilverSim.Scene.Npc
         readonly GridUserServiceInterface m_GridUserService;
         readonly PresenceServiceInterface m_PresenceService;
         readonly NpcPresenceServiceInterface m_NpcPresenceService;
+
+        private ChatServiceInterface m_ChatService;
+        private ChatServiceInterface.Listener m_ChatListener;
+
+        UUID GetMyUUID()
+        {
+            return ID;
+        }
+
+        Vector3 GetMyPosition()
+        {
+            return GlobalPosition;
+        }
+
+        internal void EnableListen()
+        {
+            if (m_ChatListener == null)
+            {
+                try
+                {
+                    m_ChatService = CurrentScene.GetService<ChatServiceInterface>();
+                    m_ChatListener = m_ChatService.AddAgentListen(0, string.Empty, UUID.Zero, string.Empty, GetMyUUID, GetMyPosition, OnChatReceive);
+                }
+                catch
+                {
+                    /* intentionally ignored */
+                }
+            }
+        }
+
+        internal void DisableListen()
+        {
+            if(null != m_ChatListener)
+            {
+                m_ChatListener.Remove();
+                m_ChatListener = null;
+            }
+        }
 
         public NpcAgent(
             UUI npcID,

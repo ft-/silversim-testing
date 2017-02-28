@@ -4,6 +4,7 @@
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -138,5 +139,62 @@ namespace SilverSim.Scene.Npc
             }
         }
 
+        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedChatListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(delegate() { return new RwLockedDictionary<UUID, int>(); });
+
+        void OnChatReceive(ListenEvent ev)
+        {
+            foreach(KeyValuePair<UUID, RwLockedDictionary<UUID, int>> kvp in m_ScriptedChatListeners)
+            {
+                ObjectPart part;
+                ObjectPartInventoryItem item;
+                if(CurrentScene.Primitives.TryGetValue(kvp.Key, out part))
+                {
+                    foreach(KeyValuePair<UUID, int> kvpinner in kvp.Value)
+                    {
+                        if(part.Inventory.TryGetValue(kvpinner.Key, out item))
+                        {
+                            ScriptInstance instance = item.ScriptInstance;
+                            if(null != instance)
+                            {
+                                /* Translate listen event to mapped channel */
+                                ListenEvent nev = new ListenEvent();
+                                nev.ButtonIndex = ev.ButtonIndex;
+                                nev.Channel = kvpinner.Value;
+                                nev.Distance = ev.Distance;
+                                nev.GlobalPosition = ev.GlobalPosition;
+                                nev.ID = ev.ID;
+                                nev.Message = ev.Message;
+                                nev.Name = ev.Name;
+                                nev.OriginSceneID = ev.OriginSceneID;
+                                nev.OwnerID = ev.OwnerID;
+                                nev.SourceType = ev.SourceType;
+                                nev.TargetID = ev.TargetID;
+                                nev.Type = ev.Type;
+                                instance.PostEvent(nev);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    m_ScriptedChatListeners.Remove(kvp.Key);
+                }
+            }
+        }
+
+        public void ListenAsNpc(UUID objectid, UUID itemid, int tochannel)
+        {
+            m_ScriptedChatListeners[objectid][itemid] = tochannel;
+        }
+
+        public void UnlistenAsNpc(UUID objectid, UUID itemid)
+        {
+            RwLockedDictionary<UUID, int> itemlist;
+            if(m_ScriptedChatListeners.TryGetValue(objectid, out itemlist))
+            {
+                itemlist.Remove(itemid);
+            }
+            m_ScriptedChatListeners.RemoveIf(objectid, delegate (RwLockedDictionary<UUID, int> list) { return list.Count == 0; });
+        }
     }
 }

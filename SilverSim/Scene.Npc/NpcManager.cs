@@ -173,7 +173,9 @@ namespace SilverSim.Scene.Npc
                             agent.LookAt = npcInfo.LookAt;
                             agent.NpcOwner = npcInfo.Owner;
                             agent.Group = npcInfo.Group;
+                            agent.CurrentScene = scene;
                             scene.Add(agent);
+                            agent.EnableListen();
                             try
                             {
                                 if (npcInfo.SittingOnObjectID != UUID.Zero)
@@ -244,6 +246,7 @@ namespace SilverSim.Scene.Npc
                 presenceInfo.RegionID = npc.SceneID;
                 IObject obj = npc.SittingOnObject;
                 presenceInfo.SittingOnObjectID = obj != null ? obj.ID : UUID.Zero;
+                kvp.Value.DisableListen();
                
                 if(m_NpcAgents.Remove(kvp.Key))
                 {
@@ -291,6 +294,7 @@ namespace SilverSim.Scene.Npc
                     npcInfo.Group = agent.Group;
                     inventoryService.CheckInventory(npcInfo.Npc.ID);
                     presenceService.Store(npcInfo);
+                    agent.CurrentScene = scene;
                     scene.Add(agent);
                 }
                 catch
@@ -303,6 +307,7 @@ namespace SilverSim.Scene.Npc
                     m_NpcAgents.Remove(agent.ID);
                     throw;
                 }
+                agent.EnableListen();
 
                 try
                 {
@@ -345,6 +350,7 @@ namespace SilverSim.Scene.Npc
             NpcAgent npc;
             if (m_NpcAgents.Remove(npcId, out npc))
             {
+                npc.DisableListen();
                 npc.CurrentScene.Remove(npc);
                 RemoveNpcData(npc);
                 return true;
@@ -358,6 +364,17 @@ namespace SilverSim.Scene.Npc
         public bool TryGetNpc(UUID npcId, out NpcAgent agent)
         {
             return m_NpcAgents.TryGetValue(npcId, out agent);
+        }
+
+        public void UnlistenAsNpc(UUID sceneid, UUID objectid, UUID itemid)
+        {
+            foreach(NpcAgent agent in m_NpcAgents.Values)
+            {
+                if(agent.SceneID == sceneid)
+                {
+                    agent.UnlistenAsNpc(objectid, itemid);
+                }
+            }
         }
         #endregion
 
