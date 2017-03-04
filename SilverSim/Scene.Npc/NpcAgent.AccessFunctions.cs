@@ -8,6 +8,7 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
 
@@ -137,6 +138,69 @@ namespace SilverSim.Scene.Npc
                     }
                 }
             }
+        }
+
+        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedIMListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(delegate () { return new RwLockedDictionary<UUID, int>(); });
+
+        public override bool IMSend(GridInstantMessage im)
+        {
+            if(im.Dialog == GridInstantMessageDialog.MessageFromAgent ||
+                im.Dialog == GridInstantMessageDialog.MessageFromObject)
+            {
+                foreach (KeyValuePair<UUID, RwLockedDictionary<UUID, int>> kvp in m_ScriptedChatListeners)
+                {
+                    ObjectPart part;
+                    ObjectPartInventoryItem item;
+                    if (CurrentScene.Primitives.TryGetValue(kvp.Key, out part))
+                    {
+                        foreach (KeyValuePair<UUID, int> kvpinner in kvp.Value)
+                        {
+                            if (part.Inventory.TryGetValue(kvpinner.Key, out item))
+                            {
+                                ScriptInstance instance = item.ScriptInstance;
+                                if (null != instance)
+                                {
+                                    /* Translate IM event to mapped channel */
+                                    ListenEvent nev = new ListenEvent();
+                                    nev.ButtonIndex = -1;
+                                    nev.Channel = kvpinner.Value;
+                                    nev.Distance = 0;
+                                    nev.GlobalPosition = Vector3.Zero;
+                                    nev.ID = im.FromAgent.ID;
+                                    nev.Message = im.Message;
+                                    nev.Name = im.FromAgent.FullName;
+                                    nev.OriginSceneID = UUID.Zero;
+                                    nev.OwnerID = im.FromAgent.ID;
+                                    nev.SourceType = im.Dialog == GridInstantMessageDialog.MessageFromObject ? ListenEvent.ChatSourceType.Object : ListenEvent.ChatSourceType.Agent;
+                                    nev.TargetID = ID;
+                                    nev.Type = ListenEvent.ChatType.Say;
+                                    instance.PostEvent(nev);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        m_ScriptedIMListeners.Remove(kvp.Key);
+                    }
+                }
+            }
+            return true;
+        }
+
+        public void ListenIM(UUID objectid, UUID itemid, int tochannel)
+        {
+            m_ScriptedIMListeners[objectid][itemid] = tochannel;
+        }
+
+        public void UnlistenIM(UUID objectid, UUID itemid)
+        {
+            RwLockedDictionary<UUID, int> itemlist;
+            if (m_ScriptedIMListeners.TryGetValue(objectid, out itemlist))
+            {
+                itemlist.Remove(itemid);
+            }
+            m_ScriptedIMListeners.RemoveIf(objectid, delegate (RwLockedDictionary<UUID, int> list) { return list.Count == 0; });
         }
 
         readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedChatListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(delegate() { return new RwLockedDictionary<UUID, int>(); });

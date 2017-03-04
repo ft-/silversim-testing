@@ -10,7 +10,6 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
@@ -26,7 +25,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Grid;
-using SilverSim.Types.IM;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages.Agent;
 using System;
@@ -479,11 +477,6 @@ namespace SilverSim.Scene.Npc
         public override void HandleMessage(ChildAgentUpdate m)
         {
             /* ignored */
-        }
-
-        public override bool IMSend(GridInstantMessage im)
-        {
-            throw new NotImplementedException();
         }
 
         public override void ReleaseControls(ScriptInstance instance)
