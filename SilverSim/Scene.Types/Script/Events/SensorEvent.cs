@@ -7,8 +7,8 @@ using System.Diagnostics.CodeAnalysis;
 namespace SilverSim.Scene.Types.Script.Events
 {
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-    public struct SensorEvent : IScriptEvent
+    public struct SensorEvent : IScriptDetectedEvent
     {
-        public List<DetectInfo> Data;
+        public List<DetectInfo> Detected { get; set; }
     }
 }

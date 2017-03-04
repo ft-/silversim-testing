@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SilverSim.Scene.Types.Script.Events
 {
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-    public struct TouchEvent : IScriptEvent
+    public struct TouchEvent : IScriptDetectedEvent
     {
         public enum TouchType
         {
@@ -16,6 +16,6 @@ namespace SilverSim.Scene.Types.Script.Events
             End
         }
         public TouchType Type;
-        public List<DetectInfo> Detected;
+        public List<DetectInfo> Detected { get; set; }
     }
 }

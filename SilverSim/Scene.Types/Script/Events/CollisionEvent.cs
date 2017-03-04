@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SilverSim.Scene.Types.Script.Events
 {
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-    public struct CollisionEvent : IScriptEvent
+    public struct CollisionEvent : IScriptDetectedEvent
     {
         public enum CollisionType
         {
@@ -16,6 +16,6 @@ namespace SilverSim.Scene.Types.Script.Events
             End
         }
         public CollisionType Type;
-        public List<DetectInfo> Detected;
+        public List<DetectInfo> Detected { get; set; }
     }
 }

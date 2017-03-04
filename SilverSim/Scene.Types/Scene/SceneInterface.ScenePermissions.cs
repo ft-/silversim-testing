@@ -325,8 +325,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         #region Object Permissions
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool CanRez(IAgent agent, Vector3 location)
+        public bool CanRez(UUI agent, Vector3 location)
         {
             ParcelInfo pinfo;
             if (!Parcels.TryGetValue(location, out pinfo))
@@ -334,17 +333,17 @@ namespace SilverSim.Scene.Types.Scene
                 return false;
             }
 
-            if((pinfo.Flags & ParcelFlags.CreateObjects) != 0)
+            if ((pinfo.Flags & ParcelFlags.CreateObjects) != 0)
             {
                 return true;
             }
-            else if((agent.Owner.EqualsGrid(pinfo.Owner)) || IsPossibleGod(agent.Owner))
+            else if ((agent.EqualsGrid(pinfo.Owner)) || IsPossibleGod(agent))
             {
                 return true;
             }
-            else if((pinfo.Flags & ParcelFlags.CreateGroupObjects) != 0 &&
+            else if ((pinfo.Flags & ParcelFlags.CreateGroupObjects) != 0 &&
                 pinfo.Group.ID != UUID.Zero &&
-                HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.AllowRez))
+                HasGroupPower(agent, pinfo.Group, GroupPowers.AllowRez))
             {
                 return true;
             }
@@ -354,11 +353,10 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool CanRunScript(IAgent agent, Vector3 location)
+        public bool CanRunScript(UUI agent, Vector3 location)
         {
             ParcelInfo pinfo;
-            if(!Parcels.TryGetValue(location, out pinfo))
+            if (!Parcels.TryGetValue(location, out pinfo))
             {
                 return false;
             }
@@ -367,13 +365,13 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return true;
             }
-            else if ((agent.Owner.EqualsGrid(pinfo.Owner)) || IsPossibleGod(agent.Owner))
+            else if ((agent.EqualsGrid(pinfo.Owner)) || IsPossibleGod(agent))
             {
                 return true;
             }
             else if ((pinfo.Flags & ParcelFlags.AllowGroupScripts) != 0 &&
                 pinfo.Group.ID != UUID.Zero &&
-                IsGroupMember(agent.Owner, pinfo.Group))
+                IsGroupMember(agent, pinfo.Group))
             {
                 return true;
             }
