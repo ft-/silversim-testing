@@ -376,6 +376,17 @@ namespace SilverSim.Scene.Npc
                 }
             }
         }
+
+        public void UnlistenIM(UUID sceneid, UUID objectid, UUID itemid)
+        {
+            foreach (NpcAgent agent in m_NpcAgents.Values)
+            {
+                if (agent.SceneID == sceneid)
+                {
+                    agent.UnlistenIM(objectid, itemid);
+                }
+            }
+        }
         #endregion
 
         #region Console commands
