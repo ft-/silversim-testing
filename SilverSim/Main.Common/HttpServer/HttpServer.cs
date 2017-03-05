@@ -596,6 +596,10 @@ namespace SilverSim.Main.Common.HttpServer
                     httpstream.ReadTimeout = 10000;
                 }
             }
+            catch (HttpResponse.DisconnectFromThreadException)
+            {
+                /* we simply disconnected that HttpRequest from HttpServer */
+            }
             catch (HttpResponse.ConnectionCloseException)
             {
                 /* simply a closed connection */
