@@ -532,6 +532,10 @@ namespace SilverSim.Main.Cmd.Region
 
                         case "productname":
                             rInfo.ProductName = args[argi + 1];
+                            if(string.IsNullOrEmpty(rInfo.ProductName))
+                            {
+                                rInfo.ProductName = "Mainland";
+                            }
                             changeRegionData = true;
                             break;
 
@@ -849,6 +853,10 @@ namespace SilverSim.Main.Cmd.Region
 
                         case "productname":
                             rInfo.ProductName = args[argi + 1];
+                            if(string.IsNullOrEmpty(rInfo.ProductName))
+                            {
+                                rInfo.ProductName = "Mainland";
+                            }
                             break;
 
                         case "estate":
