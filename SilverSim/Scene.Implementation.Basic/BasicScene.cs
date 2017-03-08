@@ -1477,6 +1477,6 @@ namespace SilverSim.Scene.Implementation.Basic
             agent.SendMessageAlways(res, ID);
         }
 
-#endregion
+        #endregion
     }
 }
