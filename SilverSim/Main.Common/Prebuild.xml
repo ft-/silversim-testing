@@ -21,6 +21,7 @@
   <Reference name="System.Web"/>
   <Reference name="System.Security"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
+  <Reference name="SilverSim.Updater" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
   <Reference name="log4net" localCopy="false"/>
   <Reference name="SilverSim.Types" localCopy="false"/>

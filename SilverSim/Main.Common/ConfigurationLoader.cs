@@ -40,6 +40,7 @@ using SilverSim.Types;
 using SilverSim.Types.Assembly;
 using SilverSim.Types.Grid;
 using SilverSim.Types.StructuredData.XmlRpc;
+using SilverSim.Updater;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1475,6 +1476,32 @@ namespace SilverSim.Main.Common
                 }
             }
 
+            CoreUpdater.Instance.LoadInstalledPackageDescriptions();
+
+            foreach(string defaultCfg in CoreUpdater.Instance.GetDefaultConfigurationFiles(mode))
+            {
+                if(defaultCfg.Contains(':'))
+                {
+                    string[] parts = defaultCfg.Split(new char[] { ':' }, 2);
+                    if (parts[1].EndsWith(".xml"))
+                    {
+                        m_Sources.Enqueue(new CFG_NiniXmlResourceSource(parts[1], "Package Defaults " + defaultCfg, parts[0]));
+                    }
+                    else
+                    {
+                        m_Sources.Enqueue(new CFG_IniResourceSource(parts[1], "Package Defaults " + defaultCfg, parts[0]));
+                    }
+                }
+                else if(defaultCfg.EndsWith(".xml"))
+                {
+                    m_Sources.Enqueue(new CFG_NiniXmlFileSource(Path.Combine("../data", defaultCfg)));
+                }
+                else
+                {
+                    m_Sources.Enqueue(new CFG_IniFileSource(Path.Combine("../data", defaultCfg)));
+                }
+            }
+            
             /* pre-process defaults ini before adding the final configuration */
             ProcessConfigurations(false);
 
