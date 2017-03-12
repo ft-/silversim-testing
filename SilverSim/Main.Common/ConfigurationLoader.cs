@@ -1212,11 +1212,11 @@ namespace SilverSim.Main.Common
                 string sourceParam = sourceConfig.GetString(useparam[1], config.GetString("SourceParameterDefault", string.Empty));
 
                 config.Remove("UseSourceParameter");
-                if(string.IsNullOrEmpty(sourceParam) || sourceParam == "SourceParameterDefault")
+                if(string.IsNullOrEmpty(sourceParam) || sourceParam.StartsWith("SourceParameter"))
                 {
                     continue;
                 }
-                string inputsource = config.GetString(sourceParam);
+                string inputsource = config.GetString("SourceParameter-" + sourceParam);
                 if(inputsource.Contains(":"))
                 {
                     config.Set("ImportResource-Generated", inputsource);
