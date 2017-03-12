@@ -1641,6 +1641,38 @@ namespace SilverSim.Main.Common
             }
             ProcessConfigurations();
 
+            foreach(IConfig cfg in m_Config.Configs)
+            {
+                foreach (IConfig config in m_Config.Configs)
+                {
+                    if (!config.Contains("UseSourceParameter"))
+                    {
+                        continue;
+                    }
+
+                    string[] useparam = config.Get("UseSourceParameter").Split(new char[] { '.' }, 2);
+                    if (useparam.Length < 2)
+                    {
+                        continue;
+                    }
+
+                    IConfig sourceConfig = m_Config.Configs[useparam[0]];
+                    if (null == sourceConfig || !sourceConfig.Contains(useparam[1]))
+                    {
+                        continue;
+                    }
+
+                    string sourceParam = sourceConfig.GetString(useparam[1]);
+
+                    if (string.IsNullOrEmpty(sourceParam))
+                    {
+                        continue;
+                    }
+                    throw new ConfigurationErrorException(string.Format("Parameter value {0} for {1} in section {2}",
+                        sourceParam, useparam[1], useparam[0]));
+                }
+            }
+
             if (dumpResultingIniName.Length != 0)
             {
                 using (TextWriter writer = new StreamWriter(dumpResultingIniName))
