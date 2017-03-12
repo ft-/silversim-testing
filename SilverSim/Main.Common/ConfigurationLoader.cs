@@ -285,6 +285,22 @@ namespace SilverSim.Main.Common
             m_HeloResponseHeaders[key] = val;
         }
 
+        public void AddHeloProtocolsProvided(string val)
+        {
+            string xprotocols;
+            List<string> xprotocols_list = new List<string>();
+            if(m_HeloResponseHeaders.TryGetValue("X-Protocols-Provided", out xprotocols))
+            {
+                xprotocols_list = new List<string>(xprotocols.Split(','));
+            }
+            
+            if(!xprotocols_list.Contains(val))
+            {
+                xprotocols_list.Add(val);
+            }
+            m_HeloResponseHeaders["X-Protocols-Provided"] = string.Join(",", xprotocols_list);
+        }
+
         public void HeloResponseHandler(HttpRequest req)
         {
             if(req.Method != "GET" && req.Method != "HEAD")
@@ -1171,6 +1187,48 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        #region Process UseSourceParameter lines
+        private void ProcessUseSourceParameter()
+        {
+            foreach (IConfig config in m_Config.Configs)
+            {
+                if (!config.Contains("UseSourceParameter"))
+                {
+                    continue;
+                }
+
+                string[] useparam = config.Get("UseSourceParameter").Split(new char[] { ':' }, 2);
+                if (useparam.Length < 2)
+                {
+                    config.Remove("UseSourceParameter");
+                    continue;
+                }
+                IConfig sourceConfig = m_Config.Configs[useparam[0]];
+                if(null == sourceConfig)
+                {
+                    continue;
+                }
+
+                string sourceParam = sourceConfig.GetString(useparam[1], config.GetString("SourceParameterDefault", string.Empty));
+
+                config.Remove("UseSourceParameter");
+                if(string.IsNullOrEmpty(sourceParam) || sourceParam == "SourceParameterDefault")
+                {
+                    continue;
+                }
+                string inputsource = config.GetString(sourceParam);
+                if(inputsource.Contains(":"))
+                {
+                    config.Set("ImportResource-Generated", inputsource);
+                }
+                else
+                {
+                    AddSource(inputsource);
+                }
+            }
+        }
+        #endregion
+
         #region Process UseTemplates lines
         private void ProcessUseTemplates()
         {
@@ -1311,6 +1369,7 @@ namespace SilverSim.Main.Common
                     throw new ConfigurationErrorException();
                 }
                 LoadGridsXml();
+                ProcessUseSourceParameter();
                 AddIncludes(source);
                 ProcessImportResources();
                 if (processParameterMap)
