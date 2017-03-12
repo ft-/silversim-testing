@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Scene.Registration</name>
+	<files>
+		<file name="bin/plugins/SilverSim.Scene.Registration.dll"/>
+	</files>
+</package>

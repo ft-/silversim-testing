@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Scene.RegionLoader</name>
+	<files>
+		<file name="bin/plugins/SilverSim.Scene.RegionLoader.dll"/>
+	</files>
+</package>

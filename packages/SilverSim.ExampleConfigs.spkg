@@ -6,5 +6,6 @@
 		<file name="data/SilverSim.Grid.ini.example"/>
 		<file name="data/SilverSim.ini.example"/>
 		<file name="data/SilverSim.Standalone.ini.example"/>
+		<file name="data/supplements/Regions.ini.example"/>
 	</files>
 </package>

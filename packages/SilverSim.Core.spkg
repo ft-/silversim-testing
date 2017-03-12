@@ -3,6 +3,7 @@
 	<name>SilverSim.Core</name>
 	<dependencies>
 		<dependency name="log4net"/>
+		<dependency name="SilverSim.Backend.Common"/>
 		<dependency name="SilverSim.Http"/>
 		<dependency name="SilverSim.Main.Common"/>
 		<dependency name="SilverSim.Main.IM"/>
