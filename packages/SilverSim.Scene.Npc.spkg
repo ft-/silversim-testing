@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Scene.Npc</name>
 	<files>
-		<file name="bin/SilverSim.Scene.Npc.dll"/>
+		<file name="bin/plugins/SilverSim.Scene.Npc.dll"/>
 	</files>
 </package>
