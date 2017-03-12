@@ -6,6 +6,7 @@
 		<use-if-started-as>bare</use-if-started-as>
 		<use-if-started-as>simulator</use-if-started-as>
 		<use-if-started-as>standalone</use-if-started-as>
+		<use-if-started-as>testing</use-if-started-as>
 	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.Scene.Implementation.Basic.dll"/>
