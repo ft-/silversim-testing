@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>MySql.Data</name>
+	<files>
+		<file name="bin/MySql.Data.dll"/>
+	</files>
+</package>

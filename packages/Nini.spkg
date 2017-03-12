@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>Nini</name>
+	<files>
+		<file name="bin/Nini.dll"/>
+	</files>
+</package>
