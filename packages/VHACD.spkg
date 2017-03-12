@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+	<name>VHACD</name>
+	<files>
+		<file name="bin/platform-libs/linux/32/vhacd.so"/>
+		<file name="bin/platform-libs/linux/64/vhacd.so"/>
+		<file name="bin/platform-libs/windows/32/vhacd.dll"/>
+		<file name="bin/platform-libs/windows/64/vhacd.dll"/>
+	</files>
+</package>

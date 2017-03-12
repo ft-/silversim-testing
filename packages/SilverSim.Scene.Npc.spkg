@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Scene.Npc</name>
+	<files>
+		<file name="bin/SilverSim.Scene.Npc.dll"/>
+	</files>
+</package>

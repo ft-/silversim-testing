@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Viewer.Messages</name>
+	<files>
+		<file name="bin/SilverSim.Viewer.Messages.dll"/>
+	</files>
+</package>

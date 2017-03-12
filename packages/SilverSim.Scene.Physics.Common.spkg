@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Scene.Physics.Common</name>
+	<files>
+		<file name="bin/SilverSim.Scene.Physics.Common.dll"/>
+	</files>
+</package>

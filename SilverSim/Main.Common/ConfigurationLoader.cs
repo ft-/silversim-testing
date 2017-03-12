@@ -1221,7 +1221,7 @@ namespace SilverSim.Main.Common
                 string inputsource = config.GetString("SourceParameter-" + sourceParam);
                 if(inputsource.Contains(":"))
                 {
-                    config.Set("ImportResource-Generated", inputsource);
+                    config.Set("ImportResource-Generated", inputsource.StartsWith(":") ? inputsource.Substring(1) : inputsource);
                 }
                 else
                 {

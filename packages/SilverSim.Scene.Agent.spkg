@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Scene.Agent</name>
+	<files>
+		<file name="bin/SilverSim.Scene.Agent.dll"/>
+	</files>
+</package>

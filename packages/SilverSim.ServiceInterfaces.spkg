@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.ServiceInterfaces</name>
+	<files>
+		<file name="bin/SilverSim.ServiceInterfaces.dll"/>
+	</files>
+</package>

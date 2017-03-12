@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Types</name>
+	<files>
+		<file name="bin/SilverSim.Types.dll"/>
+	</files>
+</package>

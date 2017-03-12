@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Http</name>
+	<files>
+		<file name="bin/SilverSim.Http.dll"/>
+	</files>
+</package>

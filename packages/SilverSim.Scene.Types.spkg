@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Scene.Types</name>
+	<files>
+		<file name="bin/SilverSim.Scene.Types.dll"/>
+	</files>
+</package>

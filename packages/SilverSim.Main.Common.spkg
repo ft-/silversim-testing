@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Main.Common</name>
+	<files>
+		<file name="bin/SilverSim.Main.Common.dll"/>
+	</files>
+</package>

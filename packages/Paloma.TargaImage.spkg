@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>Paloma.TargaImage</name>
+	<files>
+		<file name="bin/Paloma.TargaImage.dll"/>
+	</files>
+</package>

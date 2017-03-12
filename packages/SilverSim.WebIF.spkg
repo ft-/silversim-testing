@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.WebIF</name>
+	<default-configuration>
+		<source>SilverSim.WebIF:PackageConfig.ini</source>
+		<use-if-started-as>bare</use-if-started-as>
+		<use-if-started-as>grid</use-if-started-as>
+		<use-if-started-as>simulator</use-if-started-as>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.WebIF:PackageConfig.Bare.ini</source>
+		<use-if-started-as>bare</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.WebIF:PackageConfig.Grid.ini</source>
+		<use-if-started-as>grid</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.WebIF:PackageConfig.Simulator.ini</source>
+		<use-if-started-as>simulator</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.WebIF:PackageConfig.Standalone.ini</source>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.WebIF.dll"/>
+	</files>
+</package>

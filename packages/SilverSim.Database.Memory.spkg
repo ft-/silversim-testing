@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Database.Memory</name>
+	<files>
+		<file name="bin/plugins/SilverSim.Database.Memory.dll"/>
+	</files>
+</package>

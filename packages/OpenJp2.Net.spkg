@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package>
+	<name>OpenJp2.Net</name>
+	<files>
+		<file name="bin/OpenJp2.Net.dll"/>
+		<file name="bin/OpenJp2.Net.dll.config"/>
+		<file name="bin/platform-libs/linux/32/openjp2.so"/>
+		<file name="bin/platform-libs/linux/64/openjp2.so"/>
+		<file name="bin/platform-libs/windows/32/openjp2.dll"/>
+		<file name="bin/platform-libs/windows/64/openjp2.dll"/>
+	</files>
+</package>

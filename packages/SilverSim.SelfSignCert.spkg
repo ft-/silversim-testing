@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.SelfSignCert</name>
+	<files>
+		<file name="bin/SilverSim.SelfSignCert.dll"/>
+		<file name="bin/platform-libs/Mono.Security.dll"/>
+	</files>
+</package>
