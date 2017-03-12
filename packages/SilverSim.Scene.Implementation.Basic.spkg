@@ -9,5 +9,7 @@
 	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.Scene.Implementation.Basic.dll"/>
+		<file name="bin/languages/de/SilverSim.Scene.Implementation.Basic.de.resources"/>
+		<file name="bin/languages/en/SilverSim.Scene.Implementation.Basic.en.resources"/>
 	</files>
 </package>

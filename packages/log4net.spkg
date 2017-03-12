@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>log4net</name>
+	<files>
+		<file name="bin/log4net.dll"/>
+	</files>
+</package>

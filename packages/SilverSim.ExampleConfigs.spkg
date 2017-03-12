@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.ExampleConfigs</name>
+	<files>
+		<file name="data/SilverSim.Bare.ini.example"/>
+		<file name="data/SilverSim.Grid.ini.example"/>
+		<file name="data/SilverSim.ini.example"/>
+		<file name="data/SilverSim.Standalone.ini.example"/>
+	</files>
+</package>

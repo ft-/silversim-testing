@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Core</name>
+	<dependencies>
+		<dependency name="log4net"/>
+		<dependency name="SilverSim.Http"/>
+		<dependency name="SilverSim.Main.Common"/>
+		<dependency name="SilverSim.Main.IM"/>
+		<dependency name="SilverSim.Scene.Management"/>
+		<dependency name="SilverSim.Scene.Types"/>
+		<dependency name="SilverSim.Scene.ServiceInterfaces"/>
+		<dependency name="SilverSim.Types"/>
+		<dependency name="SilverSim.ServiceInterfaces"/>
+		<dependency name="SilverSim.SelfSignCert"/>
+		<dependency name="SilverSim.Threading"/>
+		<dependency name="SilverSim.Viewer.Messages"/>
+	</dependencies>
+</package>

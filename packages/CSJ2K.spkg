@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>CSJ2K</name>
+	<files>
+		<file name="bin/CSJ2K.dll"/>
+	</files>
+</package>

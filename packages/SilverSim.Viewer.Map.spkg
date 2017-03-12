@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Viewer.Map</name>
+	<dependencies>
+		<dependency name="SilverSim.Viewer.Core"/>
+		<dependency name="SilverSim.Viewer.Messages"/>
+	</dependencies>
+	<files>
+		<file name="bin/plugins/SilverSim.Viewer.Map.dll"/>
+	</files>
+</package>

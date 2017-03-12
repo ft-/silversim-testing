@@ -9,5 +9,6 @@
 	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.Scene.Physics.ShapeManager.dll"/>
+		<file name="bin/plugins/SilverSim.Scene.Physics.ShapeManager.dll.config"/>
 	</files>
 </package>

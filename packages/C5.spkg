@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>C5</name>
+	<files>
+		<file name="bin/C5.dll"/>
+	</files>
+</package>

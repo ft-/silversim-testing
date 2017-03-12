@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Threading</name>
+	<files>
+		<file name="bin/SilverSim.Threading.dll"/>
+	</files>
+</package>

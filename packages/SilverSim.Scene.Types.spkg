@@ -3,5 +3,7 @@
 	<name>SilverSim.Scene.Types</name>
 	<files>
 		<file name="bin/SilverSim.Scene.Types.dll"/>
+		<file name="bin/languages/de/SilverSim.Scene.Types.de.resources"/>
+		<file name="bin/languages/en/SilverSim.Scene.Types.en.resources"/>
 	</files>
 </package>
