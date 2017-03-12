@@ -1197,25 +1197,27 @@ namespace SilverSim.Main.Common
                     continue;
                 }
 
-                string[] useparam = config.Get("UseSourceParameter").Split(new char[] { ':' }, 2);
+                string[] useparam = config.Get("UseSourceParameter").Split(new char[] { '.' }, 2);
                 if (useparam.Length < 2)
                 {
                     config.Remove("UseSourceParameter");
                     continue;
                 }
                 IConfig sourceConfig = m_Config.Configs[useparam[0]];
-                if(null == sourceConfig)
+                if(null == sourceConfig || !sourceConfig.Contains(useparam[1]))
                 {
                     continue;
                 }
 
-                string sourceParam = sourceConfig.GetString(useparam[1], config.GetString("SourceParameterDefault", string.Empty));
+                string sourceParam = sourceConfig.GetString(useparam[1]);
 
+                if(string.IsNullOrEmpty(sourceParam) || sourceParam.StartsWith("SourceParameter") ||
+                    !config.Contains("SourceParameter-" + sourceParam))
+                {
+                    continue;
+                }
                 config.Remove("UseSourceParameter");
-                if(string.IsNullOrEmpty(sourceParam) || sourceParam.StartsWith("SourceParameter"))
-                {
-                    continue;
-                }
+
                 string inputsource = config.GetString("SourceParameter-" + sourceParam);
                 if(inputsource.Contains(":"))
                 {
