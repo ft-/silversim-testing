@@ -1582,6 +1582,7 @@ namespace SilverSim.Main.Common
             {
                 CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
             }
+            UpdaterControlCommands.RegisterCommands(this);
             CommandRegistry.Commands.Add("execute", ExecuteCommand);
             CommandRegistry.AddShowCommand("memory", ShowMemoryCommand);
             CommandRegistry.AddShowCommand("threadcount", ShowThreadCountCommand);
