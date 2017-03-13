@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <package>
 	<name>SilverSim.Types</name>
-	<dependencies>
-		<dependency name="log4net"/>
-	</dependencies>
 	<files>
 		<file name="bin/SilverSim.Types.dll"/>
 	</files>

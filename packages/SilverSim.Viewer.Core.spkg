@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <package>
 	<name>SilverSim.Viewer.Core</name>
-	<dependencies>
-		<dependency name="C5"/>
-	</dependencies>
 	<files>
 		<file name="bin/SilverSim.Viewer.Core.dll"/>
 		<file name="bin/languages/de/SilverSim.Viewer.Core.de.resources"/>

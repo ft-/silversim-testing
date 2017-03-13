@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <package>
 	<name>SilverSim.Viewer.Friends</name>
-	<dependencies>
-		<dependency name="SilverSim.Viewer.Core"/>
-		<dependency name="SilverSim.Viewer.Messages"/>
-	</dependencies>
 	<files>
 		<file name="bin/plugins/SilverSim.Viewer.Friends.dll"/>
 		<file name="bin/languages/de/SilverSim.Viewer.Friends.de.resources"/>
