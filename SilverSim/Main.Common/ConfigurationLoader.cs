@@ -285,20 +285,17 @@ namespace SilverSim.Main.Common
             m_HeloResponseHeaders[key] = val;
         }
 
-        public void AddHeloProtocolsProvided(string val)
+        RwLockedDictionary<string, int> m_XProtocolsProvided = new RwLockedDictionary<string, int>();
+        public void AddHeloProtocolsProvided(string protocol, int priority)
         {
-            string xprotocols;
-            List<string> xprotocols_list = new List<string>();
-            if(m_HeloResponseHeaders.TryGetValue("X-Protocols-Provided", out xprotocols))
+            m_XProtocolsProvided[protocol] = -priority;
+            StringBuilder builder = new StringBuilder();
+            List<string> list = new List<string>();
+            foreach(KeyValuePair<string, int> item in m_XProtocolsProvided.OrderBy(key => key.Value))
             {
-                xprotocols_list = new List<string>(xprotocols.Split(','));
+                list.Add(item.Key);
             }
-            
-            if(!xprotocols_list.Contains(val))
-            {
-                xprotocols_list.Add(val);
-            }
-            m_HeloResponseHeaders["X-Protocols-Provided"] = string.Join(",", xprotocols_list);
+            m_HeloResponseHeaders["X-Protocols-Provided"] = string.Join(",", list);
         }
 
         public void HeloResponseHandler(HttpRequest req)
@@ -1744,6 +1741,15 @@ namespace SilverSim.Main.Common
                 foreach (string key in heloConfig.GetKeys())
                 {
                     SetHeloResponseHeader(key, heloConfig.GetString(key));
+                }
+            }
+
+            heloConfig = m_Config.Configs["Helo.X-Protocols-Provided"];
+            if(null != heloConfig)
+            {
+                foreach(string key in heloConfig.GetKeys())
+                {
+                    AddHeloProtocolsProvided(key, heloConfig.GetInt(key));
                 }
             }
 
