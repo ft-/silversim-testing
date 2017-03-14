@@ -20,16 +20,17 @@
   <Reference name="System.Core"/>
   <Reference name="System.Xml"/>
   <Reference name="System.Web"/>
-  <Reference name="SilverSim.Main.Common"/>
-  <Reference name="SilverSim.Types"/>
-  <Reference name="SilverSim.Scene.Types"/>
-  <Reference name="SilverSim.Scripting.Common"/>
-  <Reference name="SilverSim.Scene.Physics.Common"/>
-  <Reference name="SilverSim.ServiceInterfaces"/>
-  <Reference name="SilverSim.Scene.ServiceInterfaces"/>
-  <Reference name="SilverSim.Scene.Management"/>
-  <Reference name="SilverSim.Scene.Npc"/>
-  <Reference name="SilverSim.Http"/>
+  <Reference name="SilverSim.Main.Common" localCopy="false"/>
+  <Reference name="SilverSim.Types" localCopy="false"/>
+  <Reference name="SilverSim.Scene.Types" localCopy="false"/>
+  <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
+  <Reference name="SilverSim.Scene.Physics.Common" localCopy="false"/>
+  <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
+  <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
+  <Reference name="SilverSim.Scene.Management" localCopy="false"/>
+  <Reference name="SilverSim.Scene.Npc" localCopy="false"/>
+  <Reference name="SilverSim.Http" localCopy="false"/>
+  <Reference name="SilverSim.Updater" localCopy="false"/>
   <Reference name="log4net" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
