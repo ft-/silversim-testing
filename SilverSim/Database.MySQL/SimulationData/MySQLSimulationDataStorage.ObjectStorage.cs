@@ -109,6 +109,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             objpart.CameraEyeOffset = dbReader.GetVector3("CameraEyeOffset");
 
             objpart.PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType");
+            objpart.PathfindingType = dbReader.GetEnum<PathfindingType>("PathfindingType");
             objpart.Material = dbReader.GetEnum<PrimitiveMaterial>("Material");
             objpart.Size = dbReader.GetVector3("Size");
             objpart.Slice = dbReader.GetVector3("Slice");

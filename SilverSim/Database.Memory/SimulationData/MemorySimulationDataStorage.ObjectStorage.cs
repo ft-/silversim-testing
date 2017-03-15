@@ -101,6 +101,7 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.CameraEyeOffset = map["CameraEyeOffset"].AsVector3;
 
             objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)map["PhysicsShapeType"].AsInt;
+            objpart.PathfindingType = (PathfindingType)map["PathfindingType"].AsInt;
             objpart.Material = (PrimitiveMaterial)map["Material"].AsInt;
             objpart.Size = map["Size"].AsVector3;
             objpart.Slice = map["Slice"].AsVector3;

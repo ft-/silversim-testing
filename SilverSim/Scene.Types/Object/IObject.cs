@@ -51,6 +51,18 @@ namespace SilverSim.Scene.Types.Object
         AttachedSlotsAvailable = 35
     }
 
+    public enum PathfindingType
+    {
+        Other = -1,
+        LegacyLinkset = 0,
+        Avatar = 1,
+        Character = 2,
+        Walkable = 3,
+        StaticObstacle = 4,
+        MaterialVolume = 5,
+        ExclusionVolume = 6
+    }
+
     public interface IPrimitiveParamsInterface
     {
         void GetPrimitiveParams(PrimitiveParamsType type, AnArray paramList);
@@ -171,6 +183,11 @@ namespace SilverSim.Scene.Types.Object
             set;
         }
 
+        PathfindingType PathfindingType
+        {
+            get;
+            set;
+        }
 
         bool IsInScene(SceneInterface scene);
 

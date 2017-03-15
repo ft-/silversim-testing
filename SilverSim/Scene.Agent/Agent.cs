@@ -69,6 +69,18 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public PathfindingType PathfindingType
+        {
+            get
+            {
+                return PathfindingType.Avatar;
+            }
+            set
+            {
+                /* setting intentionally ignored */
+            }
+        }
+
         protected Agent(UUID agentId, Uri homeURI)
         {
             Group = UGI.Unknown;

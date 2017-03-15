@@ -135,6 +135,19 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        public PathfindingType PathfindingType
+        {
+            get
+            {
+                return RootPart.PathfindingType;
+            }
+
+            set
+            {
+                RootPart.PathfindingType = value;
+            }
+        }
+
         /* UUID references to PartID and Vector3 is the attaching force */
         public RwLockedDictionary<UUID, Vector3> AttachedForces = new RwLockedDictionary<UUID, Vector3>();
 

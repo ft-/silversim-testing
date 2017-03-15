@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Database.MySQL._Migration;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -146,6 +147,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<bool>("IsRotateXEnabled") { IsNullAllowed = false, Default = true },
             new AddColumn<bool>("IsRotateYEnabled") { IsNullAllowed = false, Default = true },
             new AddColumn<bool>("IsRotateZEnabled") { IsNullAllowed = false, Default = true },
+            new TableRevision(12),
+            new AddColumn<PathfindingType>("PathfindingType") {IsNullAllowed = false, Default = PathfindingType.LegacyLinkset },
             #endregion
 
             #region Table primitems

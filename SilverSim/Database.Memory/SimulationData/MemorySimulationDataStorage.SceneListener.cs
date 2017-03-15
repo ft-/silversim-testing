@@ -273,6 +273,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 data.Add("SitTargetOffset", objpart.SitTargetOffset);
                 data.Add("SitTargetOrientation", objpart.SitTargetOrientation);
                 data.Add("PhysicsShapeType", (int)objpart.PhysicsShapeType);
+                data.Add("PathfindingType", (int)objpart.PathfindingType);
                 data.Add("Material", (int)objpart.Material);
                 data.Add("Size", objpart.Size);
                 data.Add("Slice", objpart.Slice);

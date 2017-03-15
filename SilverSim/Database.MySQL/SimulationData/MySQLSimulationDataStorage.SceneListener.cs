@@ -432,6 +432,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 data.Add("SitTargetOffset", objpart.SitTargetOffset);
                 data.Add("SitTargetOrientation", objpart.SitTargetOrientation);
                 data.Add("PhysicsShapeType", objpart.PhysicsShapeType);
+                data.Add("PathfindingType", objpart.PathfindingType);
                 data.Add("Material", objpart.Material);
                 data.Add("Size", objpart.Size);
                 data.Add("Slice", objpart.Slice);

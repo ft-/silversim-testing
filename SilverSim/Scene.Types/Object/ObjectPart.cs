@@ -102,6 +102,29 @@ namespace SilverSim.Scene.Types.Object
 
         public int LoadedLinkNumber; /* not authoritative, just for loading from XML */
 
+        PathfindingType m_PathfindingType = PathfindingType.LegacyLinkset;
+
+        public PathfindingType PathfindingType
+        {
+            get
+            {
+                ObjectGroup grp = ObjectGroup;
+                if(grp != null && grp.IsAttached)
+                {
+                    return PathfindingType.Other;
+                }
+                return m_PathfindingType;
+            }
+            set
+            {
+                if (value != PathfindingType.Avatar)
+                {
+                    m_PathfindingType = value;
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
+            }
+        }
+
         public uint m_PhysicsParameterUpdateSerial = 1;
 
         public uint PhysicsParameterUpdateSerial
@@ -1588,11 +1611,14 @@ namespace SilverSim.Scene.Types.Object
 
                     case ObjectDetailsType.ScriptMemory:
                     case ObjectDetailsType.CharacterTime:
-                    case ObjectDetailsType.PathfindingType:
                     case ObjectDetailsType.RenderWeight:
                     case ObjectDetailsType.HoverHeight:
                     case ObjectDetailsType.AttachedSlotsAvailable:
                         paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.PathfindingType:
+                        paramList.Add((int)PathfindingType);
                         break;
 
                     case ObjectDetailsType.ServerCost:
