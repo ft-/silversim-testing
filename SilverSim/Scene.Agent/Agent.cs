@@ -778,6 +778,10 @@ namespace SilverSim.Scene.Agent
                         paramList.Add(1);
                         break;
 
+                    case ObjectDetailsType.PathfindingType:
+                        paramList.Add(1); // this is OPT_AVATAR
+                        break;
+
                     case ObjectDetailsType.ScriptTime:
                     case ObjectDetailsType.ServerCost:
                     case ObjectDetailsType.StreamingCost:
@@ -788,7 +792,6 @@ namespace SilverSim.Scene.Agent
                     case ObjectDetailsType.ScriptMemory:
                     case ObjectDetailsType.CharacterTime:
                     case ObjectDetailsType.AttachedPoint:
-                    case ObjectDetailsType.PathfindingType:
                         paramList.Add(0);
                         break;
 
