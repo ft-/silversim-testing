@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-	<name>SilverSim.Core.Viewer</name>
+	<name>SilverSim.Meta.Core.Viewer</name>
 	<dependencies>
 		<dependency name="SilverSim.Viewer.Core"/>
 		<dependency name="SilverSim.Viewer.Economy"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-	<name>SilverSim.Core</name>
+	<name>SilverSim.Meta.Core</name>
 	<dependencies>
 		<dependency name="log4net"/>
 		<dependency name="SilverSim.Backend.Common"/>
