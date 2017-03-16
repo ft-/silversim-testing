@@ -7,6 +7,9 @@
 		<use-if-started-as>simulator</use-if-started-as>
 		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
+	<dependencies>
+		<dependency name="VHACD"/>
+	</dependencies>
 	<files>
 		<file name="bin/plugins/SilverSim.Scene.Physics.ShapeManager.dll"/>
 		<file name="bin/plugins/SilverSim.Scene.Physics.ShapeManager.dll.config"/>
