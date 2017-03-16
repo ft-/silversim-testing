@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
 <package>
 	<name>SilverSim.Viewer.Core</name>
+	<dependencies>
+		<dependency name="SilverSim.Viewer.Economy"/>
+		<dependency name="SilverSim.Viewer.Friends"/>
+		<dependency name="SilverSim.Viewer.Groups"/>
+		<dependency name="SilverSim.Viewer.Map"/>
+		<dependency name="SilverSim.Viewer.OfflineIM"/>
+		<dependency name="SilverSim.Viewer.Profile"/>
+		<dependency name="SilverSim.Viewer.Search"/>
+		<dependency name="SilverSim.Viewer.Teleport"/>
+		<dependency name="SilverSim.Viewer.TerrainEdit"/>
+	</dependencies>
 	<files>
 		<file name="bin/SilverSim.Viewer.Core.dll"/>
 		<file name="bin/languages/de/SilverSim.Viewer.Core.de.resources"/>
