@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-	<name>SilverSim.Meta.Viewer.Simulator</name>
+	<name>SilverSim.Meta.Core.Simulator</name>
 	<dependencies>
 		<dependency name="log4net"/>
 		<dependency name="SilverSim.Meta.Core"/>
