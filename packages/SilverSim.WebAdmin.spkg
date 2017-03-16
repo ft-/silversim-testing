@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <package>
   <name>SilverSim.WebAdmin</name>
+  <dependencies>
+	<dependency name="SilverSim.WebIF"/>
+  </dependencies>
   <files>
     <file name="data/adminpages/html/index.html"/>
     <file name="data/adminpages/js/cryptojs/LICENSE"/>
