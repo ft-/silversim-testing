@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Meta.Viewer.Simulator</name>
+	<dependencies>
+		<dependency name="log4net"/>
+		<dependency name="SilverSim.Meta.Core"/>
+		<dependency name="SilverSim.Scene.Chat"/>
+		<dependency name="SilverSim.Scene.Implementation.Basic"/>
+	</dependencies>
+</package>

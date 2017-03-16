@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Meta.Viewer.Grid</name>
+	<dependencies>
+		<dependency name="log4net"/>
+		<dependency name="SilverSim.Meta.Core"/>
+		<dependency name="SilverSim.Grid"/>
+	</dependencies>
+</package>
