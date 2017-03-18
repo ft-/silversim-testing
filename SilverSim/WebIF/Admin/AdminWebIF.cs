@@ -32,7 +32,6 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
-using SilverSim.Updater;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -255,10 +254,6 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("module.get", ModuleGet);
             JsonMethods.Add("dnscache.list", DnsCacheList);
             JsonMethods.Add("dnscache.delete", DnsCacheRemove);
-            JsonMethods.Add("packages.list.installed", PackagesInstalledList);
-            JsonMethods.Add("package.install", PackageInstall);
-            JsonMethods.Add("package.uninstall", PackageUninstall);
-            JsonMethods.Add("packages.updates.available", PackageUpdatesAvailable);
             JsonMethods.Add("webif.modules", AvailableModulesList);
             LogController.Queues.Add(m_LogEventQueue);
             ThreadManager.CreateThread(LogThread).Start();
@@ -1284,81 +1279,6 @@ namespace SilverSim.WebIF.Admin
             m.Add("title", m_Title);
             m.Add("modules", res);
             SuccessResponse(req, m);
-        }
-
-        [AdminWebIfRequiredRight("packages.view")]
-        void PackageUpdatesAvailable(HttpRequest req, Map jsondata)
-        {
-            Map res = new Map();
-            try
-            {
-                CoreUpdater.Instance.UpdatePackageFeed();
-                res.Add("available", CoreUpdater.Instance.AreUpdatesAvailable);
-                res.Add("success", true);
-            }
-            catch(Exception e)
-            {
-                res.Add("success", false);
-                res.Add("message", e.Message);
-            }
-            SuccessResponse(req, res);
-        }
-
-        [AdminWebIfRequiredRight("packages.view")]
-        void PackagesInstalledList(HttpRequest req, Map jsondata)
-        {
-            Map res = new Map();
-            foreach(KeyValuePair<string, string> kvp in CoreUpdater.Instance.InstalledPackages)
-            {
-                res.Add(kvp.Key, kvp.Value);
-            }
-            SuccessResponse(req, res);
-        }
-
-        [AdminWebIfRequiredRight("packages.manage")]
-        void PackageInstall(HttpRequest req, Map jsondata)
-        {
-            if(!jsondata.ContainsKey("package"))
-            {
-                ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
-                return;
-            }
-
-            Map res = new Map();
-            try
-            {
-                CoreUpdater.Instance.InstallPackage(jsondata["package"].ToString());
-                res.Add("success", true);
-            }
-            catch(Exception e)
-            {
-                res.Add("success", false);
-                res.Add("message", e.Message);
-            }
-            SuccessResponse(req, res);
-        }
-
-        [AdminWebIfRequiredRight("packages.manage")]
-        void PackageUninstall(HttpRequest req, Map jsondata)
-        {
-            if (!jsondata.ContainsKey("package"))
-            {
-                ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
-                return;
-            }
-
-            Map res = new Map();
-            try
-            {
-                CoreUpdater.Instance.UninstallPackage(jsondata["package"].ToString());
-                res.Add("success", true);
-            }
-            catch(Exception e)
-            {
-                res.Add("success", false);
-                res.Add("message", e.Message);
-            }
-            SuccessResponse(req, res);
         }
 
         [AdminWebIfRequiredRight("dnscache.manage")]

@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <package>
 	<name>SilverSim.Scene.Npc</name>
+	<dependencies>
+		<dependency name="SilverSim.Database.Memory"/>
+	</dependencies>
 	<files>
 		<file name="bin/plugins/SilverSim.Scene.Npc.dll"/>
 	</files>

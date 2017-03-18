@@ -21,6 +21,7 @@
 
 using Nini.Config;
 using SilverSim.Types;
+using SilverSim.Updater;
 using System;
 using System.IO;
 using System.Xml;
@@ -137,7 +138,31 @@ namespace SilverSim.Main.Common
             }
             if(!File.Exists(filename))
             {
-                return false;
+                try
+                {
+                    CoreUpdater.Instance.UpdatePackageFeed();
+                }
+                catch
+                {
+                    return false;
+                }
+
+                /* check if we can get one from package feed */
+                if (CoreUpdater.Instance.AvailablePackages.ContainsKey("SilverSim.GridInfo." + gridId))
+                {
+                    try
+                    {
+                        CoreUpdater.Instance.InstallPackage("SilverSim.GridInfo." + gridId);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             using (FileStream fs = new FileStream(filename, FileMode.Open))
