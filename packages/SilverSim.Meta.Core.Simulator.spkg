@@ -6,5 +6,7 @@
 		<dependency name="SilverSim.Meta.Core"/>
 		<dependency name="SilverSim.Scene.Chat"/>
 		<dependency name="SilverSim.Scene.Implementation.Basic"/>
+		<dependency name="SilverSim.Scene.RegionLoader"/>
+		<dependency name="SilverSim.Scene.Registration"/>
 	</dependencies>
 </package>
