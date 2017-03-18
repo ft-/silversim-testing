@@ -188,6 +188,7 @@ namespace SilverSim.Main.Common
         }
 
         readonly ILog m_Log;
+        readonly ILog m_UpdaterLog;
         readonly IConfigSource m_Config = new IniConfigSource();
         readonly Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
         readonly RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
@@ -578,6 +579,28 @@ namespace SilverSim.Main.Common
             e.Cancel = true;
         }
 
+        void UpdaterLogEvent(CoreUpdater.LogType type, string msg)
+        {
+            switch(type)
+            {
+                case CoreUpdater.LogType.Info:
+                    m_UpdaterLog.Info(msg);
+                    break;
+
+                case CoreUpdater.LogType.Warn:
+                    m_UpdaterLog.Warn(msg);
+                    break;
+
+                case CoreUpdater.LogType.Error:
+                    m_UpdaterLog.Error(msg);
+                    break;
+
+                default:
+                    m_UpdaterLog.Debug(msg);
+                    break;
+            }
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed, bool disableShutdownCommand = false)
@@ -873,6 +896,9 @@ namespace SilverSim.Main.Common
                 XmlConfigurator.Configure();
                 m_Log = LogManager.GetLogger("MAIN");
             }
+
+            m_UpdaterLog = LogManager.GetLogger("UPDATER");
+            CoreUpdater.Instance.OnUpdateLog += UpdaterLogEvent;
 
             IConfig heloConfig = m_Config.Configs["Helo.Headers"];
             if(null != heloConfig)
