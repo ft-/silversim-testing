@@ -50,9 +50,25 @@ namespace SilverSim.WebIF.Admin
             m_WebIF.JsonMethods.Add("package.install", PackageInstall);
             m_WebIF.JsonMethods.Add("package.uninstall", PackageUninstall);
             m_WebIF.JsonMethods.Add("packages.updates.available", PackageUpdatesAvailable);
+            m_WebIF.JsonMethods.Add("packages.update.feed", PackagesUpdateFeed);
 
             m_WebIF.AutoGrantRights["packages.install"].Add("packages.view");
             m_WebIF.AutoGrantRights["packages.uninstall"].Add("packages.view");
+        }
+
+        [AdminWebIfRequiredRight("packages.view")]
+        void PackagesUpdateFeed(HttpRequest req, Map jsondata)
+        {
+            try
+            {
+                CoreUpdater.Instance.UpdatePackageFeed();
+            }
+            catch
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
+                return;
+            }
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIfRequiredRight("packages.view")]
@@ -72,12 +88,11 @@ namespace SilverSim.WebIF.Admin
                     pkglist.Add(pkg);
                 }
                 res.Add("list", pkglist);
-                res.Add("success", true);
             }
             catch(Exception e)
             {
-                res.Add("success", false);
-                res.Add("message", e.Message);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
+                return;
             }
 
             m_WebIF.SuccessResponse(req, res);
@@ -91,12 +106,11 @@ namespace SilverSim.WebIF.Admin
             {
                 CoreUpdater.Instance.UpdatePackageFeed();
                 res.Add("available", CoreUpdater.Instance.AreUpdatesAvailable);
-                res.Add("success", true);
             }
-            catch (Exception e)
+            catch
             {
-                res.Add("success", false);
-                res.Add("message", e.Message);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
+                return;
             }
             m_WebIF.SuccessResponse(req, res);
         }
@@ -130,12 +144,11 @@ namespace SilverSim.WebIF.Admin
             try
             {
                 CoreUpdater.Instance.InstallPackage(jsondata["package"].ToString());
-                res.Add("success", true);
             }
-            catch (Exception e)
+            catch
             {
-                res.Add("success", false);
-                res.Add("message", e.Message);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+                return;
             }
             m_WebIF.SuccessResponse(req, res);
         }
@@ -153,12 +166,11 @@ namespace SilverSim.WebIF.Admin
             try
             {
                 CoreUpdater.Instance.UninstallPackage(jsondata["package"].ToString());
-                res.Add("success", true);
             }
-            catch (Exception e)
+            catch
             {
-                res.Add("success", false);
-                res.Add("message", e.Message);
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
+                return;
             }
             m_WebIF.SuccessResponse(req, res);
         }
