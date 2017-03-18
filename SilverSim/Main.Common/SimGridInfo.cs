@@ -128,6 +128,29 @@ namespace SilverSim.Main.Common
             }
         }
 
+        static bool TryInstallingFromPackage(string gridId)
+        {
+            try
+            {
+                CoreUpdater.Instance.UpdatePackageFeed();
+            }
+            catch
+            {
+                return false;
+            }
+
+            /* check if we can get one from package feed */
+            try
+            {
+                CoreUpdater.Instance.InstallPackage("SilverSim.GridInfo." + gridId);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static bool LoadFromGridsXml(IConfigSource config, string gridId)
         {
             string filename = GridsXml;
@@ -136,28 +159,13 @@ namespace SilverSim.Main.Common
             {
                 filename = gridspecificfile;
             }
+
+retry:
             if(!File.Exists(filename))
             {
-                try
+                if(TryInstallingFromPackage(gridId) && filename != gridspecificfile)
                 {
-                    CoreUpdater.Instance.UpdatePackageFeed();
-                }
-                catch
-                {
-                    return false;
-                }
-
-                /* check if we can get one from package feed */
-                if (CoreUpdater.Instance.AvailablePackages.ContainsKey("SilverSim.GridInfo." + gridId))
-                {
-                    try
-                    {
-                        CoreUpdater.Instance.InstallPackage("SilverSim.GridInfo." + gridId);
-                    }
-                    catch
-                    {
-                        return false;
-                    }
+                    filename = gridspecificfile;
                 }
                 else
                 {
@@ -183,7 +191,16 @@ namespace SilverSim.Main.Common
                                 {
                                     throw new SimGridInfoXmlException();
                                 }
-                                return LoadFromGridsXml_Root(config, reader, gridId);
+                                bool success = LoadFromGridsXml_Root(config, reader, gridId);
+                                if(!success && filename != gridspecificfile)
+                                {
+                                    if(TryInstallingFromPackage(gridId))
+                                    {
+                                        filename = gridspecificfile;
+                                        goto retry;
+                                    }
+                                }
+                                return success;
 
                             case XmlNodeType.EndElement:
                                 throw new SimGridInfoXmlException();
