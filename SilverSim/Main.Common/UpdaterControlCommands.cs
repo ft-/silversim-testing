@@ -21,11 +21,8 @@
 
 using SilverSim.Types;
 using SilverSim.Updater;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.Main.Common
 {
@@ -38,6 +35,31 @@ namespace SilverSim.Main.Common
             loader.CommandRegistry.Commands.Add("install", InstallPackageCommand);
             loader.CommandRegistry.Commands.Add("uninstall", UninstallPackageCommand);
             loader.CommandRegistry.AddShowCommand("installed-packages", ShowInstalledPackages);
+            loader.CommandRegistry.AddShowCommand("available-packages", ShowAvailablePackages);
+        }
+
+        static void ShowAvailablePackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Not supported from limited console");
+            }
+            else if (args[0] == "help")
+            {
+                io.Write("show available-packages - Show installed packages");
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("Available Packages\n");
+                sb.Append("---------------------------------------------------------\n");
+                foreach (KeyValuePair<string, PackageDescription> kvp in CoreUpdater.Instance.AvailablePackages)
+                {
+                    sb.AppendFormat("{0}: {1}\n", kvp.Key, kvp.Value.Version);
+                    sb.AppendFormat("{0}\n\n", kvp.Value.Description);
+                }
+                io.Write(sb.ToString());
+            }
         }
 
         static void ShowInstalledPackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
