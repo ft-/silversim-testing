@@ -36,6 +36,7 @@ namespace SilverSim.Main.Common
             loader.CommandRegistry.Commands.Add("uninstall", UninstallPackageCommand);
             loader.CommandRegistry.AddShowCommand("installed-packages", ShowInstalledPackages);
             loader.CommandRegistry.AddShowCommand("available-packages", ShowAvailablePackages);
+            loader.CommandRegistry.AddGetCommand("updates", UpdateInstalledPackages);
         }
 
         static void ShowAvailablePackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
@@ -59,6 +60,45 @@ namespace SilverSim.Main.Common
                     sb.AppendFormat("{0}\n\n", kvp.Value.Description);
                 }
                 io.Write(sb.ToString());
+            }
+        }
+
+        class UpdateLogRelay
+        {
+            CmdIO.TTY m_IO;
+            public UpdateLogRelay(CmdIO.TTY io)
+            {
+                m_IO = io;
+            }
+
+            public void LogEvent(CoreUpdater.LogType type, string msg)
+            {
+                m_IO.Write(msg);
+            }
+        }
+
+        static void UpdateInstalledPackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Not supported from limited console");
+            }
+            else if (args[0] == "help")
+            {
+                io.Write("get updates - Update installed packages");
+            }
+            else
+            {
+                UpdateLogRelay relay = new UpdateLogRelay(io);
+                CoreUpdater.Instance.OnUpdateLog += relay.LogEvent;
+                try
+                {
+                    CoreUpdater.Instance.CheckForUpdates();
+                }
+                finally
+                {
+                    CoreUpdater.Instance.OnUpdateLog -= relay.LogEvent;
+                }
             }
         }
 
