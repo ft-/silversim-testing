@@ -50,9 +50,12 @@ namespace SilverSim.WebIF.Admin
             m_WebIF.JsonMethods.Add("package.install", PackageInstall);
             m_WebIF.JsonMethods.Add("package.uninstall", PackageUninstall);
             m_WebIF.JsonMethods.Add("packages.updates.available", PackageUpdatesAvailable);
+
+            m_WebIF.AutoGrantRights["packages.install"].Add("packages.view");
+            m_WebIF.AutoGrantRights["packages.uninstall"].Add("packages.view");
         }
 
-        [AdminWebIfRequiredRight("packages.manage")]
+        [AdminWebIfRequiredRight("packages.view")]
         void PackagesAvailableList(HttpRequest req, Map jsondata)
         {
             Map res = new Map();
@@ -68,7 +71,7 @@ namespace SilverSim.WebIF.Admin
                     pkg.Add("description", desc.Description);
                     pkglist.Add(pkg);
                 }
-                res.Add("packages", pkglist);
+                res.Add("list", pkglist);
                 res.Add("success", true);
             }
             catch(Exception e)
@@ -80,7 +83,7 @@ namespace SilverSim.WebIF.Admin
             m_WebIF.SuccessResponse(req, res);
         }
 
-        [AdminWebIfRequiredRight("packages.view")]
+        [AdminWebIfRequiredRight("packages.install")]
         void PackageUpdatesAvailable(HttpRequest req, Map jsondata)
         {
             Map res = new Map();
@@ -102,14 +105,19 @@ namespace SilverSim.WebIF.Admin
         void PackagesInstalledList(HttpRequest req, Map jsondata)
         {
             Map res = new Map();
+            AnArray pkgs = new AnArray();
             foreach (KeyValuePair<string, string> kvp in CoreUpdater.Instance.InstalledPackages)
             {
-                res.Add(kvp.Key, kvp.Value);
+                Map pkg = new Map();
+                pkg.Add("name", kvp.Key);
+                pkg.Add("version", kvp.Value);
+                pkgs.Add(pkg);
             }
+            res.Add("list", pkgs);
             m_WebIF.SuccessResponse(req, res);
         }
 
-        [AdminWebIfRequiredRight("packages.manage")]
+        [AdminWebIfRequiredRight("packages.install")]
         void PackageInstall(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("package"))
@@ -132,7 +140,7 @@ namespace SilverSim.WebIF.Admin
             m_WebIF.SuccessResponse(req, res);
         }
 
-        [AdminWebIfRequiredRight("packages.manage")]
+        [AdminWebIfRequiredRight("packages.uninstall")]
         void PackageUninstall(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("package"))
