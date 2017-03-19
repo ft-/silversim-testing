@@ -62,11 +62,49 @@ namespace SilverSim.Database.MySQL
                 }
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            return String.Format("Server={0};Uid={1};Pwd={2};Database={3};", 
+            StringBuilder connectionString = new StringBuilder();
+            if (config.Contains("Protocol"))
+            {
+                connectionString.AppendFormat("Protocol={0};", config.GetString("Protocol"));
+            }
+
+            if (config.Contains("SslMode"))
+            {
+                connectionString.AppendFormat("SslMode={0};", config.GetString("SslMode"));
+            }
+
+            if (config.Contains("UseCompression"))
+            {
+                connectionString.AppendFormat("UseCompression={0};", config.GetString("UseCompression"));
+            }
+
+            if(config.Contains("PipeName"))
+            {
+                connectionString.AppendFormat("PipeName={0};", config.GetString("PipeName"));
+            }
+
+            if (config.Contains("SharedMemoryName"))
+            {
+                connectionString.AppendFormat("SharedMemoryName={0};", config.GetString("SharedMemoryName"));
+            }
+
+            connectionString.AppendFormat("Server={0};Uid={1};Pwd={2};Database={3};", 
                 config.GetString("Server"),
                 config.GetString("Username"),
                 config.GetString("Password"),
                 config.GetString("Database"));
+
+            if(config.Contains("Port"))
+            {
+                connectionString.AppendFormat("Port={0};", config.GetString("Port"));
+            }
+
+            if(config.Contains("MaximumPoolsize"))
+            {
+                connectionString.AppendFormat("MaximumPoolsize={0};", config.GetString("MaximumPoolsize"));
+            }
+
+            return connectionString.ToString();
         }
         #endregion
 
