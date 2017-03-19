@@ -522,6 +522,11 @@ namespace SilverSim.Main.Cmd.Region
                     {
                         case "name":
                             rInfo.Name = args[argi + 1];
+                            if (Uri.IsWellFormedUriString(rInfo.Name, UriKind.Absolute))
+                            {
+                                io.WriteFormatted("Naming an region based on URI structure is not allowed. See {0}", rInfo.Name);
+                                return;
+                            }
                             changeRegionData = true;
                             break;
 
@@ -683,6 +688,15 @@ namespace SilverSim.Main.Cmd.Region
 
                 StringBuilder msg = new StringBuilder();
 
+                foreach(IConfig regionEntry in cfg.Configs)
+                {
+                    if(Uri.IsWellFormedUriString(regionEntry.Name, UriKind.Absolute))
+                    {
+                        io.WriteFormatted("Naming an region based on URI structure is not allowed. See {0}", regionEntry.Name);
+                        return;
+                    }
+                }
+
                 foreach (IConfig regionEntry in cfg.Configs)
                 {
                     RegionInfo r = new RegionInfo();
@@ -781,6 +795,11 @@ namespace SilverSim.Main.Cmd.Region
             else if (m_EstateService.All.Count == 0)
             {
                 io.Write("please create an estate first");
+            }
+            else if (Uri.IsWellFormedUriString(args[2], UriKind.Absolute))
+            {
+                io.WriteFormatted("Naming an region based on URI structure is not allowed. See {0}", args[2]);
+                return;
             }
             else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {

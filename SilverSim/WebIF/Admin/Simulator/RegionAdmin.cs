@@ -633,6 +633,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                 rInfo.Size = new GridVector(256, 256);
                 rInfo.ProductName = "Mainland";
 
+                if (Uri.IsWellFormedUriString(rInfo.Name, UriKind.Absolute))
+                {
+                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
+                    return;
+                }
                 if (!uint.TryParse(jsondata["port"].ToString(), out rInfo.ServerPort))
                 {
                     m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
@@ -811,6 +816,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                 if(jsondata.ContainsKey("name"))
                 {
                     rInfo.Name = jsondata["name"].ToString();
+                    if (Uri.IsWellFormedUriString(rInfo.Name, UriKind.Absolute))
+                    {
+                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
+                        return;
+                    }
                     changeRegionData = true;
                 }
                 if(jsondata.ContainsKey("port"))
