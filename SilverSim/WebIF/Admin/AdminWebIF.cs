@@ -1509,6 +1509,10 @@ namespace SilverSim.WebIF.Admin
                     try
                     {
                         value = m_ServerParams[regionid, parameter];
+                        Map entry = new Map();
+                        entry.Add("parameter", parameter);
+                        entry.Add("value", value);
+                        resultlist.Add(entry);
                     }
                     catch
                     {
