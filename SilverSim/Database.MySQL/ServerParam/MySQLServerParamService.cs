@@ -145,6 +145,25 @@ namespace SilverSim.Database.MySQL.ServerParam
         public override bool TryGetValue(UUID regionID, string parameter, out string value)
         {
             RwLockedDictionary<string, string> regParams;
+
+            if(TryGetExplicitValue(regionID, parameter, out value))
+            {
+                return true;
+            }
+
+            if (UUID.Zero != regionID &&
+                TryGetValue(UUID.Zero, parameter, out value))
+            {
+                return true;
+            }
+
+            value = string.Empty;
+            return false;
+        }
+
+        public override bool TryGetExplicitValue(UUID regionID, string parameter, out string value)
+        {
+            RwLockedDictionary<string, string> regParams;
             if (m_Cache.TryGetValue(regionID, out regParams) &&
                 regParams.TryGetValue(parameter, out value))
             {
@@ -171,15 +190,10 @@ namespace SilverSim.Database.MySQL.ServerParam
                 }
             }
 
-            if (UUID.Zero != regionID &&
-                TryGetValue(UUID.Zero, parameter, out value))
-            {
-                return true;
-            }
-
             value = string.Empty;
             return false;
         }
+
 
         public override bool Contains(UUID regionID, string parameter)
         {

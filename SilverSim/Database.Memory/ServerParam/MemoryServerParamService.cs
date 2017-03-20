@@ -110,9 +110,7 @@ namespace SilverSim.Database.Memory.ServerParam
 
         public override bool TryGetValue(UUID regionID, string parameter, out string value)
         {
-            RwLockedDictionary<string, string> regParams;
-            if (m_Parameters.TryGetValue(regionID, out regParams) &&
-                regParams.TryGetValue(parameter, out value))
+            if(TryGetExplicitValue(regionID, parameter, out value))
             {
                 return true;
             }
@@ -143,6 +141,13 @@ namespace SilverSim.Database.Memory.ServerParam
             }
 
             return false;
+        }
+
+        public override bool TryGetExplicitValue(UUID regionID, string parameter, out string value)
+        {
+            RwLockedDictionary<string, string> regParams;
+            value = string.Empty;
+            return m_Parameters.TryGetValue(regionID, out regParams) && regParams.TryGetValue(parameter, out value);
         }
 
         protected override void Store(UUID regionID, string parameter, string value)

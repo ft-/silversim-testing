@@ -153,6 +153,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
 
         public abstract bool TryGetValue(UUID regionID, string parameter, out string value);
         public abstract bool Contains(UUID regionID, string parameter);
+        public abstract bool TryGetExplicitValue(UUID regionID, string parameter, out string value);
 
         public abstract List<string> this[UUID regionID]
         {

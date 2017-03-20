@@ -247,6 +247,7 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("session.validate", HandleSessionValidateRequest);
             JsonMethods.Add("serverparam.get", GetServerParam);
             JsonMethods.Add("serverparams.get", GetServerParams);
+            JsonMethods.Add("serverparams.get.explicitly", GetServerParamsExplicitly);
             JsonMethods.Add("serverparams.show", ShowServerParams);
             JsonMethods.Add("serverparam.set", SetServerParam);
             JsonMethods.Add("issues.get", IssuesView);
@@ -1473,6 +1474,55 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("serverparams.manage")]
+        void GetServerParamsExplicitly(HttpRequest req, Map jsondata)
+        {
+            IValue ipara;
+            AnArray paradata;
+            if (!jsondata.TryGetValue("parameters", out ipara) ||
+                null == (paradata = ipara as AnArray))
+            {
+                ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+            }
+            else
+            {
+                AnArray resultlist = new AnArray();
+                foreach (IValue iv in paradata)
+                {
+                    Map reqdata = iv as Map;
+                    if (null == reqdata || !reqdata.ContainsKey("parameter"))
+                    {
+                        ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
+                        return;
+                    }
+                    UUID regionid = UUID.Zero;
+                    if (jsondata.ContainsKey("regionid") && !UUID.TryParse(jsondata["regionid"].ToString(), out regionid))
+                    {
+                        ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
+                        return;
+                    }
+                    string parameter = jsondata["parameter"].ToString();
+                    string value;
+                    if (parameter.StartsWith("WebIF.Admin.User."))
+                    {
+                        ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
+                        return;
+                    }
+                    
+                    if(m_ServerParams.TryGetExplicitValue(regionid, parameter, out value))
+                    {
+                        Map entry = new Map();
+                        entry.Add("parameter", parameter);
+                        entry.Add("value", value);
+                        resultlist.Add(entry);
+                    }
+                }
+                Map res = new Map();
+                res.Add("values", resultlist);
+                SuccessResponse(req, res);
+            }
+        }
+
+        [AdminWebIfRequiredRight("serverparams.manage")]
         void GetServerParams(HttpRequest req, Map jsondata)
         {
             IValue ipara;
@@ -1506,17 +1556,13 @@ namespace SilverSim.WebIF.Admin
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
-                    try
+                    
+                    if(m_ServerParams.TryGetValue(regionid, parameter, out value))
                     {
-                        value = m_ServerParams[regionid, parameter];
                         Map entry = new Map();
                         entry.Add("parameter", parameter);
                         entry.Add("value", value);
                         resultlist.Add(entry);
-                    }
-                    catch
-                    {
-                        /* no data */
                     }
                 }
                 Map res = new Map();
