@@ -41,13 +41,9 @@ namespace SilverSim.Database.MySQL
         #region Connection String Creator
         public static string BuildConnectionString(IConfig config, ILog log)
         {
-            if (!(config.Contains("Server") && config.Contains("Username") && config.Contains("Password") && config.Contains("Database")))
+            if (!(config.Contains("Username") && config.Contains("Password") && config.Contains("Database")))
             {
                 string configName = config.Name;
-                if (!config.Contains("Server"))
-                {
-                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Server' missing in [{0}]", configName);
-                }
                 if (!config.Contains("Username"))
                 {
                     log.FatalFormat("[MYSQL CONFIG]: Parameter 'Username' missing in [{0}]", configName);
@@ -88,8 +84,12 @@ namespace SilverSim.Database.MySQL
                 connectionString.AppendFormat("SharedMemoryName={0};", config.GetString("SharedMemoryName"));
             }
 
-            connectionString.AppendFormat("Server={0};Uid={1};Pwd={2};Database={3};", 
-                config.GetString("Server"),
+            if(config.Contains("Server"))
+            {
+                connectionString.AppendFormat("Server={0};", config.GetString("Server"));
+            }
+
+            connectionString.AppendFormat("Uid={0};Pwd={1};Database={2};", 
                 config.GetString("Username"),
                 config.GetString("Password"),
                 config.GetString("Database"));
