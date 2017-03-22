@@ -79,17 +79,16 @@ namespace SilverSim.WebIF.Admin
             {
                 CoreUpdater.Instance.UpdatePackageFeed();
                 AnArray pkglist = new AnArray();
-                foreach(PackageDescription desc in CoreUpdater.Instance.AvailablePackages.Values)
+                foreach(KeyValuePair<string, string> kvp in CoreUpdater.Instance.AvailablePackages)
                 {
                     Map pkg = new Map();
-                    pkg.Add("name", desc.Name);
-                    pkg.Add("version", desc.Version);
-                    pkg.Add("description", desc.Description);
+                    pkg.Add("name", kvp.Key);
+                    pkg.Add("version", kvp.Value);
                     pkglist.Add(pkg);
                 }
                 res.Add("list", pkglist);
             }
-            catch(Exception e)
+            catch
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;

@@ -30,7 +30,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System;
 
 namespace SilverSim.Database.MySQL.ServerParam
 {
@@ -144,8 +143,6 @@ namespace SilverSim.Database.MySQL.ServerParam
 
         public override bool TryGetValue(UUID regionID, string parameter, out string value)
         {
-            RwLockedDictionary<string, string> regParams;
-
             if(TryGetExplicitValue(regionID, parameter, out value))
             {
                 return true;

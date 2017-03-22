@@ -54,10 +54,9 @@ namespace SilverSim.Main.Common
                 StringBuilder sb = new StringBuilder();
                 sb.Append("Available Packages\n");
                 sb.Append("---------------------------------------------------------\n");
-                foreach (KeyValuePair<string, PackageDescription> kvp in CoreUpdater.Instance.AvailablePackages)
+                foreach (KeyValuePair<string, string> kvp in CoreUpdater.Instance.AvailablePackages)
                 {
-                    sb.AppendFormat("{0}: {1}\n", kvp.Key, kvp.Value.Version);
-                    sb.AppendFormat("{0}\n\n", kvp.Value.Description);
+                    sb.AppendFormat("{0}: {1}\n", kvp.Key, kvp.Value);
                 }
                 io.Write(sb.ToString());
             }
