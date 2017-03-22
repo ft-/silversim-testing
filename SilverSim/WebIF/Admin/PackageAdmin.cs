@@ -19,14 +19,13 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Updater;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Nini.Config;
 
 namespace SilverSim.WebIF.Admin
 {
