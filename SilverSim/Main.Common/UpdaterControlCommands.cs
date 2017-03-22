@@ -37,6 +37,41 @@ namespace SilverSim.Main.Common
             loader.CommandRegistry.AddShowCommand("installed-packages", ShowInstalledPackages);
             loader.CommandRegistry.AddShowCommand("available-packages", ShowAvailablePackages);
             loader.CommandRegistry.AddGetCommand("updates", UpdateInstalledPackages);
+            loader.CommandRegistry.AddShowCommand("package", ShowPackageDetails);
+        }
+
+        static void ShowPackageDetails(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            PackageDescription desc;
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Not supported from limited console");
+            }
+            else if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("show package <pkgname> - Show package details");
+            }
+            else if(CoreUpdater.Instance.TryGetPackageDetails(args[2], out desc))
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("Package {0}\n", desc.Name);
+                sb.Append("---------------------------------------------------------\n");
+                sb.AppendFormat("License: {0}\n", desc.License);
+                sb.AppendFormat("Description:\n{0}\n", desc.Description);
+                if(CoreUpdater.Instance.TryGetInstalledPackageDetails(args[2], out desc))
+                {
+                    sb.AppendFormat("Installed Version: {0}\n", desc.Version);
+                }
+                if (CoreUpdater.Instance.TryGetAvailablePackageDetails(args[2], out desc))
+                {
+                    sb.AppendFormat("Available Feed Version: {0}\n", desc.Version);
+                }
+                io.Write(sb.ToString());
+            }
+            else
+            {
+                io.WriteFormatted("Package {0} not found.\n", args[2]);
+            }
         }
 
         static void ShowAvailablePackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)

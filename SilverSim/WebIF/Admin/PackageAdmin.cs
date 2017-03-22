@@ -51,9 +51,95 @@ namespace SilverSim.WebIF.Admin
             m_WebIF.JsonMethods.Add("package.uninstall", PackageUninstall);
             m_WebIF.JsonMethods.Add("packages.updates.available", PackageUpdatesAvailable);
             m_WebIF.JsonMethods.Add("packages.update.feed", PackagesUpdateFeed);
+            m_WebIF.JsonMethods.Add("package.get.installed", PackageGetInstalledDetails);
+            m_WebIF.JsonMethods.Add("package.get.available", PackageGetAvailableDetails);
+            m_WebIF.JsonMethods.Add("package.get", PackageGetDetails);
+            m_WebIF.JsonMethods.Add("packages.update.system", PackageUpdateSystem);
 
             m_WebIF.AutoGrantRights["packages.install"].Add("packages.view");
             m_WebIF.AutoGrantRights["packages.uninstall"].Add("packages.view");
+        }
+
+        Map PackageDetailsToMap(PackageDescription desc)
+        {
+            Map map = new Map();
+            map.Add("name", desc.Name);
+            map.Add("version", desc.Version);
+            map.Add("description", desc.Description);
+            map.Add("license", desc.License);
+            return map;
+        }
+
+        [AdminWebIfRequiredRight("packages.install")]
+        void PackageUpdateSystem(HttpRequest req, Map jsondata)
+        {
+            try
+            {
+                CoreUpdater.Instance.CheckForUpdates();
+            }
+            catch
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
+                return;
+            }
+            m_WebIF.SuccessResponse(req, new Map());
+        }
+
+        [AdminWebIfRequiredRight("packages.view")]
+        void PackageGetInstalledDetails(HttpRequest req, Map jsondata)
+        {
+            PackageDescription desc;
+            if (!jsondata.ContainsKey("package"))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+            else if(!CoreUpdater.Instance.TryGetInstalledPackageDetails(jsondata["package"].ToString(), out desc))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+            }
+            else
+            {
+                m_WebIF.SuccessResponse(req, PackageDetailsToMap(desc));
+            }
+        }
+
+        [AdminWebIfRequiredRight("packages.view")]
+        void PackageGetAvailableDetails(HttpRequest req, Map jsondata)
+        {
+            PackageDescription desc;
+            if (!jsondata.ContainsKey("package"))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+            else if (!CoreUpdater.Instance.TryGetAvailablePackageDetails(jsondata["package"].ToString(), out desc))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+            }
+            else
+            {
+                m_WebIF.SuccessResponse(req, PackageDetailsToMap(desc));
+            }
+        }
+
+        [AdminWebIfRequiredRight("packages.view")]
+        void PackageGetDetails(HttpRequest req, Map jsondata)
+        {
+            PackageDescription desc;
+            if (!jsondata.ContainsKey("package"))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+            else if (!CoreUpdater.Instance.TryGetPackageDetails(jsondata["package"].ToString(), out desc))
+            {
+                m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+            }
+            else
+            {
+                m_WebIF.SuccessResponse(req, PackageDetailsToMap(desc));
+            }
         }
 
         [AdminWebIfRequiredRight("packages.view")]
