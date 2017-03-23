@@ -249,6 +249,14 @@ namespace SilverSim.Viewer.Core
                 return ep1.Address.Equals(ep2.Address);
             }
 
+            foreach(IPortControlServiceInterface service in m_PortControlServices)
+            {
+                if(service.CheckIfMappedAddress(newEp, circ.RemoteEndPoint))
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 

@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using System.Net;
 using System.Net.Sockets;
 
 namespace SilverSim.ServiceInterfaces.PortControl
@@ -27,5 +28,7 @@ namespace SilverSim.ServiceInterfaces.PortControl
     {
         void EnablePort(AddressFamily[] family, ProtocolType proto, int port);
         void DisablePort(AddressFamily[] family, ProtocolType proto, int port);
+        bool CheckIfMappedAddress(EndPoint actualEp, EndPoint expectedEp);
+        bool TryMapAddressToPublic(EndPoint actualEp, out EndPoint newEp);
     }
 }
