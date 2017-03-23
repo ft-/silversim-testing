@@ -230,6 +230,28 @@ namespace SilverSim.Viewer.Core
                 UdpReceiveEndHandler, pck);
         }
 
+        bool VerifyEndpointAddress(AgentCircuit circ, EndPoint newEp)
+        {
+            if (circ.RemoteEndPoint.AddressFamily != newEp.AddressFamily)
+            {
+                return false;
+            }
+
+            if (circ.RemoteEndPoint.AddressFamily == AddressFamily.InterNetwork ||
+                circ.RemoteEndPoint.AddressFamily == AddressFamily.InterNetworkV6)
+            {
+                IPEndPoint ep1 = circ.RemoteEndPoint as IPEndPoint;
+                IPEndPoint ep2 = newEp as IPEndPoint;
+                if(null == ep1 || null == ep2)
+                {
+                    return false;
+                }
+                return ep1.Address.Equals(ep2.Address);
+            }
+
+            return false;
+        }
+
         void UdpReceiveEndHandler(IAsyncResult ar)
         {
             Circuit circuit;
@@ -275,7 +297,8 @@ namespace SilverSim.Viewer.Core
                                 {
                                     /* there it is check for SessionID and AgentID */
                                     if (!acircuit.SessionID.Equals(sessionID) ||
-                                        !acircuit.AgentID.Equals(agentID))
+                                        !acircuit.AgentID.Equals(agentID) ||
+                                        !VerifyEndpointAddress(acircuit, pck.RemoteEndPoint))
                                     {
                                         /* no match on SessionID or AgentID */
                                         m_Log.DebugFormat("Unmatched UseCircuitCode for AgentID {0} SessionID {1} CircuitCode {2} received", agentID, sessionID, circuitcode);
