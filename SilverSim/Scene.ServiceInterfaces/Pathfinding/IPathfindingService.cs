@@ -22,10 +22,10 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.Scene.Types.Scene
+namespace SilverSim.Scene.ServiceInterfaces.Pathfinding
 {
     public interface IPathfindingService
     {
-        List<Vector3> ResolvePath(UUID sceneID, Vector3 fromPos, Vector3 toPos);
+        bool TryResolvePath(UUID sceneID, Vector3 fromPos, Vector3 toPos, out List<Vector3> waypoints);
     }
 }
