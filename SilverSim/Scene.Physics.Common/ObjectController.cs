@@ -38,13 +38,15 @@ namespace SilverSim.Scene.Physics.Common
         protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
         protected UUID SceneID { get; private set; }
+        SceneInterface.LocationInfoProvider m_LocInfoProvider;
 
-        protected ObjectController(ObjectPart part, UUID sceneID)
+        protected ObjectController(ObjectPart part, UUID sceneID, SceneInterface.LocationInfoProvider locInfoProvider)
         {
             SceneID = sceneID;
             m_StateData = new PhysicsStateData(part, sceneID);
             m_Part = part;
             m_Vehicle = part.VehicleParams.GetMotor();
+            m_LocInfoProvider = locInfoProvider;
         }
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
@@ -265,16 +267,8 @@ namespace SilverSim.Scene.Physics.Common
 
                 if (m_EnableHoverHeight)
                 {
-                    double waterHeight;
-                    try
-                    {
-                        waterHeight = m_Part.ObjectGroup.Scene.RegionSettings.WaterHeight;
-                    }
-                    catch
-                    {
-                        waterHeight = 21;
-                    }
-                    forces.Add(HoverHeightMotor(m_Part, m_HoverHeight, m_AboveWater, m_HoverTau, waterHeight, Vector3.Zero));
+                    SceneInterface.LocationInfo locInfo = m_LocInfoProvider.At(m_Part.ObjectGroup.GlobalPosition);
+                    forces.Add(HoverHeightMotor(m_Part, m_HoverHeight, m_AboveWater, m_HoverTau, locInfo, Vector3.Zero));
                 }
             }
 

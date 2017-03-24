@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -40,14 +41,24 @@ namespace SilverSim.Scene.Physics.Common
         protected IAgent m_Agent { get; private set; }
         protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
+        readonly SceneInterface.LocationInfoProvider m_LocInfoProvider;
 
-        protected AgentController(IAgent agent, UUID sceneID)
+        protected SceneInterface.LocationInfoProvider LocationInfoProvider
+        {
+            get
+            {
+                return m_LocInfoProvider;
+            }
+        }
+
+        protected AgentController(IAgent agent, UUID sceneID, SceneInterface.LocationInfoProvider locInfoProvider)
         {
             ControlLinearInputFactor = 10;
             ControlRotationalInputFactor = 10;
             RestitutionInputFactor = 0.8;
             m_Agent = agent;
             m_StateData = new PhysicsStateData(agent, sceneID);
+            m_LocInfoProvider = locInfoProvider;
         }
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
@@ -267,25 +278,6 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        double m_CurrentWaterHeight;
-        public double CurrentWaterHeight
-        {
-            get
-            {
-                lock(m_Lock)
-                {
-                    return m_CurrentWaterHeight;
-                }
-            }
-            set
-            {
-                lock(m_Lock)
-                {
-                    m_CurrentWaterHeight = value;
-                }
-            }
-        }
-
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {
             List<PositionalForce> forces = new List<PositionalForce>();
@@ -327,7 +319,8 @@ namespace SilverSim.Scene.Physics.Common
 
                 if(m_EnableHoverHeight)
                 {
-                    forces.Add(HoverHeightMotor(m_Agent, m_HoverHeight, m_AboveWater, m_HoverTau, CurrentWaterHeight, Vector3.Zero));
+                    SceneInterface.LocationInfo locInfo = m_LocInfoProvider.At(m_Agent.GlobalPosition);
+                    forces.Add(HoverHeightMotor(m_Agent, m_HoverHeight, m_AboveWater, m_HoverTau, locInfo, Vector3.Zero));
                 }
             }
 

@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 
 namespace SilverSim.Scene.Physics.Common
@@ -132,7 +133,7 @@ namespace SilverSim.Scene.Physics.Common
         #endregion
 
         #region Hover Motor / Ground Repel Motor
-        protected PositionalForce HoverHeightMotor(IPhysicalObject obj, double height, bool aboveWater, double tau, double waterHeight, Vector3 pos)
+        protected PositionalForce HoverHeightMotor(IPhysicalObject obj, double height, bool aboveWater, double tau, SceneInterface.LocationInfo locInfo, Vector3 pos)
         {
             return new PositionalForce("HoverHeightMotor", Vector3.Zero, pos);
         }

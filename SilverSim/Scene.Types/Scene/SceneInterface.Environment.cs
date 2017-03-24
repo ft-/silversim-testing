@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.WindLight;
+using SilverSim.Types;
 using SilverSim.Types.Estate;
 
 namespace SilverSim.Scene.Types.Scene
@@ -29,6 +30,37 @@ namespace SilverSim.Scene.Types.Scene
     {
         public TerrainController Terrain;
         public EnvironmentController Environment;
+
+        public struct LocationInfo
+        {
+            public double GroundHeight;
+            public double WaterHeight;
+        }
+
+        public class LocationInfoProvider
+        {
+            TerrainController m_TerrainController;
+            RegionSettings m_RegionSettings;
+
+            internal LocationInfoProvider(TerrainController terrain, RegionSettings regionSettings)
+            {
+
+            }
+
+            public LocationInfo At(Vector3 pos)
+            {
+                LocationInfo locInfo = new LocationInfo();
+                locInfo.WaterHeight = m_RegionSettings.WaterHeight;
+                locInfo.GroundHeight = m_TerrainController[pos];
+
+                return locInfo;
+            }
+        }
+
+        public LocationInfoProvider GetLocationInfoProvider()
+        {
+            return new LocationInfoProvider(Terrain, RegionSettings);
+        }
 
         public void UpdateEnvironmentSettings()
         {

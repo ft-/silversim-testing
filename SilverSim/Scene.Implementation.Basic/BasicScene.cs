@@ -1446,7 +1446,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
             UpdateEnvironmentSettings();
-            PhysicsScene.SetCurrentWaterHeight(RegionSettings.WaterHeight);
         }
 
         public override void SendRegionInfo(IAgent agent)
