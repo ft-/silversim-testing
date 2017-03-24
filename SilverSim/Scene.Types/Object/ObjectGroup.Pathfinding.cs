@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -27,12 +28,12 @@ namespace SilverSim.Scene.Types.Object
     {
         public void MoveToTarget(Vector3 target, double tau, UUID notifyPrimId, UUID itemId)
         {
-
+            throw new NotImplementedException("MoveToTarget");
         }
 
         public void StopMoveToTarget()
         {
-
+            throw new NotImplementedException("StopMoveToTarget");
         }
     }
 }

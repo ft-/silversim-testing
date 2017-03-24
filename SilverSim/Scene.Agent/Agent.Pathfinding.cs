@@ -19,8 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Agent
 {
@@ -28,12 +28,12 @@ namespace SilverSim.Scene.Agent
     {
         public void MoveToTarget(Vector3 target, double tau, UUID notifyPrimId, UUID itemId)
         {
-
+            throw new NotImplementedException("MoveToTarget");
         }
 
         public void StopMoveToTarget()
         {
-
+            throw new NotImplementedException("StopMoveToTarget");
         }
     }
 }

@@ -267,6 +267,25 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        double m_CurrentWaterHeight;
+        public double CurrentWaterHeight
+        {
+            get
+            {
+                lock(m_Lock)
+                {
+                    return m_CurrentWaterHeight;
+                }
+            }
+            set
+            {
+                lock(m_Lock)
+                {
+                    m_CurrentWaterHeight = value;
+                }
+            }
+        }
+
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {
             List<PositionalForce> forces = new List<PositionalForce>();
@@ -308,20 +327,7 @@ namespace SilverSim.Scene.Physics.Common
 
                 if(m_EnableHoverHeight)
                 {
-                    /* TODO: enable access to waterHeight here */
-#if ENABLE_HOVER
-                    double waterHeight;
-                    try
-                    {
-                        waterHeight = Scene.RegionSettings.WaterHeight;
-                    }
-                    catch
-                    {
-                        waterHeight = 21;
-                    }
-
-                    forces.Add(HoverHeightMotor(m_Agent, m_HoverHeight, m_AboveWater, m_HoverTau, Vector3.Zero));
-#endif
+                    forces.Add(HoverHeightMotor(m_Agent, m_HoverHeight, m_AboveWater, m_HoverTau, CurrentWaterHeight, Vector3.Zero));
                 }
             }
 

@@ -40,5 +40,7 @@ namespace SilverSim.Scene.Types.Physics
         uint PhysicsFrameNumber { get; }
 
         string PhysicsEngineName { get; }
+
+        void SetCurrentWaterHeight(double waterHeight);
     }
 }
