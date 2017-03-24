@@ -103,38 +103,48 @@ namespace SilverSim.Scene.Physics.Common
         bool m_HoverEnabled;
         bool m_AboveWater;
         double m_HoverTau;
+        object m_HoverParamsLock = new object();
         protected PositionalForce HoverMotor(IPhysicalObject obj, Vector3 pos)
         {
-            if (m_HoverEnabled)
+            lock (m_HoverParamsLock)
             {
-                Vector3 v = new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
-                double targetHoverHeight;
-                SceneInterface.LocationInfo locInfo = LocationInfoProvider.At(obj.GlobalPosition);
-                targetHoverHeight = locInfo.GroundHeight;
-                if(targetHoverHeight < locInfo.WaterHeight && m_AboveWater)
+                if (m_HoverEnabled)
                 {
-                    targetHoverHeight = locInfo.WaterHeight;
+                    Vector3 v = new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
+                    double targetHoverHeight;
+                    SceneInterface.LocationInfo locInfo = LocationInfoProvider.At(obj.GlobalPosition);
+                    targetHoverHeight = locInfo.GroundHeight;
+                    if (targetHoverHeight < locInfo.WaterHeight && m_AboveWater)
+                    {
+                        targetHoverHeight = locInfo.WaterHeight;
+                    }
+                    v.Z += (targetHoverHeight - obj.Position.Z) * m_HoverTau;
+                    return new PositionalForce("HoverMotor", v, pos);
                 }
-                v.Z += (targetHoverHeight - obj.Position.Z) * m_HoverTau;
-                return new PositionalForce("HoverMotor", v, pos);
-            }
-            else
-            {
-                return new PositionalForce("HoverMotor", Vector3.Zero, pos);
+                else
+                {
+                    return new PositionalForce("HoverMotor", Vector3.Zero, pos);
+                }
             }
         }
 
         public void SetHoverHeight(double height, bool water, double tau)
         {
-            m_HoverEnabled = tau > double.Epsilon;
-            m_HoverHeight = height;
-            m_AboveWater = water;
-            m_HoverTau = tau;
+            lock (m_HoverParamsLock)
+            {
+                m_HoverEnabled = tau > double.Epsilon;
+                m_HoverHeight = height;
+                m_AboveWater = water;
+                m_HoverTau = tau;
+            }
         }
 
         public void StopHover()
         {
-            m_HoverEnabled = false;
+            lock (m_HoverParamsLock)
+            {
+                m_HoverEnabled = false;
+            }
         }
         #endregion
 
