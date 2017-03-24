@@ -24,8 +24,14 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.ServiceInterfaces.Pathfinding
 {
+    public struct WaypointData
+    {
+        public Vector3 Position;
+        public bool IsFlying;
+    }
+
     public interface IPathfindingService
     {
-        bool TryResolvePath(UUID sceneID, Vector3 fromPos, Vector3 toPos, out List<Vector3> waypoints);
+        bool TryResolvePath(UUID sceneID, Vector3 fromPos, Vector3 toPos, out List<WaypointData> waypoints);
     }
 }
