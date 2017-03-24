@@ -132,7 +132,7 @@ namespace SilverSim.Scene.Physics.Common
         #endregion
 
         #region Hover Motor / Ground Repel Motor
-        protected PositionalForce HoverHeightMotor(IPhysicalObject obj, double height, bool aboveWater, double tau, Vector3 pos)
+        protected PositionalForce HoverHeightMotor(IPhysicalObject obj, double height, bool aboveWater, double tau, double waterHeight, Vector3 pos)
         {
             return new PositionalForce("HoverHeightMotor", Vector3.Zero, pos);
         }

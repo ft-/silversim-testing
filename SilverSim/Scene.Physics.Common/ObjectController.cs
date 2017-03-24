@@ -23,6 +23,7 @@ using SilverSim.Scene.Physics.Common.Vehicle;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -264,7 +265,16 @@ namespace SilverSim.Scene.Physics.Common
 
                 if (m_EnableHoverHeight)
                 {
-                    forces.Add(HoverHeightMotor(m_Part, m_HoverHeight, m_AboveWater, m_HoverTau, Vector3.Zero));
+                    double waterHeight;
+                    try
+                    {
+                        waterHeight = m_Part.ObjectGroup.Scene.RegionSettings.WaterHeight;
+                    }
+                    catch
+                    {
+                        waterHeight = 21;
+                    }
+                    forces.Add(HoverHeightMotor(m_Part, m_HoverHeight, m_AboveWater, m_HoverTau, waterHeight, Vector3.Zero));
                 }
             }
 

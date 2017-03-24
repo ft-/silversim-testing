@@ -308,7 +308,20 @@ namespace SilverSim.Scene.Physics.Common
 
                 if(m_EnableHoverHeight)
                 {
+                    /* TODO: enable access to waterHeight here */
+#if ENABLE_HOVER
+                    double waterHeight;
+                    try
+                    {
+                        waterHeight = Scene.RegionSettings.WaterHeight;
+                    }
+                    catch
+                    {
+                        waterHeight = 21;
+                    }
+
                     forces.Add(HoverHeightMotor(m_Agent, m_HoverHeight, m_AboveWater, m_HoverTau, Vector3.Zero));
+#endif
                 }
             }
 
