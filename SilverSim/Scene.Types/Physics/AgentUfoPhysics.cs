@@ -238,5 +238,20 @@ namespace SilverSim.Scene.Types.Physics
                 /* intentionally left empty */
             }
         }
+
+        public void GroundRepel(double height, bool water, double tau)
+        {
+
+        }
+
+        public void SetHoverHeight(double height, bool water, double tau)
+        {
+
+        }
+
+        public void StopHover()
+        {
+
+        }
     }
 }

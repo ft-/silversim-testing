@@ -171,6 +171,16 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        public void SetHoverHeight(double height, bool water, double tau)
+        {
+
+        }
+
+        public void StopHover()
+        {
+
+        }
+
         public static readonly DummyPhysicsObject SharedInstance = new DummyPhysicsObject();
     }
 }

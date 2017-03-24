@@ -193,6 +193,30 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        bool m_EnableHoverHeight;
+        double m_HoverHeight;
+        bool m_AboveWater;
+        double m_HoverTau;
+
+        public void SetHoverHeight(double height, bool water, double tau)
+        {
+            lock (m_Lock)
+            {
+                m_EnableHoverHeight = tau > double.Epsilon;
+                m_HoverHeight = height;
+                m_AboveWater = water;
+                m_HoverTau = tau;
+            }
+        }
+
+        public void StopHover()
+        {
+            lock (m_Lock)
+            {
+                m_EnableHoverHeight = false;
+            }
+        }
+
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 vehicleTorque)
         {
             ObjectGroup grp = m_Part.ObjectGroup;
@@ -237,6 +261,11 @@ namespace SilverSim.Scene.Physics.Common
                 m_AngularImpulse = Vector3.Zero;
                 forces.Add(new PositionalForce("AppliedForce", m_AppliedForce, Vector3.Zero));
                 vehicleTorque += m_AppliedTorque;
+
+                if (m_EnableHoverHeight)
+                {
+                    forces.Add(HoverHeightMotor(m_Part, m_HoverHeight, m_AboveWater, m_HoverTau, Vector3.Zero));
+                }
             }
 
             return forces;

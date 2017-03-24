@@ -223,6 +223,9 @@ namespace SilverSim.Scene.Types.Object
         void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList);
         DetectedTypeFlags DetectedType { get; }
         void PostEvent(IScriptEvent ev);
+
+        void MoveToTarget(Vector3 target, double tau, UUID notifyPrimId, UUID notifyItemId);
+        void StopMoveToTarget();
         #endregion
     }
 

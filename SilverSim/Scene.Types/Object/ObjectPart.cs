@@ -2327,6 +2327,17 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void MoveToTarget(Vector3 target, double tau, UUID notifyPrimId, UUID itemId)
+        {
+            ObjectGroup.MoveToTarget(target, tau, notifyPrimId, itemId);
+        }
+
+        public void StopMoveToTarget()
+        {
+            ObjectGroup.StopMoveToTarget();
+        }
+
+
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
