@@ -46,6 +46,11 @@ namespace SilverSim.Scene.Physics.Common
 
         }
 
+        protected abstract SceneInterface.LocationInfoProvider LocationInfoProvider
+        {
+            get;
+        }
+
         public struct PositionalForce
         {
             public string Name;
@@ -96,18 +101,40 @@ namespace SilverSim.Scene.Physics.Common
         #region Hover Motor
         double m_HoverHeight;
         bool m_HoverEnabled;
+        bool m_AboveWater;
+        double m_HoverTau;
         protected PositionalForce HoverMotor(IPhysicalObject obj, Vector3 pos)
         {
             if (m_HoverEnabled)
             {
                 Vector3 v = new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
-                v.Z += (m_HoverHeight - obj.Position.Z);
+                double targetHoverHeight;
+                SceneInterface.LocationInfo locInfo = LocationInfoProvider.At(obj.GlobalPosition);
+                targetHoverHeight = locInfo.GroundHeight;
+                if(targetHoverHeight < locInfo.WaterHeight && m_AboveWater)
+                {
+                    targetHoverHeight = locInfo.WaterHeight;
+                }
+                v.Z += (targetHoverHeight - obj.Position.Z) * m_HoverTau;
                 return new PositionalForce("HoverMotor", v, pos);
             }
             else
             {
                 return new PositionalForce("HoverMotor", Vector3.Zero, pos);
             }
+        }
+
+        public void SetHoverHeight(double height, bool water, double tau)
+        {
+            m_HoverEnabled = tau > double.Epsilon;
+            m_HoverHeight = height;
+            m_AboveWater = water;
+            m_HoverTau = tau;
+        }
+
+        public void StopHover()
+        {
+            m_HoverEnabled = false;
         }
         #endregion
 
@@ -129,13 +156,6 @@ namespace SilverSim.Scene.Physics.Common
         protected Vector3 TargetRotationMotor(IPhysicalObject obj, Quaternion targetrot, double factor)
         {
             return (targetrot / obj.Rotation).AsVector3 * factor;
-        }
-        #endregion
-
-        #region Hover Motor / Ground Repel Motor
-        protected PositionalForce HoverHeightMotor(IPhysicalObject obj, double height, bool aboveWater, double tau, SceneInterface.LocationInfo locInfo, Vector3 pos)
-        {
-            return new PositionalForce("HoverHeightMotor", Vector3.Zero, pos);
         }
         #endregion
     }

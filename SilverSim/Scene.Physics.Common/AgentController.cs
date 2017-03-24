@@ -43,7 +43,7 @@ namespace SilverSim.Scene.Physics.Common
         readonly object m_Lock = new object();
         readonly SceneInterface.LocationInfoProvider m_LocInfoProvider;
 
-        protected SceneInterface.LocationInfoProvider LocationInfoProvider
+        protected override SceneInterface.LocationInfoProvider LocationInfoProvider
         {
             get
             {
@@ -254,30 +254,6 @@ namespace SilverSim.Scene.Physics.Common
         protected double ControlRotationalInputFactor { get; set; }
         protected double RestitutionInputFactor { get; set; }
 
-        bool m_EnableHoverHeight;
-        double m_HoverHeight;
-        bool m_AboveWater;
-        double m_HoverTau;
-
-        public void SetHoverHeight(double height, bool water, double tau)
-        {
-            lock(m_Lock)
-            {
-                m_EnableHoverHeight = tau > double.Epsilon;
-                m_HoverHeight = height;
-                m_AboveWater = water;
-                m_HoverTau = tau;
-            }
-        }
-
-        public void StopHover()
-        {
-            lock(m_Lock)
-            {
-                m_EnableHoverHeight = false;
-            }
-        }
-
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {
             List<PositionalForce> forces = new List<PositionalForce>();
@@ -316,12 +292,6 @@ namespace SilverSim.Scene.Physics.Common
                 m_AngularImpulse = Vector3.Zero;
                 forces.Add(new PositionalForce("AppliedForce", m_AppliedForce, Vector3.Zero));
                 agentTorque += m_AppliedTorque;
-
-                if(m_EnableHoverHeight)
-                {
-                    SceneInterface.LocationInfo locInfo = m_LocInfoProvider.At(m_Agent.GlobalPosition);
-                    forces.Add(HoverHeightMotor(m_Agent, m_HoverHeight, m_AboveWater, m_HoverTau, locInfo, Vector3.Zero));
-                }
             }
 
             return forces;
