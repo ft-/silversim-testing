@@ -43,7 +43,7 @@ using System.Threading;
 namespace SilverSim.Main.Common.HttpServer
 {
     [Description("HTTP Server")]
-    [ServerParam("HTTP.MaxActiveConnectionsPerPort", Type = ServerParamType.GlobalOnly, ParameterType = typeof(uint))]
+    [ServerParam("HTTP.MaxActiveConnectionsPerPort", Type = ServerParamType.GlobalOnly, ParameterType = typeof(uint), DefaultValue = 500)]
     public class BaseHttpServer : IPlugin, IPluginShutdown, IServerParamListener
     {
         private static readonly ILog m_Log = LogManager.GetLogger("HTTP SERVER");

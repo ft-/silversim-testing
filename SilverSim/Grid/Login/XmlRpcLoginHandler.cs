@@ -61,18 +61,18 @@ namespace SilverSim.Grid.Login
 {
     #region Service Implementation
     [Description("XmlRpc Login Handler")]
-    [ServerParam("AllowLoginViaHttpWhenHttpsIsConfigured", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("WelcomeMessage", ParameterType = typeof(string), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("GridLibraryOwner", ParameterType = typeof(UUID), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("GridLibraryFolderId", ParameterType = typeof(UUID), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("GridLibraryEnabled", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly)]
+    [ServerParam("AllowLoginViaHttpWhenHttpsIsConfigured", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly, DefaultValue = false)]
+    [ServerParam("WelcomeMessage", ParameterType = typeof(string), Type = ServerParamType.GlobalOnly, DefaultValue = "Welcome to your new world!")]
+    [ServerParam("GridLibraryOwner", ParameterType = typeof(UUID), Type = ServerParamType.GlobalOnly, DefaultValue = "11111111-1111-0000-0000-000100bba000")]
+    [ServerParam("GridLibraryFolderId", ParameterType = typeof(UUID), Type = ServerParamType.GlobalOnly, DefaultValue = "00000112-000f-0000-0000-000100bba000")]
+    [ServerParam("GridLibraryEnabled", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly, DefaultValue = false)]
     [ServerParam("AboutPage", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
     [ServerParam("WelcomePage", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
     [ServerParam("RegisterPage", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("GridNick", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("GridName", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("AllowMultiplePresences", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("MaxAgentGroups", ParameterType = typeof(uint), Type = ServerParamType.GlobalOnly)]
+    [ServerParam("GridNick", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly, DefaultValue = "")]
+    [ServerParam("GridName", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly, DefaultValue = "")]
+    [ServerParam("AllowMultiplePresences", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly, DefaultValue = false)]
+    [ServerParam("MaxAgentGroups", ParameterType = typeof(uint), Type = ServerParamType.GlobalOnly, DefaultValue = 42)]
     public class XmlRpcLoginHandler : IPlugin, IServerParamListener
     {
         private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC LOGIN");
@@ -106,7 +106,7 @@ namespace SilverSim.Grid.Login
         readonly string m_LoginConnectorServiceName;
         UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
         UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
-        string m_WelcomeMessage = "Greetings Programs";
+        string m_WelcomeMessage = "Welcome to your new world!";
         Uri m_AboutPage;
         Uri m_WelcomePage;
         Uri m_RegisterPage;

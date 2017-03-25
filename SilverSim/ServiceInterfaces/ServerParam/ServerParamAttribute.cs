@@ -36,6 +36,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         public string Description { get; set; }
         public ServerParamType Type { get; set; }
         public Type ParameterType { get; set; }
+        public object DefaultValue { get; set; }
 
         public ServerParamAttribute(string name)
         {

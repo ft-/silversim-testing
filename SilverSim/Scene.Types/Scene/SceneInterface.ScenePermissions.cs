@@ -32,12 +32,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    [ServerParam("estate_manager_is_god", ParameterType = typeof(bool))]
-    [ServerParam("region_owner_is_simconsole_user", ParameterType = typeof(bool))]
-    [ServerParam("estate_owner_is_simconsole_user", ParameterType = typeof(bool))]
-    [ServerParam("region_manager_is_simconsole_user", ParameterType = typeof(bool))]
-    [ServerParam("parcel_owner_is_admin", ParameterType = typeof(bool))]
-    [ServerParam("god_agents")]
+    [ServerParam("estate_manager_is_god", ParameterType = typeof(bool), DefaultValue = false)]
+    [ServerParam("region_owner_is_simconsole_user", ParameterType = typeof(bool), DefaultValue = false)]
+    [ServerParam("estate_owner_is_simconsole_user", ParameterType = typeof(bool), DefaultValue = false)]
+    [ServerParam("region_manager_is_simconsole_user", ParameterType = typeof(bool), DefaultValue = false)]
+    [ServerParam("parcel_owner_is_admin", ParameterType = typeof(bool), DefaultValue = false)]
+    [ServerParam("god_agents", ParameterType = typeof(string), DefaultValue = "")]
     public abstract partial class SceneInterface
     {
         void ParameterUpdatedHandler(ref bool localval, ref bool globalval, ref bool settolocalval, UUID regionId, string value)
