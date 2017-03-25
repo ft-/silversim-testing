@@ -6588,5 +6588,6 @@
     <file name="data/adminpages/js/silversim/regionenable.js"/>
     <file name="data/adminpages/js/silversim/regions.js"/>
     <file name="data/adminpages/js/silversim/regionstartstop.js"/>
+    <file name="data/adminpages/js/silversim/selectuser.js"/>
   </files>
 </package>
