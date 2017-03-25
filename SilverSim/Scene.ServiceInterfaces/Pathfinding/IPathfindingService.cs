@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System.Collections.Generic;
 
@@ -33,5 +34,6 @@ namespace SilverSim.Scene.ServiceInterfaces.Pathfinding
     public interface IPathfindingService
     {
         bool TryResolvePath(UUID sceneID, Vector3 fromPos, Vector3 toPos, out List<WaypointData> waypoints);
+        bool TryGetClosestNavPoint(Vector3 targetPoint, double distanceLimit, bool useStaticOnly, PathfindingType pType, out Vector3 navPoint);
     }
 }

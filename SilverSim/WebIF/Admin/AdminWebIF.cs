@@ -256,9 +256,9 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("dnscache.list", DnsCacheList);
             JsonMethods.Add("dnscache.delete", DnsCacheRemove);
             JsonMethods.Add("webif.modules", AvailableModulesList);
-            JsonMethods.Add("avatarname.search.exact", FindExactUser);
-            JsonMethods.Add("avatarname.search", FindUser);
-            JsonMethods.Add("avatarname.getdetails", GetUserDetails);
+            JsonMethods.Add("avatarname.search.exact", HandleFindExactUser);
+            JsonMethods.Add("avatarname.search", HandleFindUser);
+            JsonMethods.Add("avatarname.getdetails", HandleGetUserDetails);
             LogController.Queues.Add(m_LogEventQueue);
             ThreadManager.CreateThread(LogThread).Start();
         }
@@ -1272,7 +1272,7 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
-        void FindExactUser(HttpRequest req, Map jsondata)
+        void HandleFindExactUser(HttpRequest req, Map jsondata)
         {
             AnArray res = new AnArray();
             IValue q1;
@@ -1297,7 +1297,7 @@ namespace SilverSim.WebIF.Admin
 
         }
 
-        void FindUser(HttpRequest req, Map jsondata)
+        void HandleFindUser(HttpRequest req, Map jsondata)
         {
             AnArray res = new AnArray();
             IValue q1;
@@ -1328,7 +1328,7 @@ namespace SilverSim.WebIF.Admin
             SuccessResponse(req, resdata);
         }
 
-        void GetUserDetails(HttpRequest req, Map jsondata)
+        void HandleGetUserDetails(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("uuid"))
             {
