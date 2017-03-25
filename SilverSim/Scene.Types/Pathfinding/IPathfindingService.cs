@@ -19,11 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 
-namespace SilverSim.Scene.ServiceInterfaces.Pathfinding
+namespace SilverSim.Scene.Types.Pathfinding
 {
     public struct WaypointData
     {
@@ -31,9 +32,30 @@ namespace SilverSim.Scene.ServiceInterfaces.Pathfinding
         public bool IsFlying;
     }
 
+    [Flags]
+    public enum PathfindingOptions
+    {
+        None,
+        UseStaticOnly = 1
+    }
+
+    public struct CharacterInfo
+    {
+        public CharacterType Type;
+        public Vector3 AabbMin;
+        public Vector3 AabbMax;
+        public PathfindingOptions Options;
+    }
+
     public interface IPathfindingService
     {
-        bool TryResolvePath(UUID sceneID, Vector3 fromPos, Vector3 toPos, out List<WaypointData> waypoints);
-        bool TryGetClosestNavPoint(Vector3 targetPoint, double distanceLimit, bool useStaticOnly, PathfindingType pType, out Vector3 navPoint);
+        bool TryResolvePath(UUID sceneID, Vector3 fromPos, Vector3 toPos, CharacterInfo characterInfo, out List<WaypointData> waypoints);
+        bool TryGetClosestNavPoint(Vector3 targetPoint, double distanceLimit, bool useStaticOnly, CharacterType type, out Vector3 navPoint);
+        void Stop();
+    }
+
+    public interface IPathfindingServiceFactory
+    {
+        IPathfindingService Instantiate(SceneInterface scene);
     }
 }

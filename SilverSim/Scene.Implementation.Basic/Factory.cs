@@ -27,6 +27,7 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces;
@@ -47,7 +48,7 @@ namespace SilverSim.Scene.Implementation.Basic
     [Description("Basic Scene Factory")]
     public sealed class SceneFactory : SceneFactoryInterface, IPlugin
     {
-        ChatServiceFactoryInterface m_ChatFactory;
+        internal ChatServiceFactoryInterface m_ChatFactory { get; private set; }
         readonly string m_ChatFactoryName;
         readonly string m_GroupsNameServiceName;
         readonly string m_GroupsServiceName;
@@ -61,27 +62,29 @@ namespace SilverSim.Scene.Implementation.Basic
         readonly string m_PhysicsName;
         readonly string m_NeighborServiceName;
         readonly string m_WindModelFactoryName;
+        readonly string m_PathfindingServiceFactoryName;
         readonly List<string> m_AvatarNameServiceNames = new List<string>();
 
-        GroupsNameServiceInterface m_GroupsNameService;
-        AssetServiceInterface m_AssetService;
-        AssetServiceInterface m_AssetCacheService;
-        GridServiceInterface m_GridService;
-        GridServiceInterface m_RegionStorage;
-        GroupsServiceInterface m_GroupsService;
-        IMServiceInterface m_IMService;
-        EstateServiceInterface m_EstateService;
-        SimulationDataStorageInterface m_SimulationDataStorage;
-        readonly Dictionary<string, string> m_CapabilitiesConfig;
-        IPhysicsSceneFactory m_PhysicsFactory;
-        NeighborServiceInterface m_NeighborService;
-        ExternalHostNameServiceInterface m_ExternalHostNameService;
-        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
-        SceneList m_Scenes;
-        IMRouter m_IMRouter;
-        BaseHttpServer m_HttpServer;
-        List<IPortControlServiceInterface> m_PortControlServices;
-        IWindModelFactory m_WindModelFactory;
+        internal GroupsNameServiceInterface m_GroupsNameService { get; private set; }
+        internal AssetServiceInterface m_AssetService { get; private set; }
+        internal AssetServiceInterface m_AssetCacheService { get; private set; }
+        internal GridServiceInterface m_GridService { get; private set; }
+        internal GridServiceInterface m_RegionStorage { get; private set; }
+        internal GroupsServiceInterface m_GroupsService { get; private set; }
+        internal IMServiceInterface m_IMService { get; private set; }
+        internal EstateServiceInterface m_EstateService { get; private set; }
+        internal SimulationDataStorageInterface m_SimulationDataStorage { get; private set; }
+        internal readonly Dictionary<string, string> m_CapabilitiesConfig = new Dictionary<string, string>();
+        internal IPhysicsSceneFactory m_PhysicsFactory { get; private set; }
+        internal NeighborServiceInterface m_NeighborService { get; private set; }
+        internal ExternalHostNameServiceInterface m_ExternalHostNameService { get; private set; }
+        internal readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        internal SceneList m_Scenes { get; private set; }
+        internal IMRouter m_IMRouter { get; private set; }
+        internal BaseHttpServer m_HttpServer { get; private set; }
+        internal List<IPortControlServiceInterface> m_PortControlServices { get; private set; }
+        internal IWindModelFactory m_WindModelFactory { get; private set; }
+        internal IPathfindingServiceFactory m_PathfindingServiceFactory { get; private set; }
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -98,6 +101,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_PhysicsName = ownConfig.GetString("Physics", string.Empty);
             m_NeighborServiceName = ownConfig.GetString("NeighborService", "NeighborService");
             m_WindModelFactoryName = ownConfig.GetString("WindPlugin", string.Empty);
+            m_PathfindingServiceFactoryName = ownConfig.GetString("PathfindingPlugin", string.Empty);
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
             if (!string.IsNullOrEmpty(avatarNameServices))
             {
@@ -107,7 +111,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
-            m_CapabilitiesConfig = new Dictionary<string, string>();
             foreach(string key in ownConfig.GetKeys())
             {
                 if(key.StartsWith("Cap_") && key != "Cap_")
@@ -122,6 +125,10 @@ namespace SilverSim.Scene.Implementation.Basic
             if(!string.IsNullOrEmpty(m_WindModelFactoryName))
             {
                 m_WindModelFactory = loader.GetService<IWindModelFactory>(m_WindModelFactoryName);
+            }
+            if(!string.IsNullOrEmpty(m_PathfindingServiceFactoryName))
+            {
+                m_PathfindingServiceFactory = loader.GetService<IPathfindingServiceFactory>(m_PathfindingServiceFactoryName);
             }
             m_HttpServer = loader.HttpServer;
             m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
@@ -160,30 +167,9 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override SceneInterface Instantiate(RegionInfo ri)
         {
-            BasicScene scene = new BasicScene(
-                m_Scenes,
-                m_IMRouter,
-                m_ChatFactory.Instantiate(), 
-                m_IMService, 
-                m_GroupsNameService, 
-                m_GroupsService,
-                m_AssetService,
-                m_AssetCacheService,
-                m_GridService,
-                ri,
-                m_AvatarNameServices,
-                m_SimulationDataStorage,
-                m_EstateService,
-                m_PhysicsFactory,
-                m_NeighborService,
-                m_CapabilitiesConfig,
-                m_RegionStorage,
+            return new BasicScene(
                 this,
-                m_ExternalHostNameService,
-                m_HttpServer,
-                m_PortControlServices,
-                m_WindModelFactory);
-            return scene;
+                ri);
         }
     }
 

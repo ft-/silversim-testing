@@ -28,6 +28,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.SceneEnvironment;
@@ -497,37 +498,17 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #region Constructor
         internal BasicScene(
-            SceneList scenes,
-            IMRouter imrouter,
-            ChatServiceInterface chatService, 
-            IMServiceInterface imService,
-            GroupsNameServiceInterface groupsNameService,
-            GroupsServiceInterface groupsService,
-            AssetServiceInterface persistentAssetService,
-            AssetServiceInterface temporaryAssetService,
-            GridServiceInterface gridService,
-            RegionInfo ri,
-            List<AvatarNameServiceInterface> avatarNameServices,
-            SimulationDataStorageInterface simulationDataStorage,
-            EstateServiceInterface estateService,
-            IPhysicsSceneFactory physicsFactory,
-            NeighborServiceInterface neighborService,
-            Dictionary<string, string> capabilitiesConfig,
-            GridServiceInterface regionStorage,
-            SceneFactory myFactory,
-            ExternalHostNameServiceInterface externalHostNameService,
-            BaseHttpServer httpServer,
-            List<IPortControlServiceInterface> portControlServices,
-            IWindModelFactory windModelFactory)
+            SceneFactory sceneParams,
+            RegionInfo ri)
         : base(ri.Size.X, ri.Size.Y)
         {
-            m_Scenes = scenes;
-            m_HttpServer = httpServer;
-            if (persistentAssetService == null)
+            m_Scenes = sceneParams.m_Scenes;
+            m_HttpServer = sceneParams.m_HttpServer;
+            if (sceneParams.m_AssetService == null)
             {
                 throw new ArgumentNullException("persistentAssetService");
             }
-            if (gridService == null)
+            if (sceneParams.m_GridService == null)
             {
                 throw new ArgumentNullException("gridService");
             }
@@ -535,38 +516,38 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 throw new ArgumentNullException("ri");
             }
-            if (avatarNameServices == null)
+            if (sceneParams.m_AvatarNameServices == null)
             {
                 throw new ArgumentNullException("avatarNameServices");
             }
-            if (simulationDataStorage == null)
+            if (sceneParams.m_SimulationDataStorage == null)
             {
                 throw new ArgumentNullException("simulationDataStorage");
             }
-            if (estateService == null)
+            if (sceneParams.m_EstateService == null)
             {
                 throw new ArgumentNullException("estateService");
             }
-            if (capabilitiesConfig == null)
+            if (sceneParams.m_CapabilitiesConfig == null)
             {
                 throw new ArgumentNullException("capabilitiesConfig");
             }
-            if (regionStorage == null)
+            if (sceneParams.m_RegionStorage == null)
             {
                 throw new ArgumentNullException("regionStorage");
             }
 
             #region Setup services
-            m_ChatService = chatService;
-            RegionStorage = regionStorage;
-            GroupsNameService = groupsNameService;
-            GroupsService = groupsService;
-            m_NeighborService = neighborService;
-            m_SimulationDataStorage = simulationDataStorage;
-            PersistentAssetService = persistentAssetService;
-            TemporaryAssetService = temporaryAssetService;
-            GridService = gridService;
-            EstateService = estateService;
+            m_ChatService = sceneParams.m_ChatFactory.Instantiate();
+            RegionStorage = sceneParams.m_RegionStorage;
+            GroupsNameService = sceneParams.m_GroupsNameService;
+            GroupsService = sceneParams.m_GroupsService;
+            m_NeighborService = sceneParams.m_NeighborService;
+            m_SimulationDataStorage = sceneParams.m_SimulationDataStorage;
+            PersistentAssetService = sceneParams.m_AssetService;
+            TemporaryAssetService = sceneParams.m_AssetCacheService;
+            GridService = sceneParams.m_GridService;
+            EstateService = sceneParams.m_EstateService;
             /* next line is there to break the circular dependencies */
             TryGetScene = m_Scenes.TryGetValue;
             #endregion
@@ -582,7 +563,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ScopeID = ri.ScopeID;
             ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
-            m_ExternalHostNameService = externalHostNameService;
+            m_ExternalHostNameService = sceneParams.m_ExternalHostNameService;
             #endregion
 
             /* load estate flags cache */
@@ -598,36 +579,41 @@ namespace SilverSim.Scene.Implementation.Basic
                 throw new ArgumentException("Could not load estate data");
             }
 
-            m_RestartObject = new RestartObject(scenes, this, myFactory, regionStorage);
+            m_RestartObject = new RestartObject(m_Scenes, this, sceneParams, sceneParams.m_RegionStorage);
 
-            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this, portControlServices);
+            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, sceneParams.m_IMService, m_ChatService, this, sceneParams.m_PortControlServices);
             m_SceneObjects = new BasicSceneObjectsCollection(this);
             m_SceneObjectParts = new BasicSceneObjectPartsCollection(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
             m_SceneAgents = new BasicSceneAgentsCollection(this);
             m_SceneRootAgents = new BasicSceneRootAgentsCollection(this);
             m_SceneParcels = new BasicSceneParcelsCollection(this);
-            CapabilitiesConfig = capabilitiesConfig;
-            foreach (AvatarNameServiceInterface avNameService in avatarNameServices)
+            CapabilitiesConfig = sceneParams.m_CapabilitiesConfig;
+            foreach (AvatarNameServiceInterface avNameService in sceneParams.m_AvatarNameServices)
             {
                 AvatarNameServices.Add(avNameService);
             }
 
             Terrain = new TerrainController(this);
-            Environment = new EnvironmentController(this, windModelFactory);
+            Environment = new EnvironmentController(this, sceneParams.m_WindModelFactory);
 
-            m_IMRouter = imrouter;
+            if(null != sceneParams.m_PathfindingServiceFactory)
+            {
+                PathfindingService = sceneParams.m_PathfindingServiceFactory.Instantiate(this);
+            }
+
+            m_IMRouter = sceneParams.m_IMRouter;
             m_IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
 
             ScriptThreadPool = new ScriptWorkerThreadPool(50, 150, ID);
-            if(null != physicsFactory)
+            if(null != sceneParams.m_PhysicsFactory)
             {
                 try
                 {
-                    PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);
+                    PhysicsScene = sceneParams.m_PhysicsFactory.InstantiatePhysicsScene(this);
                 }
                 catch
                 {
@@ -686,6 +672,10 @@ namespace SilverSim.Scene.Implementation.Basic
             ScriptThreadPool.Shutdown();
             Environment.OnEnvironmentControllerChangeParams -= StoreEnvironmentControllerData;
             Environment.Stop();
+            if(PathfindingService != null)
+            {
+                PathfindingService.Stop();
+            }
             int serializedcount = 0;
             foreach(ObjectPart part in Primitives)
             {

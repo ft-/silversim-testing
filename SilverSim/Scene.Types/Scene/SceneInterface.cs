@@ -22,6 +22,7 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
@@ -145,6 +146,7 @@ namespace SilverSim.Scene.Types.Scene
         public GroupsServiceInterface GroupsService { get; protected set; }
         public GroupsNameServiceInterface GroupsNameService { get; protected set; }
         public AvatarNameServiceInterface AvatarNameService { get; private set; }
+        public IPathfindingService PathfindingService { get; protected set; }
         public readonly RwLockedList<AvatarNameServiceInterface> AvatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
         public readonly RwLockedList<ISceneListener> SceneListeners = new RwLockedList<ISceneListener>();
         public readonly RwLockedList<IAgentListener> AgentListeners = new RwLockedList<IAgentListener>();
@@ -337,6 +339,10 @@ namespace SilverSim.Scene.Types.Scene
             else if (service.IsAssignableFrom(typeof(TerrainController)))
             {
                 return Terrain;
+            }
+            else if(service.IsAssignableFrom(typeof(IPathfindingService)) && PathfindingService != null)
+            {
+                return PathfindingService;
             }
             else
             {
