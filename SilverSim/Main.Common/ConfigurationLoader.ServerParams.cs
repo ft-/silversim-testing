@@ -33,6 +33,136 @@ namespace SilverSim.Main.Common
 {
     partial class ConfigurationLoader
     {
+        #region Load Server Params
+        void LoadServerParamsForPlugin(string name, IPlugin instance, Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults)
+        {
+            ServerParamServiceInterface serverParams = GetServerParamStorage();
+            Type instanceType = instance.GetType();
+            ServerParamStartsWithAttribute[] startswithattrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamStartsWithAttribute)) as ServerParamStartsWithAttribute[];
+            if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)) && startswithattrs.Length != 0)
+            {
+                IServerParamAnyListener listener = (IServerParamAnyListener)instance;
+#if DEBUG
+                m_Log.DebugFormat("Processing {0} for start with server params", name);
+#endif
+                foreach (ServerParamStartsWithAttribute attr in startswithattrs)
+                {
+                    foreach (KeyValuePair<UUID, string> kvp in serverParams.KnownParameters)
+                    {
+                        if (kvp.Value.StartsWith(attr.ParameterNameStartsWith))
+                        {
+#if DEBUG
+                            m_Log.DebugFormat("sending config value to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), kvp.Value);
+#endif
+                            try
+                            {
+                                listener.TriggerParameterUpdated(kvp.Key, kvp.Value, serverParams.GetString(kvp.Key, kvp.Value));
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), kvp.Value, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
+                        }
+                    }
+
+#if DEBUG
+                    m_Log.DebugFormat("adding update listener for {0} with start with parameter {1}", name, attr.ParameterNameStartsWith);
+#endif
+                    serverParams.StartsWithServerParamListeners[attr.ParameterNameStartsWith].Add((IServerParamAnyListener)instance);
+                }
+
+            }
+
+            if (instanceType.GetInterfaces().Contains(typeof(IServerParamListener)))
+            {
+#if DEBUG
+                m_Log.DebugFormat("Processing {0} for specific server param", name);
+#endif
+                ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                foreach (ServerParamAttribute attr in attrs)
+                {
+                    string parameterName = attr.ParameterName;
+                    List<KeyValuePair<UUID, string>> result;
+                    if (!cachedResults.TryGetValue(parameterName, out result))
+                    {
+                        result = serverParams[parameterName];
+                        cachedResults.Add(parameterName, result);
+                    }
+
+                    bool foundSpecific = false;
+                    MethodInfo[] mis = instanceType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                    foreach (MethodInfo mi in mis)
+                    {
+                        ServerParamAttribute[] mi_attrs = Attribute.GetCustomAttributes(mi, typeof(ServerParamAttribute)) as ServerParamAttribute[];
+                        foreach (ServerParamAttribute mi_attr in mi_attrs)
+                        {
+                            if (mi_attr.ParameterName == parameterName)
+                            {
+                                Action<UUID, string> del;
+                                try
+                                {
+                                    del = Delegate.CreateDelegate(typeof(Action<UUID, string>), instance, mi) as Action<UUID, string>;
+                                }
+                                catch (Exception e)
+                                {
+                                    m_Log.WarnFormat("Failed to initialize {0} for parameter {1}: {2}: {3}\n{4}", name, parameterName, e.GetType().FullName, e.Message, e.StackTrace);
+                                    /* could not create so skip it */
+                                    continue;
+                                }
+                                foundSpecific = true;
+                                foreach (KeyValuePair<UUID, string> kvp in result)
+                                {
+#if DEBUG
+                                    m_Log.DebugFormat("sending config value to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
+#endif
+                                    try
+                                    {
+                                        del(kvp.Key, kvp.Value);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), parameterName, e.GetType().FullName, e.Message, e.StackTrace);
+                                    }
+                                }
+#if DEBUG
+                                m_Log.DebugFormat("adding update listener for {0} with parameter {1}", name, parameterName);
+#endif
+                                serverParams.SpecificParamListeners[parameterName].Add(del);
+                            }
+                        }
+                    }
+
+                    if (foundSpecific)
+                    {
+                        continue;
+                    }
+
+                    if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
+                    {
+                        IServerParamAnyListener listener = (IServerParamAnyListener)instance;
+                        foreach (KeyValuePair<UUID, string> kvp in result)
+                        {
+#if DEBUG
+                            m_Log.DebugFormat("sending config value to {0} with parameter {1}/{2}", name, kvp.Key.ToString(), parameterName);
+#endif
+                            try
+                            {
+                                listener.TriggerParameterUpdated(kvp.Key, parameterName, kvp.Value);
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Failed to configure {0} with parameter {1}/{2}: {3}: {4}\n{5}", name, kvp.Key.ToString(), parameterName, e.GetType().FullName, e.Message, e.StackTrace);
+                            }
+                        }
+#if DEBUG
+                        m_Log.DebugFormat("adding update listener for {0} with parameter {1}", name, parameterName);
+#endif
+                        serverParams.GenericServerParamListeners[parameterName].Add(listener);
+                    }
+                }
+            }
+        }
+        #endregion
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void GetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
@@ -152,51 +282,63 @@ namespace SilverSim.Main.Common
             io.Write(sb.ToString());
         }
 
-        public IDictionary<string, ServerParamAttribute> ServerParams
+        Dictionary<string, ServerParamAttribute> m_KnownServerParams;
+        object m_KnownServerParamsLock = new object();
+
+        public IReadOnlyDictionary<string, ServerParamAttribute> ServerParams
         {
             get
             {
-                Dictionary<string, ServerParamAttribute> resList = new Dictionary<string, ServerParamAttribute>();
-                foreach (SceneInterface scene in Scenes.Values)
+                if (m_KnownServerParams == null)
                 {
-                    Type instanceType = scene.GetType();
-                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
-                    foreach (ServerParamAttribute attr in attrs)
+                    lock (m_KnownServerParamsLock)
                     {
-                        if (!resList.ContainsKey(attr.ParameterName))
+                        if (m_KnownServerParams == null)
                         {
-                            resList.Add(attr.ParameterName, attr);
-                        }
-                    }
-                }
-
-                foreach (IServerParamListener listener in GetServicesByValue<IServerParamListener>())
-                {
-                    Type instanceType = listener.GetType();
-                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
-                    foreach (ServerParamAttribute attr in attrs)
-                    {
-                        ServerParamAttribute paraType;
-                        if (!resList.TryGetValue(attr.ParameterName, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
-                        {
-                            resList[attr.ParameterName] = attr;
-                        }
-                    }
-
-                    if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
-                    {
-                        IServerParamAnyListener anyListener = (IServerParamAnyListener)listener;
-                        foreach (KeyValuePair<string, ServerParamAttribute> kvp in anyListener.ServerParams)
-                        {
-                            ServerParamAttribute paraType;
-                            if (!resList.TryGetValue(kvp.Key, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
+                            m_KnownServerParams = new Dictionary<string, ServerParamAttribute>();
+                            foreach (SceneInterface scene in Scenes.Values)
                             {
-                                resList[kvp.Key] = kvp.Value;
+                                Type instanceType = scene.GetType();
+                                ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
+                                foreach (ServerParamAttribute attr in attrs)
+                                {
+                                    if (!m_KnownServerParams.ContainsKey(attr.ParameterName))
+                                    {
+                                        m_KnownServerParams.Add(attr.ParameterName, attr);
+                                    }
+                                }
+                            }
+
+                            foreach (IServerParamListener listener in GetServicesByValue<IServerParamListener>())
+                            {
+                                Type instanceType = listener.GetType();
+                                ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
+                                foreach (ServerParamAttribute attr in attrs)
+                                {
+                                    ServerParamAttribute paraType;
+                                    if (!m_KnownServerParams.TryGetValue(attr.ParameterName, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
+                                    {
+                                        m_KnownServerParams[attr.ParameterName] = attr;
+                                    }
+                                }
+
+                                if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
+                                {
+                                    IServerParamAnyListener anyListener = (IServerParamAnyListener)listener;
+                                    foreach (KeyValuePair<string, ServerParamAttribute> kvp in anyListener.ServerParams)
+                                    {
+                                        ServerParamAttribute paraType;
+                                        if (!m_KnownServerParams.TryGetValue(kvp.Key, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
+                                        {
+                                            m_KnownServerParams[kvp.Key] = kvp.Value;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                return resList;
+                return m_KnownServerParams;
             }
         }
 
