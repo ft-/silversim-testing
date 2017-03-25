@@ -40,6 +40,14 @@ namespace SilverSim.Scene.Physics.Common
         protected UUID SceneID { get; private set; }
         SceneInterface.LocationInfoProvider m_LocInfoProvider;
 
+        protected override SceneInterface.LocationInfoProvider LocationInfoProvider
+        {
+            get
+            {
+                return m_LocInfoProvider;
+            }
+        }
+
         protected ObjectController(ObjectPart part, UUID sceneID, SceneInterface.LocationInfoProvider locInfoProvider)
         {
             SceneID = sceneID;
