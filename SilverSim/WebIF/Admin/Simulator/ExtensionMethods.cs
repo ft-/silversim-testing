@@ -36,7 +36,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m.Add("ParentEstateID", (int)estate.ParentEstateID);
             m.Add("Name", estate.Name);
             m.Add("Flags", ((uint)estate.Flags).ToString());
-            m.Add("Owner", estate.Owner.ToString());
+            m.Add("Owner", estate.Owner.ToMap());
             m.Add("PricePerMeter", estate.PricePerMeter);
             m.Add("BillableFactor", estate.BillableFactor);
             m.Add("SunPosition", estate.SunPosition);
@@ -76,8 +76,8 @@ namespace SilverSim.WebIF.Admin.Simulator
                     m.Add("Access", "unknown");
                     break;
             }
-            
-            m.Add("Owner", region.Owner.ToString());
+
+            m.Add("Owner", region.Owner.ToMap());
             m.Add("Flags", ((uint)region.Flags).ToString());
             return m;
         }

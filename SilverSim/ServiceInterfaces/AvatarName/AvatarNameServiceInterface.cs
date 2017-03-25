@@ -109,7 +109,11 @@ namespace SilverSim.ServiceInterfaces.AvatarName
         public bool TranslateToUUI(string arg, out UUI uui)
         {
             uui = UUI.Unknown;
-            if (arg.Contains("."))
+            if (UUI.TryParse(arg, out uui))
+            {
+                return true;
+            }
+            else if (arg.Contains("."))
             {
                 string[] names = arg.Split(new char[] { '.' }, 2);
                 if (names.Length == 1)
@@ -131,10 +135,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                     uui = founduui;
                     return true;
                 }
-            }
-            else if (UUI.TryParse(arg, out uui))
-            {
-                return true;
             }
             return false;
         }

@@ -256,6 +256,9 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("dnscache.list", DnsCacheList);
             JsonMethods.Add("dnscache.delete", DnsCacheRemove);
             JsonMethods.Add("webif.modules", AvailableModulesList);
+            JsonMethods.Add("avatarname.search.exact", FindExactUser);
+            JsonMethods.Add("avatarname.search", FindUser);
+            JsonMethods.Add("avatarname.getdetails", GetUserDetails);
             LogController.Queues.Add(m_LogEventQueue);
             ThreadManager.CreateThread(LogThread).Start();
         }
@@ -1269,6 +1272,83 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
+        void FindExactUser(HttpRequest req, Map jsondata)
+        {
+            AnArray res = new AnArray();
+            IValue q1;
+            IValue q2;
+
+            if (!jsondata.TryGetValue("firstname", out q1) || !jsondata.TryGetValue("lastname", out q2))
+            {
+                ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+
+            UUI uui;
+            if(!m_AvatarNameService.TryGetValue(q1.ToString(), q2.ToString(), out uui))
+            {
+                ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+                return;
+            }
+
+            Map resdata = new Map();
+            resdata.Add("user", uui.ToMap());
+            SuccessResponse(req, resdata);
+
+        }
+
+        void FindUser(HttpRequest req, Map jsondata)
+        {
+            AnArray res = new AnArray();
+            IValue q1;
+            IValue q2;
+            List<UUI> uuis;
+
+            if(jsondata.TryGetValue("firstname", out q1) && jsondata.TryGetValue("lastname", out q2))
+            {
+                uuis = m_AvatarNameService.Search(new string[] { q1.ToString(), q2.ToString() });
+            }
+            else if(jsondata.TryGetValue("query", out q1))
+            {
+                uuis = m_AvatarNameService.Search(new string[] { q1.ToString() });
+            }
+            else
+            {
+                ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+
+            Map resdata = new Map();
+            AnArray resarray = new AnArray();
+            foreach(UUI uui in uuis)
+            {
+                resarray.Add(uui.ToMap());
+            }
+            resdata.Add("uuis", resarray);
+            SuccessResponse(req, resdata);
+        }
+
+        void GetUserDetails(HttpRequest req, Map jsondata)
+        {
+            if(!jsondata.ContainsKey("uuid"))
+            {
+                ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
+            }
+
+            UUI uui;
+            if(!m_AvatarNameService.TryGetValue(jsondata["uuid"].AsUUID, out uui))
+            {
+                ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+            }
+            else
+            {
+                Map res = new Map();
+                res.Add("user", uui.ToMap());
+                SuccessResponse(req, res);
+            }
+        }
+
         void AvailableModulesList(HttpRequest req, Map jsondata)
         {
             AnArray res = new AnArray();

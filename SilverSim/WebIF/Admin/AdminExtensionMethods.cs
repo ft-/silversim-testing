@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common;
+using SilverSim.Types;
 using System.Collections.Generic;
 
 namespace SilverSim.WebIF.Admin
@@ -36,5 +37,14 @@ namespace SilverSim.WebIF.Admin
             return webIF[0];
         }
 
+        public static Map ToMap(this UUI uui)
+        {
+            Map owner = new Map();
+            owner.Add("fullname", uui.FullName);
+            owner.Add("uui", uui.ToString());
+            owner.Add("firstname", uui.FirstName);
+            owner.Add("lastname", uui.LastName);
+            return owner;
+        }
     }
 }
