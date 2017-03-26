@@ -260,14 +260,7 @@ namespace SilverSim.Scene.Physics.Common
             agentTorque = Vector3.Zero;
             if (!IsPhysicsActive)
             {
-                if(m_Agent.SittingOnObject != null)
-                {
-                    m_Agent.SetDefaultAnimation("sitting");
-                }
-                else
-                {
-                    m_Agent.SetDefaultAnimation("sitting on ground");
-                }
+                /* No animation update on disabled physics */
                 return forces;
             }
             else if(m_Agent.IsFlying)
