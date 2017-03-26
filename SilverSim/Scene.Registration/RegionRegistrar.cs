@@ -27,10 +27,8 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
 
 namespace SilverSim.Scene.Registration
 {
@@ -39,7 +37,6 @@ namespace SilverSim.Scene.Registration
     public class SceneRegistrar : IPlugin
     {
         readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
-        private BaseHttpServer m_HttpServer;
         SceneList m_Scenes;
 
         public SceneRegistrar(IConfig ownSection)
@@ -49,7 +46,6 @@ namespace SilverSim.Scene.Registration
         public void Startup(ConfigurationLoader loader)
         {
             m_Scenes = loader.Scenes;
-            m_HttpServer = loader.HttpServer;
             m_Scenes.OnRegionAdd += RegionAdded;
             m_Scenes.OnRegionRemove += RegionRemoved;
 
