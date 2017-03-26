@@ -35,8 +35,6 @@ namespace SilverSim.Database.Memory.ServerParam
     [Description("Memory ServerParam Backend")]
     public sealed class MemoryServerParamService : ServerParamServiceInterface, IPlugin
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("NULL SERVER PARAM SERVICE");
-
         readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Parameters = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(delegate() { return new RwLockedDictionary<string, string>(); });
 
         public override List<KeyValuePair<UUID, string>> KnownParameters
