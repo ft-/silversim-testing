@@ -24,6 +24,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Resources;
+using System.Reflection;
 
 namespace SilverSim.Types
 {
@@ -32,6 +33,7 @@ namespace SilverSim.Types
         static readonly RwLockedDictionary<string, ResourceSet> m_LoadedAssemblyResources = new RwLockedDictionary<string, ResourceSet>();
         static readonly object m_LoadAssemblyLock = new object();
         static readonly CultureInfo EnCulture = new CultureInfo("en");
+        static readonly string InstallBinPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
         public static ResourceSet GetLanguageResourceSet(
             this object o,
@@ -51,7 +53,7 @@ namespace SilverSim.Types
                 {
                     if (!m_LoadedAssemblyResources.TryGetValue(cultureName + ":" + assemblyName, out res))
                     {
-                        string fName = "languages/" + cultureName + "/" + assemblyName + "." + cultureName + ".resources";
+                        string fName = Path.Combine(InstallBinPath, "languages/" + cultureName + "/" + assemblyName + "." + cultureName + ".resources");
                         if (File.Exists(fName))
                         {
                             using (ResourceReader reader = new ResourceReader(fName))
@@ -64,7 +66,7 @@ namespace SilverSim.Types
                     else if (cultureGroup != cultureName &&
                         !m_LoadedAssemblyResources.TryGetValue(cultureGroup + ":" + assemblyName, out res))
                     {
-                        string fName = "languages/" + cultureGroup + "/" + assemblyName + "." + cultureGroup +  ".resources";
+                        string fName = Path.Combine(InstallBinPath, "languages/" + cultureGroup + "/" + assemblyName + "." + cultureGroup +  ".resources");
                         if (File.Exists(fName))
                         {
                             using (ResourceReader reader = new ResourceReader(fName))
