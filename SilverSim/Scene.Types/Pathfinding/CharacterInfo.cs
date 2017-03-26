@@ -19,43 +19,41 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Types;
-using System.Collections.Generic;
-
 namespace SilverSim.Scene.Types.Pathfinding
 {
-    public struct WaypointData
+    public enum CapsuleOrientation
     {
-        public Vector3 Position;
-        public bool IsFlying;
+        Vertical,
+        Horizontal
     }
 
-    public enum ResolvePathStatus
+    public enum TraversalType
     {
-        Success = 0,
-        GoalReached = 1,
-        InvalidStart = 2,
-        InvalidGoal = 3,
-        Unreachable = 4,
-        TargetGone = 5,
-        NoValidDestination = 6,
-        EvadeHidden = 7,
-        EvadeSpotted = 8,
-        NoNavMesh = 9,
-        DynamicPathfindingDisabled = 10,
-        ParcelUnreachable = 11
+        Slow,
+        Fast,
+        None
     }
 
-    public interface IPathfindingService
+    public class CharacterInfo
     {
-        ResolvePathStatus TryResolvePath(Vector3 fromPos, Vector3 toPos, CharacterInfo characterInfo, out List<WaypointData> waypoints);
-        bool TryGetClosestNavPoint(Vector3 targetPoint, double distanceLimit, bool useStaticOnly, CharacterType type, out Vector3 navPoint);
-        void Stop();
-    }
+        public CharacterType Type;
+        public double CollisionCapsuleRadius;
+        public double CollisionCapsuleLength;
+        public CapsuleOrientation CollisionCapsuleOrientation;
+        public PathfindingOptions Options;
+        public TraversalType TraversalType;
+        public double DesiredSpeed = 6;
+        public double MaxAcceleration = 20;
+        public double MaxDeceleration = 30;
+        public double DesiredTurnSpeed = 12;
+        public double MaxTurnRadius = 10;
+        public double MaxSpeed = 13;
+        public bool AccountForSkippedFrames = true;
+        public bool StayWithinParcel = true;
 
-    public interface IPathfindingServiceFactory
-    {
-        IPathfindingService Instantiate(SceneInterface scene);
+        public CharacterInfo()
+        {
+
+        }
     }
 }

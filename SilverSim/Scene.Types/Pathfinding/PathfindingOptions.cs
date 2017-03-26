@@ -19,43 +19,16 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Types;
-using System.Collections.Generic;
+using System;
 
 namespace SilverSim.Scene.Types.Pathfinding
 {
-    public struct WaypointData
+    [Flags]
+    public enum PathfindingOptions
     {
-        public Vector3 Position;
-        public bool IsFlying;
-    }
-
-    public enum ResolvePathStatus
-    {
-        Success = 0,
-        GoalReached = 1,
-        InvalidStart = 2,
-        InvalidGoal = 3,
-        Unreachable = 4,
-        TargetGone = 5,
-        NoValidDestination = 6,
-        EvadeHidden = 7,
-        EvadeSpotted = 8,
-        NoNavMesh = 9,
-        DynamicPathfindingDisabled = 10,
-        ParcelUnreachable = 11
-    }
-
-    public interface IPathfindingService
-    {
-        ResolvePathStatus TryResolvePath(Vector3 fromPos, Vector3 toPos, CharacterInfo characterInfo, out List<WaypointData> waypoints);
-        bool TryGetClosestNavPoint(Vector3 targetPoint, double distanceLimit, bool useStaticOnly, CharacterType type, out Vector3 navPoint);
-        void Stop();
-    }
-
-    public interface IPathfindingServiceFactory
-    {
-        IPathfindingService Instantiate(SceneInterface scene);
+        None,
+        UseStaticOnly = 1,
+        AvoidDynamicObstacles = 2,
+        AvoidCharacters = 4
     }
 }
