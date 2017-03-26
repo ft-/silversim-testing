@@ -31,7 +31,6 @@ namespace SilverSim.Types
     {
         static readonly RwLockedDictionary<string, ResourceSet> m_LoadedAssemblyResources = new RwLockedDictionary<string, ResourceSet>();
         static readonly object m_LoadAssemblyLock = new object();
-        static readonly CultureInfo EnCulture = new CultureInfo("en");
         static readonly string InstallBinPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
         public static ResourceSet GetLanguageResourceSet(
