@@ -272,7 +272,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public void SetDefaultAnimation(string anim_state)
         {
-            if (m_AnimStates.Contains<string>(anim_state))
+            if (m_AnimStates.Contains(anim_state))
             {
                 lock (m_Lock)
                 {

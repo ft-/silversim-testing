@@ -87,6 +87,16 @@ namespace SilverSim.Scene.Types.Agent
         void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true);
         void AddWaitForRoot(SceneInterface scene, Action<object, bool> del, object o);
 
+        bool IsFlying
+        {
+            get;
+        }
+
+        bool IsRunning
+        {
+            get;
+        }
+
         IAgentTeleportServiceInterface ActiveTeleportService
         {
             get;

@@ -260,7 +260,71 @@ namespace SilverSim.Scene.Physics.Common
             agentTorque = Vector3.Zero;
             if (!IsPhysicsActive)
             {
+                if(m_Agent.SittingOnObject != null)
+                {
+                    m_Agent.SetDefaultAnimation("sitting");
+                }
+                else
+                {
+                    m_Agent.SetDefaultAnimation("sitting on ground");
+                }
                 return forces;
+            }
+            else if(m_Agent.IsFlying)
+            {
+                if (m_Agent.Velocity.X * m_Agent.Velocity.X + m_Agent.Velocity.Y * m_Agent.Velocity.Y > 0.1)
+                {
+                    m_Agent.SetDefaultAnimation("flying");
+                }
+                if (m_Agent.Velocity.X * m_Agent.Velocity.X + m_Agent.Velocity.Y * m_Agent.Velocity.Y > 0.001)
+                {
+                    m_Agent.SetDefaultAnimation("flyingslow");
+                }
+                else if(m_Agent.Velocity.Z > 0.001)
+                {
+                    m_Agent.SetDefaultAnimation("hovering up");
+                }
+                else if(m_Agent.Velocity.Z < -0.001)
+                {
+                    m_Agent.SetDefaultAnimation("hovering down");
+                }
+                else
+                {
+                    m_Agent.SetDefaultAnimation("hovering");
+                }
+                /* TODO: implement taking off */
+            }
+            else
+            {
+                bool isfalling = m_Agent.Velocity.Z < -0.001;
+                bool standing_still = (m_Agent.Velocity.ApproxEquals(Vector3.Zero, double.Epsilon));
+                bool turning_left = m_Agent.AngularVelocity.Z < -0.001;
+                bool turning_right = m_Agent.AngularVelocity.Z > 0.001;
+                if(isfalling)
+                {
+                    m_Agent.SetDefaultAnimation("falling down");
+                }
+                else if (turning_left)
+                {
+                    m_Agent.SetDefaultAnimation("turning left");
+                }
+                else if (turning_right)
+                {
+                    m_Agent.SetDefaultAnimation("turning right");
+                }
+                else if (standing_still)
+                {
+                    m_Agent.SetDefaultAnimation("standing");
+                }
+                else if(m_Agent.IsRunning)
+                {
+                    m_Agent.SetDefaultAnimation("running");
+                }
+                else
+                {
+                    m_Agent.SetDefaultAnimation("walking");
+                }
+                /* TODO: implement crouching, crouchwalking, striding, prejumping, jumping, soft landing */
             }
 
             forces.Add(BuoyancyMotor(m_Agent, Vector3.Zero));
@@ -270,7 +334,7 @@ namespace SilverSim.Scene.Physics.Common
             forces.Add(LinearRestitutionMotor(m_Agent, RestitutionInputFactor, Vector3.Zero));
 
             /* let us allow advanced physics force input to be used on agents */
-            foreach (ObjectGroup grp in m_Agent.Attachments.All)
+                foreach (ObjectGroup grp in m_Agent.Attachments.All)
             {
                 foreach (KeyValuePair<UUID, Vector3> kvp in grp.AttachedForces)
                 {

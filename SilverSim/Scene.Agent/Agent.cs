@@ -188,6 +188,9 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public abstract bool IsRunning { get; }
+        public abstract bool IsFlying { get; }
+
         public UUID ID
         {
             get

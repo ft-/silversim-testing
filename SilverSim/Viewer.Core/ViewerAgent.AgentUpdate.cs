@@ -27,6 +27,7 @@ using SilverSim.Types.Agent;
 using SilverSim.Viewer.Messages;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Viewer.Core
 {
@@ -215,6 +216,22 @@ namespace SilverSim.Viewer.Core
             m_IsRunning = sar.AlwaysRun;
 
             ProcessAgentControls();
+        }
+
+        public override bool IsRunning
+        {
+            get
+            {
+                return m_IsRunning;
+            }
+        }
+
+        public override bool IsFlying
+        {
+            get
+            {
+                return false; /* TODO: implement flying state */
+            }
         }
 
         [PacketHandler(MessageType.AgentUpdate)]

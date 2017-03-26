@@ -63,6 +63,22 @@ namespace SilverSim.Scene.Npc
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
 
+        public override bool IsRunning
+        {
+            get
+            {
+                return false; /* TODO: implement controls */
+            }
+        }
+
+        public override bool IsFlying
+        {
+            get
+            {
+                return false; /* TODO: implement controls */
+            }
+        }
+
         UUID GetMyUUID()
         {
             return ID;
