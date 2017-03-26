@@ -20,7 +20,9 @@
 // exception statement from your version.
 
 using System;
+using System.IO;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 
 namespace SilverSim.Main.Common

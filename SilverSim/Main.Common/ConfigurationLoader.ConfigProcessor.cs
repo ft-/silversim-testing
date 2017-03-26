@@ -236,7 +236,7 @@ namespace SilverSim.Main.Common
                     {
                         try
                         {
-                            assembly = Assembly.LoadFrom("plugins/" + m_Assembly + ".dll");
+                            assembly = Assembly.LoadFrom(Path.Combine(InstallationBinPath, "plugins/" + m_Assembly + ".dll"));
                         }
                         catch
                         {
@@ -323,7 +323,7 @@ namespace SilverSim.Main.Common
                     {
                         try
                         {
-                            assembly = Assembly.LoadFrom("plugins/" + m_Assembly + ".dll");
+                            assembly = Assembly.LoadFrom(Path.Combine(InstallationBinPath, "plugins/" + m_Assembly + ".dll"));
                         }
                         catch
                         {
@@ -500,6 +500,8 @@ namespace SilverSim.Main.Common
                     return null;
             }
 
+            assemblyFileName = Path.Combine(InstallationBinPath, assemblyFileName);
+
             if (!File.Exists(assemblyFileName))
             {
                 return null;
@@ -521,7 +523,7 @@ namespace SilverSim.Main.Common
                 m_Log.FatalFormat("Invalid Module in section {0}: {1}", config.Name, modulename);
                 throw new ConfigurationErrorException();
             }
-            string assemblyname = "plugins/" + modulenameparts[0] + ".dll";
+            string assemblyname = Path.Combine(InstallationBinPath, "plugins/" + modulenameparts[0] + ".dll");
             Assembly assembly;
             try
             {
@@ -610,9 +612,9 @@ namespace SilverSim.Main.Common
                     {
                         string fName = config.GetString(key);
                         if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
-                            LoadLibrary(Path.GetFullPath(fName)) == IntPtr.Zero)
+                            LoadLibrary(Path.Combine(InstallationBinPath, fName)) == IntPtr.Zero)
                         {
-                            throw new ConfigurationLoader.ConfigurationErrorException("unmanaged module " + fName + " not found");
+                            throw new ConfigurationErrorException("unmanaged module " + fName + " not found");
                         }
                     }
                 }
@@ -851,11 +853,12 @@ namespace SilverSim.Main.Common
                     importedInfo.Set("Imported-" + source.Name, true);
                     m_Config.Merge(source.ConfigSource);
                 }
-                catch
+                catch(Exception e)
                 {
-                    System.Console.Write(String.Format(source.Message, source.Name));
+                    string eInfo = string.Format(source.Message, source.Name);
+                    System.Console.Write(eInfo);
                     System.Console.WriteLine();
-                    throw new ConfigurationErrorException();
+                    throw new ConfigurationErrorException(eInfo, e);
                 }
                 LoadGridsXml();
                 ProcessUseSourceParameter();

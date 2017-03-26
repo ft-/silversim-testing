@@ -201,6 +201,15 @@ namespace SilverSim.Main.Common
         public readonly IMRouter IMRouter = new IMRouter();
         public readonly CmdIO.CommandRegistry CommandRegistry = new CmdIO.CommandRegistry();
 
+        static string m_InstallationBinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static string InstallationBinPath
+        {
+            get
+            {
+                return m_InstallationBinPath;
+            }
+        }
+
         #region Simulator Shutdown Handler
         readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
         int m_ShutdownInSeconds = -1;
@@ -350,7 +359,7 @@ namespace SilverSim.Main.Common
              */
             if(!VersionInfo.IsPlatformMono)
             {
-                m_MonoSecurity = Assembly.LoadFile(Path.GetFullPath("platform-libs/Mono.Security.dll"));
+                m_MonoSecurity = Assembly.LoadFile(Path.Combine(InstallationBinPath, "platform-libs/Mono.Security.dll"));
                 AppDomain.CurrentDomain.AssemblyResolve += ResolveMonoSecurityEventHandler;
             }
 
@@ -698,6 +707,7 @@ namespace SilverSim.Main.Common
 
             CoreUpdater.Instance.LoadInstalledPackageDescriptions();
 
+            string DefaultDataPath = Path.Combine(InstallationBinPath, "../data");
             foreach(string defaultCfg in CoreUpdater.Instance.GetDefaultConfigurationFiles(mode))
             {
                 if(defaultCfg.Contains(':'))
@@ -714,11 +724,11 @@ namespace SilverSim.Main.Common
                 }
                 else if(defaultCfg.EndsWith(".xml"))
                 {
-                    m_Sources.Enqueue(new CFG_NiniXmlFileSource(Path.Combine("../data", defaultCfg)));
+                    m_Sources.Enqueue(new CFG_NiniXmlFileSource(Path.Combine(DefaultDataPath, defaultCfg)));
                 }
                 else
                 {
-                    m_Sources.Enqueue(new CFG_IniFileSource(Path.Combine("../data", defaultCfg)));
+                    m_Sources.Enqueue(new CFG_IniFileSource(Path.Combine(DefaultDataPath, defaultCfg)));
                 }
             }
             

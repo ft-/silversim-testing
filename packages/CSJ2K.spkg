@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <package>
 	<name>CSJ2K</name>
+	<license>BSD</license>
 	<files>
 		<file name="bin/CSJ2K.dll"/>
 	</files>
