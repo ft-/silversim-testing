@@ -65,6 +65,7 @@ namespace SilverSim.Types.IM
         FriendshipAccepted = 39,
         FriendshipDeclined = 40,
         StartTyping = 41,
-        StopTyping = 42
+        StopTyping = 42,
+        EjectedFromGroup = -46
     }
 }
