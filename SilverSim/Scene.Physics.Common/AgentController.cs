@@ -26,6 +26,7 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -265,7 +266,7 @@ namespace SilverSim.Scene.Physics.Common
             }
             else if(m_Agent.IsFlying)
             {
-                if (m_Agent.Velocity.X * m_Agent.Velocity.X + m_Agent.Velocity.Y * m_Agent.Velocity.Y > 0.1)
+                if (m_Agent.Velocity.HorizontalLength > 0.1)
                 {
                     m_Agent.SetDefaultAnimation("flying");
                 }
@@ -290,7 +291,7 @@ namespace SilverSim.Scene.Physics.Common
             else
             {
                 bool isfalling = m_Agent.Velocity.Z < -0.001;
-                bool standing_still = (m_Agent.Velocity.ApproxEquals(Vector3.Zero, double.Epsilon));
+                bool standing_still = m_Agent.Velocity.HorizontalLength < 0.01;
                 bool turning_left = m_Agent.AngularVelocity.Z < -0.001;
                 bool turning_right = m_Agent.AngularVelocity.Z > 0.001;
                 if(isfalling)

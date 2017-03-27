@@ -85,6 +85,15 @@ namespace SilverSim.Types
         #endregion Constructors
 
         #region Properties
+        /** <summary>Delivers X and Y length only. No Z component</summary> */
+        public double HorizontalLength
+        {
+            get
+            {
+                return Math.Sqrt(X * X + Y * Y);
+            }
+        }
+
         public double Length
         {
             get
@@ -170,9 +179,9 @@ namespace SilverSim.Types
 
             if (!BitConverter.IsLittleEndian)
             {
-                System.Array.Reverse(dest, pos + 0, 4);
-                System.Array.Reverse(dest, pos + 4, 4);
-                System.Array.Reverse(dest, pos + 8, 4);
+                Array.Reverse(dest, pos + 0, 4);
+                Array.Reverse(dest, pos + 4, 4);
+                Array.Reverse(dest, pos + 8, 4);
             }
         }
 
