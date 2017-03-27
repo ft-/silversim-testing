@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages.Avatar;
@@ -32,6 +33,8 @@ namespace SilverSim.Scene.Types.Agent
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class AgentAnimationController
     {
+        static ILog m_Log = LogManager.GetLogger("AGENT ANIMATION");
+
         static readonly string[] m_AnimStates = new string[] {
             "crouching",
             "crouchwalking",
@@ -278,11 +281,18 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     if (m_CurrentDefaultAnimation != anim_state)
                     {
+#if DEBUG
+                        m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state, m_AgentID);
+#endif
                         StopAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
                         m_CurrentDefaultAnimation = anim_state;
                         PlayAnimation(m_AnimationOverride[anim_state], UUID.Zero);
                     }
                 }
+            }
+            else
+            {
+                m_Log.ErrorFormat("Unexpected anim_state {0} set for agent {1}.", anim_state, m_AgentID);
             }
         }
 

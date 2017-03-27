@@ -269,7 +269,7 @@ namespace SilverSim.Scene.Physics.Common
                 {
                     m_Agent.SetDefaultAnimation("flying");
                 }
-                if (m_Agent.Velocity.X * m_Agent.Velocity.X + m_Agent.Velocity.Y * m_Agent.Velocity.Y > 0.001)
+                else if (m_Agent.Velocity.X * m_Agent.Velocity.X + m_Agent.Velocity.Y * m_Agent.Velocity.Y > 0.001)
                 {
                     m_Agent.SetDefaultAnimation("flyingslow");
                 }
@@ -327,7 +327,7 @@ namespace SilverSim.Scene.Physics.Common
             forces.Add(LinearRestitutionMotor(m_Agent, RestitutionInputFactor, Vector3.Zero));
 
             /* let us allow advanced physics force input to be used on agents */
-                foreach (ObjectGroup grp in m_Agent.Attachments.All)
+            foreach (ObjectGroup grp in m_Agent.Attachments.All)
             {
                 foreach (KeyValuePair<UUID, Vector3> kvp in grp.AttachedForces)
                 {
