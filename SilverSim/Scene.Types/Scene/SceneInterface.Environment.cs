@@ -44,7 +44,8 @@ namespace SilverSim.Scene.Types.Scene
 
             internal LocationInfoProvider(TerrainController terrain, RegionSettings regionSettings)
             {
-
+                m_TerrainController = terrain;
+                m_RegionSettings = regionSettings;
             }
 
             public LocationInfo At(Vector3 pos)
