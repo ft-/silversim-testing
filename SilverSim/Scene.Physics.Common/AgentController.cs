@@ -26,7 +26,6 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -56,7 +55,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             ControlLinearInputFactor = 10;
             ControlRotationalInputFactor = 10;
-            RestitutionInputFactor = 0.8;
+            RestitutionInputFactor = 3.2;
             m_Agent = agent;
             m_StateData = new PhysicsStateData(agent, sceneID);
             m_LocInfoProvider = locInfoProvider;
@@ -290,7 +289,7 @@ namespace SilverSim.Scene.Physics.Common
             }
             else
             {
-                bool isfalling = m_Agent.Velocity.Z < -0.001;
+                bool isfalling = m_Agent.GlobalPositionOnGround.Z - m_LocInfoProvider.At(m_Agent.GlobalPosition).GroundHeight > 0.1;
                 bool standing_still = m_Agent.Velocity.HorizontalLength < 0.01;
                 bool turning_left = m_Agent.AngularVelocity.Z < -0.001;
                 bool turning_right = m_Agent.AngularVelocity.Z > 0.001;

@@ -275,6 +275,16 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public Vector3 GlobalPositionOnGround
+        {
+            get
+            {
+                Vector3 v = GlobalPosition;
+                v.Z -= m_AvatarSize.Z / 2;
+                return v;
+            }
+        }
+
         private Vector3 m_GlobalPosition = Vector3.Zero;
 
         public Vector3 Position

@@ -39,7 +39,6 @@ using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Estate;
-using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
@@ -286,6 +285,8 @@ namespace SilverSim.Scene.Types.Agent
             get;
             set;
         }
+
+        Vector3 GlobalPositionOnGround { get; }
 
         Quaternion BodyRotation { get; set; }
 
