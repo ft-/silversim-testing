@@ -41,6 +41,9 @@ namespace SilverSim.Scene.Types.Physics
 
         double Buoyancy { get; set; }
 
+        Vector3 Torque { get; }
+        Vector3 Force { get; }
+
         /* Vehicle model is now accessed through shared memory class VehicleParams */
 
         void TransferState(IPhysicsObject target, Vector3 positionOffset);

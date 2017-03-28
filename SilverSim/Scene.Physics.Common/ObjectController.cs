@@ -48,6 +48,9 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        public abstract Vector3 Torque { get; }
+        public abstract Vector3 Force { get; }
+
         protected ObjectController(ObjectPart part, UUID sceneID, SceneInterface.LocationInfoProvider locInfoProvider)
         {
             SceneID = sceneID;

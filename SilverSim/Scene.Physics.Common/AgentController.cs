@@ -51,6 +51,9 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        public abstract Vector3 Torque { get; }
+        public abstract Vector3 Force { get; }
+
         protected AgentController(IAgent agent, UUID sceneID, SceneInterface.LocationInfoProvider locInfoProvider)
         {
             ControlLinearInputFactor = 10;
