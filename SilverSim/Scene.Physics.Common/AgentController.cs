@@ -292,13 +292,20 @@ namespace SilverSim.Scene.Physics.Common
             }
             else
             {
+                Vector3 angularVelocity = m_Agent.AngularVelocity;
+                Vector3 linearVelocity = m_Agent.Velocity;
                 bool isfalling = m_Agent.GlobalPositionOnGround.Z - m_LocInfoProvider.At(m_Agent.GlobalPosition).GroundHeight > 0.1;
-                bool standing_still = m_Agent.Velocity.HorizontalLength < 0.01;
-                bool turning_left = m_Agent.AngularVelocity.Z < -0.001;
-                bool turning_right = m_Agent.AngularVelocity.Z > 0.001;
-                if(isfalling)
+                bool standing_still = linearVelocity.HorizontalLength < 0.01;
+                bool turning_left = angularVelocity.Z < -0.001;
+                bool turning_right = angularVelocity.Z > 0.001;
+
+                if (isfalling)
                 {
                     m_Agent.SetDefaultAnimation("falling down");
+                }
+                else if (!standing_still)
+                {
+                    m_Agent.SetDefaultAnimation(m_Agent.IsRunning ? "running" : "walking");
                 }
                 else if (turning_left)
                 {
@@ -308,17 +315,9 @@ namespace SilverSim.Scene.Physics.Common
                 {
                     m_Agent.SetDefaultAnimation("turning right");
                 }
-                else if (standing_still)
-                {
-                    m_Agent.SetDefaultAnimation("standing");
-                }
-                else if(m_Agent.IsRunning)
-                {
-                    m_Agent.SetDefaultAnimation("running");
-                }
                 else
                 {
-                    m_Agent.SetDefaultAnimation("walking");
+                    m_Agent.SetDefaultAnimation("standing");
                 }
                 /* TODO: implement crouching, crouchwalking, striding, prejumping, jumping, soft landing */
             }
