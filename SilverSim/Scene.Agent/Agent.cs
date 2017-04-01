@@ -772,9 +772,15 @@ namespace SilverSim.Scene.Agent
                     case ObjectDetailsType.LastOwner:
                     case ObjectDetailsType.Owner:
                     case ObjectDetailsType.Creator:
-                    case ObjectDetailsType.Root:
                     case ObjectDetailsType.RezzerKey:
                         paramList.Add(ID);
+                        break;
+
+                    case ObjectDetailsType.Root:
+                        {
+                            ObjectGroup grp = SittingOnObject;
+                            paramList.Add(grp != null ? grp.ID : ID);
+                        }
                         break;
 
                     case ObjectDetailsType.Group:

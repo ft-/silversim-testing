@@ -129,6 +129,8 @@ namespace SilverSim.Viewer.Core
             ControlFlags agentControlFlags = m_ActiveAgentControlFlags & (~IgnoredControls);
             Vector3 agentMovementDirection = Vector3.Zero;
 
+            m_IsFlying = agentControlFlags.HasFly() && ((IAgentPhysicsObject)PhysicsActor).IsPhysicsActive;
+
             if (SittingOnObject != null)
             {
                 /* agent is sitting on object */
@@ -231,11 +233,12 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        bool m_IsFlying;
         public override bool IsFlying
         {
             get
             {
-                return false; /* TODO: implement flying state */
+                return m_IsFlying;
             }
         }
 
