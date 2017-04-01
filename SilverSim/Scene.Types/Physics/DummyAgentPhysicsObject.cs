@@ -22,6 +22,7 @@
 using SilverSim.Types;
 using System.Diagnostics.CodeAnalysis;
 using System;
+using SilverSim.Types.Agent;
 
 namespace SilverSim.Scene.Types.Physics
 {
@@ -88,6 +89,11 @@ namespace SilverSim.Scene.Types.Physics
         }
 
         public void SetControlDirectionalInput(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
+
+        public void SetControlFlags(ControlFlags flags)
         {
             /* intentionally left empty */
         }

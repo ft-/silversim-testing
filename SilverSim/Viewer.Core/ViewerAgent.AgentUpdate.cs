@@ -189,11 +189,16 @@ namespace SilverSim.Viewer.Core
             }
 
             agentMovementDirection *= BodyRotation; /* adjust directional vector */
-            if (m_IsRunning)
+            if(IsFlying)
             {
-                agentMovementDirection *= 1.5f;
+                agentMovementDirection *= 5f;
+            }
+            else if (m_IsRunning)
+            {
+                agentMovementDirection *= 1.6f;
             }
             ((IAgentPhysicsObject)PhysicsActor).SetControlDirectionalInput(agentMovementDirection);
+            ((IAgentPhysicsObject)PhysicsActor).SetControlFlags(agentControlFlags);
         }
 
         [PacketHandler(MessageType.SetAlwaysRun)]

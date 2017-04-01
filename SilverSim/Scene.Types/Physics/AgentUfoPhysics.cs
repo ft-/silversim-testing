@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using System.Diagnostics.CodeAnalysis;
 using System.Timers;
 
@@ -126,6 +127,11 @@ namespace SilverSim.Scene.Types.Physics
         }
 
         public void SetAngularImpulse(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
+
+        public void SetControlFlags(ControlFlags flags)
         {
             /* intentionally left empty */
         }

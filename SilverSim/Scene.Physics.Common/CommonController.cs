@@ -161,12 +161,5 @@ namespace SilverSim.Scene.Physics.Common
             return new PositionalForce("TargetVelocityMotor", (targetvel - obj.Velocity) * factor, pos);
         }
         #endregion
-
-        #region Target Rotation Motor
-        protected Vector3 TargetRotationMotor(IPhysicalObject obj, Quaternion targetrot, double factor)
-        {
-            return (targetrot / obj.Rotation).AsVector3 * factor;
-        }
-        #endregion
     }
 }
