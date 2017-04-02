@@ -97,6 +97,7 @@ namespace SilverSim.Scene.Types.Scene
             part.NextOwnerMask = p.NextOwnerPermissions;
             part.GroupMask = p.GroupPermissions;
             group.Group.ID = p.GroupID;
+            part.ObjectGroup = group;
             
             return RezObject(group, rezparams);
         }
