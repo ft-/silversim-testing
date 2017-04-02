@@ -20,9 +20,19 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Physics
 {
+    public struct RayResult
+    {
+        public UUID ObjectId;
+        public UUID PartId;
+        public Vector3 HitNormalWorld;
+        public Vector3 HitPointWorld;
+        public bool IsTerrain;
+    }
+
     public interface IPhysicsScene
     {
         void RemoveAll();
@@ -40,5 +50,8 @@ namespace SilverSim.Scene.Types.Physics
         uint PhysicsFrameNumber { get; }
 
         string PhysicsEngineName { get; }
+
+        RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld);
+        RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld);
     }
 }

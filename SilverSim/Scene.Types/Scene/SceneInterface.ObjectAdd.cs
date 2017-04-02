@@ -41,6 +41,8 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            ObjectAdd(p);
         }
 
         public UInt32 ObjectAdd(ObjectAdd p)

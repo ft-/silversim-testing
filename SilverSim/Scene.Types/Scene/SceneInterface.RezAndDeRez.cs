@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -52,6 +53,22 @@ namespace SilverSim.Scene.Types.Scene
             public InventoryPermissionsMask NextOwnerMask;
         }
 
+        Vector3 CalculateTargetedRezLocation(
+            RayResult ray,
+            Vector3 scale,
+            Vector3 projectedWaterLocation)
+        {
+            Vector3 pos = ray.HitNormalWorld.Cross(scale);
+            pos *= 0.5;
+            pos += ray.HitPointWorld;
+
+            if (projectedWaterLocation.Z > pos.Z)
+            {
+                pos = projectedWaterLocation;
+            }
+            return pos;
+        }
+
         public Vector3 CalculateRezLocation(
             RezObjectParams rezparams,
             Vector3 scale)
@@ -62,22 +79,65 @@ namespace SilverSim.Scene.Types.Scene
                 return rezparams.RayEnd;
             }
 
-            if(rezparams.RayTargetID != UUID.Zero)
+            Vector3 projectedWaterLocation = Vector3.Zero;
+            double waterHeight = RegionSettings.WaterHeight;
+            if(rezparams.RayStart.Z > waterHeight && rezparams.RayEnd.Z < waterHeight)
             {
-                ObjectPart target;
-                if(Primitives.TryGetValue(rezparams.RayTargetID, out target))
+                Vector3 dir = rezparams.RayEnd - rezparams.RayStart;
+                double ratio = (waterHeight - rezparams.RayStart.Z) / dir.Z;
+
+                projectedWaterLocation = rezparams.RayStart;
+                projectedWaterLocation.X += (ratio * dir.X);
+                projectedWaterLocation.Y += (ratio * dir.Y);
+                projectedWaterLocation.Z = waterHeight;
+            }
+            else
+            {
+                projectedWaterLocation.Z = waterHeight;
+            }
+
+            ObjectPart target;
+            if (Primitives.TryGetValue(rezparams.RayTargetID, out target))
+            {
+                pos = target.GlobalPosition;
+            }
+            RayResult[] results = PhysicsScene.ClosestRayTest(rezparams.RayStart, pos);
+
+            if (rezparams.RayTargetID != UUID.Zero)
+            {
+                foreach(RayResult ray in results)
                 {
-                    pos = target.GlobalPosition;
-#warning Implement raycasting object
-                }
-                else
-                {
-#warning implement raycasting scene
+                    if(ray.PartId == rezparams.RayTargetID)
+                    {
+                        return CalculateTargetedRezLocation(ray, scale, projectedWaterLocation);
+                    }
                 }
             }
             else
             {
-#warning implement this with ground location placement calculation
+                foreach (RayResult ray in results)
+                {
+                    if (ray.IsTerrain)
+                    {
+                        return CalculateTargetedRezLocation(ray, scale, projectedWaterLocation);
+                    }
+                }
+            }
+
+            if(results.Length > 0)
+            {
+                return CalculateTargetedRezLocation(results[0], scale, projectedWaterLocation);
+            }
+            else
+            {
+                pos = rezparams.RayEnd;
+                LocationInfo info = GetLocationInfoProvider().At(pos);
+                pos.Z = info.GroundHeight;
+                if(pos.Z < info.WaterHeight)
+                {
+                    pos.Z = info.WaterHeight;
+                }
+                pos.Z += scale.Z * 0.5;
             }
             return pos;
         }

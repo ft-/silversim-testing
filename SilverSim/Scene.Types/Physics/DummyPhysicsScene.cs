@@ -113,5 +113,15 @@ namespace SilverSim.Scene.Types.Physics
                 return 0;
             }
         }
+
+        public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld)
+        {
+            return new RayResult[0];
+        }
+
+        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld)
+        {
+            return new RayResult[0];
+        }
     }
 }

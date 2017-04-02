@@ -312,7 +312,7 @@ namespace SilverSim.Scene.Physics.Common
                 double groundHeightDiff = m_Agent.GlobalPositionOnGround.Z - m_LocInfoProvider.At(m_Agent.GlobalPosition).GroundHeight;
                 bool isfalling = groundHeightDiff > 0.1;
                 bool standing_still = horizontalVelocity < StandstillSpeedThreshold;
-                bool iscrouching = groundHeightDiff < -0.1;
+                bool iscrouching = false; // groundHeightDiff < -0.1;
 
                 Vector3 bodyRotDiff = m_Agent.BodyRotation.GetEulerAngles() - m_LastKnownBodyRotation.GetEulerAngles();
 
