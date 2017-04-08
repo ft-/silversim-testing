@@ -37,13 +37,14 @@ namespace SilverSim.Scene.Types.Physics
     [Flags]
     public enum RayTestHitFlags : ulong
     {
-        All = 0,
+        All = ~0UL,
         Phantom = 1,
         NonPhantom = 2,
         Physical = 4,
         NonPhysical = 8,
         Avatar = 16,
         Character = 32,
+        Terrain = 64,
     }
 
     public interface IPhysicsScene
