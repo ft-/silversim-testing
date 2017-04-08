@@ -26,6 +26,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -98,6 +99,9 @@ namespace SilverSim.Scene.Types.Scene
             part.GroupMask = p.GroupPermissions;
             group.Group.ID = p.GroupID;
             part.ObjectGroup = group;
+            TextureEntry te = new TextureEntry();
+            te.DefaultTexture = new TextureEntryFace(null);
+            part.TextureEntry = te;
             
             return RezObject(group, rezparams);
         }

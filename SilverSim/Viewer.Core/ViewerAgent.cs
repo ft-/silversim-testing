@@ -823,6 +823,12 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
                 ObjectPart part;
+                ObjectGroup sittingOn = SittingOnObject;
+                if(sittingOn != null)
+                {
+                    sittingOn.AgentSitting.UnSit(this);
+                }
+
                 if(scene.Primitives.TryGetValue(sitreq.TargetID, out part))
                 {
                     ObjectGroup grp = part.ObjectGroup;
@@ -831,8 +837,7 @@ namespace SilverSim.Viewer.Core
                         ObjectPart sitOnLink;
                         Vector3 sitOffset;
                         Quaternion sitRotation;
-                        grp.AgentSitting.CheckSittable(this, out sitOffset, out sitRotation, out sitOnLink, sitreq.Offset, grp.RootPart != part ? part.LinkNumber : -1);
-                        if(null == sitOnLink)
+                        if(!grp.AgentSitting.CheckSittable(this, out sitOffset, out sitRotation, out sitOnLink, sitreq.Offset, grp.RootPart != part ? part.LinkNumber : -1))
                         {
                             return;
                         }

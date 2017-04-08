@@ -1185,7 +1185,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
-            public void CheckSittable(IAgent agent, out Vector3 sitPosition, out Quaternion sitRotation, out ObjectPart sitOnTarget, Vector3 preferedOffset, int preferedLinkNumber = -1)
+            public bool CheckSittable(IAgent agent, out Vector3 sitPosition, out Quaternion sitRotation, out ObjectPart sitOnTarget, Vector3 preferedOffset, int preferedLinkNumber = -1)
             {
                 sitOnTarget = null;
                 lock (m_SitLock)
@@ -1221,7 +1221,7 @@ namespace SilverSim.Scene.Types.Object
                         {
                             sitPosition = Vector3.Zero;
                             sitRotation = Quaternion.Identity;
-                            return;
+                            return false;
                         }
                         sitOnTarget = m_Group.RootPart;
                     }
@@ -1238,6 +1238,8 @@ namespace SilverSim.Scene.Types.Object
                     sitRotation = Quaternion.Identity;
 #warning Implement Unscripted sit here
                 }
+
+                return sitOnTarget != null;
             }
 
             public bool UnSit(IAgent agent)
