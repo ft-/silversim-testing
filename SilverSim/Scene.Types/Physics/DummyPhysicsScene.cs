@@ -133,5 +133,10 @@ namespace SilverSim.Scene.Types.Physics
         {
             return new RayResult[0];
         }
+
+        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits)
+        {
+            return new RayResult[0];
+        }
     }
 }
