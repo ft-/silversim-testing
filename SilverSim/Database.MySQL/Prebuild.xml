@@ -28,7 +28,7 @@
   <Reference name="SilverSim.Viewer.Messages" localCopy="false"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
-  <Reference name="MySql.Data" localCopy="false"/>
+  <Reference name="MySql.Data" path="../../bin" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">

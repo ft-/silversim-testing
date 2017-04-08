@@ -52,6 +52,8 @@ namespace SilverSim.Scene.Types.Pathfinding
         ResolvePathStatus TryResolvePath(Vector3 fromPos, Vector3 toPos, CharacterInfo characterInfo, out List<WaypointData> waypoints);
         bool TryGetClosestNavPoint(Vector3 targetPoint, double distanceLimit, bool useStaticOnly, CharacterType type, out Vector3 navPoint);
         void Stop();
+        void TriggerRebuild();
+        bool IsDynamicEnabled { get; }
     }
 
     public interface IPathfindingServiceFactory
