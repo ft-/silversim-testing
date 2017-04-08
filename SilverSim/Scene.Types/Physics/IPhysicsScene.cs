@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Types.Physics
 {
@@ -31,6 +32,18 @@ namespace SilverSim.Scene.Types.Physics
         public Vector3 HitNormalWorld;
         public Vector3 HitPointWorld;
         public bool IsTerrain;
+    }
+
+    [Flags]
+    public enum RayTestHitFlags : ulong
+    {
+        All = 0,
+        Phantom = 1,
+        NonPhantom = 2,
+        Physical = 4,
+        NonPhysical = 8,
+        Avatar = 16,
+        Character = 32,
     }
 
     public interface IPhysicsScene
@@ -51,7 +64,12 @@ namespace SilverSim.Scene.Types.Physics
 
         string PhysicsEngineName { get; }
 
+        /* following two hit everything */
         RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld);
         RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld);
+
+        /* next two hit specific based on flags */
+        RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags);
+        RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags);
     }
 }
