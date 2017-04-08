@@ -307,6 +307,24 @@ namespace SilverSim.Types
             return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
         }
 
+        public Vector3 ComponentMin(Vector3 b)
+        {
+            Vector3 res = new Vector3();
+            res.X = Math.Min(X, b.X);
+            res.Y = Math.Min(Y, b.Y);
+            res.Z = Math.Min(Z, b.Z);
+            return res;
+        }
+
+        public Vector3 ComponentMax(Vector3 b)
+        {
+            Vector3 res = new Vector3();
+            res.X = Math.Max(X, b.X);
+            res.Y = Math.Max(Y, b.Y);
+            res.Z = Math.Max(Z, b.Z);
+            return res;
+        }
+
         /// <summary>
         /// Get a formatted string representation of the vector
         /// </summary>
