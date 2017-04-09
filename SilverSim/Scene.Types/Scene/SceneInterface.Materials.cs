@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -227,24 +228,21 @@ namespace SilverSim.Scene.Types.Scene
             byte[] buf;
             using (MemoryStream ms = new MemoryStream())
             {
-                using (GZipStream gz = new GZipStream(ms, CompressionMode.Compress))
+                byte[] zlibheader = new byte[2] { 0x78, 0xDA };
+                ms.Write(zlibheader, 0, 2);
+
+                AnArray matArray = new AnArray();
+                foreach(KeyValuePair<UUID, Material> kvp in m_Materials)
                 {
-                    using (XmlTextWriter writer = gz.UTF8XmlTextWriter())
-                    {
-                        writer.WriteStartElement("llsd");
-                        writer.WriteStartElement("array");
-                        foreach (KeyValuePair<UUID, Material> kvp in m_Materials)
-                        {
-                            writer.WriteStartElement("map");
-                            writer.WriteNamedValue("key", "ID");
-                            writer.WriteNamedValue("uuid", kvp.Key);
-                            writer.WriteNamedValue("key", "Material");
-                            kvp.Value.WriteMap(writer);
-                            writer.WriteEndElement();
-                        }
-                        writer.WriteEndElement();
-                        writer.WriteEndElement();
-                    }
+                    Map matData = new Map();
+                    matData.Add("ID", kvp.Key);
+                    matData.Add("Material", kvp.Value.WriteMap());
+                    matArray.Add(matData);
+                }
+
+                using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Compress))
+                {
+                    LlsdBinary.Serialize(matArray, gz);
                 }
                 buf = ms.ToArray();
             }

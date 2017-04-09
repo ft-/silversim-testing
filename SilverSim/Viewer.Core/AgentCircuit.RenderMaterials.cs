@@ -97,9 +97,11 @@ namespace SilverSim.Viewer.Core
                 {
                     using (MemoryStream ms = new MemoryStream((BinaryData)reqmap["Zipped"]))
                     {
-                        using (GZipStream gz = new GZipStream(ms, CompressionMode.Decompress))
+                        byte[] skipheader = new byte[2];
+                        ms.Read(skipheader, 0, 2);
+                        using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Decompress))
                         {
-                            IValue inp = LlsdXml.Deserialize(gz);
+                            IValue inp = LlsdBinary.Deserialize(gz);
                             zippedDataArray = inp as AnArray;
                             zippedDataMap = inp as Map;
                         }
@@ -191,7 +193,9 @@ namespace SilverSim.Viewer.Core
             byte[] buf;
             using (MemoryStream ms = new MemoryStream())
             {
-                using (GZipStream gz = new GZipStream(ms, CompressionMode.Compress))
+                byte[] zlibheader = new byte[] { 0x78, 0xDA };
+                ms.Write(zlibheader, 0, 2);
+                using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Compress))
                 {
                     using (XmlTextWriter writer = gz.UTF8XmlTextWriter())
                     {

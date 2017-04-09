@@ -208,6 +208,34 @@ namespace SilverSim.Types.Asset.Format
             w.WriteEndElement();
         }
 
+        public Map WriteMap()
+        {
+            Map w = new Map();
+            w.Add("AlphaMaskCutoff", AlphaMaskCutoff);
+            w.Add("DiffuseAlphaMode", DiffuseAlphaMode);
+            w.Add("EnvIntensity", EnvIntensity);
+            w.Add("NormMap", NormMap);
+            w.Add("NormOffsetX", NormOffsetX);
+            w.Add("NormOffsetY", NormOffsetY);
+            w.Add("NormRepeatX", NormRepeatX);
+            w.Add("NormRepeatY", NormRepeatY);
+            w.Add("NormRotation", NormRotation);
+            AnArray spec = new AnArray();
+            spec.Add(SpecColor.R_AsByte);
+            spec.Add(SpecColor.G_AsByte);
+            spec.Add(SpecColor.B_AsByte);
+            spec.Add(SpecColor.A_AsByte);
+            w.Add("SpecColor", spec);
+            w.Add("SpecExp", SpecExp);
+            w.Add("SpecMap", SpecMap);
+            w.Add("SpecOffsetX", SpecOffsetX);
+            w.Add("SpecOffsetY", SpecOffsetY);
+            w.Add("SpecRepeatX", SpecRepeatX);
+            w.Add("SpecRepeatY", SpecRepeatY);
+            w.Add("SpecRotation", SpecRotation);
+            return w;
+        }
+
         public static implicit operator AssetData(Material v)
         {
             AssetData asset = new AssetData();
