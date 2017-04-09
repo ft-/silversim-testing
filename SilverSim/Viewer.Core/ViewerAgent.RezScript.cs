@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Core
             AgentCircuit circuit;
             try
             {
-                circuit = Circuits[req.InventoryBlock.FolderID];
+                circuit = Circuits[req.CircuitSceneID];
                 scene = circuit.Scene;
                 part = scene.Primitives[req.InventoryBlock.FolderID];
             }
