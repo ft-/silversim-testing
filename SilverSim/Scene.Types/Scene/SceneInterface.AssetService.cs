@@ -203,12 +203,11 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                AssetData ad;
-                if(ResourceAssets.TryGetValue(key, out ad))
+                if(ResourceAssets.TryGetValue(key, out assetData))
                 {
-                    ad.Local = false;
-                    ad.Temporary = false;
-                    m_Scene.PersistentAssetService.Store(ad);
+                    assetData.Local = false;
+                    assetData.Temporary = false;
+                    m_Scene.PersistentAssetService.Store(assetData);
                     return true;
                 }
 

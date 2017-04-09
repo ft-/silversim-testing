@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
@@ -235,6 +236,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
+
             UInt32 localID;
             try
             {

@@ -194,6 +194,7 @@ namespace SilverSim.Scene.Types.Object
             IsChanged = false;
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;
+            m_TextureEntryBytes = m_TextureEntry.GetBytes();
             m_ObjectUpdateInfo = new ObjectUpdateInfo(this);
         }
         #endregion

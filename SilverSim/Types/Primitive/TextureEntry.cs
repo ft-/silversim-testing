@@ -37,7 +37,7 @@ namespace SilverSim.Types.Primitive
 
         public TextureEntry()
         {
-
+            DefaultTexture = new TextureEntryFace(null);
         }
         
         public TextureEntry(byte[] data, int pos, int length)

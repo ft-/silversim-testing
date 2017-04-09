@@ -19,14 +19,15 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Object;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Object;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -92,17 +93,32 @@ namespace SilverSim.Scene.Types.Scene
             pshape.State = p.State;
             group.AttachPoint = p.LastAttachPoint;
 
+            part.Size = Vector3.One / 2.0;
             part.BaseMask = p.BasePermissions;
             part.EveryoneMask = p.EveryOnePermissions;
             part.OwnerMask = p.CurrentPermissions;
             part.NextOwnerMask = p.NextOwnerPermissions;
             part.GroupMask = p.GroupPermissions;
+            part.Shape = pshape;
             group.Group.ID = p.GroupID;
             part.ObjectGroup = group;
-            TextureEntry te = new TextureEntry();
-            te.DefaultTexture = new TextureEntryFace(null);
-            part.TextureEntry = te;
-            
+            part.Size = Vector3.One / 2f;
+
+            /* initial setup of object */
+            part.UpdateData(ObjectPart.UpdateDataFlags.All);
+
+            RwLockedList<UUID> selectedList = agent.SelectedObjects(ID);
+            IList<UUID> oldList = selectedList.GetAndClear();
+            foreach(UUID old in oldList)
+            {
+                ObjectPart oldSelectedPart;
+                if(Primitives.TryGetValue(old, out oldSelectedPart))
+                {
+                    agent.ScheduleUpdate(oldSelectedPart.UpdateInfo, ID);
+                }
+            }
+            selectedList.Add(part.ID);
+
             return RezObject(group, rezparams);
         }
     }
