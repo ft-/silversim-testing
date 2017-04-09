@@ -197,22 +197,8 @@ namespace SilverSim.Viewer.Core
                 ms.Write(zlibheader, 0, 2);
                 using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Compress))
                 {
-                    using (XmlTextWriter writer = gz.UTF8XmlTextWriter())
-                    {
-                        writer.WriteStartElement("llsd");
-                        writer.WriteStartElement("array");
-                        foreach (Material matdata in materials)
-                        {
-                            writer.WriteStartElement("map");
-                            writer.WriteNamedValue("key", "ID");
-                            writer.WriteNamedValue("uuid", matdata.MaterialID);
-                            writer.WriteNamedValue("key", "Material");
-                            matdata.WriteMap(writer);
-                            writer.WriteEndElement();
-                        }
-                        writer.WriteEndElement();
-                        writer.WriteEndElement();
-                    }
+                    byte[] matdata = Scene.MaterialsData;
+                    gz.Write(matdata, 0, matdata.Length);
                 }
                 buf = ms.ToArray();
             }
