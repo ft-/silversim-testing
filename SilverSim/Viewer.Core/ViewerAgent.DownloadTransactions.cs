@@ -72,10 +72,10 @@ namespace SilverSim.Viewer.Core
                     m_DownloadTransfers.Remove(req.Filename);
                     tdata.Position += res.Data.Length;
                 }
-                tdata.Data[0] = (byte)(tdata.Data.Length & 0xFF);
-                tdata.Data[1] = (byte)((tdata.Data.Length >> 8) & 0xFF);
-                tdata.Data[2] = (byte)((tdata.Data.Length >> 16) & 0xFF);
-                tdata.Data[3] = (byte)((tdata.Data.Length >> 24) & 0xFF);
+                res.Data[0] = (byte)(tdata.Data.Length & 0xFF);
+                res.Data[1] = (byte)((tdata.Data.Length >> 8) & 0xFF);
+                res.Data[2] = (byte)((tdata.Data.Length >> 16) & 0xFF);
+                res.Data[3] = (byte)((tdata.Data.Length >> 24) & 0xFF);
                 res.Packet = 0;
                 res.ID = tdata.XferID;
                 SendMessageAlways(res, req.CircuitSceneID);
