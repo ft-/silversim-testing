@@ -63,6 +63,34 @@ namespace SilverSim.Scene.Types.Scene
             instance.PostEvent(new ResetScriptEvent());
         }
 
+        [PacketHandler(MessageType.GetScriptRunning)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        internal void HandleGetScriptRunning(Message m)
+        {
+            GetScriptRunning req = (GetScriptRunning)m;
+
+            IAgent agent;
+            Script.ScriptInstance instance;
+            ObjectPart part;
+            ObjectPartInventoryItem item;
+            if (!Primitives.TryGetValue(req.ObjectID, out part) ||
+                !part.Inventory.TryGetValue(req.ItemID, out item) ||
+                !Agents.TryGetValue(req.CircuitAgentID, out agent) ||
+                !part.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify) ||
+                !item.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify))
+            {
+                return;
+            }
+            instance = item.ScriptInstance;
+
+            ScriptRunningReply reply = new ScriptRunningReply();
+            reply.ItemID = req.ItemID;
+            reply.ObjectID = req.ObjectID;
+            reply.IsRunning = instance.IsRunning ? instance.IsRunning : false;
+
+            agent.SendMessageAlways(reply, ID);
+        }
+
         [PacketHandler(MessageType.ScriptAnswerYes)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleScriptAnswerYes(Message m)

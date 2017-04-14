@@ -283,6 +283,8 @@ namespace SilverSim.Viewer.Core
             }
             if (denyLSLTextViaDirect && asset.Type == AssetType.LSLText)
             {
+                m_Log.DebugFormat("Failed to request (TransferRequest) for Agent {0}: Insufficient permissions", AgentID);
+                SendAssetInsufficientPermissions(req);
                 return;
             }
 
