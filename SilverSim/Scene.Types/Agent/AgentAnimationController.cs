@@ -131,8 +131,7 @@ namespace SilverSim.Scene.Types.Agent
             {
                 foreach (AnimationInfo ai in m_ActiveAnimations)
                 {
-                    m.AnimationList.Add(new AvatarAnimation.AnimationData(ai.AnimID, ai.AnimSeq));
-                    m.AnimationSourceList.Add(new AvatarAnimation.AnimationSourceData(ai.SourceID));
+                    m.AnimationList.Add(new AvatarAnimation.AnimationData(ai.AnimID, ai.AnimSeq, ai.SourceID));
                 }
             }
 

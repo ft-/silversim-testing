@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = (double)packetsSent * 1000f / dt;
 
             m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = agent != null ?
-                m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + agent.m_DownloadTransfers.Count :
+                m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + agent.m_DownloadTransfersByName.Count :
                 m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count;
 
             m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;

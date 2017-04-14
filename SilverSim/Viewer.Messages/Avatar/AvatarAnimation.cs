@@ -35,23 +35,16 @@ namespace SilverSim.Viewer.Messages.Avatar
         {
             public UUID AnimID;
             public UInt32 AnimSequenceID;
-            public AnimationData(UUID animID, UInt32 seqID)
+            public UUID ObjectID;
+
+            public AnimationData(UUID animID, UInt32 seqID, UUID objectID)
             {
                 AnimID = animID;
                 AnimSequenceID = seqID;
-            }
-        }
-        public List<AnimationData> AnimationList = new List<AnimationData>();
-
-        public struct AnimationSourceData
-        {
-            public UUID ObjectID;
-            public AnimationSourceData(UUID objectID)
-            {
                 ObjectID = objectID;
             }
         }
-        public List<AnimationSourceData> AnimationSourceList = new List<AnimationSourceData>();
+        public List<AnimationData> AnimationList = new List<AnimationData>();
 
         public struct PhysicalAvatarEventData
         {
@@ -73,8 +66,8 @@ namespace SilverSim.Viewer.Messages.Avatar
                 p.WriteUUID(d.AnimID);
                 p.WriteUInt32(d.AnimSequenceID);
             }
-            p.WriteUInt8((byte)AnimationSourceList.Count);
-            foreach(AnimationSourceData d in AnimationSourceList)
+            p.WriteUInt8((byte)AnimationList.Count);
+            foreach(AnimationData d in AnimationList)
             {
                 p.WriteUUID(d.ObjectID);
             }
@@ -101,9 +94,13 @@ namespace SilverSim.Viewer.Messages.Avatar
             n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                AnimationSourceData d = new AnimationSourceData();
-                d.ObjectID = p.ReadUUID();
-                m.AnimationSourceList.Add(d);
+                UUID objectID = p.ReadUUID();
+                if(m.AnimationList.Count > i)
+                {
+                    AnimationData d = m.AnimationList[(int)i];
+                    d.ObjectID = objectID;
+                    m.AnimationList[(int)i] = d;
+                }
             }
             n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)

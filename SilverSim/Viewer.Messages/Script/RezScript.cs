@@ -63,7 +63,7 @@ namespace SilverSim.Viewer.Messages.Script
             public UInt32 CRC;
         }
 
-        public InventoryData InventoryBlock;
+        public InventoryData InventoryBlock = new InventoryData();
 
         public RezScript()
         {

@@ -35,15 +35,17 @@ namespace SilverSim.Viewer.Core
             public uint Packet;
             public byte[] Data;
             public ulong XferID;
+            public string Filename;
 
-            public DownloadTransferData(byte[] data, ulong xferid)
+            public DownloadTransferData(byte[] data, string filename)
             {
                 Data = data;
-                XferID = xferid;
+                Filename = filename;
             }
         }
 
-        internal RwLockedDoubleDictionary<string, ulong, DownloadTransferData> m_DownloadTransfers = new RwLockedDoubleDictionary<string, ulong, DownloadTransferData>();
+        internal RwLockedDictionary<string, DownloadTransferData> m_DownloadTransfersByName = new RwLockedDictionary<string, DownloadTransferData>();
+        internal RwLockedDictionary<ulong, DownloadTransferData> m_DownloadTransfersByXferID = new RwLockedDictionary<ulong, DownloadTransferData>();
 
         [PacketHandler(MessageType.RequestXfer)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
@@ -51,7 +53,7 @@ namespace SilverSim.Viewer.Core
         {
             RequestXfer req = (RequestXfer)m;
             DownloadTransferData tdata;
-            if(m_DownloadTransfers.TryGetValue(req.Filename, out tdata))
+            if(m_DownloadTransfersByName.TryGetValue(req.Filename, out tdata))
             {
                 if(tdata.Position != 0)
                 {
@@ -59,17 +61,19 @@ namespace SilverSim.Viewer.Core
                 }
 
                 SendXferPacket res = new SendXferPacket();
-                if(tdata.Data.Length > 1400)
+                tdata.XferID = req.ID;
+                if (tdata.Data.Length > 1400)
                 {
                     res.Data = new byte[1400 + 4];
                     Buffer.BlockCopy(tdata.Data, 0, res.Data, 4, 1400);
                     tdata.Position += 1400;
+                    m_DownloadTransfersByXferID.Add(tdata.XferID, tdata);
                 }
                 else
                 {
                     res.Data = new byte[tdata.Data.Length + 4];
                     Buffer.BlockCopy(tdata.Data, 0, res.Data, 4, tdata.Data.Length);
-                    m_DownloadTransfers.Remove(req.Filename);
+                    m_DownloadTransfersByName.Remove(req.Filename);
                     tdata.Position += res.Data.Length;
                 }
                 res.Data[0] = (byte)(tdata.Data.Length & 0xFF);
@@ -88,7 +92,7 @@ namespace SilverSim.Viewer.Core
         {
             ConfirmXferPacket req = (ConfirmXferPacket)m;
             DownloadTransferData tdata;
-            if (m_DownloadTransfers.TryGetValue(req.ID, out tdata))
+            if (m_DownloadTransfersByXferID.TryGetValue(req.ID, out tdata))
             {
                 if (tdata.Packet != req.Packet || tdata.Position == 0)
                 {
@@ -97,18 +101,19 @@ namespace SilverSim.Viewer.Core
 
                 SendXferPacket res = new SendXferPacket();
                 res.Packet = ++tdata.Packet;
-                if (tdata.Data.Length > 1400)
+                int remaininglength = tdata.Data.Length - tdata.Position;
+                if (remaininglength > 1400)
                 {
                     res.Data = new byte[1400];
-                    Buffer.BlockCopy(tdata.Data, 0, res.Data, 0, 1400);
+                    Buffer.BlockCopy(tdata.Data, tdata.Position, res.Data, 0, 1400);
                     tdata.Position += 1400;
                 }
                 else
                 {
-                    res.Data = new byte[tdata.Data.Length];
-                    Buffer.BlockCopy(tdata.Data, 0, res.Data, 0, tdata.Data.Length);
-                    m_DownloadTransfers.Remove(req.ID);
-                    tdata.Position += res.Data.Length;
+                    res.Data = new byte[remaininglength];
+                    Buffer.BlockCopy(tdata.Data, tdata.Position, res.Data, 0, remaininglength);
+                    m_DownloadTransfersByXferID.Remove(req.ID);
+                    m_DownloadTransfersByName.Remove(tdata.Filename);
                 }
                 res.ID = tdata.XferID;
                 SendMessageAlways(res, req.CircuitSceneID);
@@ -118,8 +123,8 @@ namespace SilverSim.Viewer.Core
         public override ulong AddNewFile(string filename, byte[] data)
         {
             ulong xferid = NextXferID;
-            DownloadTransferData tdata = new DownloadTransferData(data, xferid);
-            m_DownloadTransfers.Add(filename, xferid, tdata);
+            DownloadTransferData tdata = new DownloadTransferData(data, filename);
+            m_DownloadTransfersByName.Add(filename, tdata);
             return xferid;
         }
     }
