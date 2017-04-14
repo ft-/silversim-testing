@@ -57,8 +57,16 @@ namespace SilverSim.Viewer.Messages.Appearance
             p.WriteBoolean(IsTrial);
             p.WriteUInt16((UInt16)TextureEntry.Length);
             p.WriteBytes(TextureEntry);
-            p.WriteUInt8((byte)VisualParams.Length);
-            p.WriteBytes(VisualParams);
+            if (VisualParams.Length > 255)
+            {
+                p.WriteUInt8(255);
+                p.WriteBytes(VisualParams, 255);
+            }
+            else
+            {
+                p.WriteUInt8((byte)VisualParams.Length);
+                p.WriteBytes(VisualParams);
+            }
             p.WriteUInt8((byte)AppearanceData.Count);
             foreach(AppearanceDataEntry d in AppearanceData)
             {

@@ -368,7 +368,12 @@ namespace SilverSim.Viewer.Messages
 
         private void WriteZeroEncoded(byte[] buf)
         {
-            for(int i = 0; i < buf.Length; ++i)
+            WriteZeroEncoded(buf, buf.Length);
+        }
+
+        private void WriteZeroEncoded(byte[] buf, int actlen)
+        {
+            for(int i = 0; i < actlen; ++i)
             {
                 byte b = buf[i];
                 if(b == 0)
@@ -1029,18 +1034,23 @@ namespace SilverSim.Viewer.Messages
 
         public void WriteBytes(byte[] buf)
         {
-            if(buf.Length == 0)
+            WriteBytes(buf, buf.Length);
+        }
+
+        public void WriteBytes(byte[] buf, int actlen)
+        {
+            if (buf.Length == 0)
             {
                 /* nothing to do */
             }
-            else if(IsZeroEncoded)
+            else if (IsZeroEncoded)
             {
-                WriteZeroEncoded(buf);
+                WriteZeroEncoded(buf, actlen);
             }
             else
             {
-                Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataPos += buf.Length;
+                Buffer.BlockCopy(buf, 0, Data, DataPos, actlen);
+                DataPos += actlen;
                 DataLength = DataPos;
             }
         }

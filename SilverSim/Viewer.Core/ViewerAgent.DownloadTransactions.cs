@@ -68,6 +68,7 @@ namespace SilverSim.Viewer.Core
                     Buffer.BlockCopy(tdata.Data, 0, res.Data, 4, 1400);
                     tdata.Position += 1400;
                     m_DownloadTransfersByXferID.Add(tdata.XferID, tdata);
+                    res.Packet = 0;
                 }
                 else
                 {
@@ -75,12 +76,12 @@ namespace SilverSim.Viewer.Core
                     Buffer.BlockCopy(tdata.Data, 0, res.Data, 4, tdata.Data.Length);
                     m_DownloadTransfersByName.Remove(req.Filename);
                     tdata.Position += res.Data.Length;
+                    res.Packet = 0x80000000;
                 }
                 res.Data[0] = (byte)(tdata.Data.Length & 0xFF);
                 res.Data[1] = (byte)((tdata.Data.Length >> 8) & 0xFF);
                 res.Data[2] = (byte)((tdata.Data.Length >> 16) & 0xFF);
                 res.Data[3] = (byte)((tdata.Data.Length >> 24) & 0xFF);
-                res.Packet = 0;
                 res.ID = tdata.XferID;
                 SendMessageAlways(res, req.CircuitSceneID);
             }
@@ -114,6 +115,7 @@ namespace SilverSim.Viewer.Core
                     Buffer.BlockCopy(tdata.Data, tdata.Position, res.Data, 0, remaininglength);
                     m_DownloadTransfersByXferID.Remove(req.ID);
                     m_DownloadTransfersByName.Remove(tdata.Filename);
+                    res.Packet |= 0x80000000;
                 }
                 res.ID = tdata.XferID;
                 SendMessageAlways(res, req.CircuitSceneID);
