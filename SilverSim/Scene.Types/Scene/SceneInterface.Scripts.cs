@@ -42,7 +42,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            IAgent agent;
+            IAgent agent = null;
             Script.ScriptInstance instance;
             ObjectPart part;
             ObjectPartInventoryItem item;
@@ -52,6 +52,10 @@ namespace SilverSim.Scene.Types.Scene
                 !part.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify) ||
                 !item.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify))
             {
+                if(null != agent)
+                {
+                    agent.SendAlertMessage("NOTIFY: CannotResetSelectObjectsNoPermission", ID);
+                }
                 return;
             }
             instance = item.ScriptInstance;

@@ -241,7 +241,7 @@ namespace SilverSim.Viewer.Core
 
                     if (item.AssetType == AssetType.LSLText)
                     {
-                        if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryPermissionsMask.Modify))
+                        if(!item.CheckPermissions(Agent.Owner, Agent.Group, InventoryPermissionsMask.Modify))
                         {
                             SendAssetInsufficientPermissions(req);
                             return;
