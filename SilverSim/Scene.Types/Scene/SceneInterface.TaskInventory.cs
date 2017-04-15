@@ -111,6 +111,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.RemoveTaskInventory)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRemoveTaskInventory(Message m)
         {
             RemoveTaskInventory req = (RemoveTaskInventory)m;
