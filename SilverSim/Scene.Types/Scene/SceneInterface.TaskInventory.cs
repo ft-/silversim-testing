@@ -114,6 +114,58 @@ namespace SilverSim.Scene.Types.Scene
             return null != inventoryService && null != assetService;
         }
 
+        [PacketHandler(MessageType.MoveTaskInventory)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        internal void HandleMoveTaskInventory(Message m)
+        {
+            MoveTaskInventory req = (MoveTaskInventory)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.LocalID, out part))
+            {
+                return;
+            }
+
+            ObjectPartInventoryItem item;
+            if(!part.Inventory.TryGetValue(req.ItemID, out item))
+            {
+                return;
+            }
+
+            InventoryItem newItem = new InventoryItem(item);
+            newItem.ID = UUID.Random;
+
+            if(item.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
+            {
+                /* permissions okay */
+            }
+            else if(CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+            {
+                part.Inventory.Remove(item.ID);
+            }
+            else
+            {
+                /* we cannot edit */
+                return;
+            }
+            new ObjectTransferItem(agent,
+                this,
+                newItem.AssetID,
+                new List<InventoryItem>(new InventoryItem[] { newItem }),
+                req.FolderID, newItem.AssetType).QueueWorkItem();
+        }
+
         [PacketHandler(MessageType.RemoveTaskInventory)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRemoveTaskInventory(Message m)

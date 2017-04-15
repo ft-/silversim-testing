@@ -41,6 +41,7 @@ namespace SilverSim.Scene.Types.Scene
             protected readonly UUID m_SceneID;
             readonly List<InventoryItem> m_Items;
             readonly string m_DestinationFolder = string.Empty;
+            readonly UUID m_DestinationFolderID = UUID.Zero;
             protected readonly TryGetSceneDelegate TryGetScene;
             readonly AssetType m_DestinationFolderType = AssetType.Object;
 
@@ -57,6 +58,24 @@ namespace SilverSim.Scene.Types.Scene
                 m_SceneID = scene.ID;
                 m_Items = items;
                 m_DestinationFolder = destinationFolder;
+                TryGetScene = scene.TryGetScene;
+            }
+
+            public ObjectTransferItem(
+                IAgent agent,
+                SceneInterface scene,
+                UUID assetid,
+                List<InventoryItem> items,
+                UUID destinationFolderID,
+                AssetType destinationFolderType)
+                : base(agent.AssetService, scene.AssetService, assetid, ReferenceSource.Source)
+            {
+                m_InventoryService = agent.InventoryService;
+                m_DestinationAgent = agent.Owner;
+                m_SceneID = scene.ID;
+                m_Items = items;
+                m_DestinationFolderID = destinationFolderID;
+                m_DestinationFolderType = destinationFolderType;
                 TryGetScene = scene.TryGetScene;
             }
 
@@ -141,7 +160,8 @@ namespace SilverSim.Scene.Types.Scene
 
                 if (m_DestinationFolder.Length == 0)
                 {
-                    if (!m_InventoryService.Folder.TryGetValue(m_DestinationAgent.ID, m_DestinationFolderType, out folder))
+                    if(!(m_DestinationFolderID != UUID.Zero && m_InventoryService.Folder.TryGetValue(m_DestinationAgent.ID, m_DestinationFolderID, out folder)) &&
+                        !m_InventoryService.Folder.TryGetValue(m_DestinationAgent.ID, m_DestinationFolderType, out folder))
                     {
                         return;
                     }
