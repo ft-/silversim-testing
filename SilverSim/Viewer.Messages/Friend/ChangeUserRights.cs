@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Friends;
 using System;
 using System.Collections.Generic;
 
@@ -36,7 +37,7 @@ namespace SilverSim.Viewer.Messages.Friend
         public struct RightsEntry
         {
             public UUID AgentRelated;
-            public Int32 RelatedRights;
+            public FriendRightFlags RelatedRights;
         }
 
         public List<RightsEntry> Rights = new List<RightsEntry>();
@@ -54,7 +55,7 @@ namespace SilverSim.Viewer.Messages.Friend
             foreach(RightsEntry d in Rights)
             {
                 p.WriteUUID(d.AgentRelated);
-                p.WriteInt32(d.RelatedRights);
+                p.WriteUInt32((uint)d.RelatedRights);
             }
         }
 
@@ -68,7 +69,7 @@ namespace SilverSim.Viewer.Messages.Friend
             {
                 RightsEntry d = new RightsEntry();
                 d.AgentRelated = p.ReadUUID();
-                d.RelatedRights = p.ReadInt32();
+                d.RelatedRights = (FriendRightFlags)p.ReadUInt32();
                 m.Rights.Add(d);
             }
             return m;
