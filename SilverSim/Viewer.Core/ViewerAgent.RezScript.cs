@@ -199,7 +199,7 @@ namespace SilverSim.Viewer.Core
             item.Name = req.InventoryBlock.Name;
             item.AssetID = data.ID;
             item.Description = req.InventoryBlock.Description;
-            item.AssetType = Types.Asset.AssetType.LSLText;
+            item.AssetType = AssetType.LSLText;
             item.Creator = Owner;
             item.Flags = 0;
             item.Group = Group;
@@ -225,6 +225,7 @@ namespace SilverSim.Viewer.Core
                 instance = ScriptLoader.Load(part, item, item.Owner, data);
                 item.ScriptInstance = instance;
                 item.ScriptInstance.IsRunning = true;
+                item.ScriptInstance.Reset();
             }
             catch
             {

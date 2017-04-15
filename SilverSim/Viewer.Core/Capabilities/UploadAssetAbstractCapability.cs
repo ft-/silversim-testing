@@ -28,6 +28,7 @@ using System.IO;
 using System.Net;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using log4net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {

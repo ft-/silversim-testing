@@ -108,11 +108,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch
                 {
+                    m_Log.WarnFormat("Inventory not found for {0}", transactionID.ToString());
                     throw new UrlNotFoundException();
                 }
 
                 if (item.AssetType != data.Type)
                 {
+                    m_Log.WarnFormat("Wrong inventory type for {0}", transactionID.ToString());
                     throw new UrlNotFoundException();
                 }
 
@@ -139,27 +141,28 @@ namespace SilverSim.Viewer.Core.Capabilities
                 ScriptInstance instance;
                 try
                 {
-                    instance = item.RemoveScriptInstance;
-                    if(instance != null)
-                    {
-                        instance.Abort();
-                        instance.Remove();
-                        ScriptLoader.Remove(oldAssetID, instance);
-                    }
-                    item.ScriptInstance.Remove();
                     part.Inventory.Remove(kvp.Value.ItemID);
                     part.Inventory.Add(item.ID, item.Name, item);
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Failed to store inventory item: {0}\n{1}", e.Message, e.StackTrace);
+#endif
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreInventoryItem", "Failed to store inventory item"));
                 }
+
+                part.SendObjectUpdate();
 
                 try
                 {
                     instance = ScriptLoader.Load(part, item, item.Owner, data);
                     item.ScriptInstance = instance;
                     item.ScriptInstance.IsRunning = kvp.Value.IsScriptRunning;
+                    item.ScriptInstance.Reset();
                     m.Add("compiled", true);
                 }
                 catch (CompilerException e)
@@ -223,7 +226,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         {
             get
             {
-                return AssetType.Notecard;
+                return AssetType.LSLText;
             }
         }
     }
