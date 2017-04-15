@@ -33,7 +33,9 @@ using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Economy;
@@ -159,6 +161,10 @@ namespace SilverSim.Scene.Types.Scene
         public string GatekeeperURI { get; protected set; }
         public IScriptWorkerThreadPool ScriptThreadPool { get; protected set; }
         public Date m_StartTime = new Date();
+
+        protected List<IUserAgentServicePlugin> UserAgentServicePlugins = new List<IUserAgentServicePlugin>();
+        protected List<IAssetServicePlugin> AssetServicePlugins = new List<IAssetServicePlugin>();
+        protected List<IInventoryServicePlugin> InventoryServicePlugins = new List<IInventoryServicePlugin>();
 
         public string ProductName { get; set; }
 

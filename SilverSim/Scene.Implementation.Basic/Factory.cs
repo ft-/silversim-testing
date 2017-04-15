@@ -37,8 +37,10 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.PortControl;
+using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -85,6 +87,10 @@ namespace SilverSim.Scene.Implementation.Basic
         internal List<IPortControlServiceInterface> m_PortControlServices { get; private set; }
         internal IWindModelFactory m_WindModelFactory { get; private set; }
         internal IPathfindingServiceFactory m_PathfindingServiceFactory { get; private set; }
+
+        internal List<IUserAgentServicePlugin> UserAgentServicePlugins { get; private set; }
+        internal List<IAssetServicePlugin> AssetServicePlugins { get; private set; }
+        internal List<IInventoryServicePlugin> InventoryServicePlugins { get; private set; }
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -163,9 +169,12 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(servicename));
             }
-        }
+            UserAgentServicePlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
+            AssetServicePlugins = loader.GetServicesByValue<IAssetServicePlugin>();
+            InventoryServicePlugins = loader.GetServicesByValue<IInventoryServicePlugin>();
+    }
 
-        public override SceneInterface Instantiate(RegionInfo ri)
+    public override SceneInterface Instantiate(RegionInfo ri)
         {
             return new BasicScene(
                 this,

@@ -34,9 +34,12 @@ using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scripting.Common;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Neighbor;
+using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -543,6 +546,11 @@ namespace SilverSim.Scene.Implementation.Basic
             EstateService = sceneParams.m_EstateService;
             /* next line is there to break the circular dependencies */
             TryGetScene = m_Scenes.TryGetValue;
+
+            UserAgentServicePlugins.AddRange(sceneParams.UserAgentServicePlugins);
+            AssetServicePlugins.AddRange(sceneParams.AssetServicePlugins);
+            InventoryServicePlugins.AddRange(sceneParams.InventoryServicePlugins);
+
             #endregion
 
             #region Setup Region Data

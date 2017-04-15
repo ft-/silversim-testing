@@ -21,17 +21,96 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.ServiceInterfaces;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
+using SilverSim.Types.ServerURIs;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.TaskInventory;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Scene.Types.Scene
 {
+    [ServerParam("DoNotAddScriptsToTrashFolder", ParameterType = typeof(bool), DefaultValue = false)]
     public partial class SceneInterface
     {
+        bool m_DoNotAddScriptsToTrashFolderUpdatedLocal;
+        bool m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
+        bool m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal;
+
+        [ServerParam("DoNotAddScriptsToTrashFolder", ParameterType = typeof(bool))]
+        public void DoNotAddScriptsToTrashFolderUpdated(UUID regionID, string value)
+        {
+            ParameterUpdatedHandler(
+                ref m_DoNotAddScriptsToTrashFolderUpdatedLocal,
+                ref m_DoNotAddScriptsToTrashFolderUpdatedGlobal,
+                ref m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal,
+                regionID, value);
+        }
+
+        bool DoNotAddScriptsToTrashFolder
+        {
+            get
+            {
+                return m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal ? m_DoNotAddScriptsToTrashFolderUpdatedLocal : m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
+            }
+        }
+
+        bool TryGetServices(UUI targetAgentId, out InventoryServiceInterface inventoryService, out AssetServiceInterface assetService)
+        {
+            UserAgentServiceInterface userAgentService = null;
+            string homeUri = targetAgentId.HomeURI.ToString();
+            inventoryService = null;
+            assetService = null;
+            Dictionary<string, string> heloheaders = ServicePluginHelo.HeloRequest(homeUri);
+            foreach (IUserAgentServicePlugin userAgentPlugin in UserAgentServicePlugins)
+            {
+                if (userAgentPlugin.IsProtocolSupported(homeUri, heloheaders))
+                {
+                    userAgentService = userAgentPlugin.Instantiate(homeUri);
+                }
+            }
+
+            if (null == userAgentService)
+            {
+                return false;
+            }
+
+            ServerURIs serverurls = userAgentService.GetServerURLs(targetAgentId);
+            string inventoryServerURI = serverurls.InventoryServerURI;
+            string assetServerURI = serverurls.AssetServerURI;
+
+            heloheaders = ServicePluginHelo.HeloRequest(inventoryServerURI);
+            foreach (IInventoryServicePlugin inventoryPlugin in InventoryServicePlugins)
+            {
+                if (inventoryPlugin.IsProtocolSupported(inventoryServerURI, heloheaders))
+                {
+                    inventoryService = inventoryPlugin.Instantiate(inventoryServerURI);
+                    break;
+                }
+            }
+
+            heloheaders = ServicePluginHelo.HeloRequest(assetServerURI);
+            foreach (IAssetServicePlugin assetPlugin in AssetServicePlugins)
+            {
+                if (assetPlugin.IsProtocolSupported(assetServerURI, heloheaders))
+                {
+                    assetService = assetPlugin.Instantiate(assetServerURI);
+                    break;
+                }
+            }
+
+            return null != inventoryService && null != assetService;
+        }
+
         [PacketHandler(MessageType.RemoveTaskInventory)]
         internal void HandleRemoveTaskInventory(Message m)
         {
@@ -59,9 +138,64 @@ namespace SilverSim.Scene.Types.Scene
                 part.Inventory.TryGetValue(req.ItemID, out item))
             {
                 UUI owner = item.Owner;
+                InventoryItem deletedItem = new InventoryItem(item);
                 part.Inventory.Remove(req.ItemID);
+                InventoryServiceInterface inventoryService;
+                AssetServiceInterface assetService;
+                AssetData asset;
+                if ((!DoNotAddScriptsToTrashFolder || item.AssetType != AssetType.LSLText) &&
+                    TryGetServices(owner, out inventoryService, out assetService) &&
+                    AssetService.TryGetValue(item.AssetID, out asset))
+                {
+                    switch(deletedItem.AssetType)
+                    {
+                        case AssetType.Animation:
+                        case AssetType.CallingCard:
+                        case AssetType.ImageJPEG:
+                        case AssetType.ImageTGA:
+                        case AssetType.Landmark:
+                        case AssetType.LSLBytecode:
+                        case AssetType.LSLText:
+                        case AssetType.Sound:
+                        case AssetType.SoundWAV:
+                        case AssetType.Texture:
+                        case AssetType.TextureTGA:
+                            /* these are all assets not refering to other assets in visible way */
+                            try
+                            {
+                                assetService.Store(asset);
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Asset could not be stored on agent's ({0} asset service: {1}\n{2}", owner.FullName, e.Message, e.StackTrace);
+                            }
+                            try
+                            {
+                                InventoryFolder folder = inventoryService.Folder[owner.ID, AssetType.TrashFolder];
+                                deletedItem.ParentFolderID = folder.ID;
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Trash folder not found for agent {0}: {1}\n{2}", owner.FullName, e.Message, e.StackTrace);
+                                return;
+                            }
 
-                /* TODO: copy to someone's inventory */
+                            deletedItem.ID = UUID.Random;
+                            try
+                            {
+                                inventoryService.Item.Add(deletedItem);
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.WarnFormat("Could not add inventory item {3} to TrashFolder for agent {0}: {1}\n{2}", owner.FullName, e.Message, e.StackTrace, deletedItem.Name);
+                            }
+                            break;
+
+                        default:
+                            /* TODO: we have to fire up one of those asset transfers here */
+                            break;
+                    }
+                }
             }
         }
 
@@ -89,6 +223,8 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            bool canEdit = CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition);
 
             List<ObjectPartInventoryItem> items = part.Inventory.Values;
             if(items.Count == 0)
@@ -151,7 +287,7 @@ namespace SilverSim.Scene.Types.Scene
                                             item.Owner.ID.ToString(),
                                             item.LastOwner.ID.ToString(),
                                             item.Group.ID.ToString(),
-                                            item.AssetID.ToString(),
+                                            canEdit ? item.AssetID.ToString() : UUID.Zero,
                                             item.AssetTypeName,
                                             item.InventoryTypeName,
                                             (uint)item.Flags,
