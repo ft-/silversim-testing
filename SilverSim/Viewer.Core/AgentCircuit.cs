@@ -860,14 +860,7 @@ namespace SilverSim.Viewer.Core
                             if(m.Params.Length >= 96)
                             {
                                 UUID taskID = new UUID(m.Params, 48);
-                                if(taskID.Equals(UUID.Zero))
-                                {
-                                    m_InventoryRequestQueue.Enqueue(m);
-                                }
-                                else if (m_MessageRouting.TryGetValue(MessageType.TransferRequest, out mdel))
-                                {
-                                    mdel(m);
-                                }
+                                m_InventoryRequestQueue.Enqueue(m);
                             }
                         }
                         else if(m.SourceType == Messages.Transfer.SourceType.Asset)

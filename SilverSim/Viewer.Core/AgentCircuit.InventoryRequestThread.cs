@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.Object;
 
 namespace SilverSim.Viewer.Core
 {
@@ -195,34 +196,65 @@ namespace SilverSim.Viewer.Core
             Messages.Transfer.TransferRequest req = (Messages.Transfer.TransferRequest)m;
             if (req.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
             {
+                UUID taskID = new UUID(req.Params, 48);
                 UUID itemID = new UUID(req.Params, 64);
                 assetID = new UUID(req.Params, 80);
-                InventoryItem item;
-                try
+                if (taskID == UUID.Zero)
                 {
-                    item = Agent.InventoryService.Item[AgentID, itemID];
-                }
-                catch (Exception e)
-                {
-                    m_Log.DebugFormat("Failed to request inventory asset (TransferRequest) for Agent {0}: {1}", AgentID, e.Message);
-                    SendAssetNotFound(req);
-                    return;
-                }
-
-                if (item.AssetType == AssetType.LSLText)
-                {
-                    if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryPermissionsMask.Modify))
+                    InventoryItem item;
+                    try
                     {
-                        SendAssetInsufficientPermissions(req);
+                        item = Agent.InventoryService.Item[AgentID, itemID];
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("Failed to request inventory asset (TransferRequest) for Agent {0}: {1}", AgentID, e.Message);
+                        SendAssetNotFound(req);
+                        return;
+                    }
+
+                    if (item.AssetType == AssetType.LSLText)
+                    {
+                        if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryPermissionsMask.Modify))
+                        {
+                            SendAssetInsufficientPermissions(req);
+                            return;
+                        }
+                    }
+                    else if (item.AssetID != assetID)
+                    {
+                        m_Log.DebugFormat("Failed to request inventory asset (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
+                        SendAssetNotFound(req);
                         return;
                     }
                 }
-                else if (item.AssetID != assetID)
+                else
                 {
-                    m_Log.DebugFormat("Failed to request inventory asset (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
-                    SendAssetNotFound(req);
-                    return;
+                    ObjectPart part;
+                    ObjectPartInventoryItem item;
+                    if(!Scene.Primitives.TryGetValue(taskID, out part) ||
+                        !part.Inventory.TryGetValue(itemID, out item))
+                    {
+                        SendAssetNotFound(req);
+                        return;
+                    }
+
+                    if (item.AssetType == AssetType.LSLText)
+                    {
+                        if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryPermissionsMask.Modify))
+                        {
+                            SendAssetInsufficientPermissions(req);
+                            return;
+                        }
+                    }
+                    else if (item.AssetID != assetID)
+                    {
+                        m_Log.DebugFormat("Failed to request sim inventory asset (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
+                        SendAssetNotFound(req);
+                        return;
+                    }
                 }
+
             }
             else if (req.SourceType == Messages.Transfer.SourceType.Asset)
             {

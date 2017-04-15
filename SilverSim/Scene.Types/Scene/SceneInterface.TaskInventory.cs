@@ -32,6 +32,39 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
+        [PacketHandler(MessageType.RemoveTaskInventory)]
+        internal void HandleRemoveTaskInventory(Message m)
+        {
+            RemoveTaskInventory req = (RemoveTaskInventory)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.LocalID, out part))
+            {
+                return;
+            }
+
+            ObjectPartInventoryItem item;
+            if(CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition) &&
+                part.Inventory.TryGetValue(req.ItemID, out item))
+            {
+                UUI owner = item.Owner;
+                part.Inventory.Remove(req.ItemID);
+
+                /* TODO: copy to someone's inventory */
+            }
+        }
+
         [PacketHandler(MessageType.RequestTaskInventory)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
@@ -46,21 +79,13 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if(!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
 
             ObjectPart part;
-            try
-            {
-                part = Primitives[req.LocalID];
-            }
-            catch
+            if(!Primitives.TryGetValue(req.LocalID, out part))
             {
                 return;
             }

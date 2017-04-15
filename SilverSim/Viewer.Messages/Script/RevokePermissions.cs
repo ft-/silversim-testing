@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Script;
-using System;
 
 namespace SilverSim.Viewer.Messages.Script
 {

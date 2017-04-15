@@ -19,10 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
 using SilverSim.Types;
 using SilverSim.Types.IM;
-using System.Text;
+using System;
 using System.Linq;
 
 namespace SilverSim.Viewer.Messages

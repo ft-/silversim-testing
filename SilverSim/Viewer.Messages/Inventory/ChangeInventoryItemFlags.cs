@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Inventory

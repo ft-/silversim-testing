@@ -201,7 +201,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 {
                                     if (!items.ContainsKey(itemID))
                                     {
-                                        primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}' AND ID LIKE '{2})",
+                                        primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}' AND InventoryID LIKE '{2}')",
                                             sceneID, partID, itemID.ToString()));
                                     }
                                 }

@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SilverSim.Viewer.Messages.Groups
 {
