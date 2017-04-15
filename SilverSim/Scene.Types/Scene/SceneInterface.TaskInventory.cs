@@ -66,9 +66,13 @@ namespace SilverSim.Scene.Types.Scene
         bool TryGetServices(UUI targetAgentId, out InventoryServiceInterface inventoryService, out AssetServiceInterface assetService)
         {
             UserAgentServiceInterface userAgentService = null;
-            string homeUri = targetAgentId.HomeURI.ToString();
             inventoryService = null;
             assetService = null;
+            if (targetAgentId.HomeURI == null)
+            {
+                return false;
+            }
+            string homeUri = targetAgentId.HomeURI.ToString();
             Dictionary<string, string> heloheaders = ServicePluginHelo.HeloRequest(homeUri);
             foreach (IUserAgentServicePlugin userAgentPlugin in UserAgentServicePlugins)
             {
