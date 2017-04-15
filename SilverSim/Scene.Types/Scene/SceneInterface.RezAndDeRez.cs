@@ -23,6 +23,8 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Transfer;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
@@ -387,9 +389,20 @@ namespace SilverSim.Scene.Types.Scene
                         kvp.Value, 
                         req.Destination == DeRezAction.DeleteToTrash ? AssetType.TrashFolder : AssetType.Object).QueueWorkItem();
                 }
-                else
+                else 
                 {
-#warning Implement handling for agents not on region
+                    InventoryServiceInterface agentInventoryService;
+                    AssetServiceInterface agentAssetService;
+                    if (TryGetServices(kvp.Key, out agentInventoryService, out agentAssetService))
+                    {
+                        new ObjectTransferItem(agentInventoryService,
+                            agentAssetService,
+                            kvp.Key,
+                            this,
+                            assetIDs,
+                            kvp.Value,
+                            req.Destination == DeRezAction.DeleteToTrash ? AssetType.TrashFolder : AssetType.Object).QueueWorkItem();
+                    }
                 }
             }
 

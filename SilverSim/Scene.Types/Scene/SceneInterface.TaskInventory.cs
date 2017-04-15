@@ -32,7 +32,6 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.ServerURIs;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.TaskInventory;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -134,6 +133,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ObjectPartInventoryItem item;
+
             if(CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition) &&
                 part.Inventory.TryGetValue(req.ItemID, out item))
             {
@@ -142,59 +142,30 @@ namespace SilverSim.Scene.Types.Scene
                 part.Inventory.Remove(req.ItemID);
                 InventoryServiceInterface inventoryService;
                 AssetServiceInterface assetService;
-                AssetData asset;
-                if ((!DoNotAddScriptsToTrashFolder || item.AssetType != AssetType.LSLText) &&
-                    TryGetServices(owner, out inventoryService, out assetService) &&
-                    AssetService.TryGetValue(item.AssetID, out asset))
+                if(deletedItem.AssetType == AssetType.LSLText && DoNotAddScriptsToTrashFolder)
                 {
-                    switch(deletedItem.AssetType)
-                    {
-                        case AssetType.Animation:
-                        case AssetType.CallingCard:
-                        case AssetType.ImageJPEG:
-                        case AssetType.ImageTGA:
-                        case AssetType.Landmark:
-                        case AssetType.LSLBytecode:
-                        case AssetType.LSLText:
-                        case AssetType.Sound:
-                        case AssetType.SoundWAV:
-                        case AssetType.Texture:
-                        case AssetType.TextureTGA:
-                            /* these are all assets not refering to other assets in visible way */
-                            try
-                            {
-                                assetService.Store(asset);
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.WarnFormat("Asset could not be stored on agent's ({0} asset service: {1}\n{2}", owner.FullName, e.Message, e.StackTrace);
-                            }
-                            try
-                            {
-                                InventoryFolder folder = inventoryService.Folder[owner.ID, AssetType.TrashFolder];
-                                deletedItem.ParentFolderID = folder.ID;
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.WarnFormat("Trash folder not found for agent {0}: {1}\n{2}", owner.FullName, e.Message, e.StackTrace);
-                                return;
-                            }
+                    /* do not add scripts to trash if option is set */
+                    return;
+                }
 
-                            deletedItem.ID = UUID.Random;
-                            try
-                            {
-                                inventoryService.Item.Add(deletedItem);
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.WarnFormat("Could not add inventory item {3} to TrashFolder for agent {0}: {1}\n{2}", owner.FullName, e.Message, e.StackTrace, deletedItem.Name);
-                            }
-                            break;
-
-                        default:
-                            /* TODO: we have to fire up one of those asset transfers here */
-                            break;
-                    }
+                IAgent targetAgent;
+                if(Agents.TryGetValue(owner.ID, out targetAgent) && agent.Owner.EqualsGrid(owner))
+                {
+                    new ObjectTransferItem(targetAgent,
+                        this,
+                        new List<UUID>(new UUID[] { deletedItem.AssetID }),
+                        new List<InventoryItem>(new InventoryItem[] { deletedItem }),
+                        AssetType.TrashFolder).QueueWorkItem();
+                }
+                else if (TryGetServices(owner, out inventoryService, out assetService))
+                {
+                    new ObjectTransferItem(inventoryService,
+                        assetService,
+                        deletedItem.Owner,
+                        this,
+                        new List<UUID>(new UUID[] { deletedItem.AssetID }),
+                        new List<InventoryItem>(new InventoryItem[] { deletedItem }),
+                        AssetType.TrashFolder).QueueWorkItem();
                 }
             }
         }
