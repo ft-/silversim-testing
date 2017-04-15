@@ -201,6 +201,7 @@ namespace SilverSim.Viewer.Core
             item.Description = req.InventoryBlock.Description;
             item.AssetType = AssetType.LSLText;
             item.Creator = Owner;
+            item.Owner = Owner;
             item.Flags = 0;
             item.Group = Group;
             item.IsGroupOwned = false;
