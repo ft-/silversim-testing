@@ -82,6 +82,7 @@ namespace SilverSim.Viewer.Messages.Script
             m.InventoryBlock.FolderID = p.ReadUUID();
             m.InventoryBlock.CreatorID = p.ReadUUID();
             m.InventoryBlock.OwnerID = p.ReadUUID();
+            m.InventoryBlock.GroupID = p.ReadUUID();
             m.InventoryBlock.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
             m.InventoryBlock.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
             m.InventoryBlock.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();

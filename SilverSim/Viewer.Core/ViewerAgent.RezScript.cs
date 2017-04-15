@@ -152,7 +152,7 @@ namespace SilverSim.Viewer.Core
             if (data.Type != AssetType.LSLText)
             {
                 Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = "Unable to rez a non-script asset as script";
+                res.Message = this.GetLanguageString(CurrentCulture, "UnableToRezANonScriptAsScript", "Unable to rez a non-script asset as script");
                 circuit.SendMessage(res);
                 return;
             }
