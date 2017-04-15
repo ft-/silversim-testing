@@ -22,3 +22,4 @@ YouAreNotPermittedToRelocateRegion=Du hast keine Berechtigung zum Verschieben de
 ItHasNotBeenPossibleToRelocateRegion=Es war nicht möglich, die Region zu verlegen.
 SimConsoleNotAllowedForAgent=SimConsole nicht erlaubt.
 TeleportNotPossibleToRegion=Teleport zur Region nicht möglich.
+UnableToRezANonScriptAsScript=Ein anderes Asset als ein Skript rezzen nicht möglich.

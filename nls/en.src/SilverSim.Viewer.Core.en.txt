@@ -22,3 +22,4 @@ YouAreNotPermittedToRelocateRegion=You are not permitted to relocate region.
 ItHasNotBeenPossibleToRelocateRegion=It has not been possible to relocate region.
 SimConsoleNotAllowedForAgent=SimConsole not allowed.
 TeleportNotPossibleToRegion=Teleport not possible to region.
+UnableToRezANonScriptAsScript=Unable to rez a non-script asset as script.
