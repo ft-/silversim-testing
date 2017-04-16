@@ -127,7 +127,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 item.AssetID = data.ID;
                 data.Creator = item.Creator;
                 data.Name = item.Name;
-                item.ID = UUID.Random;
+                item.ID = kvp.Value.ItemID;
 
                 try
                 {

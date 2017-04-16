@@ -74,10 +74,15 @@ namespace SilverSim.Types
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
+            bool first = true;
             foreach(IValue iv in this)
             {
+                if(!first)
+                {
+                    s.Append(",");
+                }
                 s.Append(iv.ToString());
-                s.Append(",");
+                first = false;
             }
             return s.ToString();
         }

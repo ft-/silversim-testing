@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         {
             public UUID ID;
             public UInt32 Time;
-            public UInt32 Flags;
+            public ParcelAccessList Flags;
         }
 
         public List<Data> AccessList = new List<Data>();
@@ -70,7 +70,7 @@ namespace SilverSim.Viewer.Messages.Parcel
                 Data d;
                 d.ID = p.ReadUUID();
                 d.Time = p.ReadUInt32();
-                d.Flags = p.ReadUInt32();
+                d.Flags = (ParcelAccessList)p.ReadUInt32();
                 m.AccessList.Add(d);
             }
 
@@ -92,7 +92,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             {
                 p.WriteUUID(d.ID);
                 p.WriteUInt32(d.Time);
-                p.WriteUInt32(d.Flags);
+                p.WriteUInt32((uint)d.Flags);
             }
         }
     }
