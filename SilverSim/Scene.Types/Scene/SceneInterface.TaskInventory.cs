@@ -114,6 +114,205 @@ namespace SilverSim.Scene.Types.Scene
             return null != inventoryService && null != assetService;
         }
 
+        [PacketHandler(MessageType.UpdateTaskInventory)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        internal void HandleUpdateTaskInventory(Message m)
+        {
+            UpdateTaskInventory req = (UpdateTaskInventory)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.LocalID, out part))
+            {
+                return;
+            }
+
+            if (part.IsLocked)
+            {
+                /* locked prims are not allowed */
+                return;
+            }
+
+            switch (req.Key)
+            {
+                case UpdateTaskInventory.KeyType.AgentInventory:
+                    AddTaskInventoryItem(req, agent, part);
+                    break;
+
+                case UpdateTaskInventory.KeyType.ObjectInventory:
+                    UpdateTaskInventoryItem(req, agent, part);
+                    break;
+            }
+        }
+
+        void AddTaskInventoryItem(UpdateTaskInventory req, IAgent agent, ObjectPart part)
+        { 
+            switch(req.InvType)
+            {
+                case InventoryType.Animation:
+                case InventoryType.Attachable:
+                case InventoryType.Bodypart:
+                case InventoryType.CallingCard:
+                case InventoryType.Clothing:
+                case InventoryType.Gesture:
+                case InventoryType.Landmark:
+                case InventoryType.Notecard:
+                case InventoryType.Object:
+                case InventoryType.Snapshot:
+                case InventoryType.Sound:
+                case InventoryType.Texture:
+                case InventoryType.TextureTGA:
+                case InventoryType.Wearable:
+                    break;
+
+                default:
+                    /* do not allow anything else than the ones above */
+                    return;
+            }
+
+            switch(req.AssetType)
+            {
+                case AssetType.LSLText:
+                case AssetType.LSLBytecode:
+                case AssetType.Link:
+                case AssetType.LinkFolder:
+                    /* no addition here of scripts, item links or folder links */
+                    return;
+
+                default:
+                    break;
+            }
+
+            if (part.IsAllowedDrop)
+            {
+                /* llAllowInventoryDrop active, so we can drop anything except scripts */
+            }
+            else if(!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+            {
+                /* not allowed */
+                return;
+            }
+
+            InventoryItem agentItem;
+            if(agent.InventoryService.Item.TryGetValue(req.ItemID, out agentItem) &&
+                agentItem.AssetType == req.AssetType &&
+                agentItem.InventoryType == req.InvType)
+            {
+                ObjectPartInventoryItem item = new ObjectPartInventoryItem(agentItem);
+                item.ID = UUID.Random;
+                AdjustPermissionsAccordingly(agent, part.Owner, item);
+                item.LastOwner = item.Owner;
+                item.Owner = part.Owner;
+
+                if (AssetService.Exists(agentItem.AssetID))
+                {
+                    /* no need for an assettransferer here */
+
+                    part.Inventory.Add(item);
+
+                    if(agent.SelectedObjects(ID).Contains(part.ID))
+                    {
+                        using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+                        {
+                            propHandler.Send(part);
+                        }
+                    }
+
+                    if (agentItem.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
+                    {
+                        agent.InventoryService.Item.Delete(agent.Owner.ID, agentItem.ID);
+                    }
+                }
+                else
+                {
+                    new AddToObjectTransferItem(agent, this, item.AssetID, part, item).QueueWorkItem();
+                }
+            }
+        }
+
+        void AdjustPermissionsAccordingly(IAgent agent, UUI newOwner, ObjectPartInventoryItem item)
+        {
+            if(agent.Owner != newOwner && !agent.IsActiveGod)
+            {
+                item.Permissions.AdjustToNextOwner();
+            }
+        }
+
+        void UpdateTaskInventoryItem(UpdateTaskInventory req, IAgent agent, ObjectPart part)
+        {
+            ObjectPartInventoryItem item;
+
+            if(!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+            {
+                return;
+            }
+
+            if(!part.Inventory.TryGetValue(req.ItemID, out item))
+            {
+                return;
+            }
+
+            if(item.AssetType == AssetType.LSLText || item.AssetType == AssetType.LSLBytecode ||
+                item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+            {
+                /* do not allow editing scripts through this */
+                return;
+            }
+
+            if(req.TransactionID != UUID.Zero)
+            {
+                /* asset upload follows */
+            }
+            else
+            {
+                /* no asset upload */
+                if(req.Name != item.Name)
+                {
+                    item.Name = req.Name;
+                    part.Inventory.ChangeKey(item.Name, req.Name);
+                }
+                item.Description = req.Description;
+                if(agent.IsActiveGod)
+                {
+                    item.Permissions.Base = req.BaseMask | InventoryPermissionsMask.Move;
+                    item.Permissions.Current = req.OwnerMask;
+                    item.Permissions.EveryOne = req.EveryoneMask;
+                    item.Permissions.Group = req.GroupMask;
+                    item.Permissions.NextOwner = req.NextOwnerMask;
+                }
+                else if(part.Owner.EqualsGrid(agent.Owner))
+                {
+                    item.Permissions.EveryOne = req.EveryoneMask & item.Permissions.Base;
+                    item.Permissions.Group = req.GroupMask & item.Permissions.Base;
+                    item.Permissions.Current = req.OwnerMask & item.Permissions.Base;
+                    item.Permissions.NextOwner = req.OwnerMask & item.Permissions.Base;
+                }
+
+                SendObjectPropertiesToAgent(agent, part);
+            }
+        }
+
+        public void SendObjectPropertiesToAgent(IAgent agent, ObjectPart part)
+        {
+            if (agent.SelectedObjects(ID).Contains(part.ID))
+            {
+                using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+                {
+                    propHandler.Send(part);
+                }
+            }
+        }
+
         [PacketHandler(MessageType.MoveTaskInventory)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleMoveTaskInventory(Message m)

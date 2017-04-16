@@ -72,6 +72,12 @@ namespace SilverSim.Types.Inventory
         public InventoryPermissionsMask Group;
         public InventoryPermissionsMask NextOwner;
 
+        public void AdjustToNextOwner()
+        {
+            Base = (Base & NextOwner) | InventoryPermissionsMask.Move;
+            Current = Base;
+        }
+
         public bool CheckAgentPermissions(UUI creator, UUI owner, UUI accessor, InventoryPermissionsMask wanted)
         {
             if(accessor.EqualsGrid(creator))

@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -34,6 +35,45 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
+        public class AddToObjectTransferItem : AssetTransferWorkItem
+        {
+            readonly ObjectPart m_Part;
+            protected readonly UUI m_SourceAgent;
+            protected readonly UUID m_SceneID;
+            ObjectPartInventoryItem m_Item;
+            protected readonly TryGetSceneDelegate TryGetScene;
+
+            public AddToObjectTransferItem(
+                IAgent agent,
+                SceneInterface scene,
+                UUID assetid,
+                ObjectPart part,
+                ObjectPartInventoryItem item)
+                : base(scene.AssetService, agent.AssetService, assetid, ReferenceSource.Source)
+            {
+                m_Part = part;
+                m_Item = item;
+                m_Part = part;
+                m_SceneID = scene.ID;
+            }
+
+            public override void AssetTransferComplete()
+            {
+                m_Part.Inventory.Add(m_Item);
+            }
+
+            public override void AssetTransferFailed(Exception e)
+            {
+                SceneInterface scene;
+                IAgent agent;
+                if (!TryGetScene(m_SourceAgent.ID, out scene) &&
+                    scene.Agents.TryGetValue(m_SourceAgent.ID, out agent))
+                {
+
+                }
+            }
+        }
+
         public class ObjectTransferItem : AssetTransferWorkItem
         {
             readonly InventoryServiceInterface m_InventoryService;

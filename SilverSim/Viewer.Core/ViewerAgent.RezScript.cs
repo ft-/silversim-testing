@@ -227,6 +227,7 @@ namespace SilverSim.Viewer.Core
                 item.ScriptInstance = instance;
                 item.ScriptInstance.IsRunning = true;
                 item.ScriptInstance.Reset();
+                part.ObjectGroup.Scene.SendObjectPropertiesToAgent(this, part);
             }
             catch
             {

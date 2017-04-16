@@ -31,10 +31,15 @@ namespace SilverSim.Viewer.Messages.TaskInventory
     [NotTrusted]
     public class UpdateTaskInventory : Message
     {
+        public enum KeyType : byte
+        {
+            AgentInventory = 0,
+            ObjectInventory = 1
+        }
         public UUID AgentID;
         public UUID SessionID;
         public UInt32 LocalID;
-        public byte Key;
+        public KeyType Key;
         public UUID ItemID;
         public UUID FolderID;
         public UUID CreatorID;
@@ -69,7 +74,7 @@ namespace SilverSim.Viewer.Messages.TaskInventory
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             m.LocalID = p.ReadUInt32();
-            m.Key = p.ReadUInt8();
+            m.Key = (KeyType)p.ReadUInt8();
             m.ItemID = p.ReadUUID();
             m.FolderID = p.ReadUUID();
             m.CreatorID = p.ReadUUID();
@@ -100,7 +105,7 @@ namespace SilverSim.Viewer.Messages.TaskInventory
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt32(LocalID);
-            p.WriteUInt8(Key);
+            p.WriteUInt8((byte)Key);
             p.WriteUUID(ItemID);
             p.WriteUUID(FolderID);
             p.WriteUUID(CreatorID);
