@@ -469,7 +469,7 @@ namespace SilverSim.Scene.Types.Agent
                 agent.CurrentOutfitFolder = currentOutfitFolder.ID;
                 if (null != logOutput)
                 {
-                    logOutput.Invoke(string.Format("Retrived current outfit folder for agent {0}", agent.Owner.FullName));
+                    logOutput.Invoke(string.Format("Retrieved current outfit folder for agent {0}", agent.Owner.FullName));
                 }
             }
 
@@ -558,6 +558,8 @@ namespace SilverSim.Scene.Types.Agent
             {
                 logOutput.Invoke(string.Format("Baking agent {0} completed", agent.Owner.FullName));
             }
+
+            
         }
         #endregion
 

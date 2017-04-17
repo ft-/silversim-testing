@@ -665,6 +665,7 @@ namespace SilverSim.Viewer.Core
                 m_EconomyService.Login(Owner, SessionID, m_SecureSessionID);
             }
             OnPositionChange += ChildUpdateOnPositionChange;
+            OnAppearanceUpdate += HandleAppearanceUpdate;
         }
 
         ~ViewerAgent()

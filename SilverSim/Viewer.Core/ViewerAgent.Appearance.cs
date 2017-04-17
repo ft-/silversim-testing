@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
@@ -163,6 +164,15 @@ namespace SilverSim.Viewer.Core
             }
 
             SendMessageAlways(res, m.CircuitSceneID);
+        }
+
+        void HandleAppearanceUpdate(IAgent agent)
+        {
+            AgentCircuit circuit;
+            if (Circuits.TryGetValue(m_CurrentSceneID, out circuit))
+            {
+                circuit.Scene.SendAgentObjectToAllAgents(this);
+            }
         }
     }
 }

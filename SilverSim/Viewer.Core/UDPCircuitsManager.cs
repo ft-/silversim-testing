@@ -359,7 +359,7 @@ namespace SilverSim.Viewer.Core
 
                                             Messages.Region.RegionHandshake.RegionExtDataEntry entry = new Messages.Region.RegionHandshake.RegionExtDataEntry();
                                             entry.RegionFlagsExtended = (ulong)regionFlags;
-                                            entry.RegionProtocols = 0; /* 0 => no SSB, 1 => SSB */
+                                            entry.RegionProtocols = 1; /* 0 => no SSB, 1 => SSB */
                                             rh.RegionExtData.Add(entry);
 
                                             /* Immediate Ack */
