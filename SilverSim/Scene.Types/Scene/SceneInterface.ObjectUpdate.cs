@@ -91,9 +91,9 @@ namespace SilverSim.Scene.Types.Scene
             d.ProfileCurve = 1;
             d.Material = PrimitiveMaterial.Flesh;
             d.PSBlock = new byte[0];
-            d.Scale = new SilverSim.Types.Vector3(0.45f, 0.6f, 1.9f);
+            d.Scale = new Vector3(0.45f, 0.6f, 1.9f);
             d.Text = string.Empty;
-            d.TextColor = new SilverSim.Types.ColorAlpha(0, 0, 0, 0);
+            d.TextColor = new ColorAlpha(0, 0, 0, 0);
             d.TextureAnim = new byte[0];
             d.TextureEntry = new byte[0];
             d.UpdateFlags = PrimitiveFlags.Physics | PrimitiveFlags.ObjectModify | PrimitiveFlags.ObjectCopy | PrimitiveFlags.ObjectAnyOwner |
