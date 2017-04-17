@@ -316,6 +316,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                     lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
+                    lp.IncrementSerial();
                 }
 #if DEBUG
                 catch (Exception e)
