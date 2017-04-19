@@ -374,12 +374,12 @@ namespace SilverSim.Main.Common
                                 {
                                     if (loadparams.SimulationDataStorage.ScriptStates.TryGetValue(loadparams.Scene.ID, part.ID, item.ID, out serializedState))
                                     {
-                                        item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, serializedState);
+                                        item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, null, serializedState);
                                         item.ScriptInstance.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.RegionStart));
                                     }
                                     else
                                     {
-                                        item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData);
+                                        item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, null);
                                         item.ScriptInstance.IsResetRequired = true;
                                     }
 

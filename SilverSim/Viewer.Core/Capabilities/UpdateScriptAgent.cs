@@ -128,7 +128,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 try
                 {
-                    ScriptLoader.SyntaxCheck(item.Owner, data);
+                    ScriptLoader.SyntaxCheck(item.Owner, data, m_Agent.CurrentCulture);
                     m.Add("compiled", true);
                 }
                 catch(CompilerException e)

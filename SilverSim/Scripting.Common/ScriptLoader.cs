@@ -25,6 +25,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 
@@ -72,7 +73,7 @@ namespace SilverSim.Scripting.Common
             m_LoadedDomains.Add(assetID, appDom);
         }
 
-        public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data, byte[] serializedState = null)
+        public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data, CultureInfo currentCulture, byte[] serializedState = null)
         {
             ScriptInstance instance;
             m_CompilerLock.AcquireReaderLock(-1);
@@ -83,7 +84,7 @@ namespace SilverSim.Scripting.Common
                 {
                     using (TextReader reader = new StreamReader(data.InputStream))
                     {
-                        return CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, user, data.ID, reader);
+                        return CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, user, data.ID, reader, currentCulture);
                     }
                 });
                 m_LoadedAssemblies[data.ID] = assembly;
@@ -101,11 +102,11 @@ namespace SilverSim.Scripting.Common
             return instance;
         }
 
-        public static void SyntaxCheck(UUI user, AssetData data)
+        public static void SyntaxCheck(UUI user, AssetData data, CultureInfo currentCulture)
         {
             using(TextReader reader = new StreamReader(data.InputStream))
             {
-                CompilerRegistry.ScriptCompilers.SyntaxCheck(user, data.ID, reader);
+                CompilerRegistry.ScriptCompilers.SyntaxCheck(user, data.ID, reader, currentCulture);
             }
         }
     }
