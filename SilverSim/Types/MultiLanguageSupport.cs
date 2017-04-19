@@ -32,15 +32,17 @@ namespace SilverSim.Types
         static readonly RwLockedDictionary<string, ResourceSet> m_LoadedAssemblyResources = new RwLockedDictionary<string, ResourceSet>();
         static readonly object m_LoadAssemblyLock = new object();
         static readonly string InstallBinPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
 
         public static ResourceSet GetLanguageResourceSet(
             this object o,
-            CultureInfo culture)
+            CultureInfo selectedCulture)
         {
             Type type = o.GetType();
             System.Reflection.Assembly a = type.Assembly;
             string assemblyName = a.GetName().Name;
             ResourceSet res = null;
+            CultureInfo culture = selectedCulture ?? EnUsCulture; 
             string cultureName = culture.Name;
             string cultureGroup = cultureName.Split('-')[0];
 
@@ -82,10 +84,11 @@ namespace SilverSim.Types
 
         public static string GetLanguageString(
             this object o,
-            CultureInfo culture,
+            CultureInfo selectedCulture,
             string name,
             string defvalue)
         {
+            CultureInfo culture = selectedCulture ?? EnUsCulture;
             ResourceSet res = o.GetLanguageResourceSet(culture);
             if(res == null)
             {

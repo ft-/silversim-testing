@@ -25,6 +25,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -110,14 +111,14 @@ namespace SilverSim.Scripting.Common
                 return compiler;
             }
 
-            private IScriptAssembly Compile(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+            private IScriptAssembly Compile(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
                 IScriptCompiler compiler = DetermineShBangs(shbangs);
 
                 object[] attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectModeAttribute), false);
                 if(attrs.Length != 0)
                 {
-                    return compiler.Compile(AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber);
+                    return compiler.Compile(AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber, cultureInfo);
                 }
                 else
                 {
@@ -126,7 +127,7 @@ namespace SilverSim.Scripting.Common
                         AppDomain.CurrentDomain.Evidence);
                     try
                     {
-                        IScriptAssembly assembly = compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber);
+                        IScriptAssembly assembly = compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber, cultureInfo);
                         ScriptLoader.RegisterAppDomain(assetID, appDom);
                         return assembly;
                     }
@@ -138,18 +139,18 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            private void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+            private void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
                 IScriptCompiler compiler = DetermineShBangs(shbangs);
 
-                compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber);
+                compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber, cultureInfo);
             }
 
-            private void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+            private void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
                 IScriptCompiler compiler = DetermineShBangs(shbangs);
 
-                compiler.SyntaxCheckAndDump(s, user, shbangs, assetID, reader, linenumber);
+                compiler.SyntaxCheckAndDump(s, user, shbangs, assetID, reader, linenumber, cultureInfo);
             }
 
             public class StreamReaderAddHead : TextReader
@@ -175,14 +176,14 @@ namespace SilverSim.Scripting.Common
                 public override int Peek()
                 {
                     return m_Header.Length != 0 ?
-                        (int)m_Header[0] :
+                        m_Header[0] :
                         m_InnerReader.Peek();
                 }
                 public override int Read()
                 {
                     if (m_Header.Length != 0)
                     {
-                        int c = (int)m_Header[0];
+                        int c = m_Header[0];
                         m_Header = m_Header.Substring(1);
                         return c;
                     }
@@ -254,7 +255,7 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            public IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader)
+            public IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
@@ -271,11 +272,11 @@ namespace SilverSim.Scripting.Common
 
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    return Compile(user, shbangs, assetID, headReader, linenumber);
+                    return Compile(user, shbangs, assetID, headReader, linenumber, cultureInfo);
                 }
             }
 
-            public void SyntaxCheck(UUI user, UUID assetID, TextReader reader)
+            public void SyntaxCheck(UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
@@ -291,11 +292,11 @@ namespace SilverSim.Scripting.Common
                 }
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    Compile(user, shbangs, assetID, headReader, linenumber);
+                    Compile(user, shbangs, assetID, headReader, linenumber, cultureInfo);
                 }
             }
 
-            public void SyntaxCheckAndDump(Stream s, UUI user, UUID assetID, TextReader reader)
+            public void SyntaxCheckAndDump(Stream s, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
@@ -312,11 +313,11 @@ namespace SilverSim.Scripting.Common
                 }
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, linenumber);
+                    SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, linenumber, cultureInfo);
                 }
             }
 
-            public void CompileToDisk(string filename, UUI user, UUID assetID, TextReader reader)
+            public void CompileToDisk(string filename, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
@@ -335,7 +336,7 @@ namespace SilverSim.Scripting.Common
 
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, linenumber);
+                    compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, linenumber, cultureInfo);
                 }
             }
         }
