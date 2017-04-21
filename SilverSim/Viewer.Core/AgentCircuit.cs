@@ -194,7 +194,14 @@ namespace SilverSim.Viewer.Core
             cfs.Audible = Messages.Chat.ChatAudibleLevel.Fully;
             cfs.ChatType = (Messages.Chat.ChatType)(byte)le.Type;
             cfs.FromName = le.Name;
-            cfs.Message = le.Message;
+            if (le.Localization != null)
+            {
+                cfs.Message = le.Localization.Localize(le, Agent.CurrentCulture);
+            }
+            else
+            {
+                cfs.Message = le.Message;
+            }
             cfs.Position = le.GlobalPosition;
             cfs.SourceID = le.ID;
             cfs.SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType;

@@ -21,9 +21,15 @@
 
 using SilverSim.Types;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
+    public interface IListenEventLocalization
+    {
+        string Localize(ListenEvent le, CultureInfo currentCulture);
+    }
+
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct ListenEvent : IScriptEvent
     {
@@ -69,6 +75,7 @@ namespace SilverSim.Scene.Types.Script.Events
         public int ButtonIndex;
         public UUID OriginSceneID; /* used for Origin when doing sim neighbor passing */
         public double Distance;
+        public IListenEventLocalization Localization;
 
         public ListenEvent(ListenEvent le)
         {
@@ -84,6 +91,7 @@ namespace SilverSim.Scene.Types.Script.Events
             ButtonIndex = le.ButtonIndex;
             OriginSceneID = le.OriginSceneID;
             Distance = le.Distance;
+            Localization = le.Localization;
         }
     }
 }
