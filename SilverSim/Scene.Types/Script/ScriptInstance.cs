@@ -31,9 +31,31 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Script
 {
+    public class LocalizedScriptMessage : IListenEventLocalization
+    {
+        readonly object m_NlsRefObject;
+        readonly string m_NlsId;
+        readonly object[] m_Param;
+        readonly string m_NlsDefMessage;
+
+        public LocalizedScriptMessage(object nlsRefObject, string nlsId, string nlsDefMessage, params object[] param)
+        {
+            m_NlsRefObject = nlsRefObject;
+            m_NlsId = nlsId;
+            m_NlsDefMessage = nlsDefMessage;
+            m_Param = param;
+        }
+
+        public string Localize(ListenEvent le, CultureInfo currentCulture)
+        {
+            return string.Format(m_NlsRefObject.GetLanguageString(currentCulture, m_NlsId, m_NlsDefMessage), m_Param);
+        }
+    }
+
     public abstract class ScriptInstance
     {
         public abstract void PostEvent(IScriptEvent e);
@@ -46,6 +68,7 @@ namespace SilverSim.Scene.Types.Script
 
         public abstract void ProcessEvent();
         public abstract void ShoutError(string msg);
+        public abstract void ShoutError(IListenEventLocalization localizedMessage);
         public abstract bool HasEventsPending { get; }
         public IScriptWorkerThreadPool ThreadPool { get; set; }
         public event Action<ScriptInstance> OnStateChange;
