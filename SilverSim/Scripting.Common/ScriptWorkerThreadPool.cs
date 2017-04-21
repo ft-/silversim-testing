@@ -275,6 +275,17 @@ namespace SilverSim.Scripting.Common
                     instance.IsRunning = false;
                     continue;
                 }
+                catch(Exception e)
+                {
+                    ObjectPartInventoryItem item = ev.Item;
+                    ScriptInstance instance = item.ScriptInstance;
+                    m_Log.WarnFormat("Exception at script {0} ({1}) of {2} ({3}) in {4} ({5}) due to program error: {6}\n{7}",
+                        item.Name, item.AssetID.ToString(),
+                        ev.Part.Name, ev.Part.ID.ToString(),
+                        ev.Part.ObjectGroup.Name, ev.Part.ObjectGroup.ID.ToString(),
+                        e.Message,
+                        e.StackTrace);
+                }
                 finally
                 {
                     lock (tc)
