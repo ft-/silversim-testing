@@ -31,6 +31,7 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -123,14 +124,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "NotAllowedToModifyScript", "Not allowed to modify script"));
                 }
 
-                UUID oldAssetID = item.AssetID;
-                item.AssetID = data.ID;
                 data.Creator = item.Creator;
                 data.Name = item.Name;
                 item.ID = kvp.Value.ItemID;
 
                 try
                 {
+                    part.Inventory.SetAssetID(item.ID, data.ID);
                     m_Scene.AssetService.Store(data);
                 }
                 catch
@@ -141,8 +141,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 ScriptInstance instance;
                 try
                 {
-                    part.Inventory.Remove(kvp.Value.ItemID);
-                    part.Inventory.Add(item.ID, item.Name, item);
+                    instance = item.RemoveScriptInstance;
+                    instance.Abort();
                 }
                 catch
 #if DEBUG
@@ -150,12 +150,10 @@ namespace SilverSim.Viewer.Core.Capabilities
 #endif
                 {
 #if DEBUG
-                    m_Log.DebugFormat("Failed to store inventory item: {0}\n{1}", e.Message, e.StackTrace);
+                    m_Log.DebugFormat("Failed to abort script: {0}\n{1}", e.Message, e.StackTrace);
 #endif
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreInventoryItem", "Failed to store inventory item"));
                 }
-
-                part.SendObjectUpdate();
 
                 try
                 {
@@ -189,6 +187,9 @@ namespace SilverSim.Viewer.Core.Capabilities
                     m.Add("errors", errors);
                     m.Add("compiled", false);
                 }
+
+                part.SendObjectUpdate();
+                part.ObjectGroup.Scene.SendObjectPropertiesToAgent(m_Agent, part);
 
                 return m;
             }

@@ -205,6 +205,25 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void SetAssetID(UUID key1, UUID assetID)
+        {
+            ObjectPartInventoryItem item;
+            if (TryGetValue(key1, out item))
+            {
+                item.AssetID = assetID;
+                Interlocked.Increment(ref InventorySerial);
+
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    {
+                        d(ChangeAction.Change, PartID, item.ID);
+                    }
+                }
+            }
+        }
+
         public void SetNextOwnerAssetID(UUID key1, UUID assetID)
         {
             ObjectPartInventoryItem item;
