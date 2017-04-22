@@ -56,7 +56,6 @@ namespace SilverSim.Viewer.Core
 
             string assetType_string = reqUrl.Substring(0, pos);
             string assetId_string = reqUrl.Substring(pos + 4);
-            string contentType;
             UUID assetId;
             AssetType assetType = assetType_string.StringToAssetType();
             if (!UUID.TryParse(assetId_string, out assetId))
@@ -68,11 +67,13 @@ namespace SilverSim.Viewer.Core
             switch (assetType)
             {
                 case AssetType.Animation:
-                    contentType = "application/vnd.ll.animation";
-                    break;
-
                 case AssetType.Sound:
-                    contentType = "audio/ogg";
+                case AssetType.Notecard:
+                case AssetType.Gesture:
+                case AssetType.Bodypart:
+                case AssetType.Clothing:
+                case AssetType.Landmark:
+                case AssetType.CallingCard:
                     break;
 
                 default:
@@ -113,24 +114,13 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            if (asset.Type != AssetType.Texture)
-            {
-                if (asset.Type != AssetType.Mesh)
-                {
-                    m_Log.DebugFormat("Failed to download asset (Cap_ViewerAsset): Viewer for AgentID {0} tried to download non-texture asset ({1})", AgentID, asset.Type.ToString());
-                }
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                return;
-            }
-
-
             if (asset.Type != assetType)
             {
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
-            ReturnRangeProcessedAsset(httpreq, asset, contentType, "ViewerAsset");
+            ReturnRangeProcessedAsset(httpreq, asset, asset.ContentType, "ViewerAsset");
         }
     }
 }
