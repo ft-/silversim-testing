@@ -89,7 +89,7 @@ namespace SilverSim.Scripting.Common
                     if (shbang.Value.StartsWith("//#!Engine:"))
                     {
                         /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
-                        language = shbang.Value.Substring(11).Trim().ToUpper();
+                        language = shbang.Value.Substring(11).Trim().ToLower();
                         useDefault = false;
                         lineno = shbang.Key;
                     }
@@ -167,6 +167,7 @@ namespace SilverSim.Scripting.Common
                 {
                     m_InnerReader.Close();
                 }
+
                 protected override void Dispose(bool disposing)
                 {
                     if(disposing)
