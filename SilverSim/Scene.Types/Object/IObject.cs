@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -247,13 +248,22 @@ namespace SilverSim.Scene.Types.Object
     #region Params Helper
     public static class ParamsHelper
     {
+        sealed class NlsAnchor
+        {
+            public NlsAnchor()
+            {
+
+            }
+        }
+        static readonly NlsAnchor m_NlsAnchor = new NlsAnchor();
+
         #region List Access Helpers
         public static PrimitiveParamsType GetPrimParamType(IEnumerator<IValue> enumerator)
         {
             IValue current = enumerator.Current;
             if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for parameter type: got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAnIntegerParameterForParameterTypeGot0", "Expecting an integer parameter for parameter type: got {0}", current.LSL_Type.ToString());
             }
             return (PrimitiveParamsType)current.AsInt;
         }
@@ -263,7 +273,7 @@ namespace SilverSim.Scene.Types.Object
             IValue current = enumerator.Current;
             if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for object details type: got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAnIntegerParameterForObjectDetailsTypeGot0", "Expecting an integer parameter for object details type: got {0}", current.LSL_Type.ToString());
             }
             return (ObjectDetailsType)current.AsInt;
         }
@@ -272,12 +282,12 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!enumerator.MoveNext())
             {
-                throw new ArgumentException("No parameter for " + paraName);
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "NoParameterFor0", "No parameter for {0}", paraName);
             }
             IValue current = enumerator.Current;
             if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for " + paraName + ": got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAnIntegerParameterFor0Got1", "Expecting an integer parameter for {0}: got {1}", paraName, current.LSL_Type.ToString());
             }
             return current.AsInt;
         }
@@ -286,12 +296,12 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!enumerator.MoveNext())
             {
-                throw new ArgumentException("No parameter for " + paraName);
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "NoParameterFor0", "No parameter for {0}", paraName);
             }
             IValue current = enumerator.Current;
             if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for " + paraName + ": got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAnIntegerParameterFor0Got1", "Expecting an integer parameter for {0}: got {1}", paraName, current.LSL_Type.ToString());
             }
             return current.AsBoolean;
         }
@@ -300,13 +310,13 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!enumerator.MoveNext())
             {
-                throw new ArgumentException("No parameter for " + paraName);
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "NoParameterFor0", "No parameter for {0}", paraName);
             }
             IValue current = enumerator.Current;
             LSLValueType lslType = current.LSL_Type;
             if (lslType != LSLValueType.String && lslType != LSLValueType.Key)
             {
-                throw new ArgumentException("Expecting a string parameter for " + paraName + ": got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAStringParameterFor0Got1", "Expecting a string parameter for {0}: got {1}", paraName, current.LSL_Type.ToString());
             }
             return current.ToString();
         }
@@ -315,13 +325,13 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!enumerator.MoveNext())
             {
-                throw new ArgumentException("No parameter for " + paraName);
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "NoParameterFor0", "No parameter for {0}", paraName);
             }
             IValue current = enumerator.Current;
             LSLValueType lslType = current.LSL_Type;
             if (lslType != LSLValueType.String && lslType != LSLValueType.Key)
             {
-                throw new ArgumentException("Expecting a key parameter for " + paraName + ": got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAKeyParameterFor0Got1", "Expecting a key parameter for {0}: got {1}", paraName, current.LSL_Type.ToString());
             }
             return current.AsUUID;
         }
@@ -330,12 +340,12 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!enumerator.MoveNext())
             {
-                throw new ArgumentException("No parameter for " + paraName);
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "NoParameterFor0", "No parameter for {0}", paraName);
             }
             IValue current = enumerator.Current;
             if (current.LSL_Type != LSLValueType.Float && current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting a float parameter for " + paraName + ": got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAFloatParameterFor0Got1", "Expecting a float parameter for {0}: got {1}", paraName, current.LSL_Type.ToString());
             }
             return current.AsReal;
         }
@@ -344,12 +354,12 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!enumerator.MoveNext())
             {
-                throw new ArgumentException("No parameter for " + paraName);
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "NoParameterFor0", "No parameter for {0}", paraName);
             }
             IValue current = enumerator.Current;
             if (current.LSL_Type != LSLValueType.Rotation)
             {
-                throw new ArgumentException("Expecting a rotation parameter for " + paraName + ": got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingARotationParameterFor0Got1", "Expecting a rotation parameter for {0}: got {1}", paraName, current.LSL_Type.ToString());
             }
             return current.AsQuaternion;
         }
@@ -358,12 +368,12 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!enumerator.MoveNext())
             {
-                throw new ArgumentException("No parameter for " + paraName);
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "NoParameterFor0", "No parameter for {0}", paraName);
             }
             IValue current = enumerator.Current;
             if (current.LSL_Type != LSLValueType.Vector)
             {
-                throw new ArgumentException("Expecting a vector parameter for " + paraName + ": got " + current.LSL_Type.ToString());
+                throw new LocalizedScriptErrorException(m_NlsAnchor, "ExpectingAVectorParameterFor0Got1", "Expecting a vector parameter for {0}: got {1}", paraName, current.LSL_Type.ToString());
             }
             return current.AsVector3;
         }
