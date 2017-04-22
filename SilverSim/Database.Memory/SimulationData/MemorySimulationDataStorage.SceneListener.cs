@@ -273,6 +273,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 data.Add("AttachedPos", objgroup.AttachedPos);
                 data.Add("AttachPoint", (int)objgroup.AttachPoint);
                 data.Add("IsIncludedInSearch", objgroup.IsIncludedInSearch);
+                data.Add("RezzingObjectID", objgroup.RezzingObjectID);
                 return data;
             }
 

@@ -94,6 +94,7 @@ namespace SilverSim.Database.Memory.SimulationData
             objgroup.AttachedPos = map["AttachedPos"].AsVector3;
             objgroup.AttachPoint = (AttachmentPoint)map["AttachPoint"].AsUInt;
             objgroup.IsIncludedInSearch = map["IsIncludedInSearch"].AsBoolean;
+            objgroup.RezzingObjectID = map["RezzingObjectID"].AsUUID;
             return objgroup;
         }
 
