@@ -47,6 +47,8 @@ namespace SilverSim.Scene.Chat
                 switch(ev.Type)
                 {
                     case ListenEvent.ChatType.Region:
+                    case ListenEvent.ChatType.DebugChannel:
+                    case ListenEvent.ChatType.Broadcast:
                         listener.Send(ev);
                         break;
 
