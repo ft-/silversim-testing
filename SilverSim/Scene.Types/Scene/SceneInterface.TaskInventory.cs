@@ -262,15 +262,15 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            if(item.AssetType == AssetType.LSLText || item.AssetType == AssetType.LSLBytecode ||
-                item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
-            {
-                /* do not allow editing scripts through this */
-                return;
-            }
-
             if(req.TransactionID != UUID.Zero)
             {
+                if (item.AssetType == AssetType.LSLText || item.AssetType == AssetType.LSLBytecode ||
+                    item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+                {
+                    /* do not allow editing scripts through this */
+                    return;
+                }
+
                 /* asset upload follows */
             }
             else
@@ -278,7 +278,6 @@ namespace SilverSim.Scene.Types.Scene
                 /* no asset upload */
                 if(req.Name != item.Name)
                 {
-                    item.Name = req.Name;
                     part.Inventory.ChangeKey(item.Name, req.Name);
                 }
                 item.Description = req.Description;

@@ -250,6 +250,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 base.ChangeKey(newKey, oldKey);
                 item = base[newKey];
+                item.Name = newKey;
             }
             Interlocked.Increment(ref InventorySerial);
 
