@@ -142,7 +142,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 try
                 {
                     instance = item.RemoveScriptInstance;
-                    instance.Abort();
+                    if (null != instance)
+                    {
+                        instance.Abort();
+                    }
                 }
                 catch
 #if DEBUG
