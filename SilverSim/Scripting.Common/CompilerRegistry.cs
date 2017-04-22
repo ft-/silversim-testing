@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.Common
                 }
                 set
                 {
-                    if (String.IsNullOrEmpty(name))
+                    if (string.IsNullOrEmpty(name))
                     {
                         throw new ArgumentException("value");
                     }
@@ -78,7 +78,8 @@ namespace SilverSim.Scripting.Common
             }
 
             private IScriptCompiler DetermineShBangs(
-                Dictionary<int, string> shbangs)
+                Dictionary<int, string> shbangs,
+                CultureInfo currentCulture)
             {
                 string language = DefaultCompilerName;
                 bool useDefault = true;
@@ -106,14 +107,14 @@ namespace SilverSim.Scripting.Common
                 }
                 catch
                 {
-                    throw new CompilerException(lineno, "Unknown engine specified");
+                    throw new CompilerException(lineno, string.Format(this.GetLanguageString(currentCulture, "UnknownEngine0Specified", "Unknown engine '{0}' specified"), language));
                 }
                 return compiler;
             }
 
             private IScriptAssembly Compile(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
-                IScriptCompiler compiler = DetermineShBangs(shbangs);
+                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 object[] attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectModeAttribute), false);
                 if(attrs.Length != 0)
@@ -141,14 +142,14 @@ namespace SilverSim.Scripting.Common
 
             private void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
-                IScriptCompiler compiler = DetermineShBangs(shbangs);
+                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber, cultureInfo);
             }
 
             private void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
-                IScriptCompiler compiler = DetermineShBangs(shbangs);
+                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 compiler.SyntaxCheckAndDump(s, user, shbangs, assetID, reader, linenumber, cultureInfo);
             }
@@ -332,7 +333,7 @@ namespace SilverSim.Scripting.Common
                     }
                 }
 
-                IScriptCompiler compiler = DetermineShBangs(shbangs);
+                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {

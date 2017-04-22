@@ -90,7 +90,7 @@ namespace SilverSim.Scene.Types.Scene
             ScriptRunningReply reply = new ScriptRunningReply();
             reply.ItemID = req.ItemID;
             reply.ObjectID = req.ObjectID;
-            reply.IsRunning = instance.IsRunning ? instance.IsRunning : false;
+            reply.IsRunning = instance != null && instance.IsRunning ? instance.IsRunning : false;
 
             agent.SendMessageAlways(reply, ID);
         }
