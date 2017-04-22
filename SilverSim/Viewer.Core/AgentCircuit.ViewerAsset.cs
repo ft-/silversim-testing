@@ -27,9 +27,9 @@ using System.Net;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class AgentCircuit
+    partial class AgentCircuit
     {
-        void Cap_GetMesh(HttpRequest httpreq)
+        void Cap_ViewerAsset(HttpRequest httpreq)
         {
             string[] parts = httpreq.RawUrl.Substring(1).Split('/');
 
@@ -44,79 +44,93 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            if (parts.Length < 4)
+            int pos = httpreq.RawUrl.IndexOf('?');
+            if (pos < 0)
             {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not found");
+                return;
+            }
+            string reqUrl = httpreq.RawUrl.Substring(pos + 1);
+            // Format: ?<type_name>_id=<uuid>
+            pos = reqUrl.IndexOf("_id=");
+
+            string assetType_string = reqUrl.Substring(0, pos);
+            string assetId_string = reqUrl.Substring(pos + 4);
+            string contentType;
+            UUID assetId;
+            AssetType assetType = assetType_string.StringToAssetType();
+            if (!UUID.TryParse(assetId_string, out assetId))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not found");
                 return;
             }
 
-            UUID meshID;
-            if (parts[3].Substring(0, 1) != "?")
+            switch (assetType)
             {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                return;
-            }
+                case AssetType.Animation:
+                    contentType = "application/vnd.ll.animation";
+                    break;
 
-            string meshreq = parts[3].Substring(1);
-            string[] texreq = meshreq.Split('&');
-            string mID = string.Empty;
+                case AssetType.Sound:
+                    contentType = "audio/ogg";
+                    break;
 
-            foreach (string texreqentry in texreq)
-            {
-                if (texreqentry.StartsWith("mesh_id="))
-                {
-                    mID = texreqentry.Substring(8);
-                }
-            }
-
-            try
-            {
-                meshID = UUID.Parse(mID);
-            }
-            catch
-            {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                return;
+                default:
+                    httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                    return;
             }
 
             AssetData asset;
             try
             {
                 /* let us prefer the sim asset service */
-                asset = Scene.AssetService[meshID];
+                asset = Scene.AssetService[assetId];
             }
-            catch
+            catch (Exception e1)
             {
                 try
                 {
-                    asset = Agent.AssetService[meshID];
+                    asset = Agent.AssetService[assetId];
                     try
                     {
                         /* try to store the asset on our sim's asset service */
+                        asset.Temporary = true;
                         Scene.AssetService.Store(asset);
                     }
-                    catch(Exception e)
+                    catch (Exception e3)
                     {
-                        m_Log.WarnFormat("Storing of asset failed: {0}: {1}\n{2}",
-                            e.GetType().FullName,
-                            e.Message,
-                            e.StackTrace);
+                        m_Log.DebugFormat("Failed to store asset {0} locally (Cap_ViewerAsset): {1}", assetId, e3.Message);
                     }
                 }
-                catch
+                catch (Exception e2)
                 {
+                    if (Server.LogAssetFailures)
+                    {
+                        m_Log.DebugFormat("Failed to download asset {0} (Cap_ViewerAsset): {1} or {2}\nA: {3}\nB: {4}", assetId, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
+                    }
                     httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
                 }
             }
 
-            if (asset.Type != AssetType.Mesh)
+            if (asset.Type != AssetType.Texture)
+            {
+                if (asset.Type != AssetType.Mesh)
+                {
+                    m_Log.DebugFormat("Failed to download asset (Cap_ViewerAsset): Viewer for AgentID {0} tried to download non-texture asset ({1})", AgentID, asset.Type.ToString());
+                }
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+
+            if (asset.Type != assetType)
             {
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
-            ReturnRangeProcessedAsset(httpreq, asset, "application/vnd.ll.mesh", "GetMesh");
+            ReturnRangeProcessedAsset(httpreq, asset, contentType, "ViewerAsset");
         }
     }
 }

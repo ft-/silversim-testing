@@ -317,6 +317,7 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("FetchLib2", regionSeedID, Cap_FetchInventory2, capConfig);
             AddDefCapability("FetchInventoryDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
             AddDefCapability("FetchLibDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
+            AddDefCapability("ViewerAsset", regionSeedID, Cap_ViewerAsset, capConfig);
             AddDefCapability("GetTexture", regionSeedID, Cap_GetTexture, capConfig);
             AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);
             AddDefCapability("GetMesh2", regionSeedID, Cap_GetMesh, capConfig);

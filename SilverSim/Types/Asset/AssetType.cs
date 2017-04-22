@@ -66,4 +66,84 @@ namespace SilverSim.Types.Asset
         MarketplaceListings = 53,
         MarketplaceStock = 54
     }
+
+    public static class AssetTypeExtensionMethods
+    {
+        public static string AssetTypeToString(this AssetType v)
+        {
+            switch (v)
+            {
+                case AssetType.Texture: return "texture";
+                case AssetType.Sound: return "sound";
+                case AssetType.CallingCard: return "callcard";
+                case AssetType.Landmark: return "Landmark";
+                case AssetType.Clothing: return "clothing";
+                case AssetType.Object: return "object";
+                case AssetType.Notecard: return "notecard";
+                case AssetType.LSLText: return "lsltext";
+                case AssetType.LSLBytecode: return "lslbyte";
+                case AssetType.TextureTGA: return "txtr_tga";
+                case AssetType.Bodypart: return "bodypart";
+                case AssetType.SoundWAV: return "snd_wav";
+                case AssetType.ImageTGA: return "img_tga";
+                case AssetType.ImageJPEG: return "jpeg";
+                case AssetType.Animation: return "animatn";
+                case AssetType.Gesture: return "gesture";
+                case AssetType.Simstate: return "simstate";
+                case AssetType.Link: return "link";
+                case AssetType.LinkFolder: return "link_f";
+                case AssetType.Mesh: return "mesh";
+                default: return "unknown";
+            }
+        }
+
+        public static AssetType StringToAssetType(this string s)
+        {
+            switch (s)
+            {
+                case "texture":
+                    return AssetType.Texture;
+                case "sound":
+                    return AssetType.Sound;
+                case "callcard":
+                    return AssetType.CallingCard;
+                case "landmark":
+                    return AssetType.Landmark;
+                case "clothing":
+                    return AssetType.Clothing;
+                case "object":
+                    return AssetType.Object;
+                case "notecard":
+                    return AssetType.Notecard;
+                case "lsltext":
+                    return AssetType.LSLText;
+                case "lslbyte":
+                    return AssetType.LSLBytecode;
+                case "txtr_tga":
+                    return AssetType.TextureTGA;
+                case "bodypart":
+                    return AssetType.Bodypart;
+                case "snd_wav":
+                    return AssetType.SoundWAV;
+                case "img_tga":
+                    return AssetType.ImageTGA;
+                case "jpeg":
+                    return AssetType.ImageJPEG;
+                case "animatn":
+                    return AssetType.Animation;
+                case "gesture":
+                    return AssetType.Gesture;
+                case "simstate":
+                    return AssetType.Simstate;
+                case "link":
+                    return AssetType.Link;
+                case "link_f":
+                    return AssetType.LinkFolder;
+                case "mesh":
+                    return AssetType.Mesh;
+                default:
+                    return AssetType.Unknown;
+            }
+        }
+    }
 }

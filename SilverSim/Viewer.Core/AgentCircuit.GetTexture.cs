@@ -23,7 +23,6 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core
@@ -142,121 +141,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            if (httpreq.ContainsHeader("Range"))
-            {
-                string[] ranges = httpreq["Range"].Split(' ');
-                if(ranges.Length > 1)
-                {
-                    using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
-                    {
-                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
-                        {
-                            o.Write(asset.Data, 0, asset.Data.Length);
-                        }
-                    }
-                    return;
-                }
-
-                string[] p = ranges[0].Split('=');
-                if(p.Length != 2)
-                {
-                    httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                    m_Log.WarnFormat("Requested range for GetTexture is not decoded. {0}", ranges[0]);
-                    return;
-                }
-                string[] v = p[1].Split('-');
-                if(v.Length != 2)
-                {
-                    httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                    m_Log.WarnFormat("Requested range for GetTexture is not decoded. {0} see {1}", ranges[0], p[1]);
-                    return;
-                }
-
-                if(p[0] != "bytes")
-                {
-                    using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
-                    {
-                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
-                        {
-                            o.Write(asset.Data, 0, asset.Data.Length);
-                        }
-                    }
-                    return;
-                }
-
-                int start;
-                int end;
-
-                try
-                {
-                    start = int.Parse(v[0]);
-                    end = string.IsNullOrEmpty(v[1]) ?
-                        asset.Data.Length - 1 :
-                        int.Parse(v[1]);
-
-                    /* The following check is regarding some weirdness of some viewers trying to retrieve data past the file size.
-                     * Yet, RFC2616 requires a RequestedRangeNotSatisfiable here but those viewers would not accept it.
-                     */
-                    if(start >= asset.Data.Length)
-                    {
-                        using(HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c"))
-                        {
-                            /* no additional action needed */
-                        }
-                        return;
-                    }
-                    if (start > end)
-                    {
-                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                        return;
-                    }
-                    if(end > asset.Data.Length - 1)
-                    {
-                        end = asset.Data.Length - 1;
-                    }
-                    if (end >= asset.Data.Length)
-                    {
-                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                        return;
-                    }
-                    if (start == 0 && end == asset.Data.Length - 1)
-                    {
-                        using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
-                        {
-                            using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
-                            {
-                                o.Write(asset.Data, 0, asset.Data.Length);
-                            }
-                        }
-                        return;
-                    }
-                }
-                catch(Exception e)
-                {
-                    m_Log.Debug("Exception when parsing requested range (GetTexture)", e);
-                    httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                    return;
-                }
-
-                using (HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c"))
-                {
-                    httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
-                    using (Stream o = httpres.GetOutputStream(end - start + 1))
-                    {
-                        o.Write(asset.Data, start, end - start + 1);
-                    }
-                }
-            }
-            else
-            {
-                using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
-                {
-                    using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
-                    {
-                        o.Write(asset.Data, 0, asset.Data.Length);
-                    }
-                }
-            }
+            ReturnRangeProcessedAsset(httpreq, asset, "image/x-j2c", "GetTexture");
         }
     }
 }

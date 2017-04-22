@@ -60,4 +60,86 @@ namespace SilverSim.Types.Inventory
         Outbox = 51,
         BasicRoot = 51
     }
+
+    public static class InventoryTypeExtensionMethods
+    {
+        public static string AssetTypeToString(sbyte v)
+        {
+            switch (v)
+            {
+                default: return "unknown";
+            }
+        }
+
+        public static string InventoryTypeToString(this InventoryType v)
+        {
+            switch (v)
+            {
+                case InventoryType.Snapshot: return "snapshot";
+                case InventoryType.Attachable: return "attach";
+                case InventoryType.Wearable: return "wearable";
+                case InventoryType.Texture: return "texture";
+                case InventoryType.Sound: return "sound";
+                case InventoryType.CallingCard: return "callcard";
+                case InventoryType.Landmark: return "Landmark";
+                case InventoryType.Clothing: return "clothing";
+                case InventoryType.Object: return "object";
+                case InventoryType.Notecard: return "notecard";
+                case InventoryType.LSLText: return "lsltext";
+                case InventoryType.LSLBytecode: return "lslbyte";
+                case InventoryType.TextureTGA: return "txtr_tga";
+                case InventoryType.Bodypart: return "bodypart";
+                case InventoryType.Animation: return "animatn";
+                case InventoryType.Gesture: return "gesture";
+                case InventoryType.Simstate: return "simstate";
+                case InventoryType.Mesh: return "mesh";
+                default: return "unknown";
+            }
+        }
+
+        public static InventoryType StringToInventoryType(this string v)
+        {
+            switch (v)
+            {
+                case "texture":
+                    return InventoryType.Texture;
+                case "sound":
+                    return InventoryType.Sound;
+                case "callcard":
+                    return InventoryType.CallingCard;
+                case "landmark":
+                    return InventoryType.Landmark;
+                case "clothing":
+                    return InventoryType.Clothing;
+                case "object":
+                    return InventoryType.Object;
+                case "notecard":
+                    return InventoryType.Notecard;
+                case "lsltext":
+                    return InventoryType.LSLText;
+                case "lslbyte":
+                    return InventoryType.LSLBytecode;
+                case "txtr_tga":
+                    return InventoryType.TextureTGA;
+                case "bodypart":
+                    return InventoryType.Bodypart;
+                case "animatn":
+                    return InventoryType.Animation;
+                case "gesture":
+                    return InventoryType.Gesture;
+                case "simstate":
+                    return InventoryType.Simstate;
+                case "snapshot":
+                    return InventoryType.Snapshot;
+                case "attach":
+                    return InventoryType.Attachable;
+                case "wearable":
+                    return InventoryType.Wearable;
+                case "mesh":
+                    return InventoryType.Mesh;
+                default:
+                    return InventoryType.Unknown;
+            }
+        }
+    }
 }

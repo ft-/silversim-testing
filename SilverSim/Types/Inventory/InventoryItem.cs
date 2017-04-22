@@ -194,110 +194,16 @@ namespace SilverSim.Types.Inventory
         }
         #endregion
 
-        #region Type conversions
-        public static string AssetTypeToString(sbyte v)
-        {
-            switch (v)
-            {
-                case (sbyte)AssetType.Texture: return "texture";
-                case (sbyte)AssetType.Sound: return "sound";
-                case (sbyte)AssetType.CallingCard: return "callcard";
-                case (sbyte)AssetType.Landmark: return "Landmark";
-                case (sbyte)AssetType.Clothing: return "clothing";
-                case (sbyte)AssetType.Object: return "object";
-                case (sbyte)AssetType.Notecard: return "notecard";
-                case (sbyte)AssetType.LSLText: return "lsltext";
-                case (sbyte)AssetType.LSLBytecode: return "lslbyte";
-                case (sbyte)AssetType.TextureTGA: return "txtr_tga";
-                case (sbyte)AssetType.Bodypart: return "bodypart";
-                case (sbyte)AssetType.SoundWAV: return "snd_wav";
-                case (sbyte)AssetType.ImageTGA: return "img_tga";
-                case (sbyte)AssetType.ImageJPEG: return "jpeg";
-                case (sbyte)AssetType.Animation: return "animatn";
-                case (sbyte)AssetType.Gesture: return "gesture";
-                case (sbyte)AssetType.Simstate: return "simstate";
-                default: return "unknown";
-            }
-        }
-
-        public static string InventoryTypeToString(sbyte v)
-        {
-            switch(v)
-            {
-                case (sbyte)InventoryType.Snapshot: return "snapshot";
-                case (sbyte)InventoryType.Attachable: return "attach";
-                case (sbyte)InventoryType.Wearable: return "wearable";
-                default: return AssetTypeToString(v);
-            }
-        }
-        #endregion
-
         #region Properties
         public string AssetTypeName
         {
             get
             {
-                return AssetTypeToString((sbyte)AssetType);
+                return AssetType.AssetTypeToString();
             }
             set
             {
-                switch(value)
-                {
-                    case "texture":
-                        AssetType = AssetType.Texture;
-                        break;
-                    case "sound":
-                        AssetType = AssetType.Sound;
-                        break;
-                    case "callcard":
-                        AssetType = AssetType.CallingCard;
-                        break;
-                    case "landmark":
-                        AssetType = AssetType.Landmark;
-                        break;
-                    case "clothing":
-                        AssetType = AssetType.Clothing;
-                        break;
-                    case "object":
-                        AssetType = AssetType.Object;
-                        break;
-                    case "notecard":
-                        AssetType = AssetType.Notecard;
-                        break;
-                    case "lsltext":
-                        AssetType = AssetType.LSLText;
-                        break;
-                    case "lslbyte":
-                        AssetType = AssetType.LSLBytecode;
-                        break;
-                    case "txtr_tga":
-                        AssetType = AssetType.TextureTGA;
-                        break;
-                    case "bodypart":
-                        AssetType = AssetType.Bodypart;
-                        break;
-                    case "snd_wav":
-                        AssetType = AssetType.SoundWAV;
-                        break;
-                    case "img_tga":
-                        AssetType = AssetType.ImageTGA;
-                        break;
-                    case "jpeg":
-                        AssetType = AssetType.ImageJPEG;
-                        break;
-                    case "animatn":
-                        AssetType = AssetType.Animation;
-                        break;
-                    case "gesture":
-                        AssetType = AssetType.Gesture;
-                        break;
-                    case "simstate":
-                        AssetType = AssetType.Simstate;
-                        break;
-                    default:
-                        AssetType = AssetType.Unknown;
-                        break;
-                }
+                AssetType = value.StringToAssetType();
             }
         }
 
@@ -305,67 +211,11 @@ namespace SilverSim.Types.Inventory
         {
             get
             {
-                return InventoryTypeToString((sbyte)InventoryType);
+                return InventoryType.InventoryTypeToString();
             }
             set
             {
-                switch (value)
-                {
-                    case "texture":
-                        InventoryType = InventoryType.Texture;
-                        break;
-                    case "sound":
-                        InventoryType = InventoryType.Sound;
-                        break;
-                    case "callcard":
-                        InventoryType = InventoryType.CallingCard;
-                        break;
-                    case "landmark":
-                        InventoryType = InventoryType.Landmark;
-                        break;
-                    case "clothing":
-                        InventoryType = InventoryType.Clothing;
-                        break;
-                    case "object":
-                        InventoryType = InventoryType.Object;
-                        break;
-                    case "notecard":
-                        InventoryType = InventoryType.Notecard;
-                        break;
-                    case "lsltext":
-                        InventoryType = InventoryType.LSLText;
-                        break;
-                    case "lslbyte":
-                        InventoryType = InventoryType.LSLBytecode;
-                        break;
-                    case "txtr_tga":
-                        InventoryType = InventoryType.TextureTGA;
-                        break;
-                    case "bodypart":
-                        InventoryType = InventoryType.Bodypart;
-                        break;
-                    case "animatn":
-                        InventoryType = InventoryType.Animation;
-                        break;
-                    case "gesture":
-                        InventoryType = InventoryType.Gesture;
-                        break;
-                    case "simstate":
-                        InventoryType = InventoryType.Simstate;
-                        break;
-                    case "snapshot":
-                        InventoryType = InventoryType.Snapshot;
-                        break;
-                    case "attach":
-                        InventoryType = InventoryType.Attachable;
-                        break;
-                    case "wearable":
-                        InventoryType = InventoryType.Wearable;
-                        break;
-                    default:
-                        AssetType = AssetType.Unknown;
-                        break;
-                }
+                InventoryType = value.StringToInventoryType();
             }
         }
         #endregion
