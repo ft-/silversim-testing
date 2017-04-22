@@ -105,10 +105,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "NotAllowedToModifyNotecard", "Not allowed to modify notecard"));
                 }
 
-                item.AssetID = data.ID;
                 data.Creator = item.Creator;
                 data.Name = item.Name;
-                item.ID = UUID.Random;
 
                 try
                 {
@@ -121,13 +119,16 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 try
                 {
-                    part.Inventory.Remove(kvp.Value.ItemID);
-                    part.Inventory.Add(item.ID, item.Name, item);
+                    part.Inventory.SetAssetID(item.ID, data.ID);
                 }
                 catch
                 {
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreInventoryItem", "Failed to store inventory item"));
                 }
+
+                part.SendObjectUpdate();
+                part.ObjectGroup.Scene.SendObjectPropertiesToAgent(m_Agent, part);
+
                 return m;
             }
             else
