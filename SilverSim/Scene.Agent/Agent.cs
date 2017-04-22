@@ -516,15 +516,16 @@ namespace SilverSim.Scene.Agent
                     break;
 
                 case PrimitiveParamsType.Type:
-                    throw new ArgumentException("PRIM_TYPE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TYPE");
 
                 case PrimitiveParamsType.Slice:
-                    throw new ArgumentException("PRIM_SLICE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SLICE");
 
                 case PrimitiveParamsType.PhysicsShapeType:
-                    throw new ArgumentException("PRIM_PHYSICSSHAPETYPE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PHYSICSHAPETYPE");
 
                 case PrimitiveParamsType.Material:
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_MATERIAL");
                     throw new ArgumentException("PRIM_MATERIAL not allowed for agents");
 
                 case PrimitiveParamsType.Position:
@@ -548,76 +549,76 @@ namespace SilverSim.Scene.Agent
                     break;
 
                 case PrimitiveParamsType.Texture:
-                    throw new ArgumentException("PRIM_TEXTURE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TEXTURE");
 
                 case PrimitiveParamsType.Text:
-                    throw new ArgumentException("PRIM_TEXT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TEXT");
 
                 case PrimitiveParamsType.Color:
-                    throw new ArgumentException("PRIM_COLOR not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_COLOR");
 
                 case PrimitiveParamsType.BumpShiny:
-                    throw new ArgumentException("PRIM_BUMPSHINY not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_BUMPSHINY");
 
                 case PrimitiveParamsType.PointLight:
-                    throw new ArgumentException("PRIM_POINTLIGHT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_POINTLIGHT");
 
                 case PrimitiveParamsType.FullBright:
-                    throw new ArgumentException("PRIM_FULLBRIGHT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_FULLBRIGHT");
 
                 case PrimitiveParamsType.Flexible:
-                    throw new ArgumentException("PRIM_FLEXIBLE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_FLEXIBLE");
 
                 case PrimitiveParamsType.TexGen:
-                    throw new ArgumentException("PRIM_TEXGEN not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TEXGEN");
 
                 case PrimitiveParamsType.Glow:
-                    throw new ArgumentException("PRIM_GLOW not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_GLOW");
 
                 case PrimitiveParamsType.Omega:
-                    throw new ArgumentException("PRIM_OMEGA not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_OMEGA");
 
                 case PrimitiveParamsType.Specular:
-                    throw new ArgumentException("PRIM_SPECULAR not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SPECULAR");
 
                 case PrimitiveParamsType.Normal:
-                    throw new ArgumentException("PRIM_NORMAL not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_NORMAL");
 
                 case PrimitiveParamsType.AlphaMode:
-                    throw new ArgumentException("PRIM_ALPHA_MODE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_ALPHA_MODE");
 
                 case PrimitiveParamsType.Alpha:
-                    throw new ArgumentException("PRIM_ALPHA not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_ALPHA");
 
                 case PrimitiveParamsType.AllowUnsit:
-                    throw new ArgumentException("PRIM_ALLOW_UNSIT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_ALLOW_UNSIT");
 
                 case PrimitiveParamsType.ScriptedSitOnly:
-                    throw new ArgumentException("PRIM_SCRIPTED_SIT_ONLY not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SCRIPTED_SIT_ONLY");
 
                 case PrimitiveParamsType.SitTarget:
-                    throw new ArgumentException("PRIM_SIT_TARGET not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SIT_TARGET");
 
                 case PrimitiveParamsType.Projector:
-                    throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR");
 
                 case PrimitiveParamsType.ProjectorEnabled:
-                    throw new ArgumentException("PRIM_PROJECTOR_ENABLED not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJETOR_ENABLED");
 
                 case PrimitiveParamsType.ProjectorTexture:
-                    throw new ArgumentException("PRIM_PROJECTOR_TEXTURE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_TEXTURE");
 
                 case PrimitiveParamsType.ProjectorFov:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOV not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_FOV");
 
                 case PrimitiveParamsType.ProjectorFocus:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOCUS not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_FOCUS");
 
                 case PrimitiveParamsType.ProjectorAmbience:
-                    throw new ArgumentException("PRIM_PROJECTOR_AMBIENCE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_AMBIENCE");
 
                 default:
-                    throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsUInt));
+                    throw new LocalizedScriptErrorException(this, "PRIMInvalidParameterType0", "Invalid primitive parameter type {0}", enumerator.Current.AsUInt);
             }
         }
 
@@ -634,16 +635,16 @@ namespace SilverSim.Scene.Agent
                     break;
 
                 case PrimitiveParamsType.Type:
-                    throw new ArgumentException("PRIM_TYPE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TYPE");
 
                 case PrimitiveParamsType.Slice:
-                    throw new ArgumentException("PRIM_SLICE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SLICE");
 
                 case PrimitiveParamsType.PhysicsShapeType:
-                    throw new ArgumentException("PRIM_PHYSICSSHAPETYPE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PHYSICSSHAPETYPE");
 
                 case PrimitiveParamsType.Material:
-                    throw new ArgumentException("PRIM_MATERIAL not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_MATERIAL");
 
                 case PrimitiveParamsType.Position:
                     Position = ParamsHelper.GetVector(enumerator, "PRIM_POSITION");
@@ -662,79 +663,79 @@ namespace SilverSim.Scene.Agent
                     break;
 
                 case PrimitiveParamsType.Size:
-                    throw new ArgumentException("PRIM_SIZE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SIZE");
 
                 case PrimitiveParamsType.Texture:
-                    throw new ArgumentException("PRIM_TEXTURE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TEXTURE");
 
                 case PrimitiveParamsType.Text:
-                    throw new ArgumentException("PRIM_TEXT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TEXT");
 
                 case PrimitiveParamsType.Color:
-                    throw new ArgumentException("PRIM_COLOR not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_COLOR");
 
                 case PrimitiveParamsType.BumpShiny:
-                    throw new ArgumentException("PRIM_BUMPSHINY not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_BUMPSHINY");
 
                 case PrimitiveParamsType.PointLight:
-                    throw new ArgumentException("PRIM_POINTLIGHT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_POINTLIGHT");
 
                 case PrimitiveParamsType.FullBright:
-                    throw new ArgumentException("PRIM_FULLBRIGHT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_FULLBRIGHT");
 
                 case PrimitiveParamsType.Flexible:
-                    throw new ArgumentException("PRIM_FLEXIBLE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_FLEXIBLE");
 
                 case PrimitiveParamsType.TexGen:
-                    throw new ArgumentException("PRIM_TEXGEN not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_TEXGEN");
 
                 case PrimitiveParamsType.Glow:
-                    throw new ArgumentException("PRIM_GLOW not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_GLOW");
 
                 case PrimitiveParamsType.Omega:
-                    throw new ArgumentException("PRIM_OMEGA not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_OMEGA");
 
                 case PrimitiveParamsType.Specular:
-                    throw new ArgumentException("PRIM_SPECULAR not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SPECULAR");
 
                 case PrimitiveParamsType.Normal:
-                    throw new ArgumentException("PRIM_NORMAL not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_NORMAL");
 
                 case PrimitiveParamsType.AlphaMode:
-                    throw new ArgumentException("PRIM_ALPHA_MODE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_ALPHA_MODE");
 
                 case PrimitiveParamsType.Alpha:
-                    throw new ArgumentException("PRIM_ALPHA not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_ALPHA");
 
                 case PrimitiveParamsType.AllowUnsit:
-                    throw new ArgumentException("PRIM_ALLOW_UNSIT not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_ALLOW_UNSIT");
 
                 case PrimitiveParamsType.ScriptedSitOnly:
-                    throw new ArgumentException("PRIM_SCRIPTED_SIT_ONLY not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SCRIPTED_SIT_ONLY");
 
                 case PrimitiveParamsType.SitTarget:
-                    throw new ArgumentException("PRIM_SIT_TARGET not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_SIT_TARGET");
 
                 case PrimitiveParamsType.Projector:
-                    throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR");
 
                 case PrimitiveParamsType.ProjectorEnabled:
-                    throw new ArgumentException("PRIM_PROJECTOR_ENABLED not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_ENABLED");
 
                 case PrimitiveParamsType.ProjectorTexture:
-                    throw new ArgumentException("PRIM_PROJECTOR_TEXTURE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_TEXTURE");
 
                 case PrimitiveParamsType.ProjectorFov:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOV not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_FOV");
 
                 case PrimitiveParamsType.ProjectorFocus:
-                    throw new ArgumentException("PRIM_PROJECTOR_FOCUS not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_FOCUS");
 
                 case PrimitiveParamsType.ProjectorAmbience:
-                    throw new ArgumentException("PRIM_PROJECTOR_AMBIENCE not allowed for agents");
+                    throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_PROJECTOR_AMBIENCE");
 
                 default:
-                    throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsInt));
+                    throw new LocalizedScriptErrorException(this, "PRIMInvalidParameterType0", "Invalid primitive parameter type {0}", enumerator.Current.AsInt);
             }
         }
 

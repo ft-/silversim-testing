@@ -1,0 +1,5 @@
+PRIM0NotAllowedForAgents={0} not allowed for agents
+PRIMInvalidParameterType0=Invalid primitive parameter type {0}
+InvalidLinkTargetParameterForFunction0Msg1=Invalid link target parameter for {0}: {1}
+LinkTarget0NotAllowedFor1=Link Target {0} not allowed for {1}
+LinkTarget0DoesNotExist=Link target {0} does not exist

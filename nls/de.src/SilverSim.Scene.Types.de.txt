@@ -19,3 +19,7 @@ NoPermissionToReturnObjectToOwner=Nicht berechtigt, das Objekt '{0}' an den Eige
 NoPermissionToTakeObject=Keine Erlaubnis das Objekt '{0}' zu nehmen.
 NoPermissionToCopyObject=Keine Erlaubnis das Objekt '{0}' zu kopieren.
 InvalidDerezRequestByViewer=Ungültiger Derez-Request vom Viewer.
+PRIMInvalidParameterType0=Ungültiger Prim-Parametertyp {0}
+InvalidLinkTargetParameterForFunction0Msg1=Ungültiger Linkziel-Parameter bei {0}: {1}
+LinkTarget0NotAllowedFor1=Linkziel {0} nicht erlaubt bei {1}
+LinkTarget0DoesNotExist=Linkziel {0} existiert nicht.

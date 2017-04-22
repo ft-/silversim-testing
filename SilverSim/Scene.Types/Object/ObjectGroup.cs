@@ -890,7 +890,7 @@ namespace SilverSim.Scene.Types.Object
             }
             else if (linkTarget < LINK_ROOT)
             {
-                throw new ArgumentException(String.Format("Invalid link target parameter for GetPrimitiveParams: {0}", linkTarget));
+                throw new LocalizedScriptErrorException(this, "InvalidLinkTargetParameterForFunction0Msg1", "Invalid link target parameter for {0}: {1}", "GetPrimitiveParams", linkTarget);
             }
 
             while (enumerator.MoveNext())
@@ -925,18 +925,18 @@ namespace SilverSim.Scene.Types.Object
                         switch (linkTarget)
                         {
                             case LINK_SET:
-                                throw new ArgumentException("Link Target LINK_SET not allowed for GetPrimitiveParams");
+                                throw new LocalizedScriptErrorException(this, "LinkTarget0NotAllowedFor1", "Link Target {0} not allowed for {1}", "LINK_SET", "GetPrimitiveParams");
 
                             case LINK_ALL_OTHERS:
-                                throw new ArgumentException("Link Target LINK_ALL_OTHERS not allowed for GetPrimitiveParams");
+                                throw new LocalizedScriptErrorException(this, "LinkTarget0NotAllowedFor1", "Link Target {0} not allowed for {1}", "LINK_ALL_OTHERS", "GetPrimitiveParams");
 
                             case LINK_ALL_CHILDREN:
-                                throw new ArgumentException("Link Target LINK_ALL_CHILDREN not allowed for GetPrimitiveParams");
+                                throw new LocalizedScriptErrorException(this, "LinkTarget0NotAllowedFor1", "Link Target {0} not allowed for {1}", "LINK_ALL_CHILDREN", "GetPrimitiveParams");
 
                             default:
                                 if(linkTarget < 1)
                                 {
-                                    throw new ArgumentException(String.Format("Invalid link target {0}", linkTarget));
+                                    throw new LocalizedScriptErrorException(this, "InvalidLinkTargetParameterForFunction0Msg1", "Invalid link target parameter for {0}: {1}", linkTarget, "GetPrimitiveParams");
                                 }
                                 IObject obj;
                                 try
@@ -945,7 +945,7 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 catch(KeyNotFoundException)
                                 {
-                                    throw new ArgumentException(String.Format("Link target {0} does not exist", linkTarget));
+                                    throw new LocalizedScriptErrorException(this, "LinkTarget0DoesNotExist", "Link target {0} does not exist", linkTarget);
                                 }
                                 obj.GetPrimitiveParams(enumerator, paramList);
                                 break;
@@ -972,7 +972,7 @@ namespace SilverSim.Scene.Types.Object
             }
             else if(linkTarget < LINK_ROOT)
             {
-                throw new ArgumentException(String.Format("Invalid link target parameter for SetPrimitiveParams: {0}", linkTarget));
+                throw new LocalizedScriptErrorException(this, "InvalidLinkTargetParameterForFunction0Msg1", "Invalid link target parameter for {0}: {1}", "SetPrimitiveParams", linkTarget);
             }
 
             while (enumerator.MoveNext())
@@ -1061,7 +1061,7 @@ namespace SilverSim.Scene.Types.Object
                             default:
                                 if (linkTarget < 1)
                                 {
-                                    throw new ArgumentException(String.Format("Invalid link target {0}", linkTarget));
+                                    throw new LocalizedScriptErrorException(this, "InvalidLinkTargetParameterForFunction0Msg1", "Invalid link target parameter for {0}: {1}", linkTarget, "SetPrimitiveParams");
                                 }
                                 IObject linkobj;
                                 try
@@ -1070,7 +1070,7 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 catch(KeyNotFoundException)
                                 {
-                                    throw new ArgumentException(String.Format("Link target {0} does not exist", linkTarget));
+                                    throw new LocalizedScriptErrorException(this, "LinkTarget0DoesNotExist", "Link target {0} does not exist", linkTarget);
                                 }
                                 linkobj.SetPrimitiveParams(enumerator);
                                 break;

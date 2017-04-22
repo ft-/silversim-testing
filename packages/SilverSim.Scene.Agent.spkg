@@ -3,5 +3,7 @@
 	<name>SilverSim.Scene.Agent</name>
 	<files>
 		<file name="bin/SilverSim.Scene.Agent.dll"/>
+		<file name="bin/languages/en/SilverSim.Scene.Agent.en.resources"/>
+		<file name="bin/languages/de/SilverSim.Scene.Agent.de.resources"/>
 	</files>
 </package>
