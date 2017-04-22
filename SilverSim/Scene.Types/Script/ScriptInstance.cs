@@ -20,18 +20,14 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
-using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
-using System.Globalization;
 
 namespace SilverSim.Scene.Types.Script
 {
