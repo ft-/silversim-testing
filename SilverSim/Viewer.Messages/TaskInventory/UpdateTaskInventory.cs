@@ -33,8 +33,8 @@ namespace SilverSim.Viewer.Messages.TaskInventory
     {
         public enum KeyType : byte
         {
-            AgentInventory = 0,
-            ObjectInventory = 1
+            InventoryId = 0,
+            AssetId = 1
         }
         public UUID AgentID;
         public UUID SessionID;

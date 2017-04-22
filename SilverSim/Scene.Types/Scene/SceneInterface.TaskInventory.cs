@@ -35,6 +35,7 @@ using SilverSim.Viewer.Messages.TaskInventory;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -143,15 +144,21 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            switch (req.Key)
+#if DEBUG
+            m_Log.DebugFormat("UpdateTaskInventory key={0}", req.Key.ToString());
+#endif
+            if(req.Key != UpdateTaskInventory.KeyType.InventoryId)
             {
-                case UpdateTaskInventory.KeyType.AgentInventory:
-                    AddTaskInventoryItem(req, agent, part);
-                    break;
+                return;
+            }
 
-                case UpdateTaskInventory.KeyType.ObjectInventory:
-                    UpdateTaskInventoryItem(req, agent, part);
-                    break;
+            if(part.Inventory.ContainsKey(req.ItemID))
+            {
+                UpdateTaskInventoryItem(req, agent, part);
+            }
+            else
+            {
+                AddTaskInventoryItem(req, agent, part);
             }
         }
 
@@ -220,13 +227,9 @@ namespace SilverSim.Scene.Types.Scene
 
                     part.Inventory.Add(item);
 
-                    if(agent.SelectedObjects(ID).Contains(part.ID))
-                    {
-                        using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
-                        {
-                            propHandler.Send(part);
-                        }
-                    }
+                    part.SendObjectUpdate();
+
+                    SendObjectPropertiesToAgent(agent, part);
 
                     if (agentItem.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
                     {
@@ -276,10 +279,7 @@ namespace SilverSim.Scene.Types.Scene
             else
             {
                 /* no asset upload */
-                if(req.Name != item.Name)
-                {
-                    part.Inventory.ChangeKey(item.Name, req.Name);
-                }
+                part.Inventory.Rename(req.Name, item.ID);
                 item.Description = req.Description;
                 if(agent.IsActiveGod)
                 {
@@ -296,7 +296,8 @@ namespace SilverSim.Scene.Types.Scene
                     item.Permissions.Current = req.OwnerMask & item.Permissions.Base;
                     item.Permissions.NextOwner = req.OwnerMask & item.Permissions.Base;
                 }
-
+                Interlocked.Increment(ref part.Inventory.InventorySerial);
+                part.SendObjectUpdate();
                 SendObjectPropertiesToAgent(agent, part);
             }
         }

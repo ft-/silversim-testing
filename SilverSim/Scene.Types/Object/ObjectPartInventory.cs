@@ -264,6 +264,36 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool Rename(string newKey, UUID itemid)
+        {
+            bool renamed = false;
+            ObjectPartInventoryItem item;
+            lock (m_DataLock)
+            {
+                if (base.TryGetValue(itemid, out item) && item.Name != newKey)
+                {
+                    base.ChangeKey(newKey, item.Name);
+                    item.Name = newKey;
+                    renamed = true;
+                }
+            }
+
+            if (renamed)
+            {
+                Interlocked.Increment(ref InventorySerial);
+
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    {
+                        d(ChangeAction.Change, PartID, item.ID);
+                    }
+                }
+            }
+            return renamed;
+        }
+
         public void Replace(string name, ObjectPartInventoryItem newItem)
         {
             ObjectPartInventoryItem oldItem;
