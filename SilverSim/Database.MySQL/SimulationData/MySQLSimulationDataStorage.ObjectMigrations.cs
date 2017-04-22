@@ -76,6 +76,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new DropColumn("IsRotateXEnabled"),
             new DropColumn("IsRotateYEnabled"),
             new DropColumn("IsRotateZEnabled"),
+            new TableRevision(9),
+            new AddColumn<UUID>("RezzingObjectID") {IsNullAllowed = false, Default = UUID.Zero },
             #endregion
 
             #region Table prims

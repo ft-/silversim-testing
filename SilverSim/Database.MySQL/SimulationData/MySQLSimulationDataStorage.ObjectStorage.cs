@@ -103,6 +103,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
             objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
             objgroup.IsIncludedInSearch = dbReader.GetBool("IsIncludedInSearch");
+            objgroup.RezzingObjectID = dbReader.GetUUID("RezzingObjectID");
             return objgroup;
         }
 

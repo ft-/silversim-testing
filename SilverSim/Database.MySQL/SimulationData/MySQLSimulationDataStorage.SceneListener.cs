@@ -432,6 +432,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 data.Add("AttachedPos", objgroup.AttachedPos);
                 data.Add("AttachPoint", objgroup.AttachPoint);
                 data.Add("IsIncludedInSearch", objgroup.IsIncludedInSearch);
+                data.Add("RezzingObjectID", objgroup.RezzingObjectID);
                 return data;
             }
 
