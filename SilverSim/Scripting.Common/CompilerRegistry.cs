@@ -22,11 +22,13 @@
 using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Updater;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace SilverSim.Scripting.Common
@@ -112,6 +114,23 @@ namespace SilverSim.Scripting.Common
                 return compiler;
             }
 
+            static Assembly ResolveAssembly(object sender, ResolveEventArgs args)
+            {
+                AssemblyName aName = new AssemblyName(args.Name);
+
+                string[] pathList = new string[] { CoreUpdater.Instance.BinariesPath, CoreUpdater.Instance.PluginsPath };
+
+                foreach (string s in pathList)
+                {
+                    string assemblyName = Path.Combine(s, aName.Name + ".dll");
+                    if (File.Exists(assemblyName))
+                    {
+                        return Assembly.LoadFrom(assemblyName);
+                    }
+                }
+                return null;
+            }
+
             private IScriptAssembly Compile(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
                 IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
@@ -126,6 +145,11 @@ namespace SilverSim.Scripting.Common
                     AppDomain appDom = AppDomain.CreateDomain(
                         "Script Domain " + assetID.ToString(), 
                         AppDomain.CurrentDomain.Evidence);
+                    appDom.AssemblyResolve += ResolveAssembly;
+                    appDom.Load("SilverSim.Types");
+                    appDom.Load("SilverSim.ServiceInterfaces");
+                    appDom.Load("SilverSim.Scene.Types");
+                    appDom.Load("SilverSim.Scripting.Common");
                     try
                     {
                         IScriptAssembly assembly = compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber, cultureInfo);
