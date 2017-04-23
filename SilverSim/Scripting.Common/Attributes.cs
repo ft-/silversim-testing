@@ -34,4 +34,15 @@ namespace SilverSim.Scripting.Common
 
         }
     }
+
+    [Serializable]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
+    public sealed class CompilerUsesInMemoryCompilationAttribute : Attribute
+    {
+        public CompilerUsesInMemoryCompilationAttribute()
+        {
+
+        }
+    }
 }

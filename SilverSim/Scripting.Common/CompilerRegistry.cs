@@ -125,7 +125,7 @@ namespace SilverSim.Scripting.Common
                     string assemblyName = Path.Combine(s, aName.Name + ".dll");
                     if (File.Exists(assemblyName))
                     {
-                        return Assembly.LoadFrom(assemblyName);
+                        return Assembly.LoadFile(assemblyName);
                     }
                 }
                 return null;
@@ -136,7 +136,8 @@ namespace SilverSim.Scripting.Common
                 IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 object[] attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectModeAttribute), false);
-                if(attrs.Length != 0)
+                object[] attrs2 = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesInMemoryCompilationAttribute), false);
+                if(attrs.Length != 0 || attrs2.Length != 0)
                 {
                     return compiler.Compile(AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber, cultureInfo);
                 }
@@ -294,11 +295,12 @@ namespace SilverSim.Scripting.Common
                     {
                         shbangs.Add(linenumber, shbang);
                     }
+                    ++linenumber;
                 }
 
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    return Compile(user, shbangs, assetID, headReader, linenumber, cultureInfo);
+                    return Compile(user, shbangs, assetID, headReader, 1, cultureInfo);
                 }
             }
 
@@ -315,10 +317,12 @@ namespace SilverSim.Scripting.Common
                     {
                         shbangs.Add(linenumber, shbang);
                     }
+                    ++linenumber;
                 }
+
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    Compile(user, shbangs, assetID, headReader, linenumber, cultureInfo);
+                    Compile(user, shbangs, assetID, headReader, 1, cultureInfo);
                 }
             }
 
@@ -339,7 +343,7 @@ namespace SilverSim.Scripting.Common
                 }
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, linenumber, cultureInfo);
+                    SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, 1, cultureInfo);
                 }
             }
 
@@ -356,13 +360,14 @@ namespace SilverSim.Scripting.Common
                     {
                         shbangs.Add(linenumber, shbang);
                     }
+                    ++linenumber;
                 }
 
                 IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, linenumber, cultureInfo);
+                    compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, 1, cultureInfo);
                 }
             }
         }
