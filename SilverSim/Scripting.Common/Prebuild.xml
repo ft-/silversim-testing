@@ -23,6 +23,7 @@
   <Reference name="SilverSim.Scene.Types" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="SilverSim.Updater" localCopy="false"/>
+  <Reference name="SilverSim.Main.Common" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
