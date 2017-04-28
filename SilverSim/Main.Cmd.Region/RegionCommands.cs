@@ -1450,15 +1450,21 @@ namespace SilverSim.Main.Cmd.Region
                 selectedScene = io.SelectedScene;
             }
 
-            StringBuilder output = new StringBuilder();
+            FormattedListBuilder formattedList = new FormattedListBuilder()
+                .AddColumn("Region", 30)
+                .AddColumn("Env FPS", 10)
+                .AddColumn("Phys FPS", 10)
+                .AddColumn("Phys Engine", 20)
+                .AddHeader()
+                .AddSeparator();
             if (selectedScene == UUID.Zero)
             {
                 foreach (SceneInterface scene in m_Scenes.Values)
                 {
-                    output.AppendFormat("Region {0}\n  Env FPS: {1:F2}  Phys FPS: {2:F2}  Phys Engine: {3}\n",
+                    formattedList.AddData(
                         scene.Name,
-                        scene.Environment.EnvironmentFps,
-                        scene.PhysicsScene.PhysicsFPS,
+                        scene.Environment.EnvironmentFps.ToString("N2"),
+                        scene.PhysicsScene.PhysicsFPS.ToString("N2"), 
                         scene.PhysicsScene.PhysicsEngineName);
                 }
             }
@@ -1470,11 +1476,13 @@ namespace SilverSim.Main.Cmd.Region
                     io.Write("no scene selected");
                     return;
                 }
-                output.AppendFormat("Environment FPS: {0:F2}\n", scene.Environment.EnvironmentFps);
-                output.AppendFormat("Physics FPS: {0:F2} (Engine: {1})\n", scene.PhysicsScene.PhysicsFPS, scene.PhysicsScene.PhysicsEngineName);
-                output.AppendFormat("Root Agents: {0}", scene.RootAgents.Count);
+                formattedList.AddData(
+                    scene.Name, 
+                    scene.Environment.EnvironmentFps.ToString("N2"), 
+                    scene.PhysicsScene.PhysicsFPS.ToString("N2"), 
+                    scene.PhysicsScene.PhysicsEngineName);
             }
-            io.Write(output.ToString());
+            io.Write(formattedList.ToString());
         }
 
         void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
