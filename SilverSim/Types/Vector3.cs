@@ -450,7 +450,7 @@ namespace SilverSim.Types
 
         public static Vector3 operator /(Vector3 vec, Quaternion rot)
         {
-            return vec * (-rot);
+            return vec * rot.Conjugate();
         }
 
         public static Vector3 operator *(Vector3 vector, Matrix4 matrix)

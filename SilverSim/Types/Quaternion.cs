@@ -783,6 +783,7 @@ namespace SilverSim.Types
             return b;
         }
 
+        /** <summary> do not use to produce the inverse rotation. Only use Conjugate() for inversing the rotation</summary> */
         public static Quaternion operator -(Quaternion quaternion)
         {
             return new Quaternion(-quaternion.X, -quaternion.Y, -quaternion.Z, -quaternion.W);
@@ -816,25 +817,14 @@ namespace SilverSim.Types
             return new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
         }
 
-        public static Quaternion operator /(Quaternion quaternion1, Quaternion quaternion2)
+        public Quaternion Conjugate()
         {
-            double x = quaternion1.X;
-            double y = quaternion1.Y;
-            double z = quaternion1.Z;
-            double w = quaternion1.W;
+            return new Quaternion(-X, -Y, -Z, W);
+        }
 
-            double q2lensq = quaternion2.LengthSquared;
-            double ooq2lensq = 1f / q2lensq;
-            double x2 = -quaternion2.X * ooq2lensq;
-            double y2 = -quaternion2.Y * ooq2lensq;
-            double z2 = -quaternion2.Z * ooq2lensq;
-            double w2 = quaternion2.W * ooq2lensq;
-
-            return new Quaternion(
-                ((x * w2) + (x2 * w)) + (y * z2) - (z * y2),
-                ((y * w2) + (y2 * w)) + (z * x2) - (x * z2),
-                ((z * w2) + (z2 * w)) + (x * y2) - (y * x2),
-                (w * w2) - ((x * x2) + (y * y2)) + (z * z2));
+        public static Quaternion operator /(Quaternion a, Quaternion b)
+        {
+            return a * b.Conjugate();
         }
 
 
