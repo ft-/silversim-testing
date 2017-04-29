@@ -612,7 +612,7 @@ namespace SilverSim.Types
                 q[3] = (mm[j, k] - mm[k, j]) * s;
                 q[j] = (mm[i, j] + mm[j, i]) * s;
                 q[k] = (mm[i, k] + mm[k, i]) * s;
-                return new Quaternion(q[0], q[1], q[2], q[3]);
+                return new Quaternion(q[0], q[1], q[2], q[3]).Normalize();
             }
         }
 
