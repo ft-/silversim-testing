@@ -262,7 +262,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         }
         #endregion
 
-        public Vector3 Normal(int posX, int posY)
+        public Vector3 SurfaceNormal(int posX, int posY)
         {
             // Clamp to valid position
             posX = posX.Clamp(0, (int)m_Scene.SizeX);
@@ -283,12 +283,12 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                         (uint)posY :
                         (uint)posY + 1];
 
-            /* Calculate normalized vectors from p0 to p1 and p0 to p2 */
+            /* Calculate vectors from p0 to p1 and p0 to p2 */
             Vector3 v0 = p1 - p0;
             Vector3 v1 = p2 - p0;
 
             /* Calculate the cross product (the slope normal). */
-            return v0.Cross(v1).Normalize();
+            return v0.Cross(v1);
         }
 
         #region Properties
