@@ -551,58 +551,68 @@ namespace SilverSim.Types
         public static Quaternion Axes2Rot(Vector3 fwd, Vector3 left, Vector3 up)
         {
             double s;
-            double tr = fwd.X + left.Y + up.Z + 1.0;
+            double tr = fwd.X + left.Y + up.Z;
 
-            if(fwd.Length + left.Length + up.Length < double.Epsilon)
+            /* never try to optimize this +1.0, the check is entirely different then on IEEE-754 FP format */
+            if (tr > 0.0)
             {
-                return new Quaternion(1, 0, 0, 0);
-            }
-            else if (tr >= 1.0)
-            {
-                s = 0.5 / Math.Sqrt(tr);
+                s = Math.Sqrt(tr + 1.0);
+                double w = s / 2.0;
+                s = 0.5 / s;
                 return new Quaternion(
                         (left.Z - up.Y) * s,
                         (up.X - fwd.Z) * s,
                         (fwd.Y - left.X) * s,
-                        0.25 / s);
+                        w);
             }
             else
             {
-                double max = (left.Y > up.Z) ? left.Y : up.Z;
+                double[,] mm = new double[3, 3];
+                int i = 0;
+                int j;
+                int k;
+                mm[0, 0] = fwd.X;
+                mm[0, 1] = fwd.Y;
+                mm[0, 2] = fwd.Z;
+                mm[1, 0] = left.X;
+                mm[1, 1] = left.Y;
+                mm[1, 2] = left.Z;
+                mm[2, 0] = up.X;
+                mm[2, 1] = up.Y;
+                mm[2, 2] = up.Z;
+                if (mm[1,1] > mm[0,0])
+                {
+                    i = 1;
+                }
+                if(mm[2,2]>mm[1,1])
+                {
+                    i = 2;
+                }
+                j = i + 1;
+                k = j + 1;
+                if (i > 2)
+                {
+                    i -= 3;
+                }
+                if(j > 2)
+                {
+                    j -= 3;
+                }
 
-                if (max < fwd.X)
+                s = Math.Sqrt(mm[i, i] - mm[j, j] + 1.0);
+
+                double[] q = new double[4];
+                q[i] = s * 0.5;
+
+                if(s != 0f)
                 {
-                    s = Math.Sqrt(fwd.X - (left.Y + up.Z) + 1.0);
-                    double x = s * 0.5;
                     s = 0.5 / s;
-                    return new Quaternion(
-                            x,
-                            (fwd.Y + left.X) * s,
-                            (up.X + fwd.Z) * s,
-                            (left.Z - up.Y) * s);
                 }
-                else if (max == left.Y)
-                {
-                    s = Math.Sqrt(left.Y - (up.Z + fwd.X) + 1.0);
-                    double y = s * 0.5;
-                    s = 0.5 / s;
-                    return new Quaternion(
-                            (fwd.Y + left.X) * s,
-                            y,
-                            (left.Z + up.Y) * s,
-                            (up.X - fwd.Z) * s);
-                }
-                else
-                {
-                    s = Math.Sqrt(up.Z - (fwd.X + left.Y) + 1.0);
-                    double z = s * 0.5;
-                    s = 0.5 / s;
-                    return new Quaternion(
-                            (up.X + fwd.Z) * s,
-                            (left.Z + up.Y) * s,
-                            z,
-                            (fwd.Y - left.X) * s);
-                }
+
+                q[3] = (mm[j, k] - mm[k, j]) * s;
+                q[j] = (mm[i, j] + mm[j, i]) * s;
+                q[k] = (mm[i, k] + mm[k, i]) * s;
+                return new Quaternion(q[0], q[1], q[2], q[3]);
             }
         }
 
