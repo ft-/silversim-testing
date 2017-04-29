@@ -75,7 +75,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 rot.X = 0;
                 rot.Y = 0;
-                rot.Normalize();
+                rot.NormalizeSelf();
                 d.ParentID = 0;
             }
             else

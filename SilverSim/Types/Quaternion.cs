@@ -132,45 +132,33 @@ namespace SilverSim.Types
             return v;
         }
 
-        /// <summary>
-        /// Convert this quaternion to euler angles
-        /// </summary>
-        /// <param name="roll">X euler angle</param>
-        /// <param name="pitch">Y euler angle</param>
-        /// <param name="yaw">Z euler angle</param>
+        const double GimbalThreshold = 0.000436;
+
         public void GetEulerAngles(out double roll, out double pitch, out double yaw)
         {
-            roll = 0f;
-            pitch = 0f;
-            yaw = 0f;
-
-            Quaternion t = new Quaternion(this.X * this.X, this.Y * this.Y, this.Z * this.Z, this.W * this.W);
-
-            double m = (t.X + t.Y + t.Z + t.W);
-            if (Math.Abs(m) < 0.001d)
+            double sx = 2 * (X * W - Y * Z);
+            double sy = 2 * (Y * W + X * Z);
+            double ys = W * W - Y * Y;
+            double xz = X * X - Z * Z;
+            double cx = ys - xz;
+            double cy = Math.Sqrt(sx * sx + cx * cx);
+            if(cy > GimbalThreshold)
             {
-                return;
+                roll = Math.Atan2(sx, cx);
+                pitch = Math.Atan2(sy, cy);
+                yaw = Math.Atan2(2 * (Z * W - X * Y), ys + xz);
             }
-            double n = 2 * (this.Y * this.W + this.X * this.Z);
-            double p = m * m - n * n;
-
-            if (p > 0f)
+            else if(sy > 0)
             {
-                roll = Math.Atan2(2.0f * (this.X * this.W - this.Y * this.Z), (-t.X - t.Y + t.Z + t.W));
-                pitch = Math.Atan2(n, Math.Sqrt(p));
-                yaw = Math.Atan2(2.0f * (this.Z * this.W - this.X * this.Y), t.X - t.Y - t.Z + t.W);
-            }
-            else if (n > 0f)
-            {
-                roll = 0f;
-                pitch = (Math.PI / 2d);
-                yaw = Math.Atan2((this.Z * this.W + this.X * this.Y), 0.5f - t.X - t.Y);
+                roll = 0;
+                pitch = Math.PI / 2d;
+                yaw = 2 * Math.Atan2(Z + X, W + Y);
             }
             else
             {
-                roll = 0f;
-                pitch = -(Math.PI / 2d);
-                yaw = Math.Atan2((this.Z * this.W + this.X * this.Y), 0.5f - t.X - t.Z);
+                roll = 0;
+                pitch = -Math.PI / 2d;
+                yaw = 2 * Math.Atan2(Z - X, W - Y);
             }
         }
 
@@ -235,7 +223,8 @@ namespace SilverSim.Types
             q.Z = axis.Z * s;
             q.W = c;
 
-            return Quaternion.Normalize(q);
+            q.NormalizeSelf();
+            return q;
         }
 
         /// <summary>
@@ -410,15 +399,17 @@ namespace SilverSim.Types
             return (q1 * scale) + (q2 * invscale);
         }
 
-        public static Quaternion Normalize(Quaternion q)
-        {
-            return new Quaternion(q).Normalize();
-        }
-
         /// <summary>
         /// Normalizes the quaternion
         /// </summary>
         public Quaternion Normalize()
+        {
+            Quaternion q = new Quaternion(this);
+            q.NormalizeSelf();
+            return q;
+        }
+
+        public void NormalizeSelf()
         {
             const double MAG_THRESHOLD = 0.0000001f;
             double mag = Length;
@@ -434,13 +425,11 @@ namespace SilverSim.Types
             }
             else
             {
-                X = 0f;
-                Y = 0f;
-                Z = 0f;
-                W = 1f;
+                X = 0;
+                Y = 0;
+                Z = 0;
+                W = 1;
             }
-
-            return this;
         }
 
         public static Quaternion RotBetween(Vector3 a, Vector3 b)
@@ -564,7 +553,11 @@ namespace SilverSim.Types
             double s;
             double tr = fwd.X + left.Y + up.Z + 1.0;
 
-            if (tr >= 1.0)
+            if(fwd.Length + left.Length + up.Length < double.Epsilon)
+            {
+                return new Quaternion(1, 0, 0, 0);
+            }
+            else if (tr >= 1.0)
             {
                 s = 0.5 / Math.Sqrt(tr);
                 return new Quaternion(
@@ -621,11 +614,11 @@ namespace SilverSim.Types
                 double y;
                 double z;
 
-                Normalize();
+                Quaternion t = Normalize();
 
-                x = X * X - Y * Y - Z * Z + W * W;
-                y = 2 * (X * Y + Z * W);
-                z = 2 * (X * Z - Y * W);
+                x = t.X * t.X - t.Y * t.Y - t.Z * t.Z + t.W * t.W;
+                y = 2 * (t.X * t.Y + t.Z * t.W);
+                z = 2 * (t.X * t.Z - t.Y * t.W);
                 return new Vector3(x, y, z);
             }
         }
@@ -638,11 +631,11 @@ namespace SilverSim.Types
                 double y;
                 double z;
 
-                Normalize();
+                Quaternion t = Normalize();
 
-                x = 2 * (X * Y - Z * W);
-                y = -X * X + Y * Y - Z * Z + W * W;
-                z = 2 * (X * W + Y * Z);
+                x = 2 * (t.X * t.Y - t.Z * t.W);
+                y = -t.X * t.X + t.Y * t.Y - t.Z * t.Z + t.W * t.W;
+                z = 2 * (t.X * t.W + t.Y * t.Z);
                 return new Vector3(x, y, z);
             }
         }
@@ -655,11 +648,11 @@ namespace SilverSim.Types
                 double y;
                 double z;
 
-                Normalize();
+                Quaternion t = Normalize();
 
-                x = 2 * (X * Z + Y * W);
-                y = 2 * (-X * W + Y * Z);
-                z = -X * X - Y * Y + Z * Z + W * W;
+                x = 2 * (t.X * t.Z + t.Y * t.W);
+                y = 2 * (-t.X * t.W + t.Y * t.Z);
+                z = -t.X * t.X - t.Y * t.Y + t.Z * t.Z + t.W * t.W;
                 return new Vector3(x, y, z);
             }
         }
