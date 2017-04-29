@@ -599,7 +599,7 @@ namespace SilverSim.Types
                     j -= 3;
                 }
 
-                s = Math.Sqrt(mm[i, i] - mm[j, j] + 1.0);
+                s = Math.Sqrt(mm[i, i] - mm[j, j] + mm[k, k] + 1.0);
 
                 double[] q = new double[4];
                 q[i] = s * 0.5;
