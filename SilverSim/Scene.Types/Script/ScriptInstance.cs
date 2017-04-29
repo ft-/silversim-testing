@@ -60,6 +60,7 @@ namespace SilverSim.Scene.Types.Script
         /* Remove and Dispose must deregister all possible handles */
         public abstract void Remove();
         public abstract void Reset();
+        public abstract void Start(int startparam = 0);
         public bool IsResetRequired { get; set; } /* only used during startup */
 
         public abstract void ProcessEvent();

@@ -155,6 +155,11 @@ namespace SilverSim.Scripting.Common
             /* nothing to do */
         }
 
+        public override void Start(int startparam = 0)
+        {
+            /* nothing to do */
+        }
+
         public override void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions)
         {
             /* nothing to do */
