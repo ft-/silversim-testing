@@ -1219,11 +1219,11 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Rotation:
-                    Rotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROTATION");
+                    Rotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROTATION").Normalize();
                     break;
 
                 case PrimitiveParamsType.RotLocal:
-                    LocalRotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROT_LOCAL");
+                    LocalRotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROT_LOCAL").Normalize();
                     break;
 
                 case PrimitiveParamsType.Size:
