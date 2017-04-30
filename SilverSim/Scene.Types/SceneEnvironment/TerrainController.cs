@@ -293,7 +293,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public Vector3 SurfaceSlope(double posX, double posY)
         {
-            Vector3 vsn = SurfaceNormal(posX, posY);
+            Vector3 vsn = SurfaceNormal(posX, posY).Normalize();
 
             /* Put the x,y coordinates of the slope normal into the plane equation to get
              * the height of that point on the plane.  
