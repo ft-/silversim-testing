@@ -268,27 +268,18 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             uint iposX = (uint)posX.Clamp(0, m_Scene.SizeX);
             uint iposY = (uint)posY.Clamp(0, m_Scene.SizeY);
 
-            /* Find neighboring points so we can calculate the resulting plane */
-            Vector3 p0 = new Vector3(posX, posY, this[iposX, iposY]);
-            Vector3 p1 = new Vector3(iposX + 1, iposY, 0);
-            Vector3 p2 = new Vector3(iposX, iposY + 1, 0);
+            uint iposX_plus_1 = iposX + 1;
+            uint iposY_plus_1 = iposY + 1;
 
-            p1.Z = this[(posX + 1) >= m_Scene.SizeX ?
-                        iposX :
-                        iposX + 1,
-                        iposY];
-
-            p2.Z = this[iposX,
-                        (iposY + 1.0) >= m_Scene.SizeY ?
-                        iposY :
-                        iposY + 1];
-
-            /* Calculate vectors from p0 to p1 and p0 to p2 */
-            Vector3 v0 = p1 - p0;
-            Vector3 v1 = p2 - p0;
+            double t00 = this[iposX, iposY];
+            double zx = iposX_plus_1 >= m_Scene.SizeX ? 0 : this[iposX_plus_1, iposY] - t00;
+            double zy = iposY_plus_1 >= m_Scene.SizeY ? 0 : this[iposX, iposY_plus_1] - t00;
 
             /* Calculate the cross product (the slope normal). */
-            return v0.Cross(v1);
+            return new Vector3(
+                -zx,
+                zx - zy,
+                1);
         }
 
         public Vector3 SurfaceSlope(double posX, double posY)
