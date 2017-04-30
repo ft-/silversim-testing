@@ -289,6 +289,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             /* Put the x,y coordinates of the slope normal into the plane equation to get
              * the height of that point on the plane.  
              * The resulting vector provides the slope.
+             * 
+             * Info from old lslwiki data:
+             * The slope of the ground is direction the land is 'laying'. It is always orthogonal to llGroundNormal.
+             * Example: A 'cliff' would have a slope of approximately <0, 0, -1> (pointing down).
              */
             Vector3 vsl = vsn;
             vsl.Z = (((vsn.X * vsn.X) + (vsn.Y * vsn.Y)) / (-1 * vsn.Z));
@@ -298,6 +302,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public Vector3 SurfaceContour(double posX, double posY)
         {
+            /* Info from old lslwiki data:
+             * The ground contour is the direction in which there is no change in height.
+             * Example: Imagine taking a horizontal "slice" of the sim's land at the height of the ground being sampled. The ground contour would point in the direction of the outline created.             * 
+             */
             Vector3 v = SurfaceSlope(posX, posY);
             return new Vector3(-v.Y, v.X, 0);
         }
