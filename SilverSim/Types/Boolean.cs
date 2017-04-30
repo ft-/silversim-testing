@@ -124,6 +124,7 @@ namespace SilverSim.Types
         public uint AsUInt { get { return m_Value ? (uint)1 : 0; } }
         public int AsInt { get { return m_Value ? 1 : 0; } }
         public ulong AsULong { get { return m_Value ? (ulong)1 : 0; } }
+        public long AsLong { get { return m_Value ? 1 : 0; } }
         #endregion
     }
 }

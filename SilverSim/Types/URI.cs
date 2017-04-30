@@ -144,9 +144,10 @@ namespace SilverSim.Types
         public AString AsString { get { return new AString(ToString()); } }
         public UUID AsUUID { get { return new UUID(); } }
         public Vector3 AsVector3 { get { return new Vector3(1); } }
-        public uint AsUInt { get { return (uint)1; } }
+        public uint AsUInt { get { return 1; } }
         public int AsInt { get { return 1; } }
-        public ulong AsULong { get { return (ulong)1; } }
+        public ulong AsULong { get { return 1; } }
+        public long AsLong { get { return 1; } }
         #endregion
 
     }

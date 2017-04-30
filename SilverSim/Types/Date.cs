@@ -218,6 +218,7 @@ namespace SilverSim.Types
         public uint AsUInt { get { return (uint)DateTimeToUnixTime(); } }
         public int AsInt { get { return (int)DateTimeToUnixTime(); } }
         public ulong AsULong { get { return DateTimeToUnixTime(); } }
+        public long AsLong { get { return (long)DateTimeToUnixTime(); } }
         #endregion
 
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0);

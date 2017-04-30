@@ -209,6 +209,8 @@ namespace SilverSim.Types
         public int AsInt { get { return int.Parse(m_Value); } }
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public ulong AsULong { get { return ulong.Parse(m_Value); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
+        public long AsLong { get { return long.Parse(m_Value); } }
         #endregion
     }
 }

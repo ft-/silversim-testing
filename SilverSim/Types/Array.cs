@@ -185,6 +185,7 @@ namespace SilverSim.Types
         public uint AsUInt { get { return 0; } }
         public int AsInt { get { return 0; } }
         public ulong AsULong { get { return 0; } }
+        public long AsLong { get { return 0; } }
         #endregion 
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]

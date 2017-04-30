@@ -187,6 +187,7 @@ namespace SilverSim.Types
         public uint AsUInt { get { return this.Equals(Zero) ? 0 : (uint) 1; } }
         public int AsInt { get { return this.Equals(Zero) ? 0 : 1; } }
         public ulong AsULong { get { return this.Equals(Zero) ? 0 : (ulong)1; } }
+        public long AsLong { get { return this.Equals(Zero) ? 0 : (long)1; } }
         #endregion
 
         #region Properties

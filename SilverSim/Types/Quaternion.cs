@@ -982,6 +982,7 @@ namespace SilverSim.Types
         public uint AsUInt { get { return (uint)Length; } }
         public int AsInt { get { return (int)Length; } }
         public ulong AsULong { get { return (ulong)Length; } }
+        public long AsLong { get { return (long)Length; } }
         #endregion
 
         /// <summary>A quaternion with a value of 0,0,0,1</summary>
