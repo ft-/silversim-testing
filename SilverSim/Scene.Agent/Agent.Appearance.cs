@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
-using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages.Appearance;
 using System;
 using System.Collections.Generic;
