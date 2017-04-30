@@ -113,6 +113,11 @@ namespace SilverSim.Types
             base.Add(new Integer(val));
         }
 
+        public void AddLongInt(long val)
+        {
+            base.Add(new LongInteger(val));
+        }
+
         public static AnArray operator +(AnArray a, AnArray b)
         {
             AnArray n = new AnArray(a);
