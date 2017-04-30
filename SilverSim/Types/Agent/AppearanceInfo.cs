@@ -155,7 +155,7 @@ namespace SilverSim.Types.Agent
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
-        public static readonly int MaxVisualParams = 260;
+        public static readonly int MaxVisualParams = 255;
 
         public readonly AvatarTextureData AvatarTextures = new AvatarTextureData();
 
