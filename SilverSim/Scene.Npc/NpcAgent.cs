@@ -127,6 +127,21 @@ namespace SilverSim.Scene.Npc
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
             m_NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
+            OnAppearanceUpdate += HandleAppearanceUpdate;
+        }
+
+        ~NpcAgent()
+        {
+            OnAppearanceUpdate -= HandleAppearanceUpdate;
+        }
+
+        void HandleAppearanceUpdate(IAgent agent)
+        {
+            SceneInterface scene = CurrentScene;
+            if (null != scene)
+            {
+                scene.SendAgentObjectToAllAgents(this);
+            }
         }
 
         UUI m_NpcOwner = UUI.Unknown;

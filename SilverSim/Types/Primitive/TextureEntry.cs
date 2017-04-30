@@ -687,7 +687,7 @@ namespace SilverSim.Types.Primitive
                     binWriter.Write(DefaultTexture.MaterialID.GetBytes());
                     for (int i = 0; i < materialIDs.Length; i++)
                     {
-                        if (materialIDs[i] != UInt32.MaxValue)
+                        if (materialIDs[i] != UInt32.MaxValue && materialIDs[i] != 0)
                         {
                             binWriter.Write(GetFaceBitfieldBytes(materialIDs[i]));
                             binWriter.Write(m_FaceTextures[i].MaterialID.GetBytes());

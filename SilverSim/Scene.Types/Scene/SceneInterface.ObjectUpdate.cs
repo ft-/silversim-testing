@@ -108,14 +108,17 @@ namespace SilverSim.Scene.Types.Scene
         {
             SilverSim.Viewer.Messages.Message m = AgentToObjectUpdate(agent);
             targetAgent.SendMessageAlways(m, ID);
+            targetAgent.SendMessageAlways(agent.GetAvatarAppearanceMsg(), ID);
         }
 
         public void SendAgentObjectToAllAgents(IAgent agent)
         {
             SilverSim.Viewer.Messages.Message m = AgentToObjectUpdate(agent);
+            SilverSim.Viewer.Messages.Message am = agent.GetAvatarAppearanceMsg();
             foreach (IAgent a in Agents)
             {
                 a.SendMessageAlways(m, ID);
+                a.SendMessageAlways(am, ID);
             }
         }
 

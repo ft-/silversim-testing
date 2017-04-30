@@ -45,6 +45,7 @@ using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Appearance;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -70,6 +71,8 @@ namespace SilverSim.Scene.Types.Agent
 
         /** <summary>Key is region ID</summary> */
         RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds { get; }
+
+        AvatarAppearance GetAvatarAppearanceMsg();
 
         bool IMSend(GridInstantMessage im);
 
