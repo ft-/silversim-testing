@@ -262,26 +262,26 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         }
         #endregion
 
-        public Vector3 SurfaceNormal(int posX, int posY)
+        public Vector3 SurfaceNormal(double posX, double posY)
         {
             // Clamp to valid position
-            posX = posX.Clamp(0, (int)m_Scene.SizeX);
-            posY = posY.Clamp(0, (int)m_Scene.SizeY);
+            uint iposX = (uint)posX.Clamp(0, m_Scene.SizeX);
+            uint iposY = (uint)posY.Clamp(0, m_Scene.SizeY);
 
             /* Find neighboring points so we can calculate the resulting plane */
-            Vector3 p0 = new Vector3(posX, posY, this[(uint)posX, (uint)posY]);
-            Vector3 p1 = new Vector3(posX + 1, posY, 0);
-            Vector3 p2 = new Vector3(posX, posY + 1, 0);
+            Vector3 p0 = new Vector3(posX, posY, this[iposX, iposY]);
+            Vector3 p1 = new Vector3(iposX + 1, iposY, 0);
+            Vector3 p2 = new Vector3(iposX, iposY + 1, 0);
 
             p1.Z = this[(posX + 1) >= m_Scene.SizeX ?
-                        (uint)posX :
-                        (uint)posX + 1,
-                        (uint)posY];
+                        iposX :
+                        iposX + 1,
+                        iposY];
 
-            p2.Z = this[(uint)posX,
-                        (posY + 1.0) >= m_Scene.SizeY ?
-                        (uint)posY :
-                        (uint)posY + 1];
+            p2.Z = this[iposX,
+                        (iposY + 1.0) >= m_Scene.SizeY ?
+                        iposY :
+                        iposY + 1];
 
             /* Calculate vectors from p0 to p1 and p0 to p2 */
             Vector3 v0 = p1 - p0;
@@ -289,6 +289,26 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
             /* Calculate the cross product (the slope normal). */
             return v0.Cross(v1);
+        }
+
+        public Vector3 SurfaceSlope(double posX, double posY)
+        {
+            Vector3 vsn = SurfaceNormal(posX, posY);
+
+            /* Put the x,y coordinates of the slope normal into the plane equation to get
+             * the height of that point on the plane.  
+             * The resulting vector provides the slope.
+             */
+            Vector3 vsl = vsn;
+            vsl.Z = (((vsn.X * vsn.X) + (vsn.Y * vsn.Y)) / (-1 * vsn.Z));
+
+            return vsl;
+        }
+
+        public Vector3 SurfaceContour(double posX, double posY)
+        {
+            Vector3 v = SurfaceSlope(posX, posY);
+            return new Vector3(-v.Y, v.X, 0);
         }
 
         #region Properties
