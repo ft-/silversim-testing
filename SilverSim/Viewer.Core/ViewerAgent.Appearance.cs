@@ -171,7 +171,7 @@ namespace SilverSim.Viewer.Core
             AgentCircuit circuit;
             if (Circuits.TryGetValue(m_CurrentSceneID, out circuit))
             {
-                circuit.Scene.SendAgentObjectToAllAgents(this);
+                circuit.Scene.SendAgentAppearanceToAllAgents(this);
             }
         }
     }

@@ -140,7 +140,7 @@ namespace SilverSim.Scene.Npc
             SceneInterface scene = CurrentScene;
             if (null != scene)
             {
-                scene.SendAgentObjectToAllAgents(this);
+                scene.SendAgentAppearanceToAllAgents(this);
             }
         }
 

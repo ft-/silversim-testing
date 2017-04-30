@@ -122,6 +122,9 @@ namespace SilverSim.Scene.Agent
             AvatarAppearance appearance = new AvatarAppearance();
             appearance.Sender = ID;
             appearance.VisualParams = VisualParams;
+            AvatarAppearance.AppearanceDataEntry e = new AvatarAppearance.AppearanceDataEntry();
+            e.AppearanceVersion = 1;
+            appearance.AppearanceData.Add(e);
             return appearance;
         }
 
