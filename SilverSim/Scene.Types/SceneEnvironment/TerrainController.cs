@@ -275,7 +275,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             double zx = iposX_plus_1 >= m_Scene.SizeX ? 0 : this[iposX_plus_1, iposY] - t00;
             double zy = iposY_plus_1 >= m_Scene.SizeY ? 0 : this[iposX, iposY_plus_1] - t00;
 
-            /* Calculate the cross product (the slope normal). */
+            /* Calculate the cross product (the surface normal). */
             return new Vector3(
                 -zx,
                 zx - zy,
