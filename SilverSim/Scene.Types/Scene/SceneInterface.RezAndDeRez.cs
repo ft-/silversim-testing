@@ -226,7 +226,7 @@ namespace SilverSim.Scene.Types.Scene
                 case DeRezAction.DeleteToTrash:
                     foreach (ObjectGroup grp in objectgroups)
                     {
-                        if (!isActiveGod || !agent.IsInScene(this))
+                        if (isActiveGod && !agent.IsInScene(this))
                         {
                             return;
                         }
@@ -241,7 +241,7 @@ namespace SilverSim.Scene.Types.Scene
                 case DeRezAction.ReturnToOwner:
                     foreach (ObjectGroup grp in objectgroups)
                     {
-                        if (!isActiveGod || !agent.IsInScene(this))
+                        if (isActiveGod && !agent.IsInScene(this))
                         {
                             return;
                         }
@@ -267,7 +267,7 @@ namespace SilverSim.Scene.Types.Scene
                 case DeRezAction.Take:
                     foreach (ObjectGroup grp in objectgroups)
                     {
-                        if (!isActiveGod || !agent.IsInScene(this))
+                        if (isActiveGod && !agent.IsInScene(this))
                         {
                             return;
                         }
