@@ -158,9 +158,10 @@ namespace SilverSim.Viewer.Core
             res.WearableData = new List<Messages.Appearance.AgentCachedTextureResponse.WearableDataEntry>((int)WearableType.NumWearables);
 
             /* respond with no caching at all for now */
+            UUID[] textures = Textures.All;
             foreach(Messages.Appearance.AgentCachedTexture.WearableDataEntry wde in m.WearableData)
             {
-                res.WearableData.Add(new Messages.Appearance.AgentCachedTextureResponse.WearableDataEntry(wde.TextureIndex, UUID.Zero));
+                res.WearableData.Add(new Messages.Appearance.AgentCachedTextureResponse.WearableDataEntry(wde.TextureIndex, textures[wde.TextureIndex]));
             }
 
             SendMessageAlways(res, m.CircuitSceneID);

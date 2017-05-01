@@ -25,6 +25,7 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages.Appearance;
 using System;
 using System.Collections.Generic;
@@ -120,11 +121,30 @@ namespace SilverSim.Scene.Agent
         {
             AvatarAppearance appearance = new AvatarAppearance();
             appearance.Sender = ID;
+            appearance.TextureEntry = TextureEntry;
             appearance.VisualParams = VisualParams;
             AvatarAppearance.AppearanceDataEntry e = new AvatarAppearance.AppearanceDataEntry();
             e.AppearanceVersion = 1;
             appearance.AppearanceData.Add(e);
             return appearance;
+        }
+
+        public TextureEntry TextureEntry
+        {
+            get
+            {
+                TextureEntry te = new TextureEntry();
+                UUID[] textures = Textures.All;
+                te.DefaultTexture.TextureID = textures[0];
+                for (int i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
+                {
+                    if (UUID.Zero != textures[i])
+                    {
+                        te[(uint)i].TextureID = textures[i];
+                    }
+                }
+                return te;
+            }
         }
 
         public AppearanceInfo.AvatarTextureData Textures
@@ -272,6 +292,7 @@ namespace SilverSim.Scene.Agent
         public void RebakeAppearance(Action<string> logOutput = null)
         {
             AgentBakeAppearance.LoadAppearanceFromCurrentOutfit(this, AssetService, true, logOutput);
+            InvokeOnAppearanceUpdate();
         }
 
         private void ToUInt16Bytes(double value, double min, double max, byte[] buf, int pos)
