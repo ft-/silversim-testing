@@ -754,7 +754,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                IsScriptedSitOnly = value;
+                m_IsScriptedSitOnly = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -2338,6 +2338,49 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup.StopMoveToTarget();
         }
 
+        static Map DynAttrsFromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
+        {
+            if(reader.IsEmptyElement)
+            {
+                return new Map();
+            }
+            Map damap = LlsdXml.Deserialize(reader) as Map;
+            if (null != damap)
+            {
+                foreach (string key in damap.Keys)
+                {
+                    if (!(damap[key] is Map))
+                    {
+                        /* remove everything that is not a map */
+                        damap.Remove(key);
+                    }
+                }
+            }
+
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        reader.ReadToEndElement();
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != "DynAttrs")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return damap;
+                }
+            }
+
+            throw new InvalidObjectXmlException();
+        }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -2788,21 +2831,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "DynAttrs":
-                                {
-                                    Map damap = LlsdXml.Deserialize(reader) as Map;
-                                    if(null != damap)
-                                    {
-                                        foreach(string key in damap.Keys)
-                                        {
-                                            if(!(damap[key] is Map))
-                                            {
-                                                /* remove everything that is not a map */
-                                                damap.Remove(key);
-                                            }
-                                        }
-                                        part.m_DynAttrMap = damap;
-                                    }
-                                }
+                                part.m_DynAttrMap = DynAttrsFromXml(reader, rootGroup, currentOwner);
                                 break;
 
                             case "Components":

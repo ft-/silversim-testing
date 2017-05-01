@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
@@ -34,6 +35,7 @@ namespace SilverSim.Scene.Types.Transfer
 {
     public abstract class RezObjectHandler : AssetTransferWorkItem
     {
+        static readonly ILog m_Log = LogManager.GetLogger("REZOBJECT");
         readonly SceneInterface m_Scene;
         readonly Vector3 m_TargetPos;
         readonly UUI m_RezzingAgent;
@@ -80,8 +82,9 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 objgroups = ObjectXML.FromAsset(data, m_RezzingAgent);
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Error(string.Format("Unable to decode asset {0} to rez", data.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");
                 return;
             }
@@ -90,8 +93,9 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 PostProcessObjectGroups(objgroups);
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Error(string.Format("Unable to post process objects {0} ({1})", m_Scene.Name, m_Scene.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");
                 return;
             }
@@ -100,8 +104,9 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 m_Scene.RezObjects(objgroups, m_RezParams);
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Error(string.Format("Failed to rez object in scene {0} ({1})", m_Scene.Name, m_Scene.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");
                 return;
             }
