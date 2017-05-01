@@ -472,7 +472,7 @@ namespace SilverSim.Scene.Types.Object
                 if((flags & UpdateDataFlags.Compressed) != 0)
                 {
                     byte[] partsystem = ParticleSystemBytes;
-                    if (partsystem.Length != 0 && partsystem.Length != 86)
+                    if ((partsystem.Length != 0 && partsystem.Length != 86) || Velocity.Length > double.Epsilon)
                     {
                         m_CompressedUpdateData = null;
                     }
