@@ -814,7 +814,31 @@ namespace SilverSim.Scene.Types.Object
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(value.ProfileHollow % 256);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(value.ProfileHollow / 256);
 
-                    if (value.SculptType == SilverSim.Types.Primitive.PrimitiveSculptType.Mesh)
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin] = (byte)(value.PathBegin % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin + 1] = (byte)(value.PathBegin / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd] = (byte)(value.PathEnd % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd + 1] = (byte)(value.PathEnd / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathCurve] = value.PathCurve;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathRadiusOffset] = (byte)value.PathRadiusOffset;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathRevolutions] = value.PathRevolutions;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleX] = value.PathScaleX;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleY] = value.PathScaleY;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathShearX] = value.PathShearX;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathShearY] = value.PathShearY;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathSkew] = (byte)value.PathSkew;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTaperX] = (byte)value.PathTaperX;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTaperY] = (byte)value.PathTaperY;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTwist] = (byte)value.PathTwist;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTwistBegin] = (byte)value.PathTwistBegin;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = (byte)(value.ProfileBegin % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = (byte)(value.ProfileBegin / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileCurve] = value.ProfileCurve;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = (byte)(value.ProfileEnd % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = (byte)(value.ProfileEnd / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = (byte)(value.ProfileHollow % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = (byte)(value.ProfileHollow / 256);
+
+                    if (value.SculptType == PrimitiveSculptType.Mesh)
                     {
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(12500 % 256);
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(12500 / 256);
@@ -822,6 +846,13 @@ namespace SilverSim.Scene.Types.Object
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = 0;
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(27500 % 256);
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(27500 / 256);
+
+                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = (byte)(12500 % 256);
+                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = (byte)(12500 / 256);
+                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = 0;
+                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = 0;
+                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = (byte)(27500 % 256);
+                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = (byte)(27500 / 256);
                     }
                 }
                 if (sculptChanged)

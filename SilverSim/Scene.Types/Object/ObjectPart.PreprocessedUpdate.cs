@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages.Object;
@@ -32,10 +34,12 @@ namespace SilverSim.Scene.Types.Object
         readonly byte[] m_FullUpdateFixedBlock1 = new byte[(int)FullFixedBlock1Offset.BlockLength];
         readonly byte[] m_FullUpdateFixedBlock2 = new byte[(int)FullFixedBlock2Offset.BlockLength];
         readonly byte[] m_PropUpdateFixedBlock = new byte[(int)PropertiesFixedBlockOffset.BlockLength];
+        readonly byte[] m_CompressedUpdateFixedBlock = new byte[(int)CompressedUpdateOffset.BlockLength];
 
         byte[] m_FullUpdateData;
         byte[] m_TerseUpdateData;
         byte[] m_PropUpdateData;
+        byte[] m_CompressedUpdateData;
         readonly object m_UpdateDataLock = new object();
 
         int m_ObjectSerial;
@@ -72,6 +76,18 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public byte[] CompressedUpdateData
+        {
+            get
+            {
+                if(m_CompressedUpdateData == null)
+                {
+                    UpdateData(UpdateDataFlags.Compressed);
+                }
+                return m_CompressedUpdateData;
+            }
+        }
+
         public byte[] PropertiesUpdateData
         {
             get
@@ -82,6 +98,30 @@ namespace SilverSim.Scene.Types.Object
                 }
                 return m_PropUpdateData;
             }
+        }
+
+        public enum CompressedUpdateOffset
+        {
+            PathCurve = 0,
+            PathBegin = PathCurve + 1,
+            PathEnd = PathBegin + 2,
+            PathScaleX = PathEnd + 2,
+            PathScaleY = PathScaleX + 1,
+            PathShearX = PathScaleY + 1,
+            PathShearY = PathShearX + 1,
+            PathTwist = PathShearY + 1,
+            PathTwistBegin = PathTwist + 1,
+            PathRadiusOffset = PathTwistBegin + 1,
+            PathTaperX = PathRadiusOffset + 1,
+            PathTaperY = PathTaperX + 1,
+            PathRevolutions = PathTaperY + 1,
+            PathSkew = PathRevolutions + 1,
+            ProfileCurve = PathSkew + 1,
+            ProfileBegin = ProfileCurve + 1,
+            ProfileEnd = ProfileBegin + 2,
+            ProfileHollow = ProfileEnd + 2,
+            
+            BlockLength = ProfileHollow + 2
         }
 
         public enum FullFixedBlock1Offset
@@ -174,6 +214,7 @@ namespace SilverSim.Scene.Types.Object
             Full = 1,
             Terse = 2,
             Properties = 4,
+            Compressed = 8,
             All = 0xFFFFFFFF
         }
 
@@ -218,9 +259,82 @@ namespace SilverSim.Scene.Types.Object
                 {
                     flags |= UpdateDataFlags.Properties;
                 }
+                if(m_CompressedUpdateData == null)
+                {
+                    flags |= UpdateDataFlags.Compressed;
+                }
+
+                uint primUpdateFlags = 0;
+                uint parentID = 0;
+                string name = string.Empty;
+
+                ObjectGroup objectGroup = ObjectGroup;
+                if (objectGroup != null)
+                {
+                    if (IsAllowedDrop)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.AllowInventoryDrop;
+                    }
+                    if (Inventory.Count == 0)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.InventoryEmpty;
+                    }
+                    if (objectGroup.IsPhysics)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.Physics;
+                    }
+                    if (IsScripted)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.Scripted;
+                    }
+                    if (objectGroup.IsVolumeDetect)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.VolumeDetect;
+                    }
+                    if (objectGroup.IsGroupOwned)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.ObjectGroupOwned;
+                    }
+                    if (objectGroup.IsTemporary)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.Temporary;
+                    }
+                    if (objectGroup.IsTempOnRez)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.TemporaryOnRez;
+                    }
+
+                    if (objectGroup.RootPart != this)
+                    {
+                        parentID = ObjectGroup.RootPart.LocalID;
+                    }
+                    else if (objectGroup.IsAttached)
+                    {
+                        IAgent agent;
+                        SceneInterface scene = objectGroup.Scene;
+                        if(scene != null && scene.Agents.TryGetValue(Owner.ID, out agent))
+                        {
+                            parentID = agent.LocalID;
+                        }
+                        else
+                        {
+#if DEBUG
+                            m_Log.DebugFormat("Failed to find agent for attachment");
+#endif
+                        }
+                    }
+                    if (objectGroup.IsAttached)
+                    {
+                        name = string.Format("AttachItemID STRING RW SV {0}", objectGroup.FromItemID);
+                    }
+                    else
+                    {
+                        name = string.Empty;
+                    }
+                }
 
                 #region ObjectUpdate
-                if((flags & UpdateDataFlags.Full) != 0)
+                if ((flags & UpdateDataFlags.Full) != 0)
                 {
                     byte[] textureEntry = TextureEntryBytes;
                     byte[] textureAnimEntry = TextureAnimationBytes;
@@ -243,99 +357,26 @@ namespace SilverSim.Scene.Types.Object
                             break;
                     }
 
-                    uint primUpdateFlags = 0;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags] = (byte)(primUpdateFlags & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 1] = (byte)((primUpdateFlags >> 8) & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 2] = (byte)((primUpdateFlags >> 16) & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 3] = (byte)((primUpdateFlags >> 24) & 0xFF);
 
-                    string name;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
 
-                    if (ObjectGroup != null)
-                    {
-                        if (IsAllowedDrop)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.AllowInventoryDrop;
-                        }
-                        if (Inventory.Count == 0)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.InventoryEmpty;
-                        }
-                        if (ObjectGroup.IsPhysics)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.Physics;
-                        }
-                        if (IsScripted)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.Scripted;
-                        }
-                        if(ObjectGroup.IsVolumeDetect)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.VolumeDetect;
-                        }
-                        if (ObjectGroup.IsGroupOwned)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.ObjectGroupOwned;
-                        }
-                        if (ObjectGroup.IsTemporary)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.Temporary;
-                        }
-                        if (ObjectGroup.IsTempOnRez)
-                        {
-                            primUpdateFlags |= (uint)PrimitiveFlags.TemporaryOnRez;
-                        }
-
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags] = (byte)(primUpdateFlags & 0xFF);
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 1] = (byte)((primUpdateFlags >> 8) & 0xFF);
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 2] = (byte)((primUpdateFlags >> 16) & 0xFF);
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 3] = (byte)((primUpdateFlags >> 24) & 0xFF);
-
-                        if (ObjectGroup.RootPart != this)
-                        {
-                            uint parentID = ObjectGroup.RootPart.LocalID;
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
-                        }
-                        else if (ObjectGroup.IsAttached)
-                        {
-                            uint parentID;
-
-                            try
-                            {
-                                parentID = ObjectGroup.Scene.Agents[Owner.ID].LocalID;
-                            }
-                            catch
-                            {
-                                parentID = 0;
-#if DEBUG
-                                m_Log.DebugFormat("Failed to find agent for attachment");
-#endif
-                            }
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
-                        }
-                        else
-                        {
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID] = 0;
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 1] = 0;
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 2] = 0;
-                            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 3] = 0;
-                        }
-                    }
-
-                    if(ObjectGroup == null)
+                    if(objectGroup == null)
                     {
                         name = string.Empty;
                     }
-                    else if (ObjectGroup.IsAttached)
+                    else if (objectGroup.IsAttached)
                     {
-                        name = string.Format("AttachItemID STRING RW SV {0}", ObjectGroup.FromItemID);
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State]  = (byte)(((byte)ObjectGroup.AttachPoint % 16) * 16 + (((byte)ObjectGroup.AttachPoint / 16)));
                     }
                     else
                     {
-                        name = string.Empty;
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] = ObjectGroup.RootPart.Shape.State;
                     }
 
@@ -424,6 +465,186 @@ namespace SilverSim.Scene.Types.Object
                     newTerseData[offset++] = (byte)(textureEntry.Length / 256);
                     Buffer.BlockCopy(textureEntry, 0, newTerseData, offset, textureEntry.Length);
                     m_TerseUpdateData = newTerseData;
+                }
+                #endregion
+
+                #region CompressedUpdate
+                if((flags & UpdateDataFlags.Compressed) != 0)
+                {
+                    byte[] partsystem = ParticleSystemBytes;
+                    if (partsystem.Length != 0 && partsystem.Length != 86)
+                    {
+                        m_CompressedUpdateData = null;
+                    }
+                    else
+                    {
+                        ObjectUpdateCompressed.CompressedFlags compressedflags = ObjectUpdateCompressed.CompressedFlags.None;
+                        TextParam textparam = Text;
+                        int compressedSize = 80;
+                        byte[] textbytes = null;
+                        byte[] mediaurlbytes = null;
+                        byte[] namebytes = null;
+                        byte[] textureanimbytes = TextureAnimationBytes;
+                        byte[] textureentry = TextureEntryBytes;
+                        byte[] extrabytes = ExtraParamsBytes;
+
+                        if(extrabytes == null || extrabytes.Length == 0)
+                        {
+                            extrabytes = new byte[1] { 0 };
+                        }
+
+                        compressedSize += (4 + textureentry.Length) + extrabytes.Length + m_CompressedUpdateFixedBlock.Length;
+
+                        if (AngularVelocity.Length > double.Epsilon)
+                        {
+                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasAngularVelocity;
+                            compressedSize += 12;
+                        }
+
+                        if(textureanimbytes != null && textureanimbytes.Length != 0)
+                        {
+                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.TextureAnimation;
+                            compressedSize += textureanimbytes.Length + 4;
+                        }
+
+                        if(parentID != 0)
+                        {
+                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParent;
+                            compressedSize += 4;
+                        }
+
+                        if(!string.IsNullOrEmpty(name))
+                        {
+                            namebytes = (name + "\0").ToUTF8Bytes();
+                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasNameValues;
+                            compressedSize += namebytes.Length;
+                        }
+
+                        if(textparam.Text.Length != 0)
+                        {
+                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasText;
+                            textbytes = (textparam.Text + "\0").ToUTF8Bytes();
+                            compressedSize += (textbytes.Length + 4);
+                        }
+
+                        string mediaUrl = MediaURL;
+                        if(!string.IsNullOrEmpty(mediaUrl))
+                        {
+                            mediaurlbytes = (MediaURL + "\0").ToUTF8Bytes();
+                            compressedSize += mediaurlbytes.Length;
+                        }
+
+                        if(partsystem.Length != 0)
+                        {
+                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParticles;
+                            compressedSize += partsystem.Length;
+                        }
+
+                        byte[] compressedData = new byte[compressedSize];
+                        ID.ToBytes(compressedData, 0);
+                        compressedData[16] = (byte)(LocalID & 0xFF);
+                        compressedData[17] = (byte)((LocalID >> 8) & 0xFF);
+                        compressedData[18] = (byte)((LocalID >> 16) & 0xFF);
+                        compressedData[19] = (byte)((LocalID >> 24) & 0xFF);
+                        PrimitiveShape shape = Shape;
+                        compressedData[20] = (byte)shape.PCode;
+                        compressedData[21] = shape.State;
+                        //CRC
+                        compressedData[22] = 0;
+                        compressedData[23] = 0;
+                        compressedData[24] = 0;
+                        compressedData[25] = 0;
+                        compressedData[26] = (byte)Material;
+                        compressedData[27] = (byte)ClickAction;
+                        Size.ToBytes(compressedData, 28);
+                        Position.ToBytes(compressedData, 40);
+                        // 12 byte rotation at 52
+                        compressedData[64] = (byte)((uint)compressedflags & 0xFF);
+                        compressedData[65] = (byte)(((uint)compressedflags >> 8) & 0xFF);
+                        compressedData[66] = (byte)(((uint)compressedflags >> 16) & 0xFF);
+                        compressedData[67] = (byte)(((uint)compressedflags >> 24) & 0xFF);
+                        Owner.ID.ToBytes(compressedData, 68);
+
+                        int offset = 80;
+
+                        //Angular velocity
+                        if((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasAngularVelocity) != 0)
+                        {
+                            AngularVelocity.ToBytes(compressedData, offset);
+                            offset += 12;
+                        }
+
+                        //Parent
+                        if(parentID != 0)
+                        {
+                            compressedData[offset] = (byte)(parentID & 0xFF);
+                            compressedData[offset + 1] = (byte)((parentID >> 8) & 0xFF);
+                            compressedData[offset + 2] = (byte)((parentID >> 16) & 0xFF);
+                            compressedData[offset + 3] = (byte)((parentID >> 24) & 0xFF);
+                            offset += 4;
+                        }
+                        
+                        //Hover text
+                        if(textbytes != null)
+                        {
+                            Buffer.BlockCopy(textbytes, 0, compressedData, offset, textbytes.Length);
+                            offset += textbytes.Length;
+                            compressedData[offset++] = textparam.TextColor.R_AsByte;
+                            compressedData[offset++] = textparam.TextColor.G_AsByte;
+                            compressedData[offset++] = textparam.TextColor.B_AsByte;
+                            compressedData[offset++] = (byte)(255 - textparam.TextColor.A_AsByte);
+                        }
+
+                        //Media url
+                        if(mediaurlbytes != null)
+                        {
+                            Buffer.BlockCopy(mediaurlbytes, 0, compressedData, offset, mediaurlbytes.Length);
+                            offset += mediaurlbytes.Length;
+                        }
+
+                        //Particle system
+                        if(partsystem.Length != 0)
+                        {
+                            Buffer.BlockCopy(partsystem, 0, compressedData, offset, partsystem.Length);
+                            offset += partsystem.Length;
+                        }
+
+                        //ExtraParams
+                        Buffer.BlockCopy(extrabytes, 0, compressedData, offset, extrabytes.Length);
+                        offset += extrabytes.Length;
+
+                        if((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasNameValues) != 0)
+                        {
+                            Buffer.BlockCopy(namebytes, 0, compressedData, offset, namebytes.Length);
+                            offset += namebytes.Length;
+                        }
+
+                        //PShape
+                        Buffer.BlockCopy(m_CompressedUpdateFixedBlock, 0, compressedData, offset, m_CompressedUpdateFixedBlock.Length);
+                        offset += m_CompressedUpdateFixedBlock.Length;
+
+                        //TextureEntry
+                        compressedData[offset++] = (byte)(textureentry.Length & 0xFF);
+                        compressedData[offset++] = (byte)((textureentry.Length >> 8) & 0xFF);
+                        compressedData[offset++] = (byte)((textureentry.Length >> 16) & 0xFF);
+                        compressedData[offset++] = (byte)((textureentry.Length >> 24) & 0xFF);
+
+                        //TextureEntry
+                        Buffer.BlockCopy(textureentry, 0, compressedData, offset, textureentry.Length);
+                        offset += textureentry.Length;
+
+                        //TextureAnim
+                        if((compressedflags & ObjectUpdateCompressed.CompressedFlags.TextureAnimation) != 0)
+                        {
+                            compressedData[offset++] = (byte)(textureanimbytes.Length & 0xFF);
+                            compressedData[offset++] = (byte)((textureanimbytes.Length >> 8) & 0xFF);
+                            compressedData[offset++] = (byte)((textureanimbytes.Length >> 16) & 0xFF);
+                            compressedData[offset++] = (byte)((textureanimbytes.Length >> 24) & 0xFF);
+
+                            Buffer.BlockCopy(textureanimbytes, 0, compressedData, offset, textureanimbytes.Length);
+                        }
+                        m_CompressedUpdateData = compressedData;
+                    }
                 }
                 #endregion
 

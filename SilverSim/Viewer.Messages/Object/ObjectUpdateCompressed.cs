@@ -38,6 +38,22 @@ namespace SilverSim.Viewer.Messages.Object
             public byte[] Data;
         }
 
+        [Flags]
+        public enum CompressedFlags : uint
+        {
+            None = 0x0000,
+            ScratchPad = 0x0001,
+            Tree = 0x0002,
+            HasText = 0x0004,
+            HasParticles = 0x0008,
+            HasSound = 0x0010,
+            HasParent = 0x0020,
+            TextureAnimation = 0x0040,
+            HasAngularVelocity = 0x0080,
+            HasNameValues = 0x0100,
+            MediaURL = 0x0200
+        }
+
         public List<ObjData> ObjectData = new List<ObjData>();
 
         public ObjectUpdateCompressed()
