@@ -51,7 +51,7 @@ namespace SilverSim.Viewer.Core
                         UUID oldID = part.ID;
                         UUID newID = UUID.Random;
                         part.ID = newID;
-                        grp.ChangeKey(oldID, newID);
+                        grp.ChangeKey(newID, oldID);
                     }
                 }
             }
