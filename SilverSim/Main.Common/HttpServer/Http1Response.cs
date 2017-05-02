@@ -92,6 +92,7 @@ namespace SilverSim.Main.Common.HttpServer
 
             if (IsCloseConnection)
             {
+                m_Output.Close();
                 throw new ConnectionCloseException();
             }
         }
