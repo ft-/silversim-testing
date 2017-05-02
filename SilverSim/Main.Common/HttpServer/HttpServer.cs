@@ -397,7 +397,7 @@ namespace SilverSim.Main.Common.HttpServer
                     Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
                     /* Start SSL handshake */
-                    SslStream sslstream = new SslStream(new NetworkStream(socket));
+                    SslStream sslstream = new SslStream(new NetworkStream(socket, true));
                     try
                     {
                         sslstream.AuthenticateAsServer(m_ServerCertificate, false, m_SslProtocols, false);
@@ -617,6 +617,7 @@ namespace SilverSim.Main.Common.HttpServer
             catch (HttpResponse.DisconnectFromThreadException)
             {
                 /* we simply disconnected that HttpRequest from HttpServer */
+                throw;
             }
             catch (HttpResponse.ConnectionCloseException)
             {
