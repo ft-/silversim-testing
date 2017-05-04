@@ -24,6 +24,7 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using System.Diagnostics.CodeAnalysis;
 using System.Timers;
+using System;
 
 namespace SilverSim.Scene.Types.Physics
 {
@@ -259,6 +260,12 @@ namespace SilverSim.Scene.Types.Physics
             {
                 /* intentionally left empty */
             }
+        }
+
+        public double SpeedFactor
+        {
+            get;
+            set;
         }
 
         public void GroundRepel(double height, bool water, double tau)

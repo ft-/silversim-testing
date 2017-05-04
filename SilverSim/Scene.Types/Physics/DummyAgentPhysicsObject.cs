@@ -210,6 +210,12 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        public double SpeedFactor
+        {
+            get;
+            set;
+        }
+
         public void SetHoverHeight(double height, bool water, double tau)
         {
 
