@@ -1215,6 +1215,8 @@ namespace SilverSim.Scene.Types.Object
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator)
         {
+            UpdateChangedFlags flags = 0;
+            bool isUpdated = false;
             switch (ParamsHelper.GetPrimParamType(enumerator))
             {
                 case PrimitiveParamsType.Name:
@@ -1273,6 +1275,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Texture;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1292,6 +1296,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.Normal, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Texture;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1311,6 +1317,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.Specular, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Texture;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1330,6 +1338,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.Texture, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Texture;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1360,6 +1370,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.Color, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Color;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1379,6 +1391,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.Alpha, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Color;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1398,6 +1412,7 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.BumpShiny, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Texture;
                     }
                     finally
                     {
@@ -1429,6 +1444,7 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.FullBright, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Color;
                     }
                     finally
                     {
@@ -1461,6 +1477,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.TexGen, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Texture;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1480,6 +1498,8 @@ namespace SilverSim.Scene.Types.Object
                             SetTexPrimitiveParams(face, PrimitiveParamsType.Glow, enumerator);
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                        flags |= UpdateChangedFlags.Color;
+                        isUpdated = true;
                     }
                     finally
                     {
@@ -1576,6 +1596,11 @@ namespace SilverSim.Scene.Types.Object
 
                 default:
                     throw new LocalizedScriptErrorException(this, "PRIMInvalidParameterType0", "Invalid primitive parameter type {0}", enumerator.Current.AsUInt);
+            }
+
+            if(isUpdated)
+            {
+                TriggerOnUpdate(flags);
             }
         }
         #endregion

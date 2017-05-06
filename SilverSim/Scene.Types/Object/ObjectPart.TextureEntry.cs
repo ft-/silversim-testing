@@ -65,6 +65,51 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        UpdateChangedFlags ChangedTexParams(TextureEntryFace oldTexFace, TextureEntryFace newTexFace)
+        {
+            UpdateChangedFlags flags = 0;
+            if(oldTexFace.Glow != newTexFace.Glow ||
+                oldTexFace.Bump != newTexFace.Bump ||
+                oldTexFace.FullBright != newTexFace.FullBright ||
+                oldTexFace.MaterialID != newTexFace.MaterialID ||
+                oldTexFace.OffsetU != newTexFace.OffsetU ||
+                oldTexFace.OffsetV != newTexFace.OffsetV ||
+                oldTexFace.RepeatU != newTexFace.RepeatU ||
+                oldTexFace.RepeatV != newTexFace.RepeatV ||
+                oldTexFace.Rotation != newTexFace.Rotation ||
+                oldTexFace.Shiny != newTexFace.Shiny ||
+                oldTexFace.TexMapType != newTexFace.TexMapType ||
+                oldTexFace.TextureID != newTexFace.TextureID)
+            {
+                flags |= UpdateChangedFlags.Texture;
+            }
+
+            if(oldTexFace.TextureColor.R != newTexFace.TextureColor.R ||
+                oldTexFace.TextureColor.G != newTexFace.TextureColor.G ||
+                oldTexFace.TextureColor.B != newTexFace.TextureColor.B ||
+                oldTexFace.TextureColor.A != newTexFace.TextureColor.A)
+            {
+                flags |= UpdateChangedFlags.Color;
+            }
+
+            if(oldTexFace.MediaFlags != newTexFace.MediaFlags)
+            {
+                flags |= UpdateChangedFlags.Media;
+            }
+            return flags;
+        }
+
+        UpdateChangedFlags ChangedTexParams(TextureEntry oldTex, TextureEntry newTex)
+        {
+            UpdateChangedFlags flags = ChangedTexParams(oldTex.DefaultTexture, newTex.DefaultTexture);
+            uint index;
+            for(index = 0; index < 32; ++index)
+            {
+                flags |= ChangedTexParams(oldTex[index], newTex[index]);
+            }
+            return flags;
+        }
+
         public TextureEntry TextureEntry
         {
             get
@@ -81,10 +126,12 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                UpdateChangedFlags flags = 0;
                 TextureEntry copy = new TextureEntry(value.GetBytes());
                 m_TextureEntryLock.AcquireWriterLock(-1);
                 try
                 {
+                    flags = ChangedTexParams(m_TextureEntry, copy);
                     m_TextureEntry = copy;
                     m_TextureEntryBytes = value.GetBytes();
                 }
@@ -92,6 +139,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_TextureEntryLock.ReleaseWriterLock();
                 }
+                TriggerOnUpdate(flags);
             }
         }
 
@@ -113,16 +161,21 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                UpdateChangedFlags flags;
                 m_TextureEntryLock.AcquireWriterLock(-1);
                 try
                 {
+                    TextureEntry newTex;
                     m_TextureEntryBytes = value;
-                    m_TextureEntry = new TextureEntry(value);
+                    newTex = new TextureEntry(value);
+                    flags = ChangedTexParams(m_TextureEntry, newTex);
+                    m_TextureEntry = newTex;
                 }
                 finally
                 {
                     m_TextureEntryLock.ReleaseWriterLock();
                 }
+                TriggerOnUpdate(flags);
             }
         }
 
@@ -166,6 +219,7 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureAnimationLock.ReleaseWriterLock();
                     }
                 }
+                TriggerOnUpdate(0);
             }
         }
 
@@ -196,6 +250,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_TextureAnimationLock.ReleaseWriterLock();
                 }
+                TriggerOnUpdate(0);
             }
         }
     }
