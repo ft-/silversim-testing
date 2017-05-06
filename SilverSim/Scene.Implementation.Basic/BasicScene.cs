@@ -37,6 +37,7 @@ using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -69,7 +70,8 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal readonly RwLockedDoubleDictionary<UUID, UInt32, ObjectPart> m_Primitives = new RwLockedDoubleDictionary<UUID, UInt32, ObjectPart>();
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
-        private UDPCircuitsManager m_UDPServer;
+        UDPCircuitsManager m_UDPServer;
+        readonly IMServiceInterface m_IMService;
         readonly SceneList m_Scenes;
         readonly IMRouter m_IMRouter;
         #endregion
@@ -460,9 +462,18 @@ namespace SilverSim.Scene.Implementation.Basic
 
         protected override object GetService(Type service)
         {
-            return (service.IsAssignableFrom(typeof(ChatServiceInterface))) ?
-                m_ChatService :
-                base.GetService(service);
+            if (service.IsAssignableFrom(typeof(ChatServiceInterface)))
+            {
+                return m_ChatService;
+            }
+            else if (service.IsAssignableFrom(typeof(IMServiceInterface)))
+            {
+                return m_IMService;
+            }
+            else
+            {
+                return base.GetService(service);
+            }
         }
 
         protected override void SendChatPass(ListenEvent le)
@@ -581,7 +592,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
 
             m_RestartObject = new RestartObject(m_Scenes, this, sceneParams, sceneParams.m_RegionStorage);
-
+            m_IMService = sceneParams.m_IMService;
             m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, sceneParams.m_IMService, m_ChatService, this, sceneParams.m_PortControlServices);
             m_SceneObjects = new BasicSceneObjectsCollection(this);
             m_SceneObjectParts = new BasicSceneObjectPartsCollection(this);

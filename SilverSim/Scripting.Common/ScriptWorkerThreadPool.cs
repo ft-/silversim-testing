@@ -247,7 +247,17 @@ namespace SilverSim.Scripting.Common
                     ObjectPartInventoryItem item = ev.Item;
                     ScriptInstance instance = item.ScriptInstance;
                     item.ScriptInstance = null;
-                    instance.Remove();
+                    try
+                    {
+                        instance.Remove();
+                    }
+                    catch(Exception e)
+                    {
+                        m_Log.WarnFormat("Exception at script removal {0} ({1}): {2}\n{3}",
+                            item.Name, item.AssetID.ToString(),
+                            e.Message,
+                            e.StackTrace);
+                    }
                     ScriptLoader.Remove(item.AssetID, instance);
                     continue;
                 }
@@ -256,7 +266,17 @@ namespace SilverSim.Scripting.Common
                     ObjectPartInventoryItem item = ev.Item;
                     ScriptInstance instance = item.ScriptInstance;
                     instance.AbortBegin();
-                    instance.Remove();
+                    try
+                    {
+                        instance.Remove();
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.WarnFormat("Exception at script removal {0} ({1}): {2}\n{3}",
+                            item.Name, item.AssetID.ToString(),
+                            e.Message,
+                            e.StackTrace);
+                    }
                     item.ScriptInstance = null;
                     ScriptLoader.Remove(item.AssetID, instance);
                     continue;
