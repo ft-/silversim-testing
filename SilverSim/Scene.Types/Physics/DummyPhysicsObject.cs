@@ -197,6 +197,16 @@ namespace SilverSim.Scene.Types.Physics
 
         }
 
+        public void SetLookAt(Quaternion q, double strength, double damping)
+        {
+
+        }
+
+        public void StopLookAt()
+        {
+
+        }
+
         public static readonly DummyPhysicsObject SharedInstance = new DummyPhysicsObject();
     }
 }

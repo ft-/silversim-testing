@@ -146,6 +146,20 @@ namespace SilverSim.Scene.Physics.Common
                 m_HoverEnabled = false;
             }
         }
+
+        #endregion
+
+        #region LookAt Motor
+
+        public void SetLookAt(Quaternion q, double strength, double damping)
+        {
+
+        }
+
+        public void StopLookAt()
+        {
+
+        }
         #endregion
 
         #region Restitution Motor

@@ -51,5 +51,8 @@ namespace SilverSim.Scene.Types.Physics
 
         void SetHoverHeight(double height, bool water, double tau);
         void StopHover();
+
+        void SetLookAt(Quaternion q, double strength, double damping);
+        void StopLookAt();
     }
 }
