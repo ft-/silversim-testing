@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Physics.Common
 {
@@ -150,15 +151,46 @@ namespace SilverSim.Scene.Physics.Common
         #endregion
 
         #region LookAt Motor
+        object m_LookAtParamsLock = new object();
+        bool m_EnableLookAt;
+        Quaternion m_LookAtTarget;
+        double m_LookAtStrength;
+        double m_LookAtDamping;
+
+        protected Vector3 LookAtMotor(IPhysicalObject obj)
+        {
+            lock (m_LookAtParamsLock)
+            {
+                if(!m_EnableLookAt)
+                {
+                    return Vector3.Zero;
+                }
+                Quaternion dirRot = m_LookAtTarget / obj.Rotation;
+                Vector3 dir = dirRot.GetEulerAngles();
+
+                dir /= m_LookAtStrength;
+
+                return dir - obj.AngularVelocity * m_LookAtDamping;
+            }
+        }
 
         public void SetLookAt(Quaternion q, double strength, double damping)
         {
-
+            lock(m_LookAtParamsLock)
+            {
+                m_EnableLookAt = true;
+                m_LookAtTarget = q;
+                m_LookAtStrength = strength;
+                m_LookAtDamping = Math.Max(1.0, damping);
+            }
         }
 
         public void StopLookAt()
         {
-
+            lock(m_LookAtParamsLock)
+            {
+                m_EnableLookAt = false;
+            }
         }
         #endregion
 
