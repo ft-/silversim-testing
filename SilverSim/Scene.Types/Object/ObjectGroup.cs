@@ -109,6 +109,7 @@ namespace SilverSim.Scene.Types.Object
         public SceneInterface Scene { get; set; }
         public UUID FromItemID = UUID.Zero; /* used for attachments */
         public UUID RezzingObjectID = UUID.Zero; /* used alongside llRezObject and llRezAtRoot */
+        BoundingBox? m_BoundingBox;
 
         readonly object m_Lock = new object();
 
@@ -265,6 +266,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 OriginalAssetID = UUID.Zero;
                 NextOwnerAssetID = UUID.Zero;
+                m_BoundingBox = null;
             }
 
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
@@ -1287,10 +1289,36 @@ namespace SilverSim.Scene.Types.Object
 
         public void GetBoundingBox(out BoundingBox box)
         {
-            box = new BoundingBox();
-            box.CenterOffset = Vector3.Zero;
-            box.Size = Vector3.Zero;
-#warning Implement update
+            bool rebuildBoundingBox;
+            lock(m_Lock)
+            {
+                rebuildBoundingBox = m_BoundingBox == null;
+                box = m_BoundingBox.Value;
+            }
+            if (rebuildBoundingBox)
+            {
+                box = new BoundingBox();
+                Vector3 min = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
+                Vector3 max = new Vector3(double.MinValue, double.MinValue, double.MinValue);
+                foreach(ObjectPart p in ValuesByKey1)
+                {
+                    BoundingBox inner;
+                    p.GetBoundingBox(out inner);
+                    max = max.ComponentMax(p.LocalPosition + inner.CenterOffset + inner.Size / 2);
+                    min = min.ComponentMin(p.LocalPosition + inner.CenterOffset - inner.Size / 2);
+                }
+
+                box.CenterOffset = max + min;
+                box.Size = max - min;
+
+                lock (m_Lock)
+                {
+                    if (null == m_BoundingBox)
+                    {
+                        m_BoundingBox = box;
+                    }
+                }
+            }
         }
 
         public byte[] TerseData
