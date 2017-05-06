@@ -213,7 +213,7 @@ namespace SilverSim.Types
 
     public class ColorAlpha : Color
     {
-        public double A = 1f;
+        public double A = 0f;
 
         #region Constructors
         public ColorAlpha()

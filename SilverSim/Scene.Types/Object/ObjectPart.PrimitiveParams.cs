@@ -1638,11 +1638,11 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Color:
                     paramList.Add(face.TextureColor.AsVector3);
-                    paramList.Add(face.TextureColor.A);
+                    paramList.Add(1 - face.TextureColor.A);
                     break;
 
                 case PrimitiveParamsType.Alpha:
-                    paramList.Add(face.TextureColor.A);
+                    paramList.Add(1 - face.TextureColor.A);
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
@@ -1796,15 +1796,15 @@ namespace SilverSim.Scene.Types.Object
                 case PrimitiveParamsType.Color:
                     {
                         Vector3 color = ParamsHelper.GetVector(enumerator, "PRIM_COLOR");
-                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_COLOR");
-                        face.TextureColor = new ColorAlpha(color, alpha);
+                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_COLOR").Clamp(0, 1);
+                        face.TextureColor = new ColorAlpha(color, 1 - alpha);
                     }
                     break;
 
                 case PrimitiveParamsType.Alpha:
                     {
-                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_ALPHA");
-                        face.TextureColor.A = alpha;
+                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_ALPHA").Clamp(0, 1);
+                        face.TextureColor.A = 1 - alpha;
                     }
                     break;
 
