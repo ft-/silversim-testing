@@ -253,6 +253,8 @@ namespace SilverSim.Scene.Physics.Common
                 vehicleTorque += m_AppliedTorque;
             }
 
+            vehicleTorque += LookAtMotor(m_Part);
+
             return forces;
         }
 

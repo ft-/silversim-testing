@@ -371,6 +371,8 @@ namespace SilverSim.Scene.Physics.Common
                 forces.Add(new PositionalForce("AppliedForce", m_AppliedForce, Vector3.Zero));
             }
 
+            agentTorque += LookAtMotor(m_Agent);
+
             return forces;
         }
 
