@@ -125,6 +125,7 @@ namespace SilverSim.WebIF.Admin
 
         void LogThread()
         {
+            System.Threading.Thread.CurrentThread.Name = "WebIF LogThread";
             while(!m_ShutdownHandlerThreads)
             {
                 LoggingEvent logevent;
