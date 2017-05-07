@@ -25,6 +25,7 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -53,6 +54,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             TouchEvent e = new TouchEvent();
+            e.Detected = new List<DetectInfo>();
             e.Type = TouchEvent.TouchType.Start;
 
             ObjectPart part;
@@ -97,6 +99,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             TouchEvent e = new TouchEvent();
+            e.Detected = new List<DetectInfo>();
             e.Type = TouchEvent.TouchType.Continuous;
 
             ObjectPart part;
@@ -141,6 +144,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             TouchEvent e = new TouchEvent();
+            e.Detected = new List<DetectInfo>();
             e.Type = TouchEvent.TouchType.End;
 
             ObjectPart part;

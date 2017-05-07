@@ -264,9 +264,19 @@ namespace SilverSim.Scene.Types.Object
                     flags |= UpdateDataFlags.Compressed;
                 }
 
-                uint primUpdateFlags = 0;
+                uint primUpdateFlags = (uint)m_PrimitiveFlags;
                 uint parentID = 0;
                 string name = string.Empty;
+
+                primUpdateFlags &= (uint)(~(
+                    PrimitiveFlags.AllowInventoryDrop |
+                    PrimitiveFlags.InventoryEmpty |
+                    PrimitiveFlags.Physics |
+                    PrimitiveFlags.Scripted |
+                    PrimitiveFlags.VolumeDetect |
+                    PrimitiveFlags.ObjectGroupOwned |
+                    PrimitiveFlags.Temporary |
+                    PrimitiveFlags.TemporaryOnRez));
 
                 ObjectGroup objectGroup = ObjectGroup;
                 if (objectGroup != null)
