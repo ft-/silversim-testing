@@ -731,6 +731,11 @@ namespace SilverSim.Main.Common
                     m_Sources.Enqueue(new CFG_IniFileSource(Path.Combine(DefaultDataPath, defaultCfg)));
                 }
             }
+
+            foreach(string preloadAssembly in CoreUpdater.Instance.GetPreloadAssemblies(mode))
+            {
+                Assembly.LoadFile(Path.Combine(CoreUpdater.Instance.BinariesPath, preloadAssembly));
+            }
             
             /* pre-process defaults ini before adding the final configuration */
             ProcessConfigurations(false);
