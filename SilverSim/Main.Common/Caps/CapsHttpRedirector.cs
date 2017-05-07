@@ -124,6 +124,14 @@ namespace SilverSim.Main.Common.Caps
             }
         }
 
+        public string ServerURI
+        {
+            get
+            {
+                return m_HttpServer.ServerURI;
+            }
+        }
+
         public void Startup(ConfigurationLoader loader)
         {
             m_Log.Info("Initializing Caps Http Redirector");
