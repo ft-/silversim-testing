@@ -35,8 +35,6 @@ namespace SilverSim.Viewer.TerrainEdit
     [Description("Viewer Terraforming Handler")]
     public class ViewerTerrainEdit : IPlugin, IPacketHandlerExtender
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("LL TERRAIN EDIT");
-        
         public ViewerTerrainEdit()
         {
         }

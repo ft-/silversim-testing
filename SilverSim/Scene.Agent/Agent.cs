@@ -526,7 +526,6 @@ namespace SilverSim.Scene.Agent
 
                 case PrimitiveParamsType.Material:
                     throw new LocalizedScriptErrorException(this, "PRIM0NotAllowedForAgents", "{0} not allowed for agents", "PRIM_MATERIAL");
-                    throw new ArgumentException("PRIM_MATERIAL not allowed for agents");
 
                 case PrimitiveParamsType.Position:
                     paramList.Add(Position);
@@ -891,7 +890,6 @@ namespace SilverSim.Scene.Agent
         {
             if (null != GroupsService)
             {
-                string title = string.Empty;
                 GroupActiveMembership gam;
                 GroupRole role;
                 if (GroupsService.ActiveMembership.TryGetValue(Owner, Owner, out gam) &&
@@ -1023,9 +1021,6 @@ namespace SilverSim.Scene.Agent
 
         public bool UnSit()
         {
-            Quaternion bodyRot = BodyRotation;
-            Vector3 euler = BodyRotation.GetEulerAngles();
-            Quaternion q = Quaternion.CreateFromEulers(0, 0, euler.Z);
             IObject obj = SittingOnObject;
             if (obj == null)
             {

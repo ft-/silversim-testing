@@ -60,7 +60,6 @@ namespace SilverSim.WebIF.Admin.Simulator
         ServerParamServiceInterface m_ServerParams;
         SimulationDataStorageInterface m_SimulationData;
         BaseHttpServer m_HttpServer;
-        ExternalHostNameServiceInterface m_ExternalHostNameService;
         IAdminWebIF m_WebIF;
         SceneList m_Scenes;
         ConfigurationLoader m_Loader;
@@ -77,7 +76,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             m_Loader = loader;
             m_HttpServer = loader.HttpServer;
             m_Scenes = loader.Scenes;
-            m_ExternalHostNameService = loader.ExternalHostNameService;
 
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
@@ -199,7 +197,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             Map udpdata = new Map();
             resdata.Add("udp", udpdata);
-            IEnumerable<RegionInfo> regions = regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+            IEnumerable<RegionInfo> regions = m_RegionStorage.GetAllRegions(UUID.Zero);
             foreach (RegionInfo region in regions)
             {
                 Map regiondata = new Map();

@@ -1275,7 +1275,6 @@ namespace SilverSim.WebIF.Admin
         #region WebIF admin functions
         void HandleFindExactUser(HttpRequest req, Map jsondata)
         {
-            AnArray res = new AnArray();
             IValue q1;
             IValue q2;
 
@@ -1295,12 +1294,10 @@ namespace SilverSim.WebIF.Admin
             Map resdata = new Map();
             resdata.Add("user", uui.ToMap());
             SuccessResponse(req, resdata);
-
         }
 
         void HandleFindUser(HttpRequest req, Map jsondata)
         {
-            AnArray res = new AnArray();
             IValue q1;
             IValue q2;
             List<UUI> uuis;

@@ -31,8 +31,6 @@ namespace SilverSim.Viewer.Core
     {
         void Cap_ViewerAsset(HttpRequest httpreq)
         {
-            string[] parts = httpreq.RawUrl.Substring(1).Split('/');
-
             if (httpreq.CallerIP != RemoteIP)
             {
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");

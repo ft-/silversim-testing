@@ -866,7 +866,6 @@ namespace SilverSim.Viewer.Core
                         {
                             if(m.Params.Length >= 96)
                             {
-                                UUID taskID = new UUID(m.Params, 48);
                                 m_InventoryRequestQueue.Enqueue(m);
                             }
                         }

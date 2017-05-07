@@ -36,8 +36,6 @@ namespace SilverSim.WebIF.Admin.UserServer
     [Description("WebIF User Account Admin Support")]
     public class UserAccountAdmin : IPlugin
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF - USER ACCOUNTS");
-
         readonly string m_UserAccountServiceName;
         readonly string m_AuthInfoServiceName;
         UserAccountServiceInterface m_UserAccountService;
