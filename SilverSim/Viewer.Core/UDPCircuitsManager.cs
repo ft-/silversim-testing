@@ -77,6 +77,14 @@ namespace SilverSim.Viewer.Core
 
         readonly List<IPortControlServiceInterface> m_PortControlServices;
 
+        public int LocalPort
+        {
+            get
+            {
+                return m_BindPort;
+            }
+        }
+
         public UDPCircuitsManager(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene,
             List<IPortControlServiceInterface> portControlServices)
         {
@@ -118,9 +126,11 @@ namespace SilverSim.Viewer.Core
             /* handle Bind before starting anything else */
             m_UdpSocket.Bind(ep);
 
+            m_BindPort = ((IPEndPoint)m_UdpSocket.LocalEndPoint).Port;
+
             foreach(IPortControlServiceInterface portControl in m_PortControlServices)
             {
-                portControl.EnablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Udp, port);
+                portControl.EnablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Udp, m_BindPort);
             }
 
             if (m_ChatService != null)
@@ -128,7 +138,7 @@ namespace SilverSim.Viewer.Core
                 m_ChatThread = ThreadManager.CreateThread(ChatSendHandler);
                 m_ChatThread.Start();
             }
-            m_Log.InfoFormat("Initialized UDP Circuits Manager at {0}:{1}", bindAddress.ToString(), port);
+            m_Log.InfoFormat("Initialized UDP Circuits Manager at {0}:{1}", bindAddress.ToString(), m_BindPort);
         }
 
         public void SendMessageToCircuit(UInt32 circuitcode, Message m)
