@@ -18,10 +18,8 @@
 *.dump.txt
 *.example
 *.log
-
 obj
 bin
-
 /.sonar
 singletests
 /testresults
@@ -32,3 +30,4 @@ libraries
 data/dumps/**
 sonar-project.properties
 feed/**
+.vs

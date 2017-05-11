@@ -140,7 +140,12 @@ namespace SilverSim.Database.Memory.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
+            foreach (string avatarnameservicename in m_AvatarNameServiceNames)
+            {
+                avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(avatarnameservicename));
+            }
+            m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServices);
         }
 
         public override void Store(FriendInfo fi)
