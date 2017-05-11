@@ -143,7 +143,7 @@ namespace SilverSim.Database.Memory.Friends
             RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
             foreach (string avatarnameservicename in m_AvatarNameServiceNames)
             {
-                avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(avatarnameservicename));
+                avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(avatarnameservicename.Trim()));
             }
             m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServices);
         }
