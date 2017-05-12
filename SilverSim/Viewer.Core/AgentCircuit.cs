@@ -310,7 +310,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-#if DEBUG
+#if EXPLICITDEBUG
                     m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, info);
 #endif
                     return (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), fi.GetValue(o), mi);
@@ -326,7 +326,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-#if DEBUG
+#if EXPLICITDEBUG
                     m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, info);
 #endif
                     return new MessageHandlerExtenderKeyValuePairCircuitQueue(this, (Queue<KeyValuePair<AgentCircuit, Message>>)fi.GetValue(o)).Handler;
@@ -358,7 +358,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-#if DEBUG
+#if EXPLICITDEBUG
                     m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
 #endif
                     return new MessageHandlerExtenderViewerAgent(Agent, this,
@@ -374,7 +374,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-#if DEBUG
+#if EXPLICITDEBUG
                     m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
 #endif
                     return new MessageHandlerExtenderIAgent(Agent,
@@ -391,7 +391,7 @@ namespace SilverSim.Viewer.Core
             }
             else
             {
-#if DEBUG
+#if EXPLICITDEBUG
                 m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
 #endif
                 return (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), o, mi);
@@ -412,7 +412,12 @@ namespace SilverSim.Viewer.Core
                 tt = tt.BaseType;
             }
 
-            foreach(Type t in types)
+            List<MessageType> messageRegisteredHere = new List<MessageType>();
+            List<string> genericMsgRegisteredHere = new List<string>();
+            List<string> godlikeMsgRegisteredHere = new List<string>();
+            List<GridInstantMessageDialog> imTypeRegisteredHere = new List<GridInstantMessageDialog>();
+
+            foreach (Type t in types)
             {
                 foreach(FieldInfo fi in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
@@ -421,7 +426,10 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
-                            m_Log.FatalFormat("Field {0} of {1} registered duplicate message {2}", fi.Name, t.GetType(), pa.Number.ToString());
+                            if (!messageRegisteredHere.Contains(pa.Number))
+                            {
+                                m_Log.FatalFormat("Field {0} of {1} registered duplicate message {2}", fi.Name, t.GetType(), pa.Number.ToString());
+                            }
                         }
                         else if(pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage || pa.Number == MessageType.GodlikeMessage)
                         {
@@ -432,6 +440,7 @@ namespace SilverSim.Viewer.Core
                             try
                             {
                                 m_MessageRouting.Add(pa.Number, DeriveActionDelegateFromFieldInfo(fi, t, o, "message " + pa.Number.ToString()));
+                                messageRegisteredHere.Add(pa.Number);
                             }
                             catch
                             {
@@ -445,13 +454,17 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_GenericMessageRouting.ContainsKey(gm.Method))
                         {
-                            m_Log.FatalFormat("Field {0} of {1} registered duplicate generic {2}", fi.Name, t.GetType(), gm.Method);
+                            if (!genericMsgRegisteredHere.Contains(gm.Method))
+                            {
+                                m_Log.FatalFormat("Field {0} of {1} registered duplicate generic {2}", fi.Name, t.GetType(), gm.Method);
+                            }
                         }
                         else
                         {
                             try
                             {
                                 m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromFieldInfo(fi, t, o, "generic " + gm.Method));
+                                genericMsgRegisteredHere.Add(gm.Method);
                             }
                             catch
                             {
@@ -465,13 +478,17 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_GodlikeMessageRouting.ContainsKey(gm.Method))
                         {
-                            m_Log.FatalFormat("Field {0} of {1} registered duplicate godlike {2}", fi.Name, t.FullName, gm.Method);
+                            if (!godlikeMsgRegisteredHere.Contains(gm.Method))
+                            {
+                                m_Log.FatalFormat("Field {0} of {1} registered duplicate godlike {2}", fi.Name, t.FullName, gm.Method);
+                            }
                         }
                         else
                         {
                             try
                             {
                                 m_GodlikeMessageRouting.Add(gm.Method, DeriveActionDelegateFromFieldInfo(fi, t, o, "godlike " + gm.Method));
+                                godlikeMsgRegisteredHere.Add(gm.Method);
                             }
                             catch
                             {
@@ -485,13 +502,17 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_IMMessageRouting.ContainsKey(im.Dialog))
                         {
-                            m_Log.FatalFormat("Field {0} of {1} registered duplicate im {2}", fi.Name, t.GetType(), im.Dialog.ToString());
+                            if (!imTypeRegisteredHere.Contains(im.Dialog))
+                            {
+                                m_Log.FatalFormat("Field {0} of {1} registered duplicate im {2}", fi.Name, t.GetType(), im.Dialog.ToString());
+                            }
                         }
                         else
                         {
                             try
                             {
                                 m_IMMessageRouting.Add(im.Dialog, DeriveActionDelegateFromFieldInfo(fi, t, o, "im " + im.Dialog.ToString()));
+                                imTypeRegisteredHere.Add(im.Dialog);
                             }
                             catch
                             {
@@ -516,7 +537,10 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
-                            m_Log.FatalFormat("Method {0} of {2} registered duplicate message {1}", mi.Name, pa.Number.ToString(), t.FullName);
+                            if (!messageRegisteredHere.Contains(pa.Number))
+                            {
+                                m_Log.FatalFormat("Method {0} of {2} registered duplicate message {1}", mi.Name, pa.Number.ToString(), t.FullName);
+                            }
                         }
                         else if (pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage || pa.Number == MessageType.GodlikeMessage)
                         {
@@ -527,6 +551,7 @@ namespace SilverSim.Viewer.Core
                             try
                             {
                                 m_MessageRouting.Add(pa.Number, DeriveActionDelegateFromMethodInfo(mi, t, o, "message " + pa.Number.ToString()));
+                                messageRegisteredHere.Add(pa.Number);
                             }
                             catch
                             {
@@ -539,13 +564,17 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_GenericMessageRouting.ContainsKey(gm.Method))
                         {
-                            m_Log.FatalFormat("Method {0} of {2} registered duplicate generic {1}", mi.Name, gm.Method, t.FullName);
+                            if (!genericMsgRegisteredHere.Contains(gm.Method))
+                            {
+                                m_Log.FatalFormat("Method {0} of {2} registered duplicate generic {1}", mi.Name, gm.Method, t.FullName);
+                            }
                         }
                         else
                         {
                             try
                             {
                                 m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "generic " + gm.Method));
+                                genericMsgRegisteredHere.Add(gm.Method);
                             }
                             catch
                             {
@@ -558,13 +587,17 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_GodlikeMessageRouting.ContainsKey(gm.Method))
                         {
-                            m_Log.FatalFormat("Method {0} of {2} registered duplicate godlike {1}", mi.Name, gm.Method, t.FullName);
+                            if (!godlikeMsgRegisteredHere.Contains(gm.Method))
+                            {
+                                m_Log.FatalFormat("Method {0} of {2} registered duplicate godlike {1}", mi.Name, gm.Method, t.FullName);
+                            }
                         }
                         else
                         {
                             try
                             {
                                 m_GodlikeMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "godlike " + gm.Method));
+                                godlikeMsgRegisteredHere.Add(gm.Method);
                             }
                             catch
                             {
@@ -577,13 +610,17 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_IMMessageRouting.ContainsKey(im.Dialog))
                         {
-                            m_Log.FatalFormat("Method {0} of {2} registered duplicate im {1}", mi.Name, im.Dialog.ToString(), t.FullName);
+                            if (!imTypeRegisteredHere.Contains(im.Dialog))
+                            {
+                                m_Log.FatalFormat("Method {0} of {2} registered duplicate im {1}", mi.Name, im.Dialog.ToString(), t.FullName);
+                            }
                         }
                         else
                         {
                             try
                             {
                                 m_IMMessageRouting.Add(im.Dialog, DeriveActionDelegateFromMethodInfo(mi, t, o, "im " + im.Dialog.ToString()));
+                                imTypeRegisteredHere.Add(im.Dialog);
                             }
                             catch
                             {
@@ -592,7 +629,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-#if DEBUG
+#if EXPLICITDEBUG
                     if (pas.Length == 0 && gms.Length == 0 && ims.Length == 0)
                     {
                         if (mi.ReturnType != typeof(void))
