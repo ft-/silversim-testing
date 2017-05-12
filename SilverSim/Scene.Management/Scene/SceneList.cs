@@ -206,6 +206,7 @@ namespace SilverSim.Scene.Management.Scene
 
             if (agentCount > 0)
             {
+                m_Log.InfoFormat("Ensuring agents logout at region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
                 using (Semaphore waitSema = new Semaphore(0, agentCount))
                 {
                     foreach (IAgent agent in agentsToLogout)
@@ -223,7 +224,7 @@ namespace SilverSim.Scene.Management.Scene
                         });
                     }
                     int count = 0;
-                    while (count < agentCount)
+                    while (count < 3 && agentCount > 0)
                     {
                         try
                         {
@@ -231,11 +232,15 @@ namespace SilverSim.Scene.Management.Scene
                         }
                         catch
                         {
-                            m_Log.InfoFormat("Remaining agents are forced to be disconnected. Count: {0}", agentCount - count);
+                            m_Log.InfoFormat("Remaining agents are forced to be disconnected. Count: {0}", agentCount);
                             break;
                         }
                         ++count;
                     }
+                }
+                if (agentCount > 0)
+                {
+                    m_Log.InfoFormat("Dropping remaining agents at region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
                 }
             }
             /* if there are still agents left, we kill their connections here. */
