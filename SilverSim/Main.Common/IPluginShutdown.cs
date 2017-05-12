@@ -23,6 +23,7 @@ namespace SilverSim.Main.Common
 {
     public enum ShutdownOrder
     {
+        BeforeLogoutAgents = -30,
         LogoutAgents = -20,
         LogoutRegion = -10,
         Any = 0,

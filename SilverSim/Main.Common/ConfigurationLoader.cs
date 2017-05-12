@@ -1233,6 +1233,7 @@ namespace SilverSim.Main.Common
         {
             Scenes.OnRegionAdd -= LoadParamsOnAddedScene;
 
+            List<IPluginShutdown> shutdownLogoutBeforeAgentsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownLogoutDatabaseList = new List<IPluginShutdown>();
@@ -1244,6 +1245,9 @@ namespace SilverSim.Main.Common
                 {
                     case ShutdownOrder.Any:
                         shutdownAnyList.Add(s);
+                        break;
+                    case ShutdownOrder.BeforeLogoutAgents:
+                        shutdownLogoutBeforeAgentsList.Add(s);
                         break;
                     case ShutdownOrder.LogoutAgents:
                         shutdownLogoutAgentsList.Add(s);
@@ -1257,6 +1261,11 @@ namespace SilverSim.Main.Common
                     default:
                         break;
                 }
+            }
+
+            foreach (IPluginShutdown s in shutdownLogoutBeforeAgentsList)
+            {
+                s.Shutdown();
             }
 
             foreach (IPluginShutdown s in shutdownLogoutAgentsList)
