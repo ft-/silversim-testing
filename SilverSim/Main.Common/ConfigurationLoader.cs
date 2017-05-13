@@ -184,7 +184,10 @@ namespace SilverSim.Main.Common
                     m_Log.Error(string.Format("Error removing PID file \"{0}\"", m_PIDFile), e);
                 }
             }
-            m_ShutdownEvent.Dispose();
+            if(null != m_ShutdownEvent)
+            {
+                m_ShutdownEvent.Dispose();
+            }
         }
 
         readonly ILog m_Log;
@@ -234,7 +237,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static Action<int> SimulatorShutdownDelegate; /* used for Scene.Management registration */
+        static public Action<int> SimulatorShutdownDelegate; /* used for Scene.Management registration */
         static public Action SimulatorShutdownAbortDelegate; /* used for Scene.Management registration */
 
         void ShutdownTimerEventHandler(object o, ElapsedEventArgs evargs)

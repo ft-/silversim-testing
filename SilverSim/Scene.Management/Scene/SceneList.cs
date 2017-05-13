@@ -46,10 +46,10 @@ namespace SilverSim.Scene.Management.Scene
             /* we have to bypass the circular issue we would get when trying to do it via using */
             Assembly assembly = Assembly.Load("SilverSim.Main.Common");
             Type t = assembly.GetType("SilverSim.Main.Common.ConfigurationLoader");
-            FieldInfo f = t.GetField("SimulatorShutdownDelegate", BindingFlags.NonPublic | BindingFlags.Static);
+            FieldInfo f = t.GetField("SimulatorShutdownDelegate", BindingFlags.Public | BindingFlags.Static);
             Action<int> act = HandleSimulatorShutdownInNotice;
             f.SetValue(null, act);
-            f = t.GetField("SimulatorShutdownAbortDelegate", BindingFlags.NonPublic | BindingFlags.Static);
+            f = t.GetField("SimulatorShutdownAbortDelegate", BindingFlags.Public | BindingFlags.Static);
             Action act2 = HandleSimulatorShutdownAbortNotice;
             f.SetValue(null, act2);
         }
