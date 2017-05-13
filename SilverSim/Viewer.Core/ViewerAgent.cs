@@ -490,7 +490,6 @@ namespace SilverSim.Viewer.Core
         private UserAgentServiceInterface m_UserAgentService;
         private PresenceServiceInterface m_PresenceService;
         private GridUserServiceInterface m_GridUserService;
-        private GridServiceInterface m_GridService;
         readonly EconomyServiceInterface m_EconomyService;
         readonly OfflineIMServiceInterface m_OfflineIMService;
 
@@ -655,7 +654,6 @@ namespace SilverSim.Viewer.Core
             m_UserAgentService = serviceList.Get<UserAgentServiceInterface>();
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
-            m_GridService = serviceList.Get<GridServiceInterface>();
             m_EconomyService = serviceList.Get<EconomyServiceInterface>();
             m_OfflineIMService = serviceList.Get<OfflineIMServiceInterface>();
             FirstName = firstName;
@@ -686,7 +684,6 @@ namespace SilverSim.Viewer.Core
                 m_UserAgentService = null;
                 m_PresenceService = null;
                 m_GridUserService = null;
-                m_GridService = null;
             }
         }
 
