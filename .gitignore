@@ -18,11 +18,12 @@
 *.dump.txt
 *.example
 *.log
+*.userprefs
 obj
 bin
-/.sonar
+.sonar
 singletests
-/testresults
+testresults
 data/**/*.ini
 nls/en
 nls/de
