@@ -47,7 +47,6 @@ namespace SilverSim.Main.Cmd.Estate
         GridServiceInterface m_RegionStorage;
         EstateServiceInterface m_EstateService;
         AggregatingAvatarNameService m_AvatarNameService;
-        private static readonly ILog m_Log = LogManager.GetLogger("ESTATE COMMANDS");
         SceneList m_Scenes;
 
         public EstateCommands(string regionStorageName, string estateServiceName)

@@ -43,8 +43,7 @@ using System.Threading;
 namespace SilverSim.Main.Common.HttpServer
 {
     [Description("HTTP Server")]
-    [ServerParam("HTTP.MaxActiveConnectionsPerPort", Type = ServerParamType.GlobalOnly, ParameterType = typeof(uint), DefaultValue = 500)]
-    public class BaseHttpServer : IPlugin, IPluginShutdown, IServerParamListener
+    public class BaseHttpServer : IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("HTTP SERVER");
 
@@ -77,7 +76,7 @@ namespace SilverSim.Main.Common.HttpServer
         X509Certificate2 m_ServerCertificate;
         readonly SslProtocols m_SslProtocols = SslProtocols.Tls12;
         readonly string m_CertificateFileName;
-        readonly Type m_SslStreamPreload;
+        readonly internal Type m_SslStreamPreload;
         readonly Socket m_ListenerSocket;
         readonly Thread m_ListenerThread;
         readonly List<IPortControlServiceInterface> m_PortControlServices = new List<IPortControlServiceInterface>();
@@ -237,17 +236,6 @@ namespace SilverSim.Main.Common.HttpServer
         }
 
         int m_ActiveThreadCount;
-        int m_MaxActiveHttpConnections = 500;
-
-        [ServerParam("HTTP.MaxActiveConnectionsPerPort")]
-        public void MaxActiveHttpConnectionsPerPortUpdate(UUID regionId, string value)
-        {
-            int val;
-            if(UUID.Zero == regionId && int.TryParse(value, out val) && val > 0)
-            {
-                m_MaxActiveHttpConnections = val;
-            }
-        }
 
         readonly AutoResetEvent m_AsyncListenerEvent = new AutoResetEvent(false);
 

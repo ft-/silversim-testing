@@ -235,7 +235,7 @@ namespace SilverSim.Main.Common
         }
 
         static Action<int> SimulatorShutdownDelegate; /* used for Scene.Management registration */
-        static Action SimulatorShutdownAbortDelegate; /* used for Scene.Management registration */
+        static public Action SimulatorShutdownAbortDelegate; /* used for Scene.Management registration */
 
         void ShutdownTimerEventHandler(object o, ElapsedEventArgs evargs)
         {
@@ -308,7 +308,6 @@ namespace SilverSim.Main.Common
         public void AddHeloProtocolsProvided(string protocol, int priority)
         {
             m_XProtocolsProvided[protocol] = -priority;
-            StringBuilder builder = new StringBuilder();
             List<string> list = new List<string>();
             foreach(KeyValuePair<string, int> item in m_XProtocolsProvided.OrderBy(key => key.Value))
             {
