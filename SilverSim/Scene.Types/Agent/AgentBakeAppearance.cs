@@ -538,9 +538,11 @@ namespace SilverSim.Scene.Types.Agent
                             wearables.Add(wearableData.Type, new List<AgentWearables.WearableInfo>());
                         }
 
-                        AgentWearables.WearableInfo wearableInfo = new AgentWearables.WearableInfo();
-                        wearableInfo.ItemID = actualItem.ID;
-                        wearableInfo.AssetID = actualItem.AssetID;
+                        AgentWearables.WearableInfo wearableInfo = new AgentWearables.WearableInfo()
+                        {
+                            ItemID = actualItem.ID,
+                            AssetID = actualItem.AssetID
+                        };
                         wearables[wearableData.Type].Add(wearableInfo);
                     }
                 }
@@ -607,8 +609,10 @@ namespace SilverSim.Scene.Types.Agent
                     InventoryItem inventoryItem;
                     if (actualItemsInDict.TryGetValue(itemId, out inventoryItem))
                     {
-                        outfitItem = new OutfitItem(inventoryItem);
-                        outfitItem.ActualItem = inventoryItem;
+                        outfitItem = new OutfitItem(inventoryItem)
+                        {
+                            ActualItem = inventoryItem
+                        };
                         switch (inventoryItem.AssetType)
                         {
                             case AssetType.Bodypart:
@@ -932,11 +936,13 @@ namespace SilverSim.Scene.Types.Agent
         {
             int bakeDimensions = (bake == BakeType.Eyes) ? 128 : 512;
             Image srcimg;
-            AssetData data = new AssetData();
-            data.Type = AssetType.Texture;
-            data.Local = true;
-            data.Temporary = true;
-            data.Flags = AssetFlags.Collectable | AssetFlags.Rewritable;
+            AssetData data = new AssetData()
+            {
+                Type = AssetType.Texture,
+                Local = true,
+                Temporary = true,
+                Flags = AssetFlags.Collectable | AssetFlags.Rewritable
+            };
             AvatarTextureIndex[] bakeProcessTable;
             switch (bake)
             {

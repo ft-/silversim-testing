@@ -222,9 +222,11 @@ namespace SilverSim.WebIF.Admin
 
         public void ErrorResponse(HttpRequest req, AdminWebIfErrorResult reason)
         {
-            Map m = new Map();
-            m.Add("success", false);
-            m.Add("reason", (int)reason);
+            Map m = new Map
+            {
+                { "success", false },
+                { "reason", (int)reason }
+            };
             using (HttpResponse res = req.BeginResponse(JsonContentType))
             {
                 using (Stream o = res.GetOutputStream())
@@ -652,8 +654,10 @@ namespace SilverSim.WebIF.Admin
 
         void HandleWebSocketConsole(HttpRequest req, string sessionid)
         {
-            Map jsondata = new Map();
-            jsondata.Add("sessionid", sessionid);
+            Map jsondata = new Map
+            {
+                { "sessionid", sessionid }
+            };
             using (WebSocketTTY tty = new WebSocketTTY(req.BeginWebSocket("console")))
             {
                 while(!m_ShutdownHandlerThreads)
@@ -1291,8 +1295,10 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
 
-            Map resdata = new Map();
-            resdata.Add("user", uui.ToMap());
+            Map resdata = new Map
+            {
+                { "user", uui.ToMap() }
+            };
             SuccessResponse(req, resdata);
         }
 
@@ -1341,8 +1347,10 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
-                Map res = new Map();
-                res.Add("user", uui.ToMap());
+                Map res = new Map
+                {
+                    { "user", uui.ToMap() }
+                };
                 SuccessResponse(req, res);
             }
         }
@@ -1354,9 +1362,11 @@ namespace SilverSim.WebIF.Admin
             {
                 res.Add(module);
             }
-            Map m = new Map();
-            m.Add("title", m_Title);
-            m.Add("modules", res);
+            Map m = new Map
+            {
+                { "title", m_Title },
+                { "modules", res }
+            };
             SuccessResponse(req, m);
         }
 
@@ -1368,8 +1378,10 @@ namespace SilverSim.WebIF.Admin
             {
                 res.Add(host);
             }
-            Map m = new Map();
-            m.Add("entries", res);
+            Map m = new Map
+            {
+                { "entries", res }
+            };
             SuccessResponse(req, m);
         }
 
@@ -1399,14 +1411,18 @@ namespace SilverSim.WebIF.Admin
             Dictionary<string, IPlugin> plugins = m_Loader.AllServices;
             foreach(KeyValuePair<string, IPlugin> kvp in plugins)
             {
-                Map pluginData = new Map();
-                pluginData.Add("Name", kvp.Key);
+                Map pluginData = new Map
+                {
+                    { "Name", kvp.Key }
+                };
                 DescriptionAttribute descAttr = Attribute.GetCustomAttribute(kvp.Value.GetType(), typeof(DescriptionAttribute)) as DescriptionAttribute;
                 pluginData.Add("Description", descAttr != null ? descAttr.Description : string.Empty);
                 res.Add(pluginData);
             }
-            Map m = new Map();
-            m.Add("modules", res);
+            Map m = new Map
+            {
+                { "modules", res }
+            };
             SuccessResponse(req, m);
         }
 
@@ -1423,8 +1439,10 @@ namespace SilverSim.WebIF.Admin
             IPlugin plugin;
             if(plugins.TryGetValue(jsondata["name"].ToString(), out plugin))
             {
-                Map res = new Map();
-                res.Add("Name", jsondata["name"].ToString());
+                Map res = new Map
+                {
+                    { "Name", jsondata["name"].ToString() }
+                };
                 Type pluginType = plugin.GetType();
                 DescriptionAttribute descAttr = Attribute.GetCustomAttribute(pluginType, typeof(DescriptionAttribute)) as DescriptionAttribute;
                 res.Add("Description", descAttr != null ? descAttr.Description : string.Empty);
@@ -1463,8 +1481,10 @@ namespace SilverSim.WebIF.Admin
             {
                 res.Add(s);
             }
-            Map mres = new Map();
-            mres["issues"] = res;
+            Map mres = new Map
+            {
+                ["issues"] = res
+            };
             SuccessResponse(req, mres);
         }
 
@@ -1484,8 +1504,10 @@ namespace SilverSim.WebIF.Admin
 
             foreach (KeyValuePair<string, ServerParamAttribute> kvp in resList)
             {
-                Map eres = new Map();
-                eres.Add("name", kvp.Key);
+                Map eres = new Map
+                {
+                    { "name", kvp.Key }
+                };
                 if (!string.IsNullOrEmpty(kvp.Value.Description))
                 {
                     eres.Add("description", kvp.Value.Description);
@@ -1509,8 +1531,10 @@ namespace SilverSim.WebIF.Admin
                     eres.Add("valuerange", "string");
                 }
             }
-            Map mres = new Map();
-            mres["serverparams"] = res;
+            Map mres = new Map
+            {
+                ["serverparams"] = res
+            };
             SuccessResponse(req, mres);
         }
 
@@ -1588,14 +1612,18 @@ namespace SilverSim.WebIF.Admin
                     
                     if(m_ServerParams.TryGetExplicitValue(regionid, parameter, out value))
                     {
-                        Map entry = new Map();
-                        entry.Add("parameter", parameter);
-                        entry.Add("value", value);
+                        Map entry = new Map
+                        {
+                            { "parameter", parameter },
+                            { "value", value }
+                        };
                         resultlist.Add(entry);
                     }
                 }
-                Map res = new Map();
-                res.Add("values", resultlist);
+                Map res = new Map
+                {
+                    { "values", resultlist }
+                };
                 SuccessResponse(req, res);
             }
         }
@@ -1637,14 +1665,18 @@ namespace SilverSim.WebIF.Admin
                     
                     if(m_ServerParams.TryGetValue(regionid, parameter, out value))
                     {
-                        Map entry = new Map();
-                        entry.Add("parameter", parameter);
-                        entry.Add("value", value);
+                        Map entry = new Map
+                        {
+                            { "parameter", parameter },
+                            { "value", value }
+                        };
                         resultlist.Add(entry);
                     }
                 }
-                Map res = new Map();
-                res.Add("values", resultlist);
+                Map res = new Map
+                {
+                    { "values", resultlist }
+                };
                 SuccessResponse(req, res);
             }
         }
@@ -1682,8 +1714,10 @@ namespace SilverSim.WebIF.Admin
                     ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                     return;
                 }
-                Map res = new Map();
-                res.Add("value", value);
+                Map res = new Map
+                {
+                    { "value", value }
+                };
                 SuccessResponse(req, res);
             }
         }
@@ -1718,9 +1752,11 @@ namespace SilverSim.WebIF.Admin
                         resdata.Add(jsondata["right"].ToString().ToLower());
                     }
                     m_ServerParams[UUID.Zero, userRef + "Rights"] = string.Join(",", rightlistnew);
-                    Map m = new Map();
-                    m["user"] = jsondata["user"];
-                    m["rights"] = resdata;
+                    Map m = new Map
+                    {
+                        ["user"] = jsondata["user"],
+                        ["rights"] = resdata
+                    };
                     SuccessResponse(req, m);
                 }
                 else
@@ -1759,9 +1795,11 @@ namespace SilverSim.WebIF.Admin
                         }
                     }
                     m_ServerParams[UUID.Zero, userRef + "Rights"] = string.Join(",", rightlistnew);
-                    Map m = new Map();
-                    m["user"] = jsondata["user"];
-                    m["rights"] = resdata;
+                    Map m = new Map
+                    {
+                        ["user"] = jsondata["user"],
+                        ["rights"] = resdata
+                    };
                     SuccessResponse(req, m);
                 }
                 else

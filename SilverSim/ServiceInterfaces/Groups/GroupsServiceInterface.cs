@@ -361,16 +361,18 @@ namespace SilverSim.ServiceInterfaces.Groups
             };
             ginfo.OwnerRoleID = role_owner.ID;
 
-            GroupRolemember gmemrole_owner = new GroupRolemember();
-            gmemrole_owner.Group = ginfo.ID;
-            gmemrole_owner.RoleID = role_owner.ID;
-            gmemrole_owner.Principal = ginfo.Founder;
-
-            GroupRolemember gmemrole_everyone = new GroupRolemember();
-            gmemrole_everyone.Group = ginfo.ID;
-            gmemrole_everyone.RoleID = role_everyone.ID;
-            gmemrole_everyone.Principal = ginfo.Founder;
-
+            GroupRolemember gmemrole_owner = new GroupRolemember()
+            {
+                Group = ginfo.ID,
+                RoleID = role_owner.ID,
+                Principal = ginfo.Founder
+            };
+            GroupRolemember gmemrole_everyone = new GroupRolemember()
+            {
+                Group = ginfo.ID,
+                RoleID = role_everyone.ID,
+                Principal = ginfo.Founder
+            };
             Groups.Create(requestingAgent, ginfo);
 
             try
@@ -406,19 +408,23 @@ namespace SilverSim.ServiceInterfaces.Groups
             {
                 if (!Rolemembers.ContainsKey(requestingAgent, group, UUID.Zero, agent))
                 {
-                    GroupRolemember rolemember = new GroupRolemember();
-                    rolemember.Group = group;
-                    rolemember.Principal = agent;
-                    rolemember.RoleID = UUID.Zero;
+                    GroupRolemember rolemember = new GroupRolemember()
+                    {
+                        Group = group,
+                        Principal = agent,
+                        RoleID = UUID.Zero
+                    };
                     Rolemembers.Add(requestingAgent, rolemember);
                 }
 
                 if(UUID.Zero != roleid)
                 {
-                    GroupRolemember rolemember = new GroupRolemember();
-                    rolemember.Group = group;
-                    rolemember.Principal = agent;
-                    rolemember.RoleID = roleid;
+                    GroupRolemember rolemember = new GroupRolemember()
+                    {
+                        Group = group,
+                        Principal = agent,
+                        RoleID = roleid
+                    };
                     Rolemembers.Add(requestingAgent, rolemember);
                 }
 
