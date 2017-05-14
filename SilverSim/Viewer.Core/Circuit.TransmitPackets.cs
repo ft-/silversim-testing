@@ -439,8 +439,15 @@ namespace SilverSim.Viewer.Core
                     p.WriteUInt8(pingID++);
                     m_PingSendTicks[pingID] = Environment.TickCount;
                     p.WriteUInt32(0);
-                    m_Server.SendPacketTo(p, RemoteEndPoint);
-                    Interlocked.Increment(ref m_PacketsSent);
+                    try
+                    {
+                        m_Server.SendPacketTo(p, RemoteEndPoint);
+                        Interlocked.Increment(ref m_PacketsSent);
+                    }
+                    catch(ObjectDisposedException)
+                    {
+                        return;
+                    }
                 }
 
                 if (Environment.TickCount - lastAckTick >= 1000)

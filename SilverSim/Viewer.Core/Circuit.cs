@@ -35,6 +35,7 @@ namespace SilverSim.Viewer.Core
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract partial class Circuit : ICircuit
     {
+        public bool ForceUseCircuitCode;
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
         public UInt32 CircuitCode { get; private set; }
         protected BlockingQueue<Message> m_TxQueue = new BlockingQueue<Message>();

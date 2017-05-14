@@ -297,7 +297,7 @@ namespace SilverSim.Viewer.Core
             pck.EnqueuedAtTime = Environment.TickCount;
 
             /* we do not want to spend time on decoding packets that are unknown where they belong */
-            if(!m_Circuits.TryGetValue(pck.RemoteEndPoint, out circuit))
+            if(!m_Circuits.TryGetValue(pck.RemoteEndPoint, out circuit) || circuit.ForceUseCircuitCode)
             {
                 try
                 {
@@ -311,6 +311,7 @@ namespace SilverSim.Viewer.Core
                         {
                             if (m_Circuits.TryGetValue(circuitcode, out circuit))
                             {
+                                circuit.ForceUseCircuitCode = false;
                                 UUID sessionID = pck.ReadUUID();
                                 UUID agentID = pck.ReadUUID();
                                 AgentCircuit acircuit = circuit as AgentCircuit;
