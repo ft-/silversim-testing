@@ -27,6 +27,7 @@ namespace SilverSim.Threading
 {
     public class RwLockedSortedDoubleDictionary<TKey1, TKey2, TValue>
     {
+        [Serializable]
         public class ChangeKeyFailedException : Exception
         {
             public ChangeKeyFailedException(string message)

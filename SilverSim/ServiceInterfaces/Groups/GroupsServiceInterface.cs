@@ -341,21 +341,24 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public virtual GroupInfo CreateGroup(UUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
         {
-            GroupRole role_everyone = new GroupRole();
-            role_everyone.ID = UUID.Zero;
-            role_everyone.Group = ginfo.ID;
-            role_everyone.Name = "Everyone";
-            role_everyone.Description = "Everyone in the group";
-            role_everyone.Title = "Member of " + ginfo.ID.GroupName;
-            role_everyone.Powers = everyonePowers;
-
-            GroupRole role_owner = new GroupRole();
-            role_owner.ID = UUID.Random;
-            role_owner.Group = ginfo.ID;
-            role_owner.Name = "Owners";
-            role_owner.Description = "Owners of the group";
-            role_owner.Title = "Owner of " + ginfo.ID.GroupName;
-            role_owner.Powers = ownerPowers;
+            GroupRole role_everyone = new GroupRole()
+            {
+                ID = UUID.Zero,
+                Group = ginfo.ID,
+                Name = "Everyone",
+                Description = "Everyone in the group",
+                Title = "Member of " + ginfo.ID.GroupName,
+                Powers = everyonePowers
+            };
+            GroupRole role_owner = new GroupRole()
+            {
+                ID = UUID.Random,
+                Group = ginfo.ID,
+                Name = "Owners",
+                Description = "Owners of the group",
+                Title = "Owner of " + ginfo.ID.GroupName,
+                Powers = ownerPowers
+            };
             ginfo.OwnerRoleID = role_owner.ID;
 
             GroupRolemember gmemrole_owner = new GroupRolemember();
@@ -476,6 +479,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
         }
 
+        [Serializable]
         public class GroupInsufficientPowersException : Exception
         {
             public GroupInsufficientPowersException(GroupPowers power)

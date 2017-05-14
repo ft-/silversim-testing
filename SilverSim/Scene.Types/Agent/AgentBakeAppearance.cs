@@ -130,6 +130,7 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        [Serializable]
         public class BakingErrorException : Exception
         {
             public BakingErrorException()

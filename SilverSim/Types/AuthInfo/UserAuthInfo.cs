@@ -24,6 +24,7 @@ using System.Runtime.Serialization;
 
 namespace SilverSim.Types.AuthInfo
 {
+    [Serializable]
     public class PasswordAuthenticationFailedException : Exception
     {
         public PasswordAuthenticationFailedException()

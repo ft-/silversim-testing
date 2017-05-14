@@ -27,7 +27,7 @@ using SilverSim.Types.Groups;
 
 namespace SilverSim.Groups.Common
 {
-    public partial class DefaultPermissionsGroupsService : GroupsServiceInterface, IPlugin
+    public sealed partial class DefaultPermissionsGroupsService : GroupsServiceInterface, IPlugin
     {
         GroupsServiceInterface m_InnerService;
         readonly string m_GroupsServiceName;

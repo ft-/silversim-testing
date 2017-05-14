@@ -46,7 +46,7 @@ namespace SilverSim.WebIF.Admin
 {
     #region Service Implementation
     [Description("Administration Web-Interface (WebIF)")]
-    public class AdminWebIF : IPlugin, IPluginShutdown, IPostLoadStep, IAdminWebIF
+    public sealed class AdminWebIF : IPlugin, IPluginShutdown, IPostLoadStep, IAdminWebIF
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF");
 

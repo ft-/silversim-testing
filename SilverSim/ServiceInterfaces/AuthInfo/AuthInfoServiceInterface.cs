@@ -26,6 +26,7 @@ using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.AuthInfo
 {
+    [Serializable]
     public class VerifyTokenFailedException : Exception
     {
         public VerifyTokenFailedException()
@@ -52,6 +53,7 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
         }
     }
 
+    [Serializable]
     public class AuthenticationFailedException : Exception
     {
         public AuthenticationFailedException()

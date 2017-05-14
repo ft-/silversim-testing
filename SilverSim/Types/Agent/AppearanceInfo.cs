@@ -197,6 +197,7 @@ namespace SilverSim.Types.Agent
 
         }
 
+        [Serializable]
         public class InvalidAppearanceInfoSerializationException : Exception
         {
             public InvalidAppearanceInfoSerializationException()

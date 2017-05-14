@@ -212,7 +212,7 @@ namespace SilverSim.Types
         }
 
         #region Stateful Enumerator
-        public class MarkEnumerator : IEnumerator<IValue>, IEnumerator, IDisposable
+        public sealed class MarkEnumerator : IEnumerator<IValue>, IEnumerator, IDisposable
         {
             private int m_CurrentIndex;
             private int m_MarkIndex;

@@ -24,6 +24,7 @@ using System.Runtime.Serialization;
 
 namespace SilverSim.Types.Asset.Format.Mesh
 {
+    [Serializable]
     public class NoSuchMeshDataException : Exception
     {
         public NoSuchMeshDataException()

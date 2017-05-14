@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Types.ServerURIs

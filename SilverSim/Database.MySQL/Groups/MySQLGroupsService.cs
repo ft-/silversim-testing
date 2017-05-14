@@ -30,11 +30,10 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
-using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    public partial class MySQLGroupsService : GroupsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
+    public sealed partial class MySQLGroupsService : GroupsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUPS SERVICE");
         AggregatingAvatarNameService m_AvatarNameService;

@@ -31,6 +31,7 @@ namespace SilverSim.Threading
         protected readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
         protected SortedDictionary<TKey, TValue> m_Dictionary;
 
+        [Serializable]
         public class KeyAlreadyExistsException : Exception
         {
             public KeyAlreadyExistsException(string message)

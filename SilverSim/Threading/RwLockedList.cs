@@ -273,6 +273,7 @@ namespace SilverSim.Threading
             }
         }
 
+        [Serializable]
         public class ValueAlreadyExistsException : Exception
         {
             public ValueAlreadyExistsException()
