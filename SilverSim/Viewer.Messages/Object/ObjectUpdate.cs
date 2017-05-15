@@ -90,11 +90,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjData> ObjectData = new List<ObjData>();
 
-        public UnreliableObjectUpdate()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt64(GridPosition.RegionHandle);
@@ -216,6 +211,7 @@ namespace SilverSim.Viewer.Messages.Object
                 d.NameValue = p.ReadStringLen16();
                 d.Data = p.ReadBytes(p.ReadUInt16());
                 d.Text = p.ReadStringLen8();
+                d.TextColor = new ColorAlpha();
                 d.TextColor.R_AsByte = p.ReadUInt8();
                 d.TextColor.G_AsByte = p.ReadUInt8();
                 d.TextColor.B_AsByte = p.ReadUInt8();
