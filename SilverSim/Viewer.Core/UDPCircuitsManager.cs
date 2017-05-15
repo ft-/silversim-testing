@@ -380,6 +380,7 @@ namespace SilverSim.Viewer.Core
                                             SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), ep);
 
                                             circuit.SendMessage(rh);
+                                            return;
                                         }
                                         catch (Exception e)
                                         {
@@ -401,6 +402,9 @@ namespace SilverSim.Viewer.Core
                     /* no action required */
                 }
 
+#if DEBUG
+                m_Log.DebugFormat("Unmatched endpoint address {0} for UDP server at port {1}", pck.RemoteEndPoint.ToString(), m_BindPort);
+#endif
                 return;
             }
 
