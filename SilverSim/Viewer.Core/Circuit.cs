@@ -111,9 +111,6 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public sealed class IgnoreMethodAttribute : Attribute
         {
-            public IgnoreMethodAttribute()
-            {
-            }
         }
 
         public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint, UDPPacket>();
@@ -168,7 +165,7 @@ namespace SilverSim.Viewer.Core
                     {
                         if (m_UnackedPacketsHash.Contains(ackno))
                         {
-                            p_acked = (UDPPacket)m_UnackedPacketsHash[ackno];
+                            p_acked = m_UnackedPacketsHash[ackno];
                             m_UnackedPacketsHash.Remove(ackno);
                         }
                     }
@@ -257,7 +254,7 @@ namespace SilverSim.Viewer.Core
                         {
                             if (m_UnackedPacketsHash.Contains(ackno))
                             {
-                                p_acked = (UDPPacket)m_UnackedPacketsHash[ackno];
+                                p_acked = m_UnackedPacketsHash[ackno];
                                 m_UnackedPacketsHash.Remove(ackno);
                             }
                         }
