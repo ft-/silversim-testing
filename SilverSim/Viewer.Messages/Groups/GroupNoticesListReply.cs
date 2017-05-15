@@ -71,20 +71,23 @@ namespace SilverSim.Viewer.Messages.Groups
         }
         public static Message Decode(UDPPacket p)
         {
-            GroupNoticesListReply m = new GroupNoticesListReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
+            var m = new GroupNoticesListReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                GroupNoticeData d = new GroupNoticeData();
-                d.NoticeID = p.ReadUUID();
-                d.Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32());
-                d.FromName = p.ReadStringLen16();
-                d.Subject = p.ReadStringLen16();
-                d.HasAttachment = p.ReadBoolean();
-                d.AssetType = (AssetType)p.ReadUInt32();
-                m.Data.Add(d);
+                m.Data.Add(new GroupNoticeData()
+                {
+                    NoticeID = p.ReadUUID(),
+                    Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32()),
+                    FromName = p.ReadStringLen16(),
+                    Subject = p.ReadStringLen16(),
+                    HasAttachment = p.ReadBoolean(),
+                    AssetType = (AssetType)p.ReadUInt32()
+                });
             }
             return m;
         }

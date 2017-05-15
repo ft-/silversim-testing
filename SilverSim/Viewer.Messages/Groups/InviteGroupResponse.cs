@@ -34,11 +34,6 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID RoleID;
         public int MembershipFee;
 
-        public InviteGroupResponse()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -50,13 +45,14 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            InviteGroupResponse m = new InviteGroupResponse();
-            m.AgentID = p.ReadUUID();
-            m.InviteeID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.RoleID = p.ReadUUID();
-            m.MembershipFee = p.ReadInt32();
-            return m;
+            return new InviteGroupResponse()
+            {
+                AgentID = p.ReadUUID(),
+                InviteeID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                RoleID = p.ReadUUID(),
+                MembershipFee = p.ReadInt32()
+            };
         }
     }
 }

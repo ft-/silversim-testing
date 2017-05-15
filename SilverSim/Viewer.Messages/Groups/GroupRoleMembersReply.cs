@@ -51,11 +51,6 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public List<MemberDataEntry> MemberData = new List<MemberDataEntry>();
 
-        public GroupRoleMembersReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -72,18 +67,21 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupRoleMembersReply m = new GroupRoleMembersReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.RequestID = p.ReadUUID();
-            m.TotalPairs = p.ReadUInt32();
+            var m = new GroupRoleMembersReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                RequestID = p.ReadUUID(),
+                TotalPairs = p.ReadUInt32()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                MemberDataEntry d = new MemberDataEntry();
-                d.RoleID = p.ReadUUID();
-                d.MemberID = p.ReadUUID();
-                m.MemberData.Add(d);
+                m.MemberData.Add(new MemberDataEntry()
+                {
+                    RoleID = p.ReadUUID(),
+                    MemberID = p.ReadUUID()
+                });
             }
             return m;
         }

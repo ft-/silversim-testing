@@ -34,11 +34,6 @@ namespace SilverSim.Viewer.Messages.Estate
         public string EstateName = string.Empty;
         public UUID EstateOwnerID = UUID.Zero;
 
-        public EstateCovenantReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(CovenantID);
@@ -49,12 +44,13 @@ namespace SilverSim.Viewer.Messages.Estate
 
         public static Message Decode(UDPPacket p)
         {
-            EstateCovenantReply m = new EstateCovenantReply();
-            m.CovenantID = p.ReadUUID();
-            m.CovenantTimestamp = p.ReadUInt32();
-            m.EstateName = p.ReadStringLen8();
-            m.EstateOwnerID = p.ReadUUID();
-            return m;
+            return new EstateCovenantReply()
+            {
+                CovenantID = p.ReadUUID(),
+                CovenantTimestamp = p.ReadUInt32(),
+                EstateName = p.ReadStringLen8(),
+                EstateOwnerID = p.ReadUUID()
+            };
         }
     }
 }

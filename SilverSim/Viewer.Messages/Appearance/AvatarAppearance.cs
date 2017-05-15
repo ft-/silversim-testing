@@ -46,11 +46,6 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public List<AppearanceDataEntry> AppearanceData = new List<AppearanceDataEntry>();
 
-        public AvatarAppearance()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(Sender);
@@ -78,18 +73,22 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public static Message Decode(UDPPacket p)
         {
-            AvatarAppearance m = new AvatarAppearance();
-            m.Sender = p.ReadUUID();
-            m.IsTrial = p.ReadBoolean();
-            m.TextureEntry = p.ReadBytes(p.ReadUInt16());
-            m.VisualParams = p.ReadBytes(p.ReadUInt8());
+            var m = new AvatarAppearance()
+            {
+                Sender = p.ReadUUID(),
+                IsTrial = p.ReadBoolean(),
+                TextureEntry = p.ReadBytes(p.ReadUInt16()),
+                VisualParams = p.ReadBytes(p.ReadUInt8())
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                AppearanceDataEntry d = new AppearanceDataEntry();
-                d.AppearanceVersion = p.ReadUInt8();
-                d.CofVersion = p.ReadInt32();
-                d.Flags = p.ReadUInt32();
+                m.AppearanceData.Add(new AppearanceDataEntry()
+                {
+                    AppearanceVersion = p.ReadUInt8(),
+                    CofVersion = p.ReadInt32(),
+                    Flags = p.ReadUInt32()
+                });
             }
             return m;
         }

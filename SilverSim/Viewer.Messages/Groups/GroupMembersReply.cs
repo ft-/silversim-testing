@@ -58,11 +58,6 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public List<MemberDataEntry> MemberData = new List<MemberDataEntry>();
 
-        public GroupMembersReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -83,22 +78,25 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupMembersReply m = new GroupMembersReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.RequestID = p.ReadUUID();
-            m.MemberCount = p.ReadInt32();
+            var m = new GroupMembersReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                RequestID = p.ReadUUID(),
+                MemberCount = p.ReadInt32()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                MemberDataEntry d = new MemberDataEntry();
-                d.AgentID = p.ReadUUID();
-                d.Contribution = p.ReadInt32();
-                d.OnlineStatus = p.ReadStringLen8();
-                d.AgentPowers = (GroupPowers)p.ReadUInt64();
-                d.Title = p.ReadStringLen8();
-                d.IsOwner = p.ReadBoolean();
-                m.MemberData.Add(d);
+                m.MemberData.Add(new MemberDataEntry()
+                {
+                    AgentID = p.ReadUUID(),
+                    Contribution = p.ReadInt32(),
+                    OnlineStatus = p.ReadStringLen8(),
+                    AgentPowers = (GroupPowers)p.ReadUInt64(),
+                    Title = p.ReadStringLen8(),
+                    IsOwner = p.ReadBoolean()
+                });
             }
             return m;
         }

@@ -28,11 +28,6 @@ namespace SilverSim.Viewer.Messages.Agent
     {
         public double Health;
 
-        public HealthMessage()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteFloat((float)Health);
@@ -40,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public static Message Decode(UDPPacket p)
         {
-            HealthMessage m = new HealthMessage();
+            var m = new HealthMessage();
             m.Health = p.ReadFloat();
             return m;
         }

@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Core
 
         public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint, UDPPacket>();
 
-        public Circuit(            
+        protected Circuit(
             UDPCircuitsManager server,
             UInt32 circuitcode)
         {
@@ -315,7 +315,7 @@ namespace SilverSim.Viewer.Core
                     byte pingID = pck.ReadUInt8();
                     pck.ReadUInt32();
 
-                    UDPPacket newpck = new UDPPacket();
+                    var newpck = new UDPPacket();
                     newpck.WriteMessageNumber(MessageType.CompletePingCheck);
                     newpck.WriteUInt8(pingID);
                     newpck.SequenceNumber = NextSequenceNumber;
@@ -332,7 +332,7 @@ namespace SilverSim.Viewer.Core
                                 {
                                     continue;
                                 }
-                                Value = (UDPPacket)m_UnackedPacketsHash[keyval];
+                                Value = m_UnackedPacketsHash[keyval];
                             }
                             if (Environment.TickCount - Value.TransferredAtTime > 1000)
                             {

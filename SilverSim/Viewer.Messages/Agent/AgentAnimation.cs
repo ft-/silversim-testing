@@ -41,15 +41,9 @@ namespace SilverSim.Viewer.Messages.Agent
         public List<AnimationEntry> AnimationEntryList = new List<AnimationEntry>();
         public List<byte[]> PhysicalAvatarEventList = new List<byte[]>();
 
-
-        public AgentAnimation()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            AgentAnimation m = new AgentAnimation();
+            var m = new AgentAnimation();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             int n;
@@ -58,7 +52,7 @@ namespace SilverSim.Viewer.Messages.Agent
             n = p.ReadUInt8();
             for (i = 0; i < n; ++i)
             {
-                AnimationEntry e = new AnimationEntry();
+                var e = new AnimationEntry();
                 e.AnimID = p.ReadUUID();
                 e.StartAnim = p.ReadBoolean();
                 m.AnimationEntryList.Add(e);

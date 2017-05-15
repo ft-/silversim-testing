@@ -37,11 +37,6 @@ namespace SilverSim.Viewer.Messages.Chat
         public Vector3 Position = Vector3.Zero;
         public string Message = string.Empty;
 
-        public ChatFromSimulator()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteStringLen8(FromName);
@@ -56,16 +51,17 @@ namespace SilverSim.Viewer.Messages.Chat
 
         public static Message Decode(UDPPacket p)
         {
-            ChatFromSimulator m = new ChatFromSimulator();
-            m.FromName = p.ReadStringLen8();
-            m.SourceID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.SourceType = (ChatSourceType)p.ReadUInt8();
-            m.ChatType = (ChatType)p.ReadUInt8();
-            m.Audible = (ChatAudibleLevel)p.ReadUInt8();
-            m.Position = p.ReadVector3f();
-            m.Message = p.ReadStringLen16();
-            return m;
+            return new ChatFromSimulator()
+            {
+                FromName = p.ReadStringLen8(),
+                SourceID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                SourceType = (ChatSourceType)p.ReadUInt8(),
+                ChatType = (ChatType)p.ReadUInt8(),
+                Audible = (ChatAudibleLevel)p.ReadUInt8(),
+                Position = p.ReadVector3f(),
+                Message = p.ReadStringLen16()
+            };
         }
     }
 }

@@ -44,19 +44,9 @@ namespace SilverSim.Viewer.Messages.Groups
             public int Type;
             public string Item = string.Empty;
             public int Amount;
-
-            public HistoryDataEntry()
-            {
-
-            }
         }
 
         public List<HistoryDataEntry> HistoryData = new List<HistoryDataEntry>();
-
-        public GroupAccountTransactionsReply()
-        {
-
-        }
 
         public override void Serialize(UDPPacket p)
         {
@@ -79,23 +69,26 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupAccountTransactionsReply m = new GroupAccountTransactionsReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.RequestID = p.ReadUUID();
-            m.IntervalDays = p.ReadInt32();
-            m.CurrentInterval = p.ReadInt32();
-            m.StartDate = p.ReadStringLen8();
+            var m = new GroupAccountTransactionsReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                RequestID = p.ReadUUID(),
+                IntervalDays = p.ReadInt32(),
+                CurrentInterval = p.ReadInt32(),
+                StartDate = p.ReadStringLen8()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                HistoryDataEntry d = new HistoryDataEntry();
-                d.Time = p.ReadStringLen8();
-                d.User = p.ReadStringLen8();
-                d.Type = p.ReadInt32();
-                d.Item = p.ReadStringLen8();
-                d.Amount = p.ReadInt32();
-                m.HistoryData.Add(d);
+                m.HistoryData.Add(new HistoryDataEntry()
+                {
+                    Time = p.ReadStringLen8(),
+                    User = p.ReadStringLen8(),
+                    Type = p.ReadInt32(),
+                    Item = p.ReadStringLen8(),
+                    Amount = p.ReadInt32()
+                });
             }
             return m;
         }

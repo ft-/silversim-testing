@@ -35,18 +35,14 @@ namespace SilverSim.Viewer.Messages.CallingCard
 
         public List<UUID> FolderIDs = new List<UUID>();
 
-        public AcceptCallingCard()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            AcceptCallingCard m = new AcceptCallingCard();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
+            var m = new AcceptCallingCard()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                TransactionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {

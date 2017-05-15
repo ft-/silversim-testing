@@ -56,29 +56,26 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public List<RoleDataEntry> RoleData = new List<RoleDataEntry>();
 
-        public GroupRoleUpdate()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            GroupRoleUpdate m = new GroupRoleUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-
+            var m = new GroupRoleUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID()
+            };
             uint cnt = p.ReadUInt8();
             for(uint i = 0; i < cnt; ++i)
             {
-                RoleDataEntry e = new RoleDataEntry();
-                e.RoleID = p.ReadUUID();
-                e.Name = p.ReadStringLen8();
-                e.Description = p.ReadStringLen8();
-                e.Title = p.ReadStringLen8();
-                e.Powers = (GroupPowers)p.ReadUInt64();
-                e.UpdateType = (RoleUpdateType)p.ReadUInt8();
-                m.RoleData.Add(e);
+                m.RoleData.Add(new RoleDataEntry()
+                {
+                    RoleID = p.ReadUUID(),
+                    Name = p.ReadStringLen8(),
+                    Description = p.ReadStringLen8(),
+                    Title = p.ReadStringLen8(),
+                    Powers = (GroupPowers)p.ReadUInt64(),
+                    UpdateType = (RoleUpdateType)p.ReadUInt8()
+                });
             }
             return m;
         }

@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.Friend
     {
         public List<UUID> AgentIDs = new List<UUID>();
 
-        public OnlineNotification()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt8((byte)AgentIDs.Count);
@@ -47,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Friend
 
         public static Message Decode(UDPPacket p)
         {
-            OnlineNotification m = new OnlineNotification();
+            var m = new OnlineNotification();
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {

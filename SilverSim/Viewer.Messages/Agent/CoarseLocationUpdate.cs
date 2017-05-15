@@ -41,11 +41,6 @@ namespace SilverSim.Viewer.Messages.Agent
         }
         public List<AgentDataEntry> AgentData = new List<AgentDataEntry>();
 
-        public CoarseLocationUpdate()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt8((byte)AgentData.Count);
@@ -66,11 +61,11 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public static Message Decode(UDPPacket p)
         {
-            CoarseLocationUpdate m = new CoarseLocationUpdate();
+            var m = new CoarseLocationUpdate();
             uint cnt = p.ReadUInt8();
             for (uint i = 0; i < cnt; ++i)
             {
-                AgentDataEntry d = new AgentDataEntry();
+                var d = new AgentDataEntry();
                 d.X = p.ReadUInt8();
                 d.Y = p.ReadUInt8();
                 d.Z = p.ReadUInt8();
@@ -83,7 +78,7 @@ namespace SilverSim.Viewer.Messages.Agent
             cnt = p.ReadUInt8();
             for(int i = 0; i < cnt; ++i)
             {
-                AgentDataEntry e = m.AgentData[i];
+                var e = m.AgentData[i];
                 e.AgentID = p.ReadUUID();
                 m.AgentData[i] = e;
             }

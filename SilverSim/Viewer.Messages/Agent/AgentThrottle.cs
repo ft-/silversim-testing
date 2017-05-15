@@ -36,11 +36,6 @@ namespace SilverSim.Viewer.Messages.Agent
         public UInt32 GenCounter;
         public byte[] Throttles;
 
-        public AgentThrottle()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -53,7 +48,7 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public static Message Decode(UDPPacket p)
         {
-            AgentThrottle m = new AgentThrottle();
+            var m = new AgentThrottle();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             m.CircuitCode = p.ReadUInt32();

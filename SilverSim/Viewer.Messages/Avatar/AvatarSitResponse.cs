@@ -36,11 +36,6 @@ namespace SilverSim.Viewer.Messages.Avatar
         public Vector3 CameraAtOffset = Vector3.Zero;
         public bool ForceMouselook;
 
-        public AvatarSitResponse()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(SitObject);
@@ -54,14 +49,16 @@ namespace SilverSim.Viewer.Messages.Avatar
 
         public static Message Decode(UDPPacket p)
         {
-            AvatarSitResponse m = new AvatarSitResponse();
-            m.SitObject = p.ReadUUID();
-            m.IsAutoPilot = p.ReadBoolean();
-            m.SitPosition = p.ReadVector3f();
-            m.SitRotation = p.ReadLLQuaternion();
-            m.CameraEyeOffset = p.ReadVector3f();
-            m.CameraAtOffset = p.ReadVector3f();
-            m.ForceMouselook = p.ReadBoolean();
+            var m = new AvatarSitResponse()
+            {
+                SitObject = p.ReadUUID(),
+                IsAutoPilot = p.ReadBoolean(),
+                SitPosition = p.ReadVector3f(),
+                SitRotation = p.ReadLLQuaternion(),
+                CameraEyeOffset = p.ReadVector3f(),
+                CameraAtOffset = p.ReadVector3f(),
+                ForceMouselook = p.ReadBoolean()
+            };
             return m;
         }
     }

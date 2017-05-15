@@ -32,11 +32,6 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
         public bool Success;
 
-        public EjectGroupMemberReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -46,11 +41,12 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            EjectGroupMemberReply m = new EjectGroupMemberReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.Success = p.ReadBoolean();
-            return m;
+            return new EjectGroupMemberReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                Success = p.ReadBoolean()
+            };
         }
     }
 }

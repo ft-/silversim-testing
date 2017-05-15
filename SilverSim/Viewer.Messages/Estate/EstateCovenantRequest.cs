@@ -31,18 +31,13 @@ namespace SilverSim.Viewer.Messages.Estate
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public EstateCovenantRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            EstateCovenantRequest m = new EstateCovenantRequest();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
-            return m;
+            return new EstateCovenantRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

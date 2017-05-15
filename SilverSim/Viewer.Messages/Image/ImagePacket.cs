@@ -33,11 +33,6 @@ namespace SilverSim.Viewer.Messages.Image
         public UInt16 Packet;
         public byte[] Data = new byte[0];
 
-        public ImagePacket()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ID);
@@ -48,11 +43,12 @@ namespace SilverSim.Viewer.Messages.Image
 
         public static Message Decode(UDPPacket p)
         {
-            ImagePacket m = new ImagePacket();
-            m.ID = p.ReadUUID();
-            m.Packet = p.ReadUInt16();
-            m.Data = p.ReadBytes(p.ReadUInt16());
-            return m;
+            return new ImagePacket()
+            {
+                ID = p.ReadUUID(),
+                Packet = p.ReadUInt16(),
+                Data = p.ReadBytes(p.ReadUInt16())
+            };
         }
     }
 }

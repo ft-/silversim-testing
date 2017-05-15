@@ -51,27 +51,24 @@ namespace SilverSim.Viewer.Messages.Image
 
         public readonly List<RequestImageEntry> RequestImageList = new List<RequestImageEntry>();
 
-        public RequestImage()
-        {
-
-        }
-
         public static RequestImage Decode(UDPPacket p)
         {
-            RequestImage m = new RequestImage();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new RequestImage()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint count = p.ReadUInt8();
             for (uint idx = 0; idx < count; ++idx)
             {
-                RequestImageEntry e = new RequestImageEntry();
-                e.ImageID = p.ReadUUID();
-                e.DiscardLevel = p.ReadInt8();
-                e.DownloadPriority = p.ReadFloat();
-                e.Packet = p.ReadUInt32();
-                e.Type = (ImageType)p.ReadUInt8();
-                m.RequestImageList.Add(e);
+                m.RequestImageList.Add(new RequestImageEntry()
+                {
+                    ImageID = p.ReadUUID(),
+                    DiscardLevel = p.ReadInt8(),
+                    DownloadPriority = p.ReadFloat(),
+                    Packet = p.ReadUInt32(),
+                    Type = (ImageType)p.ReadUInt8()
+                });
             }
 
             return m;

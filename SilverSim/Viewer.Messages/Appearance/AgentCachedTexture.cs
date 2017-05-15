@@ -42,25 +42,22 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public List<WearableDataEntry> WearableData = new List<WearableDataEntry>();
 
-        public AgentCachedTexture()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            AgentCachedTexture m = new AgentCachedTexture();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.SerialNum = p.ReadInt32();
-
+            var m = new AgentCachedTexture()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                SerialNum = p.ReadInt32()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                WearableDataEntry d;
-                d.ID = p.ReadUUID();
-                d.TextureIndex = p.ReadUInt8();
-                m.WearableData.Add(d);
+                m.WearableData.Add(new WearableDataEntry()
+                {
+                    ID = p.ReadUUID(),
+                    TextureIndex = p.ReadUInt8()
+                });
             }
 
             return m;

@@ -26,16 +26,10 @@ namespace SilverSim.Viewer.Messages.Economy
     [NotTrusted]
     public class EconomyDataRequest : Message
     {
-        public EconomyDataRequest()
-        {
-
-        }
 
         public static Message Decode(UDPPacket p)
         {
-            EconomyDataRequest m = new EconomyDataRequest();
-
-            return m;
+            return new EconomyDataRequest();
         }
 
         public override void Serialize(UDPPacket p)

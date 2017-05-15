@@ -44,11 +44,6 @@ namespace SilverSim.Viewer.Messages.Event
         public Vector3 GlobalPos;
         public UInt32 EventFlags;
 
-        public EventInfoReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -69,22 +64,23 @@ namespace SilverSim.Viewer.Messages.Event
 
         public static Message Decode(UDPPacket p)
         {
-            EventInfoReply m = new EventInfoReply();
-            m.AgentID = p.ReadUUID();
-            m.EventID = p.ReadUInt32();
-            m.Creator = p.ReadStringLen8();
-            m.Name = p.ReadStringLen8();
-            m.Category = p.ReadStringLen8();
-            m.Desc = p.ReadStringLen16();
-            m.Date = p.ReadStringLen8();
-            m.DateUTC = p.ReadUInt32();
-            m.Duration = p.ReadUInt32();
-            m.Cover = p.ReadUInt32();
-            m.Amount = p.ReadUInt32();
-            m.SimName = p.ReadStringLen8();
-            m.GlobalPos = p.ReadVector3d();
-            m.EventFlags = p.ReadUInt32();
-            return m;
+            return new EventInfoReply()
+            {
+                AgentID = p.ReadUUID(),
+                EventID = p.ReadUInt32(),
+                Creator = p.ReadStringLen8(),
+                Name = p.ReadStringLen8(),
+                Category = p.ReadStringLen8(),
+                Desc = p.ReadStringLen16(),
+                Date = p.ReadStringLen8(),
+                DateUTC = p.ReadUInt32(),
+                Duration = p.ReadUInt32(),
+                Cover = p.ReadUInt32(),
+                Amount = p.ReadUInt32(),
+                SimName = p.ReadStringLen8(),
+                GlobalPos = p.ReadVector3d(),
+                EventFlags = p.ReadUInt32()
+            };
         }
     }
 }

@@ -34,22 +34,17 @@ namespace SilverSim.Viewer.Messages.Circuit
         public GridVector GridPosition;
         public GridVector RegionSize;
 
-        public EstablishAgentCommunication()
-        {
-
-        }
-
         public override SilverSim.Types.IValue SerializeEQG()
         {
-            SilverSim.Types.Map i = new SilverSim.Types.Map();
-            i.Add("agent-id", AgentID);
-            i.Add("sim-ip-and-port", SimIpAndPort.ToString());
-            i.Add("seed-capability", SeedCapability);
-            i.Add("region-handle", GridPosition.RegionHandle);
-            i.Add("region-size-x", RegionSize.X);
-            i.Add("region-size-y", RegionSize.Y);
-
-            return i;
+            return new SilverSim.Types.Map
+            {
+                { "agent-id", AgentID },
+                { "sim-ip-and-port", SimIpAndPort.ToString() },
+                { "seed-capability", SeedCapability },
+                { "region-handle", GridPosition.RegionHandle },
+                { "region-size-x", RegionSize.X },
+                { "region-size-y", RegionSize.Y }
+            };
         }
     }
 }

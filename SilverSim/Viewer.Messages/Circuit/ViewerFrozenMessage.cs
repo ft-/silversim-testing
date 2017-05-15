@@ -28,11 +28,6 @@ namespace SilverSim.Viewer.Messages.Circuit
     {
         public bool Frozen;
 
-        public ViewerFrozenMessage()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteBoolean(Frozen);
@@ -40,9 +35,10 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public static Message Decode(UDPPacket p)
         {
-            ViewerFrozenMessage m = new ViewerFrozenMessage();
-            m.Frozen = p.ReadBoolean();
-            return m;
+            return new ViewerFrozenMessage()
+            {
+                Frozen = p.ReadBoolean()
+            };
         }
     }
 }

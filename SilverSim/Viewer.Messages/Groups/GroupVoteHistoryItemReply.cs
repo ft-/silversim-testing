@@ -84,30 +84,32 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupVoteHistoryItemReply m = new GroupVoteHistoryItemReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-            m.TotalNumItems = p.ReadUInt32();
-            m.VoteID = p.ReadUUID();
-            m.TerseDataID = p.ReadStringLen8();
-            m.StartDateTime = p.ReadStringLen8();
-            m.EndDateTime = p.ReadStringLen8();
-            m.VoteInitiatorID = p.ReadUUID();
-            m.VoteType = p.ReadStringLen8();
-            m.VoteResult = p.ReadStringLen8();
-            m.Majority = p.ReadFloat();
-            m.Quorum = p.ReadInt32();
-            m.ProposalText = p.ReadStringLen16();
-
+            var m = new GroupVoteHistoryItemReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                TransactionID = p.ReadUUID(),
+                TotalNumItems = p.ReadUInt32(),
+                VoteID = p.ReadUUID(),
+                TerseDataID = p.ReadStringLen8(),
+                StartDateTime = p.ReadStringLen8(),
+                EndDateTime = p.ReadStringLen8(),
+                VoteInitiatorID = p.ReadUUID(),
+                VoteType = p.ReadStringLen8(),
+                VoteResult = p.ReadStringLen8(),
+                Majority = p.ReadFloat(),
+                Quorum = p.ReadInt32(),
+                ProposalText = p.ReadStringLen16()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                VoteItemData d = new VoteItemData();
-                d.CandidateID = p.ReadUUID();
-                d.VoteCast = p.ReadStringLen8();
-                d.NumVotes = p.ReadInt32();
-                m.VoteItem.Add(d);
+                m.VoteItem.Add(new VoteItemData()
+                {
+                    CandidateID = p.ReadUUID(),
+                    VoteCast = p.ReadStringLen8(),
+                    NumVotes = p.ReadInt32()
+                });
             }
             return m;
         }

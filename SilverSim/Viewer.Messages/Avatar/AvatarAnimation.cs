@@ -44,18 +44,15 @@ namespace SilverSim.Viewer.Messages.Avatar
                 ObjectID = objectID;
             }
         }
+
         public List<AnimationData> AnimationList = new List<AnimationData>();
 
         public struct PhysicalAvatarEventData
         {
             public byte[] TypeData;
         }
+
         public List<PhysicalAvatarEventData> PhysicalAvatarEventList = new List<PhysicalAvatarEventData>();
-
-        public AvatarAnimation()
-        {
-
-        }
 
         public override void Serialize(UDPPacket p)
         {
@@ -81,15 +78,18 @@ namespace SilverSim.Viewer.Messages.Avatar
 
         public static Message Decode(UDPPacket p)
         {
-            AvatarAnimation m = new AvatarAnimation();
-            m.Sender = p.ReadUUID();
+            var m = new AvatarAnimation()
+            {
+                Sender = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                AnimationData d = new AnimationData();
-                d.AnimID = p.ReadUUID();
-                d.AnimSequenceID = p.ReadUInt32();
-                m.AnimationList.Add(d);
+                m.AnimationList.Add(new AnimationData()
+                {
+                    AnimID = p.ReadUUID(),
+                    AnimSequenceID = p.ReadUInt32()
+                });
             }
             n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
@@ -97,7 +97,7 @@ namespace SilverSim.Viewer.Messages.Avatar
                 UUID objectID = p.ReadUUID();
                 if(m.AnimationList.Count > i)
                 {
-                    AnimationData d = m.AnimationList[(int)i];
+                    var d = m.AnimationList[(int)i];
                     d.ObjectID = objectID;
                     m.AnimationList[(int)i] = d;
                 }
@@ -105,9 +105,10 @@ namespace SilverSim.Viewer.Messages.Avatar
             n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                PhysicalAvatarEventData d = new PhysicalAvatarEventData();
-                d.TypeData = p.ReadBytes(p.ReadUInt8());
-                m.PhysicalAvatarEventList.Add(d);
+                m.PhysicalAvatarEventList.Add(new PhysicalAvatarEventData()
+                {
+                    TypeData = p.ReadBytes(p.ReadUInt8())
+                });
             }
             return m;
         }

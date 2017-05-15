@@ -40,11 +40,6 @@ namespace SilverSim.Viewer.Messages.Camera
 
         public List<CameraProperty> CameraProperties = new List<CameraProperty>();
 
-        public SetFollowCamProperties()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ObjectID);
@@ -58,15 +53,18 @@ namespace SilverSim.Viewer.Messages.Camera
 
         public static Message Decode(UDPPacket p)
         {
-            SetFollowCamProperties m = new SetFollowCamProperties();
-            m.ObjectID = p.ReadUUID();
+            var m = new SetFollowCamProperties()
+            {
+                ObjectID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                CameraProperty d = new CameraProperty();
-                d.Type = p.ReadInt32();
-                d.Value = p.ReadFloat();
-                m.CameraProperties.Add(d);
+                m.CameraProperties.Add(new CameraProperty()
+                {
+                    Type = p.ReadInt32(),
+                    Value = p.ReadFloat()
+                });
             }
             return m;
         }

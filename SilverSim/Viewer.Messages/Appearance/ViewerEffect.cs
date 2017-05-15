@@ -43,33 +43,25 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public List<EffectData> Effects = new List<EffectData>();
 
-        public ViewerEffect()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ViewerEffect m = new ViewerEffect();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ViewerEffect()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                EffectData d;
-                d.ID = p.ReadUUID();
-                d.AgentID = p.ReadUUID();
-                d.Type = p.ReadUInt8();
-                d.Duration = p.ReadFloat();
-                byte[] t = p.ReadBytes(4);
-                d.EffectColor = new ColorAlpha();
-                d.EffectColor.R_AsByte = t[0];
-                d.EffectColor.G_AsByte = t[1];
-                d.EffectColor.B_AsByte = t[2];
-                d.EffectColor.A_AsByte = t[3];
-                d.TypeData = p.ReadBytes(p.ReadUInt8());
+                var d = new EffectData()
+                {
+                    ID = p.ReadUUID(),
+                    AgentID = p.ReadUUID(),
+                    Type = p.ReadUInt8(),
+                    Duration = p.ReadFloat(),
+                    EffectColor = new ColorAlpha(p.ReadBytes(4)),
+                    TypeData = p.ReadBytes(p.ReadUInt8())
+                };
             }
 
             return m;

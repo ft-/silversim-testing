@@ -43,11 +43,6 @@ namespace SilverSim.Viewer.Messages.Circuit
         /* EQG extension */
         public GridVector RegionSize;
 
-        public CrossedRegion()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -62,27 +57,31 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override IValue SerializeEQG()
         {
-            Types.Map i = new Types.Map();
-            i.Add("LookAt", LookAt);
-            i.Add("Position", Position);
-
-            Types.Map a = new Types.Map();
-            a.Add("AgentID", AgentID);
-            a.Add("SessionID", SessionID);
-
-            Types.Map r = new Types.Map();
-            r.Add("RegionHandle", new BinaryData(GridPosition.AsBytes));
-            r.Add("SeedCapability", SeedCapability);
-            r.Add("SimIP", new BinaryData(SimIP.GetAddressBytes()));
-            r.Add("SimPort", SimPort);
-            r.Add("RegionSizeX", RegionSize.X);
-            r.Add("RegionSizeY", RegionSize.Y);
-
-            Types.Map m = new Types.Map();
-            m.Add("Info", i);
-            m.Add("AgentData", a);
-            m.Add("RegionData", r);
-
+            var i = new Types.Map
+            {
+                { "LookAt", LookAt },
+                { "Position", Position }
+            };
+            var a = new Types.Map
+            {
+                { "AgentID", AgentID },
+                { "SessionID", SessionID }
+            };
+            var r = new Types.Map
+            {
+                { "RegionHandle", new BinaryData(GridPosition.AsBytes) },
+                { "SeedCapability", SeedCapability },
+                { "SimIP", new BinaryData(SimIP.GetAddressBytes()) },
+                { "SimPort", SimPort },
+                { "RegionSizeX", RegionSize.X },
+                { "RegionSizeY", RegionSize.Y }
+            };
+            var m = new Types.Map
+            {
+                { "Info", i },
+                { "AgentData", a },
+                { "RegionData", r }
+            };
             return m;
         }
     }

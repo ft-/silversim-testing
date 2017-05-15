@@ -27,11 +27,6 @@ namespace SilverSim.Viewer.Messages.Circuit
     [Trusted]
     public class DisableSimulator : Message
     {
-        public DisableSimulator()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             /* no data to serialize */
@@ -44,9 +39,7 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override Types.IValue SerializeEQG()
         {
-            Types.Map m = new Types.Map();
-
-            return m;
+            return new Types.Map();
         }
     }
 }

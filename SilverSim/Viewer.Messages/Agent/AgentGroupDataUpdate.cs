@@ -47,11 +47,6 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
 
-        public AgentGroupDataUpdate()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -69,12 +64,12 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public static Message Decode(UDPPacket p)
         {
-            AgentGroupDataUpdate m = new AgentGroupDataUpdate();
+            var m = new AgentGroupDataUpdate();
             m.AgentID = p.ReadUUID();
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                GroupDataEntry e = new GroupDataEntry();
+                var e = new GroupDataEntry();
                 e.GroupID = p.ReadUUID();
                 e.GroupPowers = (GroupPowers)p.ReadUInt64();
                 e.AcceptNotices = p.ReadBoolean();
@@ -88,16 +83,16 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public override IValue SerializeEQG()
         {
-            MapType body = new MapType();
-            AnArray agentDataArray = new AnArray();
-            MapType agentDataMap = new MapType();
+            var body = new MapType();
+            var agentDataArray = new AnArray();
+            var agentDataMap = new MapType();
             agentDataMap.Add("AgentID", AgentID);
             agentDataArray.Add(agentDataMap);
             body.Add("AgentData", agentDataArray);
-            AnArray groupDataArray = new AnArray();
+            var groupDataArray = new AnArray();
             foreach(GroupDataEntry e in GroupData)
             {
-                MapType groupData = new MapType();
+                var groupData = new MapType();
                 groupData.Add("ListInProfile", e.ListInProfile);
                 groupData.Add("GroupID", e.GroupID);
                 groupData.Add("GroupInsigniaID", e.GroupInsigniaID);

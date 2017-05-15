@@ -38,11 +38,6 @@ namespace SilverSim.Viewer.Messages.Groups
         public string Message;
         public byte[] BinaryBucket = new byte[0];
 
-        public GroupNoticeAdd()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -57,15 +52,16 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupNoticeAdd m = new GroupNoticeAdd();
-            m.AgentID = p.ReadUUID();
-            m.ToGroupID = p.ReadUUID();
-            m.ID = p.ReadUUID();
-            m.Dialog = (GridInstantMessageDialog)p.ReadUInt8();
-            m.FromAgentName = p.ReadStringLen8();
-            m.Message = p.ReadStringLen16();
-            m.BinaryBucket = p.ReadBytes(p.ReadUInt16());
-            return m;
+            return new GroupNoticeAdd()
+            {
+                AgentID = p.ReadUUID(),
+                ToGroupID = p.ReadUUID(),
+                ID = p.ReadUUID(),
+                Dialog = (GridInstantMessageDialog)p.ReadUInt8(),
+                FromAgentName = p.ReadStringLen8(),
+                Message = p.ReadStringLen16(),
+                BinaryBucket = p.ReadBytes(p.ReadUInt16())
+            };
         }
     }
 }

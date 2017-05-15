@@ -31,14 +31,9 @@ namespace SilverSim.Viewer.Messages.Agent
         public UUID AgentID;
         public UUID SessionID;
 
-        public AgentDataUpdateRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            AgentDataUpdateRequest m = new AgentDataUpdateRequest();
+            var m = new AgentDataUpdateRequest();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
 

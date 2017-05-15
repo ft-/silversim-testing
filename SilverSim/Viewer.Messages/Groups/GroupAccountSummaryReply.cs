@@ -53,11 +53,6 @@ namespace SilverSim.Viewer.Messages.Groups
         public string LastTaxDate = string.Empty;
         public string TaxDate = string.Empty;
 
-        public GroupAccountSummaryReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -86,29 +81,30 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupAccountSummaryReply m = new GroupAccountSummaryReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.RequestID = p.ReadUUID();
-            m.IntervalDays = p.ReadInt32();
-            m.CurrentInterval = p.ReadInt32();
-            m.StartDate = p.ReadStringLen8();
-            m.Balance = p.ReadInt32();
-            m.TotalCredits = p.ReadInt32();
-            m.TotalDebits = p.ReadInt32();
-            m.ObjectTaxCurrent = p.ReadInt32();
-            m.LightTaxCurrent = p.ReadInt32();
-            m.LandTaxCurrent = p.ReadInt32();
-            m.GroupTaxCurrent = p.ReadInt32();
-            m.ParcelDirFeeCurrent = p.ReadInt32();
-            m.ObjectTaxEstimate = p.ReadInt32();
-            m.LightTaxEstimate = p.ReadInt32();
-            m.GroupTaxEstimate = p.ReadInt32();
-            m.ParcelDirFeeEstimate = p.ReadInt32();
-            m.NonExemptMembers = p.ReadInt32();
-            m.LastTaxDate = p.ReadStringLen8();
-            m.TaxDate = p.ReadStringLen8();
-            return m;
+            return new GroupAccountSummaryReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                RequestID = p.ReadUUID(),
+                IntervalDays = p.ReadInt32(),
+                CurrentInterval = p.ReadInt32(),
+                StartDate = p.ReadStringLen8(),
+                Balance = p.ReadInt32(),
+                TotalCredits = p.ReadInt32(),
+                TotalDebits = p.ReadInt32(),
+                ObjectTaxCurrent = p.ReadInt32(),
+                LightTaxCurrent = p.ReadInt32(),
+                LandTaxCurrent = p.ReadInt32(),
+                GroupTaxCurrent = p.ReadInt32(),
+                ParcelDirFeeCurrent = p.ReadInt32(),
+                ObjectTaxEstimate = p.ReadInt32(),
+                LightTaxEstimate = p.ReadInt32(),
+                GroupTaxEstimate = p.ReadInt32(),
+                ParcelDirFeeEstimate = p.ReadInt32(),
+                NonExemptMembers = p.ReadInt32(),
+                LastTaxDate = p.ReadStringLen8(),
+                TaxDate = p.ReadStringLen8()
+            };
         }
     }
 }

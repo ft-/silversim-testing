@@ -33,21 +33,15 @@ namespace SilverSim.Viewer.Messages.CallingCard
         public UUID DestID;
         public UUID TransactionID;
 
-        public OfferCallingCard()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            OfferCallingCard m = new OfferCallingCard();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.DestID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-
-            return m;
+            return new OfferCallingCard()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                DestID = p.ReadUUID(),
+                TransactionID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

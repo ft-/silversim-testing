@@ -33,20 +33,15 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
         public UUID TitleRoleID = UUID.Zero;
 
-        public GroupTitleUpdate()
-        {
-
-        }
-
         public static GroupTitleUpdate Decode(UDPPacket p)
         {
-            GroupTitleUpdate m = new GroupTitleUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.TitleRoleID = p.ReadUUID();
-
-            return m;
+            return new GroupTitleUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                TitleRoleID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

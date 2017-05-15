@@ -36,20 +36,14 @@ namespace SilverSim.Viewer.Messages.CallingCard
         public UUID SessionID;
         public UUID TransactionID;
 
-        public DeclineCallingCard()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            DeclineCallingCard m = new DeclineCallingCard();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-
-            return m;
+            return new DeclineCallingCard()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                TransactionID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

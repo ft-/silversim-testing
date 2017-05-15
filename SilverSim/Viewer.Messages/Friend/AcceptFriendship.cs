@@ -34,18 +34,14 @@ namespace SilverSim.Viewer.Messages.Friend
         public UUID TransactionID;
         public List<UUID> FolderIDs = new List<UUID>();
 
-        public AcceptFriendship()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            AcceptFriendship m = new AcceptFriendship();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-
+            var m = new AcceptFriendship()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                TransactionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {

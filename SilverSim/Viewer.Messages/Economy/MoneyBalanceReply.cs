@@ -44,11 +44,6 @@ namespace SilverSim.Viewer.Messages.Economy
         public Int32 Amount;
         public string ItemDescription = string.Empty;
 
-        public MoneyBalanceReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -69,22 +64,23 @@ namespace SilverSim.Viewer.Messages.Economy
 
         public static Message Decode(UDPPacket p)
         {
-            MoneyBalanceReply m = new MoneyBalanceReply();
-            m.AgentID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-            m.TransactionSuccess = p.ReadBoolean();
-            m.MoneyBalance = p.ReadInt32();
-            m.SquareMetersCredit = p.ReadInt32();
-            m.SquareMetersCommitted = p.ReadInt32();
-            m.Description = p.ReadStringLen8();
-            m.TransactionType = p.ReadInt32();
-            m.SourceID = p.ReadUUID();
-            m.IsSourceGroup = p.ReadBoolean();
-            m.DestID = p.ReadUUID();
-            m.IsDestGroup = p.ReadBoolean();
-            m.Amount = p.ReadInt32();
-            m.ItemDescription = p.ReadStringLen8();
-            return m;
+            return new MoneyBalanceReply()
+            {
+                AgentID = p.ReadUUID(),
+                TransactionID = p.ReadUUID(),
+                TransactionSuccess = p.ReadBoolean(),
+                MoneyBalance = p.ReadInt32(),
+                SquareMetersCredit = p.ReadInt32(),
+                SquareMetersCommitted = p.ReadInt32(),
+                Description = p.ReadStringLen8(),
+                TransactionType = p.ReadInt32(),
+                SourceID = p.ReadUUID(),
+                IsSourceGroup = p.ReadBoolean(),
+                DestID = p.ReadUUID(),
+                IsDestGroup = p.ReadBoolean(),
+                Amount = p.ReadInt32(),
+                ItemDescription = p.ReadStringLen8()
+            };
         }
     }
 }

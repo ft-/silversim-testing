@@ -26,11 +26,6 @@ namespace SilverSim.Viewer.Messages.Generic
     [NotTrusted]
     public class GodlikeMessage : GenericMessageFormat
     {
-        public GodlikeMessage()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
             return Decode(p, new GodlikeMessage());

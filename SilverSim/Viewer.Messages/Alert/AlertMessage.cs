@@ -61,15 +61,18 @@ namespace SilverSim.Viewer.Messages.Alert
 
         public static Message Decode(UDPPacket p)
         {
-            AlertMessage m = new AlertMessage();
-            m.Message = p.ReadStringLen8();
+            var m = new AlertMessage()
+            {
+                Message = p.ReadStringLen8()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                Data d = new Data();
-                d.Message = p.ReadStringLen8();
-                d.ExtraParams = p.ReadBytes(p.ReadUInt8());
-                m.AlertInfo.Add(d);
+                m.AlertInfo.Add(new Data()
+                {
+                    Message = p.ReadStringLen8(),
+                    ExtraParams = p.ReadBytes(p.ReadUInt8())
+                });
             }
             return m;
         }

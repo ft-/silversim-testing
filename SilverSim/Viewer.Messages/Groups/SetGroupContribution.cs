@@ -33,20 +33,15 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
         public int Contribution;
 
-        public SetGroupContribution()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            SetGroupContribution m = new SetGroupContribution();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.Contribution = p.ReadInt32();
-
-            return m;
+            return new SetGroupContribution()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                Contribution = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

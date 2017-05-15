@@ -45,10 +45,11 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public static Message Decode(UDPPacket p)
         {
-            ConfirmEnableSimulator m = new ConfirmEnableSimulator();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            return m;
+            return new ConfirmEnableSimulator()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
         }
     }
 }

@@ -33,11 +33,6 @@ namespace SilverSim.Viewer.Messages.Groups
         public bool Success;
         public string Message = string.Empty;
 
-        public CreateGroupReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -48,12 +43,13 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            CreateGroupReply m = new CreateGroupReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.Success = p.ReadBoolean();
-            m.Message = p.ReadStringLen8();
-            return m;
+            return new CreateGroupReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                Success = p.ReadBoolean(),
+                Message = p.ReadStringLen8()
+            };
         }
     }
 }

@@ -32,17 +32,14 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID SessionID;
         public UUID GroupNoticeID;
 
-        public GroupNoticeRequest()
-        {
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            GroupNoticeRequest m = new GroupNoticeRequest();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupNoticeID = p.ReadUUID();
-            return m;
+            return new GroupNoticeRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupNoticeID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

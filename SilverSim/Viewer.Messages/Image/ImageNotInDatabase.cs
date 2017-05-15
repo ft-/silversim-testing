@@ -30,11 +30,6 @@ namespace SilverSim.Viewer.Messages.Image
     {
         public UUID ID = UUID.Zero;
 
-        public ImageNotInDatabase()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ID);
@@ -42,9 +37,10 @@ namespace SilverSim.Viewer.Messages.Image
 
         public static Message Decode(UDPPacket p)
         {
-            ImageNotInDatabase m = new ImageNotInDatabase();
-            m.ID = p.ReadUUID();
-            return m;
+            return new ImageNotInDatabase()
+            {
+                ID = p.ReadUUID()
+            };
         }
     }
 }

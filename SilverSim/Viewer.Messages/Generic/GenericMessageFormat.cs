@@ -61,10 +61,10 @@ namespace SilverSim.Viewer.Messages.Generic
             m.TransactionID = p.ReadUUID();
             m.Method = p.ReadStringLen8();
             m.Invoice = p.ReadUUID();
-            int c = (int)p.ReadUInt8();
+            int c = p.ReadUInt8();
             for (int i = 0; i < c; ++i)
             {
-                m.ParamList.Add(p.ReadBytes((int)p.ReadUInt8()));
+                m.ParamList.Add(p.ReadBytes(p.ReadUInt8()));
             }
 
             return m;

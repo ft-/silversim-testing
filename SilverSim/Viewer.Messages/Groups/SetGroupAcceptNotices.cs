@@ -35,21 +35,16 @@ namespace SilverSim.Viewer.Messages.Groups
         public bool AcceptNotices;
         public bool ListInProfile;
 
-        public SetGroupAcceptNotices()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            SetGroupAcceptNotices m = new SetGroupAcceptNotices();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.AcceptNotices = p.ReadBoolean();
-            m.ListInProfile = p.ReadBoolean();
-
-            return m;
+            return new SetGroupAcceptNotices()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                AcceptNotices = p.ReadBoolean(),
+                ListInProfile = p.ReadBoolean()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -33,11 +33,6 @@ namespace SilverSim.Viewer.Messages.Event
         public UUID RegionID;
         public Vector3 RegionPos;
 
-        public EventLocationReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(QueryID);
@@ -48,12 +43,13 @@ namespace SilverSim.Viewer.Messages.Event
 
         public static Message Decode(UDPPacket p)
         {
-            EventLocationReply m = new EventLocationReply();
-            m.QueryID = p.ReadUUID();
-            m.Success = p.ReadBoolean();
-            m.RegionID = p.ReadUUID();
-            m.RegionPos = p.ReadVector3f();
-            return m;
+            return new EventLocationReply()
+            {
+                QueryID = p.ReadUUID(),
+                Success = p.ReadBoolean(),
+                RegionID = p.ReadUUID(),
+                RegionPos = p.ReadVector3f()
+            };
         }
     }
 }

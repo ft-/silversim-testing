@@ -42,24 +42,21 @@ namespace SilverSim.Viewer.Messages.Friend
 
         public List<RightsEntry> Rights = new List<RightsEntry>();
 
-        public GrantUserRights()
-        {
-
-        }
-
         public static GrantUserRights Decode(UDPPacket p)
         {
-            GrantUserRights m = new GrantUserRights();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new GrantUserRights()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for(uint i = 0; i < c; ++i)
             {
-                RightsEntry d = new RightsEntry();
-                d.AgentRelated = p.ReadUUID();
-                d.RelatedRights = (FriendRightFlags)p.ReadUInt32();
-                m.Rights.Add(d);
+                m.Rights.Add(new RightsEntry()
+                {
+                    AgentRelated = p.ReadUUID(),
+                    RelatedRights = (FriendRightFlags)p.ReadUInt32()
+                });
             }
 
             return m;

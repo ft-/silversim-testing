@@ -55,11 +55,6 @@ namespace SilverSim.Viewer.Messages.Groups
         }
         public List<RoleDataEntry> RoleData = new List<RoleDataEntry>();
 
-        public GroupRoleDataReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -80,22 +75,25 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupRoleDataReply m = new GroupRoleDataReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.RequestID = p.ReadUUID();
-            m.RoleCount = p.ReadInt32();
+            var m = new GroupRoleDataReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                RequestID = p.ReadUUID(),
+                RoleCount = p.ReadInt32()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                RoleDataEntry d = new RoleDataEntry();
-                d.RoleID = p.ReadUUID();
-                d.Name = p.ReadStringLen8();
-                d.Title = p.ReadStringLen8();
-                d.Description = p.ReadStringLen8();
-                d.Powers = (GroupPowers)p.ReadUInt64();
-                d.Members = p.ReadUInt32();
-                m.RoleData.Add(d);
+                m.RoleData.Add(new RoleDataEntry()
+                {
+                    RoleID = p.ReadUUID(),
+                    Name = p.ReadStringLen8(),
+                    Title = p.ReadStringLen8(),
+                    Description = p.ReadStringLen8(),
+                    Powers = (GroupPowers)p.ReadUInt64(),
+                    Members = p.ReadUInt32()
+                });
             }
             return m;
         }

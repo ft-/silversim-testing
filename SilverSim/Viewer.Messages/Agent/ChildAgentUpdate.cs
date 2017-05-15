@@ -93,11 +93,6 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public List<UInt32> AgentInfo = new List<UInt32>();
 
-        public ChildAgentUpdate()
-        {
-
-        }
-
         public override MessageType Number
         {
             get

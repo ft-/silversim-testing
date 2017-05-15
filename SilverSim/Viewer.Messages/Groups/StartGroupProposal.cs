@@ -39,23 +39,18 @@ namespace SilverSim.Viewer.Messages.Groups
         public int Duration;
         public string ProposalText;
 
-        public StartGroupProposal()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            StartGroupProposal m = new StartGroupProposal();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.Quorum = p.ReadInt32();
-            m.Majority = p.ReadFloat();
-            m.Duration = p.ReadInt32();
-            m.ProposalText = p.ReadStringLen8();
-
-            return m;
+            return new StartGroupProposal()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                Quorum = p.ReadInt32(),
+                Majority = p.ReadFloat(),
+                Duration = p.ReadInt32(),
+                ProposalText = p.ReadStringLen8()
+            };
         }
 
         public override void Serialize(UDPPacket p)

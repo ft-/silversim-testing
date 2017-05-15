@@ -31,17 +31,13 @@ namespace SilverSim.Viewer.Messages.IM
         public UUID AgentID;
         public UUID SessionID;
 
-        public RetrieveInstantMessages()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RetrieveInstantMessages m = new RetrieveInstantMessages();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            return m;
+            return new RetrieveInstantMessages()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

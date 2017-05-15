@@ -47,27 +47,24 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public byte[] VisualParams = new byte[0];
 
-        public AgentSetAppearance()
-        {
-
-        }
-
         public static AgentSetAppearance Decode(UDPPacket p)
         {
-            AgentSetAppearance m = new AgentSetAppearance();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.SerialNum = p.ReadUInt32();
-            m.Size = p.ReadVector3f();
-
+            var m = new AgentSetAppearance()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                SerialNum = p.ReadUInt32(),
+                Size = p.ReadVector3f()
+            };
             uint c = p.ReadUInt8();
 
             for (uint i = 0; i < c; ++i)
             {
-                WearableDataEntry d = new WearableDataEntry();
-                d.CacheID = p.ReadUUID();
-                d.TextureIndex = p.ReadUInt8();
-                m.WearableData.Add(d);
+                m.WearableData.Add(new WearableDataEntry()
+                {
+                    CacheID = p.ReadUUID(),
+                    TextureIndex = p.ReadUInt8()
+                });
             }
 
             c = p.ReadUInt16();

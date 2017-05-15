@@ -53,11 +53,6 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public List<ProposalDataEntry> ProposalData = new List<ProposalDataEntry>();
 
-        public GroupActiveProposalItemReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -82,26 +77,29 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            GroupActiveProposalItemReply m = new GroupActiveProposalItemReply();
-            m.AgentID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-            m.TotalNumItems = p.ReadUInt32();
+            var m = new GroupActiveProposalItemReply()
+            {
+                AgentID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                TransactionID = p.ReadUUID(),
+                TotalNumItems = p.ReadUInt32()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                ProposalDataEntry d = new ProposalDataEntry();
-                d.VoteID = p.ReadUUID();
-                d.VoteInitiatorID = p.ReadUUID();
-                d.TerseDateID = p.ReadStringLen8();
-                d.StartDateTime = p.ReadStringLen8();
-                d.EndDateTime = p.ReadStringLen8();
-                d.AlreadyVoted = p.ReadBoolean();
-                d.VoteCast = p.ReadStringLen8();
-                d.Majority = p.ReadFloat();
-                d.Quorum = p.ReadInt32();
-                d.ProposalText = p.ReadStringLen8();
-                m.ProposalData.Add(d);
+                m.ProposalData.Add(new ProposalDataEntry()
+                {
+                    VoteID = p.ReadUUID(),
+                    VoteInitiatorID = p.ReadUUID(),
+                    TerseDateID = p.ReadStringLen8(),
+                    StartDateTime = p.ReadStringLen8(),
+                    EndDateTime = p.ReadStringLen8(),
+                    AlreadyVoted = p.ReadBoolean(),
+                    VoteCast = p.ReadStringLen8(),
+                    Majority = p.ReadFloat(),
+                    Quorum = p.ReadInt32(),
+                    ProposalText = p.ReadStringLen8()
+                });
             }
             return m;
         }

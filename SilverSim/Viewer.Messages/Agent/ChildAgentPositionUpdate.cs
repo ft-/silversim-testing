@@ -41,14 +41,9 @@ namespace SilverSim.Viewer.Messages.Agent
         public Vector3 UpAxis;
         public bool ChangedGrid;
 
-        public ChildAgentPositionUpdate()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ChildAgentPositionUpdate m = new ChildAgentPositionUpdate();
+            var m = new ChildAgentPositionUpdate();
             m.RegionLocation.RegionHandle = p.ReadUInt64();
             m.ViewerCircuitCode = p.ReadUInt32();
             m.AgentID = p.ReadUUID();

@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Messages.IM
 
         public static explicit operator GridInstantMessage(ImprovedInstantMessage m)
         {
-            GridInstantMessage im = new GridInstantMessage();
+            var im = new GridInstantMessage();
             im.FromAgent.ID = m.AgentID;
             im.FromGroup.ID = m.AgentID;
             im.IsFromGroup = m.FromGroup;
@@ -118,22 +118,23 @@ namespace SilverSim.Viewer.Messages.IM
 
         public static ImprovedInstantMessage Decode(UDPPacket p)
         {
-            ImprovedInstantMessage m = new ImprovedInstantMessage();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.FromGroup = p.ReadBoolean();
-            m.ToAgentID = p.ReadUUID();
-            m.ParentEstateID = p.ReadUInt32();
-            m.RegionID = p.ReadUUID();
-            m.Position = p.ReadVector3f();
-            m.IsOffline = p.ReadBoolean();
-            m.Dialog = (GridInstantMessageDialog)p.ReadUInt8();
-            m.ID = p.ReadUUID();
-            m.Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32());
-            m.FromAgentName = p.ReadStringLen8();
-            m.Message = p.ReadStringLen16();
-            m.BinaryBucket = p.ReadBytes((int)(uint)p.ReadUInt16());
-            return m;
+            return new ImprovedInstantMessage()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                FromGroup = p.ReadBoolean(),
+                ToAgentID = p.ReadUUID(),
+                ParentEstateID = p.ReadUInt32(),
+                RegionID = p.ReadUUID(),
+                Position = p.ReadVector3f(),
+                IsOffline = p.ReadBoolean(),
+                Dialog = (GridInstantMessageDialog)p.ReadUInt8(),
+                ID = p.ReadUUID(),
+                Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32()),
+                FromAgentName = p.ReadStringLen8(),
+                Message = p.ReadStringLen16(),
+                BinaryBucket = p.ReadBytes((int)(uint)p.ReadUInt16())
+            };
         }
     }
 }

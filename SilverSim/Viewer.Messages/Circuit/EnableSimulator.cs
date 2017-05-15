@@ -39,11 +39,6 @@ namespace SilverSim.Viewer.Messages.Circuit
         /* EQG extension */
         public GridVector RegionSize;
 
-        public EnableSimulator()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt64(GridPosition.RegionHandle);
@@ -53,20 +48,22 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public override IValue SerializeEQG()
         {
-            Types.Map i = new Types.Map();
-            i.Add("Handle", new BinaryData(GridPosition.AsBytes));
-            i.Add("IP", new BinaryData(SimIP.GetAddressBytes()));
-            i.Add("Port", SimPort);
-            i.Add("RegionSizeX", RegionSize.X);
-            i.Add("RegionSizeY", RegionSize.Y);
-
-            AnArray arr = new AnArray();
-            arr.Add(i);
-
-            SilverSim.Types.Map m = new SilverSim.Types.Map();
-            m.Add("SimulatorInfo", arr);
-
-            return m;
+            var i = new Types.Map
+            {
+                { "Handle", new BinaryData(GridPosition.AsBytes) },
+                { "IP", new BinaryData(SimIP.GetAddressBytes()) },
+                { "Port", SimPort },
+                { "RegionSizeX", RegionSize.X },
+                { "RegionSizeY", RegionSize.Y }
+            };
+            var arr = new AnArray
+            {
+                i
+            };
+            return new Types.Map
+            {
+                { "SimulatorInfo", arr }
+            };
         }
     }
 }

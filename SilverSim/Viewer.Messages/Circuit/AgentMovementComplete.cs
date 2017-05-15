@@ -37,11 +37,6 @@ namespace SilverSim.Viewer.Messages.Circuit
         public UInt32 Timestamp;
         public string ChannelVersion;
 
-        public AgentMovementComplete()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -55,11 +50,13 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public static Message Decode(UDPPacket p)
         {
-            AgentMovementComplete m = new AgentMovementComplete();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Position = p.ReadVector3f();
-            m.LookAt = p.ReadVector3f();
+            var m = new AgentMovementComplete()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                Position = p.ReadVector3f(),
+                LookAt = p.ReadVector3f()
+            };
             m.GridPosition.RegionHandle = p.ReadUInt64();
             m.Timestamp = p.ReadUInt32();
             m.ChannelVersion = p.ReadStringLen16();

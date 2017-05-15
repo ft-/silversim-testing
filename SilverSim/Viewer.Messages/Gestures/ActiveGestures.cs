@@ -43,25 +43,23 @@ namespace SilverSim.Viewer.Messages.Gestures
 
         public List<DataEntry> Data = new List<DataEntry>();
 
-        public ActivateGestures()
-        {
-
-        }
-
         public static ActivateGestures Decode(UDPPacket p)
         {
-            ActivateGestures m = new ActivateGestures();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Flags = p.ReadUInt32();
+            var m = new ActivateGestures()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                Flags = p.ReadUInt32()
+            };
             uint c = p.ReadUInt8();
             for(uint i = 0; i < c; ++i)
             {
-                DataEntry e = new DataEntry();
-                e.ItemID = p.ReadUUID();
-                e.AssetID = p.ReadUUID();
-                e.GestureFlags = p.ReadUInt32();
-                m.Data.Add(e);
+                m.Data.Add(new DataEntry()
+                {
+                    ItemID = p.ReadUUID(),
+                    AssetID = p.ReadUUID(),
+                    GestureFlags = p.ReadUInt32()
+                });
             }
 
             return m;

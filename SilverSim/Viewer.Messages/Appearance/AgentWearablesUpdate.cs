@@ -44,11 +44,6 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public List<WearableDataEntry> WearableData = new List<WearableDataEntry>();
 
-        public AgentWearablesUpdate()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -65,18 +60,21 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public static Message Decode(UDPPacket p)
         {
-            AgentWearablesUpdate m = new AgentWearablesUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.SerialNum = p.ReadUInt32();
+            var m = new AgentWearablesUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                SerialNum = p.ReadUInt32()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                WearableDataEntry d = new WearableDataEntry();
-                d.ItemID = p.ReadUUID();
-                d.AssetID = p.ReadUUID();
-                d.WearableType = (WearableType)p.ReadUInt8();
-                m.WearableData.Add(d);
+                m.WearableData.Add(new WearableDataEntry()
+                {
+                    ItemID = p.ReadUUID(),
+                    AssetID = p.ReadUUID(),
+                    WearableType = (WearableType)p.ReadUInt8()
+                });
             }
             return m;
         }
