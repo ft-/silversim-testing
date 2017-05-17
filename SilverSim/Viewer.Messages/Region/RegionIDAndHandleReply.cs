@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.Region
         public UUID RegionID;
         public GridVector RegionPosition;
 
-        public RegionIDAndHandleReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(RegionID);
@@ -44,8 +39,10 @@ namespace SilverSim.Viewer.Messages.Region
 
         public static Message Decode(UDPPacket p)
         {
-            RegionIDAndHandleReply m = new RegionIDAndHandleReply();
-            m.RegionID = p.ReadUUID();
+            var m = new RegionIDAndHandleReply()
+            {
+                RegionID = p.ReadUUID()
+            };
             m.RegionPosition.RegionHandle = p.ReadUInt64();
             return m;
         }

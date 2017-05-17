@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public override UUID GetUploaderID(Map reqmap)
         {
-            UUID transaction = UUID.Random;
+            var transaction = UUID.Random;
             m_Transactions.Add(transaction, reqmap["item_id"].AsUUID);
             return transaction;
         }
@@ -77,7 +77,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             KeyValuePair<UUID, UUID> kvp;
             if (m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
             {
-                Map m = new Map();
+                var m = new Map();
                 InventoryItem item;
                 try
                 {

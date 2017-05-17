@@ -113,11 +113,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            UUID notecardID = reqmap["notecard-id"].AsUUID;
-            UUID objectID = reqmap["object-id"].AsUUID;
-            UUID itemID = reqmap["item-id"].AsUUID;
-            UUID destinationFolderID = reqmap["folder-id"].AsUUID;
-            uint callbackID = reqmap["callback-id"].AsUInt;
+            var notecardID = reqmap["notecard-id"].AsUUID;
+            var objectID = reqmap["object-id"].AsUUID;
+            var itemID = reqmap["item-id"].AsUUID;
+            var destinationFolderID = reqmap["folder-id"].AsUUID;
+            var callbackID = reqmap["callback-id"].AsUInt;
 
             ObjectPart part;
             ObjectPartInventoryItem item;
@@ -134,11 +134,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                 nc = new Notecard(data);
             }
 
-            List<UUID> transferItems = new List<UUID>();
-            Dictionary<AssetType, InventoryFolder> destFolder = new Dictionary<AssetType, InventoryFolder>();
+            var transferItems = new List<UUID>();
+            var destFolder = new Dictionary<AssetType, InventoryFolder>();
             if(null != nc)
             {
-                foreach (NotecardInventoryItem ncitem in nc.Inventory.Values)
+                foreach (var ncitem in nc.Inventory.Values)
                 {
                     try
                     {
@@ -156,7 +156,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                                 destFolder.Add(ncitem.AssetType, destinationFolder);
                             }
                         }
-                        UUID assetID = CreateInventoryItemFromNotecard(destinationFolder, ncitem, callbackID);
+                        var assetID = CreateInventoryItemFromNotecard(destinationFolder, ncitem, callbackID);
                         if (!transferItems.Contains(assetID))
                         {
                             transferItems.Add(assetID);
@@ -169,7 +169,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
             }
 
-            NotecardAssetTransfer transferItem = new NotecardAssetTransfer(m_Agent.AssetService, m_Scene.AssetService, transferItems);
+            var transferItem = new NotecardAssetTransfer(m_Agent.AssetService, m_Scene.AssetService, transferItems);
             ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, transferItem);
 
             using (HttpResponse httpres = httpreq.BeginResponse())
@@ -190,12 +190,13 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         UUID CreateInventoryItemFromNotecard(InventoryFolder destinationFolder, NotecardInventoryItem ncitem, uint callbackID)
         {
-            InventoryItem item;
-            item = new InventoryItem();
-            item.InventoryType = ncitem.InventoryType;
-            item.AssetType = ncitem.AssetType;
-            item.Description = ncitem.Description;
-            item.Name = ncitem.Name;
+            var item = new InventoryItem()
+            {
+                InventoryType = ncitem.InventoryType,
+                AssetType = ncitem.AssetType,
+                Description = ncitem.Description,
+                Name = ncitem.Name
+            };
             item.LastOwner = item.Owner;
             item.Owner = m_Agent.Owner;
             item.Creator = ncitem.Creator;

@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public List<byte[]> ObjectData = new List<byte[]>();
 
-        public ObjectProperties()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt8((byte)ObjectData.Count);

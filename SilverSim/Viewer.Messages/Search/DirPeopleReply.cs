@@ -42,26 +42,16 @@ namespace SilverSim.Viewer.Messages.Search
             public string Group = string.Empty;
             public bool Online;
             public int Reputation;
-
-            public QueryReplyData()
-            {
-
-            }
         }
 
         public List<QueryReplyData> QueryReplies = new List<QueryReplyData>();
-
-        public DirPeopleReply()
-        {
-
-        }
 
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
             p.WriteUInt8((byte)QueryReplies.Count);
-            foreach(QueryReplyData d in QueryReplies)
+            foreach(var d in QueryReplies)
             {
                 p.WriteUUID(d.AgentID);
                 p.WriteStringLen8(d.FirstName);
@@ -74,20 +64,23 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            DirPeopleReply m = new DirPeopleReply();
-            m.AgentID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
+            var m = new DirPeopleReply()
+            {
+                AgentID = p.ReadUUID(),
+                QueryID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                QueryReplyData d = new QueryReplyData();
-                d.AgentID = p.ReadUUID();
-                d.FirstName = p.ReadStringLen8();
-                d.LastName = p.ReadStringLen8();
-                d.Group = p.ReadStringLen8();
-                d.Online = p.ReadBoolean();
-                d.Reputation = p.ReadInt32();
-                m.QueryReplies.Add(d);
+                m.QueryReplies.Add(new QueryReplyData()
+                {
+                    AgentID = p.ReadUUID(),
+                    FirstName = p.ReadStringLen8(),
+                    LastName = p.ReadStringLen8(),
+                    Group = p.ReadStringLen8(),
+                    Online = p.ReadBoolean(),
+                    Reputation = p.ReadInt32()
+                });
             }
             return m;
         }

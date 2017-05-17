@@ -38,15 +38,10 @@ namespace SilverSim.Viewer.Messages.Script
 
         public List<DataEntry> Data = new List<DataEntry>();
 
-        public ScriptControlChange()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt8((byte)Data.Count);
-            foreach(DataEntry d in Data)
+            foreach(var d in Data)
             {
                 p.WriteBoolean(d.TakeControls);
                 p.WriteUInt32(d.Controls);
@@ -56,15 +51,16 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            ScriptControlChange m = new ScriptControlChange();
+            var m = new ScriptControlChange();
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                DataEntry d = new DataEntry();
-                d.TakeControls = p.ReadBoolean();
-                d.Controls = p.ReadUInt32();
-                d.PassToAgent = p.ReadBoolean();
-                m.Data.Add(d);
+                m.Data.Add(new DataEntry()
+                {
+                    TakeControls = p.ReadBoolean(),
+                    Controls = p.ReadUInt32(),
+                    PassToAgent = p.ReadBoolean()
+                });
             }
             return m;
         }

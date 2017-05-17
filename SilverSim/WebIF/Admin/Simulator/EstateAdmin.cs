@@ -74,10 +74,10 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("estates.view")]
         void HandleList(HttpRequest req, Map jsondata)
         {
-            List<EstateInfo> estates = m_EstateService.All;
+            var estates = m_EstateService.All;
 
-            Map res = new Map();
-            AnArray estateRes = new AnArray();
+            var res = new Map();
+            var estateRes = new AnArray();
             foreach (EstateInfo estate in estates)
             {
                 estate.Owner = m_WebIF.ResolveName(estate.Owner);
@@ -104,15 +104,15 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
 
-            Map res = new Map();
+            var res = new Map();
             estateInfo.Owner = m_WebIF.ResolveName(estateInfo.Owner);
             res.Add("estate", estateInfo.ToJsonMap());
-            List<UUID> regionMap = m_EstateService.RegionMap[estateInfo.ID];
-            AnArray regionsdata = new AnArray();
+            var regionMap = m_EstateService.RegionMap[estateInfo.ID];
+            var regionsdata = new AnArray();
             foreach(UUID regionid in regionMap)
             {
                 RegionInfo rInfo;
-                Map regiondata = new Map();
+                var regiondata = new Map();
 
                 regiondata.Add("ID", regionid);
                 if (m_RegionStorageService.TryGetValue(regionid, out rInfo))
@@ -196,8 +196,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
 
-            List<UUID> regionids = m_EstateService.RegionMap[estateInfo.ID];
-            foreach(UUID regionid in regionids)
+            foreach(UUID regionid in m_EstateService.RegionMap[estateInfo.ID])
             {
                 SceneInterface scene;
                 if(m_Scenes.TryGetValue(regionid, out scene))
@@ -211,7 +210,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("estates.manage")]
         void HandleCreate(HttpRequest req, Map jsondata)
         {
-            EstateInfo estateInfo = new EstateInfo();
+            var estateInfo = new EstateInfo();
             if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
@@ -225,7 +224,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 else
                 {
-                    List<uint> estateids = m_EstateService.AllIDs;
+                    var estateids = m_EstateService.AllIDs;
                     uint id = 100;
                     while(estateids.Contains(id))
                     {
@@ -303,13 +302,13 @@ namespace SilverSim.WebIF.Admin.Simulator
             else
             {
                 uint estateID = jsondata["id"].AsUInt;
-                List<UUID> regionIds = m_EstateService.RegionMap[estateID];
+                var regionIds = m_EstateService.RegionMap[estateID];
 
                 if(regionIds.Count == 0)
                 {
                     if (m_EstateService.ContainsKey(estateID))
                     {
-                        Map m = new Map();
+                        var m = new Map();
                         m.Add("noticed_regions", new AnArray());
                         m_WebIF.SuccessResponse(req, m);
                     }
@@ -321,22 +320,22 @@ namespace SilverSim.WebIF.Admin.Simulator
                 else
                 {
                     string message = jsondata["message"].ToString();
-                    AnArray regions = new AnArray();
+                    var regions = new AnArray();
 
-                    foreach(UUID regionId in regionIds)
+                    foreach(var regionId in regionIds)
                     {
                         SceneInterface si;
                         if(m_Scenes.TryGetValue(regionId, out si))
                         {
                             regions.Add(regionId);
-                            UUI regionOwner = si.Owner;
-                            foreach(IAgent agent in si.RootAgents)
+                            var regionOwner = si.Owner;
+                            foreach(var agent in si.RootAgents)
                             {
                                 agent.SendRegionNotice(regionOwner, message, regionId);
                             }
                         }
                     }
-                    Map m = new Map();
+                    var m = new Map();
                     m.Add("noticed_regions", regions);
                     m_WebIF.SuccessResponse(req, m);
                 }
@@ -349,11 +348,6 @@ namespace SilverSim.WebIF.Admin.Simulator
     [PluginName("EstateAdmin")]
     public class EstateAdminFactory : IPluginFactory
     {
-        public EstateAdminFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new EstateAdmin(

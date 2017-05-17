@@ -36,22 +36,17 @@ namespace SilverSim.Viewer.Messages.Map
         public bool IsGodlike;
         public string Name;
 
-        public MapNameRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            MapNameRequest m = new MapNameRequest();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Flags = (MapAgentFlags)p.ReadUInt32();
-            m.EstateID = p.ReadUInt32();
-            m.IsGodlike = p.ReadBoolean();
-            m.Name = p.ReadStringLen8();
-
-            return m;
+            return new MapNameRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                Flags = (MapAgentFlags)p.ReadUInt32(),
+                EstateID = p.ReadUInt32(),
+                IsGodlike = p.ReadBoolean(),
+                Name = p.ReadStringLen8()
+            };
         }
 
         public override void Serialize(UDPPacket p)

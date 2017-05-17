@@ -34,11 +34,6 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ItemID;
         public bool IsRunning;
 
-        public ScriptRunningReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ObjectID);
@@ -48,26 +43,31 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            ScriptRunningReply m = new ScriptRunningReply();
-            m.ObjectID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-            m.IsRunning = p.ReadBoolean();
-            return m;
+            return new ScriptRunningReply()
+            {
+                ObjectID = p.ReadUUID(),
+                ItemID = p.ReadUUID(),
+                IsRunning = p.ReadBoolean()
+            };
         }
 
         public override IValue SerializeEQG()
         {
-            Types.Map script = new Types.Map();
-            script.Add("ObjectID", ObjectID);
-            script.Add("ItemID", ItemID);
-            script.Add("Running", IsRunning);
-            script.Add("Mono", true);
-
-            AnArray scriptArr = new AnArray();
-            scriptArr.Add(script);
-            Types.Map body = new Types.Map();
-            body.Add("Script", scriptArr);
-            return body;
+            var script = new Types.Map
+            {
+                { "ObjectID", ObjectID },
+                { "ItemID", ItemID },
+                { "Running", IsRunning },
+                { "Mono", true }
+            };
+            var scriptArr = new AnArray
+            {
+                script
+            };
+            return new Types.Map
+            {
+                { "Script", scriptArr }
+            };
         }
     }
 }

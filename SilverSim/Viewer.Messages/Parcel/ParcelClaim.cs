@@ -47,30 +47,27 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public List<ParcelDataEntry> ParcelData = new List<ParcelDataEntry>();
 
-        public ParcelClaim()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelClaim m = new ParcelClaim();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            var m = new ParcelClaim()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
 
-            m.GroupID = p.ReadUUID();
-            m.IsGroupOwned = p.ReadBoolean();
-            m.IsFinal = p.ReadBoolean();
-
+                GroupID = p.ReadUUID(),
+                IsGroupOwned = p.ReadBoolean(),
+                IsFinal = p.ReadBoolean()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                ParcelDataEntry d;
-                d.West = p.ReadFloat();
-                d.South = p.ReadFloat();
-                d.East = p.ReadFloat();
-                d.North = p.ReadFloat();
-                m.ParcelData.Add(d);
+                m.ParcelData.Add(new ParcelDataEntry()
+                {
+                    West = p.ReadFloat(),
+                    South = p.ReadFloat(),
+                    East = p.ReadFloat(),
+                    North = p.ReadFloat()
+                });
             }
 
             return m;
@@ -85,7 +82,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteBoolean(IsFinal);
 
             p.WriteUInt8((byte)ParcelData.Count);
-            foreach(ParcelDataEntry d in ParcelData)
+            foreach(var d in ParcelData)
             {
                 p.WriteFloat((float)d.West);
                 p.WriteFloat((float)d.South);

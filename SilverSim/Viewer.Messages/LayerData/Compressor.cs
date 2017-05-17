@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         public static LayerData ToLayerMessage(List<LayerPatch> patches, Messages.LayerData.LayerData.LayerDataType type, int offset, int length, out int outlength)
         {
             outlength = 0;
-            Messages.LayerData.LayerData layer = new Messages.LayerData.LayerData();
+            var layer = new LayerData();
             layer.LayerType = type;
 
             bool extended = false;
@@ -49,18 +49,16 @@ namespace SilverSim.Viewer.Messages.LayerData
                 case LayerData.LayerDataType.WindExtended:
                     extended = true;
                     break;
-
-                default:
-                    break;
             }
 
-            GroupHeader header = new GroupHeader();
-            header.Stride = STRIDE;
-            header.PatchSize = LAYER_PATCH_NUM_XY_ENTRIES;
-            header.Type = type;
-
-            byte[] data = new byte[1500];
-            BitPacker bitpack = new BitPacker(data, 0);
+            var header = new GroupHeader()
+            {
+                Stride = STRIDE,
+                PatchSize = LAYER_PATCH_NUM_XY_ENTRIES,
+                Type = type
+            };
+            var data = new byte[1500];
+            var bitpack = new BitPacker(data, 0);
             bitpack.PackBits(header.Stride, 16);
             bitpack.PackBits(header.PatchSize, 8);
             bitpack.PackBits((uint)header.Type, 8);
@@ -105,7 +103,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                         throw new ArgumentException("Patch data must be a 16x16 array");
                     }
 
-                    PatchHeader pheader = PrescanPatch(layerpatch);
+                    var pheader = PrescanPatch(layerpatch);
                     pheader.QuantWBits = 136;
                     if (extended)
                     {
@@ -137,7 +135,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         #region Layer Bit Packing Processing
         private static PatchHeader PrescanPatch(LayerPatch patch)
         {
-            PatchHeader header = new PatchHeader();
+            var header = new PatchHeader();
             float zmax = -99999999.0f;
             float zmin = 99999999.0f;
 
@@ -310,12 +308,12 @@ namespace SilverSim.Viewer.Messages.LayerData
         #region Actual compression
         private static int[] CompressPatch(LayerPatch patchData, PatchHeader header, int prequant)
         {
-            float[] block = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
+            var block = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
             int wordsize = prequant;
             float oozrange = 1.0f / (float)header.Range;
-            float range = (float)(1 << prequant);
+            var range = (float)(1 << prequant);
             float premult = oozrange * range;
-            float sub = (float)(1 << (prequant - 1)) + header.DCOffset * premult;
+            float sub = (1 << (prequant - 1)) + header.DCOffset * premult;
 
             header.QuantWBits = wordsize - 2;
             header.QuantWBits |= (prequant - 2) << 4;
@@ -329,8 +327,8 @@ namespace SilverSim.Viewer.Messages.LayerData
                 }
             }
 
-            float[] ftemp = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
-            int[] itemp = new int[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
+            var ftemp = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
+            var itemp = new int[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
 
             for (int o = 0; o < LAYER_PATCH_NUM_XY_ENTRIES; o++)
             {

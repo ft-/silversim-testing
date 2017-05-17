@@ -59,11 +59,6 @@ namespace SilverSim.Viewer.Map
         SceneList m_Scenes;
         bool m_ShutdownMap;
 
-        public ViewerMap()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             m_Scenes = loader.Scenes;
@@ -76,7 +71,7 @@ namespace SilverSim.Viewer.Map
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void HandlerThread(object o)
         {
-            BlockingQueue<KeyValuePair<AgentCircuit, Message>> requestQueue = (BlockingQueue<KeyValuePair<AgentCircuit, Message>>)o;
+            var requestQueue = (BlockingQueue<KeyValuePair<AgentCircuit, Message>>)o;
             Thread.CurrentThread.Name = (requestQueue == MapDetailsRequestQueue) ?
                 "Map Details Handler Thread" :
                 "Map Blocks Handler Thread";
@@ -94,12 +89,12 @@ namespace SilverSim.Viewer.Map
                 }
 
                 Message m = req.Value;
-                AgentCircuit circuit = req.Key;
+                var circuit = req.Key;
                 if(circuit == null)
                 {
                     continue;
                 }
-                SceneInterface scene = circuit.Scene;
+                var scene = circuit.Scene;
                 if (scene == null)
                 {
                     continue;
@@ -119,9 +114,6 @@ namespace SilverSim.Viewer.Map
                         case MessageType.MapItemRequest:
                             HandleMapItemRequest(circuit.Agent, scene, m);
                             break;
-
-                        default:
-                            break;
                     }
                 }
                 catch (Exception e)
@@ -135,8 +127,8 @@ namespace SilverSim.Viewer.Map
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleMapBlockRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            List<MapBlockReply.DataEntry> results = new List<MapBlockReply.DataEntry>();
-            MapBlockRequest req = (MapBlockRequest)m;
+            var results = new List<MapBlockReply.DataEntry>();
+            var req = (MapBlockRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -156,19 +148,20 @@ namespace SilverSim.Viewer.Map
                 ris = new List<RegionInfo>();
             }
 
-            foreach(RegionInfo ri in ris)
+            foreach(var ri in ris)
             {
-                MapBlockReply.DataEntry d = new MapBlockReply.DataEntry();
-                d.X = ri.Location.GridX;
-                d.Y = ri.Location.GridY;
+                results.Add(new MapBlockReply.DataEntry()
+                {
+                    X = ri.Location.GridX,
+                    Y = ri.Location.GridY,
 
-                d.Name = ri.Name;
-                d.Access = ri.Access;
-                d.RegionFlags = RegionOptionFlags.None; /* this is same RegionOptionFlags as seen in a sim */
-                d.WaterHeight = 21;
-                d.Agents = 0;
-                d.MapImageID = ri.RegionMapTexture;
-                results.Add(d);
+                    Name = ri.Name,
+                    Access = ri.Access,
+                    RegionFlags = RegionOptionFlags.None, /* this is same RegionOptionFlags as seen in a sim */
+                    WaterHeight = 21,
+                    Agents = 0,
+                    MapImageID = ri.RegionMapTexture
+                });
             }
 
             SendMapBlocks(agent, scene, req.Flags, results);
@@ -177,7 +170,7 @@ namespace SilverSim.Viewer.Map
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleMapNameRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            MapNameRequest req = (MapNameRequest)m;
+            var req = (MapNameRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -188,10 +181,10 @@ namespace SilverSim.Viewer.Map
             m_Log.InfoFormat("MapNameRequest for {0}", req.Name);
 #endif
             string[] s;
-            bool isForeignGridTarget = false;
-            string regionName = req.Name;
-            string gatekeeperURI = string.Empty;
-            List<MapBlockReply.DataEntry> results = new List<MapBlockReply.DataEntry>();
+            var isForeignGridTarget = false;
+            var regionName = req.Name;
+            var gatekeeperURI = string.Empty;
+            var results = new List<MapBlockReply.DataEntry>();
 
             s = req.Name.Split(new char[] { ':' }, 3);
             if(s.Length > 1)
@@ -247,9 +240,9 @@ namespace SilverSim.Viewer.Map
             if(isForeignGridTarget)
             {
                 RegionInfo ri = null;
-                bool foundRegionButWrongProtocol = false;
-                string foundProtocolName = string.Empty;
-                foreach(IForeignGridConnectorPlugin foreignGrid in m_ForeignGridConnectorPlugins)
+                var foundRegionButWrongProtocol = false;
+                var foundProtocolName = string.Empty;
+                foreach(var foreignGrid in m_ForeignGridConnectorPlugins)
                 {
                     if(foreignGrid.IsProtocolSupported(gatekeeperURI))
                     {
@@ -280,19 +273,20 @@ namespace SilverSim.Viewer.Map
                 }
                 else if(ri != null)
                 {
-                    GridVector hgLoc = agent.CacheHgDestination(ri);
-                    MapBlockReply.DataEntry d = new MapBlockReply.DataEntry();
-                    /* we map foreign grid locations in specific agent only */
-                    d.X = hgLoc.GridX;
-                    d.Y = hgLoc.GridY;
+                    var hgLoc = agent.CacheHgDestination(ri);
+                    results.Add(new MapBlockReply.DataEntry()
+                    {
+                        /* we map foreign grid locations in specific agent only */
+                        X = hgLoc.GridX,
+                        Y = hgLoc.GridY,
 
-                    d.Name = ri.Name;
-                    d.Access = ri.Access;
-                    d.RegionFlags = RegionOptionFlags.None; /* this is same region flags as seen on a sim */
-                    d.WaterHeight = 21;
-                    d.Agents = 0;
-                    d.MapImageID = ri.RegionMapTexture;
-                    results.Add(d);
+                        Name = ri.Name,
+                        Access = ri.Access,
+                        RegionFlags = RegionOptionFlags.None, /* this is same region flags as seen on a sim */
+                        WaterHeight = 21,
+                        Agents = 0,
+                        MapImageID = ri.RegionMapTexture
+                    });
                 }
             }
             else if(string.IsNullOrEmpty(regionName))
@@ -301,7 +295,7 @@ namespace SilverSim.Viewer.Map
             }
             else
             {
-                GridServiceInterface service = scene.GridService;
+                var service = scene.GridService;
                 if(service != null)
                 {
                     List<RegionInfo> ris;
@@ -314,19 +308,20 @@ namespace SilverSim.Viewer.Map
                         ris = new List<RegionInfo>();
                     }
 
-                    foreach(RegionInfo ri in ris)
+                    foreach(var ri in ris)
                     {
-                        MapBlockReply.DataEntry d = new MapBlockReply.DataEntry();
-                        d.X = ri.Location.GridX;
-                        d.Y = ri.Location.GridY;
+                        results.Add(new MapBlockReply.DataEntry()
+                        {
+                            X = ri.Location.GridX,
+                            Y = ri.Location.GridY,
 
-                        d.Name = ri.Name;
-                        d.Access = ri.Access;
-                        d.RegionFlags = RegionOptionFlags.None; /* this is same region flags as seen on a sim */
-                        d.WaterHeight = 21;
-                        d.Agents = 0;
-                        d.MapImageID = ri.RegionMapTexture;
-                        results.Add(d);
+                            Name = ri.Name,
+                            Access = ri.Access,
+                            RegionFlags = RegionOptionFlags.None, /* this is same region flags as seen on a sim */
+                            WaterHeight = 21,
+                            Agents = 0,
+                            MapImageID = ri.RegionMapTexture
+                        });
                     }
                 }
             }
@@ -336,21 +331,22 @@ namespace SilverSim.Viewer.Map
 
         void SendMapBlocks(ViewerAgent agent, SceneInterface scene, MapAgentFlags mapflags, List<MapBlockReply.DataEntry> mapBlocks)
         {
-            MapBlockReply.DataEntry end = new MapBlockReply.DataEntry();
-            end.Agents = 0;
-            end.Access = RegionAccess.NonExistent;
-            end.MapImageID = UUID.Zero;
-            end.Name = string.Empty;
-            end.RegionFlags = RegionOptionFlags.None; /* this is same region flags as seen on a sim */
-            end.WaterHeight = 0;
-            end.X = 0;
-            end.Y = 0;
-            mapBlocks.Add(end);
+            mapBlocks.Add(new MapBlockReply.DataEntry()
+            {
+                Agents = 0,
+                Access = RegionAccess.NonExistent,
+                MapImageID = UUID.Zero,
+                Name = string.Empty,
+                RegionFlags = RegionOptionFlags.None, /* this is same region flags as seen on a sim */
+                WaterHeight = 0,
+                X = 0,
+                Y = 0
+            });
 
             MapBlockReply replymsg = null;
             int mapBlockReplySize = 20;
 
-            foreach(MapBlockReply.DataEntry d in mapBlocks)
+            foreach(var d in mapBlocks)
             {
                 int mapBlockDataSize = 27 + d.Name.Length;
                 if (mapBlockReplySize + mapBlockDataSize > 1400 && null != replymsg)
@@ -361,9 +357,11 @@ namespace SilverSim.Viewer.Map
 
                 if (null == replymsg)
                 {
-                    replymsg = new MapBlockReply();
-                    replymsg.AgentID = agent.ID;
-                    replymsg.Flags = mapflags;
+                    replymsg = new MapBlockReply()
+                    {
+                        AgentID = agent.ID,
+                        Flags = mapflags
+                    };
                     mapBlockReplySize = 20;
                 }
 
@@ -382,14 +380,14 @@ namespace SilverSim.Viewer.Map
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleMapItemRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            MapItemRequest req = (MapItemRequest)m;
+            var req = (MapItemRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            MapItemReply reply = new MapItemReply();
+            var reply = new MapItemReply();
             reply.AgentID = agent.ID;
             reply.Flags = req.Flags;
             reply.ItemType = req.ItemType;
@@ -418,11 +416,11 @@ namespace SilverSim.Viewer.Map
                     if(null != accessScene)
                     {
                         /* local */
-                        foreach(IAgent sceneagent in accessScene.Agents)
+                        foreach(var sceneagent in accessScene.Agents)
                         {
                             if(sceneagent.IsInScene(accessScene) && !sceneagent.Owner.Equals(agent.Owner) && sceneagent is ViewerAgent)
                             {
-                                MapItemReply.DataEntry d = new MapItemReply.DataEntry();
+                                var d = new MapItemReply.DataEntry();
                                 d.X = (ushort)sceneagent.GlobalPosition.X;
                                 d.Y = (ushort)sceneagent.GlobalPosition.Y;
                                 d.ID = UUID.Zero;
@@ -443,11 +441,11 @@ namespace SilverSim.Viewer.Map
                     if(null != accessScene)
                     {
                         /* local */
-                        foreach(ParcelInfo parcel in accessScene.Parcels)
+                        foreach(var parcel in accessScene.Parcels)
                         {
                             if((parcel.Flags & ParcelFlags.ForSale) != 0)
                             {
-                                MapItemReply.DataEntry d = new MapItemReply.DataEntry();
+                                var d = new MapItemReply.DataEntry();
                                 double x = (parcel.AABBMin.X + parcel.AABBMax.X) / 2;
                                 double y = (parcel.AABBMin.Y + parcel.AABBMax.Y) / 2;
                                 d.X = (ushort)x;
@@ -476,9 +474,6 @@ namespace SilverSim.Viewer.Map
                         /* remote */
                     }
                     break;
-
-                default:
-                    break;
             }
             agent.SendMessageAlways(reply, scene.ID);
         }
@@ -501,11 +496,6 @@ namespace SilverSim.Viewer.Map
     [PluginName("ViewerMap")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerMap();

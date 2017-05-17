@@ -87,8 +87,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            int localID = reqmap["local-id"].AsInt; /* this is parcel local id */
-            string url = reqmap["url"].ToString();
+            var localID = reqmap["local-id"].AsInt; /* this is parcel local id */
+            var url = reqmap["url"].ToString();
 
             ParcelInfo parcelInfo;
             if(m_Scene.Parcels.TryGetValue(localID, out parcelInfo))
@@ -98,16 +98,17 @@ namespace SilverSim.Viewer.Core.Capabilities
                     return;
                 }
                 parcelInfo.MediaURI = new URI(url);
-                ParcelMediaUpdate pmu = new ParcelMediaUpdate();
-                pmu.MediaAutoScale = parcelInfo.MediaAutoScale;
-                pmu.MediaDesc = parcelInfo.MediaDescription;
-                pmu.MediaHeight = parcelInfo.MediaHeight;
-                pmu.MediaID = parcelInfo.MediaID;
-                pmu.MediaLoop = parcelInfo.MediaLoop;
-                pmu.MediaType = parcelInfo.MediaType;
-                pmu.MediaURL = url;
-                pmu.MediaWidth = parcelInfo.MediaWidth;
-
+                var pmu = new ParcelMediaUpdate()
+                {
+                    MediaAutoScale = parcelInfo.MediaAutoScale,
+                    MediaDesc = parcelInfo.MediaDescription,
+                    MediaHeight = parcelInfo.MediaHeight,
+                    MediaID = parcelInfo.MediaID,
+                    MediaLoop = parcelInfo.MediaLoop,
+                    MediaType = parcelInfo.MediaType,
+                    MediaURL = url,
+                    MediaWidth = parcelInfo.MediaWidth
+                };
                 parcelInfo.MediaAutoScale = pmu.MediaAutoScale;
                 parcelInfo.MediaDescription = pmu.MediaDesc;
                 parcelInfo.MediaHeight = pmu.MediaHeight;
@@ -118,17 +119,17 @@ namespace SilverSim.Viewer.Core.Capabilities
                 parcelInfo.MediaWidth = pmu.MediaWidth;
                 m_Scene.Parcels.Store(parcelInfo.ID);
 
-                foreach (IAgent rootAgent in m_Scene.RootAgents)
+                foreach (var rootAgent in m_Scene.RootAgents)
                 {
                     rootAgent.SendMessageIfRootAgent(pmu, m_Scene.ID);
                 }
             }
 
-            Map m = new Map();
-            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            var m = new Map();
+            using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
                 resp.ContentType = "application/llsd+xml";
-                using (Stream s = resp.GetOutputStream())
+                using (var s = resp.GetOutputStream())
                 {
                     LlsdXml.Serialize(m, s);
                 }

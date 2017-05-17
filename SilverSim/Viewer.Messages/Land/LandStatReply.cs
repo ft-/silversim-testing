@@ -46,11 +46,6 @@ namespace SilverSim.Viewer.Messages.Land
 
         public List<ReportDataEntry> ReportData = new List<ReportDataEntry>();
 
-        public LandStatReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt32(ReportType);
@@ -58,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Land
             p.WriteUInt32(TotalObjectCount);
 
             p.WriteUInt8((byte)ReportData.Count);
-            foreach (ReportDataEntry d in ReportData)
+            foreach (var d in ReportData)
             {
                 p.WriteUInt32(d.TaskLocalID);
                 p.WriteUUID(d.TaskID);
@@ -71,21 +66,24 @@ namespace SilverSim.Viewer.Messages.Land
 
         public static Message Decode(UDPPacket p)
         {
-            LandStatReply m = new LandStatReply();
-            m.ReportType = p.ReadUInt32();
-            m.RequestFlags = p.ReadUInt32();
-            m.TotalObjectCount = p.ReadUInt32();
+            var m = new LandStatReply()
+            {
+                ReportType = p.ReadUInt32(),
+                RequestFlags = p.ReadUInt32(),
+                TotalObjectCount = p.ReadUInt32()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ReportDataEntry d = new ReportDataEntry();
-                d.TaskLocalID = p.ReadUInt32();
-                d.TaskID = p.ReadUUID();
-                d.Location = p.ReadVector3f();
-                d.Score = p.ReadFloat();
-                d.TaskName = p.ReadStringLen8();
-                d.OwnerName = p.ReadStringLen8();
-                m.ReportData.Add(d);
+                m.ReportData.Add(new ReportDataEntry()
+                {
+                    TaskLocalID = p.ReadUInt32(),
+                    TaskID = p.ReadUUID(),
+                    Location = p.ReadVector3f(),
+                    Score = p.ReadFloat(),
+                    TaskName = p.ReadStringLen8(),
+                    OwnerName = p.ReadStringLen8()
+                });
             }
             return m;
         }

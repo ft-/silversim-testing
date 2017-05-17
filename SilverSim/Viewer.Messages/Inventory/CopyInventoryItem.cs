@@ -42,17 +42,12 @@ namespace SilverSim.Viewer.Messages.Inventory
         }
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
-        public CopyInventoryItem()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt8((byte)InventoryData.Count);
-            foreach(InventoryDataEntry d in InventoryData)
+            foreach(var d in InventoryData)
             {
                 p.WriteUInt32(d.CallbackID);
                 p.WriteUUID(d.OldAgentID);
@@ -64,20 +59,22 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            CopyInventoryItem m = new CopyInventoryItem();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new CopyInventoryItem()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                InventoryDataEntry d = new InventoryDataEntry();
-                d.CallbackID = p.ReadUInt32();
-                d.OldAgentID = p.ReadUUID();
-                d.OldItemID = p.ReadUUID();
-                d.NewFolderID = p.ReadUUID();
-                d.NewName = p.ReadStringLen8();
-                m.InventoryData.Add(d);
+                m.InventoryData.Add(new InventoryDataEntry()
+                {
+                    CallbackID = p.ReadUInt32(),
+                    OldAgentID = p.ReadUUID(),
+                    OldItemID = p.ReadUUID(),
+                    NewFolderID = p.ReadUUID(),
+                    NewName = p.ReadStringLen8()
+                });
             }
 
             return m;

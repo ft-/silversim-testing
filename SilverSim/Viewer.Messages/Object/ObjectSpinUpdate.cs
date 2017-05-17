@@ -33,19 +33,15 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID ObjectID = UUID.Zero;
         public Quaternion Rotation = Quaternion.Identity;
 
-        public ObjectSpinUpdate()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectSpinUpdate m = new ObjectSpinUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            m.Rotation = p.ReadLLQuaternion();
-            return m;
+            return new ObjectSpinUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectID = p.ReadUUID(),
+                Rotation = p.ReadLLQuaternion()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -38,22 +38,18 @@ namespace SilverSim.Viewer.Messages.Transfer
         public UUID VFileID;
         public Int16 VFileType;
 
-        public RequestXfer()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RequestXfer m = new RequestXfer();
-            m.ID = p.ReadUInt64();
-            m.Filename = p.ReadStringLen8();
-            m.FilePath = p.ReadUInt8();
-            m.DeleteOnCompletion = p.ReadBoolean();
-            m.UseBigPackets = p.ReadBoolean();
-            m.VFileID = p.ReadUUID();
-            m.VFileType = p.ReadInt16();
-            return m;
+            return new RequestXfer()
+            {
+                ID = p.ReadUInt64(),
+                Filename = p.ReadStringLen8(),
+                FilePath = p.ReadUInt8(),
+                DeleteOnCompletion = p.ReadBoolean(),
+                UseBigPackets = p.ReadBoolean(),
+                VFileID = p.ReadUUID(),
+                VFileType = p.ReadInt16()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -52,7 +52,7 @@ namespace SilverSim.Database.Memory.Profile
 
         public void Delete(UUID id)
         {
-            foreach(RwLockedDictionary<UUID, ProfileClassified> classifieds in m_Classifieds.Values)
+            foreach(var classifieds in m_Classifieds.Values)
             {
                 if(classifieds.Remove(id))
                 {
@@ -64,10 +64,10 @@ namespace SilverSim.Database.Memory.Profile
         public Dictionary<UUID, string> GetClassifieds(UUI user)
         {
             RwLockedDictionary<UUID, ProfileClassified> classifieds;
-            Dictionary<UUID, string> names = new Dictionary<UUID, string>();
+            var names = new Dictionary<UUID, string>();
             if(m_Classifieds.TryGetValue(user.ID, out classifieds))
             {
-                foreach(KeyValuePair<UUID, ProfileClassified> classified in classifieds)
+                foreach(var classified in classifieds)
                 {
                     names.Add(classified.Key, classified.Value.Name);
                 }

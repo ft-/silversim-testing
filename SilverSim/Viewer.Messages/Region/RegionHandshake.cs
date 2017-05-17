@@ -73,11 +73,6 @@ namespace SilverSim.Viewer.Messages.Region
 
         public readonly List<RegionExtDataEntry> RegionExtData = new List<RegionExtDataEntry>();
 
-        public RegionHandshake()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt32((uint)RegionFlags);
@@ -111,7 +106,7 @@ namespace SilverSim.Viewer.Messages.Region
             p.WriteStringLen8(ProductSKU);
             p.WriteStringLen8(ProductName);
             p.WriteUInt8((byte)RegionExtData.Count);
-            foreach(RegionExtDataEntry e in RegionExtData)
+            foreach(var e in RegionExtData)
             {
                 p.WriteUInt64(e.RegionFlagsExtended);
                 p.WriteUInt64(e.RegionProtocols);
@@ -120,44 +115,47 @@ namespace SilverSim.Viewer.Messages.Region
 
         public static Message Decode(UDPPacket p)
         {
-            RegionHandshake m = new RegionHandshake();
-            m.RegionFlags = (RegionOptionFlags)p.ReadUInt32();
-            m.SimAccess = (RegionAccess)p.ReadUInt8();
-            m.SimName = p.ReadStringLen8();
-            m.SimOwner = p.ReadUUID();
-            m.IsEstateManager = p.ReadBoolean();
-            m.WaterHeight = p.ReadFloat();
-            m.BillableFactor = p.ReadFloat();
-            m.CacheID = p.ReadUUID();
-            m.TerrainBase0 = p.ReadUUID();
-            m.TerrainBase1 = p.ReadUUID();
-            m.TerrainBase2 = p.ReadUUID();
-            m.TerrainBase3 = p.ReadUUID();
-            m.TerrainDetail0 = p.ReadUUID();
-            m.TerrainDetail1 = p.ReadUUID();
-            m.TerrainDetail2 = p.ReadUUID();
-            m.TerrainDetail3 = p.ReadUUID();
-            m.TerrainStartHeight00 = p.ReadFloat();
-            m.TerrainStartHeight01 = p.ReadFloat();
-            m.TerrainStartHeight10 = p.ReadFloat();
-            m.TerrainStartHeight11 = p.ReadFloat();
-            m.TerrainHeightRange00 = p.ReadFloat();
-            m.TerrainHeightRange01 = p.ReadFloat();
-            m.TerrainHeightRange10 = p.ReadFloat();
-            m.TerrainHeightRange11 = p.ReadFloat();
-            m.RegionID = p.ReadUUID();
-            m.CPUClassID = p.ReadInt32();
-            m.CPURatio = p.ReadInt32();
-            m.ColoName = p.ReadStringLen8();
-            m.ProductSKU = p.ReadStringLen8();
-            m.ProductName = p.ReadStringLen8();
+            var m = new RegionHandshake()
+            {
+                RegionFlags = (RegionOptionFlags)p.ReadUInt32(),
+                SimAccess = (RegionAccess)p.ReadUInt8(),
+                SimName = p.ReadStringLen8(),
+                SimOwner = p.ReadUUID(),
+                IsEstateManager = p.ReadBoolean(),
+                WaterHeight = p.ReadFloat(),
+                BillableFactor = p.ReadFloat(),
+                CacheID = p.ReadUUID(),
+                TerrainBase0 = p.ReadUUID(),
+                TerrainBase1 = p.ReadUUID(),
+                TerrainBase2 = p.ReadUUID(),
+                TerrainBase3 = p.ReadUUID(),
+                TerrainDetail0 = p.ReadUUID(),
+                TerrainDetail1 = p.ReadUUID(),
+                TerrainDetail2 = p.ReadUUID(),
+                TerrainDetail3 = p.ReadUUID(),
+                TerrainStartHeight00 = p.ReadFloat(),
+                TerrainStartHeight01 = p.ReadFloat(),
+                TerrainStartHeight10 = p.ReadFloat(),
+                TerrainStartHeight11 = p.ReadFloat(),
+                TerrainHeightRange00 = p.ReadFloat(),
+                TerrainHeightRange01 = p.ReadFloat(),
+                TerrainHeightRange10 = p.ReadFloat(),
+                TerrainHeightRange11 = p.ReadFloat(),
+                RegionID = p.ReadUUID(),
+                CPUClassID = p.ReadInt32(),
+                CPURatio = p.ReadInt32(),
+                ColoName = p.ReadStringLen8(),
+                ProductSKU = p.ReadStringLen8(),
+                ProductName = p.ReadStringLen8()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                RegionExtDataEntry d = new RegionExtDataEntry();
-                d.RegionFlagsExtended = p.ReadUInt64();
-                d.RegionProtocols = p.ReadUInt64();
-                m.RegionExtData.Add(d);
+                m.RegionExtData.Add(new RegionExtDataEntry()
+                {
+                    RegionFlagsExtended = p.ReadUInt64(),
+                    RegionProtocols = p.ReadUInt64()
+                });
             }
             return m;
         }

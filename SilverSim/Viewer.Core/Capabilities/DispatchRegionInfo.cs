@@ -116,10 +116,10 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_Scene.TriggerRegionSettingsChanged();
             m_Scene.ReregisterRegion();
 
-            using (HttpResponse httpres = httpreq.BeginResponse())
+            using (var httpres = httpreq.BeginResponse())
             {
                 httpres.ContentType = "application/llsd+xml";
-                using (Stream outStream = httpres.GetOutputStream())
+                using (var outStream = httpres.GetOutputStream())
                 {
                     LlsdXml.Serialize(new Map(), outStream);
                 }

@@ -34,16 +34,13 @@ namespace SilverSim.Viewer.Messages.Teleport
         public Vector3 Position;
         public Vector3 LookAt;
 
-        public TeleportLocationRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            TeleportLocationRequest m = new TeleportLocationRequest();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            var m = new TeleportLocationRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             m.GridPosition.RegionHandle = p.ReadUInt64();
             m.Position = p.ReadVector3f();
             m.LookAt = p.ReadVector3f();

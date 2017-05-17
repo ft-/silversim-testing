@@ -37,11 +37,6 @@ namespace SilverSim.Database.Memory.TravelingData
     {
         readonly RwLockedDictionary<UUID, TravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, TravelingDataInfo>();
 
-        public MemoryTravelingDataService()
-        {
-
-        }
-
         public override TravelingDataInfo GetTravelingData(UUID sessionID)
         {
             return m_HGTravelingDatas[sessionID];
@@ -49,7 +44,7 @@ namespace SilverSim.Database.Memory.TravelingData
 
         public override TravelingDataInfo GetTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
         {
-            foreach(TravelingDataInfo hgd in m_HGTravelingDatas.Values)
+            foreach(var hgd in m_HGTravelingDatas.Values)
             {
                 if(hgd.ClientIPAddress == ipAddress && hgd.UserID == agentID)
                 {
@@ -61,7 +56,7 @@ namespace SilverSim.Database.Memory.TravelingData
 
         public override TravelingDataInfo GetTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI)
         {
-            foreach (TravelingDataInfo hgd in m_HGTravelingDatas.Values)
+            foreach (var hgd in m_HGTravelingDatas.Values)
             {
                 if (hgd.GridExternalName != homeURI && hgd.UserID == agentID)
                 {
@@ -73,8 +68,8 @@ namespace SilverSim.Database.Memory.TravelingData
 
         public override List<TravelingDataInfo> GetTravelingDatasByAgentUUID(UUID agentID)
         {
-            List<TravelingDataInfo> hgds = new List<TravelingDataInfo>();
-            foreach(TravelingDataInfo hgd in m_HGTravelingDatas.Values)
+            var hgds = new List<TravelingDataInfo>();
+            foreach(var hgd in m_HGTravelingDatas.Values)
             {
                 if(hgd.UserID == agentID)
                 {
@@ -96,8 +91,8 @@ namespace SilverSim.Database.Memory.TravelingData
 
         public override bool RemoveByAgentUUID(UUID agentID)
         {
-            List<UUID> sessionIds = new List<UUID>();
-            foreach(KeyValuePair<UUID, TravelingDataInfo> kvp in m_HGTravelingDatas)
+            var sessionIds = new List<UUID>();
+            foreach(var kvp in m_HGTravelingDatas)
             {
                 if(kvp.Value.UserID == agentID)
                 {
@@ -106,7 +101,7 @@ namespace SilverSim.Database.Memory.TravelingData
             }
 
             bool f = false;
-            foreach(UUID id in sessionIds)
+            foreach(var id in sessionIds)
             {
                 if(m_HGTravelingDatas.Remove(id))
                 {
@@ -132,11 +127,6 @@ namespace SilverSim.Database.Memory.TravelingData
     [PluginName("TravelingData")]
     public class MemoryTravelingDataServiceFactory : IPluginFactory
     {
-        public MemoryTravelingDataServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryTravelingDataService();

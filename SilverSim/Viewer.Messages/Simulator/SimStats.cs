@@ -94,11 +94,6 @@ namespace SilverSim.Viewer.Messages.Simulator
         public Int32 PID;
         public List<UInt64> RegionFlagsExtended = new List<UInt64>();
 
-        public SimStats()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt32(RegionX);

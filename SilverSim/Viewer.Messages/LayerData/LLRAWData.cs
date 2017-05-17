@@ -100,7 +100,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                     LookupHeightTable[i + (j * 256)] = new HeightmapLookupValue((ushort)(i + (j * 256)), (float)((double)i * ((double)j / 128.0d)));
                 }
             }
-            Array.Sort<HeightmapLookupValue>(LookupHeightTable);
+            Array.Sort(LookupHeightTable);
         }
 
         static float ReadLLRAWElev(Stream input)
@@ -116,14 +116,14 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public static List<LayerPatch> LoadLLRawStream(this Stream input, int suggested_width, int suggested_height)
         {
-            List<LayerPatch> res = new List<LayerPatch>();
+            var res = new List<LayerPatch>();
             input.LoadLLRawStream(suggested_width, suggested_height, delegate (LayerPatch lp) { res.Add(lp); });
             return res;
         }
 
         public static void LoadLLRawStream(this Stream input, int suggested_width, int suggested_height, Action<LayerPatch> del)
         {
-            float[,] vals = new float[LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+            var vals = new float[LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
             uint maxY = (uint)suggested_height / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - 1;
 
             for (uint patchy = 0; patchy < suggested_height / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++patchy)
@@ -140,9 +140,11 @@ namespace SilverSim.Viewer.Messages.LayerData
                 /* now build patches from those 16 lines */
                 for (uint patchx = 0; patchx < suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++patchx)
                 {
-                    LayerPatch patch = new LayerPatch();
-                    patch.X = patchx;
-                    patch.Y = maxY - patchy;
+                    var patch = new LayerPatch()
+                    {
+                        X = patchx,
+                        Y = maxY - patchy
+                    };
                     for (uint y = 0; y < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                     {
                         for (uint x = 0; x < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
@@ -162,7 +164,7 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public static byte[] ToLLRaw(this List<LayerPatch> terrain)
         {
-            byte[] outdata = new byte[13 * terrain.Count * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+            var outdata = new byte[13 * terrain.Count * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
             uint maxY = terrain[0].Y;
             uint minY = terrain[0].Y;
             uint maxX = terrain[0].X;
@@ -189,9 +191,9 @@ namespace SilverSim.Viewer.Messages.LayerData
                         uint llraw_pos = (p.XYToYInverted(linewidth, maxY) +
                             (LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - y) + x) * 13;
                         float elev = Math.Min(p[x, y], 0);
-                        int index = Array.BinarySearch<HeightmapLookupValue>(LookupHeightTable, new HeightmapLookupValue(0, elev));
-                        byte r = (byte)(index & 0xFF);
-                        byte g = (byte)((index >> 8) & 0xFF);
+                        int index = Array.BinarySearch(LookupHeightTable, new HeightmapLookupValue(0, elev));
+                        var r = (byte)(index & 0xFF);
+                        var g = (byte)((index >> 8) & 0xFF);
 
                         outdata[llraw_pos + 0] = r;
                         outdata[llraw_pos + 1] = g;

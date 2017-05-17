@@ -58,11 +58,6 @@ namespace SilverSim.Viewer.Messages.Region
 
         public List<UInt64> RegionFlagsExtended = new List<UInt64>();
 
-        public RegionInfo()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -104,29 +99,31 @@ namespace SilverSim.Viewer.Messages.Region
 
         public static Message Decode(UDPPacket p)
         {
-            RegionInfo m = new RegionInfo();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.SimName = p.ReadStringLen8();
-            m.EstateID = p.ReadUInt32();
-            m.ParentEstateID = p.ReadUInt32();
-            m.RegionFlags = (RegionOptionFlags)p.ReadUInt32();
-            m.SimAccess = (RegionAccess)p.ReadUInt8();
-            m.BillableFactor = p.ReadFloat();
-            m.ObjectBonusFactor = p.ReadFloat();
-            m.WaterHeight = p.ReadFloat();
-            m.TerrainRaiseLimit = p.ReadFloat();
-            m.TerrainLowerLimit = p.ReadFloat();
-            m.PricePerMeter = p.ReadInt32();
-            m.RedirectGridX = p.ReadInt32();
-            m.RedirectGridY = p.ReadInt32();
-            m.UseEstateSun = p.ReadBoolean();
-            m.SunHour = p.ReadFloat();
-            m.ProductSKU = p.ReadStringLen8();
-            m.ProductName = p.ReadStringLen8();
-            m.MaxAgents = p.ReadUInt32();
-            m.HardMaxAgents = p.ReadUInt32();
-            m.HardMaxObjects = p.ReadUInt32();
+            var m = new RegionInfo()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                SimName = p.ReadStringLen8(),
+                EstateID = p.ReadUInt32(),
+                ParentEstateID = p.ReadUInt32(),
+                RegionFlags = (RegionOptionFlags)p.ReadUInt32(),
+                SimAccess = (RegionAccess)p.ReadUInt8(),
+                BillableFactor = p.ReadFloat(),
+                ObjectBonusFactor = p.ReadFloat(),
+                WaterHeight = p.ReadFloat(),
+                TerrainRaiseLimit = p.ReadFloat(),
+                TerrainLowerLimit = p.ReadFloat(),
+                PricePerMeter = p.ReadInt32(),
+                RedirectGridX = p.ReadInt32(),
+                RedirectGridY = p.ReadInt32(),
+                UseEstateSun = p.ReadBoolean(),
+                SunHour = p.ReadFloat(),
+                ProductSKU = p.ReadStringLen8(),
+                ProductName = p.ReadStringLen8(),
+                MaxAgents = p.ReadUInt32(),
+                HardMaxAgents = p.ReadUInt32(),
+                HardMaxObjects = p.ReadUInt32()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {

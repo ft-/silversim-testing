@@ -38,10 +38,6 @@ namespace SilverSim.Database.Memory.SimulationData
         private static readonly ILog m_Log = LogManager.GetLogger("MEMORY SIMULATION STORAGE");
 
         #region Constructor
-        public MemorySimulationDataStorage()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
@@ -148,11 +144,6 @@ namespace SilverSim.Database.Memory.SimulationData
     [PluginName("SimulationData")]
     public class MemorySimulationDataServiceFactory : IPluginFactory
     {
-        public MemorySimulationDataServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemorySimulationDataStorage();

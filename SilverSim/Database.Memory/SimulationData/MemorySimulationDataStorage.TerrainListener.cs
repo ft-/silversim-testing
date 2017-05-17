@@ -43,7 +43,7 @@ namespace SilverSim.Database.Memory.SimulationData
             {
                 Thread.CurrentThread.Name = "Storage Terrain Thread: " + m_RegionID.ToString();
 
-                C5.TreeDictionary<uint, uint> knownSerialNumbers = new C5.TreeDictionary<uint, uint>();
+                var knownSerialNumbers = new C5.TreeDictionary<uint, uint>();
 
                 while (!m_StopStorageThread || m_StorageTerrainRequestQueue.Count != 0)
                 {
@@ -57,7 +57,7 @@ namespace SilverSim.Database.Memory.SimulationData
                         continue;
                     }
 
-                    uint serialNumber = req.Serial;
+                    var serialNumber = req.Serial;
 
                     if (!knownSerialNumbers.Contains(req.ExtendedPatchID) || knownSerialNumbers[req.ExtendedPatchID] != req.Serial)
                     {

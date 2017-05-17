@@ -35,18 +35,15 @@ namespace SilverSim.Viewer.Messages.Transfer
         public double Priority;
         public byte[] Params = new byte[0];
 
-        public TransferRequest()
-        {
-
-        }
-
         public static TransferRequest Decode(UDPPacket p)
         {
-            TransferRequest m = new TransferRequest();
-            m.TransferID = p.ReadUUID();
-            m.ChannelType = p.ReadInt32();
-            m.SourceType = (SourceType)p.ReadInt32();
-            m.Priority = p.ReadFloat();
+            var m = new TransferRequest()
+            {
+                TransferID = p.ReadUUID(),
+                ChannelType = p.ReadInt32(),
+                SourceType = (SourceType)p.ReadInt32(),
+                Priority = p.ReadFloat()
+            };
             uint c = p.ReadUInt16();
             m.Params = p.ReadBytes((int)c);
 

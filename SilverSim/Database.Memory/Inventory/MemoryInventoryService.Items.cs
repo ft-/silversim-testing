@@ -33,7 +33,7 @@ namespace SilverSim.Database.Memory.Inventory
     {
         bool IInventoryItemServiceInterface.ContainsKey(UUID key)
         {
-            foreach(RwLockedDictionary<UUID, InventoryItem> dict in m_Items.Values)
+            foreach(var dict in m_Items.Values)
             {
                 if(dict.ContainsKey(key))
                 {
@@ -46,7 +46,7 @@ namespace SilverSim.Database.Memory.Inventory
 
         bool IInventoryItemServiceInterface.TryGetValue(UUID key, out InventoryItem item)
         {
-            foreach (RwLockedDictionary<UUID, InventoryItem> dict in m_Items.Values)
+            foreach (var dict in m_Items.Values)
             {
                 if (dict.TryGetValue(key, out item))
                 {
@@ -77,8 +77,8 @@ namespace SilverSim.Database.Memory.Inventory
         {
             get
             {
-                List<InventoryItem> res = new List<InventoryItem>();
-                foreach (UUID key in keys)
+                var res = new List<InventoryItem>();
+                foreach (var key in keys)
                 {
                     try
                     {
@@ -173,7 +173,7 @@ namespace SilverSim.Database.Memory.Inventory
             if (m_Items.TryGetValue(principalID, out itemSet) &&
                 itemSet.TryGetValue(id, out item))
             {
-                UUID oldFolderID = item.ParentFolderID;
+                var oldFolderID = item.ParentFolderID;
                 item.ParentFolderID = toFolderID;
                 IncrementVersion(principalID, oldFolderID);
                 IncrementVersion(principalID, item.ParentFolderID);
@@ -198,8 +198,8 @@ namespace SilverSim.Database.Memory.Inventory
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<UUID> IInventoryItemServiceInterface.Delete(UUID principalID, List<UUID> itemids)
         {
-            List<UUID> deleted = new List<UUID>();
-            foreach (UUID id in itemids)
+            var deleted = new List<UUID>();
+            foreach (var id in itemids)
             {
                 try
                 {

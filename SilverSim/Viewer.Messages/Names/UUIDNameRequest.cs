@@ -32,14 +32,9 @@ namespace SilverSim.Viewer.Messages.Names
 
         public List<UUID> UUIDNameBlock = new List<UUID>();
 
-        public UUIDNameRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            UUIDNameRequest m = new UUIDNameRequest();
+            var m = new UUIDNameRequest();
 
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
@@ -54,7 +49,7 @@ namespace SilverSim.Viewer.Messages.Names
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt8((byte)UUIDNameBlock.Count);
-            foreach (UUID id in UUIDNameBlock)
+            foreach (var id in UUIDNameBlock)
             {
                 p.WriteUUID(id);
             }

@@ -37,7 +37,7 @@ namespace SilverSim.Database.Memory.SimulationData
             byte[] data;
             if(m_EnvSettingsData.TryGetValue(regionID, out data))
             { 
-                using (MemoryStream ms = new MemoryStream(data))
+                using (var ms = new MemoryStream(data))
                 {
                     settings = WindLightSettings.Deserialize(ms);
                     return true;
@@ -68,7 +68,7 @@ namespace SilverSim.Database.Memory.SimulationData
 
                 else
                 {
-                    using(MemoryStream ms = new MemoryStream())
+                    using(var ms = new MemoryStream())
                     {
                         value.Serialize(ms, regionID);
                         m_EnvSettingsData[regionID] = ms.ToArray();

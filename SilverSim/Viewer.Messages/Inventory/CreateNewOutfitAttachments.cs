@@ -42,24 +42,22 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
 
-        public CreateNewOutfitAttachments()
-        {
-
-        }
-
         public static CreateNewOutfitAttachments Decode(UDPPacket p)
         {
-            CreateNewOutfitAttachments m = new CreateNewOutfitAttachments();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.NewFolderID = p.ReadUUID();
+            var m = new CreateNewOutfitAttachments()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                NewFolderID = p.ReadUUID()
+            };
             uint cnt = p.ReadUInt8();
             for(uint i = 0; i < cnt; ++i)
             {
-                ObjectDataEntry e = new ObjectDataEntry();
-                e.OldItemID = p.ReadUUID();
-                e.OldFolderID = p.ReadUUID();
-                m.ObjectData.Add(e);
+                m.ObjectData.Add(new ObjectDataEntry()
+                {
+                    OldItemID = p.ReadUUID(),
+                    OldFolderID = p.ReadUUID()
+                });
             }
             return m;
         }
@@ -70,7 +68,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(SessionID);
             p.WriteUUID(NewFolderID);
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach(ObjectDataEntry e in ObjectData)
+            foreach(var e in ObjectData)
             {
                 p.WriteUUID(e.OldItemID);
                 p.WriteUUID(e.OldFolderID);

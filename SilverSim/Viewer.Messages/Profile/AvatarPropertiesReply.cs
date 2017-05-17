@@ -42,11 +42,6 @@ namespace SilverSim.Viewer.Messages.Profile
         public byte[] CharterMember = new byte[1];
         public UInt32 Flags;
 
-        public AvatarPropertiesReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -65,19 +60,20 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public static Message Decode(UDPPacket p)
         {
-            AvatarPropertiesReply m = new AvatarPropertiesReply();
-            m.AgentID = p.ReadUUID();
-            m.AvatarID = p.ReadUUID();
-            m.ImageID = p.ReadUUID();
-            m.FLImageID = p.ReadUUID();
-            m.PartnerID = p.ReadUUID();
-            m.AboutText = p.ReadStringLen16();
-            m.FLAboutText = p.ReadStringLen8();
-            m.BornOn = p.ReadStringLen8();
-            m.ProfileURL = p.ReadStringLen8();
-            m.CharterMember = p.ReadBytes(p.ReadUInt8());
-            m.Flags = p.ReadUInt32();
-            return m;
+            return new AvatarPropertiesReply()
+            {
+                AgentID = p.ReadUUID(),
+                AvatarID = p.ReadUUID(),
+                ImageID = p.ReadUUID(),
+                FLImageID = p.ReadUUID(),
+                PartnerID = p.ReadUUID(),
+                AboutText = p.ReadStringLen16(),
+                FLAboutText = p.ReadStringLen8(),
+                BornOn = p.ReadStringLen8(),
+                ProfileURL = p.ReadStringLen8(),
+                CharterMember = p.ReadBytes(p.ReadUInt8()),
+                Flags = p.ReadUInt32()
+            };
         }
     }
 }

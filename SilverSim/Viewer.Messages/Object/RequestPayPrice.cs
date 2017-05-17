@@ -30,17 +30,12 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public UUID ObjectID = UUID.Zero;
 
-        public RequestPayPrice()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RequestPayPrice m = new RequestPayPrice();
-            m.ObjectID = p.ReadUUID();
-
-            return m;
+            return new RequestPayPrice()
+            {
+                ObjectID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

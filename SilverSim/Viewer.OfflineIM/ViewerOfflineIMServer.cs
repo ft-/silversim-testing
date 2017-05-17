@@ -42,11 +42,6 @@ namespace SilverSim.Viewer.OfflineIM
 
         bool m_ShutdownOfflineIM;
 
-        public ViewerOfflineIMServer()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             ThreadManager.CreateThread(HandlerThread).Start();
@@ -122,11 +117,6 @@ namespace SilverSim.Viewer.OfflineIM
     [PluginName("ViewerOfflineIMServer")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerOfflineIMServer();

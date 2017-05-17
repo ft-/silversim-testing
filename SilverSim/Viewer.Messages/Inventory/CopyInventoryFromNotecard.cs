@@ -43,27 +43,23 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
-        public CopyInventoryFromNotecard()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            CopyInventoryFromNotecard m = new CopyInventoryFromNotecard();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.NotecardItemID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-
+            var m = new CopyInventoryFromNotecard()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                NotecardItemID = p.ReadUUID(),
+                ObjectID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                InventoryDataEntry d = new InventoryDataEntry();
-                d.ItemID = p.ReadUUID();
-                d.FolderID = p.ReadUUID();
-                m.InventoryData.Add(d);
+                m.InventoryData.Add(new InventoryDataEntry()
+                {
+                    ItemID = p.ReadUUID(),
+                    FolderID = p.ReadUUID()
+                });
             }
 
             return m;
@@ -77,7 +73,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(ObjectID);
 
             p.WriteUInt8((byte)InventoryData.Count);
-            foreach(InventoryDataEntry e in InventoryData)
+            foreach(var e in InventoryData)
             {
                 p.WriteUUID(e.ItemID);
                 p.WriteUUID(e.FolderID);

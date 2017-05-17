@@ -35,21 +35,16 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID ItemID = UUID.Zero;
         public UUID FolderID = UUID.Zero;
 
-        public BuyObjectInventory()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            BuyObjectInventory m = new BuyObjectInventory();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-            m.FolderID = p.ReadUUID();
-
-            return m;
+            return new BuyObjectInventory()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectID = p.ReadUUID(),
+                ItemID = p.ReadUUID(),
+                FolderID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

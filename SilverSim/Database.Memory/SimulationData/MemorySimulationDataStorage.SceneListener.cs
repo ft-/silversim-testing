@@ -55,9 +55,9 @@ namespace SilverSim.Database.Memory.SimulationData
             {
                 Thread.CurrentThread.Name = "Storage Main Thread: " + m_RegionID.ToString();
 
-                C5.TreeDictionary<uint, int> knownSerialNumbers = new C5.TreeDictionary<uint, int>();
-                C5.TreeDictionary<uint, int> knownInventorySerialNumbers = new C5.TreeDictionary<uint, int>();
-                C5.TreeDictionary<uint, List<UUID>> knownInventories = new C5.TreeDictionary<uint, List<UUID>>();
+                var knownSerialNumbers = new C5.TreeDictionary<uint, int>();
+                var knownInventorySerialNumbers = new C5.TreeDictionary<uint, int>();
+                var knownInventories = new C5.TreeDictionary<uint, List<UUID>>();
 
                 int m_ProcessedPrims = 0;
 
@@ -92,7 +92,7 @@ namespace SilverSim.Database.Memory.SimulationData
 
                         if(m_PrimItems.TryGetValue(sceneID, out primItemList))
                         {
-                            List<string> deleteItems = new List<string>(from id in primItemList.Keys where id.StartsWith(partID.ToString()) select id);
+                            var deleteItems = new List<string>(from id in primItemList.Keys where id.StartsWith(partID.ToString()) select id);
                             foreach(string id in deleteItems)
                             {
                                 m_PrimItems.Remove(id);
@@ -120,7 +120,7 @@ namespace SilverSim.Database.Memory.SimulationData
                             RwLockedDictionary<string, Map> primItemList;
                             if (m_PrimItems.TryGetValue(sceneID, out primItemList))
                             {
-                                List<string> deleteKeys = new List<string>(from id in primItemList.Keys where id.StartsWith(partID.ToString()) select id);
+                                var deleteKeys = new List<string>(from id in primItemList.Keys where id.StartsWith(partID) select id);
                                 foreach(string key in deleteKeys)
                                 {
                                     primItemList.Remove(key);
@@ -169,8 +169,8 @@ namespace SilverSim.Database.Memory.SimulationData
 
                     if (updatePrim)
                     {
-                        Map primData = GenerateUpdateObjectPart(req.Part);
-                        ObjectGroup grp = req.Part.ObjectGroup;
+                        var primData = GenerateUpdateObjectPart(req.Part);
+                        var grp = req.Part.ObjectGroup;
                         primData.Add("RegionID", grp.Scene.ID);
                         m_Primitives[grp.Scene.ID][req.Part.ID] = primData;
                         knownSerialNumbers[req.LocalID] = req.SerialNumber;
@@ -180,8 +180,8 @@ namespace SilverSim.Database.Memory.SimulationData
 
                     if (updateInventory)
                     {
-                        Dictionary<UUID, ObjectPartInventoryItem> items = new Dictionary<UUID, ObjectPartInventoryItem>();
-                        foreach (ObjectPartInventoryItem item in req.Part.Inventory.ValuesByKey1)
+                        var items = new Dictionary<UUID, ObjectPartInventoryItem>();
+                        foreach (var item in req.Part.Inventory.ValuesByKey1)
                         {
                             items.Add(item.ID, item);
                         }
@@ -189,7 +189,7 @@ namespace SilverSim.Database.Memory.SimulationData
                         if (knownInventories.Contains(req.Part.LocalID))
                         {
                             string partID = req.Part.ID.ToString();
-                            foreach (UUID itemID in knownInventories[req.Part.LocalID])
+                            foreach (var itemID in knownInventories[req.Part.LocalID])
                             {
                                 if (!items.ContainsKey(itemID))
                                 {
@@ -197,18 +197,18 @@ namespace SilverSim.Database.Memory.SimulationData
                                 }
                             }
 
-                            foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in items)
+                            foreach (var kvp in items)
                             {
-                                Map data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
+                                var data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
                                 data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
                                 m_PrimItems[req.Part.ObjectGroup.Scene.ID][GenItemKey(req.Part.ID, kvp.Key)] = data;
                             }
                         }
                         else
                         {
-                            foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in items)
+                            foreach (var kvp in items)
                             {
-                                Map data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
+                                var data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
                                 data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
                                 m_PrimItems[req.Part.ObjectGroup.Scene.ID][GenItemKey(req.Part.ID, kvp.Key)] = data;
                             }
@@ -221,31 +221,33 @@ namespace SilverSim.Database.Memory.SimulationData
 
             private Map GenerateUpdateObjectPartInventoryItem(UUID primID, ObjectPartInventoryItem item)
             {
-                Map data = new Map();
-                data.Add("AssetId", item.AssetID);
-                data.Add("AssetType", (int)item.AssetType);
-                data.Add("CreationDate", item.CreationDate);
-                data.Add("Creator", item.Creator.ToString());
-                data.Add("Description", item.Description);
-                data.Add("Flags", (int)item.Flags);
-                data.Add("Group", item.Group.ToString());
-                data.Add("GroupOwned", item.IsGroupOwned);
-                data.Add("PrimID", primID);
-                data.Add("Name", item.Name);
-                data.Add("InventoryID", item.ID);
-                data.Add("InventoryType", (int)item.InventoryType);
-                data.Add("LastOwner", item.LastOwner.ToString());
-                data.Add("Owner", item.Owner.ToString());
-                data.Add("ParentFolderID", item.ParentFolderID);
-                data.Add("BasePermissions", (int)item.Permissions.Base);
-                data.Add("CurrentPermissions", (int)item.Permissions.Current);
-                data.Add("EveryOnePermissions", (int)item.Permissions.EveryOne);
-                data.Add("GroupPermissions", (int)item.Permissions.Group);
-                data.Add("NextOwnerPermissions", (int)item.Permissions.NextOwner);
-                data.Add("SaleType", (int)item.SaleInfo.Type);
-                data.Add("SalePrice", item.SaleInfo.Price);
-                data.Add("SalePermMask", (int)item.SaleInfo.PermMask);
-                ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
+                var data = new Map
+                {
+                    { "AssetId", item.AssetID },
+                    { "AssetType", (int)item.AssetType },
+                    { "CreationDate", item.CreationDate },
+                    { "Creator", item.Creator.ToString() },
+                    { "Description", item.Description },
+                    { "Flags", (int)item.Flags },
+                    { "Group", item.Group.ToString() },
+                    { "GroupOwned", item.IsGroupOwned },
+                    { "PrimID", primID },
+                    { "Name", item.Name },
+                    { "InventoryID", item.ID },
+                    { "InventoryType", (int)item.InventoryType },
+                    { "LastOwner", item.LastOwner.ToString() },
+                    { "Owner", item.Owner.ToString() },
+                    { "ParentFolderID", item.ParentFolderID },
+                    { "BasePermissions", (int)item.Permissions.Base },
+                    { "CurrentPermissions", (int)item.Permissions.Current },
+                    { "EveryOnePermissions", (int)item.Permissions.EveryOne },
+                    { "GroupPermissions", (int)item.Permissions.Group },
+                    { "NextOwnerPermissions", (int)item.Permissions.NextOwner },
+                    { "SaleType", (int)item.SaleInfo.Type },
+                    { "SalePrice", item.SaleInfo.Price },
+                    { "SalePermMask", (int)item.SaleInfo.PermMask }
+                };
+                var grantinfo = item.PermsGranter;
                 data.Add("PermsGranter", grantinfo.PermsGranter.ToString());
                 data.Add("PermsMask", (int)grantinfo.PermsMask);
                 data.Add("NextOwnerAssetID", item.NextOwnerAssetID);
@@ -254,74 +256,76 @@ namespace SilverSim.Database.Memory.SimulationData
 
             private Map GenerateUpdateObjectGroup(ObjectGroup objgroup)
             {
-                Map data = new Map();
-                data.Add("ID", objgroup.ID);
-                data.Add("RegionID", objgroup.Scene.ID);
-                data.Add("IsTempOnRez", objgroup.IsTempOnRez);
-                data.Add("Owner", objgroup.Owner.ToString());
-                data.Add("LastOwner", objgroup.LastOwner.ToString());
-                data.Add("Group", objgroup.Group.ToString());
-                data.Add("OriginalAssetID", objgroup.OriginalAssetID);
-                data.Add("NextOwnerAssetID", objgroup.NextOwnerAssetID);
-                data.Add("SaleType", (int)objgroup.SaleType);
-                data.Add("SalePrice", objgroup.SalePrice);
-                data.Add("PayPrice0", objgroup.PayPrice0);
-                data.Add("PayPrice1", objgroup.PayPrice1);
-                data.Add("PayPrice2", objgroup.PayPrice2);
-                data.Add("PayPrice3", objgroup.PayPrice3);
-                data.Add("PayPrice4", objgroup.PayPrice4);
-                data.Add("AttachedPos", objgroup.AttachedPos);
-                data.Add("AttachPoint", (int)objgroup.AttachPoint);
-                data.Add("IsIncludedInSearch", objgroup.IsIncludedInSearch);
-                data.Add("RezzingObjectID", objgroup.RezzingObjectID);
-                return data;
+                return new Map
+                {
+                    { "ID", objgroup.ID },
+                    { "RegionID", objgroup.Scene.ID },
+                    { "IsTempOnRez", objgroup.IsTempOnRez },
+                    { "Owner", objgroup.Owner.ToString() },
+                    { "LastOwner", objgroup.LastOwner.ToString() },
+                    { "Group", objgroup.Group.ToString() },
+                    { "OriginalAssetID", objgroup.OriginalAssetID },
+                    { "NextOwnerAssetID", objgroup.NextOwnerAssetID },
+                    { "SaleType", (int)objgroup.SaleType },
+                    { "SalePrice", objgroup.SalePrice },
+                    { "PayPrice0", objgroup.PayPrice0 },
+                    { "PayPrice1", objgroup.PayPrice1 },
+                    { "PayPrice2", objgroup.PayPrice2 },
+                    { "PayPrice3", objgroup.PayPrice3 },
+                    { "PayPrice4", objgroup.PayPrice4 },
+                    { "AttachedPos", objgroup.AttachedPos },
+                    { "AttachPoint", (int)objgroup.AttachPoint },
+                    { "IsIncludedInSearch", objgroup.IsIncludedInSearch },
+                    { "RezzingObjectID", objgroup.RezzingObjectID }
+                };
             }
 
             private Map GenerateUpdateObjectPart(ObjectPart objpart)
             {
-                Map data = new Map();
-                data.Add("ID", objpart.ID);
-                data.Add("LinkNumber", objpart.LinkNumber);
-                data.Add("RootPartID", objpart.ObjectGroup.RootPart.ID);
-                data.Add("Position", objpart.Position);
-                data.Add("Rotation", objpart.Rotation);
-                data.Add("SitText", objpart.SitText);
-                data.Add("TouchText", objpart.TouchText);
-                data.Add("Name", objpart.Name);
-                data.Add("Description", objpart.Description);
-                data.Add("SitTargetOffset", objpart.SitTargetOffset);
-                data.Add("SitTargetOrientation", objpart.SitTargetOrientation);
-                data.Add("PhysicsShapeType", (int)objpart.PhysicsShapeType);
-                data.Add("PathfindingType", (int)objpart.PathfindingType);
-                data.Add("Material", (int)objpart.Material);
-                data.Add("Size", objpart.Size);
-                data.Add("Slice", objpart.Slice);
-                data.Add("MediaURL", objpart.MediaURL);
-                data.Add("Creator", objpart.Creator.ToString());
-                data.Add("CreationDate", objpart.CreationDate);
-                data.Add("Flags", (int)objpart.Flags);
-                data.Add("AngularVelocity", objpart.AngularVelocity);
-                data.Add("LightData", new BinaryData(objpart.PointLight.Serialization));
-                data.Add("HoverTextData", new BinaryData(objpart.Text.Serialization));
-                data.Add("FlexibleData", new BinaryData(objpart.Flexible.Serialization));
-                data.Add("LoopedSoundData", new BinaryData(objpart.Sound.Serialization));
-                data.Add("ImpactSoundData", new BinaryData(objpart.CollisionSound.Serialization));
-                data.Add("PrimitiveShapeData", new BinaryData(objpart.Shape.Serialization));
-                data.Add("ParticleSystem", new BinaryData(objpart.ParticleSystemBytes));
-                data.Add("TextureEntryBytes", new BinaryData(objpart.TextureEntryBytes));
-                data.Add("TextureAnimationBytes", new BinaryData(objpart.TextureAnimationBytes));
-                data.Add("ScriptAccessPin", objpart.ScriptAccessPin);
-                data.Add("CameraAtOffset", objpart.CameraAtOffset);
-                data.Add("CameraEyeOffset", objpart.CameraEyeOffset);
-                data.Add("ForceMouselook", objpart.ForceMouselook);
-                data.Add("BasePermissions", (int)objpart.BaseMask);
-                data.Add("CurrentPermissions", (int)objpart.OwnerMask);
-                data.Add("EveryOnePermissions", (int)objpart.EveryoneMask);
-                data.Add("GroupPermissions", (int)objpart.GroupMask);
-                data.Add("NextOwnerPermissions", (int)objpart.NextOwnerMask);
-                data.Add("ClickAction", (int)objpart.ClickAction);
-
-                using (MemoryStream ms = new MemoryStream())
+                var data = new Map
+                {
+                    { "ID", objpart.ID },
+                    { "LinkNumber", objpart.LinkNumber },
+                    { "RootPartID", objpart.ObjectGroup.RootPart.ID },
+                    { "Position", objpart.Position },
+                    { "Rotation", objpart.Rotation },
+                    { "SitText", objpart.SitText },
+                    { "TouchText", objpart.TouchText },
+                    { "Name", objpart.Name },
+                    { "Description", objpart.Description },
+                    { "SitTargetOffset", objpart.SitTargetOffset },
+                    { "SitTargetOrientation", objpart.SitTargetOrientation },
+                    { "PhysicsShapeType", (int)objpart.PhysicsShapeType },
+                    { "PathfindingType", (int)objpart.PathfindingType },
+                    { "Material", (int)objpart.Material },
+                    { "Size", objpart.Size },
+                    { "Slice", objpart.Slice },
+                    { "MediaURL", objpart.MediaURL },
+                    { "Creator", objpart.Creator.ToString() },
+                    { "CreationDate", objpart.CreationDate },
+                    { "Flags", (int)objpart.Flags },
+                    { "AngularVelocity", objpart.AngularVelocity },
+                    { "LightData", new BinaryData(objpart.PointLight.Serialization) },
+                    { "HoverTextData", new BinaryData(objpart.Text.Serialization) },
+                    { "FlexibleData", new BinaryData(objpart.Flexible.Serialization) },
+                    { "LoopedSoundData", new BinaryData(objpart.Sound.Serialization) },
+                    { "ImpactSoundData", new BinaryData(objpart.CollisionSound.Serialization) },
+                    { "PrimitiveShapeData", new BinaryData(objpart.Shape.Serialization) },
+                    { "ParticleSystem", new BinaryData(objpart.ParticleSystemBytes) },
+                    { "TextureEntryBytes", new BinaryData(objpart.TextureEntryBytes) },
+                    { "TextureAnimationBytes", new BinaryData(objpart.TextureAnimationBytes) },
+                    { "ScriptAccessPin", objpart.ScriptAccessPin },
+                    { "CameraAtOffset", objpart.CameraAtOffset },
+                    { "CameraEyeOffset", objpart.CameraEyeOffset },
+                    { "ForceMouselook", objpart.ForceMouselook },
+                    { "BasePermissions", (int)objpart.BaseMask },
+                    { "CurrentPermissions", (int)objpart.OwnerMask },
+                    { "EveryOnePermissions", (int)objpart.EveryoneMask },
+                    { "GroupPermissions", (int)objpart.GroupMask },
+                    { "NextOwnerPermissions", (int)objpart.NextOwnerMask },
+                    { "ClickAction", (int)objpart.ClickAction }
+                };
+                using (var ms = new MemoryStream())
                 {
                     LlsdBinary.Serialize(objpart.DynAttrs, ms);
                     data.Add("DynAttrs", new BinaryData(ms.ToArray()));

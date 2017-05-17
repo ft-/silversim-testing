@@ -35,10 +35,6 @@ namespace SilverSim.Viewer.TerrainEdit
     [Description("Viewer Terraforming Handler")]
     public class ViewerTerrainEdit : IPlugin, IPacketHandlerExtender
     {
-        public ViewerTerrainEdit()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
@@ -47,13 +43,13 @@ namespace SilverSim.Viewer.TerrainEdit
         [PacketHandler(MessageType.ModifyLand)]
         public void HandleMessage(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
-            ModifyLand req = (ModifyLand)m;
+            var req = (ModifyLand)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
             }
-            SceneInterface scene = circuit.Scene;
+            var scene = circuit.Scene;
             if(null == scene)
             {
                 return;
@@ -61,7 +57,7 @@ namespace SilverSim.Viewer.TerrainEdit
 
             Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data> modifier;
             
-            foreach (ModifyLand.Data data in req.ParcelData)
+            foreach (var data in req.ParcelData)
             {
                 if (data.South == data.North && data.West == data.East)
                 {
@@ -84,11 +80,6 @@ namespace SilverSim.Viewer.TerrainEdit
     [PluginName("ViewerTerrainEdit")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerTerrainEdit();

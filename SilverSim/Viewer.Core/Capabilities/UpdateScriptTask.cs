@@ -85,8 +85,8 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public override UUID GetUploaderID(Map reqmap)
         {
-            UUID transaction = UUID.Random;
-            UUID experienceID = UUID.Zero;
+            var transaction = UUID.Random;
+            var experienceID = UUID.Zero;
             if(reqmap.ContainsKey("experience"))
             {
                 experienceID = reqmap["experience"].AsUUID;
@@ -100,9 +100,9 @@ namespace SilverSim.Viewer.Core.Capabilities
             KeyValuePair<UUID, TransactionInfo> kvp;
             if (m_Transactions.RemoveIf(transactionID, delegate(TransactionInfo v) { return true; }, out kvp))
             {
-                Map m = new Map();
+                var m = new Map();
                 ObjectPartInventoryItem item;
-                ObjectPart part = m_Scene.Primitives[kvp.Value.TaskID];
+                var part = m_Scene.Primitives[kvp.Value.TaskID];
                 try
                 {
                     item = part.Inventory[kvp.Value.ItemID];
@@ -168,8 +168,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch (CompilerException e)
                 {
-                    AnArray errors = new AnArray();
-                    foreach (KeyValuePair<int, string> line in e.Messages)
+                    var errors = new AnArray();
+                    foreach (var line in e.Messages)
                     {
                         int lineNumber = line.Key - 1;
                         /* Viewer editors count lines from 0 */
@@ -185,7 +185,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 catch (Exception e)
                 {
                     m_Log.ErrorFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
-                    AnArray errors = new AnArray();
+                    var errors = new AnArray();
                     errors.Add("0:Unexpected compiler error " + e.GetType().Name);
                     m.Add("errors", errors);
                     m.Add("compiled", false);

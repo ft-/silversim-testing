@@ -34,22 +34,17 @@ namespace SilverSim.Viewer.Messages.Teleport
         public byte LureType;
         public string Message;
         public List<UUID> TargetData = new List<UUID>();
-        
-
-        public StartLure()
-        {
-
-        }
 
         public static Message Decode(UDPPacket p)
         {
-            StartLure m = new StartLure();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.LureType = p.ReadUInt8();
-            m.Message = p.ReadStringLen8();
-            uint count;
-            count = p.ReadUInt8();
+            var m = new StartLure()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                LureType = p.ReadUInt8(),
+                Message = p.ReadStringLen8()
+            };
+            uint count = p.ReadUInt8();
             for (uint i = 0; i < count; ++i)
             {
                 m.TargetData.Add(p.ReadUUID());
@@ -65,7 +60,7 @@ namespace SilverSim.Viewer.Messages.Teleport
             p.WriteUInt8(LureType);
             p.WriteStringLen8(Message);
             p.WriteUInt8((byte)TargetData.Count);
-            foreach(UUID id in TargetData)
+            foreach(var id in TargetData)
             {
                 p.WriteUUID(id);
             }

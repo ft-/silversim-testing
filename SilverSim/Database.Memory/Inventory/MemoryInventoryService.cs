@@ -101,11 +101,6 @@ namespace SilverSim.Database.Memory.Inventory
     [PluginName("Inventory")]
     public class MemoryInventoryServiceFactory : IPluginFactory
     {
-        public MemoryInventoryServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryInventoryService();

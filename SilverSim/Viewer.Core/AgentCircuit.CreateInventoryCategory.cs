@@ -56,20 +56,21 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            Map reqmap = o as Map;
+            var reqmap = o as Map;
             if(null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 
-            InventoryFolder folder = new InventoryFolder();
-            folder.ID = reqmap["folder_id"].AsUUID;
-            folder.ParentFolderID = reqmap["parent_id"].AsUUID;
-            folder.InventoryType = (InventoryType)reqmap["type"].AsInt;
-            folder.Name = reqmap["name"].ToString();
-            folder.Version = 1;
-
+            var folder = new InventoryFolder()
+            {
+                ID = reqmap["folder_id"].AsUUID,
+                ParentFolderID = reqmap["parent_id"].AsUUID,
+                InventoryType = (InventoryType)reqmap["type"].AsInt,
+                Name = reqmap["name"].ToString(),
+                Version = 1
+            };
             try
             {
                 Agent.InventoryService.Folder.Add(folder);
@@ -80,14 +81,16 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            Map resmap = new Map();
-            resmap.Add("folder_id", folder.ID);
-            resmap.Add("parent_id", folder.ParentFolderID);
-            resmap.Add("type", (int)folder.InventoryType);
-            resmap.Add("name", folder.Name);
-            using (HttpResponse res = httpreq.BeginResponse())
+            var resmap = new Map
             {
-                using (Stream stream = res.GetOutputStream())
+                { "folder_id", folder.ID },
+                { "parent_id", folder.ParentFolderID },
+                { "type", (int)folder.InventoryType },
+                { "name", folder.Name }
+            };
+            using (var res = httpreq.BeginResponse())
+            {
+                using (var stream = res.GetOutputStream())
                 {
                     LlsdXml.Serialize(resmap, stream);
                 }

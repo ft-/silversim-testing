@@ -35,11 +35,6 @@ namespace SilverSim.Database.Memory.Maptile
     {
         readonly RwLockedDictionary<string, MaptileData> m_Maptiles = new RwLockedDictionary<string, MaptileData>();
 
-        public MemoryMaptileService()
-        {
-
-        }
-
         static string GetKey(UUID scopeid, GridVector loc, int zoomlevel)
         {
             return string.Format("{0}-{1}-{2}-{3}", scopeid.ToString(), loc.X, loc.Y, zoomlevel);
@@ -52,7 +47,7 @@ namespace SilverSim.Database.Memory.Maptile
 
         public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
         {
-            List<MaptileInfo> infos = new List<MaptileInfo>();
+            var infos = new List<MaptileInfo>();
             foreach(MaptileData data in m_Maptiles.Values)
             {
                 if(data.ScopeID == scopeid && data.ZoomLevel == zoomlevel && data.Location.X >= minloc.X && data.Location.Y >= minloc.Y && data.Location.X <= maxloc.X && data.Location.Y <= maxloc.Y)
@@ -70,7 +65,7 @@ namespace SilverSim.Database.Memory.Maptile
 
         public override void Store(MaptileData data)
         {
-            MaptileData ndata = new MaptileData(data);
+            var ndata = new MaptileData(data);
             ndata.LastUpdate = Date.Now;
             m_Maptiles[GetKey(data)] = ndata;
         }
@@ -89,11 +84,6 @@ namespace SilverSim.Database.Memory.Maptile
     [PluginName("Maptile")]
     public class MemoryMaptileServiceFactory : IPluginFactory
     {
-        public MemoryMaptileServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryMaptileService();

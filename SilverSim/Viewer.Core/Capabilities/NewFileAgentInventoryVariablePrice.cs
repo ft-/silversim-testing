@@ -70,17 +70,19 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public override UUID GetUploaderID(Map reqmap)
         {
-            UUID transaction = UUID.Random;
-            InventoryItem item = new InventoryItem();
-            item.ID = UUID.Random;
-            item.Description = reqmap["description"].ToString();
-            item.Name = reqmap["name"].ToString();
-            item.ParentFolderID = reqmap["folder_id"].AsUUID;
-            item.AssetTypeName = reqmap["asset_type"].ToString();
-            item.InventoryTypeName = reqmap["inventory_type"].ToString();
-            item.LastOwner = m_Creator;
-            item.Owner = m_Creator;
-            item.Creator = m_Creator;
+            var transaction = UUID.Random;
+            var item = new InventoryItem()
+            {
+                ID = UUID.Random,
+                Description = reqmap["description"].ToString(),
+                Name = reqmap["name"].ToString(),
+                ParentFolderID = reqmap["folder_id"].AsUUID,
+                AssetTypeName = reqmap["asset_type"].ToString(),
+                InventoryTypeName = reqmap["inventory_type"].ToString(),
+                LastOwner = m_Creator,
+                Owner = m_Creator,
+                Creator = m_Creator
+            };
             item.Permissions.Base = InventoryPermissionsMask.All;
             item.Permissions.Current = InventoryPermissionsMask.Every;
             item.Permissions.EveryOne = (InventoryPermissionsMask)reqmap["everyone_mask"].AsUInt;
@@ -95,8 +97,10 @@ namespace SilverSim.Viewer.Core.Capabilities
             KeyValuePair<UUID, InventoryItem> kvp;
             if (m_Transactions.RemoveIf(transactionID, delegate(InventoryItem v) { return true; }, out kvp))
             {
-                Map m = new Map();
-                m.Add("new_inventory_item", kvp.Value.ID.ToString());
+                var m = new Map
+                {
+                    { "new_inventory_item", kvp.Value.ID.ToString() }
+                };
                 kvp.Value.AssetID = data.ID;
                 data.Type = kvp.Value.AssetType;
                 data.Name = kvp.Value.Name;
@@ -138,26 +142,26 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         void UploadObject(UUID transactionID, AssetData data)
         {
-            Map m = (Map)LlsdXml.Deserialize(data.InputStream);
-            AnArray instance_list = (AnArray)m["instance_list"];
-            AnArray mesh_list = (AnArray)m["mesh_list"];
-            AnArray texture_list = (AnArray)m["texture_list"];
+            var m = (Map)LlsdXml.Deserialize(data.InputStream);
+            var instance_list = (AnArray)m["instance_list"];
+            var mesh_list = (AnArray)m["mesh_list"];
+            var texture_list = (AnArray)m["texture_list"];
 
-            List<UUID> textureids = new List<UUID>();
-            Quaternion[] primrots = new Quaternion[instance_list.Count];
-            Vector3[] primpositions = new Vector3[instance_list.Count];
-            Vector3[] primscales = new Vector3[instance_list.Count];
+            var textureids = new List<UUID>();
+            var primrots = new Quaternion[instance_list.Count];
+            var primpositions = new Vector3[instance_list.Count];
+            var primscales = new Vector3[instance_list.Count];
 
-            using (MemoryStream objectms = new MemoryStream())
+            using (var objectms = new MemoryStream())
             {
-                using(XmlTextWriter writer = objectms.UTF8XmlTextWriter())
+                using(var writer = objectms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("SceneObjectGroup");
                     /* we serialize the assets straight away, no allocating SOG in between here. Allocating a SOG would just take senselessly a lot of time and memory. */
                     if (texture_list.Count > 0)
                     {
-                        UUID textureFolder = m_InventoryService.Folder[m_Creator.ID, AssetType.Texture].ID;
-                        InventoryFolder folder = new InventoryFolder();
+                        var textureFolder = m_InventoryService.Folder[m_Creator.ID, AssetType.Texture].ID;
+                        var folder = new InventoryFolder();
                         folder.Name = data.Name + " - Textures";
                         folder.Owner = m_Creator;
                         folder.InventoryType = InventoryType.Unknown;
@@ -166,28 +170,32 @@ namespace SilverSim.Viewer.Core.Capabilities
                         m_InventoryService.Folder.Add(folder);
 
                         int idx = 0;
-                        foreach(IValue iv in texture_list)
+                        foreach(var iv in texture_list)
                         {
                             ++idx;
 
-                            AssetData newasset = new AssetData();
-                            newasset.ID = UUID.Random;
-                            newasset.Type = AssetType.Texture;
-                            newasset.Creator = m_Creator;
-                            newasset.Data = (BinaryData)iv;
-                            newasset.Name = data.Name + " - Texture " + idx.ToString();
+                            var newasset = new AssetData()
+                            {
+                                ID = UUID.Random,
+                                Type = AssetType.Texture,
+                                Creator = m_Creator,
+                                Data = (BinaryData)iv,
+                                Name = data.Name + " - Texture " + idx.ToString()
+                            };
                             textureids.Add(newasset.ID);
                             m_AssetService.Store(newasset);
 
-                            InventoryItem item = new InventoryItem();
-                            item.AssetID = newasset.ID;
-                            item.AssetType = AssetType.Texture;
-                            item.Creator = m_Creator;
-                            item.InventoryType = InventoryType.Texture;
-                            item.LastOwner = m_Creator;
-                            item.Name = data.Name + " - Texture " + idx.ToString();
-                            item.Owner = m_Creator;
-                            item.ParentFolderID = folder.ID;
+                            var item = new InventoryItem()
+                            {
+                                AssetID = newasset.ID,
+                                AssetType = AssetType.Texture,
+                                Creator = m_Creator,
+                                InventoryType = InventoryType.Texture,
+                                LastOwner = m_Creator,
+                                Name = data.Name + " - Texture " + idx.ToString(),
+                                Owner = m_Creator,
+                                ParentFolderID = folder.ID
+                            };
                             item.Permissions.Base = InventoryPermissionsMask.All;
                             item.Permissions.Current = InventoryPermissionsMask.Every;
                             item.Permissions.EveryOne = InventoryPermissionsMask.None;
@@ -204,13 +212,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                         int idx;
                         for (idx = 0; idx < instance_list.Count; ++idx)
                         {
-                            Map inner_instance = (Map)instance_list[idx];
+                            var inner_instance = (Map)instance_list[idx];
                             primpositions[idx] = inner_instance["position"].AsVector3;
                             primscales[idx] = inner_instance["scale"].AsVector3;
                             primrots[idx] = inner_instance["rotation"].AsQuaternion;
                         }
 
-                        Quaternion rootRotConjugated = Quaternion.Inverse(primrots[0]);
+                        var rootRotConjugated = Quaternion.Inverse(primrots[0]);
                         for(idx = 1; idx < primscales.Length; ++idx)
                         {
                             primpositions[idx] = primpositions[idx] - primpositions[0];
@@ -220,7 +228,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                     if (mesh_list.Count > 0)
                     {
-                        bool wroteOtherParts = false;
+                        var wroteOtherParts = false;
                         for (int idx = 0; idx < mesh_list.Count; ++idx)
                         {
                             UUID meshassetid;
@@ -239,11 +247,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                             }
 
                             {
-                                using (MemoryStream meshstream = new MemoryStream())
+                                using (var meshstream = new MemoryStream())
                                 {
                                     if (mesh_list[idx] is BinaryData)
                                     {
-                                        BinaryData bin = (BinaryData)mesh_list[idx];
+                                        var bin = (BinaryData)mesh_list[idx];
                                         meshstream.Write(bin, 0, bin.Length);
                                     }
                                     else
@@ -251,31 +259,33 @@ namespace SilverSim.Viewer.Core.Capabilities
                                         LlsdBinary.Serialize(mesh_list[idx], meshstream);
                                     }
                                     meshstream.Flush();
-                                    AssetData newasset = new AssetData();
-                                    newasset.ID = UUID.Random;
+                                    var newasset = new AssetData()
+                                    {
+                                        ID = UUID.Random,
+                                        Type = AssetType.Mesh,
+                                        Creator = m_Creator,
+                                        Data = meshstream.ToArray(),
+                                        Name = data.Name + " - Mesh " + (idx + 1).ToString()
+                                    };
                                     meshassetid = newasset.ID;
-                                    newasset.Type = AssetType.Mesh;
-                                    newasset.Creator = m_Creator;
-                                    newasset.Data = meshstream.ToArray();
-                                    newasset.Name = data.Name + " - Mesh " + (idx + 1).ToString();
                                     m_AssetService.Store(newasset);
                                 }
 
-                                TextureEntry texentry = new TextureEntry();
+                                var texentry = new TextureEntry();
                                 texentry.DefaultTexture.TextureID = TextureEntry.WHITE_TEXTURE;
-                                Map inner_instance = (Map)instance_list[idx];
-                                AnArray face_list = (AnArray)(inner_instance["face_list"]);
+                                var inner_instance = (Map)instance_list[idx];
+                                var face_list = (AnArray)(inner_instance["face_list"]);
                                 for (uint faceidx = 0; faceidx < face_list.Count; ++faceidx)
                                 {
-                                    Map faceMap = (Map)(face_list[(int)faceidx]);
-                                    TextureEntryFace face = texentry[faceidx];
+                                    var faceMap = (Map)(face_list[(int)faceidx]);
+                                    var face = texentry[faceidx];
                                     if (faceMap.ContainsKey("fullbright"))
                                     {
                                         face.FullBright = faceMap["fullbright"].AsBoolean;
                                     }
                                     if (faceMap.ContainsKey("diffuse_color"))
                                     {
-                                        AnArray color4 = (AnArray)faceMap["diffuse_color"];
+                                        var color4 = (AnArray)faceMap["diffuse_color"];
                                         if (color4.Count == 4)
                                         {
                                             face.TextureColor.R = color4[0].AsReal;
@@ -285,11 +295,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                                         }
                                     }
                                     int textureNum = faceMap["image"].AsInt;
-                                    float imagerot = (float)faceMap["imagerot"].AsReal;
-                                    float offsets = (float)faceMap["offsets"].AsReal;
-                                    float offsett = (float)faceMap["offsett"].AsReal;
-                                    float scales = (float)faceMap["scales"].AsReal;
-                                    float scalet = (float)faceMap["scalet"].AsReal;
+                                    var imagerot = (float)faceMap["imagerot"].AsReal;
+                                    var offsets = (float)faceMap["offsets"].AsReal;
+                                    var offsett = (float)faceMap["offsett"].AsReal;
+                                    var scales = (float)faceMap["scales"].AsReal;
+                                    var scalet = (float)faceMap["scalet"].AsReal;
 
                                     face.Rotation = imagerot;
                                     face.OffsetU = offsets;
@@ -357,7 +367,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 {
                     writer.WriteNamedValue("ProfileCurve", 1);
                     writer.WriteNamedValue("TextureEntry", Convert.ToBase64String(te.GetBytes()));
-                    byte[] extraParams = new byte[1 + 4 + 2 + 17];
+                    var extraParams = new byte[1 + 4 + 2 + 17];
                     extraParams[0] = 1;
                     extraParams[1] = 0x30;
                     extraParams[2] = 0;

@@ -35,11 +35,6 @@ namespace SilverSim.Viewer.Messages.Sound
         public Vector3 Position;
         public double Gain;
 
-        public SoundTrigger()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(SoundID);
@@ -53,11 +48,13 @@ namespace SilverSim.Viewer.Messages.Sound
 
         public static Message Decode(UDPPacket p)
         {
-            SoundTrigger m = new SoundTrigger();
-            m.SoundID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            m.ParentID = p.ReadUUID();
+            var m = new SoundTrigger()
+            {
+                SoundID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                ObjectID = p.ReadUUID(),
+                ParentID = p.ReadUUID()
+            };
             m.GridPosition.RegionHandle = p.ReadUInt64();
             m.Position = p.ReadVector3f();
             m.Gain = p.ReadFloat();

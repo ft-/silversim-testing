@@ -39,12 +39,13 @@ namespace SilverSim.WebIF.Admin
 
         public static Map ToMap(this UUI uui)
         {
-            Map owner = new Map();
-            owner.Add("fullname", uui.FullName);
-            owner.Add("uui", uui.ToString());
-            owner.Add("firstname", uui.FirstName);
-            owner.Add("lastname", uui.LastName);
-            return owner;
+            return new Map
+            {
+                { "fullname", uui.FullName },
+                { "uui", uui.ToString() },
+                { "firstname", uui.FirstName },
+                { "lastname", uui.LastName }
+            };
         }
     }
 }

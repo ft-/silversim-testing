@@ -113,13 +113,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            Messages.Object.ObjectAdd m = new Messages.Object.ObjectAdd();
+            var m = new Messages.Object.ObjectAdd();
             m.AgentID = m_Creator.ID;
             try
             {
                 if (rm.ContainsKey("ObjectData"))
                 {
-                    Map om = rm["ObjectData"] as Map;
+                    var om = rm["ObjectData"] as Map;
                     /* new version */
                     m.BypassRaycast = om["BypassRaycast"].AsBoolean;
                     m.EveryOnePermissions = (InventoryPermissionsMask)BinToUInt(om["EveryoneMask"]);
@@ -136,7 +136,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                             return;
                         }
 
-                        Map pm = om["Path"] as Map;
+                        var pm = om["Path"] as Map;
 
                         m.PathBegin = (ushort)pm["Begin"].AsUInt;
                         m.PathCurve = (byte)pm["Curve"].AsUInt;
@@ -162,7 +162,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                             return;
                         }
 
-                        Map pm = om["Profile"] as Map;
+                        var pm = om["Profile"] as Map;
                         m.ProfileBegin = (ushort)pm["Begin"].AsUInt;
                         m.ProfileCurve = (byte)pm["Curve"].AsUInt;
                         m.ProfileEnd = (ushort)pm["End"].AsUInt;
@@ -187,7 +187,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                             return;
                         }
 
-                        Map am = rm["AgentData"] as Map;
+                        var am = rm["AgentData"] as Map;
                         m.GroupID = am["GroupId"].AsUUID;
                     }
                 }
@@ -247,15 +247,15 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
                 return;
             }
-            byte[] resultbytes = BitConverter.GetBytes(localID);
+            var resultbytes = BitConverter.GetBytes(localID);
             if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(resultbytes);
             }
 
-            using (HttpResponse res = httpreq.BeginResponse("application/xml"))
+            using (var res = httpreq.BeginResponse("application/xml"))
             {
-                using (StreamWriter w = res.GetOutputStream().UTF8StreamWriter())
+                using (var w = res.GetOutputStream().UTF8StreamWriter())
                 {
                     w.Write(string.Format("<llsd><map><key>local_id</key><binary encoding=\"base64\">{0}</binary></map></llsd>", Convert.ToBase64String(resultbytes)));
                     w.Flush();

@@ -43,24 +43,21 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
 
-        public ObjectScale()
-        {
-
-        }
-
         public static ObjectScale Decode(UDPPacket p)
         {
-            ObjectScale m = new ObjectScale();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ObjectScale()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint cnt = p.ReadUInt8();
             while(cnt-- != 0)
             {
-                ObjectDataEntry d = new ObjectDataEntry();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.Size = p.ReadVector3f();
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new ObjectDataEntry()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    Size = p.ReadVector3f()
+                });
             }
             return m;
         }
@@ -71,7 +68,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(SessionID);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (ObjectDataEntry d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteVector3f(d.Size);

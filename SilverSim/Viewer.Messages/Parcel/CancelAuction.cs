@@ -30,17 +30,12 @@ namespace SilverSim.Viewer.Messages.Parcel
     {
         public UUID ParcelID;
 
-        public CancelAuction()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            CancelAuction m = new CancelAuction();
-            m.ParcelID = p.ReadUUID();
-
-            return m;
+            return new CancelAuction()
+            {
+                ParcelID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

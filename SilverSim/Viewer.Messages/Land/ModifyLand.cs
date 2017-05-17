@@ -51,18 +51,15 @@ namespace SilverSim.Viewer.Messages.Land
 
         public List<Data> ParcelData = new List<Data>();
 
-        public ModifyLand()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ModifyLand m = new ModifyLand();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Action = p.ReadUInt8();
-            m.Size = p.ReadUInt8();
+            var m = new ModifyLand()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                Action = p.ReadUInt8(),
+                Size = p.ReadUInt8()
+            };
             double defBrushSize = (1 << (m.Size));
             m.Seconds = p.ReadFloat();
             m.Height = p.ReadFloat();
@@ -70,20 +67,21 @@ namespace SilverSim.Viewer.Messages.Land
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d = new Data();
-                d.LocalID = p.ReadInt32();
-                d.West = p.ReadFloat();
-                d.South = p.ReadFloat();
-                d.East = p.ReadFloat();
-                d.North = p.ReadFloat();
-                d.BrushSize = defBrushSize;
-                m.ParcelData.Add(d);
+                m.ParcelData.Add(new Data()
+                {
+                    LocalID = p.ReadInt32(),
+                    West = p.ReadFloat(),
+                    South = p.ReadFloat(),
+                    East = p.ReadFloat(),
+                    North = p.ReadFloat(),
+                    BrushSize = defBrushSize
+                });
             }
 
             c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d = m.ParcelData[(int)i];
+                var d = m.ParcelData[(int)i];
                 d.BrushSize = p.ReadFloat();
                 m.ParcelData[(int)i] = d;
             }
@@ -100,7 +98,7 @@ namespace SilverSim.Viewer.Messages.Land
             p.WriteFloat((float)Height);
 
             p.WriteUInt8((byte)ParcelData.Count);
-            foreach(Data d in ParcelData)
+            foreach(var d in ParcelData)
             {
                 p.WriteInt32(d.LocalID);
                 p.WriteFloat((float)d.West);
@@ -110,7 +108,7 @@ namespace SilverSim.Viewer.Messages.Land
             }
 
             p.WriteUInt8((byte)ParcelData.Count);
-            foreach(Data d in ParcelData)
+            foreach(var d in ParcelData)
             {
                 p.WriteFloat((float)d.BrushSize);
             }

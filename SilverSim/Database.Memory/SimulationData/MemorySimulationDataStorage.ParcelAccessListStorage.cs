@@ -32,9 +32,6 @@ namespace SilverSim.Database.Memory.SimulationData
     public class MemorySimulationDataParcelAccessListStorage : ISimulationDataParcelAccessListStorageInterface
     {
         readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>>(delegate() { return new RwLockedDictionary<UUI, ParcelAccessEntry>(); });
-        public MemorySimulationDataParcelAccessListStorage()
-        {
-        }
 
         string GenParcelAccessListKey(UUID regionID, UUID parcelID)
         {
@@ -75,8 +72,8 @@ namespace SilverSim.Database.Memory.SimulationData
         bool ISimulationDataParcelAccessListStorageInterface.RemoveAllFromRegion(UUID regionID)
         {
             bool found = false;
-            List<string> keys = new List<string>(from key in m_Data.Keys where key.StartsWith(regionID.ToString()) select key);
-            foreach(string key in keys)
+            var keys = new List<string>(from key in m_Data.Keys where key.StartsWith(regionID.ToString()) select key);
+            foreach(var key in keys)
             {
                 found = m_Data.Remove(key) || found;
             }

@@ -83,7 +83,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             if(reqmap.ContainsKey("default_object_perm_masks"))
             {
-                Map defobjectperms = reqmap["default_object_perm_masks"] as Map;
+                var defobjectperms = reqmap["default_object_perm_masks"] as Map;
                 if(defobjectperms != null)
                 {
                     /* Group, Everyone, NextOwner fields need to be stored */

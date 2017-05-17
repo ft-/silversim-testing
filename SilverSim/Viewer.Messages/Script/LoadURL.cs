@@ -35,11 +35,6 @@ namespace SilverSim.Viewer.Messages.Script
         public string Message = string.Empty;
         public string URL = string.Empty;
 
-        public LoadURL()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteStringLen8(ObjectName);
@@ -52,14 +47,15 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            LoadURL m = new LoadURL();
-            m.ObjectName = p.ReadStringLen8();
-            m.ObjectID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.OwnerIsGroup = p.ReadBoolean();
-            m.Message = p.ReadStringLen8();
-            m.URL = p.ReadStringLen8();
-            return m;
+            return new LoadURL()
+            {
+                ObjectName = p.ReadStringLen8(),
+                ObjectID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                OwnerIsGroup = p.ReadBoolean(),
+                Message = p.ReadStringLen8(),
+                URL = p.ReadStringLen8()
+            };
         }
     }
 }

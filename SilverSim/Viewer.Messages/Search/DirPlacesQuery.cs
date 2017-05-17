@@ -37,24 +37,19 @@ namespace SilverSim.Viewer.Messages.Search
         public string SimName;
         public int QueryStart;
 
-        public DirPlacesQuery()
-        {
-
-        }
-
         public static DirPlacesQuery Decode(UDPPacket p)
         {
-            DirPlacesQuery m = new DirPlacesQuery();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
-            m.QueryText = p.ReadStringLen8();
-            m.QueryFlags = (SearchFlags)p.ReadUInt32();
-            m.Category = p.ReadInt8();
-            m.SimName = p.ReadStringLen8();
-            m.QueryStart = p.ReadInt32();
-
-            return m;
+            return new DirPlacesQuery()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                QueryID = p.ReadUUID(),
+                QueryText = p.ReadStringLen8(),
+                QueryFlags = (SearchFlags)p.ReadUInt32(),
+                Category = p.ReadInt8(),
+                SimName = p.ReadStringLen8(),
+                QueryStart = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

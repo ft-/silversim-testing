@@ -41,11 +41,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<Data> ObjectData = new List<Data>();
 
-        public ObjectDescription()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
             ObjectDescription m = new ObjectDescription();
@@ -55,10 +50,11 @@ namespace SilverSim.Viewer.Messages.Object
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d = new Data();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.Description = p.ReadStringLen8();
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new Data()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    Description = p.ReadStringLen8()
+                });
             }
             return m;
         }
@@ -69,7 +65,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(SessionID);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (Data d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteStringLen8(d.Description);

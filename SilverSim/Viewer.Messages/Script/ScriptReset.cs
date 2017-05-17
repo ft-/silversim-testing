@@ -33,20 +33,15 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ObjectID;
         public UUID ItemID;
 
-        public ScriptReset()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ScriptReset m = new ScriptReset();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
-            return m;
+            return new ScriptReset()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectID = p.ReadUUID(),
+                ItemID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

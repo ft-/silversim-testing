@@ -42,11 +42,6 @@ namespace SilverSim.Viewer.Messages.Script
 
         public List<UUID> OwnerData = new List<UUID>();
 
-        public ScriptDialog()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ObjectID);
@@ -58,13 +53,13 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteUUID(ImageID);
 
             p.WriteUInt8((byte)Buttons.Count);
-            foreach (string d in Buttons)
+            foreach (var d in Buttons)
             {
                 p.WriteStringLen8(d);
             }
 
             p.WriteUInt8((byte)OwnerData.Count);
-            foreach(UUID d in OwnerData)
+            foreach(var d in OwnerData)
             {
                 p.WriteUUID(d);
             }
@@ -72,15 +67,16 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            ScriptDialog m = new ScriptDialog();
-            m.ObjectID = p.ReadUUID();
-            m.FirstName = p.ReadStringLen8();
-            m.LastName = p.ReadStringLen8();
-            m.ObjectName = p.ReadStringLen8();
-            m.Message = p.ReadStringLen16();
-            m.ChatChannel = p.ReadInt32();
-            m.ImageID = p.ReadUUID();
-
+            var m = new ScriptDialog()
+            {
+                ObjectID = p.ReadUUID(),
+                FirstName = p.ReadStringLen8(),
+                LastName = p.ReadStringLen8(),
+                ObjectName = p.ReadStringLen8(),
+                Message = p.ReadStringLen16(),
+                ChatChannel = p.ReadInt32(),
+                ImageID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
 
             while(n-- != 0)

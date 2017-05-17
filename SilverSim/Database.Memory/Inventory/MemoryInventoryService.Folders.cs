@@ -114,7 +114,7 @@ namespace SilverSim.Database.Memory.Inventory
             {
                 if(type == AssetType.RootFolder)
                 {
-                    foreach(InventoryFolder folder in folderSet.Values)
+                    foreach(var folder in folderSet.Values)
                     {
                         if(folder.ParentFolderID == UUID.Zero)
                         {
@@ -124,9 +124,9 @@ namespace SilverSim.Database.Memory.Inventory
                 }
                 else
                 {
-                    InventoryType invtype = (InventoryType)type;
+                    var invtype = (InventoryType)type;
 
-                    foreach(InventoryFolder folder in folderSet.Values)
+                    foreach(var folder in folderSet.Values)
                     {
                         if(folder.InventoryType == invtype)
                         {
@@ -145,7 +145,7 @@ namespace SilverSim.Database.Memory.Inventory
             {
                 if (type == AssetType.RootFolder)
                 {
-                    foreach (InventoryFolder sfolder in folderSet.Values)
+                    foreach (var sfolder in folderSet.Values)
                     {
                         if (sfolder.ParentFolderID == UUID.Zero)
                         {
@@ -156,9 +156,9 @@ namespace SilverSim.Database.Memory.Inventory
                 }
                 else
                 {
-                    InventoryType invtype = (InventoryType)type;
+                    var invtype = (InventoryType)type;
 
-                    foreach (InventoryFolder sfolder in folderSet.Values)
+                    foreach (var sfolder in folderSet.Values)
                     {
                         if (sfolder.InventoryType == invtype)
                         {
@@ -300,7 +300,7 @@ namespace SilverSim.Database.Memory.Inventory
 
             for (int index = 0; index < folders.Count; ++index)
             {
-                foreach (UUID folder in GetFolderIDs(principalID, folders[index]))
+                foreach (var folder in GetFolderIDs(principalID, folders[index]))
                 {
                     if (!folders.Contains(folder))
                     {
@@ -309,8 +309,8 @@ namespace SilverSim.Database.Memory.Inventory
                 }
             }
 
-            RwLockedDictionary<UUID, InventoryItem> itemSet = m_Items[principalID];
-            foreach(InventoryItem item in itemSet.Values)
+            var itemSet = m_Items[principalID];
+            foreach(var item in itemSet.Values)
             {
                 if(folders.Contains(item.ParentFolderID))
                 {
@@ -318,7 +318,7 @@ namespace SilverSim.Database.Memory.Inventory
                 }
             }
 
-            foreach (UUID folder in folders)
+            foreach (var folder in folders)
             {
                 m_Folders.Remove(folder);
             }
@@ -365,8 +365,8 @@ namespace SilverSim.Database.Memory.Inventory
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<UUID> IInventoryFolderServiceInterface.Delete(UUID principalID, List<UUID> folderIDs)
         {
-            List<UUID> deleted = new List<UUID>();
-            foreach (UUID id in folderIDs)
+            var deleted = new List<UUID>();
+            foreach (var id in folderIDs)
             {
                 try
                 {

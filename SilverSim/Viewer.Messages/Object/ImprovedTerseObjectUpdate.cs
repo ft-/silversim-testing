@@ -35,10 +35,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public class ObjData
         {
-            public ObjData()
-            {
-
-            }
 
             public byte[] Data;
             public byte[] TextureEntry;
@@ -46,17 +42,12 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjData> ObjectData = new List<ObjData>();
 
-        public ImprovedTerseObjectUpdate()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt64(GridPosition.RegionHandle);
             p.WriteUInt16(TimeDilation);
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (ObjData d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt8((byte)d.Data.Length);
                 p.WriteBytes(d.Data);
@@ -67,16 +58,17 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            ImprovedTerseObjectUpdate m = new ImprovedTerseObjectUpdate();
+            var m = new ImprovedTerseObjectUpdate();
             m.GridPosition.RegionHandle = p.ReadUInt64();
             m.TimeDilation = p.ReadUInt16();
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ObjData d = new ObjData();
-                d.Data = p.ReadBytes(p.ReadUInt8());
-                d.TextureEntry = p.ReadBytes(p.ReadUInt16());
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new ObjData()
+                {
+                    Data = p.ReadBytes(p.ReadUInt8()),
+                    TextureEntry = p.ReadBytes(p.ReadUInt16())
+                });
             }
             return m;
         }

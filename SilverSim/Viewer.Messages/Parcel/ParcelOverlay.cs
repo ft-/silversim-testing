@@ -32,11 +32,6 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Int32 SequenceID;
         public byte[] Data = new byte[0];
 
-        public ParcelOverlay()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteInt32(SequenceID);
@@ -46,10 +41,11 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public static Message Decode(UDPPacket p)
         {
-            ParcelOverlay m = new ParcelOverlay();
-            m.SequenceID = p.ReadInt32();
-            m.Data = p.ReadBytes(p.ReadUInt16());
-            return m;
+            return new ParcelOverlay()
+            {
+                SequenceID = p.ReadInt32(),
+                Data = p.ReadBytes(p.ReadUInt16())
+            };
         }
     }
 }

@@ -38,24 +38,22 @@ namespace SilverSim.Viewer.Messages.Inventory
         }
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
-        public FetchInventory()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            FetchInventory m = new FetchInventory();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            var m = new FetchInventory()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint i;
             uint c = p.ReadUInt8();
             for (i = 0; i < c; ++i)
             {
-                InventoryDataEntry d = new InventoryDataEntry();
-                d.OwnerID = p.ReadUUID();
-                d.ItemID = p.ReadUUID();
-                m.InventoryData.Add(d);
+                m.InventoryData.Add(new InventoryDataEntry()
+                {
+                    OwnerID = p.ReadUUID(),
+                    ItemID = p.ReadUUID()
+                });
             }
 
             return m;
@@ -66,7 +64,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt8((byte)InventoryData.Count);
-            foreach(InventoryDataEntry d in InventoryData)
+            foreach(var d in InventoryData)
             {
                 p.WriteUUID(d.OwnerID);
                 p.WriteUUID(d.ItemID);

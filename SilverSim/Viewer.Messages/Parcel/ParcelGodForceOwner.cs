@@ -35,20 +35,15 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID OwnerID;
         public Int32 LocalID;
 
-        public ParcelGodForceOwner()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelGodForceOwner m = new ParcelGodForceOwner();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.LocalID = p.ReadInt32();
-
-            return m;
+            return new ParcelGodForceOwner()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                LocalID = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

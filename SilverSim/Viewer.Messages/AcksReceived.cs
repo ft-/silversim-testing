@@ -23,11 +23,6 @@ namespace SilverSim.Viewer.Messages
 {
     public class AcksReceived : Message
     {
-        public AcksReceived()
-        {
-
-        }
-
         public override MessageType Number
         {
             get

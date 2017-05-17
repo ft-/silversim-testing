@@ -35,11 +35,6 @@ namespace SilverSim.Viewer.Messages.Sound
         public double Gain;
         public PrimitiveSoundFlags Flags;
 
-        public AttachedSound()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(SoundID);
@@ -51,13 +46,14 @@ namespace SilverSim.Viewer.Messages.Sound
         
         public static Message Decode(UDPPacket p)
         {
-            AttachedSound m = new AttachedSound();
-            m.SoundID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.Gain = p.ReadFloat();
-            m.Flags = (PrimitiveSoundFlags)p.ReadUInt8();
-            return m;
+            return new AttachedSound()
+            {
+                SoundID = p.ReadUUID(),
+                ObjectID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                Gain = p.ReadFloat(),
+                Flags = (PrimitiveSoundFlags)p.ReadUInt8()
+            };
         }
     }
 }

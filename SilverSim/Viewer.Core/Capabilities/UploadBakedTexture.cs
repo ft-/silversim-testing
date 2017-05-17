@@ -72,7 +72,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             KeyValuePair<UUID, UUID> kvp;
             if (m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
             {
-                Map m = new Map();
+                var m = new Map();
 
                 if (data.Type != NewAssetType)
                 {

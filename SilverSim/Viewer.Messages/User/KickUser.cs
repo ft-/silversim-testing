@@ -35,11 +35,6 @@ namespace SilverSim.Viewer.Messages.User
         public UUID SessionID = UUID.Zero;
         public string Message = string.Empty;
 
-        public KickUser()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt32(IpAddr);
@@ -51,13 +46,14 @@ namespace SilverSim.Viewer.Messages.User
 
         public static Message Decode(UDPPacket p)
         {
-            KickUser m = new KickUser();
-            m.IpAddr = p.ReadUInt32();
-            m.Port = p.ReadUInt16();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Message = p.ReadStringLen16();
-            return m;
+            return new KickUser()
+            {
+                IpAddr = p.ReadUInt32(),
+                Port = p.ReadUInt16(),
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                Message = p.ReadStringLen16()
+            };
         }
     }
 }

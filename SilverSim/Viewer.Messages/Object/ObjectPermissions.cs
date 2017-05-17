@@ -63,28 +63,25 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<Data> ObjectData = new List<Data>();
 
-        public ObjectPermissions()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectPermissions m = new ObjectPermissions();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            var m = new ObjectPermissions()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
 
-            m.HasGodBit = p.ReadBoolean();
-
+                HasGodBit = p.ReadBoolean()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d = new Data();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.Field = (ChangeFieldMask)p.ReadUInt8();
-                d.ChangeType = p.ReadUInt8() != 0 ? ChangeType.Set : ChangeType.Clear;
-                d.Mask = (InventoryPermissionsMask)p.ReadUInt32();
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new Data()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    Field = (ChangeFieldMask)p.ReadUInt8(),
+                    ChangeType = p.ReadUInt8() != 0 ? ChangeType.Set : ChangeType.Clear,
+                    Mask = (InventoryPermissionsMask)p.ReadUInt32()
+                });
             }
             return m;
         }
@@ -96,7 +93,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteBoolean(HasGodBit);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (Data d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteUInt8((byte)d.Field);

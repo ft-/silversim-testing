@@ -42,26 +42,21 @@ namespace SilverSim.Viewer.Messages.Inventory
         public string Name;
         public string Description;
 
-        public LinkInventoryItem()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            LinkInventoryItem m = new LinkInventoryItem();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.CallbackID = p.ReadUInt32();
-            m.FolderID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-            m.OldItemID = p.ReadUUID();
-            m.AssetType = (AssetType)p.ReadInt8();
-            m.InvType = (InventoryType)p.ReadInt8();
-            m.Name = p.ReadStringLen8();
-            m.Description = p.ReadStringLen8();
-
-            return m;
+            return new LinkInventoryItem()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                CallbackID = p.ReadUInt32(),
+                FolderID = p.ReadUUID(),
+                TransactionID = p.ReadUUID(),
+                OldItemID = p.ReadUUID(),
+                AssetType = (AssetType)p.ReadInt8(),
+                InvType = (InventoryType)p.ReadInt8(),
+                Name = p.ReadStringLen8(),
+                Description = p.ReadStringLen8()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -46,11 +46,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<Data> ObjectData = new List<Data>();
 
-        public ObjectDeGrab()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
             ObjectDeGrab m = new ObjectDeGrab();
@@ -61,14 +56,15 @@ namespace SilverSim.Viewer.Messages.Object
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d = new Data();
-                d.UVCoord = p.ReadVector3f();
-                d.STCoord = p.ReadVector3f();
-                d.FaceIndex = p.ReadInt32();
-                d.Position = p.ReadVector3f();
-                d.Normal = p.ReadVector3f();
-                d.Binormal = p.ReadVector3f();
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new Data()
+                {
+                    UVCoord = p.ReadVector3f(),
+                    STCoord = p.ReadVector3f(),
+                    FaceIndex = p.ReadInt32(),
+                    Position = p.ReadVector3f(),
+                    Normal = p.ReadVector3f(),
+                    Binormal = p.ReadVector3f()
+                });
             }
             return m;
         }
@@ -80,7 +76,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUInt32(ObjectLocalID);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (Data d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteVector3f(d.UVCoord);
                 p.WriteVector3f(d.STCoord);

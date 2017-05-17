@@ -39,22 +39,18 @@ namespace SilverSim.Viewer.Messages.Search
         public UInt32 Category;
         public int QueryStart;
 
-        public DirClassifiedQuery()
-        {
-
-        }
-
         public static DirClassifiedQuery Decode(UDPPacket p)
         {
-            DirClassifiedQuery m = new DirClassifiedQuery();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
-            m.QueryText = p.ReadStringLen8();
-            m.QueryFlags = (SearchFlags)p.ReadUInt32();
-            m.Category = p.ReadUInt32();
-            m.QueryStart = p.ReadInt32();
-            return m;
+            return new DirClassifiedQuery()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                QueryID = p.ReadUUID(),
+                QueryText = p.ReadStringLen8(),
+                QueryFlags = (SearchFlags)p.ReadUInt32(),
+                Category = p.ReadUInt32(),
+                QueryStart = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

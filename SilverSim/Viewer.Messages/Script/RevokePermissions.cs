@@ -34,20 +34,15 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ObjectID = UUID.Zero;
         public ScriptPermissions ObjectPermissions;
 
-        public RevokePermissions()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RevokePermissions m = new RevokePermissions();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            m.ObjectPermissions = (ScriptPermissions)p.ReadUInt32();
-
-            return m;
+            return new RevokePermissions()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectID = p.ReadUUID(),
+                ObjectPermissions = (ScriptPermissions)p.ReadUInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

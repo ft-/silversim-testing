@@ -34,17 +34,13 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID SessionID;
         public List<Int32> LocalIDs = new List<Int32>();
 
-        public ParcelRelease()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelRelease m = new ParcelRelease();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ParcelRelease()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {

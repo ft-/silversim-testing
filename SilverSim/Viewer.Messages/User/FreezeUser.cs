@@ -34,20 +34,15 @@ namespace SilverSim.Viewer.Messages.User
         public UUID TargetID = UUID.Zero;
         public UInt32 Flags;
 
-        public FreezeUser()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            EjectUser m = new EjectUser();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.TargetID = p.ReadUUID();
-            m.Flags = p.ReadUInt32();
-
-            return m;
+            return new EjectUser()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                TargetID = p.ReadUUID(),
+                Flags = p.ReadUInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -54,36 +54,32 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjectDataS> ObjectData = new List<ObjectDataS>();
 
-        public RezMultipleAttachmentsFromInv()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RezMultipleAttachmentsFromInv m = new RezMultipleAttachmentsFromInv();
+            var m = new RezMultipleAttachmentsFromInv()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
 
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
-            m.CompoundMsgID = p.ReadUUID();
-            m.TotalObjects = p.ReadUInt8();
-            m.FirstDetachAll = p.ReadBoolean();
-
+                CompoundMsgID = p.ReadUUID(),
+                TotalObjects = p.ReadUInt8(),
+                FirstDetachAll = p.ReadBoolean()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                ObjectDataS objData = new ObjectDataS();
-                objData.ItemID = p.ReadUUID();
-                objData.OwnerID = p.ReadUUID();
-                objData.AttachmentPoint = (AttachmentPoint)p.ReadUInt8();
-                objData.ItemFlags = p.ReadUInt32();
-                objData.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
-                objData.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
-                objData.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-                objData.Name = p.ReadStringLen8();
-                objData.Description = p.ReadStringLen8();
-                m.ObjectData.Add(objData);
+                m.ObjectData.Add(new ObjectDataS()
+                {
+                    ItemID = p.ReadUUID(),
+                    OwnerID = p.ReadUUID(),
+                    AttachmentPoint = (AttachmentPoint)p.ReadUInt8(),
+                    ItemFlags = p.ReadUInt32(),
+                    GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    Name = p.ReadStringLen8(),
+                    Description = p.ReadStringLen8()
+                });
             }
 
             return m;
@@ -98,7 +94,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteBoolean(FirstDetachAll);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (ObjectDataS d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUUID(d.ItemID);
                 p.WriteUUID(d.OwnerID);

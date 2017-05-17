@@ -83,8 +83,10 @@ namespace SilverSim.Database.Memory.Profile
                     ProfileProperties props;
                     if (!m_Properties.TryGetValue(user.ID, out props))
                     {
-                        props = new ProfileProperties();
-                        props.User = user;
+                        props = new ProfileProperties()
+                        {
+                            User = user
+                        };
                     }
                     return props;
                 }

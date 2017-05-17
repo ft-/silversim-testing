@@ -30,19 +30,8 @@ namespace SilverSim.Viewer.Profile
 {
     public sealed class DummyProfileService : ProfileServiceInterface
     {
-        public DummyProfileService()
-        {
-
-        }
-
         public sealed class DummyClassifieds : IClassifiedsInterface
         {
-            public DummyClassifieds()
-            {
-
-            }
-
-
             public Dictionary<UUID, string> GetClassifieds(UUI user)
             {
                 return new Dictionary<UUID, string>();
@@ -78,11 +67,6 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyPicks : IPicksInterface
         {
-            public DummyPicks()
-            {
-
-            }
-
             public Dictionary<UUID, string> GetPicks(UUI user)
             {
                 return new Dictionary<UUID, string>();
@@ -118,11 +102,6 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyNotes : INotesInterface
         {
-            public DummyNotes()
-            {
-
-            }
-
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public string this[UUI user, UUI target]
             {
@@ -150,16 +129,11 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyUserPrefs : IUserPreferencesInterface
         {
-            public DummyUserPrefs()
-            {
-
-            }
-
             public ProfilePreferences this[UUI user]
             {
                 get
                 {
-                    ProfilePreferences prefs = new ProfilePreferences();
+                    var prefs = new ProfilePreferences();
                     prefs.IMviaEmail = false;
                     prefs.User = user;
                     prefs.Visible = false;
@@ -185,31 +159,27 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyProperties : IPropertiesInterface
         {
-            public DummyProperties()
-            {
-
-            }
-
             public ProfileProperties this[UUI user]
             {
                 get 
                 {
-                    ProfileProperties props = new ProfileProperties();
-                    props.User = user;
-                    props.Partner = UUI.Unknown;
-                    props.PublishProfile = false;
-                    props.PublishMature = false;
-                    props.WebUrl = string.Empty;
-                    props.WantToMask = 0;
-                    props.WantToText = string.Empty;
-                    props.SkillsMask = 0;
-                    props.SkillsText = string.Empty;
-                    props.Language = string.Empty;
-                    props.ImageID = UUID.Zero;
-                    props.AboutText = string.Empty;
-                    props.FirstLifeImageID = UUID.Zero;
-                    props.FirstLifeText = string.Empty;
-                    return props;
+                    return new ProfileProperties()
+                    {
+                        User = user,
+                        Partner = UUI.Unknown,
+                        PublishProfile = false,
+                        PublishMature = false,
+                        WebUrl = string.Empty,
+                        WantToMask = 0,
+                        WantToText = string.Empty,
+                        SkillsMask = 0,
+                        SkillsText = string.Empty,
+                        Language = string.Empty,
+                        ImageID = UUID.Zero,
+                        AboutText = string.Empty,
+                        FirstLifeImageID = UUID.Zero,
+                        FirstLifeText = string.Empty
+                    };
                 }
             }
 

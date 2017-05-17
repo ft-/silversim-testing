@@ -33,21 +33,15 @@ namespace SilverSim.Viewer.Messages.Search
         public UUID QueryID;
         public string Name;
 
-        public AvatarPickerRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            AvatarPickerRequest m = new AvatarPickerRequest();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
-            m.Name = p.ReadStringLen8();
-
-            return m;
+            return new AvatarPickerRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                QueryID = p.ReadUUID(),
+                Name = p.ReadStringLen8()
+            };
         }
 
         public override void Serialize(UDPPacket p)

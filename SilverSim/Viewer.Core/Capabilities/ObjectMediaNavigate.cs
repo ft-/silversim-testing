@@ -55,11 +55,11 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         bool CheckUrlAgainstWhiteList(string rawUrl, PrimitiveMedia.Entry entry)
         {
-            Uri url = new Uri(rawUrl);
+            var url = new Uri(rawUrl);
 
-            foreach (string origWhitelistUrl in entry.WhiteList)
+            foreach (var origWhitelistUrl in entry.WhiteList)
             {
-                string whitelistUrl = origWhitelistUrl;
+                var whitelistUrl = origWhitelistUrl;
 
                 /* Deal with a line-ending wildcard */
                 if (whitelistUrl.EndsWith("*"))
@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 else
                 {
-                    string urlToMatch = url.Authority + url.AbsolutePath;
+                    var urlToMatch = url.Authority + url.AbsolutePath;
 
                     if (urlToMatch.StartsWith(whitelistUrl))
                     {
@@ -120,11 +120,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            UUID objectID = reqmap["object_id"].AsUUID;
-            string currentURL = reqmap["current_url"].ToString();
-            int textureIndex = reqmap["texture_index"].AsInt;
+            var objectID = reqmap["object_id"].AsUUID;
+            var currentURL = reqmap["current_url"].ToString();
+            var textureIndex = reqmap["texture_index"].AsInt;
 
-            ObjectPart part = m_Scene.Primitives[objectID];
+            var part = m_Scene.Primitives[objectID];
             PrimitiveMedia.Entry entry;
             try
             {
@@ -149,7 +149,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 else
                 {
-                    GroupsServiceInterface groupsService = part.ObjectGroup.Scene.GroupsService;
+                    var groupsService = part.ObjectGroup.Scene.GroupsService;
                     if(null != groupsService)
                     {
                         UGI groupID = part.ObjectGroup.Group;
@@ -167,7 +167,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             if(entry == null)
             {
-                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
                 {
                     resp.ContentType = "text/plain";
                 }
@@ -176,7 +176,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             if (entry.IsWhiteListEnabled && !CheckUrlAgainstWhiteList(currentURL, entry))
             {
-                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
                 {
                     resp.ContentType = "text/plain";
                 }
@@ -188,10 +188,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 part.UpdateMediaFace(textureIndex, entry, m_Agent.ID);
             }
 
-            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
                 resp.ContentType = "application/llsd+xml";
-                using (Stream s = resp.GetOutputStream())
+                using (var s = resp.GetOutputStream())
                 {
                     LlsdXml.Serialize(new Undef(), s);
                 }

@@ -74,8 +74,8 @@ namespace SilverSim.Viewer.Messages.LayerData
             }
             set
             {
-                X = ((value >> 16) & 0xFFFF);
-                Y = (value & 0xFFFF);
+                X = (value >> 16) & 0xFFFF;
+                Y = value & 0xFFFF;
             }
         }
 
@@ -202,7 +202,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                 {
                     copy = new LayerPatch(this);
                 }
-                byte[] dst = new byte[4 + 4 * 256];
+                var dst = new byte[4 + 4 * 256];
                 byte[] src = BitConverter.GetBytes(copy.Serial);
                 if (!BitConverter.IsLittleEndian)
                 {

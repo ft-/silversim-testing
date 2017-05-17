@@ -150,7 +150,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            string[] parts = httpreq.RawUrl.Substring(1).Split('/');
+            var parts = httpreq.RawUrl.Substring(1).Split('/');
             if(parts.Length == 3)
             {
                 UUID uploadID;
@@ -183,10 +183,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch(UploadErrorException e)
                 {
-                    Map llsderrorreply = new Map();
-                    llsderrorreply.Add("state", "error");
-                    llsderrorreply.Add("message", e.Message);
-
+                    var llsderrorreply = new Map
+                    {
+                        { "state", "error" },
+                        { "message", e.Message }
+                    };
                     using (HttpResponse httperrorres = httpreq.BeginResponse())
                     {
                         using (Stream outErrorStream = httperrorres.GetOutputStream())
@@ -216,10 +217,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                     return;
                 }
                 /* Upload start */
-                Map llsdreply = new Map();
-                llsdreply.Add("state", "upload");
-                llsdreply.Add("uploader", m_ServerURI + httpreq.RawUrl + "/Upload/" + uploadID.ToString());
-
+                var llsdreply = new Map
+                {
+                    { "state", "upload" },
+                    { "uploader", m_ServerURI + httpreq.RawUrl + "/Upload/" + uploadID.ToString() }
+                };
                 using (HttpResponse httpres = httpreq.BeginResponse())
                 {
                     using (Stream outStream = httpres.GetOutputStream())
@@ -235,8 +237,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             else
             {
                 /* Upload finished */
-                AssetData asset = new AssetData();
-                Stream body = httpreq.Body;
+                var asset = new AssetData();
+                var body = httpreq.Body;
                 asset.Data = new byte[body.Length];
                 int readBytes = body.Read(asset.Data, 0, (int)body.Length);
                 if (body.Length != readBytes)
@@ -264,14 +266,15 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch (UploadErrorException e)
                 {
-                    Map llsderrorreply = new Map();
-                    llsderrorreply.Add("state", "error");
-                    llsderrorreply.Add("message", e.Message);
-
-                    using (HttpResponse httperrorres = httpreq.BeginResponse())
+                    var llsderrorreply = new Map
+                    {
+                        { "state", "error" },
+                        { "message", e.Message }
+                    };
+                    using (var httperrorres = httpreq.BeginResponse())
                     {
                         httperrorres.ContentType = "application/llsd+xml";
-                        using (Stream outErrorStream = httperrorres.GetOutputStream())
+                        using (var outErrorStream = httperrorres.GetOutputStream())
                         {
                             LlsdXml.Serialize(llsderrorreply, outErrorStream);
                         }
@@ -280,13 +283,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch (InsufficientFundsException)
                 {
-                    Map llsderrorreply = new Map();
+                    var llsderrorreply = new Map();
                     llsderrorreply.Add("state", "insufficient funds");
 
-                    using (HttpResponse httperrorres = httpreq.BeginResponse())
+                    using (var httperrorres = httpreq.BeginResponse())
                     {
                         httperrorres.ContentType = "application/llsd+xml";
-                        using (Stream outErrorStream = httperrorres.GetOutputStream())
+                        using (var outErrorStream = httperrorres.GetOutputStream())
                         {
                             LlsdXml.Serialize(llsderrorreply, outErrorStream);
                         }
@@ -302,10 +305,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 llsdreply.Add("new_asset", asset.ID);
                 llsdreply.Add("state", "complete");
 
-                using (HttpResponse httpres = httpreq.BeginResponse())
+                using (var httpres = httpreq.BeginResponse())
                 {
                     httpres.ContentType = "application/llsd+xml";
-                    using (Stream outStream = httpres.GetOutputStream())
+                    using (var outStream = httpres.GetOutputStream())
                     {
                         LlsdXml.Serialize(llsdreply, outStream);
                     }

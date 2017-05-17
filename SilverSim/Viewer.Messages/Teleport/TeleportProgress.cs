@@ -34,11 +34,6 @@ namespace SilverSim.Viewer.Messages.Teleport
         public TeleportFlags TeleportFlags;
         public string Message;
 
-        public TeleportProgress()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -48,11 +43,12 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public static Message Decode(UDPPacket p)
         {
-            TeleportProgress m = new TeleportProgress();
-            m.AgentID = p.ReadUUID();
-            m.TeleportFlags = (TeleportFlags)p.ReadUInt32();
-            m.Message = p.ReadStringLen8();
-            return m;
+            return new TeleportProgress()
+            {
+                AgentID = p.ReadUUID(),
+                TeleportFlags = (TeleportFlags)p.ReadUInt32(),
+                Message = p.ReadStringLen8()
+            };
         }
     }
 }

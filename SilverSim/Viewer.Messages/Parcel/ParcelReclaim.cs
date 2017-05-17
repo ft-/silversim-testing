@@ -45,29 +45,26 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public List<ParcelDataEntry> ParcelData = new List<ParcelDataEntry>();
 
-        public ParcelReclaim()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelReclaim m = new ParcelReclaim();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.IsGroupOwned = p.ReadBoolean();
-            m.IsFinal = p.ReadBoolean();
-
+            var m = new ParcelReclaim()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                IsGroupOwned = p.ReadBoolean(),
+                IsFinal = p.ReadBoolean()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                ParcelDataEntry d;
-                d.West = p.ReadFloat();
-                d.South = p.ReadFloat();
-                d.East = p.ReadFloat();
-                d.North = p.ReadFloat();
-                m.ParcelData.Add(d);
+                m.ParcelData.Add(new ParcelDataEntry()
+                {
+                    West = p.ReadFloat(),
+                    South = p.ReadFloat(),
+                    East = p.ReadFloat(),
+                    North = p.ReadFloat()
+                });
             }
 
             return m;

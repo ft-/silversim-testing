@@ -43,25 +43,22 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
 
-        public ObjectImage()
-        {
-
-        }
-
         public static ObjectImage Decode(UDPPacket p)
         {
-            ObjectImage m = new ObjectImage();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ObjectImage()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint entrycnt = p.ReadUInt8();
             while(entrycnt-- != 0)
             {
-                ObjectDataEntry d = new ObjectDataEntry();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.MediaURL = p.ReadStringLen8();
-                d.TextureEntry = p.ReadBytes(p.ReadUInt16());
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new ObjectDataEntry()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    MediaURL = p.ReadStringLen8(),
+                    TextureEntry = p.ReadBytes(p.ReadUInt16())
+                });
             }
             return m;
         }
@@ -72,7 +69,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(SessionID);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (ObjectDataEntry d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteStringLen8(d.MediaURL);

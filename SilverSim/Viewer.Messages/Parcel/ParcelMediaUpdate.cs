@@ -38,11 +38,6 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Int32 MediaHeight;
         public bool MediaLoop;
 
-        public ParcelMediaUpdate()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteStringLen8(MediaURL);
@@ -57,16 +52,17 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public static Message Decode(UDPPacket p)
         {
-            ParcelMediaUpdate m = new ParcelMediaUpdate();
-            m.MediaURL = p.ReadStringLen8();
-            m.MediaID = p.ReadUUID();
-            m.MediaAutoScale = p.ReadBoolean();
-            m.MediaType = p.ReadStringLen8();
-            m.MediaDesc = p.ReadStringLen8();
-            m.MediaWidth = p.ReadInt32();
-            m.MediaHeight = p.ReadInt32();
-            m.MediaLoop = p.ReadBoolean();
-            return m;
+            return new ParcelMediaUpdate()
+            {
+                MediaURL = p.ReadStringLen8(),
+                MediaID = p.ReadUUID(),
+                MediaAutoScale = p.ReadBoolean(),
+                MediaType = p.ReadStringLen8(),
+                MediaDesc = p.ReadStringLen8(),
+                MediaWidth = p.ReadInt32(),
+                MediaHeight = p.ReadInt32(),
+                MediaLoop = p.ReadBoolean()
+            };
         }
     }
 }

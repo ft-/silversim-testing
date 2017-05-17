@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.Teleport
     {
         public TeleportFlags TeleportFlags;
 
-        public TeleportStart()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt32((UInt32)TeleportFlags);
@@ -43,10 +38,10 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public static Message Decode(UDPPacket p)
         {
-            TeleportStart m = new TeleportStart();
-            m.TeleportFlags = (TeleportFlags)p.ReadUInt32();
-
-            return m;
+            return new TeleportStart()
+            {
+                TeleportFlags = (TeleportFlags)p.ReadUInt32()
+            };
         }
     }
 }

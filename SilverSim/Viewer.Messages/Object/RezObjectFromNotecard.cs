@@ -63,19 +63,14 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<UUID> InventoryData = new List<UUID>();
 
-        public RezObjectFromNotecard()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RezObjectFromNotecard m = new RezObjectFromNotecard();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-
+            var m = new RezObjectFromNotecard()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID()
+            };
             m.RezData.FromTaskID = p.ReadUUID();
             m.RezData.BypassRaycast = p.ReadUInt8();
             m.RezData.RayStart = p.ReadVector3f();
@@ -123,7 +118,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(NotecardData.ObjectID);
 
             p.WriteUInt8((byte)InventoryData.Count);
-            foreach(UUID id in InventoryData)
+            foreach(var id in InventoryData)
             {
                 p.WriteUUID(id);
             }

@@ -67,24 +67,19 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<UInt32> ObjectLocalIDs = new List<UInt32>();
 
-        public DeRezObject()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            DeRezObject m = new DeRezObject();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.Destination = (DeRezAction)p.ReadUInt8();
-            m.DestinationID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-            m.PacketCount = p.ReadUInt8();
-            m.PacketNumber = p.ReadUInt8();
-
+            var m = new DeRezObject()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                Destination = (DeRezAction)p.ReadUInt8(),
+                DestinationID = p.ReadUUID(),
+                TransactionID = p.ReadUUID(),
+                PacketCount = p.ReadUInt8(),
+                PacketNumber = p.ReadUInt8()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
@@ -106,7 +101,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUInt8(PacketNumber);
 
             p.WriteUInt8((byte)ObjectLocalIDs.Count);
-            foreach(uint id in ObjectLocalIDs)
+            foreach(var id in ObjectLocalIDs)
             {
                 p.WriteUInt32(id);
             }

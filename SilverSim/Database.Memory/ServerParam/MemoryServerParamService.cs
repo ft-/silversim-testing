@@ -41,8 +41,8 @@ namespace SilverSim.Database.Memory.ServerParam
         {
             get
             {
-                List<KeyValuePair<UUID, string>> result = new List<KeyValuePair<UUID, string>>();
-                foreach(KeyValuePair<UUID, RwLockedDictionary<string, string>> kvp in m_Parameters)
+                var result = new List<KeyValuePair<UUID, string>>();
+                foreach(var kvp in m_Parameters)
                 {
                     foreach(string parameter in kvp.Value.Keys)
                     {
@@ -54,10 +54,6 @@ namespace SilverSim.Database.Memory.ServerParam
         }
 
         #region Constructor
-        public MemoryServerParamService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
@@ -71,10 +67,10 @@ namespace SilverSim.Database.Memory.ServerParam
                 RwLockedDictionary<string, string> regParams;
                 if (m_Parameters.TryGetValue(regionID, out regParams))
                 {
-                    List<string> list = new List<string>(regParams.Keys);
+                    var list = new List<string>(regParams.Keys);
                     if(m_Parameters.TryGetValue(regionID, out regParams) && regionID != UUID.Zero)
                     {
-                        foreach(string k in regParams.Keys)
+                        foreach(var k in regParams.Keys)
                         {
                             if(!list.Exists(delegate(string p) { return p == k;}))
                             {
@@ -93,8 +89,8 @@ namespace SilverSim.Database.Memory.ServerParam
         {
             get
             {
-                List<KeyValuePair<UUID, string>> resultSet = new List<KeyValuePair<UUID, string>>();
-                foreach(KeyValuePair<UUID, RwLockedDictionary<string, string>> kvp in m_Parameters)
+                var resultSet = new List<KeyValuePair<UUID, string>>();
+                foreach(var kvp in m_Parameters)
                 {
                     string parametervalue;
                     if(kvp.Value.TryGetValue(parametername, out parametervalue))
@@ -171,11 +167,6 @@ namespace SilverSim.Database.Memory.ServerParam
     [PluginName("ServerParams")]
     public class MemoryServerParamServiceFactory : IPluginFactory
     {
-        public MemoryServerParamServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryServerParamService();

@@ -32,11 +32,6 @@ namespace SilverSim.Viewer.Messages.Inventory
         public UUID AssetID;
         public bool IsReadable;
 
-        public InventoryAssetResponse()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(QueryID);
@@ -46,11 +41,12 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            InventoryAssetResponse m = new InventoryAssetResponse();
-            m.QueryID = p.ReadUUID();
-            m.AssetID = p.ReadUUID();
-            m.IsReadable = p.ReadBoolean();
-            return m;
+            return new InventoryAssetResponse()
+            {
+                QueryID = p.ReadUUID(),
+                AssetID = p.ReadUUID(),
+                IsReadable = p.ReadBoolean()
+            };
         }
     }
 }

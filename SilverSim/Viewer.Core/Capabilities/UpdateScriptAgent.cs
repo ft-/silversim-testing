@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public override UUID GetUploaderID(Map reqmap)
         {
-            UUID transaction = UUID.Random;
+            var transaction = UUID.Random;
             m_Transactions.Add(transaction, reqmap["item_id"].AsUUID);
             return transaction;
         }
@@ -83,7 +83,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             KeyValuePair<UUID, UUID> kvp;
             if (m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
             {
-                Map m = new Map();
+                var m = new Map();
                 InventoryItem item;
                 try
                 {
@@ -133,8 +133,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch(CompilerException e)
                 {
-                    AnArray errors = new AnArray();
-                    foreach(KeyValuePair<int, string> line in e.Messages)
+                    var errors = new AnArray();
+                    foreach(var line in e.Messages)
                     {
                         int lineNumber = line.Key - 1;
                         /* Viewer editors count lines from 0 */
@@ -150,7 +150,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 catch(Exception e)
                 {
                     m_Log.ErrorFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
-                    AnArray errors = new AnArray();
+                    var errors = new AnArray();
                     errors.Add("0:Unexpected compiler error " + e.GetType().Name);
                     m.Add("errors", errors);
                     m.Add("compiled", false);

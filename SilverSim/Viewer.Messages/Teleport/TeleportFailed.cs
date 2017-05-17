@@ -40,16 +40,12 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public List<AlertInfoEntry> AlertInfo = new List<AlertInfoEntry>();
 
-        public TeleportFailed()
-        {
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteStringLen8(Reason);
             p.WriteUInt8((byte)AlertInfo.Count);
-            foreach(AlertInfoEntry e in AlertInfo)
+            foreach(var e in AlertInfo)
             {
                 p.WriteStringLen8(e.Message);
                 p.WriteStringLen8(e.ExtraParams);
@@ -58,15 +54,19 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public static Message Decode(UDPPacket p)
         {
-            TeleportFailed m = new TeleportFailed();
-            m.AgentID = p.ReadUUID();
-            m.Reason = p.ReadStringLen8();
+            var m = new TeleportFailed()
+            {
+                AgentID = p.ReadUUID(),
+                Reason = p.ReadStringLen8()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                AlertInfoEntry e = new AlertInfoEntry();
-                e.Message = p.ReadStringLen8();
-                e.ExtraParams = p.ReadStringLen8();
+                var e = new AlertInfoEntry()
+                {
+                    Message = p.ReadStringLen8(),
+                    ExtraParams = p.ReadStringLen8()
+                };
                 m.AlertInfo.Add(e);
             }
             return m;

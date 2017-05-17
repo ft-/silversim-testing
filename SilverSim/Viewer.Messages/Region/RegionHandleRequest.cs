@@ -30,17 +30,12 @@ namespace SilverSim.Viewer.Messages.Region
     {
         public UUID RegionID;
 
-        public RegionHandleRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RegionHandleRequest m = new RegionHandleRequest();
-            m.RegionID = p.ReadUUID();
-
-            return m;
+            return new RegionHandleRequest()
+            {
+                RegionID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -31,16 +31,11 @@ namespace SilverSim.Viewer.Messages.Object
         public bool ResetList;
         public List<uint> LocalIDs = new List<uint>();
 
-        public ForceObjectSelect()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteBoolean(ResetList);
             p.WriteUInt8((byte)LocalIDs.Count);
-            foreach (uint d in LocalIDs)
+            foreach (var d in LocalIDs)
             {
                 p.WriteUInt32(d);
             }
@@ -48,8 +43,10 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            ForceObjectSelect m = new ForceObjectSelect();
-            m.ResetList = p.ReadBoolean();
+            var m = new ForceObjectSelect()
+            {
+                ResetList = p.ReadBoolean()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {

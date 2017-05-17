@@ -272,11 +272,6 @@ namespace SilverSim.Database.Memory.Asset
     [PluginName("Assets")]
     public class MemoryAssetServiceFactory : IPluginFactory
     {
-        public MemoryAssetServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryAssetService();

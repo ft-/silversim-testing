@@ -41,10 +41,6 @@ namespace SilverSim.Database.Memory.Presence
         readonly RwLockedDictionary<UUID, PresenceInfo> m_Data = new RwLockedDictionary<UUID, PresenceInfo>();
 
         #region Constructor
-        public MemoryPresenceService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
@@ -96,7 +92,7 @@ namespace SilverSim.Database.Memory.Presence
                 }
                 else if (reportType == SetType.Login)
                 {
-                    PresenceInfo pInfo = new PresenceInfo(value);
+                    var pInfo = new PresenceInfo(value);
                     pInfo.RegionID = UUID.Zero;
                     m_Data[sessionID] = pInfo;
                 }
@@ -117,7 +113,7 @@ namespace SilverSim.Database.Memory.Presence
 
         public override void LogoutRegion(UUID regionID)
         {
-            List<UUID> sessionids = new List<UUID>(from presence in m_Data where presence.Value.RegionID == regionID select presence.Key);
+            var sessionids = new List<UUID>(from presence in m_Data where presence.Value.RegionID == regionID select presence.Key);
 
             foreach (UUID sessionid in sessionids)
             {
@@ -128,7 +124,7 @@ namespace SilverSim.Database.Memory.Presence
 
         public override void Remove(UUID scopeID, UUID userAccount)
         {
-            List<UUID> sessionids = new List<UUID>(from presence in m_Data where presence.Value.UserID.ID == userAccount select presence.Key);
+            var sessionids = new List<UUID>(from presence in m_Data where presence.Value.UserID.ID == userAccount select presence.Key);
 
             foreach(UUID sessionid in sessionids)
             {
@@ -142,16 +138,10 @@ namespace SilverSim.Database.Memory.Presence
     [PluginName("Presence")]
     public class MemoryPresenceServiceFactory : IPluginFactory
     {
-        public MemoryPresenceServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryPresenceService();
         }
     }
     #endregion
-
 }

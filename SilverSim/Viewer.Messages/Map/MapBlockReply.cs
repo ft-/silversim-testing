@@ -57,17 +57,12 @@ namespace SilverSim.Viewer.Messages.Map
 
         public List<SizeInfo> Size = new List<SizeInfo>();
 
-        public MapBlockReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUInt32((uint)Flags);
             p.WriteUInt8((byte)Data.Count);
-            foreach (DataEntry d in Data)
+            foreach (var d in Data)
             {
                 p.WriteUInt16(d.X);
                 p.WriteUInt16(d.Y);
@@ -79,7 +74,7 @@ namespace SilverSim.Viewer.Messages.Map
                 p.WriteUUID(d.MapImageID);
             }
             p.WriteUInt8((byte)Size.Count);
-            foreach(SizeInfo d in Size)
+            foreach(var d in Size)
             {
                 p.WriteUInt16(d.X);
                 p.WriteUInt16(d.Y);

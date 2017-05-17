@@ -46,17 +46,12 @@ namespace SilverSim.Viewer.Messages.Search
 
         public List<QueryReplyData> QueryReplies = new List<QueryReplyData>();
 
-        public DirPlacesReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
             p.WriteUInt8((byte)QueryReplies.Count);
-            foreach(QueryReplyData d in QueryReplies)
+            foreach(var d in QueryReplies)
             {
                 p.WriteUUID(d.ParcelID);
                 p.WriteStringLen8(d.Name);
@@ -66,7 +61,7 @@ namespace SilverSim.Viewer.Messages.Search
             }
 
             p.WriteUInt8((byte)QueryReplies.Count);
-            foreach (QueryReplyData d in QueryReplies)
+            foreach (var d in QueryReplies)
             {
                 p.WriteUInt32(d.Status);
             }
@@ -74,25 +69,28 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            DirPlacesReply m = new DirPlacesReply();
-            m.AgentID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
+            var m = new DirPlacesReply()
+            {
+                AgentID = p.ReadUUID(),
+                QueryID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                QueryReplyData d = new QueryReplyData();
-                d.ParcelID = p.ReadUUID();
-                d.Name = p.ReadStringLen8();
-                d.ForSale = p.ReadBoolean();
-                d.Auction = p.ReadBoolean();
-                d.Dwell = p.ReadFloat();
-                m.QueryReplies.Add(d);
+                m.QueryReplies.Add(new QueryReplyData()
+                {
+                    ParcelID = p.ReadUUID(),
+                    Name = p.ReadStringLen8(),
+                    ForSale = p.ReadBoolean(),
+                    Auction = p.ReadBoolean(),
+                    Dwell = p.ReadFloat()
+                });
             }
 
             n = p.ReadUInt8();
             for (int i = 0; i < n && i < m.QueryReplies.Count; ++i)
             {
-                QueryReplyData d = m.QueryReplies[i];
+                var d = m.QueryReplies[i];
                 d.Status = p.ReadUInt32();
                 m.QueryReplies[i] = d;
             }

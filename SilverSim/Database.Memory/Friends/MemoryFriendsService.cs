@@ -80,7 +80,7 @@ namespace SilverSim.Database.Memory.Friends
         {
             get
             {
-                List<FriendInfo> friends = new List<FriendInfo>();
+                var friends = new List<FriendInfo>();
 
                 RwLockedDictionary<UUID, FriendData> friendList;
                 if(!m_Friends.TryGetValue(user.ID, out friendList))
@@ -88,9 +88,9 @@ namespace SilverSim.Database.Memory.Friends
                     return friends;
                 }
 
-                foreach(KeyValuePair<UUID, FriendData> kvp in friendList)
+                foreach(var kvp in friendList)
                 {
-                    FriendInfo fi = new FriendInfo();
+                    var fi = new FriendInfo();
                     RwLockedDictionary<UUID, FriendData> otherFriendList;
                     FriendData otherFriendData;
                     if (m_Friends.TryGetValue(kvp.Key, out otherFriendList) &&
@@ -140,7 +140,7 @@ namespace SilverSim.Database.Memory.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
-            RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
+            var avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
             foreach (string avatarnameservicename in m_AvatarNameServiceNames)
             {
                 avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(avatarnameservicename.Trim()));
@@ -159,7 +159,7 @@ namespace SilverSim.Database.Memory.Friends
 
         public override void StoreOffer(FriendInfo fi)
         {
-            FriendData data = new FriendData(FriendRightFlags.None, fi.Secret);
+            var data = new FriendData(FriendRightFlags.None, fi.Secret);
             RwLockedDictionary<UUID, FriendData> friendList;
             if(m_Friends.TryGetValue(fi.Friend.ID, out friendList) && !m_Friends.ContainsKey(fi.User.ID))
             {
@@ -204,11 +204,6 @@ namespace SilverSim.Database.Memory.Friends
     [PluginName("Friends")]
     public class MemoryFriendsServiceFactory : IPluginFactory
     {
-        public MemoryFriendsServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryFriendsService(ownSection.GetString("AvatarNameServices", string.Empty));

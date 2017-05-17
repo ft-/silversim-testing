@@ -93,11 +93,6 @@ namespace SilverSim.Viewer.Groups
 
         bool m_ShutdownGroups;
 
-        public ViewerGroupsServer()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             m_IMRouter = loader.IMRouter;
@@ -108,7 +103,7 @@ namespace SilverSim.Viewer.Groups
 
         void SendAgentDataUpdate(IAgent agent, GroupsServiceInterface groupsService, SceneInterface scene)
         {
-            Messages.Agent.AgentDataUpdate adu = new Messages.Agent.AgentDataUpdate();
+            var adu = new AgentDataUpdate();
             try
             {
                 GroupRole gr;
@@ -138,7 +133,7 @@ namespace SilverSim.Viewer.Groups
             adu.AgentID = agent.Owner.ID;
             adu.FirstName = agent.Owner.FirstName;
             adu.LastName = agent.Owner.LastName;
-            foreach(IAgent cagent in scene.Agents)
+            foreach(var cagent in scene.Agents)
             {
                 cagent.SendMessageAlways(adu, scene.ID);
             }
@@ -159,7 +154,7 @@ namespace SilverSim.Viewer.Groups
                     continue;
                 }
 
-                GroupsServiceInterface groupsService = req.Value.GroupsService;
+                var groupsService = req.Value.GroupsService;
 
                 if (null == groupsService)
                 {
@@ -195,14 +190,14 @@ namespace SilverSim.Viewer.Groups
                     continue;
                 }
 
-                GroupsServiceInterface groupsService = req.Key.GroupsService;
+                var groupsService = req.Key.GroupsService;
 
                 if(null == groupsService)
                 {
                     continue;
                 }
 
-                GridInstantMessage gim = req.Value;
+                var gim = req.Value;
                 List<GroupMember> gmems;
                 try
                 {
@@ -213,7 +208,7 @@ namespace SilverSim.Viewer.Groups
                     continue;
                 }
 
-                foreach(GroupMember gmem in gmems)
+                foreach(var gmem in gmems)
                 {
                     if(gim.Dialog == GridInstantMessageDialog.GroupNotice &&
                         (!gmem.IsAcceptNotices ||
@@ -252,7 +247,7 @@ namespace SilverSim.Viewer.Groups
                 }
 
                 Message m = req.Value;
-                SceneInterface scene = req.Key.Scene;
+                var scene = req.Key.Scene;
                 if (scene == null)
                 {
                     continue;
@@ -364,7 +359,7 @@ namespace SilverSim.Viewer.Groups
 
                         case MessageType.ImprovedInstantMessage:
                             {
-                                ImprovedInstantMessage im = (ImprovedInstantMessage)m;
+                                var im = (ImprovedInstantMessage)m;
                                 switch(im.Dialog)
                                 {
                                     case GridInstantMessageDialog.GroupInvitationAccept:
@@ -400,7 +395,7 @@ namespace SilverSim.Viewer.Groups
         #region Agent Data Update Handling
         void SendAllAgentsGroupDataUpdate(SceneInterface scene, GroupsServiceInterface groupsService, UGI group)
         {
-            foreach(IAgent agent in scene.Agents)
+            foreach(var agent in scene.Agents)
             {
                 SendAgentGroupDataUpdate(agent, scene, groupsService, group);
             }
@@ -418,19 +413,20 @@ namespace SilverSim.Viewer.Groups
                 List<GroupMembership> gmems = groupsService.Memberships[agent.Owner, agent.Owner];
                 if (group == null || gmems.Count(gmem => gmem.Group.ID == group.ID) != 0)
                 { /* still a lot work with that check but we are at least gentle with the viewer here */
-                    AgentGroupDataUpdate update = new AgentGroupDataUpdate();
+                    var update = new AgentGroupDataUpdate();
                     update.AgentID = agent.Owner.ID;
-                    foreach (GroupMembership gmem in gmems)
+                    foreach (var gmem in gmems)
                     {
-                        AgentGroupDataUpdate.GroupDataEntry d = new AgentGroupDataUpdate.GroupDataEntry();
-                        d.ListInProfile = gmem.IsListInProfile;
-                        d.GroupID = gmem.Group.ID;
-                        d.GroupPowers = gmem.GroupPowers;
-                        d.AcceptNotices = gmem.IsAcceptNotices;
-                        d.GroupInsigniaID = gmem.GroupInsigniaID;
-                        d.Contribution = gmem.Contribution;
-                        d.GroupName = gmem.Group.GroupName;
-                        update.GroupData.Add(d);
+                        update.GroupData.Add(new AgentGroupDataUpdate.GroupDataEntry()
+                        {
+                            ListInProfile = gmem.IsListInProfile,
+                            GroupID = gmem.Group.ID,
+                            GroupPowers = gmem.GroupPowers,
+                            AcceptNotices = gmem.IsAcceptNotices,
+                            GroupInsigniaID = gmem.GroupInsigniaID,
+                            Contribution = gmem.Contribution,
+                            GroupName = gmem.Group.GroupName
+                        });
                     }
                     agent.SendMessageAlways(update, scene.ID);
                 }
@@ -452,7 +448,7 @@ namespace SilverSim.Viewer.Groups
         void HandleGroupNotice(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
         {
             /* no validation needed with IM, that is already done in circuit */
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
 
             if(groupsService == null)
             {
@@ -480,12 +476,12 @@ namespace SilverSim.Viewer.Groups
             {
                 try
                 {
-                    IValue iv = LlsdXml.Deserialize(new MemoryStream(m.BinaryBucket));
+                    var iv = LlsdXml.Deserialize(new MemoryStream(m.BinaryBucket));
                     if(iv is Map)
                     {
-                        Map binBuck = (Map)iv;
-                        UUID itemID = binBuck["item_id"].AsUUID;
-                        UUID ownerID = binBuck["owner_id"].AsUUID;
+                        var binBuck = (Map)iv;
+                        var itemID = binBuck["item_id"].AsUUID;
+                        var ownerID = binBuck["owner_id"].AsUUID;
                         item = agent.InventoryService.Item[ownerID, itemID];
                     }
                 }
@@ -495,11 +491,11 @@ namespace SilverSim.Viewer.Groups
                 }
             }
 
-            GroupNotice gn = new GroupNotice();
+            var gn = new GroupNotice();
             gn.ID = UUID.Random;
             gn.Group = group;
             gn.FromName = agent.Owner.FullName;
-            string[] submsg = m.Message.Split(new char[] {'|'}, 2);
+            var submsg = m.Message.Split(new char[] {'|'}, 2);
             gn.Subject = submsg.Length > 1 ? submsg[0] : string.Empty;
             gn.Message = submsg.Length > 1 ? submsg[1] : submsg[0];
             gn.HasAttachment = item != null;
@@ -508,14 +504,15 @@ namespace SilverSim.Viewer.Groups
             gn.AttachmentItemID = item != null ? item.ID : UUID.Zero;
             gn.AttachmentOwner = item !=  null ? item.Owner : UUI.Unknown;
 
-            GridInstantMessage gim = new GridInstantMessage();
-            gim.FromAgent = agent.Owner;
-            gim.Dialog = GridInstantMessageDialog.GroupNotice;
-            gim.IsFromGroup = true;
-            gim.Message = m.Message;
-            gim.IMSessionID = gn.ID;
-            gim.BinaryBucket = m.BinaryBucket;
-
+            var gim = new GridInstantMessage()
+            {
+                FromAgent = agent.Owner,
+                Dialog = GridInstantMessageDialog.GroupNotice,
+                IsFromGroup = true,
+                Message = m.Message,
+                IMSessionID = gn.ID,
+                BinaryBucket = m.BinaryBucket
+            };
             try
             {
                 groupsService.Notices.Add(agent.Owner, gn);
@@ -529,20 +526,22 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupNoticesListRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupNoticesListRequest req = (GroupNoticesListRequest)m;
+            var req = (GroupNoticesListRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
 
             if(groupsService == null ||
                 (GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ReceiveNotices) == 0)
             {
-                GroupNoticesListReply reply = new GroupNoticesListReply();
-                reply.AgentID = req.AgentID;
-                reply.GroupID = req.GroupID;
+                var reply = new GroupNoticesListReply()
+                {
+                    AgentID = req.AgentID,
+                    GroupID = req.GroupID
+                };
                 agent.SendMessageAlways(reply, scene.ID);
             }
             else
@@ -560,7 +559,7 @@ namespace SilverSim.Viewer.Groups
                 GroupNoticesListReply reply = null;
                 int messageFill = 0;
 
-                foreach(GroupNotice notice in notices)
+                foreach(var notice in notices)
                 {
                     GroupNoticesListReply.GroupNoticeData d = new GroupNoticesListReply.GroupNoticeData();
                     d.NoticeID = notice.ID;
@@ -598,20 +597,20 @@ namespace SilverSim.Viewer.Groups
         #region Groups
         void HandleCreateGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            CreateGroupRequest req = (CreateGroupRequest)m;
+            var req = (CreateGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if(null == groupsService)
             {
                 return;
             }
 
-            GroupInfo groupinfo = new GroupInfo();
+            var groupinfo = new GroupInfo();
             groupinfo.ID.GroupName = req.Name;
             groupinfo.Founder = agent.Owner;
             groupinfo.Charter = req.Charter;
@@ -622,10 +621,10 @@ namespace SilverSim.Viewer.Groups
             groupinfo.IsAllowPublish = req.AllowPublish;
             groupinfo.IsMaturePublish = req.MaturePublish;
 
-            CreateGroupReply reply = new CreateGroupReply();
+            var reply = new CreateGroupReply();
             reply.AgentID = req.AgentID;
 
-            EconomyServiceInterface economyService = scene.EconomyService;
+            var economyService = scene.EconomyService;
             try
             {
                 if (null != economyService && scene.EconomyData.PriceGroupCreate > 0)
@@ -656,14 +655,14 @@ namespace SilverSim.Viewer.Groups
 
         void HandleUpdateGroupInfo(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            UpdateGroupInfo req = (UpdateGroupInfo)m;
+            var req = (UpdateGroupInfo)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
@@ -707,14 +706,14 @@ namespace SilverSim.Viewer.Groups
 
         void HandleJoinGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            JoinGroupRequest req = (JoinGroupRequest)m;
+            var req = (JoinGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if(null == groupsService)
             {
                 return;
@@ -759,26 +758,30 @@ namespace SilverSim.Viewer.Groups
 
         void HandleLeaveGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            LeaveGroupRequest req = (LeaveGroupRequest)m;
+            var req = (LeaveGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
             }
 
-            AgentDropGroup dropGroup = new AgentDropGroup();
-            dropGroup.AgentID = req.AgentID;
-            dropGroup.GroupID = req.GroupID;
-            LeaveGroupReply reply = new LeaveGroupReply();
-            reply.AgentID = req.AgentID;
-            reply.GroupID = req.GroupID;
-            reply.Success = false;
+            var dropGroup = new AgentDropGroup()
+            {
+                AgentID = req.AgentID,
+                GroupID = req.GroupID
+            };
+            var reply = new LeaveGroupReply()
+            {
+                AgentID = req.AgentID,
+                GroupID = req.GroupID,
+                Success = false
+            };
             try
             {
                 groupsService.Members.Delete(agent.Owner, new UGI(req.GroupID), agent.Owner);
@@ -797,7 +800,7 @@ namespace SilverSim.Viewer.Groups
 
         void HandleInviteGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            InviteGroupRequest req = (InviteGroupRequest)m;
+            var req = (InviteGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -807,14 +810,14 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupProfileRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupProfileRequest req = (GroupProfileRequest)m;
+            var req = (GroupProfileRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if(null == groupsService)
             {
                 return;
@@ -849,26 +852,27 @@ namespace SilverSim.Viewer.Groups
                 gr.Powers = GroupPowers.None;
             }
 
-            GroupProfileReply reply = new GroupProfileReply();
-            reply.AgentID = req.AgentID;
-            reply.GroupID = req.GroupID;
-            reply.Name = ginfo.ID.GroupName;
-            reply.Charter = ginfo.Charter;
-            reply.ShowInList = ginfo.IsShownInList;
-            reply.InsigniaID = ginfo.InsigniaID;
-            reply.FounderID = ginfo.Founder.ID;
-            reply.MembershipFee = ginfo.MembershipFee;
-            reply.OpenEnrollment = ginfo.IsOpenEnrollment;
-            reply.Money = 0;
-            reply.GroupMembershipCount = ginfo.MemberCount;
-            reply.GroupRolesCount = ginfo.RoleCount;
-            reply.AllowPublish = ginfo.IsAllowPublish;
-            reply.MaturePublish = ginfo.IsMaturePublish;
-            reply.OwnerRoleID = ginfo.OwnerRoleID;
+            var reply = new GroupProfileReply()
+            {
+                AgentID = req.AgentID,
+                GroupID = req.GroupID,
+                Name = ginfo.ID.GroupName,
+                Charter = ginfo.Charter,
+                ShowInList = ginfo.IsShownInList,
+                InsigniaID = ginfo.InsigniaID,
+                FounderID = ginfo.Founder.ID,
+                MembershipFee = ginfo.MembershipFee,
+                OpenEnrollment = ginfo.IsOpenEnrollment,
+                Money = 0,
+                GroupMembershipCount = ginfo.MemberCount,
+                GroupRolesCount = ginfo.RoleCount,
+                AllowPublish = ginfo.IsAllowPublish,
+                MaturePublish = ginfo.IsMaturePublish,
+                OwnerRoleID = ginfo.OwnerRoleID,
 
-            reply.MemberTitle = gr.Title;
-            reply.PowersMask = gr.Powers;
-
+                MemberTitle = gr.Title,
+                PowersMask = gr.Powers
+            };
             agent.SendMessageAlways(reply, scene.ID);
         }
         #endregion
@@ -876,14 +880,14 @@ namespace SilverSim.Viewer.Groups
         #region GroupRole
         void HandleGroupRoleChanges(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupRoleChanges req = (GroupRoleChanges)m;
+            var req = (GroupRoleChanges)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
@@ -917,10 +921,12 @@ namespace SilverSim.Viewer.Groups
 
                     try
                     {
-                        GroupRolemember grm = new GroupRolemember();
-                        grm.Group = new UGI(req.GroupID);
-                        grm.Principal = principalUUI;
-                        grm.RoleID = req.RoleID;
+                        var grm = new GroupRolemember()
+                        {
+                            Group = new UGI(req.GroupID),
+                            Principal = principalUUI,
+                            RoleID = req.RoleID
+                        };
                         groupsService.Rolemembers.Add(agent.Owner, grm);
                     }
                     catch
@@ -954,14 +960,14 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupRoleDataRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupRoleDataRequest req = (GroupRoleDataRequest)m;
+            var req = (GroupRoleDataRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
@@ -980,28 +986,31 @@ namespace SilverSim.Viewer.Groups
 
             GroupRoleDataReply reply = null;
             int messageFill = 0;
-            foreach(GroupRole role in rolemembers)
+            foreach(var role in rolemembers)
             {
-                GroupRoleDataReply.RoleDataEntry d = new GroupRoleDataReply.RoleDataEntry();
-                d.Name = role.Name;
-                d.Powers = role.Powers;
-                d.RoleID = role.ID;
-                d.Title = role.Title;
-                d.Members = role.Members;
-                d.Description = role.Description;
-
-                if(messageFill + d.SizeInMessage > 1400)
+                var d = new GroupRoleDataReply.RoleDataEntry()
+                {
+                    Name = role.Name,
+                    Powers = role.Powers,
+                    RoleID = role.ID,
+                    Title = role.Title,
+                    Members = role.Members,
+                    Description = role.Description
+                };
+                if (messageFill + d.SizeInMessage > 1400)
                 {
                     agent.SendMessageAlways(reply, scene.ID);
                     reply = null;
                 }
                 if(null == reply)
                 {
-                    reply = new GroupRoleDataReply();
-                    reply.AgentID = req.AgentID;
-                    reply.RequestID = req.RequestID;
-                    reply.GroupID = req.GroupID;
-                    reply.RoleCount = rolemembers.Count;
+                    reply = new GroupRoleDataReply()
+                    {
+                        AgentID = req.AgentID,
+                        RequestID = req.RequestID,
+                        GroupID = req.GroupID,
+                        RoleCount = rolemembers.Count
+                    };
                     messageFill = 0;
                 }
 
@@ -1016,14 +1025,14 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupRoleMembersRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupRoleMembersRequest req = (GroupRoleMembersRequest)m;
+            var req = (GroupRoleMembersRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
@@ -1042,12 +1051,13 @@ namespace SilverSim.Viewer.Groups
 
             GroupRoleMembersReply reply = null;
             int messageFill = 0;
-            foreach (GroupRolemember role in rolemembers)
+            foreach (var role in rolemembers)
             {
-                GroupRoleMembersReply.MemberDataEntry d = new GroupRoleMembersReply.MemberDataEntry();
-                d.MemberID = role.Principal.ID;
-                d.RoleID = role.RoleID;
-
+                var d = new GroupRoleMembersReply.MemberDataEntry()
+                {
+                    MemberID = role.Principal.ID,
+                    RoleID = role.RoleID
+                };
                 if (messageFill + d.SizeInMessage > 1400)
                 {
                     agent.SendMessageAlways(reply, scene.ID);
@@ -1055,11 +1065,13 @@ namespace SilverSim.Viewer.Groups
                 }
                 if (null == reply)
                 {
-                    reply = new GroupRoleMembersReply();
-                    reply.AgentID = req.AgentID;
-                    reply.RequestID = req.RequestID;
-                    reply.GroupID = req.GroupID;
-                    reply.TotalPairs = (uint)rolemembers.Count;
+                    reply = new GroupRoleMembersReply()
+                    {
+                        AgentID = req.AgentID,
+                        RequestID = req.RequestID,
+                        GroupID = req.GroupID,
+                        TotalPairs = (uint)rolemembers.Count
+                    };
                     messageFill = 0;
                 }
 
@@ -1074,36 +1086,38 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupRoleUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupRoleUpdate req = (GroupRoleUpdate)m;
+            var req = (GroupRoleUpdate)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
             }
 
-            GroupPowers powers = GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID));
+            var powers = GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID));
             bool haveChanges = false;
 
-            foreach(GroupRoleUpdate.RoleDataEntry gru in req.RoleData)
+            foreach(var gru in req.RoleData)
             {
                 switch(gru.UpdateType)
                 {
                     case GroupRoleUpdate.RoleUpdateType.Create:
                         if((powers & GroupPowers.CreateRole) != 0)
                         {
-                            GroupRole info = new GroupRole();
-                            info.Group = new UGI(req.GroupID);
-                            info.ID = UUID.Random;
-                            info.Name = gru.Name;
-                            info.Description = gru.Description;
-                            info.Title = gru.Title;
-                            info.Powers = gru.Powers;
+                            var info = new GroupRole()
+                            {
+                                Group = new UGI(req.GroupID),
+                                ID = UUID.Random,
+                                Name = gru.Name,
+                                Description = gru.Description,
+                                Title = gru.Title,
+                                Powers = gru.Powers
+                            };
                             try
                             {
                                 groupsService.Roles.Add(agent.Owner, info);
@@ -1186,7 +1200,7 @@ namespace SilverSim.Viewer.Groups
         #region Group members
         void HandleEjectGroupMemberRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            EjectGroupMemberRequest req = (EjectGroupMemberRequest)m;
+            var req = (EjectGroupMemberRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1198,14 +1212,14 @@ namespace SilverSim.Viewer.Groups
         #region Group Titles
         void HandleGroupTitlesRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupTitlesRequest req = (GroupTitlesRequest)m;
+            var req = (GroupTitlesRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
@@ -1219,24 +1233,27 @@ namespace SilverSim.Viewer.Groups
             {
                 gam = groupsService.ActiveMembership[agent.Owner, agent.Owner];
                 grms = groupsService.Rolemembers[agent.Owner, agent.Owner];
-                foreach(GroupRolemembership grm in grms)
+                foreach(var grm in grms)
                 {
-                    GroupTitlesReply.GroupDataEntry d = new GroupTitlesReply.GroupDataEntry();
-                    d.RoleID = grm.RoleID;
-                    d.Selected = grm.RoleID == gam.SelectedRoleID;
-                    d.Title = grm.GroupTitle;
-
-                    if(d.SizeInMessage + messageFill > 1400)
+                    var d = new GroupTitlesReply.GroupDataEntry()
+                    {
+                        RoleID = grm.RoleID,
+                        Selected = grm.RoleID == gam.SelectedRoleID,
+                        Title = grm.GroupTitle
+                    };
+                    if (d.SizeInMessage + messageFill > 1400)
                     {
                         agent.SendMessageAlways(reply, scene.ID);
                         reply = null;
                     }
                     if(null == reply)
                     {
-                        reply = new GroupTitlesReply();
-                        reply.AgentID = req.AgentID;
-                        reply.GroupID = req.GroupID;
-                        reply.RequestID = req.RequestID;
+                        reply = new GroupTitlesReply()
+                        {
+                            AgentID = req.AgentID,
+                            GroupID = req.GroupID,
+                            RequestID = req.RequestID
+                        };
                         messageFill = 0;
                     }
 
@@ -1249,9 +1266,11 @@ namespace SilverSim.Viewer.Groups
                 m_Log.Info("GroupTitlesRequest", e);
                 if (null == reply)
                 {
-                    reply = new GroupTitlesReply();
-                    reply.AgentID = req.AgentID;
-                    reply.GroupID = req.GroupID;
+                    reply = new GroupTitlesReply()
+                    {
+                        AgentID = req.AgentID,
+                        GroupID = req.GroupID
+                    };
                 }
             }
             if(null != reply)
@@ -1262,7 +1281,7 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupTitleUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupTitleUpdate req = (GroupTitleUpdate)m;
+            var req = (GroupTitleUpdate)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1297,7 +1316,7 @@ namespace SilverSim.Viewer.Groups
         #region Group Account
         void HandleGroupAccountSummaryRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupAccountSummaryRequest req = (GroupAccountSummaryRequest)m;
+            var req = (GroupAccountSummaryRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1307,7 +1326,7 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupAccountDetailsRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupAccountDetailsRequest req = (GroupAccountDetailsRequest)m;
+            var req = (GroupAccountDetailsRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1317,7 +1336,7 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupAccountTransactionsRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupAccountTransactionsRequest req = (GroupAccountTransactionsRequest)m;
+            var req = (GroupAccountTransactionsRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1329,14 +1348,14 @@ namespace SilverSim.Viewer.Groups
         #region Active Group Selection
         void HandleActivateGroup(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            ActivateGroup req = (ActivateGroup)m;
+            var req = (ActivateGroup)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if(null == groupsService)
             {
                 return;
@@ -1346,7 +1365,7 @@ namespace SilverSim.Viewer.Groups
             {
                 if (req.GroupID != UUID.Zero)
                 {
-                    GroupMember gmem = groupsService.Members[agent.Owner, new UGI(req.GroupID), agent.Owner];
+                    var gmem = groupsService.Members[agent.Owner, new UGI(req.GroupID), agent.Owner];
                     groupsService.ActiveGroup[agent.Owner, agent.Owner] = gmem.Group;
                 }
                 else
@@ -1367,7 +1386,7 @@ namespace SilverSim.Viewer.Groups
         #region Group Proposals
         void HandleGroupActiveProposalsRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupActiveProposalsRequest req = (GroupActiveProposalsRequest)m;
+            var req = (GroupActiveProposalsRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1377,7 +1396,7 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupVoteHistoryRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupVoteHistoryRequest req = (GroupVoteHistoryRequest)m;
+            var req = (GroupVoteHistoryRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1387,7 +1406,7 @@ namespace SilverSim.Viewer.Groups
 
         void HandleStartGroupProposal(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            StartGroupProposal req = (StartGroupProposal)m;
+            var req = (StartGroupProposal)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1397,7 +1416,7 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupProposalBallot(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupProposalBallot req = (GroupProposalBallot)m;
+            var req = (GroupProposalBallot)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -1409,14 +1428,14 @@ namespace SilverSim.Viewer.Groups
         #region Member group params
         void HandleSetGroupContribution(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            SetGroupContribution req = (SetGroupContribution)m;
+            var req = (SetGroupContribution)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
@@ -1439,14 +1458,14 @@ namespace SilverSim.Viewer.Groups
 
         void HandleSetGroupAcceptNotices(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            SetGroupAcceptNotices req = (SetGroupAcceptNotices)m;
+            var req = (SetGroupAcceptNotices)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if(null == groupsService)
             {
                 return;
@@ -1475,9 +1494,9 @@ namespace SilverSim.Viewer.Groups
             {
                 return GroupPowers.None;
             }
-            List<GroupRole> roles = groupsService.Roles[agent, group, agent];
-            GroupPowers powers = GroupPowers.None;
-            foreach(GroupRole role in roles)
+            var roles = groupsService.Roles[agent, group, agent];
+            var powers = GroupPowers.None;
+            foreach(var role in roles)
             {
                 powers |= role.Powers;
             }
@@ -1495,21 +1514,21 @@ namespace SilverSim.Viewer.Groups
 
         void HandleGroupMembersRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            GroupMembersRequest req = (GroupMembersRequest)m;
+            var req = (GroupMembersRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
             }
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if (null == groupsService)
             {
                 return;
             }
 
             List<GroupMember> gmems;
-            UGI group = new UGI(req.GroupID);
+            var group = new UGI(req.GroupID);
             try
             {
 
@@ -1520,15 +1539,15 @@ namespace SilverSim.Viewer.Groups
                 gmems = new List<GroupMember>();
             }
 
-            GroupInfo ginfo = groupsService.Groups[agent.Owner, group];
-            List<GroupRolemember> ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
+            var ginfo = groupsService.Groups[agent.Owner, group];
+            var ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
 
             GroupMembersReply reply = null;
             int messageFill = 0;
 
-            foreach (GroupMember gmem in gmems)
+            foreach (var gmem in gmems)
             {
-                GroupMembersReply.MemberDataEntry d = new GroupMembersReply.MemberDataEntry();
+                var d = new GroupMembersReply.MemberDataEntry();
                 d.AgentID = gmem.Principal.ID;
                 d.AgentPowers = GroupPowers.None;
                 d.Contribution = 0;
@@ -1537,11 +1556,11 @@ namespace SilverSim.Viewer.Groups
                 d.Title = string.Empty;
                 try
                 {
-                    GroupMembership gam = groupsService.Memberships[gmem.Principal, group, gmem.Principal];
+                    var gam = groupsService.Memberships[gmem.Principal, group, gmem.Principal];
                     d.AgentPowers = gam.GroupPowers;
                     d.Title = gam.GroupTitle;
 
-                    foreach (GroupRolemember grm in ownerGroupRoleMembers)
+                    foreach (var grm in ownerGroupRoleMembers)
                     {
                         if (grm.Principal.EqualsGrid(gmem.Principal))
                         {
@@ -1562,11 +1581,13 @@ namespace SilverSim.Viewer.Groups
 
                 if(null == reply)
                 {
-                    reply = new GroupMembersReply();
-                    reply.AgentID = req.AgentID;
-                    reply.GroupID = req.GroupID;
-                    reply.MemberCount = gmems.Count;
-                    reply.RequestID = req.RequestID;
+                    reply = new GroupMembersReply()
+                    {
+                        AgentID = req.AgentID,
+                        GroupID = req.GroupID,
+                        MemberCount = gmems.Count,
+                        RequestID = req.RequestID
+                    };
                     messageFill = 0;
                 }
                 reply.MemberData.Add(d);
@@ -1593,13 +1614,13 @@ namespace SilverSim.Viewer.Groups
                 return;
             }
 
-            SceneInterface scene = circuit.Scene;
+            var scene = circuit.Scene;
             if(null == scene)
             {
                 req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if(null == groupsService)
             {
                 req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
@@ -1626,10 +1647,11 @@ namespace SilverSim.Viewer.Groups
                 return;
             }
 
-            Map res = new Map();
-            res.Add("agent_id", agent.ID);
-            res.Add("group_id", group.ID);
-
+            var res = new Map
+            {
+                { "agent_id", agent.ID },
+                { "group_id", group.ID }
+            };
             List<GroupMember> gmems;
             try
             {
@@ -1643,14 +1665,16 @@ namespace SilverSim.Viewer.Groups
 
             res.Add("member_count", gmems.Count);
 
-            Map membersmap = new Map();
-            GroupInfo ginfo = groupsService.Groups[agent.Owner, group];
-            List<GroupRole> groupRoles = groupsService.Roles[agent.Owner, group];
-            List<GroupRolemember> ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
-            List<string> groupTitles = new List<string>();
-            groupTitles.Add("");
-            GroupPowers defaultPowers = GroupPowers.None;
-            foreach(GroupRole role in groupRoles)
+            var membersmap = new Map();
+            var ginfo = groupsService.Groups[agent.Owner, group];
+            var groupRoles = groupsService.Roles[agent.Owner, group];
+            var ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
+            var groupTitles = new List<string>
+            {
+                ""
+            };
+            var defaultPowers = GroupPowers.None;
+            foreach(var role in groupRoles)
             {
                 if(role.ID == UUID.Zero)
                 {
@@ -1663,14 +1687,14 @@ namespace SilverSim.Viewer.Groups
                 }
             }
 
-            foreach(GroupMember gmem in gmems)
+            foreach(var gmem in gmems)
             {
-                Map outmap = new Map();
+                var outmap = new Map();
                 outmap.Add("donated_square_meters", 0);
                 membersmap.Add(gmem.Principal.ID.ToString(), outmap);
                 try
                 {
-                    GroupMembership gam = groupsService.Memberships[gmem.Principal, group, gmem.Principal];
+                    var gam = groupsService.Memberships[gmem.Principal, group, gmem.Principal];
                     outmap.Add("powers", PowersToString(gam.GroupPowers));
                     if (groupTitles.Contains(gam.GroupTitle))
                     {
@@ -1681,7 +1705,7 @@ namespace SilverSim.Viewer.Groups
                         }
                     }
 
-                    foreach (GroupRolemember grm in ownerGroupRoleMembers)
+                    foreach (var grm in ownerGroupRoleMembers)
                     {
                         if (grm.Principal.EqualsGrid(gmem.Principal))
                         {
@@ -1696,19 +1720,20 @@ namespace SilverSim.Viewer.Groups
                 }
             }
             res.Add("members", membersmap);
-            AnArray groupTitlesArray = new AnArray();
-            foreach(string s in groupTitles)
+            var groupTitlesArray = new AnArray();
+            foreach(var s in groupTitles)
             {
                 groupTitlesArray.Add(s);
             }
-            Map defaultsMap = new Map();
+            var defaultsMap = new Map();
             defaultsMap.Add("default_powers", PowersToString(defaultPowers));
             res.Add("defaults", defaultsMap);
             res.Add("titles", groupTitlesArray);
 
-            HttpResponse httpres = req.BeginResponse("application/llsd+xml");
-            LlsdXml.Serialize(res, httpres.GetOutputStream());
-            httpres.Close();
+            using (var httpres = req.BeginResponse("application/llsd+xml"))
+            {
+                LlsdXml.Serialize(res, httpres.GetOutputStream());
+            }
         }
         #endregion
 
@@ -1729,11 +1754,6 @@ namespace SilverSim.Viewer.Groups
     [PluginName("ViewerGroupsServer")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerGroupsServer();

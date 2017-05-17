@@ -34,21 +34,15 @@ namespace SilverSim.Viewer.Messages.TaskInventory
         public UInt32 LocalID;
         public UUID ItemID;
 
-        public RemoveTaskInventory()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RemoveTaskInventory m = new RemoveTaskInventory();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.LocalID = p.ReadUInt32();
-            m.ItemID = p.ReadUUID();
-
-            return m;
+            return new RemoveTaskInventory()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                LocalID = p.ReadUInt32(),
+                ItemID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

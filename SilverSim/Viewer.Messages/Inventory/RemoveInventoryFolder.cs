@@ -35,17 +35,13 @@ namespace SilverSim.Viewer.Messages.Inventory
         public UUID SessionID;
         public List<UUID> FolderData = new List<UUID>();
 
-        public RemoveInventoryFolder()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RemoveInventoryFolder m = new RemoveInventoryFolder();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new RemoveInventoryFolder()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
@@ -60,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt8((byte)FolderData.Count);
-            foreach(UUID folderid in FolderData)
+            foreach(var folderid in FolderData)
             {
                 p.WriteUUID(folderid);
             }
@@ -68,22 +64,29 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public override IValue SerializeEQG()
         {
-            MapType llsd = new MapType();
-            AnArray agentDataArray = new AnArray();
-            MapType agentData = new MapType();
-            agentData.Add("AgentID", AgentID);
-            agentData.Add("SessionID", SessionID);
-            agentDataArray.Add(agentData);
-            llsd.Add("AgentData", agentDataArray);
-
-            AnArray folderDataArray = new AnArray();
-
-            foreach (UUID folder in FolderData)
+            var llsd = new MapType
             {
-                MapType folderData = new MapType();
-                folderData.Add("FolderID", folder);
-                folderData.Add("AgentID", AgentID);
-                folderDataArray.Add(folderData);
+                {
+                    "AgentData",
+                    new AnArray
+                    {
+                        new MapType
+                        {
+                            { "AgentID", AgentID },
+                            { "SessionID", SessionID }
+                        }
+                    }
+                }
+            };
+            var folderDataArray = new AnArray();
+
+            foreach (var folder in FolderData)
+            {
+                folderDataArray.Add(new MapType
+                {
+                    { "FolderID", folder },
+                    { "AgentID", AgentID }
+                });
             }
             llsd.Add("FolderData", folderDataArray);
 

@@ -33,18 +33,14 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID SessionID;
         public UUID ClassifiedID;
 
-        public ClassifiedInfoRequest()
-        {
-
-        }
-
         public static ClassifiedInfoRequest Decode(UDPPacket p)
         {
-            ClassifiedInfoRequest m = new ClassifiedInfoRequest();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ClassifiedID = p.ReadUUID();
-            return m;
+            return new ClassifiedInfoRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ClassifiedID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

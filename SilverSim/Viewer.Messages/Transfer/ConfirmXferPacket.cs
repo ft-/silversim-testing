@@ -31,17 +31,13 @@ namespace SilverSim.Viewer.Messages.Transfer
         public UInt64 ID;
         public UInt32 Packet;
 
-        public ConfirmXferPacket()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ConfirmXferPacket m = new ConfirmXferPacket();
-            m.ID = p.ReadUInt64();
-            m.Packet = p.ReadUInt32();
-            return m;
+            return new ConfirmXferPacket()
+            {
+                ID = p.ReadUInt64(),
+                Packet = p.ReadUInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

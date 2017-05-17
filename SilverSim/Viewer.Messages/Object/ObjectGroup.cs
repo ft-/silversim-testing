@@ -37,18 +37,14 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<UInt32> ObjectList = new List<UInt32>();
 
-        public ObjectGroup()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectGroup m = new ObjectGroup();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-
+            var m = new ObjectGroup()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
@@ -64,7 +60,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(GroupID);
 
             p.WriteUInt8((byte)ObjectList.Count);
-            foreach (uint d in ObjectList)
+            foreach (var d in ObjectList)
             {
                 p.WriteUInt32(d);
             }

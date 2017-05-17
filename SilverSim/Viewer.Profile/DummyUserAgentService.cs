@@ -30,11 +30,6 @@ namespace SilverSim.Viewer.Profile
 {
     sealed class DummyUserAgentService : UserAgentServiceInterface, IDisplayNameAccessor
     {
-        public DummyUserAgentService()
-        {
-
-        }
-
         public override IDisplayNameAccessor DisplayName
         {
             get
@@ -83,13 +78,14 @@ namespace SilverSim.Viewer.Profile
 
         public override UserInfo GetUserInfo(UUI user)
         {
-            UserInfo dummyInfo = new UserInfo();
-            dummyInfo.FirstName = user.FirstName;
-            dummyInfo.LastName = user.LastName;
-            dummyInfo.UserTitle = string.Empty;
-            dummyInfo.UserFlags = 0;
-            dummyInfo.UserCreated = new Date();
-            return dummyInfo;
+            return new UserInfo()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserTitle = string.Empty,
+                UserFlags = 0,
+                UserCreated = new Date()
+            };
         }
 
         public override ServerURIs GetServerURLs(UUI user)

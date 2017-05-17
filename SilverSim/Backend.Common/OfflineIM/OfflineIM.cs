@@ -108,7 +108,7 @@ namespace SilverSim.Backend.Common.OfflineIM
             {
                 try
                 {
-                    GridInstantMessage response_im = new GridInstantMessage();
+                    var response_im = new GridInstantMessage();
                     response_im.FromAgent = im.ToAgent;
                     response_im.ToAgent = im.FromAgent;
                     response_im.Dialog = GridInstantMessageDialog.BusyAutoResponse;
@@ -155,11 +155,6 @@ namespace SilverSim.Backend.Common.OfflineIM
     [PluginName("OfflineIMHandler")]
     public class OfflineIMFactory : IPluginFactory
     {
-        public OfflineIMFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
         {
             string avatarNameServiceName = ownConfig.GetString("GridAvatarNameService", string.Empty);

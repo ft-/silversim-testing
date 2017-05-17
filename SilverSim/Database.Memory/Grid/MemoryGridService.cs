@@ -125,7 +125,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo)
         {
-            IEnumerable<RegionInfo> res = from region in m_Data.Values
+            var res = from region in m_Data.Values
                                           where region.Location.X <= gridX && region.Location.Y <= gridY &&
              region.Location.X + region.Size.X > gridX && region.Location.Y + region.Size.Y > gridY &&
              (scopeID == UUID.Zero || scopeID == region.ScopeID)
@@ -142,7 +142,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override bool ContainsKey(UUID scopeID, uint gridX, uint gridY)
         {
-            IEnumerable<bool> res = from region in m_Data.Values
+            var res = from region in m_Data.Values
                                           where region.Location.X <= gridX && region.Location.Y <= gridY &&
              region.Location.X + region.Size.X > gridX && region.Location.Y + region.Size.Y > gridY &&
              (scopeID == UUID.Zero || scopeID == region.ScopeID)
@@ -171,7 +171,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo)
         {
-            IEnumerable<RegionInfo> res = from region in m_Data.Values
+            var res = from region in m_Data.Values
                                           where region.Name.ToLower().Equals(regionName.ToLower()) &&
              (scopeID == UUID.Zero || scopeID == region.ScopeID)
                                           select region;
@@ -187,7 +187,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override bool ContainsKey(UUID scopeID, string regionName)
         {
-            IEnumerable<bool> res = from region in m_Data.Values
+            var res = from region in m_Data.Values
                                           where region.Name.ToLower().Equals(regionName.ToLower()) &&
              (scopeID == UUID.Zero || scopeID == region.ScopeID)
                                           select true;
@@ -244,7 +244,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override void RegisterRegion(RegionInfo regionInfo)
         {
-            foreach (RegionDefaultFlagsServiceInterface service in m_RegionDefaultServices)
+            foreach (var service in m_RegionDefaultServices)
             {
                 regionInfo.Flags |= service.GetRegionDefaultFlags(regionInfo.ID);
             }
@@ -256,7 +256,7 @@ namespace SilverSim.Database.MySQL.Grid
             }
 
             /* we have to give checks for all intersection variants */
-            IEnumerable<bool> res = from region in m_Data.Values
+            var res = from region in m_Data.Values
                                     where ((region.Location.X >= regionInfo.Location.X && region.Location.Y >= regionInfo.Location.Y &&
                                             region.Location.X < regionInfo.Location.X + regionInfo.Size.X &&
                                             region.Location.Y < regionInfo.Location.Y + regionInfo.Size.Y) ||
@@ -303,7 +303,7 @@ namespace SilverSim.Database.MySQL.Grid
         #region List accessors
         List<RegionInfo> GetRegionsByFlag(UUID scopeID, RegionFlags flags)
         {
-            IEnumerable<RegionInfo> res = from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && (region.Flags & flags) != 0 select new RegionInfo(region);
+            var res = from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && (region.Flags & flags) != 0 select new RegionInfo(region);
             return new List<RegionInfo>(res);
         }
 
@@ -339,7 +339,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max)
         {
-            IEnumerable<RegionInfo> res = from region in m_Data.Values
+            var res = from region in m_Data.Values
                                           where 
                                           ((region.Location.X >= min.X && region.Location.Y >= min.Y && region.Location.X <= max.X && region.Location.Y <= max.Y) ||
                                           (region.Location.X + region.Size.X >= min.X && region.Location.Y + region.Size.Y >= min.Y && region.Location.X + region.Size.X <= max.X && region.Location.Y + region.Size.Y <= max.Y) ||
@@ -357,7 +357,7 @@ namespace SilverSim.Database.MySQL.Grid
         public override List<RegionInfo> GetNeighbours(UUID scopeID, UUID regionID)
         {
             RegionInfo ri = this[scopeID, regionID];
-            IEnumerable<RegionInfo> res = from region in m_Data.Values
+            var res = from region in m_Data.Values
                                           where
                                           (
                                           ((region.Location.X == ri.Location.X + ri.Size.X || region.Location.X + region.Size.X == ri.Location.X) &&
@@ -395,11 +395,6 @@ namespace SilverSim.Database.MySQL.Grid
     [PluginName("Grid")]
     public class MemoryGridServiceFactory : IPluginFactory
     {
-        public MemoryGridServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryGridService(ownSection);

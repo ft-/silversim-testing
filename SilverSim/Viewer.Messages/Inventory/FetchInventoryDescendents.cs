@@ -37,23 +37,18 @@ namespace SilverSim.Viewer.Messages.Inventory
         public bool FetchFolders;
         public bool FetchItems;
 
-        public FetchInventoryDescendents()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            FetchInventoryDescendents m = new FetchInventoryDescendents();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.FolderID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.SortOrder = p.ReadInt32();
-            m.FetchFolders = p.ReadBoolean();
-            m.FetchItems = p.ReadBoolean();
-
-            return m;
+            return new FetchInventoryDescendents()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                FolderID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                SortOrder = p.ReadInt32(),
+                FetchFolders = p.ReadBoolean(),
+                FetchItems = p.ReadBoolean()
+            };
         }
 
         public override void Serialize(UDPPacket p)

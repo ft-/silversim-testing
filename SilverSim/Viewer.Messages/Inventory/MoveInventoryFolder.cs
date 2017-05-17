@@ -39,25 +39,22 @@ namespace SilverSim.Viewer.Messages.Inventory
         }
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
-        public MoveInventoryFolder()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            MoveInventoryFolder m = new MoveInventoryFolder();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Stamp = p.ReadBoolean();
-
+            var m = new MoveInventoryFolder()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                Stamp = p.ReadBoolean()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                InventoryDataEntry d = new InventoryDataEntry();
-                d.FolderID = p.ReadUUID();
-                d.ParentID = p.ReadUUID();
-                m.InventoryData.Add(d);
+                m.InventoryData.Add(new InventoryDataEntry()
+                {
+                    FolderID = p.ReadUUID(),
+                    ParentID = p.ReadUUID()
+                });
             }
 
             return m;
@@ -69,7 +66,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(SessionID);
             p.WriteBoolean(Stamp);
             p.WriteUInt8((byte)InventoryData.Count);
-            foreach(InventoryDataEntry d in InventoryData)
+            foreach(var d in InventoryData)
             {
                 p.WriteUUID(d.FolderID);
                 p.WriteUUID(d.ParentID);

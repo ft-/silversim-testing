@@ -40,23 +40,21 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<Data> ObjectData = new List<Data>();
 
-        public ObjectIncludeInSearch()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectIncludeInSearch m = new ObjectIncludeInSearch();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            var m = new ObjectIncludeInSearch()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                Data d = new Data();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.IncludeInSearch = p.ReadBoolean();
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new Data()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    IncludeInSearch = p.ReadBoolean()
+                });
             }
 
             return m;
@@ -67,7 +65,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (Data d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteBoolean(d.IncludeInSearch);

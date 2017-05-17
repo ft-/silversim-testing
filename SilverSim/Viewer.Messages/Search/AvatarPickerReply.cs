@@ -41,17 +41,12 @@ namespace SilverSim.Viewer.Messages.Search
 
         public List<DataEntry> Data = new List<DataEntry>();
 
-        public AvatarPickerReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
             p.WriteUInt8((byte)Data.Count);
-            foreach (DataEntry d in Data)
+            foreach (var d in Data)
             {
                 p.WriteUUID(d.AvatarID);
                 p.WriteStringLen8(d.FirstName);
@@ -61,17 +56,20 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            AvatarPickerReply m = new AvatarPickerReply();
-            m.AgentID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
+            var m = new AvatarPickerReply()
+            {
+                AgentID = p.ReadUUID(),
+                QueryID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                DataEntry d = new DataEntry();
-                d.AvatarID = p.ReadUUID();
-                d.FirstName = p.ReadStringLen8();
-                d.LastName = p.ReadStringLen8();
-                m.Data.Add(d);
+                m.Data.Add(new DataEntry()
+                {
+                    AvatarID = p.ReadUUID(),
+                    FirstName = p.ReadStringLen8(),
+                    LastName = p.ReadStringLen8()
+                });
             }
             return m;
         }

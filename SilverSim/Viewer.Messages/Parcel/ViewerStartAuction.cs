@@ -34,21 +34,15 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Int32 LocalID;
         public UUID SnapshotID;
 
-
-        public ViewerStartAuction()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ViewerStartAuction m = new ViewerStartAuction();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.LocalID = p.ReadInt32();
-            m.SnapshotID = p.ReadUUID();
-
-            return m;
+            return new ViewerStartAuction()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                LocalID = p.ReadInt32(),
+                SnapshotID = p.ReadUUID()
+            };
         }
     }
 }

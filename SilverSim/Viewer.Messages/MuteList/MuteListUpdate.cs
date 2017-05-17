@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.MuteList
         public UUID AgentID;
         public string Filename;
 
-        public MuteListUpdate()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -44,10 +39,11 @@ namespace SilverSim.Viewer.Messages.MuteList
 
         public static Message Decode(UDPPacket p)
         {
-            MuteListUpdate m = new MuteListUpdate();
-            m.AgentID = p.ReadUUID();
-            m.Filename = p.ReadStringLen8();
-            return m;
+            return new MuteListUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                Filename = p.ReadStringLen8()
+            };
         }
     }
 }

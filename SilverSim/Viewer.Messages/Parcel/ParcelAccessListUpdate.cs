@@ -48,30 +48,27 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public List<Data> AccessList = new List<Data>();
 
-        public ParcelAccessListUpdate()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelAccessListUpdate m = new ParcelAccessListUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Flags = (ParcelAccessList)p.ReadUInt32();
-            m.LocalID = p.ReadInt32();
-            m.TransactionID = p.ReadUUID();
-            m.SequenceID = p.ReadInt32();
-            m.Sections = p.ReadInt32();
-
+            var m = new ParcelAccessListUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                Flags = (ParcelAccessList)p.ReadUInt32(),
+                LocalID = p.ReadInt32(),
+                TransactionID = p.ReadUUID(),
+                SequenceID = p.ReadInt32(),
+                Sections = p.ReadInt32()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d;
-                d.ID = p.ReadUUID();
-                d.Time = p.ReadUInt32();
-                d.Flags = (ParcelAccessList)p.ReadUInt32();
-                m.AccessList.Add(d);
+                m.AccessList.Add(new Data()
+                {
+                    ID = p.ReadUUID(),
+                    Time = p.ReadUInt32(),
+                    Flags = (ParcelAccessList)p.ReadUInt32()
+                });
             }
 
             return m;
@@ -88,7 +85,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteInt32(Sections);
 
             p.WriteUInt8((byte)AccessList.Count);
-            foreach(Data d in AccessList)
+            foreach(var d in AccessList)
             {
                 p.WriteUUID(d.ID);
                 p.WriteUInt32(d.Time);

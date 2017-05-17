@@ -106,9 +106,9 @@ namespace SilverSim.Viewer.Core.Capabilities
             pInfo.Name = reqmap["name"].ToString();
             pInfo.SalePrice = reqmap["sale_price"].AsInt;
             pInfo.Description = reqmap["description"].ToString();
-            string music_uri = reqmap["music_url"].ToString();
+            var music_uri = reqmap["music_url"].ToString();
             pInfo.MusicURI = music_uri != string.Empty && Uri.IsWellFormedUriString(music_uri, UriKind.Absolute) ? new URI(music_uri) : null;
-            string media_uri = reqmap["media_url"].ToString();
+            var media_uri = reqmap["media_url"].ToString();
             pInfo.MediaURI = media_uri != string.Empty && Uri.IsWellFormedUriString(media_uri, UriKind.Absolute) ? new URI(media_uri) : null;
             pInfo.MediaDescription = reqmap["media_desc"].ToString();
             pInfo.MediaType = reqmap["media_type"].ToString();
@@ -131,10 +131,10 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             m_Scene.TriggerParcelUpdate(pInfo);
 
-            using (HttpResponse httpres = httpreq.BeginResponse())
+            using (var httpres = httpreq.BeginResponse())
             {
                 httpres.ContentType = "application/llsd+xml";
-                using (Stream outStream = httpres.GetOutputStream())
+                using (var outStream = httpres.GetOutputStream())
                 {
                     LlsdXml.Serialize(new Map(), outStream);
                 }

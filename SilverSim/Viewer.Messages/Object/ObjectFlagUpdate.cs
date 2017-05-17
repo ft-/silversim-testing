@@ -51,32 +51,29 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ExtraPhysicsData> ExtraPhysics = new List<ExtraPhysicsData>();
 
-        public ObjectFlagUpdate()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectFlagUpdate m = new ObjectFlagUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectLocalID = p.ReadUInt32();
-            m.UsePhysics = p.ReadBoolean();
-            m.IsTemporary = p.ReadBoolean();
-            m.IsPhantom = p.ReadBoolean();
-            m.CastsShadows = p.ReadBoolean();
-
+            var m = new ObjectFlagUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectLocalID = p.ReadUInt32(),
+                UsePhysics = p.ReadBoolean(),
+                IsTemporary = p.ReadBoolean(),
+                IsPhantom = p.ReadBoolean(),
+                CastsShadows = p.ReadBoolean()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ExtraPhysicsData data = new ExtraPhysicsData();
-                data.PhysicsShapeType = (PrimitivePhysicsShapeType)p.ReadUInt8();
-                data.Density = p.ReadFloat();
-                data.Friction = p.ReadFloat();
-                data.Restitution = p.ReadFloat();
-                data.GravityMultiplier = p.ReadFloat();
-                m.ExtraPhysics.Add(data);
+                m.ExtraPhysics.Add(new ExtraPhysicsData()
+                {
+                    PhysicsShapeType = (PrimitivePhysicsShapeType)p.ReadUInt8(),
+                    Density = p.ReadFloat(),
+                    Friction = p.ReadFloat(),
+                    Restitution = p.ReadFloat(),
+                    GravityMultiplier = p.ReadFloat()
+                });
             }
             return m;
         }

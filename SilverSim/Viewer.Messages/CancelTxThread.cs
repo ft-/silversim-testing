@@ -23,11 +23,6 @@ namespace SilverSim.Viewer.Messages
 {
     public class CancelTxThread : Message
     {
-        public CancelTxThread()
-        {
-
-        }
-
         public override MessageType Number
         {
             get

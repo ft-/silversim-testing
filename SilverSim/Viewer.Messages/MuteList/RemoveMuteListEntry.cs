@@ -33,20 +33,15 @@ namespace SilverSim.Viewer.Messages.MuteList
         public UUID MuteID;
         public string MuteName;
 
-        public RemoveMuteListEntry()
-        {
-
-        }
-
         public static RemoveMuteListEntry Decode(UDPPacket p)
         {
-            RemoveMuteListEntry m = new RemoveMuteListEntry();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.MuteID = p.ReadUUID();
-            m.MuteName = p.ReadStringLen8();
-
-            return m;
+            return new RemoveMuteListEntry()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                MuteID = p.ReadUUID(),
+                MuteName = p.ReadStringLen8()
+            };
         }
 
         public override void Serialize(UDPPacket p)

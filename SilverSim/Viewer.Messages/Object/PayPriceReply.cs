@@ -34,17 +34,12 @@ namespace SilverSim.Viewer.Messages.Object
         public Int32 DefaultPayPrice;
         public List<Int32> ButtonData = new List<Int32>();
 
-        public PayPriceReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ObjectID);
             p.WriteInt32(DefaultPayPrice);
             p.WriteUInt8((byte)ButtonData.Count);
-            foreach (Int32 d in ButtonData)
+            foreach (var d in ButtonData)
             {
                 p.WriteInt32(d);
             }
@@ -52,9 +47,11 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            PayPriceReply m = new PayPriceReply();
-            m.ObjectID = p.ReadUUID();
-            m.DefaultPayPrice = p.ReadInt32();
+            var m = new PayPriceReply()
+            {
+                ObjectID = p.ReadUUID(),
+                DefaultPayPrice = p.ReadInt32()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {

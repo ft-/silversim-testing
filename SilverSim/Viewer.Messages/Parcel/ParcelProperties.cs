@@ -99,11 +99,6 @@ namespace SilverSim.Viewer.Messages.Parcel
         public bool ObscureMedia;
         public bool ObscureMusic;
 
-        public ParcelProperties()
-        {
-
-        }
-
         public override MessageType Number
         {
             get
@@ -114,86 +109,95 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public override IValue SerializeEQG()
         {
-            MapType m = new MapType();
-            AnArray parcelArray = new AnArray();
-            MapType parcelData = new MapType();
-            parcelData.Add("LocalID", LocalID);
-            parcelData.Add("AABBMax", AABBMax);
-            parcelData.Add("AABBMin", AABBMin);
-            parcelData.Add("Area", Area);
-            parcelData.Add("AuctionID", (int)AuctionID);
-            parcelData.Add("AuthBuyerID", AuthBuyerID);
-            parcelData.Add("Bitmap", new BinaryData(Bitmap));
-            parcelData.Add("Category", (int)Category);
-            parcelData.Add("ClaimDate", ClaimDate);
-            parcelData.Add("ClaimPrice", ClaimPrice);
-            parcelData.Add("Desc", Description);
+            var m = new MapType();
             byte[] parcelFlags = BitConverter.GetBytes((uint)ParcelFlags);
-            if(BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(parcelFlags);
             }
-            parcelData.Add("ParcelFlags", new BinaryData(parcelFlags));
-            parcelData.Add("GroupID", GroupID);
-            parcelData.Add("GroupPrims", GroupPrims);
-            parcelData.Add("IsGroupOwned", IsGroupOwned);
-            parcelData.Add("LandingType", (int)LandingType);
-            parcelData.Add("MaxPrims", MaxPrims);
-            parcelData.Add("MediaID", MediaID);
-            parcelData.Add("MediaURL", MediaURL);
-            parcelData.Add("MediaAutoScale", MediaAutoScale);
-            parcelData.Add("MusicURL", MusicURL);
-            parcelData.Add("Name", Name);
-            parcelData.Add("OtherCleanTime", OtherCleanTime);
-            parcelData.Add("OtherCount", OtherCount);
-            parcelData.Add("OtherPrims", OtherPrims);
-            parcelData.Add("OwnerID", OwnerID);
-            parcelData.Add("OwnerPrims", OwnerPrims);
-            parcelData.Add("ParcelPrimBonus", ParcelPrimBonus);
-            parcelData.Add("PassHours", PassHours);
-            parcelData.Add("PassPrice", PassPrice);
-            parcelData.Add("PublicCount", PublicCount);
-            parcelData.Add("Privacy", Privacy);
-            parcelData.Add("RegionDenyAnonymous", RegionDenyAnonymous);
-            parcelData.Add("RegionDenyIdentified", RegionDenyIdentified);
-            parcelData.Add("RegionDenyTransacted", RegionDenyTransacted);
-            parcelData.Add("RegionPushOverride", RegionPushOverride);
-            parcelData.Add("RentPrice", RentPrice);
-            parcelData.Add("RequestResult", (int)RequestResult);
-            parcelData.Add("SalePrice", SalePrice);
-            parcelData.Add("SelectedPrims", SelectedPrims);
-            parcelData.Add("SelfCount", SelfCount);
-            parcelData.Add("SequenceID", SequenceID);
-            parcelData.Add("SimWideMaxPrims", SimWideMaxPrims);
-            parcelData.Add("SimWideTotalPrims", SimWideTotalPrims);
-            parcelData.Add("SnapSelection", SnapSelection);
-            parcelData.Add("SnapshotID", SnapshotID);
-            parcelData.Add("Status", (int)Status);
-            parcelData.Add("TotalPrims", TotalPrims);
-            parcelData.Add("UserLocation", UserLocation);
-            parcelData.Add("UserLookAt", UserLookAt);
-            parcelData.Add("SeeAVs", SeeAVs);
-            parcelData.Add("AnyAVSounds", AnyAVSounds);
-            parcelData.Add("GroupAVSounds", GroupAVSounds);
-            parcelArray.Add(parcelData);
+            var parcelArray = new AnArray
+            {
+                new MapType
+                {
+                    { "LocalID", LocalID },
+                    { "AABBMax", AABBMax },
+                    { "AABBMin", AABBMin },
+                    { "Area", Area },
+                    { "AuctionID", (int)AuctionID },
+                    { "AuthBuyerID", AuthBuyerID },
+                    { "Bitmap", new BinaryData(Bitmap) },
+                    { "Category", (int)Category },
+                    { "ClaimDate", ClaimDate },
+                    { "ClaimPrice", ClaimPrice },
+                    { "Desc", Description },
+                    { "ParcelFlags", new BinaryData(parcelFlags) },
+                    { "GroupID", GroupID },
+                    { "GroupPrims", GroupPrims },
+                    { "IsGroupOwned", IsGroupOwned },
+                    { "LandingType", (int)LandingType },
+                    { "MaxPrims", MaxPrims },
+                    { "MediaID", MediaID },
+                    { "MediaURL", MediaURL },
+                    { "MediaAutoScale", MediaAutoScale },
+                    { "MusicURL", MusicURL },
+                    { "Name", Name },
+                    { "OtherCleanTime", OtherCleanTime },
+                    { "OtherCount", OtherCount },
+                    { "OtherPrims", OtherPrims },
+                    { "OwnerID", OwnerID },
+                    { "OwnerPrims", OwnerPrims },
+                    { "ParcelPrimBonus", ParcelPrimBonus },
+                    { "PassHours", PassHours },
+                    { "PassPrice", PassPrice },
+                    { "PublicCount", PublicCount },
+                    { "Privacy", Privacy },
+                    { "RegionDenyAnonymous", RegionDenyAnonymous },
+                    { "RegionDenyIdentified", RegionDenyIdentified },
+                    { "RegionDenyTransacted", RegionDenyTransacted },
+                    { "RegionPushOverride", RegionPushOverride },
+                    { "RentPrice", RentPrice },
+                    { "RequestResult", (int)RequestResult },
+                    { "SalePrice", SalePrice },
+                    { "SelectedPrims", SelectedPrims },
+                    { "SelfCount", SelfCount },
+                    { "SequenceID", SequenceID },
+                    { "SimWideMaxPrims", SimWideMaxPrims },
+                    { "SimWideTotalPrims", SimWideTotalPrims },
+                    { "SnapSelection", SnapSelection },
+                    { "SnapshotID", SnapshotID },
+                    { "Status", (int)Status },
+                    { "TotalPrims", TotalPrims },
+                    { "UserLocation", UserLocation },
+                    { "UserLookAt", UserLookAt },
+                    { "SeeAVs", SeeAVs },
+                    { "AnyAVSounds", AnyAVSounds },
+                    { "GroupAVSounds", GroupAVSounds }
+                }
+            };
             m.Add("ParcelData", parcelArray);
 
-            AnArray mediaArray = new AnArray();
-            MapType mediaData = new MapType();
-            mediaData.Add("MediaDesc", MediaDesc);
-            mediaData.Add("MediaHeight", MediaHeight);
-            mediaData.Add("MediaWidth", MediaWidth);
-            mediaData.Add("MediaLoop", MediaLoop);
-            mediaData.Add("MediaType", MediaType);
-            mediaData.Add("ObscureMedia", ObscureMedia);
-            mediaData.Add("ObscureMusic", ObscureMusic);
-            mediaArray.Add(mediaData);
+            var mediaArray = new AnArray
+            {
+                new MapType
+                {
+                    { "MediaDesc", MediaDesc },
+                    { "MediaHeight", MediaHeight },
+                    { "MediaWidth", MediaWidth },
+                    { "MediaLoop", MediaLoop },
+                    { "MediaType", MediaType },
+                    { "ObscureMedia", ObscureMedia },
+                    { "ObscureMusic", ObscureMusic }
+                }
+            };
             m.Add("MediaData", mediaArray);
 
-            AnArray ageArray = new AnArray();
-            MapType ageData = new MapType();
-            ageData.Add("RegionDenyAgeUnverified", RegionDenyAgeUnverified);
-            ageArray.Add(ageData);
+            var ageArray = new AnArray
+            {
+                new MapType
+                {
+                    { "RegionDenyAgeUnverified", RegionDenyAgeUnverified }
+                }
+            };
             m.Add("AgeVerificationBlock", ageArray);
             return m;
         }

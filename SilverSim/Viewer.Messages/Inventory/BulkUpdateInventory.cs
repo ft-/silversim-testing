@@ -111,7 +111,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public void AddInventoryFolder(InventoryFolder folder)
         {
-            FolderDataEntry e = new FolderDataEntry();
+            var e = new FolderDataEntry();
             e.FolderID = folder.ID;
             e.ParentID = folder.ParentFolderID;
             e.Type = folder.InventoryType;
@@ -121,7 +121,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public void AddInventoryItem(InventoryItem item, UInt32 callbackID)
         {
-            ItemDataEntry e = new ItemDataEntry();
+            var e = new ItemDataEntry();
             e.ItemID = item.ID;
             e.CallbackID = callbackID;
             e.FolderID = item.ParentFolderID;
@@ -165,7 +165,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         {
             AgentID = agentID;
             TransactionID = transactionID;
-            foreach (InventoryItem item in items)
+            foreach (var item in items)
             {
                 AddInventoryItem(item, callbackID);
             }
@@ -177,7 +177,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(TransactionID);
 
             p.WriteUInt8((byte)FolderData.Count);
-            foreach (FolderDataEntry d in FolderData)
+            foreach (var d in FolderData)
             {
                 p.WriteUUID(d.FolderID);
                 p.WriteUUID(d.ParentID);
@@ -186,7 +186,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             }
 
             p.WriteUInt8((byte)ItemData.Count);
-            foreach (ItemDataEntry d in ItemData)
+            foreach (var d in ItemData)
             {
                 p.WriteUUID(d.ItemID);
                 p.WriteUInt32(d.CallbackID);
@@ -215,48 +215,50 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            BulkUpdateInventory m = new BulkUpdateInventory();
+            var m = new BulkUpdateInventory();
             m.AgentID = p.ReadUUID();
             m.TransactionID = p.ReadUUID();
 
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                FolderDataEntry e = new FolderDataEntry();
-                e.FolderID = p.ReadUUID();
-                e.ParentID = p.ReadUUID();
-                e.Type = (InventoryType)p.ReadInt8();
-                e.Name = p.ReadStringLen8();
-                m.FolderData.Add(e);
+                m.FolderData.Add(new FolderDataEntry()
+                {
+                    FolderID = p.ReadUUID(),
+                    ParentID = p.ReadUUID(),
+                    Type = (InventoryType)p.ReadInt8(),
+                    Name = p.ReadStringLen8()
+                });
             }
 
             n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ItemDataEntry e = new ItemDataEntry();
-                e.ItemID = p.ReadUUID();
-                e.CallbackID = p.ReadUInt32();
-                e.FolderID = p.ReadUUID();
-                e.CreatorID = p.ReadUUID();
-                e.OwnerID = p.ReadUUID();
-                e.GroupID = p.ReadUUID();
-                e.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
-                e.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-                e.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
-                e.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
-                e.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-                e.IsGroupOwned = p.ReadBoolean();
-                e.AssetID = p.ReadUUID();
-                e.Type = (AssetType)p.ReadInt8();
-                e.InvType = (InventoryType)p.ReadInt8();
-                e.Flags = (InventoryFlags)p.ReadUInt32();
-                e.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
-                e.SalePrice = p.ReadInt32();
-                e.Name = p.ReadStringLen8();
-                e.Description = p.ReadStringLen8();
-                e.CreationDate = p.ReadUInt32();
+                m.ItemData.Add(new ItemDataEntry()
+                {
+                    ItemID = p.ReadUUID(),
+                    CallbackID = p.ReadUInt32(),
+                    FolderID = p.ReadUUID(),
+                    CreatorID = p.ReadUUID(),
+                    OwnerID = p.ReadUUID(),
+                    GroupID = p.ReadUUID(),
+                    BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    IsGroupOwned = p.ReadBoolean(),
+                    AssetID = p.ReadUUID(),
+                    Type = (AssetType)p.ReadInt8(),
+                    InvType = (InventoryType)p.ReadInt8(),
+                    Flags = (InventoryFlags)p.ReadUInt32(),
+                    SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
+                    SalePrice = p.ReadInt32(),
+                    Name = p.ReadStringLen8(),
+                    Description = p.ReadStringLen8(),
+                    CreationDate = p.ReadUInt32()
+                });
                 p.ReadUInt32(); /* checksum */
-                m.ItemData.Add(e);
             }
             return m;
         }
@@ -273,57 +275,60 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public override IValue SerializeEQG()
         {
-            MapType llsd = new MapType();
+            var llsd = new MapType();
 
-            AnArray agentDataArray = new AnArray();
-            MapType agentData = new MapType();
-            agentData.Add("AgentID", AgentID);
-            agentData.Add("SessionID", SessionID);
-            agentData.Add("TransactionID", TransactionID);
-            agentDataArray.Add(agentData);
+            var agentDataArray = new AnArray();
+            agentDataArray.Add(new MapType
+            {
+                { "AgentID", AgentID },
+                { "SessionID", SessionID },
+                { "TransactionID", TransactionID }
+            });
             llsd.Add("AgentData", agentDataArray);
 
-            AnArray folderDataArray = new AnArray();
+            var folderDataArray = new AnArray();
 
-            foreach(FolderDataEntry folder in FolderData)
+            foreach(var folder in FolderData)
             {
-                MapType folderData = new MapType();
-                folderData.Add("FolderID", folder.FolderID);
-                folderData.Add("AgentID", AgentID);
-                folderData.Add("ParentID", folder.ParentID);
-                folderData.Add("Type", (int)folder.Type);
-                folderData.Add("Name", folder.Name);
-                folderDataArray.Add(folderData);
+                folderDataArray.Add(new MapType
+                {
+                    { "FolderID", folder.FolderID },
+                    { "AgentID", AgentID },
+                    { "ParentID", folder.ParentID },
+                    { "Type", (int)folder.Type },
+                    { "Name", folder.Name }
+                });
             }
             llsd.Add("FolderData", folderDataArray);
 
-            AnArray itemDataArray = new AnArray();
-            foreach(ItemDataEntry item in ItemData)
+            var itemDataArray = new AnArray();
+            foreach(var item in ItemData)
             {
-                MapType itemData = new MapType();
-                itemData.Add("ItemID", item.ItemID);
-                itemData.Add("FolderID", item.FolderID);
-                itemData.Add("CreatorID", item.CreatorID);
-                itemData.Add("OwnerID", item.OwnerID);
-                itemData.Add("GroupID", item.GroupID);
-                itemData.Add("BaseMask", EncodeU32ToBinary((uint)item.BaseMask));
-                itemData.Add("OwnerMask", EncodeU32ToBinary((uint)item.OwnerMask));
-                itemData.Add("GroupMask", EncodeU32ToBinary((uint)item.GroupMask));
-                itemData.Add("EveryoneMask", EncodeU32ToBinary((uint)item.EveryoneMask));
-                itemData.Add("NextOwnerMask", EncodeU32ToBinary((uint)item.NextOwnerMask));
-                itemData.Add("GroupOwned", item.IsGroupOwned);
-                itemData.Add("AssetID", item.AssetID);
-                itemData.Add("Type", (int)item.Type);
-                itemData.Add("InvType", (int)item.InvType);
-                itemData.Add("Flags", EncodeU32ToBinary((uint)item.Flags));
-                itemData.Add("SaleType", (int)item.SaleType);
-                itemData.Add("SalePrice", item.SalePrice);
-                itemData.Add("Name", item.Name);
-                itemData.Add("Description", item.Description);
-                itemData.Add("CreationDate", (int)item.CreationDate);
-                itemData.Add("CRC", EncodeU32ToBinary(item.Checksum));
-                itemData.Add("CallbackID", 0);
-                itemDataArray.Add(itemData);
+                itemDataArray.Add(new MapType
+                {
+                    { "ItemID", item.ItemID },
+                    { "FolderID", item.FolderID },
+                    { "CreatorID", item.CreatorID },
+                    { "OwnerID", item.OwnerID },
+                    { "GroupID", item.GroupID },
+                    { "BaseMask", EncodeU32ToBinary((uint)item.BaseMask) },
+                    { "OwnerMask", EncodeU32ToBinary((uint)item.OwnerMask) },
+                    { "GroupMask", EncodeU32ToBinary((uint)item.GroupMask) },
+                    { "EveryoneMask", EncodeU32ToBinary((uint)item.EveryoneMask) },
+                    { "NextOwnerMask", EncodeU32ToBinary((uint)item.NextOwnerMask) },
+                    { "GroupOwned", item.IsGroupOwned },
+                    { "AssetID", item.AssetID },
+                    { "Type", (int)item.Type },
+                    { "InvType", (int)item.InvType },
+                    { "Flags", EncodeU32ToBinary((uint)item.Flags) },
+                    { "SaleType", (int)item.SaleType },
+                    { "SalePrice", item.SalePrice },
+                    { "Name", item.Name },
+                    { "Description", item.Description },
+                    { "CreationDate", (int)item.CreationDate },
+                    { "CRC", EncodeU32ToBinary(item.Checksum) },
+                    { "CallbackID", 0 }
+                });
             }
             llsd.Add("ItemData", itemDataArray);
 

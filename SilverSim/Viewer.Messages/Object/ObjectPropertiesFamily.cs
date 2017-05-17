@@ -48,11 +48,6 @@ namespace SilverSim.Viewer.Messages.Object
         public string Name;
         public string Description;
 
-        public ObjectPropertiesFamily()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt32(RequestFlags);
@@ -75,24 +70,25 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            ObjectPropertiesFamily m = new ObjectPropertiesFamily();
-            m.RequestFlags = p.ReadUInt32();
-            m.ObjectID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
-            m.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-            m.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
-            m.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
-            m.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-            m.OwnershipCost = p.ReadInt32();
-            m.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
-            m.SalePrice = p.ReadInt32();
-            m.Category = p.ReadUInt32();
-            m.LastOwnerID = p.ReadUUID();
-            m.Name = p.ReadStringLen8();
-            m.Description = p.ReadStringLen8();
-            return m;
+            return new ObjectPropertiesFamily()
+            {
+                RequestFlags = p.ReadUInt32(),
+                ObjectID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                OwnershipCost = p.ReadInt32(),
+                SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
+                SalePrice = p.ReadInt32(),
+                Category = p.ReadUInt32(),
+                LastOwnerID = p.ReadUUID(),
+                Name = p.ReadStringLen8(),
+                Description = p.ReadStringLen8()
+            };
         }
     }
 }

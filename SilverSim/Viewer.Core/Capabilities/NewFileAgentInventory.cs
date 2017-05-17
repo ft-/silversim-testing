@@ -67,17 +67,19 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public override UUID GetUploaderID(Map reqmap)
         {
-            UUID transaction = UUID.Random;
-            InventoryItem item = new InventoryItem();
-            item.ID = UUID.Random;
-            item.Description = reqmap["description"].ToString();
-            item.Name = reqmap["name"].ToString();
-            item.ParentFolderID = reqmap["folder_id"].AsUUID;
-            item.AssetTypeName = reqmap["asset_type"].ToString();
-            item.InventoryTypeName = reqmap["inventory_type"].ToString();
-            item.LastOwner = m_Creator;
-            item.Owner = m_Creator;
-            item.Creator = m_Creator;
+            var transaction = UUID.Random;
+            var item = new InventoryItem()
+            {
+                ID = UUID.Random,
+                Description = reqmap["description"].ToString(),
+                Name = reqmap["name"].ToString(),
+                ParentFolderID = reqmap["folder_id"].AsUUID,
+                AssetTypeName = reqmap["asset_type"].ToString(),
+                InventoryTypeName = reqmap["inventory_type"].ToString(),
+                LastOwner = m_Creator,
+                Owner = m_Creator,
+                Creator = m_Creator
+            };
             item.Permissions.Base = InventoryPermissionsMask.All;
             item.Permissions.Current = InventoryPermissionsMask.Every;
             item.Permissions.EveryOne = (InventoryPermissionsMask)reqmap["everyone_mask"].AsUInt;

@@ -46,18 +46,13 @@ namespace SilverSim.Viewer.Messages.Map
 
         public List<DataEntry> Data = new List<DataEntry>();
 
-        public MapItemReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUInt32((uint)Flags);
             p.WriteUInt32((uint)ItemType);
             p.WriteUInt8((byte)Data.Count);
-            foreach (DataEntry d in Data)
+            foreach (var d in Data)
             {
                 p.WriteUInt32(d.X);
                 p.WriteUInt32(d.Y);
@@ -70,21 +65,24 @@ namespace SilverSim.Viewer.Messages.Map
 
         public static Message Decode(UDPPacket p)
         {
-            MapItemReply m = new MapItemReply();
-            m.AgentID = p.ReadUUID();
-            m.Flags = (MapAgentFlags)p.ReadUInt32();
-            m.ItemType = (MapItemType)p.ReadUInt32();
+            var m = new MapItemReply()
+            {
+                AgentID = p.ReadUUID(),
+                Flags = (MapAgentFlags)p.ReadUInt32(),
+                ItemType = (MapItemType)p.ReadUInt32()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                DataEntry d = new DataEntry();
-                d.X = p.ReadUInt32();
-                d.Y = p.ReadUInt32();
-                d.ID = p.ReadUUID();
-                d.Extra = p.ReadInt32();
-                d.Extra2 = p.ReadInt32();
-                d.Name = p.ReadStringLen8();
-                m.Data.Add(d);
+                m.Data.Add(new DataEntry()
+                {
+                    X = p.ReadUInt32(),
+                    Y = p.ReadUInt32(),
+                    ID = p.ReadUUID(),
+                    Extra = p.ReadInt32(),
+                    Extra2 = p.ReadInt32(),
+                    Name = p.ReadStringLen8()
+                });
             }
             return m;
         }

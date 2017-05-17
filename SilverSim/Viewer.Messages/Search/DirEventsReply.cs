@@ -47,17 +47,12 @@ namespace SilverSim.Viewer.Messages.Search
 
         public List<QueryReplyData> QueryReplies = new List<QueryReplyData>();
 
-        public DirEventsReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
             p.WriteUInt8((byte)QueryReplies.Count);
-            foreach(QueryReplyData d in QueryReplies)
+            foreach(var d in QueryReplies)
             {
                 p.WriteUUID(d.OwnerID);
                 p.WriteStringLen8(d.Name);
@@ -68,7 +63,7 @@ namespace SilverSim.Viewer.Messages.Search
             }
 
             p.WriteUInt8((byte)QueryReplies.Count);
-            foreach (QueryReplyData d in QueryReplies)
+            foreach (var d in QueryReplies)
             {
                 p.WriteUInt32(d.Status);
             }
@@ -76,25 +71,28 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            DirEventsReply m = new DirEventsReply();
-            m.AgentID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
+            var m = new DirEventsReply()
+            {
+                AgentID = p.ReadUUID(),
+                QueryID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                QueryReplyData d = new QueryReplyData();
-                d.OwnerID = p.ReadUUID();
-                d.Name = p.ReadStringLen8();
-                d.EventID = p.ReadUUID();
-                d.Date = p.ReadStringLen8();
-                d.UnixTime = p.ReadUInt32();
-                d.EventFlags = p.ReadUInt32();
-                m.QueryReplies.Add(d);
+                m.QueryReplies.Add(new QueryReplyData()
+                {
+                    OwnerID = p.ReadUUID(),
+                    Name = p.ReadStringLen8(),
+                    EventID = p.ReadUUID(),
+                    Date = p.ReadStringLen8(),
+                    UnixTime = p.ReadUInt32(),
+                    EventFlags = p.ReadUInt32()
+                });
             }
 
             for (int i = 0; i < n && i < m.QueryReplies.Count; ++i)
             {
-                QueryReplyData d = m.QueryReplies[i];
+                var d = m.QueryReplies[i];
                 d.Status = p.ReadUInt32();
                 m.QueryReplies[i] = d;
             }

@@ -55,7 +55,7 @@ namespace SilverSim.WebIF.Admin.UserServer
 
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
-            IAdminWebIF webif = loader.GetAdminWebIF();
+            var webif = loader.GetAdminWebIF();
             m_WebIF = webif;
             webif.ModuleNames.Add("useraccounts");
             webif.AutoGrantRights["useraccounts.manage"].Add("useraccounts.view");
@@ -73,7 +73,7 @@ namespace SilverSim.WebIF.Admin.UserServer
         [AdminWebIfRequiredRight("useraccounts.create")]
         void HandleUserAccountCreate(HttpRequest req, Map jsondata)
         {
-            UserAccount account = new UserAccount();
+            var account = new UserAccount();
             account.Principal.ID = UUID.Random;
             if (!jsondata.ContainsKey("firstname") ||
                 !jsondata.ContainsKey("lastname") ||
@@ -118,9 +118,11 @@ namespace SilverSim.WebIF.Admin.UserServer
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.AlreadyExists);
                 return;
             }
-            UserAuthInfo uai = new UserAuthInfo();
-            uai.ID = account.Principal.ID;
-            uai.Password = jsondata["password"].ToString();
+            var uai = new UserAuthInfo()
+            {
+                ID = account.Principal.ID,
+                Password = jsondata["password"].ToString()
+            };
             try
             {
                 m_AuthInfoService.Store(uai);
@@ -131,12 +133,16 @@ namespace SilverSim.WebIF.Admin.UserServer
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
-            Map res = new Map();
-            res.Add("id", account.Principal.ID);
-            res.Add("firstname", account.Principal.FirstName);
-            res.Add("lastname", account.Principal.LastName);
-            Map resdata = new Map();
-            resdata.Add("account", res);
+            var res = new Map
+            {
+                { "id", account.Principal.ID },
+                { "firstname", account.Principal.FirstName },
+                { "lastname", account.Principal.LastName }
+            };
+            var resdata = new Map
+            {
+                { "account", res }
+            };
             m_WebIF.SuccessResponse(req, resdata);
         }
 
@@ -209,7 +215,7 @@ namespace SilverSim.WebIF.Admin.UserServer
             }
             else
             {
-                foreach (IUserAccountDeleteServiceInterface delService in m_AccountDeleteServices)
+                foreach (var delService in m_AccountDeleteServices)
                 {
                     try
                     {
@@ -287,16 +293,20 @@ namespace SilverSim.WebIF.Admin.UserServer
             UserAccount acc;
             if (m_UserAccountService.TryGetValue(scopeid, id.AsUUID, out acc))
             {
-                Map result = new Map();
-                result.Add("id", acc.Principal.ID);
-                result.Add("firstname", acc.Principal.FirstName);
-                result.Add("lastname", acc.Principal.LastName);
-                result.Add("email", acc.Email);
-                result.Add("userlevel", acc.UserLevel);
-                result.Add("userflags", acc.UserFlags.ToString());
-                result.Add("usertitle", acc.UserTitle);
-                Map resdata = new Map();
-                resdata.Add("account", result);
+                var result = new Map
+                {
+                    { "id", acc.Principal.ID },
+                    { "firstname", acc.Principal.FirstName },
+                    { "lastname", acc.Principal.LastName },
+                    { "email", acc.Email },
+                    { "userlevel", acc.UserLevel },
+                    { "userflags", acc.UserFlags.ToString() },
+                    { "usertitle", acc.UserTitle }
+                };
+                var resdata = new Map
+                {
+                    { "account", result }
+                };
                 m_WebIF.SuccessResponse(req, resdata);
             }
             else
@@ -308,8 +318,8 @@ namespace SilverSim.WebIF.Admin.UserServer
         [AdminWebIfRequiredRight("useraccounts.view")]
         void HandleUserAccountSearch(HttpRequest req, Map jsondata)
         {
-            Map res = new Map();
-            AnArray accountsRes = new AnArray();
+            var res = new Map();
+            var accountsRes = new AnArray();
             UUID scopeid;
             int start = 0;
             int count = 1000;
@@ -335,8 +345,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 count = 1000;
             }
             string query = jsondata["query"].ToString();
-            IEnumerable<UserAccount> accounts = m_UserAccountService.GetAccounts(scopeid, query);
-            foreach (UserAccount acc in accounts)
+            foreach (var acc in m_UserAccountService.GetAccounts(scopeid, query))
             {
                 if (start > 0)
                 {
@@ -348,11 +357,13 @@ namespace SilverSim.WebIF.Admin.UserServer
                     {
                         break;
                     }
-                    Map accountData = new Map();
-                    accountData.Add("scopeid", acc.ScopeID);
-                    accountData.Add("id", acc.Principal.ID);
-                    accountData.Add("firstname", acc.Principal.FirstName);
-                    accountData.Add("lastname", acc.Principal.LastName);
+                    var accountData = new Map
+                    {
+                        { "scopeid", acc.ScopeID },
+                        { "id", acc.Principal.ID },
+                        { "firstname", acc.Principal.FirstName },
+                        { "lastname", acc.Principal.LastName }
+                    };
                     accountsRes.Add(accountData);
                 }
             }
@@ -364,11 +375,6 @@ namespace SilverSim.WebIF.Admin.UserServer
     [PluginName("UserAccountAdmin")]
     public class UserAccountAdminFactory : IPluginFactory
     {
-        public UserAccountAdminFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new UserAccountAdmin(ownSection);

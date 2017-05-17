@@ -36,11 +36,6 @@ namespace SilverSim.Viewer.Messages.Telehub
 
         public List<Vector3> SpawnPoints = new List<Vector3>();
 
-        public TelehubInfo()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ObjectID);
@@ -48,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Telehub
             p.WriteVector3f(TelehubPos);
             p.WriteLLQuaternion(TelehubRot);
             p.WriteUInt8((byte)SpawnPoints.Count);
-            foreach(Vector3 spawn in SpawnPoints)
+            foreach(var spawn in SpawnPoints)
             {
                 p.WriteVector3f(spawn);
             }
@@ -56,11 +51,13 @@ namespace SilverSim.Viewer.Messages.Telehub
 
         public static Message Decode(UDPPacket p)
         {
-            TelehubInfo m = new TelehubInfo();
-            m.ObjectID = p.ReadUUID();
-            m.ObjectName = p.ReadStringLen8();
-            m.TelehubPos = p.ReadVector3f();
-            m.TelehubRot = p.ReadLLQuaternion();
+            var m = new TelehubInfo()
+            {
+                ObjectID = p.ReadUUID(),
+                ObjectName = p.ReadStringLen8(),
+                TelehubPos = p.ReadVector3f(),
+                TelehubRot = p.ReadLLQuaternion()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {

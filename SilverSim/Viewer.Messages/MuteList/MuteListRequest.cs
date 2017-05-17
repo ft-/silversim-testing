@@ -31,18 +31,13 @@ namespace SilverSim.Viewer.Messages.MuteList
         public UUID AgentID;
         public UUID SessionID;
 
-        public MuteListRequest()
-        {
-
-        }
-
         public static MuteListRequest Decode(UDPPacket p)
         {
-            MuteListRequest m = new MuteListRequest();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
-            return m;
+            return new MuteListRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

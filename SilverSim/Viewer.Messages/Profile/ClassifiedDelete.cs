@@ -32,19 +32,14 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID SessionID;
         public UUID ClassifiedID;
 
-        public ClassifiedDelete()
-        {
-
-        }
-
         public static ClassifiedDelete Decode(UDPPacket p)
         {
-            ClassifiedDelete m = new ClassifiedDelete();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ClassifiedID = p.ReadUUID();
-
-            return m;
+            return new ClassifiedDelete()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ClassifiedID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

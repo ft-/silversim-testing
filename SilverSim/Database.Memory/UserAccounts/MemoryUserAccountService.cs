@@ -39,10 +39,6 @@ namespace SilverSim.Database.Memory.UserAccounts
         readonly RwLockedDictionary<UUID, UserAccount> m_Data = new RwLockedDictionary<UUID, UserAccount>();
 
         #region Constructor
-        public MemoryUserAccountService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
@@ -84,7 +80,7 @@ namespace SilverSim.Database.Memory.UserAccounts
 
         public override bool ContainsKey(UUID scopeID, string email)
         {
-            IEnumerable<bool> result = from account in m_Data.Values
+            var result = from account in m_Data.Values
                                               where account.Email.ToLower().Equals(email.ToLower()) &&
                        (scopeID == UUID.Zero || account.ScopeID == scopeID)
                                               select true;
@@ -98,7 +94,7 @@ namespace SilverSim.Database.Memory.UserAccounts
 
         public override bool TryGetValue(UUID scopeID, string email, out UserAccount account)
         {
-            IEnumerable<UserAccount> result = from accountdata in m_Data.Values
+            var result = from accountdata in m_Data.Values
                                        where accountdata.Email.ToLower().Equals(email.ToLower()) &&
                 (scopeID == UUID.Zero || accountdata.ScopeID == scopeID)
                                        select accountdata;
@@ -128,7 +124,7 @@ namespace SilverSim.Database.Memory.UserAccounts
 
         public override bool ContainsKey(UUID scopeID, string firstName, string lastName)
         {
-            IEnumerable<bool> result = from account in m_Data.Values
+            var result = from account in m_Data.Values
                                        where account.Principal.FirstName.ToLower().Equals(firstName.ToLower()) &&
                                        account.Principal.LastName.ToLower().Equals(lastName.ToLower()) &&
                 (scopeID == UUID.Zero || account.ScopeID == scopeID)
@@ -143,7 +139,7 @@ namespace SilverSim.Database.Memory.UserAccounts
 
         public override bool TryGetValue(UUID scopeID, string firstName, string lastName, out UserAccount account)
         {
-            IEnumerable<UserAccount> result = from accountdata in m_Data.Values
+            var result = from accountdata in m_Data.Values
                                        where accountdata.Principal.FirstName.ToLower().Equals(firstName.ToLower()) &&
                                        accountdata.Principal.LastName.ToLower().Equals(lastName.ToLower()) &&
                 (scopeID == UUID.Zero || accountdata.ScopeID == scopeID)
@@ -176,7 +172,7 @@ namespace SilverSim.Database.Memory.UserAccounts
         public override List<UserAccount> GetAccounts(UUID scopeID, string query)
         {
             string[] words = query.Split(new char[] {' '}, 2);
-            List<UserAccount> accounts = new List<UserAccount>();
+            var accounts = new List<UserAccount>();
             IEnumerable<UserAccount> res;
             if (query.Trim().Length == 0)
             {
@@ -188,7 +184,7 @@ namespace SilverSim.Database.Memory.UserAccounts
                     from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) || data.Principal.LastName.ToLower().Equals(words[0].ToLower()) select new UserAccount(data) :
                     from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) && data.Principal.LastName.ToLower().Equals(words[1].ToLower()) select new UserAccount(data);
             }
-            foreach(UserAccount acc in res)
+            foreach(var acc in res)
             {
                 accounts.Add(acc);
             }
@@ -197,14 +193,14 @@ namespace SilverSim.Database.Memory.UserAccounts
 
         public override void Add(UserAccount userAccount)
         {
-            UserAccount uac = new UserAccount(userAccount);
+            var uac = new UserAccount(userAccount);
             uac.IsLocalToGrid = true;
             m_Data.Add(userAccount.Principal.ID, uac);
         }
 
         public override void Update(UserAccount userAccount)
         {
-            UserAccount uac = new UserAccount(userAccount);
+            var uac = new UserAccount(userAccount);
             uac.IsLocalToGrid = true;
             m_Data[userAccount.Principal.ID] = uac;
         }
@@ -229,11 +225,6 @@ namespace SilverSim.Database.Memory.UserAccounts
     [PluginName("UserAccounts")]
     public class MemoryUserAccountServiceFactory : IPluginFactory
     {
-        public MemoryUserAccountServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryUserAccountService();

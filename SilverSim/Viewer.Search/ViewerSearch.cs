@@ -56,10 +56,6 @@ namespace SilverSim.Viewer.Search
 
         bool m_ShutdownSearch;
 
-        public ViewerSearch()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             ThreadManager.CreateThread(HandlerThread).Start();
@@ -95,9 +91,6 @@ namespace SilverSim.Viewer.Search
                         case MessageType.AvatarPickerRequest:
                             ProcessAvatarPickerRequest(req.Key.Agent, req.Key, m);
                             break;
-
-                        default:
-                            break;
                     }
                 }
                 catch(Exception e)
@@ -110,7 +103,7 @@ namespace SilverSim.Viewer.Search
         [AgentCircuit.IgnoreMethod]
         void ProcessDirFindQuery(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
-            DirFindQuery req = (DirFindQuery)m;
+            var req = (DirFindQuery)m;
             SceneInterface scene = circuit.Scene;
             if(null == scene)
             {
@@ -142,7 +135,7 @@ namespace SilverSim.Viewer.Search
         void ProcessDirFindQuery_People(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
         {
             DirPeopleReply res = null;
-            UDPPacket t = new UDPPacket();
+            var t = new UDPPacket();
 
             List<UUI> uuis = scene.AvatarNameService.Search(req.QueryText.Split(new char[] {' '}, 2));
             foreach(UUI uui in uuis)
@@ -154,8 +147,10 @@ namespace SilverSim.Viewer.Search
                     res.QueryID = req.QueryID;
                 }
 
-                DirPeopleReply.QueryReplyData d = new DirPeopleReply.QueryReplyData();
-                d.AgentID = uui.ID;
+                var d = new DirPeopleReply.QueryReplyData()
+                {
+                    AgentID = uui.ID
+                };
                 string[] parts = uui.FullName.Split(' ');
                 d.FirstName = parts[0];
                 if (parts.Length > 1)
@@ -185,41 +180,48 @@ namespace SilverSim.Viewer.Search
         {
             DirGroupsReply res = null;
 
-            GroupsServiceInterface groupsService = scene.GroupsService;
+            var groupsService = scene.GroupsService;
             if(null == groupsService)
             {
-                res = new DirGroupsReply();
-                res.AgentID = req.AgentID;
-                res.QueryID = req.QueryID;
+                res = new DirGroupsReply()
+                {
+                    AgentID = req.AgentID,
+                    QueryID = req.QueryID
+                };
                 agent.SendMessageAlways(res, scene.ID);
                 return;
             }
 
-            List<DirGroupInfo> gis = groupsService.Groups.GetGroupsByName(agent.Owner, req.QueryText);
+            var gis = groupsService.Groups.GetGroupsByName(agent.Owner, req.QueryText);
             if(gis.Count == 0)
             {
-                res = new DirGroupsReply();
-                res.AgentID = req.AgentID;
-                res.QueryID = req.QueryID;
+                res = new DirGroupsReply()
+                {
+                    AgentID = req.AgentID,
+                    QueryID = req.QueryID
+                };
                 agent.SendMessageAlways(res, scene.ID);
                 return;
             }
-            UDPPacket t = new UDPPacket();
-            foreach (DirGroupInfo gi in gis)
+            var t = new UDPPacket();
+            foreach (var gi in gis)
             {
                 if (null == res)
                 {
-                    res = new DirGroupsReply();
-                    res.AgentID = req.AgentID;
-                    res.QueryID = req.QueryID;
+                    res = new DirGroupsReply()
+                    {
+                        AgentID = req.AgentID,
+                        QueryID = req.QueryID
+                    };
                 }
 
-                DirGroupsReply.QueryReplyData d = new DirGroupsReply.QueryReplyData();
-                d.GroupID = gi.ID.ID;
-                d.GroupName = gi.ID.GroupName;
-                d.Members = gi.MemberCount;
-                d.SearchOrder = gi.SearchOrder;
-
+                var d = new DirGroupsReply.QueryReplyData()
+                {
+                    GroupID = gi.ID.ID,
+                    GroupName = gi.ID.GroupName,
+                    Members = gi.MemberCount,
+                    SearchOrder = gi.SearchOrder
+                };
                 res.QueryReplies.Add(d);
 
                 t.Reset();
@@ -244,9 +246,9 @@ namespace SilverSim.Viewer.Search
         [AgentCircuit.IgnoreMethod]
         void ProcessAvatarPickerRequest(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
-            AvatarPickerRequest req = (AvatarPickerRequest)m;
-            AvatarPickerReply res = new AvatarPickerReply();
-            SceneInterface scene = circuit.Scene;
+            var req = (AvatarPickerRequest)m;
+            var res = new AvatarPickerReply();
+            var scene = circuit.Scene;
             if(scene == null)
             {
                 return;
@@ -274,10 +276,10 @@ namespace SilverSim.Viewer.Search
                 return;
             }
 
-            List<UUI> results = scene.AvatarNameService.Search(names);
+            var results = scene.AvatarNameService.Search(names);
             for(int offset = 0; offset < results.Count && offset < 100; ++offset)
             {
-                AvatarPickerReply.DataEntry d = new AvatarPickerReply.DataEntry();
+                var d = new AvatarPickerReply.DataEntry();
                 d.AvatarID = results[offset].ID;
                 string[] sp = results[offset].FullName.Split(new char[] {' '}, 2);
                 d.FirstName = sp[0];
@@ -298,7 +300,7 @@ namespace SilverSim.Viewer.Search
                 req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;
             }
-            string[] parts = req.RawUrl.Substring(1).Split('/');
+            var parts = req.RawUrl.Substring(1).Split('/');
             if (req.Method != "GET")
             {
                 req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
@@ -310,12 +312,12 @@ namespace SilverSim.Viewer.Search
                 return;
             }
 
-            string query = parts[3].Substring(1);
-            string[] queryreqs = query.Split('&');
+            var query = parts[3].Substring(1);
+            var queryreqs = query.Split('&');
 
-            string names = string.Empty;
-            string psize = string.Empty;
-            string pnumber = string.Empty;
+            var names = string.Empty;
+            var psize = string.Empty;
+            var pnumber = string.Empty;
 
             foreach (string reqentry in queryreqs)
             {
@@ -348,7 +350,7 @@ namespace SilverSim.Viewer.Search
                 return;
             }
 
-            string[] nameparts = names.Split(' ');
+            var nameparts = names.Split(' ');
             if(nameparts.Length > 2 || nameparts.Length < 1)
             {
                 req.ErrorResponse(HttpStatusCode.NotFound, string.Empty);
@@ -412,11 +414,6 @@ namespace SilverSim.Viewer.Search
     [PluginName("ViewerSearch")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerSearch();

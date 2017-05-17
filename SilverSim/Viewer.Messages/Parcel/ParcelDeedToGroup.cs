@@ -34,20 +34,15 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID GroupID;
         public Int32 LocalID;
 
-        public ParcelDeedToGroup()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelDeedToGroup m = new ParcelDeedToGroup();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.LocalID = p.ReadInt32();
-
-            return m;
+            return new ParcelDeedToGroup()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                LocalID = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

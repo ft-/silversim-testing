@@ -33,11 +33,6 @@ namespace SilverSim.Viewer.Messages.Script
         public Vector3 SimPosition = Vector3.Zero;
         public Vector3 LookAt = Vector3.Zero;
 
-        public ScriptTeleportRequest()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteStringLen8(ObjectName);
@@ -48,12 +43,13 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            ScriptTeleportRequest m = new ScriptTeleportRequest();
-            m.ObjectName = p.ReadStringLen8();
-            m.SimName = p.ReadStringLen8();
-            m.SimPosition = p.ReadVector3f();
-            m.LookAt = p.ReadVector3f();
-            return m;
+            return new ScriptTeleportRequest()
+            {
+                ObjectName = p.ReadStringLen8(),
+                SimName = p.ReadStringLen8(),
+                SimPosition = p.ReadVector3f(),
+                LookAt = p.ReadVector3f()
+            };
         }
     }
 }

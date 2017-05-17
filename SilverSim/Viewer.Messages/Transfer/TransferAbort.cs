@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.Transfer
         public UUID TransferID;
         public int ChannelType;
 
-        public TransferAbort()
-        {
-            
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(TransferID);
@@ -44,11 +39,11 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         public static Message Decode(UDPPacket p)
         {
-            TransferAbort m = new TransferAbort();
-            m.TransferID = p.ReadUUID();
-            m.ChannelType = p.ReadInt32();
-
-            return m;
+            return new TransferAbort()
+            {
+                TransferID = p.ReadUUID(),
+                ChannelType = p.ReadInt32()
+            };
         }
     }
 }

@@ -39,21 +39,16 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public List<UUID> ReturnIDs = new List<UUID>();
 
-        public ParcelSelectObjects()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelSelectObjects m = new ParcelSelectObjects();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.LocalID = p.ReadInt32();
-            m.ReturnType = p.ReadUInt32();
-
-            uint cnt;
-            cnt = p.ReadUInt8();
+            var m = new ParcelSelectObjects()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                LocalID = p.ReadInt32(),
+                ReturnType = p.ReadUInt32()
+            };
+            uint cnt = p.ReadUInt8();
             for (uint i = 0; i < cnt; ++i)
             {
                 m.ReturnIDs.Add(p.ReadUUID());

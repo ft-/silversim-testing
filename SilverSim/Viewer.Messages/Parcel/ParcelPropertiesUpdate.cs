@@ -54,35 +54,31 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Vector3 UserLookAt = Vector3.Zero;
         public TeleportLandingType LandingType;
 
-        public ParcelPropertiesUpdate()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelPropertiesUpdate m = new ParcelPropertiesUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.LocalID = p.ReadInt32();
-            m.Flags = p.ReadUInt32();
-            m.ParcelFlags = (ParcelFlags)p.ReadUInt32();
-            m.SalePrice = p.ReadInt32();
-            m.Name = p.ReadStringLen8();
-            m.Description = p.ReadStringLen8();
-            m.MusicURL = p.ReadStringLen8();
-            m.MediaURL = p.ReadStringLen8();
-            m.MediaAutoScale = p.ReadBoolean();
-            m.GroupID = p.ReadUUID();
-            m.PassPrice = p.ReadInt32();
-            m.PassHours = p.ReadFloat();
-            m.Category = (ParcelCategory)p.ReadUInt8();
-            m.AuthBuyerID = p.ReadUUID();
-            m.SnapshotID = p.ReadUUID();
-            m.UserLocation = p.ReadVector3f();
-            m.UserLookAt = p.ReadVector3f();
-            m.LandingType = (TeleportLandingType)p.ReadUInt8();
-            return m;
+            return new ParcelPropertiesUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                LocalID = p.ReadInt32(),
+                Flags = p.ReadUInt32(),
+                ParcelFlags = (ParcelFlags)p.ReadUInt32(),
+                SalePrice = p.ReadInt32(),
+                Name = p.ReadStringLen8(),
+                Description = p.ReadStringLen8(),
+                MusicURL = p.ReadStringLen8(),
+                MediaURL = p.ReadStringLen8(),
+                MediaAutoScale = p.ReadBoolean(),
+                GroupID = p.ReadUUID(),
+                PassPrice = p.ReadInt32(),
+                PassHours = p.ReadFloat(),
+                Category = (ParcelCategory)p.ReadUInt8(),
+                AuthBuyerID = p.ReadUUID(),
+                SnapshotID = p.ReadUUID(),
+                UserLocation = p.ReadVector3f(),
+                UserLookAt = p.ReadVector3f(),
+                LandingType = (TeleportLandingType)p.ReadUInt8()
+            };
         }
 
         public override void Serialize(UDPPacket p)

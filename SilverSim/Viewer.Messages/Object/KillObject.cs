@@ -31,15 +31,10 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public List<UInt32> LocalIDs = new List<UInt32>();
 
-        public KillObject()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt8((byte)LocalIDs.Count);
-            foreach (UInt32 i in LocalIDs)
+            foreach (var i in LocalIDs)
             {
                 p.WriteUInt32(i);
             }
@@ -47,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            KillObject m = new KillObject();
+            var m = new KillObject();
             uint n = p.ReadUInt8();
             while (n-- != 0)
             {

@@ -34,11 +34,6 @@ namespace SilverSim.Database.Memory.Profile
     [Description("MySQL Profile Backend")]
     public partial class MemoryProfileService : ProfileServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        public MemoryProfileService()
-        {
-
-        }
-
         public override IClassifiedsInterface Classifieds
         {
             get
@@ -83,7 +78,7 @@ namespace SilverSim.Database.Memory.Profile
         {
             m_Classifieds.Remove(accountID);
             m_Notes.Remove(accountID);
-            foreach(RwLockedDictionary<UUID, string> notes in m_Notes.Values)
+            foreach(var notes in m_Notes.Values)
             {
                 notes.Remove(accountID);
             }
@@ -107,11 +102,6 @@ namespace SilverSim.Database.Memory.Profile
     [PluginName("Profile")]
     public class MemoryProfileServiceFactory : IPluginFactory
     {
-        public MemoryProfileServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryProfileService();

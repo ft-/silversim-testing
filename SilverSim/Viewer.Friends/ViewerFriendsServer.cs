@@ -102,7 +102,7 @@ namespace SilverSim.Viewer.Friends
 
                 try
                 {
-                    Message m = req.Value;
+                    var m = req.Value;
 
                     switch (m.Number)
                     {
@@ -124,7 +124,7 @@ namespace SilverSim.Viewer.Friends
 
                         case MessageType.ImprovedInstantMessage:
                             {
-                                ImprovedInstantMessage im = (ImprovedInstantMessage)m;
+                                var im = (ImprovedInstantMessage)m;
                                 switch (im.Dialog)
                                 {
                                     case GridInstantMessageDialog.FriendshipOffered:
@@ -180,9 +180,9 @@ namespace SilverSim.Viewer.Friends
                 return;
             }
 
-            UUI thisAgent = agent.Owner;
+            var thisAgent = agent.Owner;
             UUI otherAgent;
-            bool foreignagent = true;
+            var foreignagent = true;
 
             if(!scene.AvatarNameService.TryGetValue(m.ToAgentID, out otherAgent))
             {
@@ -203,12 +203,14 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            FriendInfo fi = new FriendInfo();
-            fi.User = thisAgent;
-            fi.Friend = otherAgent;
-            fi.FriendGivenFlags = 0;
-            fi.UserGivenFlags = 0;
-            fi.Secret = string.Empty;
+            var fi = new FriendInfo()
+            {
+                User = thisAgent,
+                Friend = otherAgent,
+                FriendGivenFlags = 0,
+                UserGivenFlags = 0,
+                Secret = string.Empty
+            };
             fi.User.HomeURI = null;
             fi.Friend.HomeURI = null;
             if(foreignagent)
@@ -217,7 +219,7 @@ namespace SilverSim.Viewer.Friends
             }
             agent.FriendsService.StoreOffer(fi);
 
-            GridInstantMessage gim = (GridInstantMessage)m;
+            var gim = (GridInstantMessage)m;
             gim.FromAgent = thisAgent;
             gim.ToAgent = otherAgent;
             gim.IMSessionID = thisAgent.ID;
@@ -227,7 +229,7 @@ namespace SilverSim.Viewer.Friends
 
         void HandleAcceptFriendship(Message m)
         {
-            AcceptFriendship req = (AcceptFriendship)m;
+            var req = (AcceptFriendship)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -253,9 +255,9 @@ namespace SilverSim.Viewer.Friends
             }
 
             FriendsServiceInterface otherFriendsService;
-            UUI thisAgent = agent.Owner;
+            var thisAgent = agent.Owner;
             UUI otherAgent;
-            bool foreignagent = true;
+            var foreignagent = true;
 
             /* the transaction id is re-used for storing the agent */
             if (!scene.AvatarNameService.TryGetValue(req.TransactionID, out otherAgent))
@@ -275,12 +277,14 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            FriendInfo fi = new FriendInfo();
-            fi.User = thisAgent;
-            fi.Friend = otherAgent;
-            fi.FriendGivenFlags = FriendRightFlags.SeeOnline;
-            fi.UserGivenFlags = FriendRightFlags.SeeOnline;
-            fi.Secret = string.Empty;
+            var fi = new FriendInfo()
+            {
+                User = thisAgent,
+                Friend = otherAgent,
+                FriendGivenFlags = FriendRightFlags.SeeOnline,
+                UserGivenFlags = FriendRightFlags.SeeOnline,
+                Secret = string.Empty
+            };
             fi.User.HomeURI = null;
             fi.Friend.HomeURI = null;
             if (foreignagent)
@@ -289,21 +293,22 @@ namespace SilverSim.Viewer.Friends
             }
             agent.FriendsService.Delete(fi);
 
-            GridInstantMessage gim = new GridInstantMessage();
-            gim.FromAgent = thisAgent;
-            gim.ToAgent = otherAgent;
-            gim.Dialog = GridInstantMessageDialog.FriendshipAccepted;
-            gim.Message = "Friendship accepted";
-            gim.IMSessionID = otherAgent.ID;
-            gim.ParentEstateID = scene.ParentEstateID;
-            gim.RegionID = scene.ID;
-
+            var gim = new GridInstantMessage()
+            {
+                FromAgent = thisAgent,
+                ToAgent = otherAgent,
+                Dialog = GridInstantMessageDialog.FriendshipAccepted,
+                Message = "Friendship accepted",
+                IMSessionID = otherAgent.ID,
+                ParentEstateID = scene.ParentEstateID,
+                RegionID = scene.ID
+            };
             m_IMService.Send(gim);
         }
 
         void HandleDeclineFriendship(Message m)
         {
-            DeclineFriendship req = (DeclineFriendship)m;
+            var req = (DeclineFriendship)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -329,9 +334,9 @@ namespace SilverSim.Viewer.Friends
             }
 
             FriendsServiceInterface otherFriendsService;
-            UUI thisAgent = agent.Owner;
+            var thisAgent = agent.Owner;
             UUI otherAgent;
-            bool foreignagent = true;
+            var foreignagent = true;
 
             /* the transaction id is re-used for storing the agent */
             if (!scene.AvatarNameService.TryGetValue(req.TransactionID, out otherAgent))
@@ -351,12 +356,14 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            FriendInfo fi = new FriendInfo();
-            fi.User = thisAgent;
-            fi.Friend = otherAgent;
-            fi.FriendGivenFlags = 0;
-            fi.UserGivenFlags = 0;
-            fi.Secret = string.Empty;
+            var fi = new FriendInfo()
+            {
+                User = thisAgent,
+                Friend = otherAgent,
+                FriendGivenFlags = 0,
+                UserGivenFlags = 0,
+                Secret = string.Empty
+            };
             fi.User.HomeURI = null;
             fi.Friend.HomeURI = null;
             if (foreignagent)
@@ -365,21 +372,22 @@ namespace SilverSim.Viewer.Friends
             }
             agent.FriendsService.Delete(fi);
 
-            GridInstantMessage gim = new GridInstantMessage();
-            gim.FromAgent = thisAgent;
-            gim.ToAgent = otherAgent;
-            gim.Dialog = GridInstantMessageDialog.FriendshipDeclined;
-            gim.Message = "Friendship declined";
-            gim.IMSessionID = otherAgent.ID;
-            gim.ParentEstateID = scene.ParentEstateID;
-            gim.RegionID = scene.ID;
-
+            var gim = new GridInstantMessage()
+            {
+                FromAgent = thisAgent,
+                ToAgent = otherAgent,
+                Dialog = GridInstantMessageDialog.FriendshipDeclined,
+                Message = "Friendship declined",
+                IMSessionID = otherAgent.ID,
+                ParentEstateID = scene.ParentEstateID,
+                RegionID = scene.ID
+            };
             m_IMService.Send(gim);
         }
 
         void HandleTerminateFriendship(Message m)
         {
-            TerminateFriendship req = (TerminateFriendship)m;
+            var req = (TerminateFriendship)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -405,9 +413,9 @@ namespace SilverSim.Viewer.Friends
             }
 
             FriendsServiceInterface otherFriendsService;
-            UUI thisAgent = agent.Owner;
+            var thisAgent = agent.Owner;
             UUI otherAgent;
-            bool foreignagent = true;
+            var foreignagent = true;
 
             /* the transaction id is re-used for storing the agent */
             if (!scene.AvatarNameService.TryGetValue(req.OtherID, out otherAgent))
@@ -427,12 +435,14 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            FriendInfo fi = new FriendInfo();
-            fi.User = thisAgent;
-            fi.Friend = otherAgent;
-            fi.FriendGivenFlags = 0;
-            fi.UserGivenFlags = 0;
-            fi.Secret = string.Empty;
+            var fi = new FriendInfo()
+            {
+                User = thisAgent,
+                Friend = otherAgent,
+                FriendGivenFlags = 0,
+                UserGivenFlags = 0,
+                Secret = string.Empty
+            };
             fi.User.HomeURI = null;
             fi.Friend.HomeURI = null;
             if (foreignagent)
@@ -446,7 +456,7 @@ namespace SilverSim.Viewer.Friends
 
         void HandleGrantUserRights(Message m)
         {
-            GrantUserRights req = (GrantUserRights)m;
+            var req = (GrantUserRights)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -473,9 +483,9 @@ namespace SilverSim.Viewer.Friends
             }
 
             FriendsServiceInterface otherFriendsService;
-            UUI thisAgent = agent.Owner;
+            var thisAgent = agent.Owner;
             UUI otherAgent;
-            bool foreignagent = true;
+            var foreignagent = true;
             GrantUserRights.RightsEntry rightsEntry;
 
             if(req.Rights.Count == 0)
@@ -502,10 +512,12 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            FriendInfo fi = new FriendInfo();
-            fi.User = thisAgent;
-            fi.Friend = otherAgent;
-            fi.FriendGivenFlags = (FriendRightFlags)rightsEntry.RelatedRights;
+            var fi = new FriendInfo()
+            {
+                User = thisAgent,
+                Friend = otherAgent,
+                FriendGivenFlags = rightsEntry.RelatedRights
+            };
             FriendStatus fs;
             if(agent.KnownFriends.TryGetValue(otherAgent.ID, out fs))
             {
@@ -542,7 +554,7 @@ namespace SilverSim.Viewer.Friends
             }
 
             string[] handlerType;
-            string homeURI = agent.HomeURI.ToString();
+            var homeURI = agent.HomeURI.ToString();
             try
             {
                 handlerType = ServicePluginHelo.HeloRequest_HandleType(homeURI);
@@ -554,7 +566,7 @@ namespace SilverSim.Viewer.Friends
 
             UserAgentServiceInterface userAgentService = null;
 
-            foreach(IUserAgentServicePlugin service in m_UserAgentPlugins)
+            foreach(var service in m_UserAgentPlugins)
             {
                 if(handlerType.Contains(service.Name))
                 {
@@ -593,7 +605,7 @@ namespace SilverSim.Viewer.Friends
                 return false;
             }
 
-            foreach (IFriendsServicePlugin service in m_FriendsPlugins)
+            foreach (var service in m_FriendsPlugins)
             {
                 if (handlerType.Contains(service.Name))
                 {
@@ -609,11 +621,6 @@ namespace SilverSim.Viewer.Friends
     [PluginName("ViewerFriendsServer")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerFriendsServer(ownSection.GetString("IMService", "IMService"));

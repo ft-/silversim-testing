@@ -50,18 +50,13 @@ namespace SilverSim.Viewer.Messages.Search
 
         public List<DataEntry> QueryData = new List<DataEntry>();
 
-        public PlacesReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
             p.WriteUUID(TransactionID);
             p.WriteUInt8((byte)QueryData.Count);
-            foreach (DataEntry d in QueryData)
+            foreach (var d in QueryData)
             {
                 p.WriteUUID(d.OwnerID);
                 p.WriteStringLen8(d.Name);
@@ -78,25 +73,28 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            PlacesReply m = new PlacesReply();
-            m.AgentID = p.ReadUUID();
-            m.QueryID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
+            var m = new PlacesReply()
+            {
+                AgentID = p.ReadUUID(),
+                QueryID = p.ReadUUID(),
+                TransactionID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                DataEntry d = new DataEntry();
-                d.OwnerID = p.ReadUUID();
-                d.Name = p.ReadStringLen8();
-                d.Description = p.ReadStringLen8();
-                d.ActualArea = p.ReadInt32();
-                d.BillableArea = p.ReadInt32();
-                d.Flags = p.ReadUInt8();
-                d.GlobalPos = p.ReadVector3f();
-                d.SimName = p.ReadStringLen8();
-                d.SnapshotID = p.ReadUUID();
-                d.Price = p.ReadInt32();
-                m.QueryData.Add(d);
+                m.QueryData.Add(new DataEntry()
+                {
+                    OwnerID = p.ReadUUID(),
+                    Name = p.ReadStringLen8(),
+                    Description = p.ReadStringLen8(),
+                    ActualArea = p.ReadInt32(),
+                    BillableArea = p.ReadInt32(),
+                    Flags = p.ReadUInt8(),
+                    GlobalPos = p.ReadVector3f(),
+                    SimName = p.ReadStringLen8(),
+                    SnapshotID = p.ReadUUID(),
+                    Price = p.ReadInt32()
+                });
             }
             return m;
         }

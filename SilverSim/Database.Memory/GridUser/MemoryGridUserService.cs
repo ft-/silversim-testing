@@ -37,10 +37,6 @@ namespace SilverSim.Database.Memory.GridUser
         readonly RwLockedDictionary<UUID, GridUserInfo> m_Data = new RwLockedDictionary<UUID, GridUserInfo>();
 
         #region Constructor
-        public MemoryGridUserService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
@@ -177,11 +173,6 @@ namespace SilverSim.Database.Memory.GridUser
     [PluginName("GridUser")]
     public class MemoryGridUserServiceFactory : IPluginFactory
     {
-        public MemoryGridUserServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryGridUserService();

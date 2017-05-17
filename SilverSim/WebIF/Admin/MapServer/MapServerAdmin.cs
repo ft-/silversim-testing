@@ -67,16 +67,16 @@ namespace SilverSim.WebIF.Admin.MapServer
 
         void ReturnRegionsResult(HttpRequest req, List<RegionInfo> regions)
         {
-            Map resdata = new Map();
-            foreach (RegionInfo ri in regions)
+            var resdata = new Map();
+            foreach (var ri in regions)
             {
-                Map regiondata = new Map();
+                var regiondata = new Map();
                 regiondata.Add("name", ri.Name);
                 regiondata.Add("location_x", ri.Location.GridX);
                 regiondata.Add("location_y", ri.Location.GridY);
                 regiondata.Add("size_x", ri.Size.GridX);
                 regiondata.Add("size_y", ri.Size.GridY);
-                UUI owner = m_WebIF.ResolveName(ri.Owner);
+                var owner = m_WebIF.ResolveName(ri.Owner);
                 regiondata.Add("owner", owner.ToString());
                 regiondata.Add("flags", (int)ri.Flags);
                 resdata.Add(ri.ID.ToString(), regiondata);
@@ -114,8 +114,8 @@ namespace SilverSim.WebIF.Admin.MapServer
             }
             else
             {
-                RegionFlags setFlags = RegionFlags.None;
-                RegionFlags removeFlags = RegionFlags.None;
+                var setFlags = RegionFlags.None;
+                var removeFlags = RegionFlags.None;
 
                 IValue iv;
                 if(jsondata.TryGetValue("fallback", out iv))
@@ -181,8 +181,8 @@ namespace SilverSim.WebIF.Admin.MapServer
         [AdminWebIfRequiredRight("mapserver.manage")]
         void HandleMapServerGetDefaultRegionFlags(HttpRequest req, Map jsondata)
         {
-            Map resdata = new Map();
-            foreach (KeyValuePair<UUID, RegionFlags> kvp in m_RegionDefaultFlagsService.GetAllRegionDefaultFlags())
+            var resdata = new Map();
+            foreach (var kvp in m_RegionDefaultFlagsService.GetAllRegionDefaultFlags())
             {
                 resdata.Add(kvp.Key.ToString(), (int)kvp.Value);
             }
@@ -264,11 +264,6 @@ namespace SilverSim.WebIF.Admin.MapServer
     [PluginName("MapServerAdmin")]
     public class MapServerAdminFactory : IPluginFactory
     {
-        public MapServerAdminFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MapServerAdmin(ownSection);

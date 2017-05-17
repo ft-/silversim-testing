@@ -39,10 +39,6 @@ namespace SilverSim.Database.Memory.Estate
         readonly RwLockedDictionary<uint, EstateInfo> m_Data = new RwLockedDictionary<uint, EstateInfo>();
 
         #region Constructor
-        public MemoryEstateService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
@@ -66,7 +62,7 @@ namespace SilverSim.Database.Memory.Estate
 
         public override bool TryGetValue(string estateName, out EstateInfo estateInfo)
         {
-            foreach(EstateInfo intern in m_Data.Values)
+            foreach(var intern in m_Data.Values)
             {
                 if(intern.Name.ToLower() == estateName.ToLower())
                 {
@@ -85,7 +81,7 @@ namespace SilverSim.Database.Memory.Estate
 
         public override bool ContainsKey(string estateName)
         {
-            foreach (EstateInfo intern in m_Data.Values)
+            foreach (var intern in m_Data.Values)
             {
                 if (intern.Name.ToLower() == estateName.ToLower())
                 {
@@ -194,11 +190,6 @@ namespace SilverSim.Database.Memory.Estate
     [PluginName("Estate")]
     public class MemoryEstateServiceFactory : IPluginFactory
     {
-        public MemoryEstateServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryEstateService();

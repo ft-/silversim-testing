@@ -92,15 +92,10 @@ namespace SilverSim.Viewer.Profile
         readonly RwLockedDictionary<string, ProfileServiceData> m_LastKnownProfileServices = new RwLockedDictionary<string, ProfileServiceData>();
         readonly RwLockedDictionary<UUID, KeyValuePair<UUI, int>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UUI, int>>();
 
-        public ViewerProfileServer()
-        {
-
-        }
-
         public void CleanupTimer(object sender, ElapsedEventArgs e)
         {
-            List<string> removeList = new List<string>();
-            List<UUID> removeClassifiedList = new List<UUID>();
+            var removeList = new List<string>();
+            var removeClassifiedList = new List<UUID>();
             foreach(KeyValuePair<string, ProfileServiceData> kvp in m_LastKnownProfileServices)
             {
                 if(Environment.TickCount - kvp.Value.TicksAt > 60000)
@@ -114,14 +109,14 @@ namespace SilverSim.Viewer.Profile
             }
 
             /* remove classifieds query caches after half an hour */
-            foreach (KeyValuePair<UUID, KeyValuePair<UUI, int>> kvp in m_ClassifiedQueryCache)
+            foreach (var kvp in m_ClassifiedQueryCache)
             {
                 if(Environment.TickCount - kvp.Value.Value > 1800000)
                 {
                     removeClassifiedList.Add(kvp.Key);
                 }
             }
-            foreach(UUID classifiedid in removeClassifiedList)
+            foreach(var classifiedid in removeClassifiedList)
             {
                 m_ClassifiedQueryCache.Remove(classifiedid);
             }
@@ -239,14 +234,8 @@ namespace SilverSim.Viewer.Profile
                                     case "avatarnotesrequest":
                                         HandleAvatarNotesRequest(req.Key.Agent, scene, gm);
                                         break;
-
-                                    default:
-                                        break;
                                 }
                             }
-                            break;
-
-                        default:
                             break;
                     }
                 }
@@ -348,7 +337,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleDirClassifiedQuery(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            DirClassifiedQuery req = (DirClassifiedQuery)m;
+            var req = (DirClassifiedQuery)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -437,7 +426,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleClassifiedInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            ClassifiedInfoRequest req = (ClassifiedInfoRequest)m;
+            var req = (ClassifiedInfoRequest)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -465,7 +454,7 @@ namespace SilverSim.Viewer.Profile
             try
             {
                 ProfileClassified cls = serviceData.ProfileService.Classifieds[kvp.Key, req.ClassifiedID];
-                ClassifiedInfoReply reply = new ClassifiedInfoReply();
+                var reply = new ClassifiedInfoReply();
                 reply.AgentID = req.AgentID;
 
                 reply.ClassifiedID = cls.ClassifiedID;
@@ -494,7 +483,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleClassifiedInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            ClassifiedInfoUpdate req = (ClassifiedInfoUpdate)m;
+            var req = (ClassifiedInfoUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -508,7 +497,7 @@ namespace SilverSim.Viewer.Profile
 
             try
             {
-                ProfileClassified classified = agent.ProfileService.Classifieds[agent.Owner, req.ClassifiedID];
+                var classified = agent.ProfileService.Classifieds[agent.Owner, req.ClassifiedID];
                 classified.ClassifiedID = req.ClassifiedID;
                 classified.Category = req.Category;
                 classified.Name = req.Name;
@@ -530,7 +519,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleClassifiedDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            ClassifiedDelete req = (ClassifiedDelete)m;
+            var req = (ClassifiedDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -554,7 +543,7 @@ namespace SilverSim.Viewer.Profile
 
         void HandleClassifiedGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            ClassifiedGodDelete req = (ClassifiedGodDelete)m;
+            var req = (ClassifiedGodDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -596,7 +585,7 @@ namespace SilverSim.Viewer.Profile
             }
 
 
-            AvatarNotesReply reply = new AvatarNotesReply();
+            var reply = new AvatarNotesReply();
             reply.AgentID = m.AgentID;
             reply.TargetID = targetuui.ID;
             try
@@ -613,7 +602,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleAvatarNotesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            AvatarNotesUpdate req = (AvatarNotesUpdate)m;
+            var req = (AvatarNotesUpdate)m;
             if(req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -684,7 +673,7 @@ namespace SilverSim.Viewer.Profile
                 agent.SendMessageAlways(reply, scene.ID);
                 return;
             }
-            foreach(KeyValuePair<UUID, string> pick in picks)
+            foreach(var pick in picks)
             {
                 int entryLen = pick.Value.Length + 18;
                 if((entryLen + messageFill > 1400 || reply.Data.Count == 255) && reply != null)
@@ -753,8 +742,8 @@ namespace SilverSim.Viewer.Profile
 
             try
             {
-                ProfilePick pick = serviceData.ProfileService.Picks[uui, pickid];
-                PickInfoReply reply = new PickInfoReply();
+                var pick = serviceData.ProfileService.Picks[uui, pickid];
+                var reply = new PickInfoReply();
                 reply.AgentID = m.AgentID;
                 reply.CreatorID = pick.Creator.ID;
                 reply.Description = pick.Description;
@@ -779,7 +768,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandlePickInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            PickInfoUpdate req = (PickInfoUpdate)m;
+            var req = (PickInfoUpdate)m;
             if(req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -793,7 +782,7 @@ namespace SilverSim.Viewer.Profile
 
             try
             {
-                ProfilePick pick = agent.ProfileService.Picks[agent.Owner, req.PickID];
+                var pick = agent.ProfileService.Picks[agent.Owner, req.PickID];
                 pick.TopPick = req.TopPick;
                 pick.ParcelID = req.ParcelID;
                 pick.Name = req.Name;
@@ -813,7 +802,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandlePickDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            PickDelete req = (PickDelete)m;
+            var req = (PickDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -838,7 +827,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandlePickGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            PickGodDelete req = (PickGodDelete)m;
+            var req = (PickGodDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -852,7 +841,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleUserInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            UserInfoRequest req = (UserInfoRequest)m;
+            var req = (UserInfoRequest)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -872,20 +861,22 @@ namespace SilverSim.Viewer.Profile
                 prefs.User = agent.Owner;
             }
 
-            UserInfoReply reply = new UserInfoReply();
-            reply.AgentID = req.AgentID;
-            reply.DirectoryVisibility = (prefs.Visible) ?
+            var reply = new UserInfoReply()
+            {
+                AgentID = req.AgentID,
+                DirectoryVisibility = (prefs.Visible) ?
                 "default" :
-                "hidden";
-            reply.EMail = string.Empty;
-            reply.IMViaEmail = prefs.IMviaEmail;
+                "hidden",
+                EMail = string.Empty,
+                IMViaEmail = prefs.IMviaEmail
+            };
             agent.SendMessageAlways(reply, scene.ID);
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleUpdateUserInfo(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            UpdateUserInfo req = (UpdateUserInfo)m;
+            var req = (UpdateUserInfo)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -897,11 +888,12 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            ProfilePreferences prefs = new ProfilePreferences();
-            prefs.User = agent.Owner;
-            prefs.IMviaEmail = req.IMViaEmail;
-            prefs.Visible = req.DirectoryVisibility != "hidden";
-            
+            var prefs = new ProfilePreferences()
+            {
+                User = agent.Owner,
+                IMviaEmail = req.IMViaEmail,
+                Visible = req.DirectoryVisibility != "hidden"
+            };
             try
             {
                 agent.ProfileService.Preferences[agent.Owner] = prefs;
@@ -917,7 +909,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleAvatarPropertiesRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            AvatarPropertiesRequest req = (AvatarPropertiesRequest)m;
+            var req = (AvatarPropertiesRequest)m;
             if(req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -970,61 +962,67 @@ namespace SilverSim.Viewer.Profile
 #if DEBUG
                 m_Log.Debug("Exception at properties request", e);
 #endif
-                props = new ProfileProperties();
-                props.ImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
-                props.FirstLifeImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
-                props.User = uui;
-                props.Partner = UUI.Unknown;
-                props.AboutText = string.Empty;
-                props.FirstLifeText = string.Empty;
-                props.Language = string.Empty;
-                props.WantToText = string.Empty;
-                props.SkillsText = string.Empty;
-                props.WebUrl = string.Empty;
+                props = new ProfileProperties()
+                {
+                    ImageID = "5748decc-f629-461c-9a36-a35a221fe21f",
+                    FirstLifeImageID = "5748decc-f629-461c-9a36-a35a221fe21f",
+                    User = uui,
+                    Partner = UUI.Unknown,
+                    AboutText = string.Empty,
+                    FirstLifeText = string.Empty,
+                    Language = string.Empty,
+                    WantToText = string.Empty,
+                    SkillsText = string.Empty,
+                    WebUrl = string.Empty
+                };
             }
 
-            AvatarPropertiesReply res = new AvatarPropertiesReply();
-            res.AgentID = req.AgentID;
-            res.AvatarID = req.AvatarID;
+            var res = new AvatarPropertiesReply()
+            {
+                AgentID = req.AgentID,
+                AvatarID = req.AvatarID,
 
-            res.ImageID = props.ImageID;
-            res.FLImageID = props.FirstLifeImageID;
-            res.PartnerID = props.Partner.ID;
-            res.AboutText = props.AboutText;
-            res.FLAboutText = props.FirstLifeText;
-            res.BornOn = userInfo.UserCreated.ToString("M/d/yyyy", CultureInfo.InvariantCulture);
-            res.ProfileURL = props.WebUrl;
-            res.CharterMember = new byte[] { 0 };
-            res.Flags = 0;
-
+                ImageID = props.ImageID,
+                FLImageID = props.FirstLifeImageID,
+                PartnerID = props.Partner.ID,
+                AboutText = props.AboutText,
+                FLAboutText = props.FirstLifeText,
+                BornOn = userInfo.UserCreated.ToString("M/d/yyyy", CultureInfo.InvariantCulture),
+                ProfileURL = props.WebUrl,
+                CharterMember = new byte[] { 0 },
+                Flags = 0
+            };
             agent.SendMessageAlways(res, scene.ID);
 
-            AvatarInterestsReply res2 = new AvatarInterestsReply();
-            res2.AgentID = req.AgentID;
-            res2.AvatarID = req.AvatarID;
+            var res2 = new AvatarInterestsReply()
+            {
+                AgentID = req.AgentID,
+                AvatarID = req.AvatarID
+            };
             agent.SendMessageAlways(res2, scene.ID);
 
 
-            AvatarGroupsReply res3 = new AvatarGroupsReply();
-            res3.AgentID = req.AgentID;
-            res3.AvatarID = req.AvatarID;
+            var res3 = new AvatarGroupsReply()
+            {
+                AgentID = req.AgentID,
+                AvatarID = req.AvatarID
+            };
             /* when the scene has a groups service, we check which groups the avatar has */
-            if(null != scene.GroupsService)
+            if (null != scene.GroupsService)
             {
                 try
                 {
-                    List<GroupMembership> gmems = scene.GroupsService.Memberships[uui, uui];
-
-                    foreach(GroupMembership gmem in gmems)
+                    foreach(var gmem in scene.GroupsService.Memberships[uui, uui])
                     {
-                        AvatarGroupsReply.GroupDataEntry d = new AvatarGroupsReply.GroupDataEntry();
-                        d.GroupPowers = gmem.GroupPowers;
-                        d.AcceptNotices = gmem.IsAcceptNotices;
-                        d.GroupTitle = gmem.GroupTitle;
-                        d.GroupName = gmem.Group.GroupName;
-                        d.GroupInsigniaID = gmem.GroupInsigniaID;
-                        d.ListInProfile = gmem.IsListInProfile;
-                        res3.GroupData.Add(d);
+                        res3.GroupData.Add(new AvatarGroupsReply.GroupDataEntry()
+                        {
+                            GroupPowers = gmem.GroupPowers,
+                            AcceptNotices = gmem.IsAcceptNotices,
+                            GroupTitle = gmem.GroupTitle,
+                            GroupName = gmem.Group.GroupName,
+                            GroupInsigniaID = gmem.GroupInsigniaID,
+                            ListInProfile = gmem.IsListInProfile
+                        });
                     }
 
                 }
@@ -1045,7 +1043,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleAvatarPropertiesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            AvatarPropertiesUpdate req = (AvatarPropertiesUpdate)m;
+            var req = (AvatarPropertiesUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -1057,17 +1055,19 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            ProfileProperties props = new ProfileProperties();
-            props.ImageID = UUID.Zero;
-            props.FirstLifeImageID = UUID.Zero;
-            props.Partner = UUI.Unknown;
-            props.User = agent.Owner;
-            props.SkillsText = string.Empty;
-            props.WantToText = string.Empty;
-            props.Language = string.Empty;
+            var props = new ProfileProperties()
+            {
+                ImageID = UUID.Zero,
+                FirstLifeImageID = UUID.Zero,
+                Partner = UUI.Unknown,
+                User = agent.Owner,
+                SkillsText = string.Empty,
+                WantToText = string.Empty,
+                Language = string.Empty,
 
-            props.AboutText = req.AboutText;
-            props.FirstLifeText = req.FLAboutText;
+                AboutText = req.AboutText,
+                FirstLifeText = req.FLAboutText
+            };
             props.ImageID = req.ImageID;
             props.PublishMature = req.MaturePublish;
             props.PublishProfile = req.AllowPublish;
@@ -1086,7 +1086,7 @@ namespace SilverSim.Viewer.Profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleAvatarInterestsUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
-            AvatarInterestsUpdate req = (AvatarInterestsUpdate)m;
+            var req = (AvatarInterestsUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -1098,18 +1098,20 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            ProfileProperties props = new ProfileProperties();
-            props.ImageID = UUID.Zero;
-            props.FirstLifeImageID = UUID.Zero;
-            props.FirstLifeText = string.Empty;
-            props.AboutText = string.Empty;
-            props.Partner = UUI.Unknown;
-            props.User = agent.Owner;
-            props.SkillsMask = req.SkillsMask;
-            props.SkillsText = req.SkillsText;
-            props.WantToMask = req.WantToMask;
-            props.WantToText = req.WantToText;
-            props.Language = req.LanguagesText;
+            var props = new ProfileProperties()
+            {
+                ImageID = UUID.Zero,
+                FirstLifeImageID = UUID.Zero,
+                FirstLifeText = string.Empty,
+                AboutText = string.Empty,
+                Partner = UUI.Unknown,
+                User = agent.Owner,
+                SkillsMask = req.SkillsMask,
+                SkillsText = req.SkillsText,
+                WantToMask = req.WantToMask,
+                WantToText = req.WantToText,
+                Language = req.LanguagesText
+            };
             try
             {
                 agent.ProfileService.Properties[agent.Owner, ProfileServiceInterface.PropertiesUpdateFlags.Interests] = props;
@@ -1140,11 +1142,6 @@ namespace SilverSim.Viewer.Profile
     [PluginName("ViewerProfileServer")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerProfileServer();

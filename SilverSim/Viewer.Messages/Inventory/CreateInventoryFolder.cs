@@ -36,23 +36,18 @@ namespace SilverSim.Viewer.Messages.Inventory
         public InventoryType FolderType;
         public string FolderName;
 
-        public CreateInventoryFolder()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            CreateInventoryFolder m = new CreateInventoryFolder();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            return new CreateInventoryFolder()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
 
-            m.FolderID = p.ReadUUID();
-            m.ParentFolderID = p.ReadUUID();
-            m.FolderType = (InventoryType)p.ReadInt8();
-            m.FolderName = p.ReadStringLen8();
-
-            return m;
+                FolderID = p.ReadUUID(),
+                ParentFolderID = p.ReadUUID(),
+                FolderType = (InventoryType)p.ReadInt8(),
+                FolderName = p.ReadStringLen8()
+            };
         }
 
         public override void Serialize(UDPPacket p)

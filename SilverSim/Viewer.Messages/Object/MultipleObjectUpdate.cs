@@ -53,25 +53,22 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
 
-        public MultipleObjectUpdate()
-        {
-
-        }
-
         public static MultipleObjectUpdate Decode(UDPPacket p)
         {
-            MultipleObjectUpdate m = new MultipleObjectUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new MultipleObjectUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint objcnt = p.ReadUInt8();
             while(objcnt-- != 0)
             {
-                ObjectDataEntry d = new ObjectDataEntry();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.Flags = (UpdateFlags)p.ReadUInt8();
-                d.Data = p.ReadBytes(p.ReadUInt8());
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new ObjectDataEntry()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    Flags = (UpdateFlags)p.ReadUInt8(),
+                    Data = p.ReadBytes(p.ReadUInt8())
+                });
             }
             return m;
         }
@@ -81,7 +78,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach(ObjectDataEntry d in ObjectData)
+            foreach(var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteUInt8((byte)d.Flags);

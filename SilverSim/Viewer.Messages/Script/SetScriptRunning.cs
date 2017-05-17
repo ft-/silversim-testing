@@ -34,21 +34,16 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ItemID;
         public bool IsRunning;
 
-        public SetScriptRunning()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            SetScriptRunning m = new SetScriptRunning();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-            m.IsRunning = p.ReadBoolean();
-
-            return m;
+            return new SetScriptRunning()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectID = p.ReadUUID(),
+                ItemID = p.ReadUUID(),
+                IsRunning = p.ReadBoolean()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -35,11 +35,6 @@ namespace SilverSim.Viewer.Messages.Transfer
         public Int32 Status;
         public byte[] Data = new byte[0];
 
-        public TransferPacket()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(TransferID);
@@ -52,13 +47,14 @@ namespace SilverSim.Viewer.Messages.Transfer
 
         public static Message Decode(UDPPacket p)
         {
-            TransferPacket m = new TransferPacket();
-            m.TransferID = p.ReadUUID();
-            m.ChannelType = p.ReadInt32();
-            m.Packet = p.ReadInt32();
-            m.Status = p.ReadInt32();
-            m.Data = p.ReadBytes(p.ReadUInt16());
-            return m;
+            return new TransferPacket()
+            {
+                TransferID = p.ReadUUID(),
+                ChannelType = p.ReadInt32(),
+                Packet = p.ReadInt32(),
+                Status = p.ReadInt32(),
+                Data = p.ReadBytes(p.ReadUInt16())
+            };
         }
     }
 }

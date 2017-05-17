@@ -61,17 +61,12 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public List<ItemDataEntry> ItemData = new List<ItemDataEntry>();
 
-        public FetchInventoryReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
 
             p.WriteUInt8((byte)ItemData.Count);
-            foreach (ItemDataEntry d in ItemData)
+            foreach (var d in ItemData)
             {
                 p.WriteUUID(d.ItemID);
                 p.WriteUUID(d.FolderID);
@@ -114,7 +109,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                 checksum += (uint)d.Type; // Type 
                 checksum += d.CreationDate; // CreationDate
                 checksum += (uint)d.SalePrice;    // SalePrice
-                checksum += ((uint)d.SaleType * 0x07073096); // SaleType
+                checksum += (uint)d.SaleType * 0x07073096; // SaleType
 
                 p.WriteUInt32(checksum);
             }
@@ -122,34 +117,36 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            FetchInventoryReply m = new FetchInventoryReply();
-            m.AgentID = p.ReadUUID();
-
+            var m = new FetchInventoryReply()
+            {
+                AgentID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ItemDataEntry d = new ItemDataEntry();
-                d.ItemID = p.ReadUUID();
-                d.FolderID = p.ReadUUID();
-                d.CreatorID = p.ReadUUID();
-                d.OwnerID = p.ReadUUID();
-                d.GroupID = p.ReadUUID();
-                d.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.IsGroupOwned = p.ReadBoolean();
-                d.AssetID = p.ReadUUID();
-                d.Type = (AssetType)p.ReadInt8();
-                d.InvType = (InventoryType)p.ReadInt8();
-                d.Flags = (InventoryFlags)p.ReadUInt32();
-                d.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
-                d.Name = p.ReadStringLen8();
-                d.Description = p.ReadStringLen8();
-                d.CreationDate = p.ReadUInt32();
+                m.ItemData.Add(new ItemDataEntry()
+                {
+                    ItemID = p.ReadUUID(),
+                    FolderID = p.ReadUUID(),
+                    CreatorID = p.ReadUUID(),
+                    OwnerID = p.ReadUUID(),
+                    GroupID = p.ReadUUID(),
+                    BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    IsGroupOwned = p.ReadBoolean(),
+                    AssetID = p.ReadUUID(),
+                    Type = (AssetType)p.ReadInt8(),
+                    InvType = (InventoryType)p.ReadInt8(),
+                    Flags = (InventoryFlags)p.ReadUInt32(),
+                    SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
+                    Name = p.ReadStringLen8(),
+                    Description = p.ReadStringLen8(),
+                    CreationDate = p.ReadUInt32()
+                });
                 p.ReadUInt32(); /* checksum */
-                m.ItemData.Add(d);
             }
             return m;
         }

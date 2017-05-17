@@ -48,11 +48,6 @@ namespace SilverSim.Viewer.Economy
 
         bool m_ShutdownEconomy;
 
-        public ViewerEconomy()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             ThreadManager.CreateThread(HandlerThread).Start();
@@ -118,8 +113,8 @@ namespace SilverSim.Viewer.Economy
             {
                 return;
             }
-            EconomyInfo ei = scene.EconomyData;
-            EconomyData ed = new EconomyData();
+            var ei = scene.EconomyData;
+            var ed = new EconomyData();
             if (ei != null)
             {
                 ed.ObjectCapacity = ei.ObjectCapacity;
@@ -145,7 +140,7 @@ namespace SilverSim.Viewer.Economy
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleMoneyBalanceRequest(AgentCircuit circuit, Message m)
         {
-            Messages.Economy.MoneyBalanceRequest mbr = (Messages.Economy.MoneyBalanceRequest)m;
+            var mbr = (MoneyBalanceRequest)m;
             if (mbr.AgentID == mbr.CircuitAgentID && mbr.SessionID == mbr.CircuitSessionID)
             {
                 SceneInterface scene;
@@ -163,7 +158,7 @@ namespace SilverSim.Viewer.Economy
                 {
                     return;
                 }
-                Messages.Economy.MoneyBalanceReply mbrep = new Messages.Economy.MoneyBalanceReply();
+                var mbrep = new MoneyBalanceReply();
                 mbrep.ForceZeroFlag = true; /* lots of NUL at the end of the message */
                 mbrep.AgentID = mbr.AgentID;
                 mbrep.TransactionID = mbr.TransactionID;
@@ -200,11 +195,6 @@ namespace SilverSim.Viewer.Economy
     [PluginName("ViewerEconomy")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ViewerEconomy();

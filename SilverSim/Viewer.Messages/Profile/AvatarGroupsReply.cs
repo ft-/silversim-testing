@@ -51,17 +51,12 @@ namespace SilverSim.Viewer.Messages.Profile
         public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
         public bool ListInProfile;
 
-        public AvatarGroupsReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(AvatarID);
             p.WriteUInt8((byte)GroupData.Count);
-            foreach(GroupDataEntry d in GroupData)
+            foreach(var d in GroupData)
             {
                 p.WriteUInt64((UInt64)d.GroupPowers);
                 p.WriteBoolean(d.AcceptNotices);
@@ -75,31 +70,36 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public override IValue SerializeEQG()
         {
-            MapType llsd = new MapType();
+            var llsd = new MapType();
 
-            AnArray agentDataArray = new AnArray();
-            MapType agentData = new MapType();
-            agentData.Add("AgentID", AgentID);
-            agentData.Add("AvatarID", AvatarID);
-            agentDataArray.Add(agentData);
+            var agentDataArray = new AnArray
+            {
+                new MapType
+            {
+                { "AgentID", AgentID },
+                { "AvatarID", AvatarID }
+            }
+            };
             llsd.Add("AgentData", agentDataArray);
 
-            AnArray groupDataArray = new AnArray();
-            AnArray newGroupDataArray = new AnArray();
+            var groupDataArray = new AnArray();
+            var newGroupDataArray = new AnArray();
 
             foreach(GroupDataEntry e in GroupData)
             {
-                MapType groupData = new MapType();
-                MapType newGroupData = new MapType();
-                groupData.Add("GroupPowers", ((ulong)e.GroupPowers).ToString());
-                groupData.Add("AcceptNotices", e.AcceptNotices);
-                groupData.Add("GroupTitle", e.GroupTitle);
-                groupData.Add("GroupID", e.GroupID);
-                groupData.Add("GroupName", e.GroupName);
-                groupData.Add("GroupInsigniaID", e.GroupInsigniaID);
-                newGroupData.Add("ListInProfile", e.ListInProfile);
-                groupDataArray.Add(groupData);
-                newGroupDataArray.Add(newGroupData);
+                groupDataArray.Add(new MapType
+                {
+                    { "GroupPowers", ((ulong)e.GroupPowers).ToString() },
+                    { "AcceptNotices", e.AcceptNotices },
+                    { "GroupTitle", e.GroupTitle },
+                    { "GroupID", e.GroupID },
+                    { "GroupName", e.GroupName },
+                    { "GroupInsigniaID", e.GroupInsigniaID }
+                });
+                newGroupDataArray.Add(new MapType
+                {
+                    { "ListInProfile", e.ListInProfile }
+                });
             }
             llsd.Add("GroupData", groupDataArray);
             llsd.Add("NewGroupData", newGroupDataArray);

@@ -36,12 +36,12 @@ namespace SilverSim.Database.Memory.SimulationData
             get
             {
                 RwLockedDictionary<uint, byte[]> patchesData;
-                List<LayerPatch> patches = new List<LayerPatch>();
+                var patches = new List<LayerPatch>();
                 if (m_TerrainData.TryGetValue(regionID, out patchesData))
                 {
-                    foreach(KeyValuePair<uint, byte[]> kvp in patchesData)
+                    foreach(var kvp in patchesData)
                     {
-                        LayerPatch patch = new LayerPatch();
+                        var patch = new LayerPatch();
                         patch.ExtendedPatchID = kvp.Key;
                         patch.Serialization = kvp.Value;
                         patches.Add(patch);

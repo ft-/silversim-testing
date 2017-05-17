@@ -79,78 +79,86 @@ namespace SilverSim.Database.Memory.SimulationData
         #region helpers
         ObjectGroup ObjectGroupFromMap(Map map)
         {
-            ObjectGroup objgroup = new ObjectGroup();
-            objgroup.IsTempOnRez = map["IsTempOnRez"].AsBoolean;
-            objgroup.Owner = new UUI(map["Owner"].ToString());
-            objgroup.LastOwner = new UUI(map["LastOwner"].ToString());
-            objgroup.Group = new UGI(map["Group"].ToString());
-            objgroup.SaleType = (InventoryItem.SaleInfoData.SaleType)map["SaleType"].AsUInt;
-            objgroup.SalePrice = map["SalePrice"].AsInt;
-            objgroup.PayPrice0 = map["PayPrice0"].AsInt;
-            objgroup.PayPrice1 = map["PayPrice1"].AsInt;
-            objgroup.PayPrice2 = map["PayPrice2"].AsInt;
-            objgroup.PayPrice3 = map["PayPrice3"].AsInt;
-            objgroup.PayPrice4 = map["PayPrice4"].AsInt;
-            objgroup.AttachedPos = map["AttachedPos"].AsVector3;
-            objgroup.AttachPoint = (AttachmentPoint)map["AttachPoint"].AsUInt;
-            objgroup.IsIncludedInSearch = map["IsIncludedInSearch"].AsBoolean;
-            objgroup.RezzingObjectID = map["RezzingObjectID"].AsUUID;
-            return objgroup;
+            return new ObjectGroup()
+            {
+                IsTempOnRez = map["IsTempOnRez"].AsBoolean,
+                Owner = new UUI(map["Owner"].ToString()),
+                LastOwner = new UUI(map["LastOwner"].ToString()),
+                Group = new UGI(map["Group"].ToString()),
+                SaleType = (InventoryItem.SaleInfoData.SaleType)map["SaleType"].AsUInt,
+                SalePrice = map["SalePrice"].AsInt,
+                PayPrice0 = map["PayPrice0"].AsInt,
+                PayPrice1 = map["PayPrice1"].AsInt,
+                PayPrice2 = map["PayPrice2"].AsInt,
+                PayPrice3 = map["PayPrice3"].AsInt,
+                PayPrice4 = map["PayPrice4"].AsInt,
+                AttachedPos = map["AttachedPos"].AsVector3,
+                AttachPoint = (AttachmentPoint)map["AttachPoint"].AsUInt,
+                IsIncludedInSearch = map["IsIncludedInSearch"].AsBoolean,
+                RezzingObjectID = map["RezzingObjectID"].AsUUID
+            };
         }
 
         ObjectPart ObjectPartFromMap(Map map)
         {
-            ObjectPart objpart = new ObjectPart();
-            objpart.ID = map["ID"].AsUUID;
-            objpart.LoadedLinkNumber = map["LinkNumber"].AsInt;
-            objpart.Position = map["Position"].AsVector3;
-            objpart.Rotation = map["Rotation"].AsQuaternion;
-            objpart.SitText = map["SitText"].ToString();
-            objpart.TouchText = map["TouchText"].ToString();
-            objpart.Name = map["Name"].ToString();
-            objpart.Description = map["Description"].ToString();
-            objpart.SitTargetOffset = map["SitTargetOffset"].AsVector3;
-            objpart.SitTargetOrientation = map["SitTargetOrientation"].AsQuaternion;
-            objpart.Creator = new UUI(map["Creator"].ToString());
-            objpart.CreationDate = (Date)map["CreationDate"];
-            objpart.Flags = (PrimitiveFlags)map["Flags"].AsUInt;
+            var objpart = new ObjectPart()
+            {
+                ID = map["ID"].AsUUID,
+                LoadedLinkNumber = map["LinkNumber"].AsInt,
+                Position = map["Position"].AsVector3,
+                Rotation = map["Rotation"].AsQuaternion,
+                SitText = map["SitText"].ToString(),
+                TouchText = map["TouchText"].ToString(),
+                Name = map["Name"].ToString(),
+                Description = map["Description"].ToString(),
+                SitTargetOffset = map["SitTargetOffset"].AsVector3,
+                SitTargetOrientation = map["SitTargetOrientation"].AsQuaternion,
+                Creator = new UUI(map["Creator"].ToString()),
+                CreationDate = (Date)map["CreationDate"],
+                Flags = (PrimitiveFlags)map["Flags"].AsUInt,
 
-            objpart.CameraAtOffset = map["CameraAtOffset"].AsVector3;
-            objpart.CameraEyeOffset = map["CameraEyeOffset"].AsVector3;
+                CameraAtOffset = map["CameraAtOffset"].AsVector3,
+                CameraEyeOffset = map["CameraEyeOffset"].AsVector3,
 
-            objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)map["PhysicsShapeType"].AsInt;
-            objpart.PathfindingType = (PathfindingType)map["PathfindingType"].AsInt;
-            objpart.Material = (PrimitiveMaterial)map["Material"].AsInt;
-            objpart.Size = map["Size"].AsVector3;
-            objpart.Slice = map["Slice"].AsVector3;
+                PhysicsShapeType = (PrimitivePhysicsShapeType)map["PhysicsShapeType"].AsInt,
+                PathfindingType = (PathfindingType)map["PathfindingType"].AsInt,
+                Material = (PrimitiveMaterial)map["Material"].AsInt,
+                Size = map["Size"].AsVector3,
+                Slice = map["Slice"].AsVector3,
 
-            objpart.MediaURL = map["MediaURL"].ToString();
+                MediaURL = map["MediaURL"].ToString(),
 
-            objpart.AngularVelocity = map["AngularVelocity"].AsVector3;
+                AngularVelocity = map["AngularVelocity"].AsVector3
+            };
+            objpart.PointLight = new ObjectPart.PointLightParam()
+            {
+                Serialization = (BinaryData)map["LightData"]
+            };
 
-            ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
-            lp.Serialization = (BinaryData)map["LightData"];
-            objpart.PointLight = lp;
+            objpart.Text = new ObjectPart.TextParam()
+            {
+                Serialization = (BinaryData)map["HoverTextData"]
+            };
 
-            ObjectPart.TextParam tp = new ObjectPart.TextParam();
-            tp.Serialization = (BinaryData)map["HoverTextData"];
-            objpart.Text = tp;
+            objpart.Flexible = new ObjectPart.FlexibleParam()
+            {
+                Serialization = (BinaryData)map["FlexibleData"]
+            };
 
-            ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
-            fp.Serialization = (BinaryData)map["FlexibleData"];
-            objpart.Flexible = fp;
+            objpart.Sound = new ObjectPart.SoundParam()
+            {
+                Serialization = (BinaryData)map["LoopedSoundData"]
+            };
 
-            ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
-            sound.Serialization = (BinaryData)map["LoopedSoundData"];
-            objpart.Sound = sound;
+            objpart.CollisionSound = new ObjectPart.CollisionSoundParam()
+            {
+                Serialization = (BinaryData)map["ImpactSoundData"]
+            };
 
-            ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
-            collisionsound.Serialization = (BinaryData)map["ImpactSoundData"];
-            objpart.CollisionSound = collisionsound;
-
-            ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
-            ps.Serialization = (BinaryData)map["PrimitiveShapeData"];
-            objpart.Shape = ps;
+            objpart.Shape = new ObjectPart.PrimitiveShape()
+            {
+                Serialization = (BinaryData)map["PrimitiveShapeData"]
+            };
 
             objpart.ParticleSystemBytes = (BinaryData)map["ParticleSystem"];
             objpart.TextureEntryBytes = (BinaryData)map["TextureEntryBytes"];
@@ -169,9 +177,9 @@ namespace SilverSim.Database.Memory.SimulationData
 
             objpart.ClickAction = (ClickActionType)map["ClickAction"].AsInt;
 
-            using (MemoryStream ms = new MemoryStream((BinaryData)map["DynAttrs"]))
+            using (var ms = new MemoryStream((BinaryData)map["DynAttrs"]))
             {
-                foreach (KeyValuePair<string, IValue> kvp in (Map)LlsdBinary.Deserialize(ms))
+                foreach (var kvp in (Map)LlsdBinary.Deserialize(ms))
                 {
                     objpart.DynAttrs.Add(kvp.Key, kvp.Value);
                 }
@@ -201,21 +209,23 @@ namespace SilverSim.Database.Memory.SimulationData
 
         ObjectPartInventoryItem ObjectPartInventoryItemFromMap(Map map)
         {
-            ObjectPartInventoryItem item = new ObjectPartInventoryItem();
-            item.AssetID = map["AssetID"].AsUUID;
-            item.AssetType = (AssetType)map["AssetType"].AsInt;
-            item.CreationDate = (Date)map["CreationDate"];
-            item.Creator = new UUI(map["Creator"].ToString());
-            item.Description = map["Description"].ToString();
-            item.Flags = (InventoryFlags)map["Flags"].AsUInt;
-            item.Group = new UGI(map["Group"].ToString());
-            item.IsGroupOwned = map["GroupOwned"].AsBoolean;
-            item.ID = map["InventoryID"].AsUUID;
-            item.InventoryType = (InventoryType)map["InventoryType"].AsInt;
-            item.LastOwner = new UUI(map["LastOwner"].ToString());
-            item.Name = map["Name"].ToString();
-            item.Owner = new UUI(map["Owner"].ToString());
-            item.ParentFolderID = map["ParentFolderID"].AsUUID;
+            var item = new ObjectPartInventoryItem()
+            {
+                AssetID = map["AssetID"].AsUUID,
+                AssetType = (AssetType)map["AssetType"].AsInt,
+                CreationDate = (Date)map["CreationDate"],
+                Creator = new UUI(map["Creator"].ToString()),
+                Description = map["Description"].ToString(),
+                Flags = (InventoryFlags)map["Flags"].AsUInt,
+                Group = new UGI(map["Group"].ToString()),
+                IsGroupOwned = map["GroupOwned"].AsBoolean,
+                ID = map["InventoryID"].AsUUID,
+                InventoryType = (InventoryType)map["InventoryType"].AsInt,
+                LastOwner = new UUI(map["LastOwner"].ToString()),
+                Name = map["Name"].ToString(),
+                Owner = new UUI(map["Owner"].ToString()),
+                ParentFolderID = map["ParentFolderID"].AsUUID
+            };
             item.Permissions.Base = (InventoryPermissionsMask)map["BasePermissions"].AsUInt;
             item.Permissions.Current = (InventoryPermissionsMask)map["CurrentPermissions"].AsUInt;
             item.Permissions.EveryOne = (InventoryPermissionsMask)map["EveryOnePermissions"].AsUInt;
@@ -249,18 +259,18 @@ namespace SilverSim.Database.Memory.SimulationData
         {
             get
             {
-                Dictionary<UUID, ObjectGroup> objGroups = new Dictionary<UUID, ObjectGroup>();
-                Dictionary<UUID, UUID> originalAssetIDs = new Dictionary<UUID, UUID>();
-                Dictionary<UUID, UUID> nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
-                Dictionary<UUID, SortedDictionary<int, ObjectPart>> objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
-                List<UUID> objPartIDs = new List<UUID>();
-                Dictionary<UUID, ObjectPart> objParts = new Dictionary<UUID,ObjectPart>();
-                List<UUID> orphanedPrims = new List<UUID>();
-                List<KeyValuePair<UUID, UUID>> orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
+                var objGroups = new Dictionary<UUID, ObjectGroup>();
+                var originalAssetIDs = new Dictionary<UUID, UUID>();
+                var nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
+                var objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
+                var objPartIDs = new List<UUID>();
+                var objParts = new Dictionary<UUID,ObjectPart>();
+                var orphanedPrims = new List<UUID>();
+                var orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
 
-                RwLockedDictionary<UUID, Map> objectList = new RwLockedDictionary<UUID, Map>();
-                RwLockedDictionary<UUID, Map> primitiveList = new RwLockedDictionary<UUID, Map>();
-                RwLockedDictionary<string, Map> primItemList = new RwLockedDictionary<string, Map>();
+                var objectList = new RwLockedDictionary<UUID, Map>();
+                var primitiveList = new RwLockedDictionary<UUID, Map>();
+                var primItemList = new RwLockedDictionary<string, Map>();
 
                 if (m_Objects.TryGetValue(regionID, out objectList))
                 {
@@ -274,8 +284,7 @@ namespace SilverSim.Database.Memory.SimulationData
                             objgroupID = kvp.Key;
                             originalAssetIDs[objgroupID] = kvp.Value["OriginalAssetID"].AsUUID;
                             nextOwnerAssetIDs[objgroupID] = kvp.Value["NextOwnerAssetID"].AsUUID;
-                            ObjectGroup objgroup = ObjectGroupFromMap(kvp.Value);
-                            objGroups[objgroupID] = objgroup;
+                            objGroups[objgroupID] = ObjectGroupFromMap(kvp.Value);
                         }
                         catch (Exception e)
                         {
@@ -299,7 +308,7 @@ namespace SilverSim.Database.Memory.SimulationData
                                     objGroupParts.Add(rootPartID, new SortedDictionary<int, ObjectPart>());
                                 }
 
-                                ObjectPart objpart = ObjectPartFromMap(kvp.Value);
+                                var objpart = ObjectPartFromMap(kvp.Value);
 
                                 objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
                                 objPartIDs.Add(objpart.ID);
@@ -322,13 +331,13 @@ namespace SilverSim.Database.Memory.SimulationData
                     m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
                     if(m_PrimItems.TryGetValue(regionID, out primItemList))
                     {
-                        foreach(Map map in primItemList.Values)
+                        foreach(var map in primItemList.Values)
                         {
-                            UUID partID = map["PrimID"].AsUUID;
+                            var partID = map["PrimID"].AsUUID;
                             ObjectPart part;
                             if (objParts.TryGetValue(partID, out part))
                             {
-                                ObjectPartInventoryItem item = ObjectPartInventoryItemFromMap(map);
+                                var item = ObjectPartInventoryItemFromMap(map);
 
                                 part.Inventory.Add(item.ID, item.Name, item);
                                 if ((++primitemcount) % 5000 == 0)
@@ -346,8 +355,8 @@ namespace SilverSim.Database.Memory.SimulationData
                     m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
                 }
 
-                List<UUID> removeObjGroups = new List<UUID>();
-                foreach(KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
+                var removeObjGroups = new List<UUID>();
+                foreach(var kvp in objGroups)
                 {
                     if (!objGroupParts.ContainsKey(kvp.Key))
                     {
@@ -355,7 +364,7 @@ namespace SilverSim.Database.Memory.SimulationData
                     }
                     else
                     {
-                        foreach (ObjectPart objpart in objGroupParts[kvp.Key].Values)
+                        foreach (var objpart in objGroupParts[kvp.Key].Values)
                         {
                             kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
                         }
@@ -374,18 +383,18 @@ namespace SilverSim.Database.Memory.SimulationData
                     }
                 }
 
-                foreach(UUID objid in removeObjGroups)
+                foreach(var objid in removeObjGroups)
                 {
                     objGroups.Remove(objid);
                     objectList.Remove(objid);
                 }
 
-                foreach(UUID primid in orphanedPrims)
+                foreach(var primid in orphanedPrims)
                 {
                     primitiveList.Remove(primid);
                 }
 
-                foreach(KeyValuePair<UUID, UUID> kvp in orphanedPrimInventories)
+                foreach(var kvp in orphanedPrimInventories)
                 {
                     primItemList.Remove(GenItemKey(kvp.Key, kvp.Value));
                 }

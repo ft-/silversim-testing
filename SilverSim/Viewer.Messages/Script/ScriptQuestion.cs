@@ -35,11 +35,6 @@ namespace SilverSim.Viewer.Messages.Script
         public ScriptPermissions Questions;
         public UUID ExperienceID = UUID.Zero;
 
-        public ScriptQuestion()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(TaskID);
@@ -52,12 +47,14 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            ScriptQuestion m = new ScriptQuestion();
-            m.TaskID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-            m.ObjectName = p.ReadStringLen8();
-            m.ObjectOwner = p.ReadStringLen8();
-            m.Questions = (ScriptPermissions)p.ReadUInt32();
+            var m = new ScriptQuestion()
+            {
+                TaskID = p.ReadUUID(),
+                ItemID = p.ReadUUID(),
+                ObjectName = p.ReadStringLen8(),
+                ObjectOwner = p.ReadStringLen8(),
+                Questions = (ScriptPermissions)p.ReadUInt32()
+            };
             try
             {
                 m.ExperienceID = p.ReadUUID();

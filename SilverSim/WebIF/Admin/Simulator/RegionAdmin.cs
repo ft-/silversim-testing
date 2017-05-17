@@ -141,11 +141,11 @@ namespace SilverSim.WebIF.Admin.Simulator
         void HandleScriptEnginesList(HttpRequest req, Map jsondata)
         {
             Map res = new Map();
-            AnArray compilerRes = new AnArray();
+            var compilerRes = new AnArray();
             foreach(string name in CompilerRegistry.ScriptCompilers.Names)
             {
-                IScriptCompiler compiler = CompilerRegistry.ScriptCompilers[name];
-                Map m = new Map();
+                var compiler = CompilerRegistry.ScriptCompilers[name];
+                var m = new Map();
                 ScriptEngineNameAttribute attr;
                 Type compilerType = compiler.GetType();
                 attr = Attribute.GetCustomAttribute(compilerType, typeof(ScriptEngineNameAttribute)) as ScriptEngineNameAttribute;
@@ -153,10 +153,8 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     continue;
                 }
-                DescriptionAttribute descAttr;
-                string desc;
-                descAttr = Attribute.GetCustomAttribute(compilerType, typeof(DescriptionAttribute)) as DescriptionAttribute;
-                desc = descAttr != null ? descAttr.Description : string.Empty;
+                var descAttr = Attribute.GetCustomAttribute(compilerType, typeof(DescriptionAttribute)) as DescriptionAttribute;
+                var desc = descAttr != null ? descAttr.Description : string.Empty;
                 m.Add("name", name);
                 m.Add("description", desc);
                 compilerRes.Add(m);
@@ -170,16 +168,17 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.manage")]
         void HandleGetEstates(HttpRequest req, Map jsondata)
         {
-            List<EstateInfo> estates = m_EstateService.All;
+            var estates = m_EstateService.All;
 
-            Map res = new Map();
-            AnArray estateRes = new AnArray();
-            foreach (EstateInfo estate in estates)
+            var res = new Map();
+            var estateRes = new AnArray();
+            foreach (var estate in estates)
             {
-                Map m = new Map();
-                m.Add("ID", estate.ID);
-                m.Add("Name", estate.Name);
-                estateRes.Add(m);
+                estateRes.Add(new Map
+                {
+                    { "ID", estate.ID },
+                    { "Name", estate.Name }
+                });
             }
             res.Add("estates", estateRes);
             m_WebIF.SuccessResponse(req, res);
@@ -188,23 +187,24 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.view")]
         void HandleGetPorts(HttpRequest req, Map jsondata)
         {
-            Map resdata = new Map();
-            Map tcpdata = new Map();
+            var resdata = new Map();
+            var tcpdata = new Map();
             resdata.Add("tcp", tcpdata);
-            foreach(KeyValuePair<int, string> kvp in m_Loader.KnownTcpPorts)
+            foreach(var kvp in m_Loader.KnownTcpPorts)
             {
                 tcpdata.Add(kvp.Key.ToString(), kvp.Value);
             }
-            Map udpdata = new Map();
+            var udpdata = new Map();
             resdata.Add("udp", udpdata);
-            IEnumerable<RegionInfo> regions = m_RegionStorage.GetAllRegions(UUID.Zero);
-            foreach (RegionInfo region in regions)
+            foreach (RegionInfo region in m_RegionStorage.GetAllRegions(UUID.Zero))
             {
-                Map regiondata = new Map();
-                regiondata.Add("type", "regionport");
-                regiondata.Add("online", m_Scenes.ContainsKey(region.ID));
-                regiondata.Add("regionid", region.ID);
-                regiondata.Add("regionname", region.Name);
+                var regiondata = new Map
+                {
+                    { "type", "regionport" },
+                    { "online", m_Scenes.ContainsKey(region.ID) },
+                    { "regionid", region.ID },
+                    { "regionname", region.Name }
+                };
                 udpdata.Add(region.ServerPort.ToString(), regiondata);
             }
             m_WebIF.SuccessResponse(req, resdata);
@@ -224,31 +224,41 @@ namespace SilverSim.WebIF.Admin.Simulator
                 rInfo.Owner = m_WebIF.ResolveName(rInfo.Owner);
                 Map m = rInfo.ToJsonMap();
                 GetRegionDetails(rInfo.ID, m);
-                Map res = new Map();
-                res.Add("region", m);
+                var res = new Map
+                {
+                    { "region", m }
+                };
                 uint estateID;
                 EstateInfo estateInfo;
                 if(m_EstateService.RegionMap.TryGetValue(rInfo.ID, out estateID) &&
                     m_EstateService.TryGetValue(estateID, out estateInfo))
                 {
-                    Map estateData = new Map();
-                    estateData.Add("ID", estateInfo.ID);
-                    estateData.Add("Name", estateInfo.Name);
+                    var estateData = new Map
+                    {
+                        { "ID", estateInfo.ID },
+                        { "Name", estateInfo.Name }
+                    };
                     res.Add("estate", estateData);
                 }
 
-                Map permissions = new Map();
-                m = new Map();
-                m.Add("effective", m_ServerParams.GetBoolean(rInfo.ID, RegionOwnerIsSimConsoleUser, false));
-                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, RegionOwnerIsSimConsoleUser, false));
+                var permissions = new Map();
+                m = new Map
+                {
+                    { "effective", m_ServerParams.GetBoolean(rInfo.ID, RegionOwnerIsSimConsoleUser, false) },
+                    { "global", m_ServerParams.GetBoolean(UUID.Zero, RegionOwnerIsSimConsoleUser, false) }
+                };
                 permissions.Add("region_owner", m);
-                m = new Map();
-                m.Add("effective", m_ServerParams.GetBoolean(rInfo.ID, EstateOwnerIsSimConsoleUser, false));
-                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateOwnerIsSimConsoleUser, false));
+                m = new Map
+                {
+                    { "effective", m_ServerParams.GetBoolean(rInfo.ID, EstateOwnerIsSimConsoleUser, false) },
+                    { "global", m_ServerParams.GetBoolean(UUID.Zero, EstateOwnerIsSimConsoleUser, false) }
+                };
                 permissions.Add("estate_owner", m);
-                m = new Map();
-                m.Add("effective", m_ServerParams.GetBoolean(rInfo.ID, EstateManagerIsSimConsoleUser, false));
-                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateManagerIsSimConsoleUser, false));
+                m = new Map
+                {
+                    { "effective", m_ServerParams.GetBoolean(rInfo.ID, EstateManagerIsSimConsoleUser, false) },
+                    { "global", m_ServerParams.GetBoolean(UUID.Zero, EstateManagerIsSimConsoleUser, false) }
+                };
                 permissions.Add("estate_manager", m);
                 res.Add("simconsole", permissions);
 
@@ -263,7 +273,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         void GetRegionDetails(UUID regionid, Map m)
         {
             SceneInterface scene;
-            bool isOnline = m_Scenes.TryGetValue(regionid, out scene);
+            var isOnline = m_Scenes.TryGetValue(regionid, out scene);
             m.Add("IsOnline", isOnline);
             m.Add("IsLoginsEnabled", isOnline && scene.LoginControl.IsLoginEnabled);
         }
@@ -271,13 +281,13 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.view")]
         void HandleList(HttpRequest req, Map jsondata)
         {
-            List<RegionInfo> regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+            var regions = m_RegionStorage.GetAllRegions(UUID.Zero);
 
-            Map res = new Map();
-            AnArray regionsRes = new AnArray();
-            foreach (RegionInfo region in regions)
+            var res = new Map();
+            var regionsRes = new AnArray();
+            foreach (var region in regions)
             {
-                Map m = region.ToJsonMap();
+                var m = region.ToJsonMap();
                 region.Owner = m_WebIF.ResolveName(region.Owner);
                 GetRegionDetails(region.ID, m);
                 regionsRes.Add(m);
@@ -510,7 +520,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface si;
             if(TryGetRootAgent(req, jsondata, out si, out agent))
             {
-                string msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome", "You have been kicked since you could not be teleported home.");
+                var msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome", "You have been kicked since you could not be teleported home.");
                 if (jsondata.ContainsKey("message"))
                 {
                     msg = jsondata["message"].ToString();
@@ -530,7 +540,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface si;
             if (TryGetRootAgent(req, jsondata, out si, out agent))
             {
-                string msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked.");
+                var msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked.");
                 if(jsondata.ContainsKey("message"))
                 {
                     msg = jsondata["message"].ToString();
@@ -559,8 +569,10 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                Map res = new Map();
-                res.Add("agent", agent.ToJsonMap(si));
+                var res = new Map
+                {
+                    { "agent", agent.ToJsonMap(si) }
+                };
                 m_WebIF.SuccessResponse(req, res);
             }
         }
@@ -579,11 +591,11 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                bool rootOnly = jsondata.ContainsKey("root_only");
-                bool userOnly = jsondata.ContainsKey("no_npc");
-                Map res = new Map();
-                AnArray agents = new AnArray();
-                foreach(IAgent agent in si.Agents)
+                var rootOnly = jsondata.ContainsKey("root_only");
+                var userOnly = jsondata.ContainsKey("no_npc");
+                var res = new Map();
+                var agents = new AnArray();
+                foreach(var agent in si.Agents)
                 {
                     if(userOnly && agent.IsNpc)
                     {
@@ -780,8 +792,8 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 else
                 {
-                    List<EstateInfo> allEstates = m_EstateService.All;
-                    List<EstateInfo> ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(rInfo.Owner) select estate);
+                    var allEstates = m_EstateService.All;
+                    var ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(rInfo.Owner) select estate);
                     if (ownerEstates.Count != 0)
                     {
                         m_EstateService.RegionMap[rInfo.ID] = ownerEstates[0].ID;
@@ -1151,9 +1163,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                foreach (SceneInterface scene in m_Scenes.Values)
+                foreach (var scene in m_Scenes.Values)
                 {
-                    foreach (IAgent agent in scene.RootAgents)
+                    foreach (var agent in scene.RootAgents)
                     {
                         agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
                     }
@@ -1255,9 +1267,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                         return;
                 }
 
-                Map m = new Map();
-                m.Add("effective", m_ServerParams.GetBoolean(region.ID, EstateOwnerIsSimConsoleUser, false));
-                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateOwnerIsSimConsoleUser, false));
+                var m = new Map
+                {
+                    { "effective", m_ServerParams.GetBoolean(region.ID, EstateOwnerIsSimConsoleUser, false) },
+                    { "global", m_ServerParams.GetBoolean(UUID.Zero, EstateOwnerIsSimConsoleUser, false) }
+                };
                 m_WebIF.SuccessResponse(req, m);
             }
         }
@@ -1295,9 +1309,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                         return;
                 }
 
-                Map m = new Map();
-                m.Add("effective", m_ServerParams.GetBoolean(region.ID, EstateManagerIsSimConsoleUser, false));
-                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, EstateManagerIsSimConsoleUser, false));
+                var m = new Map
+                {
+                    { "effective", m_ServerParams.GetBoolean(region.ID, EstateManagerIsSimConsoleUser, false) },
+                    { "global", m_ServerParams.GetBoolean(UUID.Zero, EstateManagerIsSimConsoleUser, false) }
+                };
                 m_WebIF.SuccessResponse(req, m);
             }
         }
@@ -1335,9 +1351,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                         return;
                 }
 
-                Map m = new Map();
-                m.Add("effective", m_ServerParams.GetBoolean(region.ID, RegionOwnerIsSimConsoleUser, false));
-                m.Add("global", m_ServerParams.GetBoolean(UUID.Zero, RegionOwnerIsSimConsoleUser, false));
+                var m = new Map
+                {
+                    { "effective", m_ServerParams.GetBoolean(region.ID, RegionOwnerIsSimConsoleUser, false) },
+                    { "global", m_ServerParams.GetBoolean(UUID.Zero, RegionOwnerIsSimConsoleUser, false) }
+                };
                 m_WebIF.SuccessResponse(req, m);
             }
         }
@@ -1455,7 +1473,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                Map res = new Map();
+                var res = new Map();
                 uint secperday;
                 uint daysperyear;
 
@@ -1587,11 +1605,6 @@ namespace SilverSim.WebIF.Admin.Simulator
     [PluginName("RegionAdmin")]
     public class RegionAdminFactory : IPluginFactory
     {
-        public RegionAdminFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new RegionAdmin(

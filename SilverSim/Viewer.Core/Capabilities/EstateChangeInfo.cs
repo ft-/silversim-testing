@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            string estateName = reqmap["estate_name"].ToString();
+            var estateName = reqmap["estate_name"].ToString();
             double sun_hour = reqmap["sun_hour"].AsReal;
             bool isSunFixed = reqmap["is_sun_fixed"].AsBoolean;
             bool isExternallyVisible = reqmap["is_externally_visible"].AsBoolean;
@@ -87,7 +87,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             bool denyAnonymous = reqmap["deny_anonymous"].AsBoolean;
             bool denyAgeUnverified = reqmap["deny_age_unverified"].AsBoolean;
             bool allowVoiceChat = reqmap["allow_voice_chat"].AsBoolean;
-            UUID invoiceID = reqmap["invoice"].AsUUID;
+            var invoiceID = reqmap["invoice"].AsUUID;
 
             uint estateID;
             EstateInfo estate;
@@ -158,10 +158,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 m_Scene.TriggerEstateUpdate();
             }
 
-            using (HttpResponse httpres = httpreq.BeginResponse())
+            using (var httpres = httpreq.BeginResponse())
             {
                 httpres.ContentType = "application/llsd+xml";
-                using (Stream outStream = httpres.GetOutputStream())
+                using (var outStream = httpres.GetOutputStream())
                 {
                     LlsdXml.Serialize(new Map(), outStream);
                 }

@@ -85,8 +85,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Invalid request");
                 return;
             }
-            string verb = reqmap["verb"].ToString();
-            switch(verb)
+            switch(reqmap["verb"].ToString())
             {
                 case "GET":
                     HandleObjectMediaRequest(httpreq, reqmap);
@@ -119,19 +118,19 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            Map res = new Map();
+            var res = new Map();
             res.Add("object_id", objectID);
-            PrimitiveMedia mediaList = part.Media;
+            var mediaList = part.Media;
             if(null == mediaList)
             {
-                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
                 {
                     resp.ContentType = "text/plain";
                 }
                 return;
             }
-            AnArray mediaData = new AnArray();
-            foreach (PrimitiveMedia.Entry entry in part.Media)
+            var mediaData = new AnArray();
+            foreach (var entry in part.Media)
             {
                 if(null != entry)
                 {
@@ -144,10 +143,10 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
             res.Add("object_media_data", mediaData);
             res.Add("object_media_version", part.MediaURL);
-            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
                 resp.ContentType = "application/llsd+xml";
-                using (Stream o = resp.GetOutputStream())
+                using (var o = resp.GetOutputStream())
                 {
                     LlsdXml.Serialize(res, o);
                 }
@@ -164,17 +163,17 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
             catch
             {
-                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
                 {
                     resp.ContentType = "text/plain";
                 }
                 return;
             }
 
-            PrimitiveMedia media = new PrimitiveMedia();
-            foreach (IValue v in (AnArray)reqmap["object_media_data"])
+            var media = new PrimitiveMedia();
+            foreach (var v in (AnArray)reqmap["object_media_data"])
             {
-                Map vm = v as Map;
+                var vm = v as Map;
                 if (null != vm)
                 {
                     media.Add((PrimitiveMedia.Entry)vm);
@@ -190,7 +189,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 part.UpdateMedia(media, m_Agent.ID);
             }
 
-            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
                 resp.ContentType = "text/plain";
             }

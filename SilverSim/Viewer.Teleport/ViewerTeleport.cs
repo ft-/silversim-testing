@@ -30,11 +30,6 @@ namespace SilverSim.Viewer.Teleport
     [Description("Viewer Teleport Handler")]
     public class ViewerTeleport : IPlugin, IPacketHandlerExtender
     {
-        public ViewerTeleport()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
@@ -55,10 +50,6 @@ namespace SilverSim.Viewer.Teleport
     [PluginName("ViewerTeleport")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {

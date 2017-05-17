@@ -50,7 +50,7 @@ namespace SilverSim.Database.Memory.Profile
             RwLockedDictionary<UUID, ProfilePick> picks;
             if(m_Picks.TryGetValue(user.ID, out picks))
             {
-                foreach(KeyValuePair<UUID, ProfilePick> kvp in picks)
+                foreach(var kvp in picks)
                 {
                     results.Add(kvp.Key, kvp.Value.Name);
                 }

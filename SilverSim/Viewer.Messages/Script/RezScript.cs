@@ -65,19 +65,16 @@ namespace SilverSim.Viewer.Messages.Script
 
         public InventoryData InventoryBlock = new InventoryData();
 
-        public RezScript()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RezScript m = new RezScript();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.ObjectLocalID = p.ReadUInt32();
-            m.IsEnabled = p.ReadBoolean();
+            RezScript m = new RezScript()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
+                ObjectLocalID = p.ReadUInt32(),
+                IsEnabled = p.ReadBoolean()
+            };
             m.InventoryBlock.ItemID = p.ReadUUID();
             m.InventoryBlock.FolderID = p.ReadUUID();
             m.InventoryBlock.CreatorID = p.ReadUUID();

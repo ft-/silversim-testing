@@ -31,14 +31,9 @@ namespace SilverSim.Viewer.Messages.Names
     {
         public List<UUID> UUIDNameBlock = new List<UUID>();
 
-        public UUIDGroupNameRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            UUIDGroupNameRequest m = new UUIDGroupNameRequest();
+            var m = new UUIDGroupNameRequest();
 
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)

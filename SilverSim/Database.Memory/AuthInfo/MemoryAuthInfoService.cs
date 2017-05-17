@@ -52,11 +52,6 @@ namespace SilverSim.Database.Memory.AuthInfo
         readonly RwLockedDictionary<UUID, UserAuthInfo> m_AuthInfos = new RwLockedDictionary<UUID, UserAuthInfo>();
         readonly RwLockedDictionary<UUID, AuthToken> m_Tokens = new RwLockedDictionary<UUID, AuthToken>();
 
-        public MemoryAuthInfoService()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
@@ -65,8 +60,8 @@ namespace SilverSim.Database.Memory.AuthInfo
         public void Remove(UUID scopeID, UUID accountID)
         {
             m_AuthInfos.Remove(accountID);
-            List<UUID> tokenIds = new List<UUID>();
-            foreach(KeyValuePair<UUID, AuthToken> kvp in m_Tokens)
+            var tokenIds = new List<UUID>();
+            foreach(var kvp in m_Tokens)
             {
                 if(kvp.Value.UserID == accountID)
                 {
@@ -94,8 +89,8 @@ namespace SilverSim.Database.Memory.AuthInfo
 
         public override UUID AddToken(UUID principalId, UUID sessionid, int lifetime_in_minutes)
         {
-            UUID newTokenId = UUID.Random;
-            AuthToken tok = new AuthToken(principalId, sessionid, lifetime_in_minutes);
+            var newTokenId = UUID.Random;
+            var tok = new AuthToken(principalId, sessionid, lifetime_in_minutes);
             m_Tokens.Add(newTokenId, tok);
             return newTokenId;
         }
@@ -103,7 +98,7 @@ namespace SilverSim.Database.Memory.AuthInfo
         public override void VerifyToken(UUID principalId, UUID token, int lifetime_extension_in_minutes)
         {
             AuthToken tok;
-            ulong now = Date.Now.AsULong;
+            var now = Date.Now.AsULong;
             if (m_Tokens.TryGetValue(token, out tok) && tok.UserID == principalId)
             {
                 if (tok.ValidUntil.AsULong >= now)
@@ -127,7 +122,7 @@ namespace SilverSim.Database.Memory.AuthInfo
 
         public override void ReleaseTokenBySession(UUID accountId, UUID sessionId)
         {
-            foreach(KeyValuePair<UUID, AuthToken> kvp in m_Tokens)
+            foreach(var kvp in m_Tokens)
             {
                 if(kvp.Value.SessionID == sessionId && kvp.Value.UserID == accountId)
                 {
@@ -143,11 +138,6 @@ namespace SilverSim.Database.Memory.AuthInfo
     [PluginName("AuthInfo")]
     public class MemoryAuthInfoServiceFactory : IPluginFactory
     {
-        public MemoryAuthInfoServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryAuthInfoService();

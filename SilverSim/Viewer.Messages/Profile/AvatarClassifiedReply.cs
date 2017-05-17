@@ -40,17 +40,12 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public List<ClassifiedData> Data = new List<ClassifiedData>();
 
-        public AvatarClassifiedReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(TargetID);
             p.WriteUInt8((byte)Data.Count);
-            foreach(ClassifiedData d in Data)
+            foreach(var d in Data)
             {
                 p.WriteUUID(d.ClassifiedID);
                 p.WriteStringLen8(d.Name);
@@ -59,16 +54,19 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public static Message Decode(UDPPacket p)
         {
-            AvatarClassifiedReply m = new AvatarClassifiedReply();
-            m.AgentID = p.ReadUUID();
-            m.TargetID = p.ReadUUID();
+            var m = new AvatarClassifiedReply()
+            {
+                AgentID = p.ReadUUID(),
+                TargetID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ClassifiedData d = new ClassifiedData();
-                d.ClassifiedID = p.ReadUUID();
-                d.Name = p.ReadStringLen8();
-                m.Data.Add(d);
+                m.Data.Add(new ClassifiedData()
+                {
+                    ClassifiedID = p.ReadUUID(),
+                    Name = p.ReadStringLen8()
+                });
             }
             return m;
         }

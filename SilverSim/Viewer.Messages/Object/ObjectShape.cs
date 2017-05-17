@@ -57,41 +57,38 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID SessionID = UUID.Zero;
         public List<Data> ObjectData = new List<Data>(); 
 
-        public ObjectShape()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectShape m = new ObjectShape();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ObjectShape()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d = new Data();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.PathCurve = p.ReadUInt8();
-                d.ProfileCurve = p.ReadUInt8();
-                d.PathBegin = p.ReadUInt16();
-                d.PathEnd = p.ReadUInt16();
-                d.PathScaleX = p.ReadUInt8();
-                d.PathScaleY = p.ReadUInt8();
-                d.PathShearX = p.ReadUInt8();
-                d.PathShearY = p.ReadUInt8();
-                d.PathTwist = p.ReadInt8();
-                d.PathTwistBegin = p.ReadInt8();
-                d.PathRadiusOffset = p.ReadInt8();
-                d.PathTaperX = p.ReadInt8();
-                d.PathTaperY = p.ReadInt8();
-                d.PathRevolutions = p.ReadUInt8();
-                d.PathSkew = p.ReadInt8();
-                d.ProfileBegin = p.ReadUInt16();
-                d.ProfileEnd = p.ReadUInt16();
-                d.ProfileHollow = p.ReadUInt16();
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new Data()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    PathCurve = p.ReadUInt8(),
+                    ProfileCurve = p.ReadUInt8(),
+                    PathBegin = p.ReadUInt16(),
+                    PathEnd = p.ReadUInt16(),
+                    PathScaleX = p.ReadUInt8(),
+                    PathScaleY = p.ReadUInt8(),
+                    PathShearX = p.ReadUInt8(),
+                    PathShearY = p.ReadUInt8(),
+                    PathTwist = p.ReadInt8(),
+                    PathTwistBegin = p.ReadInt8(),
+                    PathRadiusOffset = p.ReadInt8(),
+                    PathTaperX = p.ReadInt8(),
+                    PathTaperY = p.ReadInt8(),
+                    PathRevolutions = p.ReadUInt8(),
+                    PathSkew = p.ReadInt8(),
+                    ProfileBegin = p.ReadUInt16(),
+                    ProfileEnd = p.ReadUInt16(),
+                    ProfileHollow = p.ReadUInt16()
+                });
             }
             return m;
         }
@@ -102,7 +99,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(SessionID);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (Data d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteUInt8(d.PathCurve);

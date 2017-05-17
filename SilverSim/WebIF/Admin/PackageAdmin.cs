@@ -34,11 +34,6 @@ namespace SilverSim.WebIF.Admin
     {
         IAdminWebIF m_WebIF;
 
-        public PackageAdmin()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             m_WebIF = loader.GetAdminWebIF();
@@ -159,14 +154,14 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("packages.view")]
         void PackagesAvailableList(HttpRequest req, Map jsondata)
         {
-            Map res = new Map();
+            var res = new Map();
             try
             {
                 CoreUpdater.Instance.UpdatePackageFeed();
-                AnArray pkglist = new AnArray();
-                foreach(KeyValuePair<string, string> kvp in CoreUpdater.Instance.AvailablePackages)
+                var pkglist = new AnArray();
+                foreach(var kvp in CoreUpdater.Instance.AvailablePackages)
                 {
-                    Map pkg = new Map();
+                    var pkg = new Map();
                     pkg.Add("name", kvp.Key);
                     pkg.Add("version", kvp.Value);
                     pkglist.Add(pkg);
@@ -185,7 +180,7 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("packages.install")]
         void PackageUpdatesAvailable(HttpRequest req, Map jsondata)
         {
-            Map res = new Map();
+            var res = new Map();
             try
             {
                 CoreUpdater.Instance.UpdatePackageFeed();
@@ -202,11 +197,11 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("packages.view")]
         void PackagesInstalledList(HttpRequest req, Map jsondata)
         {
-            Map res = new Map();
-            AnArray pkgs = new AnArray();
-            foreach (KeyValuePair<string, string> kvp in CoreUpdater.Instance.InstalledPackages)
+            var res = new Map();
+            var pkgs = new AnArray();
+            foreach (var kvp in CoreUpdater.Instance.InstalledPackages)
             {
-                Map pkg = new Map();
+                var pkg = new Map();
                 pkg.Add("name", kvp.Key);
                 pkg.Add("version", kvp.Value);
                 pkgs.Add(pkg);
@@ -224,7 +219,6 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
 
-            Map res = new Map();
             try
             {
                 CoreUpdater.Instance.InstallPackage(jsondata["package"].ToString());
@@ -234,7 +228,7 @@ namespace SilverSim.WebIF.Admin
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
-            m_WebIF.SuccessResponse(req, res);
+            m_WebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIfRequiredRight("packages.uninstall")]
@@ -246,7 +240,6 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
 
-            Map res = new Map();
             try
             {
                 CoreUpdater.Instance.UninstallPackage(jsondata["package"].ToString());
@@ -256,18 +249,13 @@ namespace SilverSim.WebIF.Admin
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
-            m_WebIF.SuccessResponse(req, res);
+            m_WebIF.SuccessResponse(req, new Map());
         }
     }
 
     [PluginName("PackageAdmin")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new PackageAdmin();

@@ -56,17 +56,12 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<ObjData> ObjectData = new List<ObjData>();
 
-        public ObjectUpdateCompressed()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt64(Location.RegionHandle);
             p.WriteUInt16(TimeDilation);
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (ObjData d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.UpdateFlags);
                 p.WriteUInt16((UInt16)d.Data.Length);
@@ -76,16 +71,17 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            ObjectUpdateCompressed m = new ObjectUpdateCompressed();
+            var m = new ObjectUpdateCompressed();
             m.Location.RegionHandle = p.ReadUInt64();
             m.TimeDilation = p.ReadUInt16();
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ObjData d = new ObjData();
-                d.UpdateFlags = p.ReadUInt32();
-                d.Data = p.ReadBytes(p.ReadUInt16());
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new ObjData()
+                {
+                    UpdateFlags = p.ReadUInt32(),
+                    Data = p.ReadBytes(p.ReadUInt16())
+                });
             }
             return m;
         }

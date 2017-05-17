@@ -29,46 +29,26 @@ namespace SilverSim.Viewer.Messages
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class ReliableAttribute : Attribute
     {
-        public ReliableAttribute()
-        {
-
-        }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class ZerocodedAttribute : Attribute
     {
-        public ZerocodedAttribute()
-        {
-
-        }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class TrustedAttribute : Attribute
     {
-        public TrustedAttribute()
-        {
-
-        }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class NotTrustedAttribute : Attribute
     {
-        public NotTrustedAttribute()
-        {
-
-        }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class UDPDeprecatedAttribute : Attribute
     {
-        public UDPDeprecatedAttribute()
-        {
-
-        }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]

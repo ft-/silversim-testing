@@ -34,20 +34,15 @@ namespace SilverSim.Viewer.Messages.Teleport
         public UUID LureID;
         public TeleportFlags TeleportFlags;
 
-        public TeleportLureRequest()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            TeleportLureRequest m = new TeleportLureRequest();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.LureID = p.ReadUUID();
-            m.TeleportFlags = (TeleportFlags)p.ReadUInt32();
-
-            return m;
+            return new TeleportLureRequest()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                LureID = p.ReadUUID(),
+                TeleportFlags = (TeleportFlags)p.ReadUInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

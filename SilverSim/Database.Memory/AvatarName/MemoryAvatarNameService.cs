@@ -38,10 +38,6 @@ namespace SilverSim.Database.Memory.AvatarName
         readonly RwLockedDictionary<UUID, UUI> m_Data = new RwLockedDictionary<UUID, UUI>();
 
         #region Constructor
-        public MemoryAvatarNameService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
@@ -51,8 +47,7 @@ namespace SilverSim.Database.Memory.AvatarName
         #region Accessors
         public override bool TryGetValue(string firstName, string lastName, out UUI uui)
         {
-            IEnumerable<UUI> res = from data in m_Data where data.Value.FirstName.ToLower() == firstName.ToLower() && data.Value.LastName.ToLower() == lastName.ToLower() select data.Value;
-            foreach(UUI entry in res)
+            foreach(UUI entry in from data in m_Data where data.Value.FirstName.ToLower() == firstName.ToLower() && data.Value.LastName.ToLower() == lastName.ToLower() select data.Value)
             {
                 uui = new UUI(entry);
                 return true;
@@ -115,9 +110,7 @@ namespace SilverSim.Database.Memory.AvatarName
                 return new List<UUI>();
             }
 
-            IEnumerable<UUI> res;
-
-            res = (names.Length == 1) ?
+            IEnumerable<UUI> res = (names.Length == 1) ?
                 from data in m_Data.Values where data.FirstName.ToLower().Contains(names[0].ToLower()) || data.LastName.ToLower().Contains(names[0].ToLower()) select new UUI(data) :
                 from data in m_Data.Values where data.FirstName.ToLower().Contains(names[0].ToLower()) && data.LastName.ToLower().Contains(names[1].ToLower()) select new UUI(data);
             return new List<UUI>(res);
@@ -129,11 +122,6 @@ namespace SilverSim.Database.Memory.AvatarName
     [PluginName("AvatarNames")]
     public class MemoryAvatarNameServiceFactory : IPluginFactory
     {
-        public MemoryAvatarNameServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryAvatarNameService();

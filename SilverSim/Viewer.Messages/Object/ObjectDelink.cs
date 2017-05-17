@@ -35,17 +35,13 @@ namespace SilverSim.Viewer.Messages.Object
 
         public List<UInt32> ObjectList = new List<UInt32>();
 
-        public ObjectDelink()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectDelink m = new ObjectDelink();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ObjectDelink()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
@@ -60,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(SessionID);
 
             p.WriteUInt8((byte)ObjectList.Count);
-            foreach (uint id in ObjectList)
+            foreach (var id in ObjectList)
             {
                 p.WriteUInt32(id);
             }

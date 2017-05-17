@@ -49,12 +49,14 @@ namespace SilverSim.Viewer.Core.Capabilities
             Features.Add("MaxMaterialsPerTransaction", 50);
             Features.Add("DynamicPathfindingEnabled", false);
             Features.Add("AvatarHoverHeightEnabled", true);
-            Map typesMap = new Map();
-            typesMap.Add("convex", true);
-            typesMap.Add("none", true);
-            typesMap.Add("prim", true);
+            var typesMap = new Map
+            {
+                { "convex", true },
+                { "none", true },
+                { "prim", true }
+            };
             Features.Add("PhysicsShapeTypes", typesMap);
-            Map extrasMap = new Map();
+            var extrasMap = new Map();
             if (!string.IsNullOrEmpty(gridURL))
             {
                 extrasMap.Add("GridURL", gridURL);
@@ -86,10 +88,10 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
             else
             {
-                using (HttpResponse res = httpreq.BeginResponse())
+                using (var res = httpreq.BeginResponse())
                 {
                     res.ContentType = "application/llsd+xml";
-                    using (Stream s = res.GetOutputStream())
+                    using (var s = res.GetOutputStream())
                     {
                         LlsdXml.Serialize(Features, s);
                     }

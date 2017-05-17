@@ -31,18 +31,13 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ObjectID;
         public UUID ItemID;
 
-        public GetScriptRunning()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            GetScriptRunning m = new GetScriptRunning();
-            m.ObjectID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
-            return m;
+            return new GetScriptRunning()
+            {
+                ObjectID = p.ReadUUID(),
+                ItemID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

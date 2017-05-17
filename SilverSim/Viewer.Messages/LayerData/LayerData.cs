@@ -44,11 +44,6 @@ namespace SilverSim.Viewer.Messages.LayerData
         public LayerDataType LayerType;
         public byte[] Data = new byte[0];
 
-        public LayerData()
-        {
-
-        }
-
         public override string TypeDescription
         {
             get
@@ -102,10 +97,11 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public static Message Decode(UDPPacket p)
         {
-            LayerData m = new LayerData();
-            m.LayerType = (LayerDataType)p.ReadUInt8();
-            m.Data = p.ReadBytes(p.ReadUInt16());
-            return m;
+            return new LayerData()
+            {
+                LayerType = (LayerDataType)p.ReadUInt8(),
+                Data = p.ReadBytes(p.ReadUInt16())
+            };
         }
     }
 }

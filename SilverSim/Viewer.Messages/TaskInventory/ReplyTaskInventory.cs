@@ -33,12 +33,6 @@ namespace SilverSim.Viewer.Messages.TaskInventory
         public Int16 Serial;
         public string Filename;
 
-
-        public ReplyTaskInventory()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(TaskID);
@@ -48,11 +42,12 @@ namespace SilverSim.Viewer.Messages.TaskInventory
 
         public static Message Decode(UDPPacket p)
         {
-            ReplyTaskInventory m = new ReplyTaskInventory();
-            m.TaskID = p.ReadUUID();
-            m.Serial = p.ReadInt16();
-            m.Filename = p.ReadStringLen8();
-            return m;
+            return new ReplyTaskInventory()
+            {
+                TaskID = p.ReadUUID(),
+                Serial = p.ReadInt16(),
+                Filename = p.ReadStringLen8()
+            };
         }
     }
 
@@ -63,12 +58,6 @@ namespace SilverSim.Viewer.Messages.TaskInventory
     {
         public UUID TaskID;
         public Int16 Serial;
-
-
-        public ReplyTaskInventoryNone()
-        {
-
-        }
 
         public override void Serialize(UDPPacket p)
         {

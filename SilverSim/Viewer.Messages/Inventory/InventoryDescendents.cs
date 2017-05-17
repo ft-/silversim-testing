@@ -75,11 +75,6 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public List<ItemDataEntry> ItemData = new List<ItemDataEntry>();
 
-        public InventoryDescendents()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -89,7 +84,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteInt32(Descendents);
 
             p.WriteUInt8((byte)FolderData.Count);
-            foreach (FolderDataEntry d in FolderData)
+            foreach (var d in FolderData)
             {
                 p.WriteUUID(d.FolderID);
                 p.WriteUUID(d.ParentID);
@@ -98,7 +93,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             }
 
             p.WriteUInt8((byte)ItemData.Count);
-            foreach (ItemDataEntry d in ItemData)
+            foreach (var d in ItemData)
             {
                 p.WriteUUID(d.ItemID);
                 p.WriteUUID(d.FolderID);
@@ -149,49 +144,52 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            InventoryDescendents m = new InventoryDescendents();
-            m.AgentID = p.ReadUUID();
-            m.FolderID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.Version = p.ReadInt32();
-            m.Descendents = p.ReadInt32();
-
+            var m = new InventoryDescendents()
+            {
+                AgentID = p.ReadUUID(),
+                FolderID = p.ReadUUID(),
+                OwnerID = p.ReadUUID(),
+                Version = p.ReadInt32(),
+                Descendents = p.ReadInt32()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                FolderDataEntry d = new FolderDataEntry();
-                d.FolderID = p.ReadUUID();
-                d.ParentID = p.ReadUUID();
-                d.Type = (InventoryType)p.ReadInt8();
-                d.Name = p.ReadStringLen8();
-                m.FolderData.Add(d);
+                m.FolderData.Add(new FolderDataEntry()
+                {
+                    FolderID = p.ReadUUID(),
+                    ParentID = p.ReadUUID(),
+                    Type = (InventoryType)p.ReadInt8(),
+                    Name = p.ReadStringLen8()
+                });
             }
 
             n = p.ReadUInt8();
             while(n-- != 0)
             {
-                ItemDataEntry d = new ItemDataEntry();
-                d.ItemID = p.ReadUUID();
-                d.FolderID = p.ReadUUID();
-                d.CreatorID = p.ReadUUID();
-                d.OwnerID = p.ReadUUID();
-                d.GroupID = p.ReadUUID();
-                d.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
-                d.IsGroupOwned = p.ReadBoolean();
-                d.Type = (AssetType)p.ReadInt8();
-                d.InvType = (InventoryType)p.ReadInt8();
-                d.Flags = (InventoryFlags)p.ReadUInt32();
-                d.SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8();
-                d.SalePrice = p.ReadInt32();
-                d.Name = p.ReadStringLen8();
-                d.Description = p.ReadStringLen8();
-                d.CreationDate = p.ReadUInt32();
+                m.ItemData.Add(new ItemDataEntry()
+                {
+                    ItemID = p.ReadUUID(),
+                    FolderID = p.ReadUUID(),
+                    CreatorID = p.ReadUUID(),
+                    OwnerID = p.ReadUUID(),
+                    GroupID = p.ReadUUID(),
+                    BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+                    IsGroupOwned = p.ReadBoolean(),
+                    Type = (AssetType)p.ReadInt8(),
+                    InvType = (InventoryType)p.ReadInt8(),
+                    Flags = (InventoryFlags)p.ReadUInt32(),
+                    SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
+                    SalePrice = p.ReadInt32(),
+                    Name = p.ReadStringLen8(),
+                    Description = p.ReadStringLen8(),
+                    CreationDate = p.ReadUInt32()
+                });
                 p.ReadUInt32(); /* checksum */
-                m.ItemData.Add(d);
             }
             return m;
         }

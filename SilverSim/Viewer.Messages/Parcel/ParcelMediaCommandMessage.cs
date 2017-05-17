@@ -32,11 +32,6 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UInt32 Command;
         public double Time;
 
-        public ParcelMediaCommandMessage()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUInt32(Flags);
@@ -46,11 +41,12 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public static Message Decode(UDPPacket p)
         {
-            ParcelMediaCommandMessage m = new ParcelMediaCommandMessage();
-            m.Flags = p.ReadUInt32();
-            m.Command = p.ReadUInt32();
-            m.Time = p.ReadFloat();
-            return m;
+            return new ParcelMediaCommandMessage()
+            {
+                Flags = p.ReadUInt32(),
+                Command = p.ReadUInt32(),
+                Time = p.ReadFloat()
+            };
         }
     }
 }

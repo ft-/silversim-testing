@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.Sound
         public UUID ObjectID;
         public double Gain;
 
-        public AttachedSoundGainChange()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(ObjectID);

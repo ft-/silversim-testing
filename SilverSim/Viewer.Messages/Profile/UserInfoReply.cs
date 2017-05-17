@@ -33,11 +33,6 @@ namespace SilverSim.Viewer.Messages.Profile
         public string DirectoryVisibility;
         public string EMail = string.Empty;
 
-        public UserInfoReply()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -48,12 +43,13 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public static Message Decode(UDPPacket p)
         {
-            UserInfoReply m = new UserInfoReply();
-            m.AgentID = p.ReadUUID();
-            m.IMViaEmail = p.ReadBoolean();
-            m.DirectoryVisibility = p.ReadStringLen8();
-            m.EMail = p.ReadStringLen8();
-            return m;
+            return new UserInfoReply()
+            {
+                AgentID = p.ReadUUID(),
+                IMViaEmail = p.ReadBoolean(),
+                DirectoryVisibility = p.ReadStringLen8(),
+                EMail = p.ReadStringLen8()
+            };
         }
     }
 }

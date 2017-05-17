@@ -80,18 +80,14 @@ namespace SilverSim.Viewer.Messages.Object
 
         public InventoryDataS InventoryData;
 
-        public RezObject()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RezObject m = new RezObject();
-
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
+            var m = new RezObject()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID()
+            };
             m.RezData.FromTaskID = p.ReadUUID();
             m.RezData.BypassRaycast = p.ReadUInt8();
             m.RezData.RayStart = p.ReadVector3f();

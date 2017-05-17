@@ -36,10 +36,6 @@ namespace SilverSim.Database.Memory.Groups
     {
         readonly RwLockedDictionary<UUID, UGI> m_Data = new RwLockedDictionary<UUID, UGI>();
         #region Constructor
-        public MemoryGroupsNameService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
@@ -74,7 +70,7 @@ namespace SilverSim.Database.Memory.Groups
         public override List<UGI> GetGroupsByName(string groupName, int limit)
         {
             List<UGI> groups = new List<UGI>();
-            IEnumerable<UGI> res = from grp in m_Data.Values
+            var res = from grp in m_Data.Values
                                    where grp.GroupName.ToLower().Equals(groupName.ToLower())
                                    select grp;
             foreach(UGI ugi in res)
@@ -99,11 +95,6 @@ namespace SilverSim.Database.Memory.Groups
     [PluginName("GroupNames")]
     public class MemoryGroupsNameServiceFactory : IPluginFactory
     {
-        public MemoryGroupsNameServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryGroupsNameService();

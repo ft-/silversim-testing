@@ -40,25 +40,21 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID SessionID = UUID.Zero;
         public List<Data> ObjectData = new List<Data>();
 
-
-        public ObjectRotation()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectRotation m = new ObjectRotation();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ObjectRotation()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                Data d = new Data();
-                d.ObjectLocalID = p.ReadUInt32();
-                d.Rotation = p.ReadLLQuaternion();
-                m.ObjectData.Add(d);
+                m.ObjectData.Add(new Data()
+                {
+                    ObjectLocalID = p.ReadUInt32(),
+                    Rotation = p.ReadLLQuaternion()
+                });
             }
             return m;
         }
@@ -69,7 +65,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(SessionID);
 
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (Data d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.ObjectLocalID);
                 p.WriteLLQuaternion(d.Rotation);

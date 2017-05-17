@@ -35,17 +35,13 @@ namespace SilverSim.Viewer.Messages.Inventory
         public List<UUID> FolderIDs = new List<UUID>();
         public List<UUID> ItemIDs = new List<UUID>();
 
-        public RemoveInventoryObjects()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            RemoveInventoryObjects m = new RemoveInventoryObjects();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new RemoveInventoryObjects()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
@@ -66,12 +62,12 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUInt8((byte)FolderIDs.Count);
-            foreach(UUID id in FolderIDs)
+            foreach(var id in FolderIDs)
             {
                 p.WriteUUID(id);
             }
             p.WriteUInt8((byte)ItemIDs.Count);
-            foreach(UUID id in ItemIDs)
+            foreach(var id in ItemIDs)
             {
                 p.WriteUUID(id);
             }

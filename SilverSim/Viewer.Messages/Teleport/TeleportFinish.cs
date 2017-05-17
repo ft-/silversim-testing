@@ -44,18 +44,15 @@ namespace SilverSim.Viewer.Messages.Teleport
         /* EQG extension */
         public GridVector RegionSize;
 
-        public TeleportFinish()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            TeleportFinish m = new TeleportFinish();
-            m.AgentID = p.ReadUUID();
-            m.LocationID = p.ReadUInt32();
-            m.SimIP = new IPAddress(p.ReadBytes(4));
-            m.SimPort = p.ReadUInt16();
+            var m = new TeleportFinish()
+            {
+                AgentID = p.ReadUUID(),
+                LocationID = p.ReadUInt32(),
+                SimIP = new IPAddress(p.ReadBytes(4)),
+                SimPort = p.ReadUInt16()
+            };
             m.GridPosition.RegionHandle = p.ReadUInt32();
             m.SeedCapability = p.ReadStringLen16();
             m.SimAccess = (RegionAccess)p.ReadUInt8();
@@ -77,9 +74,9 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public override IValue SerializeEQG()
         {
-            Types.Map om = new Types.Map();
-            Types.Map m = new Types.Map();
-            AnArray array = new AnArray();
+            var om = new Types.Map();
+            var m = new Types.Map();
+            var array = new AnArray();
             array.Add(m);
             om.Add("Info", array);
             m.Add("AgentID", AgentID);

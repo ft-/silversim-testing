@@ -38,10 +38,6 @@ namespace SilverSim.Database.Memory.Avatar
     {
         readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Data = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(delegate () { return new RwLockedDictionary<string, string>(); });
 
-        public MemoryAvatarService()
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
@@ -76,13 +72,13 @@ namespace SilverSim.Database.Memory.Avatar
             get
             {
                 RwLockedDictionary<string, string> data;
-                List<string> result = new List<string>();
+                var result = new List<string>();
                 if(!m_Data.TryGetValue(avatarID, out data))
                 {
                     data = new RwLockedDictionary<string, string>();
                 }
 
-                foreach(string key in itemKeys)
+                foreach(var key in itemKeys)
                 {
                     string val;
                     result.Add(data.TryGetValue(key, out val) ? val : string.Empty);
@@ -105,7 +101,7 @@ namespace SilverSim.Database.Memory.Avatar
                     throw new ArgumentException("value and itemKeys must have identical Count");
                 }
 
-                RwLockedDictionary<string, string> data = m_Data[avatarID];
+                var data = m_Data[avatarID];
                 for (int i = 0; i < itemKeys.Count; ++i)
                 {
                     data[itemKeys[i]] = value[i];
@@ -172,11 +168,6 @@ namespace SilverSim.Database.Memory.Avatar
     [PluginName("Avatar")]
     public class MemoryInventoryServiceFactory : IPluginFactory
     {
-        public MemoryInventoryServiceFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MemoryAvatarService();

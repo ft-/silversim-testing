@@ -30,11 +30,6 @@ namespace SilverSim.Viewer.Messages.MuteList
     {
         public UUID AgentID;
 
-        public UseCachedMuteList()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
@@ -42,9 +37,10 @@ namespace SilverSim.Viewer.Messages.MuteList
 
         public static Message Decode(UDPPacket p)
         {
-            UseCachedMuteList m = new UseCachedMuteList();
-            m.AgentID = p.ReadUUID();
-            return m;
+            return new UseCachedMuteList()
+            {
+                AgentID = p.ReadUUID()
+            };
         }
     }
 }

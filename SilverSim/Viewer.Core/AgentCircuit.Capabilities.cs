@@ -84,8 +84,8 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-                    StringBuilder buildUri = new StringBuilder();
-                    char l = (char)0;
+                    var buildUri = new StringBuilder();
+                    var l = (char)0;
                     foreach(char c in capsUriStr)
                     {
                         if(l == '$')
@@ -165,14 +165,14 @@ namespace SilverSim.Viewer.Core
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
-            AnArray oarray = o as AnArray;
+            var oarray = o as AnArray;
             if (null == oarray)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 
-            Dictionary<string, string> capsUri = new Dictionary<string, string>();
+            var capsUri = new Dictionary<string, string>();
 
             foreach (IValue v in oarray)
             {
@@ -194,12 +194,12 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            using (HttpResponse res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse())
             {
                 res.ContentType = "application/llsd+xml";
-                using (Stream tw = res.GetOutputStream())
+                using (var tw = res.GetOutputStream())
                 {
-                    using (XmlTextWriter text = tw.UTF8XmlTextWriter())
+                    using (var text = tw.UTF8XmlTextWriter())
                     {
                         text.WriteStartElement("llsd");
                         text.WriteStartElement("map");
@@ -267,8 +267,8 @@ namespace SilverSim.Viewer.Core
 
             public void HttpRequestHandler(HttpRequest req)
             {
-                ViewerAgent agent = m_Agent.Target as ViewerAgent;
-                AgentCircuit circuit = m_Circuit.Target as AgentCircuit;
+                var agent = m_Agent.Target as ViewerAgent;
+                var circuit = m_Circuit.Target as AgentCircuit;
                 if (agent != null && circuit != null)
                 {
                     m_Delegate(agent, circuit, req);
@@ -296,8 +296,8 @@ namespace SilverSim.Viewer.Core
             {
                 /* The LSLCompiler is the only one that has this method */
                 /* there has to be LSLSyntaxId which contains the hash of the file as UUID */
-                IScriptCompiler compiler = CompilerRegistry.ScriptCompilers["lsl"];
-                MethodInfo mi = compiler.GetType().GetMethod("GetLSLSyntaxId", Type.EmptyTypes);
+                var compiler = CompilerRegistry.ScriptCompilers["lsl"];
+                var mi = compiler.GetType().GetMethod("GetLSLSyntaxId", Type.EmptyTypes);
                 if(compiler.GetType().GetMethod("WriteLSLSyntaxFile", new Type[] { typeof(Stream)}) != null && mi != null)
                 {
                     AddDefCapability("LSLSyntax", regionSeedID, Cap_LSLSyntax, capConfig);

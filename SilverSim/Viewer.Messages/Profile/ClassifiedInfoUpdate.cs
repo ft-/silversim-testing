@@ -42,27 +42,23 @@ namespace SilverSim.Viewer.Messages.Profile
         public byte ClassifiedFlags;
         public int PriceForListing;
 
-        public ClassifiedInfoUpdate()
-        {
-
-        }
-
         public static ClassifiedInfoUpdate Decode(UDPPacket p)
         {
-            ClassifiedInfoUpdate m = new ClassifiedInfoUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ClassifiedID = p.ReadUUID();
-            m.Category = p.ReadInt32();
-            m.Name = p.ReadStringLen8();
-            m.Description = p.ReadStringLen16();
-            m.ParcelID = p.ReadUUID();
-            m.ParentEstate = p.ReadInt32();
-            m.SnapshotID = p.ReadUUID();
-            m.PosGlobal = p.ReadVector3d();
-            m.ClassifiedFlags = p.ReadUInt8();
-            m.PriceForListing = p.ReadInt32();
-            return m;
+            return new ClassifiedInfoUpdate()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ClassifiedID = p.ReadUUID(),
+                Category = p.ReadInt32(),
+                Name = p.ReadStringLen8(),
+                Description = p.ReadStringLen16(),
+                ParcelID = p.ReadUUID(),
+                ParentEstate = p.ReadInt32(),
+                SnapshotID = p.ReadUUID(),
+                PosGlobal = p.ReadVector3d(),
+                ClassifiedFlags = p.ReadUInt8(),
+                PriceForListing = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

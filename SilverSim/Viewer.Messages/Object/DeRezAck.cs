@@ -31,11 +31,6 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID TransactionID;
         public bool Success;
 
-        public DeRezAck()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(TransactionID);
@@ -44,10 +39,11 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            DeRezAck m = new DeRezAck();
-            m.TransactionID = p.ReadUUID();
-            m.Success = p.ReadBoolean();
-            return m;
+            return new DeRezAck()
+            {
+                TransactionID = p.ReadUUID(),
+                Success = p.ReadBoolean()
+            };
         }
     }
 }

@@ -32,18 +32,14 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID SessionID = UUID.Zero;
         public UUID ObjectID = UUID.Zero;
 
-        public ObjectSpinStart()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ObjectSpinStart m = new ObjectSpinStart();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectID = p.ReadUUID();
-            return m;
+            return new ObjectSpinStart()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectID = p.ReadUUID()
+            };
         }
 
         public override void Serialize(UDPPacket p)

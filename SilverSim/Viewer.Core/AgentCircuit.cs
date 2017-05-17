@@ -99,7 +99,7 @@ namespace SilverSim.Viewer.Core
             {
                 lock (m_SceneSetLock) /* scene change serialization */
                 {
-                    SceneInterface oldScene = m_Scene;
+                    var oldScene = m_Scene;
                     if (null != m_Scene)
                     {
                         if(m_ChatListener != null)
@@ -114,11 +114,11 @@ namespace SilverSim.Viewer.Core
                         }
                         m_ChatService = null;
                         
-                        foreach (KeyValuePair<string, object> kvp in m_Scene.SceneCapabilities)
+                        foreach (var kvp in m_Scene.SceneCapabilities)
                         {
                             if (kvp.Value is ICapabilityInterface)
                             {
-                                ICapabilityInterface iface = (ICapabilityInterface)(kvp.Value);
+                                var iface = (ICapabilityInterface)(kvp.Value);
                                 RemoveCapability(iface.CapabilityName);
                             }
                         }
@@ -130,12 +130,12 @@ namespace SilverSim.Viewer.Core
                     }
                     if (null != m_Scene)
                     {
-                        UUID sceneCapID = UUID.Random;
-                        foreach (KeyValuePair<string, object> kvp in m_Scene.SceneCapabilities)
+                        var sceneCapID = UUID.Random;
+                        foreach (var kvp in m_Scene.SceneCapabilities)
                         {
                             if (kvp.Value is ICapabilityInterface)
                             {
-                                ICapabilityInterface iface = (ICapabilityInterface)(kvp.Value);
+                                var iface = (ICapabilityInterface)(kvp.Value);
                                 AddCapability(iface.CapabilityName, sceneCapID, iface.HttpRequestHandler);
                             }
                         }
@@ -170,10 +170,10 @@ namespace SilverSim.Viewer.Core
         #region Chat Listener
         private Vector3 ChatGetAgentPosition()
         {
-            GridVector thisRegionPos = Scene.GridPosition;
-            GridVector rootAgentRegionPos = Agent.GetRootAgentGridPosition(thisRegionPos);
-            Vector3 diff = rootAgentRegionPos - thisRegionPos;
-            Vector3 agentPos = Agent.GlobalPosition;
+            var thisRegionPos = Scene.GridPosition;
+            var rootAgentRegionPos = Agent.GetRootAgentGridPosition(thisRegionPos);
+            var diff = rootAgentRegionPos - thisRegionPos;
+            var agentPos = Agent.GlobalPosition;
             agentPos.X += diff.X;
             agentPos.Y += diff.Y;
 

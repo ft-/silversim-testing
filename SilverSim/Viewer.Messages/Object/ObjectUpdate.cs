@@ -32,11 +32,6 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public class ObjData
         {
-            public ObjData()
-            {
-
-            }
-
             public UInt32 LocalID;
             public byte State;
             public UUID FullID;
@@ -95,7 +90,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUInt64(GridPosition.RegionHandle);
             p.WriteUInt16(TimeDilation);
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach (ObjData d in ObjectData)
+            foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.LocalID);
                 p.WriteUInt8(d.State);
@@ -170,48 +165,50 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public static Message Decode(UDPPacket p)
         {
-            ObjectUpdate m = new ObjectUpdate();
+            var m = new ObjectUpdate();
             m.GridPosition.RegionHandle = p.ReadUInt64();
             m.TimeDilation = p.ReadUInt16();
             uint n = p.ReadUInt8();
             while (n-- != 0)
             {
-                ObjData d = new ObjData();
-                d.LocalID = p.ReadUInt32();
-                d.State = p.ReadUInt8();
-                d.FullID = p.ReadUUID();
-                d.CRC = p.ReadUInt32();
-                d.PCode = (PrimitiveCode)p.ReadUInt8();
-                d.Material = (PrimitiveMaterial)p.ReadUInt8();
-                d.ClickAction = (ClickActionType)p.ReadUInt8();
-                d.Scale = p.ReadVector3f();
-                d.ObjectData = p.ReadBytes(p.ReadUInt8());
-                d.ParentID = p.ReadUInt32();
-                d.UpdateFlags = (PrimitiveFlags)p.ReadUInt32();
-                d.PathCurve = p.ReadUInt8();
-                d.ProfileCurve = p.ReadUInt8();
-                d.PathBegin = p.ReadUInt16();
-                d.PathEnd = p.ReadUInt16();
-                d.PathScaleX = p.ReadUInt8();
-                d.PathScaleY = p.ReadUInt8();
-                d.PathShearX = p.ReadUInt8();
-                d.PathShearY = p.ReadUInt8();
-                d.PathTwist = p.ReadInt8();
-                d.PathTwistBegin = p.ReadInt8();
-                d.PathRadiusOffset = p.ReadInt8();
-                d.PathTaperX = p.ReadInt8();
-                d.PathTaperY = p.ReadInt8();
-                d.PathRevolutions = p.ReadUInt8();
-                d.PathSkew = p.ReadInt8();
-                d.ProfileBegin = p.ReadUInt16();
-                d.ProfileEnd = p.ReadUInt16();
-                d.ProfileHollow = p.ReadUInt16();
-                d.TextureEntry = p.ReadBytes(p.ReadUInt16());
-                d.TextureAnim = p.ReadBytes(p.ReadUInt8());
-                d.NameValue = p.ReadStringLen16();
-                d.Data = p.ReadBytes(p.ReadUInt16());
-                d.Text = p.ReadStringLen8();
-                d.TextColor = new ColorAlpha();
+                var d = new ObjData()
+                {
+                    LocalID = p.ReadUInt32(),
+                    State = p.ReadUInt8(),
+                    FullID = p.ReadUUID(),
+                    CRC = p.ReadUInt32(),
+                    PCode = (PrimitiveCode)p.ReadUInt8(),
+                    Material = (PrimitiveMaterial)p.ReadUInt8(),
+                    ClickAction = (ClickActionType)p.ReadUInt8(),
+                    Scale = p.ReadVector3f(),
+                    ObjectData = p.ReadBytes(p.ReadUInt8()),
+                    ParentID = p.ReadUInt32(),
+                    UpdateFlags = (PrimitiveFlags)p.ReadUInt32(),
+                    PathCurve = p.ReadUInt8(),
+                    ProfileCurve = p.ReadUInt8(),
+                    PathBegin = p.ReadUInt16(),
+                    PathEnd = p.ReadUInt16(),
+                    PathScaleX = p.ReadUInt8(),
+                    PathScaleY = p.ReadUInt8(),
+                    PathShearX = p.ReadUInt8(),
+                    PathShearY = p.ReadUInt8(),
+                    PathTwist = p.ReadInt8(),
+                    PathTwistBegin = p.ReadInt8(),
+                    PathRadiusOffset = p.ReadInt8(),
+                    PathTaperX = p.ReadInt8(),
+                    PathTaperY = p.ReadInt8(),
+                    PathRevolutions = p.ReadUInt8(),
+                    PathSkew = p.ReadInt8(),
+                    ProfileBegin = p.ReadUInt16(),
+                    ProfileEnd = p.ReadUInt16(),
+                    ProfileHollow = p.ReadUInt16(),
+                    TextureEntry = p.ReadBytes(p.ReadUInt16()),
+                    TextureAnim = p.ReadBytes(p.ReadUInt8()),
+                    NameValue = p.ReadStringLen16(),
+                    Data = p.ReadBytes(p.ReadUInt16()),
+                    Text = p.ReadStringLen8(),
+                    TextColor = new ColorAlpha()
+                };
                 d.TextColor.R_AsByte = p.ReadUInt8();
                 d.TextColor.G_AsByte = p.ReadUInt8();
                 d.TextColor.B_AsByte = p.ReadUInt8();

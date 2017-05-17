@@ -35,21 +35,16 @@ namespace SilverSim.Viewer.Messages.User
         public UInt32 KickFlags;
         public string Reason;
 
-        public GodKickUser()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            GodKickUser m = new GodKickUser();
-            m.GodID = p.ReadUUID();
-            m.GodSessionID = p.ReadUUID();
-            m.AgentID = p.ReadUUID();
-            m.KickFlags = p.ReadUInt32();
-            m.Reason = p.ReadStringLen16();
-
-            return m;
+            return new GodKickUser()
+            {
+                GodID = p.ReadUUID(),
+                GodSessionID = p.ReadUUID(),
+                AgentID = p.ReadUUID(),
+                KickFlags = p.ReadUInt32(),
+                Reason = p.ReadStringLen16()
+            };
         }
 
         public override void Serialize(UDPPacket p)

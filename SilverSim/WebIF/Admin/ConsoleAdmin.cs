@@ -36,11 +36,6 @@ namespace SilverSim.WebIF.Admin
         IAdminWebIF m_WebIF;
         CommandRegistry m_Commands;
 
-        public ConsoleAdmin()
-        {
-
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             m_Commands = loader.CommandRegistry;
@@ -111,11 +106,6 @@ namespace SilverSim.WebIF.Admin
     [PluginName("ConsoleAdmin")]
     public class ConsoleAdminFactory : IPluginFactory
     {
-        public ConsoleAdminFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new ConsoleAdmin();

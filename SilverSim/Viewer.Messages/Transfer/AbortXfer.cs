@@ -31,17 +31,13 @@ namespace SilverSim.Viewer.Messages.Transfer
         public UInt64 ID;
         public Int32 Result;
 
-        public AbortXfer()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            AbortXfer m = new AbortXfer();
-            m.ID = p.ReadUInt64();
-            m.Result = p.ReadInt32();
-            return m;
+            return new AbortXfer()
+            {
+                ID = p.ReadUInt64(),
+                Result = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)

@@ -41,26 +41,21 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Int32 Price;
         public Int32 Area;
 
-        public ParcelBuy()
-        {
-
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            ParcelBuy m = new ParcelBuy();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            return new ParcelBuy()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
 
-            m.GroupID = p.ReadUUID();
-            m.IsGroupOwned = p.ReadBoolean();
-            m.RemoveContribution = p.ReadBoolean();
-            m.LocalID = p.ReadInt32();
-            m.IsFinal = p.ReadBoolean();
-            m.Price = p.ReadInt32();
-            m.Area = p.ReadInt32();
-
-            return m;
+                GroupID = p.ReadUUID(),
+                IsGroupOwned = p.ReadBoolean(),
+                RemoveContribution = p.ReadBoolean(),
+                LocalID = p.ReadInt32(),
+                IsFinal = p.ReadBoolean(),
+                Price = p.ReadInt32(),
+                Area = p.ReadInt32()
+            };
         }
 
         public override void Serialize(UDPPacket p)
