@@ -28,6 +28,7 @@ using SilverSim.Viewer.Messages;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System;
+using SilverSim.Viewer.Messages.Agent;
 
 namespace SilverSim.Viewer.Core
 {
@@ -47,20 +48,24 @@ namespace SilverSim.Viewer.Core
             {
 
             }
+
             public ScriptControlData(ScriptControlData data)
             {
                 Taken = data.Taken;
                 Ignored = data.Ignored;
             }
         }
+
         readonly Dictionary<ScriptInstance, ScriptControlData> m_ScriptControls = new Dictionary<ScriptInstance, ScriptControlData>();
         #endregion
 
         public override void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {
-            ScriptControlData data = new ScriptControlData();
-            data.Taken = accept != 0 ? (ControlFlags)controls : ControlFlags.None;
-            data.Ignored = pass_on != 0 ? (ControlFlags)controls : ControlFlags.None;
+            var data = new ScriptControlData()
+            {
+                Taken = accept != 0 ? (ControlFlags)controls : ControlFlags.None,
+                Ignored = pass_on != 0 ? (ControlFlags)controls : ControlFlags.None
+            };
             this[instance] = data;
         }
 
@@ -97,7 +102,7 @@ namespace SilverSim.Viewer.Core
                     }
                     m_TakenControls = ControlFlags.None;
                     m_IgnoredControls = ControlFlags.None;
-                    foreach(ScriptControlData sc in m_ScriptControls.Values)
+                    foreach(var sc in m_ScriptControls.Values)
                     {
                         m_TakenControls |= sc.Taken;
                         m_IgnoredControls |= sc.Ignored;
@@ -126,8 +131,8 @@ namespace SilverSim.Viewer.Core
 
         void ProcessAgentControls()
         {
-            ControlFlags agentControlFlags = m_ActiveAgentControlFlags & (~IgnoredControls);
-            Vector3 agentMovementDirection = Vector3.Zero;
+            var agentControlFlags = m_ActiveAgentControlFlags & (~IgnoredControls);
+            var agentMovementDirection = Vector3.Zero;
 
             m_IsFlying = agentControlFlags.HasFly() && ((IAgentPhysicsObject)PhysicsActor).IsPhysicsActive;
 
@@ -207,7 +212,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleSetAlwaysRun(Message m)
         {
-            Messages.Agent.SetAlwaysRun sar = (Messages.Agent.SetAlwaysRun)m;
+            var sar = (Messages.Agent.SetAlwaysRun)m;
 
             if (sar.AgentID != sar.CircuitAgentID ||
                 sar.SessionID != sar.CircuitSessionID)
@@ -247,7 +252,7 @@ namespace SilverSim.Viewer.Core
         void HandleAgentUpdateMessage(Message m)
         {
             /* only AgentUpdate is passed here */
-            Messages.Agent.AgentUpdate au = (Messages.Agent.AgentUpdate)m;
+            var au = (AgentUpdate)m;
 
             if(au.AgentID != au.CircuitAgentID ||
                 au.SessionID != au.CircuitSessionID)
@@ -293,11 +298,13 @@ namespace SilverSim.Viewer.Core
                     copy = new Dictionary<ScriptInstance, ScriptControlData>(m_ScriptControls);
                 }
 
-                foreach(KeyValuePair<ScriptInstance, ScriptControlData> kvp in copy)
+                foreach(var kvp in copy)
                 {
-                    ControlEvent ce = new ControlEvent();
-                    ce.Level = (int)(m_ActiveAgentControlFlags & kvp.Value.Taken);
-                    ce.Flags = (int)(edge & kvp.Value.Taken);
+                    var ce = new ControlEvent()
+                    {
+                        Level = (int)(m_ActiveAgentControlFlags & kvp.Value.Taken),
+                        Flags = (int)(edge & kvp.Value.Taken)
+                    };
                     kvp.Key.PostEvent(ce);
                 }
             }

@@ -29,9 +29,9 @@ namespace SilverSim.Viewer.Core
         {
             m_Circuits.ForEach(delegate(Circuit circ)
             {
-                if (circ is AgentCircuit)
+                var acirc = circ as AgentCircuit;
+                if (acirc != null)
                 {
-                    AgentCircuit acirc = (AgentCircuit)circ;
                     acirc.ScheduleUpdate(info);
                 }
             });

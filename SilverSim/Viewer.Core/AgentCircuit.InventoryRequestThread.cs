@@ -30,6 +30,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Viewer.Messages.Transfer;
+using SilverSim.Viewer.Messages.Inventory;
+using SilverSim.Viewer.Messages.Alert;
 
 namespace SilverSim.Viewer.Core
 {
@@ -41,25 +44,29 @@ namespace SilverSim.Viewer.Core
 
         private void SendAssetNotFound(Messages.Transfer.TransferRequest req)
         {
-            Messages.Transfer.TransferInfo res = new Messages.Transfer.TransferInfo();
-            res.ChannelType = 2;
-            res.Status = -2;
-            res.TargetType = (int)req.SourceType;
-            res.Params = req.Params;
-            res.Size = 0;
-            res.TransferID = req.TransferID;
+            var res = new TransferInfo()
+            {
+                ChannelType = 2,
+                Status = -2,
+                TargetType = (int)req.SourceType,
+                Params = req.Params,
+                Size = 0,
+                TransferID = req.TransferID
+            };
             SendMessage(res);
         }
 
         private void SendAssetInsufficientPermissions(Messages.Transfer.TransferRequest req)
         {
-            Messages.Transfer.TransferInfo res = new Messages.Transfer.TransferInfo();
-            res.ChannelType = 2;
-            res.Status = -5;
-            res.TargetType = (int)req.SourceType;
-            res.Params = req.Params;
-            res.Size = 0;
-            res.TransferID = req.TransferID;
+            var res = new TransferInfo()
+            {
+                ChannelType = 2,
+                Status = -5,
+                TargetType = (int)req.SourceType,
+                Params = req.Params,
+                Size = 0,
+                TransferID = req.TransferID
+            };
             SendMessage(res);
         }
 
@@ -166,13 +173,13 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_ChangeInventoryItemFlags(Message m)
         {
-            Messages.Inventory.ChangeInventoryItemFlags req = (Messages.Inventory.ChangeInventoryItemFlags)m;
+            var req = (Messages.Inventory.ChangeInventoryItemFlags)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (Messages.Inventory.ChangeInventoryItemFlags.InventoryDataEntry d in req.InventoryData)
+            foreach (var d in req.InventoryData)
             {
                 InventoryItem item;
                 try
@@ -193,11 +200,11 @@ namespace SilverSim.Viewer.Core
         {
             UUID assetID;
             bool denyLSLTextViaDirect = false;
-            Messages.Transfer.TransferRequest req = (Messages.Transfer.TransferRequest)m;
-            if (req.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
+            var req = (TransferRequest)m;
+            if (req.SourceType == SourceType.SimInventoryItem)
             {
-                UUID taskID = new UUID(req.Params, 48);
-                UUID itemID = new UUID(req.Params, 64);
+                var taskID = new UUID(req.Params, 48);
+                var itemID = new UUID(req.Params, 64);
                 assetID = new UUID(req.Params, 80);
                 if (taskID == UUID.Zero)
                 {
@@ -320,18 +327,20 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            Messages.Transfer.TransferInfo ti = new Messages.Transfer.TransferInfo();
-            ti.Params = req.Params;
-            ti.ChannelType = 2;
-            ti.Status = 0;
-            ti.TargetType = 0;
-            ti.TransferID = req.TransferID;
-            ti.Size = asset.Data.Length;
-            if (req.SourceType == Messages.Transfer.SourceType.Asset)
+            var ti = new TransferInfo()
+            {
+                Params = req.Params,
+                ChannelType = 2,
+                Status = 0,
+                TargetType = 0,
+                TransferID = req.TransferID,
+                Size = asset.Data.Length
+            };
+            if (req.SourceType == SourceType.Asset)
             {
                 ti.Params = new byte[20];
                 assetID.ToBytes(ti.Params, 0);
-                int assetType = (int)asset.Type;
+                var assetType = (int)asset.Type;
                 byte[] b = BitConverter.GetBytes(assetType);
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -339,7 +348,7 @@ namespace SilverSim.Viewer.Core
                 }
                 Array.Copy(b, 0, ti.Params, 16, 4);
             }
-            else if (req.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
+            else if (req.SourceType == SourceType.SimInventoryItem)
             {
                 ti.Params = req.Params;
             }
@@ -350,10 +359,12 @@ namespace SilverSim.Viewer.Core
             int assetOffset = 0;
             while (assetOffset < asset.Data.Length)
             {
-                Messages.Transfer.TransferPacket tp = new Messages.Transfer.TransferPacket();
-                tp.Packet = packetNumber++;
-                tp.ChannelType = 2;
-                tp.TransferID = req.TransferID;
+                var tp = new TransferPacket()
+                {
+                    Packet = packetNumber++,
+                    ChannelType = 2,
+                    TransferID = req.TransferID
+                };
                 if (asset.Data.Length - assetOffset > MAX_PACKET_SIZE)
                 {
                     tp.Data = new byte[MAX_PACKET_SIZE];
@@ -379,13 +390,13 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_CopyInventoryItem(Message m)
         {
-            Messages.Inventory.CopyInventoryItem req = (Messages.Inventory.CopyInventoryItem)m;
+            var req = (Messages.Inventory.CopyInventoryItem)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (Messages.Inventory.CopyInventoryItem.InventoryDataEntry reqd in req.InventoryData)
+            foreach (var reqd in req.InventoryData)
             {
                 InventoryItem item;
                 try
@@ -422,12 +433,14 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     Agent.InventoryService.Item.Add(item);
-                    SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, UUID.Zero, item, reqd.CallbackID));
+                    SendMessage(new UpdateCreateInventoryItem(AgentID, true, UUID.Zero, item, reqd.CallbackID));
                 }
                 catch
                 {
-                    Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                    res.Message = this.GetLanguageString(Agent.CurrentCulture, "FailedToCopyItem", "Failed to copy item");
+                    var res = new AlertMessage()
+                    {
+                        Message = this.GetLanguageString(Agent.CurrentCulture, "FailedToCopyItem", "Failed to copy item")
+                    };
                     SendMessage(res);
                 }
             }
@@ -436,7 +449,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_CreateInventoryFolder(Message m)
         {
-            Messages.Inventory.CreateInventoryFolder req = (Messages.Inventory.CreateInventoryFolder)m;
+            var req = (CreateInventoryFolder)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
@@ -448,21 +461,25 @@ namespace SilverSim.Viewer.Core
                 InventoryFolder folder;
                 if(!Agent.InventoryService.Folder.ContainsKey(AgentID, req.ParentFolderID))
                 {
-                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInvFolder"));
+                    SendMessage(new AlertMessage("ALERT: CantCreateRequestedInvFolder"));
                     return;
                 }
-                folder = new InventoryFolder();
-                folder.ID = req.FolderID;
-                folder.InventoryType = req.FolderType;
-                folder.Name = req.FolderName;
-                folder.Owner = Agent.Owner;
+                folder = new InventoryFolder()
+                {
+                    ID = req.FolderID,
+                    InventoryType = req.FolderType,
+                    Name = req.FolderName,
+                    Owner = Agent.Owner
+                };
                 folder.ParentFolderID = folder.ID;
                 folder.Version = 1;
                 Agent.InventoryService.Folder.Add(folder);
 
-                Messages.Inventory.BulkUpdateInventory res = new Messages.Inventory.BulkUpdateInventory();
-                res.AgentID = req.AgentID;
-                res.TransactionID = UUID.Zero;
+                var res = new BulkUpdateInventory()
+                {
+                    AgentID = req.AgentID,
+                    TransactionID = UUID.Zero
+                };
                 res.AddInventoryFolder(folder);
                 Agent.SendMessageAlways(res, Scene.ID);
             }
@@ -476,15 +493,15 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_FetchInventory(Message m)
         {
-            Messages.Inventory.FetchInventory req = (Messages.Inventory.FetchInventory)m;
+            var req = (FetchInventory)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            Messages.Inventory.FetchInventoryReply res = null;
+            FetchInventoryReply res = null;
             InventoryItem item;
-            foreach (Messages.Inventory.FetchInventory.InventoryDataEntry d in req.InventoryData)
+            foreach (var d in req.InventoryData)
             {
                 try
                 {
@@ -497,32 +514,35 @@ namespace SilverSim.Viewer.Core
 
                 if (null == res)
                 {
-                    res = new Messages.Inventory.FetchInventoryReply();
-                    res.AgentID = req.AgentID;
+                    res = new FetchInventoryReply()
+                    {
+                        AgentID = req.AgentID
+                    };
                 }
 
-                Messages.Inventory.FetchInventoryReply.ItemDataEntry rd = new Messages.Inventory.FetchInventoryReply.ItemDataEntry();
-                rd.ItemID = item.ID;
-                rd.FolderID = item.ParentFolderID;
-                rd.CreatorID = item.Creator.ID;
-                rd.OwnerID = item.Owner.ID;
-                rd.GroupID = item.Group.ID;
-                rd.BaseMask = item.Permissions.Current;
-                rd.OwnerMask = item.Permissions.Current;
-                rd.GroupMask = item.Permissions.Group;
-                rd.EveryoneMask = item.Permissions.EveryOne;
-                rd.NextOwnerMask = item.Permissions.NextOwner;
-                rd.IsGroupOwned = false;
-                rd.AssetID = item.AssetID;
-                rd.Type = item.AssetType;
-                rd.InvType = item.InventoryType;
-                rd.Flags = item.Flags;
-                rd.SaleType = item.SaleInfo.Type;
-                rd.SalePrice = item.SaleInfo.Price;
-                rd.Name = item.Name;
-                rd.Description = item.Description;
-                rd.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
-
+                var rd = new FetchInventoryReply.ItemDataEntry()
+                {
+                    ItemID = item.ID,
+                    FolderID = item.ParentFolderID,
+                    CreatorID = item.Creator.ID,
+                    OwnerID = item.Owner.ID,
+                    GroupID = item.Group.ID,
+                    BaseMask = item.Permissions.Current,
+                    OwnerMask = item.Permissions.Current,
+                    GroupMask = item.Permissions.Group,
+                    EveryoneMask = item.Permissions.EveryOne,
+                    NextOwnerMask = item.Permissions.NextOwner,
+                    IsGroupOwned = false,
+                    AssetID = item.AssetID,
+                    Type = item.AssetType,
+                    InvType = item.InventoryType,
+                    Flags = item.Flags,
+                    SaleType = item.SaleInfo.Type,
+                    SalePrice = item.SaleInfo.Price,
+                    Name = item.Name,
+                    Description = item.Description,
+                    CreationDate = (uint)item.CreationDate.DateTimeToUnixTime()
+                };
                 res.ItemData.Add(rd);
 
                 if (res.ItemData.Count == MAX_ITEMS_PER_PACKET)
@@ -541,7 +561,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_FetchInventoryDescendents(Message m)
         {
-            Messages.Inventory.FetchInventoryDescendents req = (Messages.Inventory.FetchInventoryDescendents)m;
+            var req = (FetchInventoryDescendents)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
@@ -579,7 +599,7 @@ namespace SilverSim.Viewer.Core
                 items = new List<InventoryItem>();
             }
 
-            Messages.Inventory.InventoryDescendents res = null;
+            InventoryDescendents res = null;
             bool message_sent = false;
 
             if (req.FetchFolders)
@@ -588,18 +608,22 @@ namespace SilverSim.Viewer.Core
                 {
                     if (null == res)
                     {
-                        res = new Messages.Inventory.InventoryDescendents();
-                        res.AgentID = req.AgentID;
-                        res.FolderID = req.FolderID;
-                        res.OwnerID = thisfolder.Owner.ID;
-                        res.Version = thisfolder.Version;
-                        res.Descendents = folders.Count + items.Count;
+                        res = new InventoryDescendents()
+                        {
+                            AgentID = req.AgentID,
+                            FolderID = req.FolderID,
+                            OwnerID = thisfolder.Owner.ID,
+                            Version = thisfolder.Version,
+                            Descendents = folders.Count + items.Count
+                        };
                     }
-                    Messages.Inventory.InventoryDescendents.FolderDataEntry d = new Messages.Inventory.InventoryDescendents.FolderDataEntry();
-                    d.FolderID = folder.ID;
-                    d.ParentID = folder.ParentFolderID;
-                    d.Type = folder.InventoryType;
-                    d.Name = folder.Name;
+                    var d = new InventoryDescendents.FolderDataEntry()
+                    {
+                        FolderID = folder.ID,
+                        ParentID = folder.ParentFolderID,
+                        Type = folder.InventoryType,
+                        Name = folder.Name
+                    };
                     res.FolderData.Add(d);
                     if (res.FolderData.Count == MAX_FOLDERS_PER_PACKET)
                     {
@@ -622,35 +646,38 @@ namespace SilverSim.Viewer.Core
                 {
                     if (null == res)
                     {
-                        res = new Messages.Inventory.InventoryDescendents();
-                        res.AgentID = req.AgentID;
-                        res.FolderID = req.FolderID;
-                        res.OwnerID = thisfolder.Owner.ID;
-                        res.Version = thisfolder.Version;
-                        res.Descendents = folders.Count + items.Count;
+                        res = new InventoryDescendents()
+                        {
+                            AgentID = req.AgentID,
+                            FolderID = req.FolderID,
+                            OwnerID = thisfolder.Owner.ID,
+                            Version = thisfolder.Version,
+                            Descendents = folders.Count + items.Count
+                        };
                     }
-                    Messages.Inventory.InventoryDescendents.ItemDataEntry d = new Messages.Inventory.InventoryDescendents.ItemDataEntry();
-
-                    d.ItemID = item.ID;
-                    d.FolderID = item.ParentFolderID;
-                    d.CreatorID = item.Creator.ID;
-                    d.OwnerID = item.Owner.ID;
-                    d.GroupID = item.Group.ID;
-                    d.BaseMask = item.Permissions.Current;
-                    d.OwnerMask = item.Permissions.Current;
-                    d.GroupMask = item.Permissions.Group;
-                    d.EveryoneMask = item.Permissions.EveryOne;
-                    d.NextOwnerMask = item.Permissions.NextOwner;
-                    d.IsGroupOwned = item.IsGroupOwned;
-                    d.AssetID = item.AssetID;
-                    d.Type = item.AssetType;
-                    d.InvType = item.InventoryType;
-                    d.Flags = item.Flags;
-                    d.SaleType = item.SaleInfo.Type;
-                    d.SalePrice = item.SaleInfo.Price;
-                    d.Name = item.Name;
-                    d.Description = item.Description;
-                    d.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
+                    var d = new InventoryDescendents.ItemDataEntry()
+                    {
+                        ItemID = item.ID,
+                        FolderID = item.ParentFolderID,
+                        CreatorID = item.Creator.ID,
+                        OwnerID = item.Owner.ID,
+                        GroupID = item.Group.ID,
+                        BaseMask = item.Permissions.Current,
+                        OwnerMask = item.Permissions.Current,
+                        GroupMask = item.Permissions.Group,
+                        EveryoneMask = item.Permissions.EveryOne,
+                        NextOwnerMask = item.Permissions.NextOwner,
+                        IsGroupOwned = item.IsGroupOwned,
+                        AssetID = item.AssetID,
+                        Type = item.AssetType,
+                        InvType = item.InventoryType,
+                        Flags = item.Flags,
+                        SaleType = item.SaleInfo.Type,
+                        SalePrice = item.SaleInfo.Price,
+                        Name = item.Name,
+                        Description = item.Description,
+                        CreationDate = (uint)item.CreationDate.DateTimeToUnixTime()
+                    };
                     res.ItemData.Add(d);
 
                     if (res.ItemData.Count == MAX_ITEMS_PER_PACKET)
@@ -670,34 +697,38 @@ namespace SilverSim.Viewer.Core
 
             if (!message_sent)
             {
-                res = new Messages.Inventory.InventoryDescendents();
-                res.AgentID = req.AgentID;
-                res.FolderID = req.FolderID;
-                res.OwnerID = thisfolder.Owner.ID;
-                res.Version = thisfolder.Version;
-                res.Descendents = folders.Count + items.Count;
+                res = new InventoryDescendents()
+                {
+                    AgentID = req.AgentID,
+                    FolderID = req.FolderID,
+                    OwnerID = thisfolder.Owner.ID,
+                    Version = thisfolder.Version,
+                    Descendents = folders.Count + items.Count
+                };
                 SendMessage(res);
             }
         }
 
         private void FetchInventoryThread_LinkInventoryItem(Message m)
         {
-            Messages.Inventory.LinkInventoryItem req = (Messages.Inventory.LinkInventoryItem)m;
+            var req = (LinkInventoryItem)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            InventoryItem item = new InventoryItem();
-            item.Owner = Agent.Owner;
-            item.Creator = Agent.Owner;
-            item.ParentFolderID = req.FolderID;
-            item.Name = req.Name;
-            item.Description = req.Description;
-            item.Flags = 0;
-            item.AssetID = req.OldItemID;
-            item.AssetType = req.AssetType;
-            item.InventoryType = req.InvType;
+            var item = new InventoryItem()
+            {
+                Owner = Agent.Owner,
+                Creator = Agent.Owner,
+                ParentFolderID = req.FolderID,
+                Name = req.Name,
+                Description = req.Description,
+                Flags = 0,
+                AssetID = req.OldItemID,
+                AssetType = req.AssetType,
+                InventoryType = req.InvType
+            };
             item.Permissions.Base = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
             item.Permissions.Current = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
             item.Permissions.EveryOne = InventoryPermissionsMask.All;
@@ -706,27 +737,29 @@ namespace SilverSim.Viewer.Core
             try
             {
                 Agent.InventoryService.Item.Add(item);
-                SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
+                SendMessage(new UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
             }
             catch (Exception e)
             {
                 m_Log.DebugFormat("LinkInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
 
-                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = "ALERT: CantCreateInventory";
+                var res = new AlertMessage()
+                {
+                    Message = "ALERT: CantCreateInventory"
+                };
                 SendMessage(res);
             }
         }
 
         private void FetchInventoryThread_MoveInventoryFolder(Message m)
         {
-            Messages.Inventory.MoveInventoryFolder req = (Messages.Inventory.MoveInventoryFolder)m;
+            var req = (MoveInventoryFolder)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (Messages.Inventory.MoveInventoryFolder.InventoryDataEntry d in req.InventoryData)
+            foreach (var d in req.InventoryData)
             {
                 try
                 {
@@ -741,13 +774,13 @@ namespace SilverSim.Viewer.Core
 
         private void FetchInventoryThread_MoveInventoryItem(Message m)
         {
-            Messages.Inventory.MoveInventoryItem req = (Messages.Inventory.MoveInventoryItem)m;
+            var req = (MoveInventoryItem)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (Messages.Inventory.MoveInventoryItem.InventoryDataEntry d in req.InventoryData)
+            foreach (var d in req.InventoryData)
             {
                 try
                 {
@@ -762,7 +795,7 @@ namespace SilverSim.Viewer.Core
 
         private void FetchInventoryThread_PurgeInventoryDescendents(Message m)
         {
-            Messages.Inventory.PurgeInventoryDescendents req = (Messages.Inventory.PurgeInventoryDescendents)m;
+            var req = (PurgeInventoryDescendents)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
@@ -773,13 +806,13 @@ namespace SilverSim.Viewer.Core
 
         private void FetchInventoryThread_RemoveInventoryFolder(Message m)
         {
-            Messages.Inventory.RemoveInventoryFolder req = (Messages.Inventory.RemoveInventoryFolder)m;
+            var req = (RemoveInventoryFolder)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (UUID id in req.FolderData)
+            foreach (var id in req.FolderData)
             {
                 try
                 {
@@ -794,13 +827,13 @@ namespace SilverSim.Viewer.Core
 
         private void FetchInventoryThread_RemoveInventoryItem(Message m)
         {
-            Messages.Inventory.RemoveInventoryItem req = (Messages.Inventory.RemoveInventoryItem)m;
+            var req = (RemoveInventoryItem)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (UUID id in req.InventoryData)
+            foreach (var id in req.InventoryData)
             {
                 try
                 {
@@ -815,7 +848,7 @@ namespace SilverSim.Viewer.Core
 
         private void FetchInventoryThread_RemoveInventoryObjects(Message m)
         {
-            Messages.Inventory.RemoveInventoryObjects req = (Messages.Inventory.RemoveInventoryObjects)m;
+            var req = (RemoveInventoryObjects)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
@@ -827,13 +860,13 @@ namespace SilverSim.Viewer.Core
 
         private void FetchInventoryThread_UpdateInventoryFolder(Message m)
         {
-            Messages.Inventory.UpdateInventoryFolder req = (Messages.Inventory.UpdateInventoryFolder)m;
+            var req = (UpdateInventoryFolder)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (Messages.Inventory.UpdateInventoryFolder.InventoryDataEntry d in req.InventoryData)
+            foreach (UpdateInventoryFolder.InventoryDataEntry d in req.InventoryData)
             {
                 try
                 {
@@ -845,8 +878,10 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                    res.Message = string.Format("Could not update folder {0}", d.Name);
+                    var res = new AlertMessage()
+                    {
+                        Message = string.Format("Could not update folder {0}", d.Name)
+                    };
                     SendMessage(res);
                 }
             }
@@ -854,13 +889,13 @@ namespace SilverSim.Viewer.Core
 
         private void FetchInventoryThread_UpdateInventoryItem(Message m)
         {
-            Messages.Inventory.UpdateInventoryItem req = (Messages.Inventory.UpdateInventoryItem)m;
+            var req = (UpdateInventoryItem)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
             }
 
-            foreach (Messages.Inventory.UpdateInventoryItem.InventoryDataEntry d in req.InventoryData)
+            foreach (var d in req.InventoryData)
             {
                 InventoryItem item;
                 try
@@ -883,13 +918,14 @@ namespace SilverSim.Viewer.Core
                 bool sendUpdate = false;
                 if (d.NextOwnerMask != 0)
                 {
-                    InventoryPermissionsData p = new InventoryPermissionsData();
-                    p.Base = d.BaseMask;
-                    p.Current = d.OwnerMask;
-                    p.NextOwner = d.NextOwnerMask;
-                    p.EveryOne = d.EveryoneMask;
-                    p.Group = d.GroupMask;
-
+                    var p = new InventoryPermissionsData()
+                    {
+                        Base = d.BaseMask,
+                        Current = d.OwnerMask,
+                        NextOwner = d.NextOwnerMask,
+                        EveryOne = d.EveryoneMask,
+                        Group = d.GroupMask
+                    };
                     if ((item.Permissions.Base & InventoryPermissionsMask.All | InventoryPermissionsMask.Export) != (InventoryPermissionsMask.All | InventoryPermissionsMask.Export) ||
                         (item.Permissions.Current & InventoryPermissionsMask.Export) == 0 ||
                         item.Creator.ID != item.Owner.ID)
@@ -958,7 +994,7 @@ namespace SilverSim.Viewer.Core
                     try
                     {
                         Agent.InventoryService.Item.Update(item);
-                        SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, 0));
+                        SendMessage(new UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, 0));
                     }
                     catch
                     {
@@ -976,7 +1012,7 @@ namespace SilverSim.Viewer.Core
                     // failing frequently.  Possibly this is a race with a separate transaction that uploads the asset.
                     if (sendUpdate)
                     {
-                        SendMessage(new Messages.Inventory.BulkUpdateInventory(AgentID, UUID.Zero, 0, item));
+                        SendMessage(new BulkUpdateInventory(AgentID, UUID.Zero, 0, item));
                     }
                 }
             }
@@ -993,11 +1029,11 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
+                SendMessage(new AlertMessage("ALERT: CantCreateLandmark"));
                 return UUID.Zero;
             }
 
-            Landmark lm = new Landmark();
+            var lm = new Landmark();
             if (!string.IsNullOrEmpty(GatekeeperURI))
             {
                 lm.GatekeeperURI = new URI(GatekeeperURI);
@@ -1031,8 +1067,7 @@ namespace SilverSim.Viewer.Core
 
         private UUID CreateDefaultGestureForInventory(InventoryItem item)
         {
-            Gesture gesture = new Gesture();
-            AssetData asset = gesture;
+            AssetData asset = new Gesture();
             asset.Name = "New Gesture";
             asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
             asset.ID = new UUID("cf83499a-6547-4b07-8669-ff1d567071d3");
@@ -1042,7 +1077,7 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInv"));
+                SendMessage(new AlertMessage("ALERT: CantCreateRequestedInv"));
                 m_Log.Error("Failed to create asset for gesture", e);
                 return UUID.Zero;
             }
@@ -1051,8 +1086,7 @@ namespace SilverSim.Viewer.Core
 
         private UUID CreateDefaultNotecardForInventory(InventoryItem item)
         {
-            Notecard nc = new Notecard();
-            AssetData asset = nc;
+            AssetData asset = new Notecard();
             asset.Name = "New Note";
             asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
             asset.ID = new UUID("43b761c3-5e3f-43c5-8bc9-d048f8df496f");
@@ -1062,7 +1096,7 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInv"));
+                SendMessage(new AlertMessage("ALERT: CantCreateRequestedInv"));
                 m_Log.Error("Failed to create asset for notecard", e);
                 return UUID.Zero;
             }
@@ -1092,17 +1126,19 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                     m_Log.DebugFormat("Failed to create inventory: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
 #endif
-                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    SendMessage(new AlertMessage("ALERT: CantCreateInventory"));
                     return;
                 }
 
-                item = new InventoryItem();
-                item.InventoryType = req.InvType;
-                item.AssetType = req.AssetType;
-                item.Description = req.Description;
-                item.Name = req.Name;
-                item.Owner = Agent.Owner;
-                item.Creator = Agent.Owner;
+                item = new InventoryItem()
+                {
+                    InventoryType = req.InvType,
+                    AssetType = req.AssetType,
+                    Description = req.Description,
+                    Name = req.Name,
+                    Owner = Agent.Owner,
+                    Creator = Agent.Owner
+                };
                 item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
                 item.SaleInfo.Price = 0;
                 item.SaleInfo.PermMask = InventoryPermissionsMask.All;
@@ -1145,13 +1181,13 @@ namespace SilverSim.Viewer.Core
                 }
                 catch(Exception e)
                 {
-                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    SendMessage(new AlertMessage("ALERT: CantCreateInventory"));
                     m_Log.ErrorFormat("Failed to create asset for type {0}: {1}: {2}\n{3}", item.InventoryType.ToString(), e.GetType().FullName, e.Message, e.StackTrace);
                     return;
                 }
                 if (UUID.Zero == item.AssetID)
                 {
-                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    SendMessage(new AlertMessage("ALERT: CantCreateInventory"));
                     m_Log.ErrorFormat("Failed to create asset for type {0}", item.InventoryType.ToString());
                     return;
                 }
@@ -1162,13 +1198,13 @@ namespace SilverSim.Viewer.Core
                 }
                 catch(Exception e)
                 {
-                    SendMessage(new Messages.Alert.AlertMessage(item.InventoryType == InventoryType.Landmark ?
+                    SendMessage(new AlertMessage(item.InventoryType == InventoryType.Landmark ?
                         "ALERT: CantCreateLandmark" :
                         "ALERT: CantCreateInventory"));
                     m_Log.Error("Failed to create inventory item for inventory", e);
                     return;
                 }
-                SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
+                SendMessage(new UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
             }
         }
         #endregion

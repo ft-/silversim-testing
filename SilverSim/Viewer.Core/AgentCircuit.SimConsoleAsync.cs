@@ -26,6 +26,7 @@ using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.IO;
 using System.Net;
+using SilverSim.Viewer.Messages.Console;
 
 namespace SilverSim.Viewer.Core
 {
@@ -62,8 +63,8 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            string message = iv.ToString();
-            SimConsoleAsyncTTY tty = new SimConsoleAsyncTTY(this);
+            var message = iv.ToString();
+            var tty = new SimConsoleAsyncTTY(this);
             if (!Scene.IsSimConsoleAllowed(Agent.Owner))
             {
                 tty.WriteFormatted(this.GetLanguageString(Agent.CurrentCulture, "SimConsoleNotAllowedForAgent", "SimConsole not allowed") + "\n", Agent.Owner.FirstName, Agent.Owner.LastName);
@@ -77,10 +78,10 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            using (var res = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
                 res.ContentType = "application/llsd+xml";
-                using (Stream o = res.GetOutputStream())
+                using (var o = res.GetOutputStream())
                 {
                     LlsdXml.Serialize(new BinaryData(new byte[1] { 0 }), o);
                 }
@@ -98,8 +99,10 @@ namespace SilverSim.Viewer.Core
 
             public override void Write(string text)
             {
-                Messages.Console.SimConsoleResponse res = new Messages.Console.SimConsoleResponse();
-                res.Message = text;
+                var res = new SimConsoleResponse()
+                {
+                    Message = text
+                };
                 m_Circuit.SendMessage(res);
                 HaveOutputSent = true;
             }

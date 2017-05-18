@@ -51,7 +51,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestXfer(Message m)
         {
-            RequestXfer req = (RequestXfer)m;
+            var req = (RequestXfer)m;
             DownloadTransferData tdata;
             if(m_DownloadTransfersByName.TryGetValue(req.Filename, out tdata))
             {
@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-                SendXferPacket res = new SendXferPacket();
+                var res = new SendXferPacket();
                 tdata.XferID = req.ID;
                 if (tdata.Data.Length > 1400)
                 {
@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleConfirmXferPacket(Message m)
         {
-            ConfirmXferPacket req = (ConfirmXferPacket)m;
+            var req = (ConfirmXferPacket)m;
             DownloadTransferData tdata;
             if (m_DownloadTransfersByXferID.TryGetValue(req.ID, out tdata))
             {
@@ -100,8 +100,10 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-                SendXferPacket res = new SendXferPacket();
-                res.Packet = ++tdata.Packet;
+                var res = new SendXferPacket()
+                {
+                    Packet = ++tdata.Packet
+                };
                 int remaininglength = tdata.Data.Length - tdata.Position;
                 if (remaininglength > 1400)
                 {
@@ -125,7 +127,7 @@ namespace SilverSim.Viewer.Core
         public override ulong AddNewFile(string filename, byte[] data)
         {
             ulong xferid = NextXferID;
-            DownloadTransferData tdata = new DownloadTransferData(data, filename);
+            var tdata = new DownloadTransferData(data, filename);
             m_DownloadTransfersByName.Add(filename, tdata);
             return xferid;
         }

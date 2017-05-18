@@ -58,11 +58,11 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            using (var res = httpreq.BeginResponse("application/llsd+xml"))
             {
-                IScriptCompiler compiler = CompilerRegistry.ScriptCompilers["lsl"];
-                MethodInfo mi = compiler.GetType().GetMethod("WriteLSLSyntaxFile", new Type[] { typeof(Stream) });
-                using (Stream o = res.GetOutputStream())
+                var compiler = CompilerRegistry.ScriptCompilers["lsl"];
+                var mi = compiler.GetType().GetMethod("WriteLSLSyntaxFile", new Type[] { typeof(Stream) });
+                using (var o = res.GetOutputStream())
                 {
                     mi.Invoke(compiler, new object[] { o });
                 }

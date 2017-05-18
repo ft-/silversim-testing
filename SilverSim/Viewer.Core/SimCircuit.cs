@@ -31,6 +31,7 @@ using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Viewer.Messages.Generic;
 
 namespace SilverSim.Viewer.Core
 {
@@ -101,18 +102,21 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.ChatPass:
                     {
-                        ListenEvent ev = new ListenEvent();
-                        ev.Channel = p.ReadInt32();
-                        ev.GlobalPosition = p.ReadVector3f();
-                        ev.ID = p.ReadUUID();
-                        ev.OwnerID = p.ReadUUID();
-                        ev.Name = p.ReadStringLen8();
-                        ev.SourceType = (ListenEvent.ChatSourceType)p.ReadUInt8();
-                        ev.Type = (ListenEvent.ChatType)p.ReadUInt8();
-                        /* radius */ p.ReadFloat();
+                        var ev = new ListenEvent()
+                        {
+                            Channel = p.ReadInt32(),
+                            GlobalPosition = p.ReadVector3f(),
+                            ID = p.ReadUUID(),
+                            OwnerID = p.ReadUUID(),
+                            Name = p.ReadStringLen8(),
+                            SourceType = (ListenEvent.ChatSourceType)p.ReadUInt8(),
+                            Type = (ListenEvent.ChatType)p.ReadUInt8()
+                        };
+                        /* radius */
+                        p.ReadFloat();
                         /* simaccess */ p.ReadUInt8();
                         ev.Message = p.ReadStringLen16();
-                        SceneInterface scene = Scene;
+                        var scene = Scene;
                         if (scene != null)
                         {
                             ev.OriginSceneID = scene.ID;
@@ -125,7 +129,7 @@ namespace SilverSim.Viewer.Core
                     Func<UDPPacket, Message> del;
                     if (m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
-                        Message m = del(p);
+                        var m = del(p);
                         /* we got a decoder, so we can make use of it */
                         m.CircuitAgentID = new UUID(RemoteSceneID);
                         try
@@ -150,7 +154,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if (m.Number == MessageType.ImprovedInstantMessage)
                         {
-                            ImprovedInstantMessage im = (ImprovedInstantMessage)m;
+                            var im = (ImprovedInstantMessage)m;
                             if (im.CircuitAgentID != im.AgentID ||
                                 im.CircuitSessionID != im.SessionID)
                             {
@@ -167,7 +171,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if (m.Number == MessageType.GenericMessage)
                         {
-                            Messages.Generic.GenericMessage genMsg = (Messages.Generic.GenericMessage)m;
+                            var genMsg = (GenericMessage)m;
                             if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
                             {
                                 mdel(m);
@@ -179,7 +183,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if (m.Number == MessageType.GodlikeMessage)
                         {
-                            Messages.Generic.GodlikeMessage genMsg = (Messages.Generic.GodlikeMessage)m;
+                            var genMsg = (GodlikeMessage)m;
                             if (m_GodlikeMessageRouting.TryGetValue(genMsg.Method, out mdel))
                             {
                                 mdel(m);

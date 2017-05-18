@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.GodUpdateRegionInfo)]
         public void HandleGodUpdateRegionInfo(Message m)
         {
-            GodUpdateRegionInfo req = (GodUpdateRegionInfo)m;
+            var req = (GodUpdateRegionInfo)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -44,7 +44,7 @@ namespace SilverSim.Viewer.Core
             }
 
             EstateInfo estate;
-            EstateServiceInterface estateService = Scene.EstateService;
+            var estateService = Scene.EstateService;
             uint estateID;
             if (estateService.RegionMap.TryGetValue(Scene.ID, out estateID) &&
                 estateService.TryGetValue(estateID, out estate))
@@ -66,15 +66,15 @@ namespace SilverSim.Viewer.Core
                 estateService[estate.ID] = estate;
             }
 
-            uint regionFlags = req.RegionFlags;
+            var regionFlags = req.RegionFlags;
 
             if ((req.RedirectGridX != 0 || req.RedirectGridY != 0))
             {
                 if (Scene.IsEstateManager(Agent.Owner))
                 {
                     /* EO and EM only */
-                    GridVector newLocation = Scene.GridPosition;
-                    GridVector oldLocation = newLocation;
+                    var newLocation = Scene.GridPosition;
+                    var oldLocation = newLocation;
                     if (req.RedirectGridX > 0 && req.RedirectGridX <= 65535)
                     {
                         newLocation.GridX = (ushort)req.RedirectGridX;

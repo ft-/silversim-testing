@@ -41,9 +41,9 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentAnimation(Message m)
         {
-            AgentAnimation req = (AgentAnimation)m;
+            var req = (AgentAnimation)m;
 
-            foreach(AgentAnimation.AnimationEntry e in req.AnimationEntryList)
+            foreach(var e in req.AnimationEntryList)
             {
                 if(e.StartAnim)
                 {

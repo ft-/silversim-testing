@@ -55,9 +55,9 @@ namespace SilverSim.Viewer.Core
 
         public void Cap_EnvironmentSettings_GET(HttpRequest httpreq)
         {
-            using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
+            using (var httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                EnvironmentSettings settings = Scene.EnvironmentSettings;
+                var settings = Scene.EnvironmentSettings;
                 if (settings != null)
                 {
                     settings.Serialize(httpres.GetOutputStream(), Scene.ID);
@@ -90,9 +90,9 @@ namespace SilverSim.Viewer.Core
 
         public void EnvironmentPostResponse(HttpRequest httpreq, UUID messageID, bool success, string failreason)
         {
-            using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
+            using (var httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                using (XmlTextWriter writer = httpres.GetOutputStream().UTF8XmlTextWriter())
+                using (var writer = httpres.GetOutputStream().UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     {

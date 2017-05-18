@@ -24,6 +24,7 @@ using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using SilverSim.Viewer.Messages.Image;
 
 namespace SilverSim.Viewer.Core
 {
@@ -37,9 +38,9 @@ namespace SilverSim.Viewer.Core
         private void TextureDownloadThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Texture Downloader for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
-            Queue<Messages.Image.RequestImage.RequestImageEntry> bakedReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
-            Queue<Messages.Image.RequestImage.RequestImageEntry> normalReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
-            HashSet<UUID> activeRequestImages = new HashSet<UUID>();
+            var bakedReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
+            var normalReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
+            var activeRequestImages = new HashSet<UUID>();
 #warning Implement Priority handling
 
             while(true)
@@ -50,18 +51,17 @@ namespace SilverSim.Viewer.Core
                 }
                 try
                 {
-                    Messages.Image.RequestImage req;
-                    req = (bakedReqs.Count != 0 || normalReqs.Count != 0) ?
-                        (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(0) :
-                        (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(1000);
+                    var req = (bakedReqs.Count != 0 || normalReqs.Count != 0) ?
+                        (RequestImage)m_TextureDownloadQueue.Dequeue(0) :
+                        (RequestImage)m_TextureDownloadQueue.Dequeue(1000);
 
-                    foreach(Messages.Image.RequestImage.RequestImageEntry imageRequest in req.RequestImageList)
+                    foreach(var imageRequest in req.RequestImageList)
                     {
                         if (!activeRequestImages.Contains(imageRequest.ImageID))
                         {
                             activeRequestImages.Add(imageRequest.ImageID);
-                            if (imageRequest.Type == Messages.Image.RequestImage.ImageType.Baked ||
-                                imageRequest.Type == Messages.Image.RequestImage.ImageType.ServerBaked)
+                            if (imageRequest.Type == RequestImage.ImageType.Baked ||
+                                imageRequest.Type == RequestImage.ImageType.ServerBaked)
                             {
                                 bakedReqs.Enqueue(imageRequest);
                             }
@@ -82,7 +82,7 @@ namespace SilverSim.Viewer.Core
 
                 if (bakedReqs.Count != 0 || normalReqs.Count != 0)
                 {
-                    Messages.Image.RequestImage.RequestImageEntry imageRequest;
+                    RequestImage.RequestImageEntry imageRequest;
                     try
                     {
                         imageRequest = bakedReqs.Dequeue();
@@ -132,8 +132,10 @@ namespace SilverSim.Viewer.Core
                             {
                                 m_Log.DebugFormat("Failed to download image {0} (RequestImage): {1} or {2}\nA: {3}\nB: {4}", imageRequest.ImageID, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
                             }
-                            Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
-                            failres.ID = imageRequest.ImageID;
+                            var failres = new ImageNotInDatabase()
+                            {
+                                ID = imageRequest.ImageID
+                            };
                             SendMessage(failres);
                             if (LogUDPTextureDownloads)
                             {
@@ -144,26 +146,28 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    Messages.Image.ImageCodec codec;
+                    ImageCodec codec;
 
                     switch (asset.Type)
                     {
                         case AssetType.ImageJPEG:
-                            codec = Messages.Image.ImageCodec.JPEG;
+                            codec = ImageCodec.JPEG;
                             break;
 
                         case AssetType.ImageTGA:
                         case AssetType.TextureTGA:
-                            codec = Messages.Image.ImageCodec.TGA;
+                            codec = ImageCodec.TGA;
                             break;
 
                         case AssetType.Texture:
-                            codec = Messages.Image.ImageCodec.J2C;
+                            codec = ImageCodec.J2C;
                             break;
 
                         default:
-                            Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
-                            failres.ID = imageRequest.ImageID;
+                            var failres = new ImageNotInDatabase()
+                            {
+                                ID = imageRequest.ImageID
+                            };
                             SendMessage(failres);
                             activeRequestImages.Remove(imageRequest.ImageID);
                             if(LogUDPTextureDownloads)
@@ -173,11 +177,12 @@ namespace SilverSim.Viewer.Core
                             continue;
                     }
 
-                    Messages.Image.ImageData res = new Messages.Image.ImageData();
-                    res.Codec = codec;
-                    res.ID = imageRequest.ImageID;
-                    res.Size = (uint)asset.Data.Length;
-
+                    var res = new ImageData()
+                    {
+                        Codec = codec,
+                        ID = imageRequest.ImageID,
+                        Size = (uint)asset.Data.Length
+                    };
                     if (asset.Data.Length > IMAGE_FIRST_PACKET_SIZE)
                     {
                         if (imageRequest.Packet == 0)
@@ -194,13 +199,14 @@ namespace SilverSim.Viewer.Core
                         ushort packetno = 0;
                         while(offset < asset.Data.Length)
                         {
-                            Messages.Image.ImagePacket ip = new Messages.Image.ImagePacket();
-                            ip.ID = imageRequest.ImageID;
-                            ip.Packet = ++packetno;
-                            ip.Data = (asset.Data.Length - offset > IMAGE_PACKET_SIZE) ?
+                            var ip = new ImagePacket()
+                            {
+                                ID = imageRequest.ImageID,
+                                Packet = ++packetno,
+                                Data = (asset.Data.Length - offset > IMAGE_PACKET_SIZE) ?
                                 new byte[IMAGE_PACKET_SIZE] :
-                                new byte[asset.Data.Length - offset];
-
+                                new byte[asset.Data.Length - offset]
+                            };
                             Buffer.BlockCopy(asset.Data, offset, ip.Data, 0, ip.Data.Length);
                             SendMessage(ip);
                             offset += IMAGE_PACKET_SIZE;

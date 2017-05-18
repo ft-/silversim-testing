@@ -58,7 +58,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            string[] parts = httpreq.RawUrl.Split('?');
+            var parts = httpreq.RawUrl.Split('?');
             if(parts.Length < 2)
             {
                 m_Log.WarnFormat("Invalid GetDisplayNames request: {0}", httpreq.RawUrl);
@@ -66,14 +66,14 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            string[] reqs = parts[1].Split('&');
-            List<UUID> uuids = new List<UUID>();
-            List<string> names = new List<string>();
-            List<string> baduuids = new List<string>();
-            List<string> badnames = new List<string>();
-            foreach(string req in reqs)
+            var reqs = parts[1].Split('&');
+            var uuids = new List<UUID>();
+            var names = new List<string>();
+            var baduuids = new List<UUID>();
+            var badnames = new List<string>();
+            foreach(var req in reqs)
             {
-                string[] p = req.Split('=');
+                var p = req.Split('=');
                 if(p.Length == 2)
                 {
                     if(p[0] == "ids")
@@ -98,16 +98,16 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            using (HttpResponse res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse())
             {
-                using (XmlTextWriter text = res.GetOutputStream().UTF8XmlTextWriter())
+                using (var text = res.GetOutputStream().UTF8XmlTextWriter())
                 {
                     text.WriteStartElement("llsd");
                     text.WriteStartElement("map");
 
-                    bool haveAgents = false;
+                    var haveAgents = false;
 
-                    foreach (UUID id in uuids)
+                    foreach (var id in uuids)
                     {
                         UUI nd;
                         try
@@ -116,7 +116,7 @@ namespace SilverSim.Viewer.Core
                         }
                         catch
                         {
-                            baduuids.Add((string)id);
+                            baduuids.Add(id);
                             continue;
                         }
                         if (!haveAgents)
@@ -129,10 +129,10 @@ namespace SilverSim.Viewer.Core
                         WriteAvatarNameData(text, nd);
                     }
 
-                    foreach (string name in names)
+                    foreach (var name in names)
                     {
                         UUI nd;
-                        string[] nameparts = name.Split('.');
+                        var nameparts = name.Split('.');
                         if (nameparts.Length < 2)
                         {
                             nameparts = new string[] { nameparts[0], string.Empty };
@@ -165,7 +165,7 @@ namespace SilverSim.Viewer.Core
                     {
                         text.WriteKeyValuePair("key", "bad_ids");
                         text.WriteStartElement("array");
-                        foreach (UUID id in baduuids)
+                        foreach (var id in baduuids)
                         {
                             text.WriteKeyValuePair("uuid", id);
                         }
@@ -176,7 +176,7 @@ namespace SilverSim.Viewer.Core
                     {
                         text.WriteKeyValuePair("key", "bad_names");
                         text.WriteStartElement("array");
-                        foreach (string name in badnames)
+                        foreach (var name in badnames)
                         {
                             text.WriteKeyValuePair("string", name);
                         }

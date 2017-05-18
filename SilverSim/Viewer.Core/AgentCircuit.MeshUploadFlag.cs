@@ -37,10 +37,10 @@ namespace SilverSim.Viewer.Core
             }
             else
             {
-                using (HttpResponse res = httpreq.BeginResponse())
+                using (var res = httpreq.BeginResponse())
                 {
                     res.ContentType = "application/llsd+xml";
-                    Map m = new Map();
+                    var m = new Map();
                     m.Add("username", Agent.FirstName + "." + Agent.LastName);
                     m.Add("display_name_next_update", new Date());
                     m.Add("legacy_first_name", Agent.FirstName);
@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Core
                     m.Add("legacy_last_name", Agent.LastName);
                     m.Add("id", Agent.ID);
                     m.Add("is_display_name_default", false);
-                    using (Stream o = res.GetOutputStream())
+                    using (var o = res.GetOutputStream())
                     {
                         LlsdXml.Serialize(m, o);
                     }

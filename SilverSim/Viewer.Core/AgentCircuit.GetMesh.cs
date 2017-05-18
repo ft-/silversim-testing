@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Core
     {
         void Cap_GetMesh(HttpRequest httpreq)
         {
-            string[] parts = httpreq.RawUrl.Substring(1).Split('/');
+            var parts = httpreq.RawUrl.Substring(1).Split('/');
 
             if (httpreq.CallerIP != RemoteIP)
             {
@@ -57,11 +57,11 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            string meshreq = parts[3].Substring(1);
-            string[] texreq = meshreq.Split('&');
-            string mID = string.Empty;
+            var meshreq = parts[3].Substring(1);
+            var texreq = meshreq.Split('&');
+            var mID = string.Empty;
 
-            foreach (string texreqentry in texreq)
+            foreach (var texreqentry in texreq)
             {
                 if (texreqentry.StartsWith("mesh_id="))
                 {

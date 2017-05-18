@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.EstateCovenantRequest)]
         public void HandleEstateCovenantRequest(Message m)
         {
-            EstateCovenantRequest req = (EstateCovenantRequest)m;
+            var req = (EstateCovenantRequest)m;
 
             if(req.SessionID != req.CircuitSessionID ||
                 req.AgentID != req.CircuitAgentID)
@@ -39,10 +39,10 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            EstateCovenantReply reply = new EstateCovenantReply();
+            var reply = new EstateCovenantReply();
             EstateInfo estate;
             uint estateID;
-            EstateServiceInterface estateService = Scene.EstateService;
+            var estateService = Scene.EstateService;
             if (estateService.RegionMap.TryGetValue(Scene.ID, out estateID) &&
                 estateService.TryGetValue(estateID, out estate))
             {

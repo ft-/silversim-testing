@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleViewerEffect(Message m)
         {
-            ViewerEffect ve = (ViewerEffect)m;
+            var ve = (ViewerEffect)m;
             if(ve.AgentID != ve.CircuitAgentID ||
                 ve.SessionID != ve.CircuitSessionID)
             {
@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Core
 
             /* we only route valid messages here but keep SessionID from being broadcasted */
             ve.SessionID = UUID.Zero;
-            foreach(IAgent agent in Scene.Agents)
+            foreach(var agent in Scene.Agents)
             {
                 if(agent.Owner.Equals(Agent.Owner))
                 {

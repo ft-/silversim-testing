@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Core
             {
                 case MessageType.RezMultipleAttachmentsFromInv:
                     {
-                        SilverSim.Viewer.Messages.Object.RezMultipleAttachmentsFromInv req = (SilverSim.Viewer.Messages.Object.RezMultipleAttachmentsFromInv)m;
+                        var req = (Messages.Object.RezMultipleAttachmentsFromInv)m;
                         if(req.SessionID != SessionID || req.AgentID != ID)
                         {
                             return;
@@ -81,7 +81,7 @@ namespace SilverSim.Viewer.Core
                             DetachAllAttachments();
                         }
 
-                        foreach (Messages.Object.RezMultipleAttachmentsFromInv.ObjectDataS d in req.ObjectData)
+                        foreach (var d in req.ObjectData)
                         {
                             RezAttachment(d.ItemID, d.AttachmentPoint);
                         }
@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Core
                 case MessageType.RezSingleAttachmentFromInv:
                     {
 
-                        Messages.Object.RezSingleAttachmentFromInv req = (Messages.Object.RezSingleAttachmentFromInv)m;
+                        var req = (Messages.Object.RezSingleAttachmentFromInv)m;
                         if (req.SessionID != SessionID || req.AgentID != ID)
                         {
                             return;
@@ -113,19 +113,19 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleDetachAttachment(Message m)
         {
-            List<DetachEntry> detachList = new List<DetachEntry>();
+            var detachList = new List<DetachEntry>();
             if(m.Number == MessageType.ObjectDetach)
             {
 #if DEBUG
                 m_Log.DebugFormat("ObjectDetach: Detach attachment to inv received for {0}", Owner.FullName);
 #endif
-                Messages.Object.ObjectDetach req = (Messages.Object.ObjectDetach)m;
+                var req = (Messages.Object.ObjectDetach)m;
                 if (req.SessionID != SessionID || req.AgentID != ID)
                 {
                     return;
                 }
 
-                foreach (UInt32 localid in req.ObjectList)
+                foreach (var localid in req.ObjectList)
                 {
                     KeyValuePair<UUID, KeyValuePair<UUID,UUID>> kvp;
                     if(m_AttachmentsList.TryGetValue(localid, out kvp))
@@ -139,7 +139,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("DetachAttachmentIntoInv: Detach attachment to inv received for {0}", Owner.FullName);
 #endif
-                Messages.Object.DetachAttachmentIntoInv req = (Messages.Object.DetachAttachmentIntoInv)m;
+                var req = (Messages.Object.DetachAttachmentIntoInv)m;
                 if (req.AgentID != ID)
                 {
                     return;
@@ -165,12 +165,12 @@ namespace SilverSim.Viewer.Core
         #region Actual attachment handling
         void DetachAllAttachments()
         {
-            List<DetachEntry> detachList = new List<DetachEntry>();
+            var detachList = new List<DetachEntry>();
             m_AttachmentsList.ForEach(delegate(KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp)
             {
                 detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value));
             });
-            foreach (DetachEntry entry in detachList)
+            foreach (var entry in detachList)
             {
                 DetachAttachment(entry);
             }
@@ -247,7 +247,7 @@ namespace SilverSim.Viewer.Core
 
                 ObjectGroup grp = objgroups[0];
 
-                foreach (ObjectPart part in grp.Values)
+                foreach (var part in grp.Values)
                 {
                     if (part.Shape.PCode == Types.Primitive.PrimitiveCode.Grass ||
                         part.Shape.PCode == Types.Primitive.PrimitiveCode.Tree ||
@@ -256,12 +256,12 @@ namespace SilverSim.Viewer.Core
                         SendAlertMessage("ALERT: WhyAreYouTryingToWearShrubbery");
                         return;
                     }
-                    UUID oldID = part.ID;
+                    var oldID = part.ID;
                     part.ID = UUID.Random;
                     grp.ChangeKey(part.ID, oldID);
                 }
 
-                AttachmentPoint attachAt = m_AttachPoint & AttachmentPoint.PositionMask;
+                var attachAt = m_AttachPoint & AttachmentPoint.PositionMask;
                 if (attachAt != AttachmentPoint.Default && attachAt != grp.AttachPoint)
                 {
                     grp.AttachedPos = Vector3.Zero;
@@ -329,7 +329,7 @@ namespace SilverSim.Viewer.Core
             m_Log.DebugFormat("Attaching item {0} / asset {1} to agent {2}", item.ID, item.AssetID, Owner.FullName);
 #endif
 
-            bool accessFailed = false;
+            var accessFailed = false;
             try
             {
                 accessFailed = !AssetService.Exists(item.AssetID);
@@ -360,7 +360,7 @@ namespace SilverSim.Viewer.Core
 
         void DetachAttachment(DetachEntry entry)
         {
-            ObjectGroup grp = Circuits[entry.SceneID].Scene.ObjectGroups[entry.ObjectID];
+            var grp = Circuits[entry.SceneID].Scene.ObjectGroups[entry.ObjectID];
             try
             {
                 Circuits[entry.SceneID].Scene.Remove(grp);
@@ -373,9 +373,9 @@ namespace SilverSim.Viewer.Core
             m_AttachmentsList.Remove(entry.ItemID);
 
             /* only serialize changed and/or scripted attachments */
-            bool isChanged = false;
-            bool isScripted = false;
-            foreach(ObjectPart part in grp.Values)
+            var isChanged = false;
+            var isScripted = false;
+            foreach(var part in grp.Values)
             {
                 isChanged = isChanged || part.IsChanged;
                 isScripted = isScripted || part.IsScripted;
@@ -389,7 +389,7 @@ namespace SilverSim.Viewer.Core
                 UUID newAssetID;
                 try
                 {
-                    AssetData data = grp.Asset();
+                    var data = grp.Asset();
                     newAssetID = data.ID;
                     AssetService.Store(data);
                 }
@@ -400,7 +400,7 @@ namespace SilverSim.Viewer.Core
                 }
                 try
                 {
-                    InventoryItem item = InventoryService.Item[ID, entry.ItemID];
+                    var item = InventoryService.Item[ID, entry.ItemID];
                     if (item.AssetType != AssetType.Object)
                     {
                         SendAlertMessage(this.GetLanguageString(CurrentCulture, "CouldNotStoreAttachmentData", "Could not store attachment data"), SceneID);

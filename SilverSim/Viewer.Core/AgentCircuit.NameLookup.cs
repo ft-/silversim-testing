@@ -33,11 +33,11 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void GroupNameLookup(Message m)
         {
-            UUIDGroupNameRequest req = (UUIDGroupNameRequest)m;
-            UUIDGroupNameReply rep = new UUIDGroupNameReply();
-            GroupsServiceInterface groupsService = Scene.GroupsService;
+            var req = (UUIDGroupNameRequest)m;
+            var rep = new UUIDGroupNameReply();
+            var groupsService = Scene.GroupsService;
 
-            foreach(UUID id in req.UUIDNameBlock)
+            foreach(var id in req.UUIDNameBlock)
             {
                 try
                 {
@@ -68,14 +68,14 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void UserNameLookup(Message m)
         {
-            UUIDNameRequest req = (UUIDNameRequest)m;
-            UUIDNameReply rep = new UUIDNameReply();
+            var req = (UUIDNameRequest)m;
+            var rep = new UUIDNameReply();
 
-            foreach (UUID id in req.UUIDNameBlock)
+            foreach (var id in req.UUIDNameBlock)
             {
                 try
                 {
-                    UUIDNameReply.Data d = new UUIDNameReply.Data();
+                    var d = new UUIDNameReply.Data();
                     UUI nd = Scene.AvatarNameService[id];
                     d.ID = nd.ID;
                     d.FirstName = nd.FirstName;

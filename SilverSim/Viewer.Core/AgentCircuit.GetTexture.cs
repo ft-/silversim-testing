@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Core
     {
         void Cap_GetTexture(HttpRequest httpreq)
         {
-            string[] parts = httpreq.RawUrl.Substring(1).Split('/');
+            var parts = httpreq.RawUrl.Substring(1).Split('/');
 
             if (httpreq.CallerIP != RemoteIP)
             {
@@ -57,9 +57,9 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            string texturereq = parts[3].Substring(1);
-            string[] texreq = texturereq.Split('&');
-            string texID = string.Empty;
+            var texturereq = parts[3].Substring(1);
+            var texreq = texturereq.Split('&');
+            var texID = string.Empty;
 
             foreach(string texreqentry in texreq)
             {

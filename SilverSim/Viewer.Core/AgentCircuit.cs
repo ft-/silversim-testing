@@ -40,6 +40,8 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
+using SilverSim.Viewer.Messages.Chat;
+using SilverSim.Viewer.Messages.Generic;
 
 namespace SilverSim.Viewer.Core
 {
@@ -190,10 +192,16 @@ namespace SilverSim.Viewer.Core
 
         private void ChatListenerAction(ListenEvent le)
         {
-            Messages.Chat.ChatFromSimulator cfs = new Messages.Chat.ChatFromSimulator();
-            cfs.Audible = Messages.Chat.ChatAudibleLevel.Fully;
-            cfs.ChatType = (Messages.Chat.ChatType)(byte)le.Type;
-            cfs.FromName = le.Name;
+            var cfs = new ChatFromSimulator()
+            {
+                Audible = Messages.Chat.ChatAudibleLevel.Fully,
+                ChatType = (Messages.Chat.ChatType)(byte)le.Type,
+                FromName = le.Name,
+                Position = le.GlobalPosition,
+                SourceID = le.ID,
+                SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType,
+                OwnerID = le.OwnerID
+            };
             if (le.Localization != null)
             {
                 cfs.Message = le.Localization.Localize(le, Agent.CurrentCulture);
@@ -202,10 +210,6 @@ namespace SilverSim.Viewer.Core
             {
                 cfs.Message = le.Message;
             }
-            cfs.Position = le.GlobalPosition;
-            cfs.SourceID = le.ID;
-            cfs.SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType;
-            cfs.OwnerID = le.OwnerID;
             if (le.Channel == DEBUG_CHANNEL)
             {
                 /* limit debug channel to root agents */
@@ -236,7 +240,7 @@ namespace SilverSim.Viewer.Core
 
             public void Handler(Message m)
             {
-                AgentCircuit circuit = m_Circuit.Target as AgentCircuit;
+                var circuit = m_Circuit.Target as AgentCircuit;
                 if (circuit != null)
                 {
                     m_Queue.Enqueue(new KeyValuePair<AgentCircuit, Message>(circuit, m));
@@ -262,8 +266,8 @@ namespace SilverSim.Viewer.Core
 
             public void Handler(Message m)
             {
-                ViewerAgent agent = m_Agent.Target as ViewerAgent;
-                AgentCircuit circuit = m_Circuit.Target as AgentCircuit;
+                var agent = m_Agent.Target as ViewerAgent;
+                var circuit = m_Circuit.Target as AgentCircuit;
                 if (agent != null && circuit != null)
                 {
                     m_Delegate(agent, circuit, m);
@@ -287,7 +291,7 @@ namespace SilverSim.Viewer.Core
 
             public void Handler(Message m)
             {
-                IAgent agent = m_Agent.Target as IAgent;
+                var agent = m_Agent.Target as IAgent;
                 if (agent != null)
                 {
                     m_Delegate(agent, m);
@@ -303,7 +307,7 @@ namespace SilverSim.Viewer.Core
         {
             if (typeof(Queue<Message>).IsAssignableFrom(fi.FieldType))
             {
-                MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(Message) });
+                var mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(Message) });
                 if (null == mi)
                 {
                     m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
@@ -319,7 +323,7 @@ namespace SilverSim.Viewer.Core
             }
             else if (typeof(Queue<KeyValuePair<AgentCircuit, Message>>).IsAssignableFrom(fi.FieldType))
             {
-                MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(KeyValuePair<AgentCircuit, Message>) });
+                var mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(KeyValuePair<AgentCircuit, Message>) });
                 if (null == mi)
                 {
                     m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
@@ -403,26 +407,25 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         void AddMessageRouting(object o)
         {
-            List<Type> types = new List<Type>();
-            Type tt;
-            tt = o.GetType();
+            var types = new List<Type>();
+            var tt = o.GetType();
             while(tt != typeof(object))
             {
                 types.Add(tt);
                 tt = tt.BaseType;
             }
 
-            List<MessageType> messageRegisteredHere = new List<MessageType>();
-            List<string> genericMsgRegisteredHere = new List<string>();
-            List<string> godlikeMsgRegisteredHere = new List<string>();
-            List<GridInstantMessageDialog> imTypeRegisteredHere = new List<GridInstantMessageDialog>();
+            var messageRegisteredHere = new List<MessageType>();
+            var genericMsgRegisteredHere = new List<string>();
+            var godlikeMsgRegisteredHere = new List<string>();
+            var imTypeRegisteredHere = new List<GridInstantMessageDialog>();
 
-            foreach (Type t in types)
+            foreach (var t in types)
             {
-                foreach(FieldInfo fi in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+                foreach(var fi in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    PacketHandlerAttribute[] pas = (PacketHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(PacketHandlerAttribute));
-                    foreach (PacketHandlerAttribute pa in pas)
+                    var pas = (PacketHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(PacketHandlerAttribute));
+                    foreach (var pa in pas)
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
@@ -449,8 +452,8 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    GenericMessageHandlerAttribute[] gms = (GenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GenericMessageHandlerAttribute));
-                    foreach (GenericMessageHandlerAttribute gm in gms)
+                    var gms = (GenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GenericMessageHandlerAttribute));
+                    foreach (var gm in gms)
                     {
                         if (m_GenericMessageRouting.ContainsKey(gm.Method))
                         {
@@ -473,8 +476,8 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    GodlikeMessageHandlerAttribute[] godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GodlikeMessageHandlerAttribute));
-                    foreach (GodlikeMessageHandlerAttribute gm in godms)
+                    var godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GodlikeMessageHandlerAttribute));
+                    foreach (var gm in godms)
                     {
                         if (m_GodlikeMessageRouting.ContainsKey(gm.Method))
                         {
@@ -497,8 +500,8 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    IMMessageHandlerAttribute[] ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(IMMessageHandlerAttribute));
-                    foreach (IMMessageHandlerAttribute im in ims)
+                    var ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(IMMessageHandlerAttribute));
+                    foreach (var im in ims)
                     {
                         if (m_IMMessageRouting.ContainsKey(im.Dialog))
                         {
@@ -522,18 +525,18 @@ namespace SilverSim.Viewer.Core
                     }
                 }
 
-                foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+                foreach (var mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethodAttribute)))
                     {
                         continue;
                     }
-                    PacketHandlerAttribute[] pas = (PacketHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(PacketHandlerAttribute));
-                    GenericMessageHandlerAttribute[] gms = (GenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(GenericMessageHandlerAttribute));
-                    GodlikeMessageHandlerAttribute[] godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(GodlikeMessageHandlerAttribute));
-                    IMMessageHandlerAttribute[] ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(IMMessageHandlerAttribute));
+                    var pas = (PacketHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(PacketHandlerAttribute));
+                    var gms = (GenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(GenericMessageHandlerAttribute));
+                    var godms = (GodlikeMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(GodlikeMessageHandlerAttribute));
+                    var ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(IMMessageHandlerAttribute));
 
-                    foreach (PacketHandlerAttribute pa in pas)
+                    foreach (var pa in pas)
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
@@ -560,7 +563,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    foreach (GenericMessageHandlerAttribute gm in gms)
+                    foreach (var gm in gms)
                     {
                         if (m_GenericMessageRouting.ContainsKey(gm.Method))
                         {
@@ -583,7 +586,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    foreach (GodlikeMessageHandlerAttribute gm in godms)
+                    foreach (var gm in godms)
                     {
                         if (m_GodlikeMessageRouting.ContainsKey(gm.Method))
                         {
@@ -606,7 +609,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    foreach (IMMessageHandlerAttribute im in ims)
+                    foreach (var im in ims)
                     {
                         if (m_IMMessageRouting.ContainsKey(im.Dialog))
                         {
@@ -671,20 +674,19 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         void AddCapabilityExtensions(object o, UUID regionSeedID)
         {
-            List<Type> types = new List<Type>();
-            Type tt;
-            tt = o.GetType();
+            var types = new List<Type>();
+            var tt = o.GetType();
             while (tt != typeof(object))
             {
                 types.Add(tt);
                 tt = tt.BaseType;
             }
 
-            foreach (Type t in types)
+            foreach (var t in types)
             {
-                foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+                foreach (var mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    CapabilityHandlerAttribute ca = (CapabilityHandlerAttribute)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandlerAttribute));
+                    var ca = (CapabilityHandlerAttribute)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandlerAttribute));
                     if (null == ca)
                     {
                         /* not a capability handler */
@@ -780,10 +782,10 @@ namespace SilverSim.Viewer.Core
 
             if(extenders != null)
             {
-                foreach (IProtocolExtender o in extenders)
+                foreach (var o in extenders)
                 {
-                    Type extenderType = o.GetType();
-                    Type[] interfaces = extenderType.GetInterfaces();
+                    var extenderType = o.GetType();
+                    var interfaces = extenderType.GetInterfaces();
                     if (interfaces.Contains(typeof(IPacketHandlerExtender)))
                     {
                         AddMessageRouting(o);
@@ -804,7 +806,7 @@ namespace SilverSim.Viewer.Core
 
         protected void CloseCircuit()
         {
-            foreach (KeyValuePair<string, UUID> kvp in m_RegisteredCapabilities)
+            foreach (var kvp in m_RegisteredCapabilities)
             {
                 m_CapsRedirector.Caps[kvp.Key].Remove(kvp.Value);
             }
@@ -858,13 +860,15 @@ namespace SilverSim.Viewer.Core
                     else
                     {
                         /* specific decoder for ListenEvent */
-                        ListenEvent ev = new ListenEvent();
-                        ev.TargetID = p.ReadUUID();
-                        ev.Channel = p.ReadInt32();
-                        ev.ButtonIndex = p.ReadInt32();
-                        ev.Message = p.ReadStringLen8();
-                        ev.ID = AgentID;
-                        ev.Type = ListenEvent.ChatType.Say;
+                        var ev = new ListenEvent()
+                        {
+                            TargetID = p.ReadUUID(),
+                            Channel = p.ReadInt32(),
+                            ButtonIndex = p.ReadInt32(),
+                            Message = p.ReadStringLen8(),
+                            ID = AgentID,
+                            Type = ListenEvent.ChatType.Say
+                        };
                         Server.RouteChat(ev);
                     }
                     break;
@@ -878,18 +882,18 @@ namespace SilverSim.Viewer.Core
                     }
                     else
                     {
-                        ListenEvent ev = new ListenEvent();
-                        ev.ID = AgentID;
-                        ev.Message = p.ReadStringLen16();
-                        byte type = p.ReadUInt8();
-
-                        ev.Type = (ListenEvent.ChatType)type;
-                        ev.Channel = p.ReadInt32();
-                        ev.GlobalPosition = Agent.GlobalPosition;
-                        ev.Name = Agent.Name;
-                        ev.TargetID = UUID.Zero;
-                        ev.SourceType = ListenEvent.ChatSourceType.Agent;
-                        ev.OwnerID = AgentID;
+                        var ev = new ListenEvent()
+                        {
+                            ID = AgentID,
+                            Message = p.ReadStringLen16(),
+                            Type = (ListenEvent.ChatType)p.ReadUInt8(),
+                            Channel = p.ReadInt32(),
+                            GlobalPosition = Agent.GlobalPosition,
+                            Name = Agent.Name,
+                            TargetID = UUID.Zero,
+                            SourceType = ListenEvent.ChatSourceType.Agent,
+                            OwnerID = AgentID
+                        };
                         Server.RouteChat(ev);
                     }
                     break;
@@ -898,7 +902,7 @@ namespace SilverSim.Viewer.Core
                     {
                         /* we need differentiation here of SimInventoryItem */
                         Action<Message> mdel;
-                        Messages.Transfer.TransferRequest m = Messages.Transfer.TransferRequest.Decode(p);
+                        var m = Messages.Transfer.TransferRequest.Decode(p);
                         if(m.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
                         {
                             if(m.Params.Length >= 96)
@@ -928,7 +932,7 @@ namespace SilverSim.Viewer.Core
                     }
                     if(m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
-                        Message m = del(p);
+                        var m = del(p);
                         /* we got a decoder, so we can make use of it */
                         m.CircuitAgentID = new UUID(AgentID);
                         try
@@ -953,7 +957,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if(m.Number == MessageType.ImprovedInstantMessage)
                         {
-                            ImprovedInstantMessage im = (ImprovedInstantMessage)m;
+                            var im = (ImprovedInstantMessage)m;
                             if(im.CircuitAgentID != im.AgentID ||
                                 im.CircuitSessionID != im.SessionID)
                             {
@@ -970,7 +974,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if (m.Number == MessageType.GenericMessage)
                         {
-                            Messages.Generic.GenericMessage genMsg = (Messages.Generic.GenericMessage)m;
+                            var genMsg = (GenericMessage)m;
                             if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
                             {
                                 mdel(m);
@@ -982,7 +986,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if (m.Number == MessageType.GodlikeMessage)
                         {
-                            Messages.Generic.GodlikeMessage genMsg = (Messages.Generic.GodlikeMessage)m;
+                            var genMsg = (GodlikeMessage)m;
                             if (m_GodlikeMessageRouting.TryGetValue(genMsg.Method, out mdel))
                             {
                                 mdel(m);
@@ -1012,20 +1016,22 @@ namespace SilverSim.Viewer.Core
                 switch(im.Dialog)
                 {
                     case GridInstantMessageDialog.MessageFromAgent:
-                        ImprovedInstantMessage m = new ImprovedInstantMessage();
-                        m.AgentID = im.FromAgent.ID;
-                        m.SessionID = UUID.Zero;
-                        m.FromAgentName = "System";
-                        m.FromGroup = false;
-                        m.ToAgentID = AgentID;
-                        m.ParentEstateID = 0;
-                        m.RegionID = UUID.Zero;
-                        m.Position = Vector3.Zero;
-                        m.IsOffline = false;
-                        m.Timestamp = new Date();
-                        m.Dialog = GridInstantMessageDialog.BusyAutoResponse;
-                        m.ID = im.IMSessionID;
-                        m.Message = "User not logged in. Message not saved.";
+                        var m = new ImprovedInstantMessage()
+                        {
+                            AgentID = im.FromAgent.ID,
+                            SessionID = UUID.Zero,
+                            FromAgentName = "System",
+                            FromGroup = false,
+                            ToAgentID = AgentID,
+                            ParentEstateID = 0,
+                            RegionID = UUID.Zero,
+                            Position = Vector3.Zero,
+                            IsOffline = false,
+                            Timestamp = new Date(),
+                            Dialog = GridInstantMessageDialog.BusyAutoResponse,
+                            ID = im.IMSessionID,
+                            Message = "User not logged in. Message not saved."
+                        };
                         SendMessage(m);
                         break;
 

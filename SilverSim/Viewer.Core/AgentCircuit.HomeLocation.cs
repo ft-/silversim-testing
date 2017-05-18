@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.SetStartLocationRequest)]
         public void HandleSetStartLocationRequest(Message m)
         {
-            SetStartLocationRequest req = (SetStartLocationRequest)m;
+            var req = (SetStartLocationRequest)m;
             if(req.CircuitAgentID != req.AgentID || req.CircuitSessionID != req.SessionID)
             {
                 return;
@@ -50,10 +50,10 @@ namespace SilverSim.Viewer.Core
                 req.LocationPos.Y = Agent.GlobalPosition.Y;
             }
 
-            UUI agentOwner = Agent.Owner;
+            var agentOwner = Agent.Owner;
             ParcelInfo pInfo = null;
 
-            bool canSetHome = false;
+            var canSetHome = false;
             canSetHome = canSetHome || Scene.IsEstateManager(agentOwner);
             canSetHome = canSetHome || Scene.IsRegionOwner(agentOwner);
             canSetHome = canSetHome || Scene.IsPossibleGod(agentOwner);
@@ -63,7 +63,7 @@ namespace SilverSim.Viewer.Core
                 canSetHome = canSetHome || Scene.HasGroupPower(agentOwner, pInfo.Group, Types.Groups.GroupPowers.AllowSetHome);
             }
 
-            UUID telehub = Scene.RegionSettings.TelehubObject;
+            var telehub = Scene.RegionSettings.TelehubObject;
             ObjectPart part;
             if(pInfo != null && telehub != UUID.Zero && Scene.Primitives.TryGetValue(telehub, out part))
             {

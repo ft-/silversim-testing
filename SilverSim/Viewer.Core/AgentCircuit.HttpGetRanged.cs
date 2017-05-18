@@ -34,15 +34,15 @@ namespace SilverSim.Viewer.Core
         {
             if (httpreq.ContainsHeader("Range"))
             {
-                List<KeyValuePair<int, int>> contentranges = new List<KeyValuePair<int, int>>();
+                var contentranges = new List<KeyValuePair<int, int>>();
 
-                string[] ranges = httpreq["Range"].Split(' ');
+                var ranges = httpreq["Range"].Split(' ');
 
                 if (ranges.Length > 1)
                 {
-                    using (HttpResponse httpres = httpreq.BeginResponse(contentType))
+                    using (var httpres = httpreq.BeginResponse(contentType))
                     {
-                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                        using (var o = httpres.GetOutputStream(asset.Data.LongLength))
                         {
                             o.Write(asset.Data, 0, asset.Data.Length);
                         }
@@ -68,9 +68,9 @@ namespace SilverSim.Viewer.Core
 
                 if (p[0] != "bytes")
                 {
-                    using (HttpResponse httpres = httpreq.BeginResponse(contentType))
+                    using (var httpres = httpreq.BeginResponse(contentType))
                     {
-                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                        using (var o = httpres.GetOutputStream(asset.Data.LongLength))
                         {
                             o.Write(asset.Data, 0, asset.Data.Length);
                         }
@@ -90,7 +90,7 @@ namespace SilverSim.Viewer.Core
                      */
                     if (start >= asset.Data.Length)
                     {
-                        using (HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
+                        using (var httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
                         {
                             /* no additional action needed here */
                         }
@@ -112,9 +112,9 @@ namespace SilverSim.Viewer.Core
                     }
                     if (start == 0 && end == asset.Data.Length - 1)
                     {
-                        using (HttpResponse httpres = httpreq.BeginResponse(contentType))
+                        using (var httpres = httpreq.BeginResponse(contentType))
                         {
-                            using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                            using (var o = httpres.GetOutputStream(asset.Data.LongLength))
                             {
                                 o.Write(asset.Data, 0, asset.Data.Length);
                             }
@@ -130,10 +130,10 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-                using (HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
+                using (var httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
                 {
                     httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
-                    using (Stream o = httpres.GetOutputStream(end - start + 1))
+                    using (var o = httpres.GetOutputStream(end - start + 1))
                     {
                         o.Write(asset.Data, start, end - start + 1);
                     }
@@ -141,9 +141,9 @@ namespace SilverSim.Viewer.Core
             }
             else
             {
-                using (HttpResponse httpres = httpreq.BeginResponse(contentType))
+                using (var httpres = httpreq.BeginResponse(contentType))
                 {
-                    using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                    using (var o = httpres.GetOutputStream(asset.Data.LongLength))
                     {
                         o.Write(asset.Data, 0, asset.Data.Length);
                     }

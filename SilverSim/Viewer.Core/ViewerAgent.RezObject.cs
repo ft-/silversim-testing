@@ -44,12 +44,12 @@ namespace SilverSim.Viewer.Core
 
             public override void PostProcessObjectGroups(List<ObjectGroup> grps)
             {
-                foreach (ObjectGroup grp in grps)
+                foreach (var grp in grps)
                 {
-                    foreach (ObjectPart part in grp.Values)
+                    foreach (var part in grp.Values)
                     {
-                        UUID oldID = part.ID;
-                        UUID newID = UUID.Random;
+                        var oldID = part.ID;
+                        var newID = UUID.Random;
                         part.ID = newID;
                         grp.ChangeKey(newID, oldID);
                     }
@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRezObject(Message m)
         {
-            Messages.Object.RezObject req = (Messages.Object.RezObject)m;
+            var req = (Messages.Object.RezObject)m;
             if(req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)
             {
                 return;
@@ -94,21 +94,22 @@ namespace SilverSim.Viewer.Core
                 SendAlertMessage("ALERT: InvalidObjectParams", m.CircuitSceneID);
                 return;
             }
-            SceneInterface.RezObjectParams rezparams = new SceneInterface.RezObjectParams();
-            rezparams.RayStart = req.RezData.RayStart;
-            rezparams.RayEnd = req.RezData.RayEnd;
-            rezparams.RayTargetID = req.RezData.RayTargetID;
-            rezparams.RayEndIsIntersection = req.RezData.RayEndIsIntersection;
-            rezparams.RezSelected = req.RezData.RezSelected;
-            rezparams.RemoveItem = req.RezData.RemoveItem;
-            rezparams.Scale = Vector3.One;
-            rezparams.Rotation = Quaternion.Identity;
-            rezparams.ItemFlags = req.RezData.ItemFlags;
-            rezparams.GroupMask = req.RezData.GroupMask;
-            rezparams.EveryoneMask = req.RezData.EveryoneMask;
-            rezparams.NextOwnerMask = req.RezData.NextOwnerMask;
-
-            AgentRezObjectHandler rezHandler = new AgentRezObjectHandler(
+            var rezparams = new SceneInterface.RezObjectParams()
+            {
+                RayStart = req.RezData.RayStart,
+                RayEnd = req.RezData.RayEnd,
+                RayTargetID = req.RezData.RayTargetID,
+                RayEndIsIntersection = req.RezData.RayEndIsIntersection,
+                RezSelected = req.RezData.RezSelected,
+                RemoveItem = req.RezData.RemoveItem,
+                Scale = Vector3.One,
+                Rotation = Quaternion.Identity,
+                ItemFlags = req.RezData.ItemFlags,
+                GroupMask = req.RezData.GroupMask,
+                EveryoneMask = req.RezData.EveryoneMask,
+                NextOwnerMask = req.RezData.NextOwnerMask
+            };
+            var rezHandler = new AgentRezObjectHandler(
                 Circuits[m.CircuitSceneID].Scene, 
                 rezparams.RayEnd, 
                 item.AssetID, 
@@ -121,7 +122,7 @@ namespace SilverSim.Viewer.Core
 
         void HandleAssetTransferWorkItem(object o)
         {
-            AssetTransferWorkItem wi = (AssetTransferWorkItem)o;
+            var wi = (AssetTransferWorkItem)o;
             wi.ProcessAssetTransfer();
         }
 
@@ -129,7 +130,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRezObjectFromNotecard(Message m)
         {
-            Messages.Object.RezObjectFromNotecard req = (Messages.Object.RezObjectFromNotecard)m;
+            var req = (Messages.Object.RezObjectFromNotecard)m;
             if (req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)
             {
                 return;

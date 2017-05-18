@@ -59,7 +59,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            int timeout = 30;
+            var timeout = 30;
             Message m = null;
             while(timeout -- != 0)
             {
@@ -81,10 +81,10 @@ namespace SilverSim.Viewer.Core
 
             if(null == m)
             {
-                using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
+                using (var res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
                 {
                     res.MinorVersion = 0;
-                    using (TextWriter w = res.GetOutputStream().UTF8StreamWriter())
+                    using (var w = res.GetOutputStream().UTF8StreamWriter())
                     {
                         w.Write("Upstream error: ");
                         w.Flush();
@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            AnArray eventarr = new AnArray();
+            var eventarr = new AnArray();
             int count = m_EventQueue.Count - 1;
 
             do
@@ -109,10 +109,10 @@ namespace SilverSim.Viewer.Core
                 catch (Exception e)
                 {
                     m_Log.DebugFormat("Unsupported message {0} in EventQueueGet: {1}\n{2}", m.GetType().FullName, e.Message, e.StackTrace);
-                    using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
+                    using (var res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
                     {
                         res.MinorVersion = 0;
-                        using (TextWriter w = res.GetOutputStream().UTF8StreamWriter())
+                        using (var w = res.GetOutputStream().UTF8StreamWriter())
                         {
                             w.Write("Upstream error: ");
                             w.Flush();
@@ -120,9 +120,11 @@ namespace SilverSim.Viewer.Core
                     }
                     return;
                 }
-                Map ev = new Map();
-                ev.Add("message", message);
-                ev.Add("body", body);
+                var ev = new Map
+                {
+                    { "message", message },
+                    { "body", body }
+                };
                 eventarr.Add(ev);
                 if(count > 0)
                 {
@@ -135,14 +137,15 @@ namespace SilverSim.Viewer.Core
                 }
             } while (m != null);
 
-            Map result = new Map();
-            result.Add("events", eventarr);
-            result.Add("id", m_EventQueueEventId++);
-
-            using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            var result = new Map
+            {
+                { "events", eventarr },
+                { "id", m_EventQueueEventId++ }
+            };
+            using (var res = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
                 res.ContentType = "application/llsd+xml";
-                using (Stream o = res.GetOutputStream())
+                using (var o = res.GetOutputStream())
                 {
                     LlsdXml.Serialize(result, o);
                 }

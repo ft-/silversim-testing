@@ -113,19 +113,19 @@ namespace SilverSim.Viewer.Core
             }
 
 
-            using (HttpResponse res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse())
             {
-                using (XmlTextWriter text = res.GetOutputStream().UTF8XmlTextWriter())
+                using (var text = res.GetOutputStream().UTF8XmlTextWriter())
                 {
-                    List<UUID> baditems = new List<UUID>();
+                    var baditems = new List<UUID>();
                     text.WriteStartElement("llsd");
                     text.WriteStartElement("map");
                     text.WriteKeyValuePair("agent_id", AgentID);
                     bool wroteheader = false;
 
-                    foreach (IValue iv in (AnArray)reqmap["items"])
+                    foreach (var iv in (AnArray)reqmap["items"])
                     {
-                        Map itemmap = iv as Map;
+                        var itemmap = iv as Map;
                         if (null == itemmap)
                         {
                             continue;
@@ -135,7 +135,7 @@ namespace SilverSim.Viewer.Core
                         {
                             continue;
                         }
-                        UUID itemid = itemmap["item_id"].AsUUID;
+                        var itemid = itemmap["item_id"].AsUUID;
                         InventoryItem item;
                         if (itemid == UUID.Zero)
                         {
@@ -171,7 +171,7 @@ namespace SilverSim.Viewer.Core
                         text.WriteValue("bad_items");
                         text.WriteEndElement();
                         text.WriteStartElement("array");
-                        foreach (UUID id in baditems)
+                        foreach (var id in baditems)
                         {
                             text.WriteNamedValue("uuid", id);
                         }

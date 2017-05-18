@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Core
                 writer.WriteValue("categories");
                 writer.WriteEndElement();
                 writer.WriteStartElement("array");
-                foreach(InventoryFolder childfolder in folder.Folders)
+                foreach(var childfolder in folder.Folders)
                 {
                     writer.WriteStartElement("map");
                     writer.WriteKeyValuePair("folder_id", childfolder.ID);
@@ -74,14 +74,14 @@ namespace SilverSim.Viewer.Core
                 writer.WriteStartElement("array");
                 if(linkeditems != null)
                 {
-                    foreach (InventoryItem childitem in linkeditems)
+                    foreach (var childitem in linkeditems)
                     {
                         writer.WriteStartElement("map");
                         WriteInventoryItem(childitem, writer);
                         writer.WriteEndElement();
                     }
                 }
-                foreach (InventoryItem childitem in folder.Items)
+                foreach (var childitem in folder.Items)
                 {
                     writer.WriteStartElement("map");
                     WriteInventoryItem(childitem, writer);
@@ -120,28 +120,28 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            Map reqmap = o as Map;
+            var reqmap = o as Map;
             if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 
-            using (HttpResponse res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse())
             {
-                using (XmlTextWriter text = res.GetOutputStream().UTF8XmlTextWriter())
+                using (var text = res.GetOutputStream().UTF8XmlTextWriter())
                 {
-                    List<UUID> badfolders = new List<UUID>();
+                    var badfolders = new List<UUID>();
                     text.WriteStartElement("llsd");
                     text.WriteStartElement("map");
-                    bool wroteheader = false;
+                    var wroteheader = false;
 
-                    Dictionary<UUID, List<Map>> folderRequests = new Dictionary<UUID, List<Map>>();
+                    var folderRequests = new Dictionary<UUID, List<Map>>();
 
-                    AnArray foldersreqarray = (AnArray)reqmap["folders"];
-                    foreach (IValue iv1 in foldersreqarray)
+                    var foldersreqarray = (AnArray)reqmap["folders"];
+                    foreach (var iv1 in foldersreqarray)
                     {
-                        Map itemmap = iv1 as Map;
+                        var itemmap = iv1 as Map;
                         if (null == itemmap)
                         {
                             continue;
@@ -153,7 +153,7 @@ namespace SilverSim.Viewer.Core
                         {
                             continue;
                         }
-                        UUID ownerid = itemmap["owner_id"].AsUUID;
+                        var ownerid = itemmap["owner_id"].AsUUID;
                         if (!folderRequests.ContainsKey(ownerid))
                         {
                             folderRequests[ownerid] = new List<Map>();
@@ -161,11 +161,11 @@ namespace SilverSim.Viewer.Core
                         folderRequests[ownerid].Add(itemmap);
                     }
 
-                    Dictionary<UUID, Dictionary<UUID, InventoryFolderContent>> folderContents = new Dictionary<UUID, Dictionary<UUID, InventoryFolderContent>>();
-                    foreach (KeyValuePair<UUID, List<Map>> req in folderRequests)
+                    var folderContents = new Dictionary<UUID, Dictionary<UUID, InventoryFolderContent>>();
+                    foreach (var req in folderRequests)
                     {
-                        List<UUID> list = new List<UUID>();
-                        foreach (Map fm in req.Value)
+                        var list = new List<UUID>();
+                        foreach (var fm in req.Value)
                         {
                             if (fm["folder_id"].AsUUID != UUID.Zero)
                             {
@@ -174,8 +174,8 @@ namespace SilverSim.Viewer.Core
                         }
                         try
                         {
-                            List<InventoryFolderContent> folderContentRes = Agent.InventoryService.Folder.Content[AgentID, list.ToArray()];
-                            foreach (InventoryFolderContent folderContent in folderContentRes)
+                            var folderContentRes = Agent.InventoryService.Folder.Content[AgentID, list.ToArray()];
+                            foreach (var folderContent in folderContentRes)
                             {
                                 if (!folderContents.ContainsKey(req.Key))
                                 {
@@ -190,9 +190,9 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    foreach (IValue iv in foldersreqarray)
+                    foreach (var iv in foldersreqarray)
                     {
-                        Map itemmap = iv as Map;
+                        var itemmap = iv as Map;
                         if (null == iv)
                         {
                             continue;
@@ -205,8 +205,8 @@ namespace SilverSim.Viewer.Core
                             continue;
                         }
 
-                        UUID folderid = itemmap["folder_id"].AsUUID;
-                        UUID ownerid = itemmap["owner_id"].AsUUID;
+                        var folderid = itemmap["folder_id"].AsUUID;
+                        var ownerid = itemmap["owner_id"].AsUUID;
                         bool fetch_folders = itemmap["fetch_folders"].AsBoolean;
                         bool fetch_items = itemmap["fetch_items"].AsBoolean;
 
@@ -215,11 +215,11 @@ namespace SilverSim.Viewer.Core
                         {
                             if (folderContents[ownerid].ContainsKey(folderid))
                             {
-                                InventoryFolderContent fc = folderContents[ownerid][folderid];
-                                List<InventoryItem> linkeditems = new List<InventoryItem>();
-                                List<UUID> linkeditemids = new List<UUID>();
+                                var fc = folderContents[ownerid][folderid];
+                                var linkeditems = new List<InventoryItem>();
+                                var linkeditemids = new List<UUID>();
 
-                                foreach (InventoryItem item in fc.Items)
+                                foreach (var item in fc.Items)
                                 {
                                     if (item.AssetType == Types.Asset.AssetType.Link)
                                     {
@@ -262,7 +262,7 @@ namespace SilverSim.Viewer.Core
                     {
                         text.WriteNamedValue("key", "bad_folders");
                         text.WriteStartElement("array");
-                        foreach (UUID id in badfolders)
+                        foreach (var id in badfolders)
                         {
                             text.WriteNamedValue("uuid", id);
                         }

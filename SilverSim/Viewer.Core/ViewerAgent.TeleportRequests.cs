@@ -51,8 +51,8 @@ namespace SilverSim.Viewer.Core
 
         void CleanDestinationCache()
         {
-            List<ulong> regionHandles = new List<ulong>();
-            foreach (KeyValuePair<ulong, KeyValuePair<ulong, RegionInfo>> kvp in m_HypergridDestinations)
+            var regionHandles = new List<ulong>();
+            foreach (var kvp in m_HypergridDestinations)
             {
                 if (Date.GetUnixTime() - kvp.Value.Key > 240)
                 {
@@ -68,9 +68,11 @@ namespace SilverSim.Viewer.Core
         public GridVector CacheHgDestination(RegionInfo di)
         {
             CleanDestinationCache();
-            GridVector hgRegionHandle = new GridVector();
-            hgRegionHandle.GridX = 0;
-            hgRegionHandle.GridY = NewHgRegionLocY;
+            var hgRegionHandle = new GridVector()
+            {
+                GridX = 0,
+                GridY = NewHgRegionLocY
+            };
             m_HypergridDestinations.Add(di.Location.RegionHandle, new KeyValuePair<ulong, RegionInfo>(Date.GetUnixTime(), di));
             return hgRegionHandle;
         }
@@ -141,17 +143,21 @@ namespace SilverSim.Viewer.Core
                 {
                     if (!TeleportTo(circuit.Scene, hgRegionInfo.GridURI, hgRegionInfo.ID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                     {
-                        TeleportFailed failedmsg = new TeleportFailed();
-                        failedmsg.AgentID = ID;
-                        failedmsg.Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible");
+                        var failedmsg = new TeleportFailed()
+                        {
+                            AgentID = ID,
+                            Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
+                        };
                         SendMessageAlways(failedmsg, req.CircuitSceneID);
                     }
                 }
                 else if(!TeleportTo(circuit.Scene, req.GridPosition, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                 {
-                    TeleportFailed failedmsg = new TeleportFailed();
-                    failedmsg.AgentID = ID;
-                    failedmsg.Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible");
+                    var failedmsg = new TeleportFailed()
+                    {
+                        AgentID = ID,
+                        Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
+                    };
                     SendMessageAlways(failedmsg, req.CircuitSceneID);
                 }
             }
@@ -161,7 +167,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportRequest(Message m)
         {
-            TeleportRequest req = (TeleportRequest)m;
+            var req = (TeleportRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -174,9 +180,11 @@ namespace SilverSim.Viewer.Core
                 /* TODO: we need the specific local list for HG destinations */
                 if (!TeleportTo(circuit.Scene, req.RegionID, req.Position, req.LookAt, Types.Grid.TeleportFlags.ViaLocation))
                 {
-                    TeleportFailed failedmsg = new TeleportFailed();
-                    failedmsg.AgentID = ID;
-                    failedmsg.Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible");
+                    var failedmsg = new TeleportFailed()
+                    {
+                        AgentID = ID,
+                        Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
+                    };
                     SendMessageAlways(failedmsg, req.CircuitSceneID);
                 }
             }

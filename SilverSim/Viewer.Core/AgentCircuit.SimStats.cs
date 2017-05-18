@@ -97,13 +97,13 @@ namespace SilverSim.Viewer.Core
             int packetsSent = m_PacketsSent - m_LastPacketsSent;
             int agentUpdatesReceived = m_AgentUpdatesReceived - m_LastAgentUpdatesReceived;
             int activeUploads = 0;
-            ViewerAgent agent = Agent;
-            SceneInterface scene = Scene;
+            var agent = Agent;
+            var scene = Scene;
             if (agent != null)
             {
                 activeUploads += agent.m_TerrainTransactions.Count + agent.m_AssetTransactions.Count;
             }
-            foreach (UploadAssetAbstractCapability cap in m_UploadCapabilities)
+            foreach (var cap in m_UploadCapabilities)
             {
                 activeUploads += cap.ActiveUploads;
             }
@@ -126,7 +126,7 @@ namespace SilverSim.Viewer.Core
                 m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = scene.Primitives.Count;
                 m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;
 
-                IPhysicsScene physics = scene.PhysicsScene;
+                var physics = scene.PhysicsScene;
                 if (physics != null)
                 {
                     m_SimStatsData[(int)SimStatIndex.PhysicsFPS].StatValue = physics.PhysicsFPS;
@@ -134,7 +134,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            SimStats stats = new SimStats();
+            var stats = new SimStats();
             if (scene != null)
             {
                 stats.RegionX = scene.GridPosition.X;

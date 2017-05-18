@@ -24,6 +24,7 @@ using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.God;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Viewer.Messages.Alert;
 
 namespace SilverSim.Viewer.Core
 {
@@ -33,7 +34,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestGodlikePowers(Message p)
         {
-            RequestGodlikePowers m = (RequestGodlikePowers)p;
+            var m = (RequestGodlikePowers)p;
             if(m.AgentID != ID || m.SessionID != m.CircuitSessionID)
             {
                 return;
@@ -44,30 +45,36 @@ namespace SilverSim.Viewer.Core
                 /* request god powers */
                 if(CheckForGodPowers(m.CircuitSceneID, ID))
                 {
-                    GrantGodlikePowers r = new GrantGodlikePowers();
-                    r.AgentID = m.AgentID;
-                    r.SessionID = m.SessionID;
+                    var r = new GrantGodlikePowers()
+                    {
+                        AgentID = m.AgentID,
+                        SessionID = m.SessionID,
 
-                    r.GodLevel = 255;
-                    r.Token = UUID.Zero;
+                        GodLevel = 255,
+                        Token = UUID.Zero
+                    };
                     m_IsActiveGod = true;
                     SendMessageIfRootAgent(r, m.CircuitSceneID);
                 }
                 else
                 {
-                    Messages.Alert.AlertMessage r = new Messages.Alert.AlertMessage();
-                    r.Message = "NOTIFY: GodlikeRequestFailed";
+                    var r = new AlertMessage()
+                    {
+                        Message = "NOTIFY: GodlikeRequestFailed"
+                    };
                     SendMessageIfRootAgent(r, m.CircuitSceneID);
                 }
             }
             else if(!m.IsGodlike && m_IsActiveGod)
             {
-                GrantGodlikePowers r = new GrantGodlikePowers();
-                r.AgentID = m.AgentID;
-                r.SessionID = m.SessionID;
+                var r = new GrantGodlikePowers()
+                {
+                    AgentID = m.AgentID,
+                    SessionID = m.SessionID,
 
-                r.GodLevel = 0;
-                r.Token = UUID.Zero;
+                    GodLevel = 0,
+                    Token = UUID.Zero
+                };
                 m_IsActiveGod = false;
                 SendMessageAlways(r, m.CircuitSceneID);
             }

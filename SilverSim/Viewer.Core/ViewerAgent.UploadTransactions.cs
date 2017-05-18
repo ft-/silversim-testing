@@ -74,7 +74,7 @@ namespace SilverSim.Viewer.Core
 
             public virtual void OnCompletion(byte[] data)
             {
-                using (MemoryStream input = new MemoryStream(ViewerAgent.BuildUploadedData(this)))
+                using (var input = new MemoryStream(BuildUploadedData(this)))
                 {
                     input.LoadLLRawStream(
                         (int)m_Scene.SizeX,
@@ -120,7 +120,7 @@ namespace SilverSim.Viewer.Core
             int dataLength = 0;
             byte[] data;
 
-            foreach (byte[] block in t.DataBlocks)
+            foreach (var block in t.DataBlocks)
             {
                 dataLength += block.Length;
             }
@@ -131,7 +131,7 @@ namespace SilverSim.Viewer.Core
                 new byte[dataLength];
 
             int dataOffset = 0;
-            foreach (byte[] block in t.DataBlocks)
+            foreach (var block in t.DataBlocks)
             {
                 int remainingLength = data.Length - dataOffset;
                 if (block.Length < remainingLength)
@@ -155,12 +155,14 @@ namespace SilverSim.Viewer.Core
             UInt64 XferID = NextXferID;
             m_AssetTransactions.Add(transactionID, XferID, t);
             t.XferID = XferID;
-            RequestXfer m = new RequestXfer();
-            m.ID = t.XferID;
-            m.VFileType = (short)t.AssetType;
-            m.VFileID = t.AssetID;
-            m.FilePath = 0;
-            m.Filename = t.Filename;
+            var m = new RequestXfer()
+            {
+                ID = t.XferID,
+                VFileType = (short)t.AssetType,
+                VFileID = t.AssetID,
+                FilePath = 0,
+                Filename = t.Filename
+            };
             SendMessageAlways(m, fromSceneID);
 
             return transactionID;
@@ -168,12 +170,14 @@ namespace SilverSim.Viewer.Core
 
         AssetData BuildUploadedAsset(AssetUploadTransaction t)
         {
-            AssetData asset = new AssetData();
-            asset.Data = BuildUploadedData(t);
-            asset.ID = t.AssetID;
-            asset.Type = t.AssetType;
-            asset.Temporary = t.IsTemporary;
-            asset.Local = t.IsLocal;
+            var asset = new AssetData()
+            {
+                Data = BuildUploadedData(t),
+                ID = t.AssetID,
+                Type = t.AssetType,
+                Temporary = t.IsTemporary,
+                Local = t.IsLocal
+            };
             return asset;
         }
 
@@ -181,7 +185,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAssetUploadRequest(Message m)
         {
-            AssetUploadRequest req = (AssetUploadRequest)m;
+            var req = (AssetUploadRequest)m;
             AssetUploadTransaction transaction;
 
             if (!m_AssetTransactions.TryGetValue(req.TransactionID, out transaction))
@@ -204,12 +208,14 @@ namespace SilverSim.Viewer.Core
             }
             else
             {
-                RequestXfer reqxfer = new RequestXfer();
-                reqxfer.ID = transaction.XferID;
-                reqxfer.VFileType = (short)transaction.AssetType;
-                reqxfer.VFileID = transaction.AssetID;
-                reqxfer.FilePath = 0;
-                reqxfer.Filename = string.Empty;
+                var reqxfer = new RequestXfer()
+                {
+                    ID = transaction.XferID,
+                    VFileType = (short)transaction.AssetType,
+                    VFileID = transaction.AssetID,
+                    FilePath = 0,
+                    Filename = string.Empty
+                };
                 SendMessageAlways(reqxfer, m.CircuitSceneID);
             }
         }
@@ -218,7 +224,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAbortXfer(Message m)
         {
-            AbortXfer req = (AbortXfer)m;
+            var req = (AbortXfer)m;
             AssetUploadTransaction assettransaction;
             if (m_AssetTransactions.TryGetValue(req.ID, out assettransaction))
             {
@@ -235,7 +241,7 @@ namespace SilverSim.Viewer.Core
 
         void AssetUploadCompleted(AssetUploadTransaction transaction, UUID fromSceneID)
         {
-            AssetData data = BuildUploadedAsset(transaction);
+            var data = BuildUploadedAsset(transaction);
             bool success = true;
             try
             {
@@ -258,10 +264,12 @@ namespace SilverSim.Viewer.Core
                 }
             }
             m_AssetTransactions.Remove(transaction.XferID);
-            AssetUploadComplete req = new AssetUploadComplete();
-            req.AssetID = data.ID;
-            req.AssetType = data.Type;
-            req.Success = success;
+            var req = new AssetUploadComplete()
+            {
+                AssetID = data.ID,
+                AssetType = data.Type,
+                Success = success
+            };
             SendMessageAlways(req, fromSceneID);
         }
         #endregion
@@ -269,15 +277,17 @@ namespace SilverSim.Viewer.Core
         #region Terrain Uploads
         void AddTerrainUploadTransaction(TerrainUploadTransaction t, UUID fromSceneID)
         {
-            UUID id = UUID.Random;
+            var id = UUID.Random;
             t.XferID = NextXferID;
             m_TerrainTransactions.Add(id, t.XferID, t);
-            RequestXfer m = new RequestXfer();
-            m.ID = t.XferID;
-            m.VFileType = 0;
-            m.VFileID = id;
-            m.FilePath = 0;
-            m.Filename = t.Filename;
+            var m = new RequestXfer()
+            {
+                ID = t.XferID,
+                VFileType = 0,
+                VFileID = id,
+                FilePath = 0,
+                Filename = t.Filename
+            };
             SendMessageAlways(m, fromSceneID);
         }
         #endregion
@@ -286,17 +296,19 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleSendXferPacket(Message m)
         {
-            SendXferPacket req = (SendXferPacket)m;
-            UUID fromSceneID = m.CircuitSceneID;
+            var req = (SendXferPacket)m;
+            var fromSceneID = m.CircuitSceneID;
 
             AssetUploadTransaction assettransaction;
             if (m_AssetTransactions.TryGetValue(req.ID, out assettransaction))
             {
                 assettransaction.DataBlocks.Add(req.Data);
 
-                ConfirmXferPacket p = new ConfirmXferPacket();
-                p.ID = assettransaction.XferID;
-                p.Packet = req.Packet;
+                var p = new ConfirmXferPacket()
+                {
+                    ID = assettransaction.XferID,
+                    Packet = req.Packet
+                };
                 SendMessageAlways(p, fromSceneID);
 
                 if((req.Packet & 0x80000000) != 0)
@@ -310,9 +322,11 @@ namespace SilverSim.Viewer.Core
             {
                 terraintransaction.DataBlocks.Add(req.Data);
 
-                ConfirmXferPacket p = new ConfirmXferPacket();
-                p.ID = terraintransaction.XferID;
-                p.Packet = req.Packet;
+                var p = new ConfirmXferPacket()
+                {
+                    ID = terraintransaction.XferID,
+                    Packet = req.Packet
+                };
                 SendMessageAlways(p, fromSceneID);
 
                 if ((req.Packet & 0x80000000) != 0)
@@ -322,6 +336,5 @@ namespace SilverSim.Viewer.Core
                 }
             }
         }
-
     }
 }

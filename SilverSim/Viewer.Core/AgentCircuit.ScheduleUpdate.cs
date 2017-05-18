@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Core
 
             void HandleCompletion(bool f)
             {
-                IAgent agent = m_Circuit.Agent;
+                ViewerAgent agent = m_Circuit.Agent;
                 if(null == agent)
                 {
                     return;
@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.Core
                 ObjectProperties props = null;
                 int bytelen = 0;
 
-                foreach (ObjectPart part in ObjectParts)
+                foreach (var part in ObjectParts)
                 {
                     byte[] propUpdate = part.PropertiesUpdateData;
                     if (null == propUpdate)
@@ -136,7 +136,7 @@ namespace SilverSim.Viewer.Core
             {
                 try
                 {
-                    UDPPacket p = m_TxObjectPool.Dequeue(1000);
+                    var p = m_TxObjectPool.Dequeue(1000);
                     p.Reset();
                     return p;
                 }
@@ -166,16 +166,16 @@ namespace SilverSim.Viewer.Core
             full_packet.WriteUInt8((byte)full_packet_data.Count);
 
             int offset = full_packet.DataPos;
-            foreach (KeyValuePair<ObjectUpdateInfo, byte[]> kvp in full_packet_data)
+            foreach (var kvp in full_packet_data)
             {
                 full_packet.WriteBytes(kvp.Value);
-                byte[] b = new byte[4];
+                var b = new byte[4];
                 Buffer.BlockCopy(full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, b, 0, 4);
                 if(!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(b);
                 }
-                Types.Primitive.PrimitiveFlags flags = (Types.Primitive.PrimitiveFlags)BitConverter.ToUInt32(b, 0);
+                var flags = (Types.Primitive.PrimitiveFlags)BitConverter.ToUInt32(b, 0);
 
                 if(kvp.Key.Part.ObjectGroup.IsGroupOwned)
                 {
@@ -267,11 +267,11 @@ namespace SilverSim.Viewer.Core
         private void HandleObjectUpdates()
         {
             UInt64 regionHandle;
-            C5.TreeDictionary<UInt32, int> LastObjSerialNo = new C5.TreeDictionary<uint, int>();
-            C5.TreeSet<UUID> SendSelectedObjects = new C5.TreeSet<UUID>();
-            Queue<ObjectUpdateInfo>[] queues = new Queue<ObjectUpdateInfo>[2];
-            Queue<ObjectUpdateInfo> physicalOutQueue = new Queue<ObjectUpdateInfo>();
-            Queue<ObjectUpdateInfo> nonPhysicalOutQueue = new Queue<ObjectUpdateInfo>();
+            var LastObjSerialNo = new C5.TreeDictionary<uint, int>();
+            var SendSelectedObjects = new C5.TreeSet<UUID>();
+            var queues = new Queue<ObjectUpdateInfo>[2];
+            var physicalOutQueue = new Queue<ObjectUpdateInfo>();
+            var nonPhysicalOutQueue = new Queue<ObjectUpdateInfo>();
             queues[0] = physicalOutQueue;
             queues[1] = nonPhysicalOutQueue;
             regionHandle = Scene.GridPosition.RegionHandle;
@@ -344,14 +344,14 @@ namespace SilverSim.Viewer.Core
 
                 if(m_TriggerFirstUpdate)
                 {
-                    foreach (IAgent agent in Scene.RootAgents)
+                    foreach (var agent in Scene.RootAgents)
                     {
                         if (agent != this)
                         {
                             Scene.SendAgentObjectToAgent(agent, Agent);
                         }
                     }
-                    foreach (ObjectUpdateInfo ui in Scene.UpdateInfos)
+                    foreach (var ui in Scene.UpdateInfos)
                     {
                         ScheduleUpdate(ui);
                     }
@@ -381,7 +381,7 @@ namespace SilverSim.Viewer.Core
                     }
                     for (queueidx = 0; queueidx < queues.Length; ++queueidx)
                     {
-                        Queue<ObjectUpdateInfo> q = queues[queueidx];
+                        var q = queues[queueidx];
                         ObjectUpdateInfo ui;
                         if (q.Count == 0)
                         {
@@ -413,7 +413,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else
                         {
-                            bool dofull = false;
+                            var dofull = false;
                             if(LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
@@ -424,8 +424,8 @@ namespace SilverSim.Viewer.Core
                                 dofull = true;
                             }
 
-                            bool isSelected = SelectedObjects.Contains(ui.Part.ID);
-                            bool wasSelected = SendSelectedObjects.Contains(ui.Part.ID);
+                            var isSelected = SelectedObjects.Contains(ui.Part.ID);
+                            var wasSelected = SendSelectedObjects.Contains(ui.Part.ID);
                             dofull |= (wasSelected && !isSelected) || (isSelected && !wasSelected);
                             if(wasSelected && !isSelected)
                             {
@@ -451,7 +451,7 @@ namespace SilverSim.Viewer.Core
                                     {
                                         if (phys_full_packet_data != null && fullUpdate.Length + phys_full_packet_data_length > 1400)
                                         {
-                                            UDPPacket full_packet = GetTxObjectPoolPacket();
+                                            var full_packet = GetTxObjectPoolPacket();
                                             if (full_packet == null)
                                             {
                                                 break;
@@ -477,7 +477,7 @@ namespace SilverSim.Viewer.Core
                                     {
                                         if (nonphys_full_packet_data != null && fullUpdate.Length + nonphys_full_packet_data_length > 1400)
                                         {
-                                            UDPPacket full_packet = GetTxObjectPoolPacket();
+                                            var full_packet = GetTxObjectPoolPacket();
                                             if (full_packet == null)
                                             {
                                                 break;
@@ -566,7 +566,7 @@ namespace SilverSim.Viewer.Core
 
                     if (phys_full_packet_data != null && physicalOutQueue.Count == 0)
                     {
-                        UDPPacket full_packet = GetTxObjectPoolPacket();
+                        var full_packet = GetTxObjectPoolPacket();
                         if (full_packet == null)
                         {
                             break;
@@ -585,7 +585,7 @@ namespace SilverSim.Viewer.Core
 
                 if (nonphys_full_packet_data != null)
                 {
-                    UDPPacket full_packet = GetTxObjectPoolPacket();
+                    var full_packet = GetTxObjectPoolPacket();
                     if (full_packet == null)
                     {
                         break;

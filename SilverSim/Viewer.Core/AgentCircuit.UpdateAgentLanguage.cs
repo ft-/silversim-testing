@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            Map reqmap = o as Map;
+            var reqmap = o as Map;
             if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
@@ -66,12 +66,11 @@ namespace SilverSim.Viewer.Core
             bool isPublic = reqmap["language_is_public"].AsBoolean;
             Agent.AgentLanguage = isPublic ? agentLanguage : string.Empty;
 
-            Map resmap = new Map();
-            using (HttpResponse res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse())
             {
-                using (Stream stream = res.GetOutputStream())
+                using (var stream = res.GetOutputStream())
                 {
-                    LlsdXml.Serialize(resmap, stream);
+                    LlsdXml.Serialize(new Map(), stream);
                 }
             }
 

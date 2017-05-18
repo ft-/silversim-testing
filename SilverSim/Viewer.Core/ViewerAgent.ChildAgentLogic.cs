@@ -36,24 +36,26 @@ namespace SilverSim.Viewer.Core
             AgentCircuit c;
             if(Circuits.TryGetValue(SceneID, out c))
             {
-                SceneInterface scene = c.Scene;
+                var scene = c.Scene;
                 if(null != scene)
                 {
-                    foreach (KeyValuePair<UUID, AgentChildInfo> kvp in ActiveChilds)
+                    foreach (var kvp in ActiveChilds)
                     {
-                        ChildAgentPositionUpdate m = new ChildAgentPositionUpdate();
-                        m.AgentID = ID;
-                        m.AgentPosition = GlobalPosition;
-                        m.AgentVelocity = Velocity;
-                        m.ChangedGrid = false;
-                        m.AtAxis = CameraAtAxis;
-                        m.Center = CameraPosition;
-                        m.LeftAxis = CameraLeftAxis;
-                        m.RegionLocation = scene.GridPosition;
-                        m.SessionID = SessionID;
-                        m.Size = Size;
-                        m.UpAxis = CameraUpAxis;
-                        IAgentChildUpdateServiceInterface childUpdater = kvp.Value.ChildAgentUpdateService;
+                        var m = new ChildAgentPositionUpdate()
+                        {
+                            AgentID = ID,
+                            AgentPosition = GlobalPosition,
+                            AgentVelocity = Velocity,
+                            ChangedGrid = false,
+                            AtAxis = CameraAtAxis,
+                            Center = CameraPosition,
+                            LeftAxis = CameraLeftAxis,
+                            RegionLocation = scene.GridPosition,
+                            SessionID = SessionID,
+                            Size = Size,
+                            UpAxis = CameraUpAxis
+                        };
+                        var childUpdater = kvp.Value.ChildAgentUpdateService;
                         if (childUpdater != null)
                         {
                             childUpdater.SendMessage(m);
@@ -68,46 +70,48 @@ namespace SilverSim.Viewer.Core
             AgentCircuit c;
             if (Circuits.TryGetValue(SceneID, out c))
             {
-                SceneInterface scene = c.Scene;
+                var scene = c.Scene;
                 if (null != scene)
                 {
-                    foreach (KeyValuePair<UUID, AgentChildInfo> kvp in ActiveChilds)
+                    foreach (var kvp in ActiveChilds)
                     {
-                        ChildAgentUpdate m = new ChildAgentUpdate();
-                        m.RegionID = scene.ID;
-                        m.RegionLocation = scene.GridPosition;
-                        m.AgentID = ID;
-                        m.SessionID = SessionID;
-                        m.AgentPosition = GlobalPosition;
-                        m.AgentVelocity = Velocity;
-                        m.Center = CameraPosition;
-                        m.Size = Size;
-                        m.AtAxis = CameraAtAxis;
-                        m.LeftAxis = CameraLeftAxis;
-                        m.UpAxis = CameraUpAxis;
-                        m.ChangedGrid = false;
-                        m.Far = DrawDistance;
-                        m.Aspect = 1;
-                        m.Throttles = new byte[9];
-                        //m.LocomotionState;
-                        m.HeadRotation = HeadRotation;
-                        m.BodyRotation = BodyRotation;
-                        m.ControlFlags = m_ActiveAgentControlFlags;
-                        m.EnergyLevel = 0;
-                        m.GodLevel = 0;
-                        m.AlwaysRun = m_IsRunning;
-                        m.PreyAgent = UUID.Zero;
-                        m.AgentAccess = 0;
-                        //m.AgentTextures;
-                        m.ActiveGroupID = Group.ID;
-                        //m.GroupData;
-                        //m.AnimationData;
-                        //m_AnimationController.
-                        //m.GranterBlock;
-                        m.VisualParams = VisualParams;
+                        var m = new ChildAgentUpdate()
+                        {
+                            RegionID = scene.ID,
+                            RegionLocation = scene.GridPosition,
+                            AgentID = ID,
+                            SessionID = SessionID,
+                            AgentPosition = GlobalPosition,
+                            AgentVelocity = Velocity,
+                            Center = CameraPosition,
+                            Size = Size,
+                            AtAxis = CameraAtAxis,
+                            LeftAxis = CameraLeftAxis,
+                            UpAxis = CameraUpAxis,
+                            ChangedGrid = false,
+                            Far = DrawDistance,
+                            Aspect = 1,
+                            Throttles = new byte[9],
+                            //m.LocomotionState;
+                            HeadRotation = HeadRotation,
+                            BodyRotation = BodyRotation,
+                            ControlFlags = m_ActiveAgentControlFlags,
+                            EnergyLevel = 0,
+                            GodLevel = 0,
+                            AlwaysRun = m_IsRunning,
+                            PreyAgent = UUID.Zero,
+                            AgentAccess = 0,
+                            //m.AgentTextures;
+                            ActiveGroupID = Group.ID,
+                            //m.GroupData;
+                            //m.AnimationData;
+                            //m_AnimationController.
+                            //m.GranterBlock;
+                            VisualParams = VisualParams
+                        };
                         //m.AgentAccessList;
                         //m.AgentInfo;
-                        IAgentChildUpdateServiceInterface childUpdater = kvp.Value.ChildAgentUpdateService;
+                        var childUpdater = kvp.Value.ChildAgentUpdateService;
                         if (childUpdater != null)
                         {
                             childUpdater.SendMessage(m);

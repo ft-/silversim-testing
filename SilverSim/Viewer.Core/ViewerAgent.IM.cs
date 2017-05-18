@@ -33,13 +33,13 @@ namespace SilverSim.Viewer.Core
         [IMMessageHandler(GridInstantMessageDialog.BusyAutoResponse)]
         public void HandleIM(ViewerAgent nop, AgentCircuit circuit, Message m)
         {
-            GridInstantMessage im = (GridInstantMessage)(ImprovedInstantMessage)m;
+            var im = (GridInstantMessage)(ImprovedInstantMessage)m;
             im.IsFromGroup = false;
             im.FromAgent.ID = ID;
 
             im.OnResult = circuit.OnIMResult;
 
-            UDPCircuitsManager server = circuit.Server;
+            var server = circuit.Server;
             if (server != null)
             {
                 server.RouteIM(im);

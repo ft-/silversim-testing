@@ -48,14 +48,14 @@ namespace SilverSim.Viewer.Core
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not found");
                 return;
             }
-            string reqUrl = httpreq.RawUrl.Substring(pos + 1);
+            var reqUrl = httpreq.RawUrl.Substring(pos + 1);
             // Format: ?<type_name>_id=<uuid>
             pos = reqUrl.IndexOf("_id=");
 
-            string assetType_string = reqUrl.Substring(0, pos);
-            string assetId_string = reqUrl.Substring(pos + 4);
+            var assetType_string = reqUrl.Substring(0, pos);
+            var assetId_string = reqUrl.Substring(pos + 4);
             UUID assetId;
-            AssetType assetType = assetType_string.StringToAssetType();
+            var assetType = assetType_string.StringToAssetType();
             if (!UUID.TryParse(assetId_string, out assetId))
             {
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not found");

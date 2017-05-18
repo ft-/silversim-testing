@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using SilverSim.Viewer.Messages.LayerData;
 
 namespace SilverSim.Viewer.Core
 {
@@ -142,7 +143,7 @@ namespace SilverSim.Viewer.Core
             var ev = OnTerminateCircuit;
             if (null != ev)
             {
-                foreach (Action d in ev.GetInvocationList().OfType<Action>())
+                foreach (var d in ev.GetInvocationList().OfType<Action>())
                 {
                     d.Invoke();
                 }
@@ -150,7 +151,7 @@ namespace SilverSim.Viewer.Core
 
             lock (m_UnackedPacketsHash)
             {
-                foreach (UDPPacket unacked in m_UnackedPacketsHash.Values)
+                foreach (var unacked in m_UnackedPacketsHash.Values)
                 {
                     if (unacked.AckMessage != null)
                     {
@@ -166,7 +167,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            UDPCircuitsManager server = m_Server;
+            var server = m_Server;
             if (null != server)
             {
                 server.RemoveCircuit(this);
@@ -184,21 +185,18 @@ namespace SilverSim.Viewer.Core
             int lastSimStatsTick = Environment.TickCount;
             byte pingID = 0;
             Thread.CurrentThread.Name = string.Format("LLUDP:Transmitter for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
-            Queue<Message> LowPriorityQueue;
-            Queue<Message> HighPriorityQueue;
-            Queue<Message> MediumPriorityQueue;
-            Queue<Message>[] QueueList = new Queue<Message>[(int)Message.QueueOutType.NumQueues];
+            var QueueList = new Queue<Message>[(int)Message.QueueOutType.NumQueues];
             Message.QueueOutType qroutidx;
-            int[] QueueCount = new int[(int)Message.QueueOutType.NumQueues];
+            var QueueCount = new int[(int)Message.QueueOutType.NumQueues];
 
             for (uint qidx = 0; qidx < (uint)Message.QueueOutType.NumQueues; ++qidx)
             {
                 QueueList[qidx] = new Queue<Message>();
             }
 
-            HighPriorityQueue = QueueList[(uint)Message.QueueOutType.High];
-            MediumPriorityQueue = QueueList[(uint)Message.QueueOutType.Medium];
-            LowPriorityQueue = QueueList[(uint)Message.QueueOutType.Low];
+            var HighPriorityQueue = QueueList[(uint)Message.QueueOutType.High];
+            var MediumPriorityQueue = QueueList[(uint)Message.QueueOutType.Medium];
+            var LowPriorityQueue = QueueList[(uint)Message.QueueOutType.Low];
 
             int qcount;
             int timeout = 10;
@@ -207,7 +205,7 @@ namespace SilverSim.Viewer.Core
 
             while (true)
             {
-                foreach (Queue<Message> q in QueueList)
+                foreach (var q in QueueList)
                 {
                     if (q.Count > 0)
                     {
@@ -248,17 +246,17 @@ namespace SilverSim.Viewer.Core
                     }
                     else if (m.Number == MessageType.LayerData)
                     {
-                        Messages.LayerData.LayerData ld = (Messages.LayerData.LayerData)m;
+                        var ld = (LayerData)m;
                         switch (ld.LayerType)
                         {
-                            case Messages.LayerData.LayerData.LayerDataType.Land:
-                            case Messages.LayerData.LayerData.LayerDataType.LandExtended:
+                            case LayerData.LayerDataType.Land:
+                            case LayerData.LayerDataType.LandExtended:
                                 m.OutQueue = Message.QueueOutType.LandLayerData;
                                 QueueList[(uint)m.OutQueue].Enqueue(m);
                                 break;
 
-                            case Messages.LayerData.LayerData.LayerDataType.Wind:
-                            case Messages.LayerData.LayerData.LayerDataType.WindExtended:
+                            case LayerData.LayerDataType.Wind:
+                            case LayerData.LayerDataType.WindExtended:
                                 m.OutQueue = Message.QueueOutType.WindLayerData;
                                 QueueList[(uint)m.OutQueue].Enqueue(m);
                                 break;
@@ -301,7 +299,7 @@ namespace SilverSim.Viewer.Core
                     /* make high packets pass low priority packets */
                     for (int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
                     {
-                        Queue<Message> q = QueueList[queueidx];
+                        var q = QueueList[queueidx];
                         if (q.Count == 0)
                         {
                             continue;
@@ -328,9 +326,11 @@ namespace SilverSim.Viewer.Core
                         {
                             try
                             {
-                                UDPPacket p = new UDPPacket();
-                                p.OutQueue = m.OutQueue;
-                                p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
+                                var p = new UDPPacket()
+                                {
+                                    OutQueue = m.OutQueue,
+                                    IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag
+                                };
                                 p.WriteMessageNumber(m.Number);
                                 m.Serialize(p);
                                 p.Flush();
@@ -346,7 +346,7 @@ namespace SilverSim.Viewer.Core
                                     if (MAX_DATA_MTU > 1 + (uint)savedDataLength)
                                     {
                                         uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
-                                        uint curacks = (uint)m_AckList.Count;
+                                        var curacks = (uint)m_AckList.Count;
                                         if (appendableAcks != 0 && curacks != 0)
                                         {
                                             p.HasAckFlag = true;
@@ -434,7 +434,7 @@ namespace SilverSim.Viewer.Core
                     !m_PingSendTicks.ContainsKey(pingID))
                 {
                     lastPingTick = Environment.TickCount;
-                    UDPPacket p = new UDPPacket();
+                    var p = new UDPPacket();
                     p.WriteMessageNumber(MessageType.StartPingCheck);
                     p.WriteUInt8(pingID++);
                     m_PingSendTicks[pingID] = Environment.TickCount;
@@ -457,7 +457,7 @@ namespace SilverSim.Viewer.Core
                     int c = m_AckList.Count;
                     while (c > 0)
                     {
-                        UDPPacket p = new UDPPacket();
+                        var p = new UDPPacket();
                         p.WriteMessageNumber(MessageType.PacketAck);
                         if (c > 100)
                         {

@@ -62,9 +62,9 @@ namespace SilverSim.Viewer.Core
 
         void Cap_RenderMaterials_GET(HttpRequest httpreq)
         {
-            using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
+            using (var httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                byte[] matdata = Scene.MaterialsData;
+                var matdata = Scene.MaterialsData;
                 httpres.GetOutputStream().Write(matdata, 0, matdata.Length);
             }
         }
@@ -88,20 +88,20 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            List<Material> materials = new List<Material>();
+            var materials = new List<Material>();
             if(reqmap.ContainsKey("Zipped"))
             {
                 AnArray zippedDataArray;
                 Map zippedDataMap;
                 try
                 {
-                    using (MemoryStream ms = new MemoryStream((BinaryData)reqmap["Zipped"]))
+                    using (var ms = new MemoryStream((BinaryData)reqmap["Zipped"]))
                     {
-                        byte[] skipheader = new byte[2];
+                        var skipheader = new byte[2];
                         ms.Read(skipheader, 0, 2);
-                        using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Decompress))
+                        using (var gz = new DeflateStream(ms, CompressionMode.Decompress))
                         {
-                            IValue inp = LlsdBinary.Deserialize(gz);
+                            var inp = LlsdBinary.Deserialize(gz);
                             zippedDataArray = inp as AnArray;
                             zippedDataMap = inp as Map;
                         }
@@ -121,7 +121,7 @@ namespace SilverSim.Viewer.Core
 
                 if(null != zippedDataArray)
                 {
-                    foreach (IValue v in zippedDataArray)
+                    foreach (var v in zippedDataArray)
                     {
                         try
                         {
@@ -136,12 +136,12 @@ namespace SilverSim.Viewer.Core
                 else if(null != zippedDataMap &&
                     zippedDataMap.ContainsKey("FullMaterialsPerFace"))
                 {
-                    AnArray faceData = zippedDataMap["FullMaterialsPerFace"] as AnArray;
+                    var faceData = zippedDataMap["FullMaterialsPerFace"] as AnArray;
                     if (null != faceData)
                     {
-                        foreach (IValue face_iv in faceData)
+                        foreach (var face_iv in faceData)
                         {
-                            Map faceDataMap = face_iv as Map;
+                            var faceDataMap = face_iv as Map;
                             if(null == faceDataMap)
                             {
                                 continue;
@@ -150,7 +150,7 @@ namespace SilverSim.Viewer.Core
                             try
                             {
                                 uint primLocalID = faceDataMap["ID"].AsUInt;
-                                UUID matID = UUID.Random;
+                                var matID = UUID.Random;
                                 Material mat;
                                 try
                                 {
@@ -167,16 +167,16 @@ namespace SilverSim.Viewer.Core
                                     Scene.StoreMaterial(mat);
                                     continue;
                                 }
-                                ObjectPart p = Scene.Primitives[primLocalID];
+                                var p = Scene.Primitives[primLocalID];
                                 if (faceDataMap.ContainsKey("Face"))
                                 {
-                                    uint face = faceDataMap["Face"].AsUInt;
-                                    TextureEntryFace te = p.TextureEntry[face];
+                                    var face = faceDataMap["Face"].AsUInt;
+                                    var te = p.TextureEntry[face];
                                     te.MaterialID = matID;
                                 }
                                 else
                                 {
-                                    TextureEntryFace te = p.TextureEntry.DefaultTexture;
+                                    var te = p.TextureEntry.DefaultTexture;
                                     te.MaterialID = matID;
                                     p.TextureEntry.DefaultTexture = te;
                                 }
@@ -191,21 +191,21 @@ namespace SilverSim.Viewer.Core
             }
 
             byte[] buf;
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                byte[] zlibheader = new byte[] { 0x78, 0xDA };
+                var zlibheader = new byte[] { 0x78, 0xDA };
                 ms.Write(zlibheader, 0, 2);
-                using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Compress))
+                using (var gz = new DeflateStream(ms, CompressionMode.Compress))
                 {
-                    byte[] matdata = Scene.MaterialsData;
+                    var matdata = Scene.MaterialsData;
                     gz.Write(matdata, 0, matdata.Length);
                 }
                 buf = ms.ToArray();
             }
 
-            using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
+            using (var httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                using (XmlTextWriter writer = httpres.GetOutputStream().UTF8XmlTextWriter())
+                using (var writer = httpres.GetOutputStream().UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     writer.WriteNamedValue("key", "Zipped");

@@ -29,6 +29,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Script;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Viewer.Messages.Alert;
 
 namespace SilverSim.Viewer.Core
 {
@@ -39,7 +40,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         void HandleRezScript(Message m)
         {
-            RezScript req = (RezScript)m;
+            var req = (RezScript)m;
             if(req.CircuitSessionID != req.SessionID ||
                 req.AgentID != req.CircuitAgentID)
             {
@@ -72,7 +73,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         void RezScriptFromAgentInventory(AgentCircuit circuit, ObjectPart part, RezScript req)
         {
-            UUID itemID = req.InventoryBlock.ItemID;
+            var itemID = req.InventoryBlock.ItemID;
             InventoryItem item;
             try
             {
@@ -80,8 +81,10 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = "ALERT: ScriptMissing";
+                var res = new AlertMessage()
+                {
+                    Message = "ALERT: ScriptMissing"
+                };
                 circuit.SendMessage(res);
                 return;
             }
@@ -94,17 +97,21 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                    res.Message = "ALERT: ScriptMissing";
+                    var res = new AlertMessage()
+                    {
+                        Message = "ALERT: ScriptMissing"
+                    };
                     circuit.SendMessage(res);
                     return;
                 }
             }
-            
+
             if(item.AssetType != AssetType.LSLText)
             {
-                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = "Unable to rez a non-script asset as script";
+                var res = new AlertMessage()
+                {
+                    Message = "Unable to rez a non-script asset as script"
+                };
                 circuit.SendMessage(res);
                 return;
             }
@@ -125,8 +132,10 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                    res.Message = "ALERT: ScriptMissing";
+                    var res = new AlertMessage()
+                    {
+                        Message = "ALERT: ScriptMissing"
+                    };
                     circuit.SendMessage(res);
                     return;
                 }
@@ -142,8 +151,10 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                    res.Message = "ALERT: UnableToLoadScript";
+                    var res = new AlertMessage()
+                    {
+                        Message = "ALERT: UnableToLoadScript"
+                    };
                     circuit.SendMessage(res);
                     return;
                 }
@@ -151,8 +162,10 @@ namespace SilverSim.Viewer.Core
 
             if (data.Type != AssetType.LSLText)
             {
-                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = this.GetLanguageString(CurrentCulture, "UnableToRezANonScriptAsScript", "Unable to rez a non-script asset as script");
+                var res = new Messages.Alert.AlertMessage()
+                {
+                    Message = this.GetLanguageString(CurrentCulture, "UnableToRezANonScriptAsScript", "Unable to rez a non-script asset as script")
+                };
                 circuit.SendMessage(res);
                 return;
             }
@@ -176,8 +189,10 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = "ALERT: ScriptMissing";
+                var res = new AlertMessage()
+                {
+                    Message = "ALERT: ScriptMissing"
+                };
                 circuit.SendMessage(res);
                 return;
             }
@@ -190,25 +205,29 @@ namespace SilverSim.Viewer.Core
         {
             if(!part.CheckPermissions(Owner, Group, InventoryPermissionsMask.Modify))
             {
-                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = "ALERT: NoPermModifyObject";
+                var res = new AlertMessage()
+                {
+                    Message = "ALERT: NoPermModifyObject"
+                };
                 circuit.SendMessage(res);
                 return;
             }
-            ObjectPartInventoryItem item = new ObjectPartInventoryItem();
-            item.Name = req.InventoryBlock.Name;
-            item.AssetID = data.ID;
-            item.Description = req.InventoryBlock.Description;
-            item.AssetType = AssetType.LSLText;
-            item.Creator = Owner;
-            item.Owner = Owner;
-            item.Flags = 0;
-            item.Group = Group;
-            item.IsGroupOwned = false;
-            item.ID = UUID.Random;
-            item.InventoryType = InventoryType.LSLText;
-            item.LastOwner = Owner;
-            item.ParentFolderID = part.ID;
+            var item = new ObjectPartInventoryItem()
+            {
+                Name = req.InventoryBlock.Name,
+                AssetID = data.ID,
+                Description = req.InventoryBlock.Description,
+                AssetType = AssetType.LSLText,
+                Creator = Owner,
+                Owner = Owner,
+                Flags = 0,
+                Group = Group,
+                IsGroupOwned = false,
+                ID = UUID.Random,
+                InventoryType = InventoryType.LSLText,
+                LastOwner = Owner,
+                ParentFolderID = part.ID
+            };
             item.Permissions.Base = req.InventoryBlock.BaseMask;
             item.Permissions.Current = req.InventoryBlock.OwnerMask;
             item.Permissions.EveryOne = req.InventoryBlock.EveryoneMask;
@@ -231,8 +250,10 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = this.GetLanguageString(circuit.Agent.CurrentCulture, "CouldNotCompileScript", "Could not compile script");
+                var res = new AlertMessage()
+                {
+                    Message = this.GetLanguageString(circuit.Agent.CurrentCulture, "CouldNotCompileScript", "Could not compile script")
+                };
                 circuit.SendMessage(res);
                 return;
             }

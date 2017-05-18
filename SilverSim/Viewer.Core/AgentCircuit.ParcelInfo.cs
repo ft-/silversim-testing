@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.ParcelSetOtherCleanTime)]
         public void HandleParcelSetOtherCleanTime(Message m)
         {
-            ParcelSetOtherCleanTime req = (ParcelSetOtherCleanTime)m;
+            var req = (ParcelSetOtherCleanTime)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.ParcelPropertiesUpdate)]
         public void HandleParcelPropertiesUpdate(Message m)
         {
-            ParcelPropertiesUpdate req = (ParcelPropertiesUpdate)m;
+            var req = (ParcelPropertiesUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -108,7 +108,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.ParcelDwellRequest)]
         public void HandleParcelDwellRequest(Message m)
         {
-            ParcelDwellRequest req = (ParcelDwellRequest)m;
+            var req = (ParcelDwellRequest)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -118,11 +118,13 @@ namespace SilverSim.Viewer.Core
             ParcelInfo pInfo;
             if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo))
             {
-                ParcelDwellReply reply = new ParcelDwellReply();
-                reply.AgentID = req.AgentID;
-                reply.LocalID = req.LocalID;
-                reply.ParcelID = pInfo.ID;
-                reply.Dwell = 0;
+                var reply = new ParcelDwellReply()
+                {
+                    AgentID = req.AgentID,
+                    LocalID = req.LocalID,
+                    ParcelID = pInfo.ID,
+                    Dwell = 0
+                };
                 SendMessage(reply);
             }
         }
@@ -133,7 +135,7 @@ namespace SilverSim.Viewer.Core
 
         void SendParcelAccessList(int localID, ParcelAccessList listType, List<ParcelAccessEntry> list)
         {
-            ParcelAccessListReply rep = new ParcelAccessListReply();
+            var rep = new ParcelAccessListReply();
             int sequenceno = 1;
             if(list.Count == 0)
             {
@@ -152,7 +154,7 @@ namespace SilverSim.Viewer.Core
                 rep.Flags = listType;
                 rep.SequenceID = sequenceno++;
                 
-                foreach (ParcelAccessEntry pae in list)
+                foreach (var pae in list)
                 {
                     if(rep.AccessList.Count == P_MAX_ENTRIES)
                     {
@@ -162,9 +164,11 @@ namespace SilverSim.Viewer.Core
                         rep.Flags = listType;
                         rep.SequenceID = sequenceno++;
                     }
-                    ParcelAccessListReply.Data pad = new ParcelAccessListReply.Data();
-                    pad.Flags = listType;
-                    pad.ID = pae.Accessor.ID;
+                    var pad = new ParcelAccessListReply.Data()
+                    {
+                        Flags = listType,
+                        ID = pae.Accessor.ID
+                    };
                     rep.AccessList.Add(pad);
                 }
 
@@ -175,7 +179,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.ParcelAccessListRequest)]
         public void HandleParcelAccessListRequest(Message m)
         {
-            ParcelAccessListRequest req = (ParcelAccessListRequest)m;
+            var req = (ParcelAccessListRequest)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -208,22 +212,24 @@ namespace SilverSim.Viewer.Core
 
         void ParcelAccessListUpdateManage(UUID parcelID, Dictionary<UUID, ParcelAccessListUpdate.Data> entries, IParcelAccessList accessList)
         {
-            foreach (ParcelAccessEntry listed in accessList[Scene.ID, parcelID])
+            foreach (var listed in accessList[Scene.ID, parcelID])
             {
                 if (!entries.ContainsKey(listed.Accessor.ID))
                 {
                     accessList.Remove(Scene.ID, parcelID, listed.Accessor);
                 }
             }
-            foreach (ParcelAccessListUpdate.Data upd in entries.Values)
+            foreach (var upd in entries.Values)
             {
                 UUI uui;
                 if (Scene.AvatarNameService.TryGetValue(upd.ID, out uui))
                 {
-                    ParcelAccessEntry pae = new ParcelAccessEntry();
-                    pae.RegionID = Scene.ID;
-                    pae.Accessor = uui;
-                    pae.ParcelID = parcelID;
+                    var pae = new ParcelAccessEntry()
+                    {
+                        RegionID = Scene.ID,
+                        Accessor = uui,
+                        ParcelID = parcelID
+                    };
                     accessList.Store(pae);
                 }
             }
@@ -232,7 +238,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.ParcelAccessListUpdate)]
         public void HandleParcelAccessListUpdateRequest(Message m)
         {
-            ParcelAccessListUpdate req = (ParcelAccessListUpdate)m;
+            var req = (ParcelAccessListUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
@@ -264,7 +270,7 @@ namespace SilverSim.Viewer.Core
                     }
                     else if (m_ParcelAccessListSegments.Count == req.Sections)
                     {
-                        Dictionary<int, ParcelAccessListUpdate> list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelAccessListSegments);
+                        var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelAccessListSegments);
                         m_ParcelAccessListSegments.Clear();
                         m_ParcelAccessListTransaction = UUID.Zero;
                         bool isComplete = true;
@@ -281,10 +287,10 @@ namespace SilverSim.Viewer.Core
                             return;
                         }
 
-                        Dictionary<UUID, ParcelAccessListUpdate.Data> entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
-                        foreach (ParcelAccessListUpdate upd in list.Values)
+                        var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                        foreach (var upd in list.Values)
                         {
-                            foreach (ParcelAccessListUpdate.Data d in upd.AccessList)
+                            foreach (var d in upd.AccessList)
                             {
                                 entries[d.ID] = d;
                             }
@@ -314,7 +320,7 @@ namespace SilverSim.Viewer.Core
                     }
                     else if (m_ParcelBanListSegments.Count == req.Sections)
                     {
-                        Dictionary<int, ParcelAccessListUpdate> list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelBanListSegments);
+                        var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelBanListSegments);
                         m_ParcelBanListSegments.Clear();
                         m_ParcelBanListTransaction = UUID.Zero;
                         bool isComplete = true;
@@ -331,10 +337,10 @@ namespace SilverSim.Viewer.Core
                             return;
                         }
 
-                        Dictionary<UUID, ParcelAccessListUpdate.Data> entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
-                        foreach (ParcelAccessListUpdate upd in list.Values)
+                        var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                        foreach (var upd in list.Values)
                         {
-                            foreach (ParcelAccessListUpdate.Data d in upd.AccessList)
+                            foreach (var d in upd.AccessList)
                             {
                                 entries[d.ID] = d;
                             }

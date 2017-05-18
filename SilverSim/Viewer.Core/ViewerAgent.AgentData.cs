@@ -25,6 +25,7 @@ using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Viewer.Messages.Agent;
 
 namespace SilverSim.Viewer.Core
 {
@@ -32,8 +33,8 @@ namespace SilverSim.Viewer.Core
     {
         void SendAgentDataUpdate(AgentCircuit circuit)
         {
-            Messages.Agent.AgentDataUpdate adu = new Messages.Agent.AgentDataUpdate();
-            GroupsServiceInterface groupsService = circuit.Scene.GroupsService;
+            var adu = new AgentDataUpdate();
+            var groupsService = circuit.Scene.GroupsService;
             if (null != groupsService)
             {
                 try
@@ -73,7 +74,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentDataUpdateRequest(Message m)
         {
-            Messages.Agent.AgentDataUpdateRequest adur = (Messages.Agent.AgentDataUpdateRequest)m;
+            var adur = (AgentDataUpdateRequest)m;
             if (adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)
             {
                 AgentCircuit circuit;

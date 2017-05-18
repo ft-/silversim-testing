@@ -82,9 +82,9 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            UUID regionID = reqmap["to_region_id"].AsUUID;
-            UUID fromRegionID = reqmap["from_region_id"].AsUUID;
-            UUID scopeID = reqmap["scope_id"].AsUUID;
+            var regionID = reqmap["to_region_id"].AsUUID;
+            var fromRegionID = reqmap["from_region_id"].AsUUID;
+            var scopeID = reqmap["scope_id"].AsUUID;
 
             SceneInterface scene;
             try
@@ -97,7 +97,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            GridServiceInterface gridService = scene.GridService;
+            var gridService = scene.GridService;
             if(null == gridService)
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
@@ -115,18 +115,20 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            UUID sessionID = UUID.Random;
+            var sessionID = UUID.Random;
             uint circuitCode = NewCircuitCode;
             Vector3 remoteOffset = regionInfo.Location - scene.GridPosition;
-            UDPCircuitsManager udpServer = (UDPCircuitsManager)scene.UDPServer;
-            SimCircuit circuit = new SimCircuit(udpServer, circuitCode, fromRegionID, sessionID, regionInfo.Location, remoteOffset);
+            var udpServer = (UDPCircuitsManager)scene.UDPServer;
+            var circuit = new SimCircuit(udpServer, circuitCode, fromRegionID, sessionID, regionInfo.Location, remoteOffset);
             udpServer.AddCircuit(circuit);
-            Map resmap = new Map();
-            resmap.Add("circuit_code", circuitCode);
-            resmap.Add("session_id", sessionID);
-            using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
+            var resmap = new Map
             {
-                using (Stream o = res.GetOutputStream())
+                { "circuit_code", circuitCode },
+                { "session_id", sessionID }
+            };
+            using (var res = req.BeginResponse("application/llsd+xml"))
+            {
+                using (var o = res.GetOutputStream())
                 {
                     LlsdXml.Serialize(resmap, o);
                 }
