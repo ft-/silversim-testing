@@ -55,7 +55,7 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                List<UUID> reflist = new List<UUID>();
+                var reflist = new List<UUID>();
                 foreach(UUID id in DefaultTexture.References)
                 {
                     if(!reflist.Contains(id))
@@ -64,11 +64,11 @@ namespace SilverSim.Types.Primitive
                     }
                 }
 
-                foreach (TextureEntryFace face in m_FaceTextures)
+                foreach (var face in m_FaceTextures)
                 {
                     if (face != null)
                     {
-                        foreach (UUID id in face.References)
+                        foreach (var id in face.References)
                         {
                             if (!reflist.Contains(id))
                             {
@@ -128,7 +128,7 @@ namespace SilverSim.Types.Primitive
         {
             if(!BitConverter.IsLittleEndian)
             {
-                byte[] newBytes = new byte[4];
+                var newBytes = new byte[4];
                 Buffer.BlockCopy(bytes, pos, newBytes, 0, 4);
                 Array.Reverse(newBytes);
                 bytes = newBytes;
@@ -141,26 +141,20 @@ namespace SilverSim.Types.Primitive
         {
             if (!BitConverter.IsLittleEndian)
             {
-                byte[] newBytes = new byte[2];
+                var newBytes = new byte[2];
                 Buffer.BlockCopy(bytes, pos, newBytes, 0, 2);
                 Array.Reverse(newBytes);
                 bytes = newBytes;
                 pos = 0;
             }
-            float offset = (float)BitConverter.ToInt16(bytes, pos);
+            short offset = BitConverter.ToInt16(bytes, pos);
             return offset / 32767.0f;
         }
 
-        private static float TERotationFloat(byte[] bytes, int pos)
-        {
-            const float TWO_PI = 6.283185307179586476925286766559f;
-            return ((float)(bytes[pos] | (bytes[pos + 1] << 8)) / 32768.0f) * TWO_PI;
-        }
+        const float TwoPi = (float)Math.PI * 2;
+        private static float TERotationFloat(byte[] bytes, int pos) => (bytes[pos] | (bytes[pos + 1] << 8)) / 32768.0f * TwoPi;
 
-        private static float TEGlowFloat(byte[] bytes, int pos)
-        {
-            return (float)bytes[pos] / 255.0f;
-        }
+        private static float TEGlowFloat(byte[] bytes, int pos) => bytes[pos] / 255.0f;
 
         private void FromBytes(byte[] data, int pos, int length)
         {
@@ -184,7 +178,7 @@ namespace SilverSim.Types.Primitive
 
             while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
             {
-                UUID tmpUUID = new UUID(data, i);
+                var tmpUUID = new UUID(data, i);
                 i += 16;
 
                 for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
@@ -203,7 +197,7 @@ namespace SilverSim.Types.Primitive
 
             while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
             {
-                ColorAlpha tmpColor = new ColorAlpha(data, i);
+                var tmpColor = new ColorAlpha(data, i);
                 i += 4;
 
                 for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
@@ -376,7 +370,7 @@ namespace SilverSim.Types.Primitive
 
                 while (i - pos + 16 <= length && ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
                 {
-                    UUID tmpUUID = new UUID(data, i);
+                    var tmpUUID = new UUID(data, i);
                     i += 16;
 
                     for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
@@ -392,10 +386,7 @@ namespace SilverSim.Types.Primitive
         }
 
 
-        private static byte TEGlowByte(float glow)
-        {
-            return (byte)(glow * 255.0f);
-        }
+        private static byte TEGlowByte(float glow) => (byte)(glow * 255.0f);
 
         private static short TEOffsetShort(float offset)
         {
@@ -404,16 +395,9 @@ namespace SilverSim.Types.Primitive
             return (short)Math.Round(offset);
         }
 
-        private static short TERotationShort(float rotation)
-        {
-            const float TWO_PI = 6.283185307179586476925286766559f;
-            return (short)Math.Round(((Math.IEEERemainder(rotation, TWO_PI) / TWO_PI) * 32768.0f) + 0.5f);
-        }
+        private static short TERotationShort(float rotation) => (short)Math.Round(((Math.IEEERemainder(rotation, TwoPi) / TwoPi) * 32768.0f) + 0.5f);
 
-        public static implicit operator byte[](TextureEntry e)
-        {
-            return e.GetBytes();
-        }
+        public static implicit operator byte[] (TextureEntry e) => e.GetBytes();
 
         [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidComplexMethodsRule")]
         public byte[] GetBytes()
@@ -423,33 +407,33 @@ namespace SilverSim.Types.Primitive
                 return new byte[0];
             }
 
-            using (MemoryStream memStream = new MemoryStream())
+            using (var memStream = new MemoryStream())
             {
-                using (BinaryWriter binWriter = new BinaryWriter(memStream))
+                using (var binWriter = new BinaryWriter(memStream))
                 {
                     #region Bitfield Setup
 
-                    uint[] textures = new uint[m_FaceTextures.Length];
+                    var textures = new uint[m_FaceTextures.Length];
                     InitializeArray(ref textures);
-                    uint[] texturecolors = new uint[m_FaceTextures.Length];
+                    var texturecolors = new uint[m_FaceTextures.Length];
                     InitializeArray(ref texturecolors);
-                    uint[] repeatus = new uint[m_FaceTextures.Length];
+                    var repeatus = new uint[m_FaceTextures.Length];
                     InitializeArray(ref repeatus);
-                    uint[] repeatvs = new uint[m_FaceTextures.Length];
+                    var repeatvs = new uint[m_FaceTextures.Length];
                     InitializeArray(ref repeatvs);
-                    uint[] offsetus = new uint[m_FaceTextures.Length];
+                    var offsetus = new uint[m_FaceTextures.Length];
                     InitializeArray(ref offsetus);
-                    uint[] offsetvs = new uint[m_FaceTextures.Length];
+                    var offsetvs = new uint[m_FaceTextures.Length];
                     InitializeArray(ref offsetvs);
-                    uint[] rotations = new uint[m_FaceTextures.Length];
+                    var rotations = new uint[m_FaceTextures.Length];
                     InitializeArray(ref rotations);
-                    uint[] materials = new uint[m_FaceTextures.Length];
+                    var materials = new uint[m_FaceTextures.Length];
                     InitializeArray(ref materials);
-                    uint[] medias = new uint[m_FaceTextures.Length];
+                    var medias = new uint[m_FaceTextures.Length];
                     InitializeArray(ref medias);
-                    uint[] glows = new uint[m_FaceTextures.Length];
+                    var glows = new uint[m_FaceTextures.Length];
                     InitializeArray(ref glows);
-                    uint[] materialIDs = new uint[m_FaceTextures.Length];
+                    var materialIDs = new uint[m_FaceTextures.Length];
                     InitializeArray(ref materialIDs);
 
                     for (int i = 0; i < m_FaceTextures.Length; i++)
@@ -729,7 +713,7 @@ namespace SilverSim.Types.Primitive
                 pos++;
             } while ((b & 0x80) != 0);
 
-            return (faceBits != 0);
+            return faceBits != 0;
         }
 
         private byte[] GetFaceBitfieldBytes(uint bitfield)
@@ -748,7 +732,7 @@ namespace SilverSim.Types.Primitive
                 return new byte[1] { 0 };
             }
 
-            byte[] bytes = new byte[byteLength];
+            var bytes = new byte[byteLength];
             for (int i = 0; i < byteLength; i++)
             {
                 bytes[i] = (byte)((bitfield >> (7 * (byteLength - i - 1))) & 0x7F);

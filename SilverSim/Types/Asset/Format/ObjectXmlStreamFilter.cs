@@ -40,7 +40,7 @@ namespace SilverSim.Types.Asset.Format
 
         public override bool CanRead
         {
-            get 
+            get
             {
                 return true;
             }
@@ -48,16 +48,15 @@ namespace SilverSim.Types.Asset.Format
 
         public override bool CanSeek
         {
-            get 
+            get
             {
                 return false;
-
             }
         }
 
         public override bool CanWrite
         {
-            get 
+            get
             {
                 return false;
             }
@@ -70,9 +69,9 @@ namespace SilverSim.Types.Asset.Format
 
         public override long Length
         {
-            get 
-            { 
-                throw new NotSupportedException(); 
+            get
+            {
+                throw new NotSupportedException();
             }
         }
 
@@ -130,7 +129,7 @@ namespace SilverSim.Types.Asset.Format
                             break;
                         }
                     }
-                    string test = m_Buffer.FromUTF8Bytes(0, tagend + 1);
+                    var test = m_Buffer.FromUTF8Bytes(0, tagend + 1);
                     if(test.StartsWith("<SceneObjectPart"))
                     {
                         if(test.Contains("xmlns:xmlns:"))
@@ -151,13 +150,13 @@ namespace SilverSim.Types.Asset.Format
                                     /* no equal sign is weird */
                                     break;
                                 }
-                                string repl = test.Substring(pos, cpos - pos);
-                                string replnew = repl.Substring(repl.LastIndexOf("xmlns:"));
+                                var repl = test.Substring(pos, cpos - pos);
+                                var replnew = repl.Substring(repl.LastIndexOf("xmlns:"));
                                 test = test.Replace(repl, replnew);
                             }
-                            byte[] newbuf = new byte[m_BufFill - tagend - 1];
+                            var newbuf = new byte[m_BufFill - tagend - 1];
                             Buffer.BlockCopy(m_Buffer, tagend + 1, newbuf, 0, m_BufFill - tagend - 1);
-                            byte[] newstr = test.ToUTF8Bytes();
+                            var newstr = test.ToUTF8Bytes();
                             Buffer.BlockCopy(newstr, 0, m_Buffer, 0, newstr.Length);
                             Buffer.BlockCopy(newbuf, 0, m_Buffer, newstr.Length, newbuf.Length);
                             m_BufFill = newstr.Length + newbuf.Length;
@@ -170,9 +169,9 @@ namespace SilverSim.Types.Asset.Format
                          * but falsely declared some as UTF-16 
                          */
                         test = "<?xml version=\"1.0\"?>";
-                        byte[] newbuf = new byte[m_BufFill - tagend - 1];
+                        var newbuf = new byte[m_BufFill - tagend - 1];
                         Buffer.BlockCopy(m_Buffer, tagend + 1, newbuf, 0, m_BufFill - tagend - 1);
-                        byte[] newstr = test.ToUTF8Bytes();
+                        var newstr = test.ToUTF8Bytes();
                         Buffer.BlockCopy(newstr, 0, m_Buffer, 0, newstr.Length);
                         Buffer.BlockCopy(newbuf, 0, m_Buffer, newstr.Length, newbuf.Length);
                         m_BufFill = newstr.Length + newbuf.Length;

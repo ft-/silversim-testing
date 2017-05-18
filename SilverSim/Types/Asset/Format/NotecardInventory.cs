@@ -26,13 +26,6 @@ namespace SilverSim.Types.Asset.Format
 {
     public class NotecardInventory : RwLockedDictionary<UUID, NotecardInventoryItem>
     {
-        #region Constructor
-        public NotecardInventory()
-        {
-
-        }
-        #endregion
-
         #region ExtCharIndex Access
         public NotecardInventoryItem this[uint extCharIndex]
         {
@@ -40,9 +33,9 @@ namespace SilverSim.Types.Asset.Format
             {
                 try
                 {
-                    ForEach(delegate(NotecardInventoryItem item)
+                    ForEach((NotecardInventoryItem item) =>
                     {
-                        if(item.ExtCharIndex == extCharIndex)
+                        if (item.ExtCharIndex == extCharIndex)
                         {
                             throw new ReturnValueException<NotecardInventoryItem>(item);
                         }

@@ -68,14 +68,13 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
         public PhysicsConvexShape GetConvexPhysics()
         {
-            Map lodMap;
             IValue iv;
             if (!m_MeshData.TryGetValue("physics_convex", out iv))
             {
                 throw new NoSuchMeshDataException();
             }
 
-            lodMap = iv as Map;
+            var lodMap = iv as Map;
             if (null == lodMap)
             {
                 throw new NoSuchMeshDataException();
@@ -112,7 +111,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                     return m_MeshData.ContainsKey("high_lod");
 
                 default:
-                    throw new ArgumentOutOfRangeException("level");
+                    throw new ArgumentOutOfRangeException(nameof(level));
             }
         }
 
@@ -142,17 +141,16 @@ namespace SilverSim.Types.Asset.Format.Mesh
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException("level");
+                    throw new ArgumentOutOfRangeException(nameof(level));
             }
 
-            Map lodMap;
             IValue iv;
             if(!m_MeshData.TryGetValue(lodName, out iv))
             {
                 throw new NoSuchMeshDataException();
             }
 
-            lodMap = iv as Map;
+            var lodMap = iv as Map;
             if(null == lodMap)
             {
                 throw new NoSuchMeshDataException();

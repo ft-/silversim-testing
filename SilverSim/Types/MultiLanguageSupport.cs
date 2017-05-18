@@ -38,13 +38,13 @@ namespace SilverSim.Types
             this object o,
             CultureInfo selectedCulture)
         {
-            Type type = o.GetType();
-            System.Reflection.Assembly a = type.Assembly;
-            string assemblyName = a.GetName().Name;
+            var type = o.GetType();
+            var assembly = type.Assembly;
+            var assemblyName = assembly.GetName().Name;
             ResourceSet res = null;
-            CultureInfo culture = selectedCulture ?? EnUsCulture; 
-            string cultureName = culture.Name;
-            string cultureGroup = cultureName.Split('-')[0];
+            var culture = selectedCulture ?? EnUsCulture; 
+            var cultureName = culture.Name;
+            var cultureGroup = cultureName.Split('-')[0];
 
             if(!m_LoadedAssemblyResources.TryGetValue(cultureName + ":" + assemblyName, out res) &&
                 !m_LoadedAssemblyResources.TryGetValue(cultureGroup + ":" + assemblyName, out res))
@@ -53,10 +53,10 @@ namespace SilverSim.Types
                 {
                     if (!m_LoadedAssemblyResources.TryGetValue(cultureName + ":" + assemblyName, out res))
                     {
-                        string fName = Path.Combine(InstallBinPath, "languages/" + cultureName + "/" + assemblyName + "." + cultureName + ".resources");
+                        var fName = Path.Combine(InstallBinPath, "languages/" + cultureName + "/" + assemblyName + "." + cultureName + ".resources");
                         if (File.Exists(fName))
                         {
-                            using (ResourceReader reader = new ResourceReader(fName))
+                            using (var reader = new ResourceReader(fName))
                             {
                                 res = new ResourceSet(reader);
                                 m_LoadedAssemblyResources.Add(cultureName + ":" + assemblyName, res);
@@ -66,10 +66,10 @@ namespace SilverSim.Types
                     else if (cultureGroup != cultureName &&
                         !m_LoadedAssemblyResources.TryGetValue(cultureGroup + ":" + assemblyName, out res))
                     {
-                        string fName = Path.Combine(InstallBinPath, "languages/" + cultureGroup + "/" + assemblyName + "." + cultureGroup +  ".resources");
+                        var fName = Path.Combine(InstallBinPath, "languages/" + cultureGroup + "/" + assemblyName + "." + cultureGroup +  ".resources");
                         if (File.Exists(fName))
                         {
-                            using (ResourceReader reader = new ResourceReader(fName))
+                            using (var reader = new ResourceReader(fName))
                             {
                                 res = new ResourceSet(reader);
                                 m_LoadedAssemblyResources.Add(cultureGroup + ":" + assemblyName, res);
@@ -88,15 +88,15 @@ namespace SilverSim.Types
             string name,
             string defvalue)
         {
-            CultureInfo culture = selectedCulture ?? EnUsCulture;
-            ResourceSet res = o.GetLanguageResourceSet(culture);
+            var culture = selectedCulture ?? EnUsCulture;
+            var res = o.GetLanguageResourceSet(culture);
             if(res == null)
             {
                 return defvalue;
             }
             try
             {
-                string str = res.GetString(name);
+                var str = res.GetString(name);
                 if(string.IsNullOrEmpty(str))
                 {
                     str = defvalue;

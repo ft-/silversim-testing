@@ -62,18 +62,6 @@ namespace SilverSim.Types.Asset.Format
                 return string.Format("{0}\n{1}\n{2}\n{3}\n",
                     (int)Type, Name, AssetID, AnimationStart ? "1" : "0");
             }
-
-            public StepAnimation()
-            {
-
-            }
-
-            public StepAnimation(string name, UUID assetID, bool animStart)
-            {
-                Name = name;
-                AssetID = assetID;
-                AnimationStart = animStart;
-            }
         }
 
         public class StepSound : IStep
@@ -94,17 +82,6 @@ namespace SilverSim.Types.Asset.Format
                 return string.Format("{0}\n{1}\n{2}\n",
                     (int)Type, Name, AssetID);
             }
-
-            public StepSound()
-            {
-
-            }
-
-            public StepSound(string name, UUID assetID)
-            {
-                Name = name;
-                AssetID = assetID;
-            }
         }
 
         public class StepChat : IStep
@@ -123,16 +100,6 @@ namespace SilverSim.Types.Asset.Format
             {
                 return string.Format("{0}\n{1}\n0\n",
                     (int)Type, Text);
-            }
-
-            public StepChat()
-            {
-
-            }
-
-            public StepChat(string text)
-            {
-                Text = text;
             }
         }
 
@@ -165,18 +132,6 @@ namespace SilverSim.Types.Asset.Format
                 return string.Format(CultureInfo.InvariantCulture, "{0}\n{1:0.000000}\n{2}\n",
                     (int)Type, WaitTime, waitFlags);
             }
-
-            public StepWait()
-            {
-
-            }
-
-            public StepWait(float waitTime, bool waitForAnim, bool waitForTime)
-            {
-                WaitTime = waitTime;
-                WaitForAnimation = waitForAnim;
-                WaitForTime = waitForTime;
-            }
         }
 
         public class StepEndOfGesture : IStep
@@ -192,11 +147,6 @@ namespace SilverSim.Types.Asset.Format
             public string Serialize()
             {
                 return ((int)Type).ToString();
-            }
-
-            public StepEndOfGesture()
-            {
-
             }
         }
 
@@ -220,8 +170,8 @@ namespace SilverSim.Types.Asset.Format
         {
             string input = asset.Data.FromUTF8Bytes();
             input = input.Replace('\t', ' ');
-            List<string> lines = new List<string>(input.Split('\n'));
-            using (List<string>.Enumerator e = lines.GetEnumerator())
+            var lines = new List<string>(input.Split('\n'));
+            using (var e = lines.GetEnumerator())
             {
                 if (!e.MoveNext())
                 {
@@ -297,9 +247,7 @@ namespace SilverSim.Types.Asset.Format
                     {
                         throw new NotAGestureFormatException();
                     }
-                    StepType type = (StepType)intval;
-
-                    switch (type)
+                    switch ((StepType)intval)
                     {
                         case StepType.EndOfGesture:
                             Sequence.Add(new StepEndOfGesture());
@@ -307,7 +255,7 @@ namespace SilverSim.Types.Asset.Format
 
                         case StepType.Animation:
                             {
-                                StepAnimation step = new StepAnimation();
+                                var step = new StepAnimation();
                                 if (e.MoveNext())
                                 {
                                     step.Name = e.Current;
@@ -329,7 +277,7 @@ namespace SilverSim.Types.Asset.Format
 
                         case StepType.Sound:
                             {
-                                StepSound step = new StepSound();
+                                var step = new StepSound();
                                 if (e.MoveNext())
                                 {
                                     step.Name = e.Current;
@@ -345,7 +293,7 @@ namespace SilverSim.Types.Asset.Format
 
                         case StepType.Chat:
                             {
-                                StepChat step = new StepChat();
+                                var step = new StepChat();
                                 if (e.MoveNext())
                                 {
                                     step.Text = e.Current;
@@ -357,7 +305,7 @@ namespace SilverSim.Types.Asset.Format
 
                         case StepType.Wait:
                             {
-                                StepWait step = new StepWait();
+                                var step = new StepWait();
                                 if (e.MoveNext() &&
                                     !float.TryParse(e.Current, NumberStyles.Float, CultureInfo.InvariantCulture, out step.WaitTime))
                                 {
@@ -390,7 +338,7 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                List<UUID> refs = new List<UUID>();
+                var refs = new List<UUID>();
                 foreach(IStep step in Sequence)
                 {
                     StepSound stepsound;
@@ -424,13 +372,13 @@ namespace SilverSim.Types.Asset.Format
 
         public AssetData Asset()
         {
-            return (AssetData)this;
+            return this;
         }
 
         public static implicit operator AssetData(Gesture v)
         {
-            AssetData asset = new AssetData();
-            StringBuilder sb = new StringBuilder();
+            var asset = new AssetData();
+            var sb = new StringBuilder();
             sb.Append("2\n");
             sb.Append(v.TriggerKey.ToString() + "\n");
             sb.Append(v.TriggerKeyMask.ToString() + "\n");

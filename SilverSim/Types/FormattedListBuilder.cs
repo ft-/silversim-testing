@@ -40,10 +40,7 @@ namespace SilverSim.Types
             Fields = new Dictionary<string, int>(fields);
         }
 
-        public override string ToString()
-        {
-            return m_StringBuilder.ToString();
-        }
+        public override string ToString() => m_StringBuilder.ToString();
 
         public FormattedListBuilder AddColumn(string column, int columnSize)
         {
@@ -67,7 +64,7 @@ namespace SilverSim.Types
 
         public FormattedListBuilder AddHeader()
         {
-            foreach (KeyValuePair<string, int> kvp in Fields)
+            foreach (var kvp in Fields)
             {
                 int fieldSize = kvp.Value;
                 m_StringBuilder.Append(kvp.Key.TrimToMaxLength(fieldSize - 1).PadRight(fieldSize));
@@ -97,7 +94,7 @@ namespace SilverSim.Types
             int fieldIndex = 0;
             foreach(int fieldSize in Fields.Values)
             {
-                string fieldValue = (fieldIndex < para.Length) ? para[fieldIndex++].ToString() : string.Empty;
+                var fieldValue = (fieldIndex < para.Length) ? para[fieldIndex++].ToString() : string.Empty;
                 fieldValue = fieldValue.TrimToMaxLength(Math.Abs(fieldSize));
                 fieldValue = (fieldSize < 0) ? fieldValue.PadLeft(fieldSize) : fieldValue.PadRight(fieldSize);
                 m_StringBuilder.Append(fieldValue);
@@ -107,9 +104,9 @@ namespace SilverSim.Types
 
         public void AddData(IDictionary<string, object> values)
         {
-            foreach (KeyValuePair<string, int> kvp in Fields)
+            foreach (var kvp in Fields)
             {
-                string fieldValue = string.Empty;
+                var fieldValue = string.Empty;
                 int fieldSize = kvp.Value;
                 object fieldObj;
                 if (values.TryGetValue(kvp.Key, out fieldObj))

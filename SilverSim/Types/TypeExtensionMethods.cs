@@ -36,20 +36,11 @@ namespace SilverSim.Types
             return a < 0 ? -1 : 1;
         }
 
-        public static double Mix(this double a, double b, double m)
-        {
-            return a * (1 - m) + b * m;
-        }
+        public static double Mix(this double a, double b, double m) => a * (1 - m) + b * m;
 
-        public static double Lerp(this double a, double b, double u)
-        {
-            return a + ((b - a) * u);
-        }
+        public static double Lerp(this double a, double b, double u) => a + ((b - a) * u);
 
-        public static Vector3 ClampElements(this Vector3 val, double min, double max)
-        {
-            return new Vector3(val.X.Clamp(min, max), val.Y.Clamp(min, max), val.Z.Clamp(min, max));
-        }
+        public static Vector3 ClampElements(this Vector3 val, double min, double max) => new Vector3(val.X.Clamp(min, max), val.Y.Clamp(min, max), val.Z.Clamp(min, max));
 
         public static double Clamp(this double val, double min, double max)
         {
@@ -67,10 +58,7 @@ namespace SilverSim.Types
             }
         }
 
-        public static bool IsFinite(this double value)
-        {
-            return !(Double.IsNaN(value) || Double.IsInfinity(value));
-        }
+        public static bool IsFinite(this double value) => !(double.IsNaN(value) || double.IsInfinity(value));
 
         public static int Clamp(this int val, int min, int max)
         {
@@ -121,15 +109,9 @@ namespace SilverSim.Types
 
         static readonly UTF8Encoding m_UTF8NoBOM = new UTF8Encoding(false);
 
-        public static byte[] ToUTF8Bytes(this string s)
-        {
-            return m_UTF8NoBOM.GetBytes(s);
-        }
+        public static byte[] ToUTF8Bytes(this string s) => m_UTF8NoBOM.GetBytes(s);
 
-        public static int ToUTF8ByteCount(this string s)
-        {
-            return m_UTF8NoBOM.GetByteCount(s);
-        }
+        public static int ToUTF8ByteCount(this string s) => m_UTF8NoBOM.GetByteCount(s);
 
         public static string FromUTF8Bytes(this byte[] data)
         {
@@ -145,57 +127,36 @@ namespace SilverSim.Types
             return (pos >= 0) ? s.Substring(0, pos) : s;
         }
 
-        public static XmlTextWriter UTF8XmlTextWriter(this Stream s)
-        {
-            return new XmlTextWriter(s, m_UTF8NoBOM);
-        }
+        public static XmlTextWriter UTF8XmlTextWriter(this Stream s) => new XmlTextWriter(s, m_UTF8NoBOM);
 
-        public static StreamReader UTF8StreamReader(this Stream s)
-        {
-            return new StreamReader(s, m_UTF8NoBOM);
-        }
+        public static StreamReader UTF8StreamReader(this Stream s) => new StreamReader(s, m_UTF8NoBOM);
 
-        public static StreamWriter UTF8StreamWriter(this Stream s)
-        {
-            return new StreamWriter(s, m_UTF8NoBOM);
-        }
+        public static StreamWriter UTF8StreamWriter(this Stream s) => new StreamWriter(s, m_UTF8NoBOM);
 
-        public static StreamWriter UTF8StreamWriterLeaveOpen(this Stream s)
-        {
-            return new StreamWriter(s, m_UTF8NoBOM, 16384, true);
-        }
+        public static StreamWriter UTF8StreamWriterLeaveOpen(this Stream s) => new StreamWriter(s, m_UTF8NoBOM, 16384, true);
 
-        public static byte[] FromHexStringToByteArray(this string hex)
-        {
-            return Enumerable.Range(0, hex.Length)
+        public static byte[] FromHexStringToByteArray(this string hex) => Enumerable.Range(0, hex.Length)
                              .Where(x => x % 2 == 0)
                              .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                              .ToArray();
-        }
 
-        public static string ToHexString(this byte[] data)
-        {
-            return BitConverter.ToString(data).Replace("-", string.Empty);
-        }
+        public static string ToHexString(this byte[] data) => BitConverter.ToString(data).Replace("-", string.Empty);
 
         public static string ComputeMD5(this string input)
         {
-            using (MD5 md5 = MD5.Create())
+            using (var md5 = MD5.Create())
             {
                 return md5.ComputeHash(m_UTF8NoBOM.GetBytes(input)).ToHexString().ToLower();
             }
         }
 
-        public static string TrimToMaxLength(this string s, int length)
-        {
-            return length < s.Length ? 
+        public static string TrimToMaxLength(this string s, int length) => length < s.Length ?
                 (
-                    length < 0 ? 
-                    string.Empty : 
+                    length < 0 ?
+                    string.Empty :
                     s.Substring(0, length)
-                ) : 
+                ) :
                 s;
-        }
 
         public static bool EndsWith(this StringBuilder s, string m)
         {
@@ -238,7 +199,7 @@ namespace SilverSim.Types
 
         public static byte[] ReadToStreamEnd(this Stream s)
         {
-            List<byte[]> segments = new List<byte[]>();
+            var segments = new List<byte[]>();
             int dataSize;
             int totalSize = 0;
             byte[] buffer;
@@ -249,7 +210,7 @@ namespace SilverSim.Types
                 totalSize += dataSize;
                 if (dataSize < buffer.Length)
                 {
-                    byte[] actData = new byte[dataSize];
+                    var actData = new byte[dataSize];
                     Buffer.BlockCopy(buffer, 0, actData, 0, dataSize);
                     segments.Add(actData);
                 }
@@ -261,8 +222,8 @@ namespace SilverSim.Types
             } while (dataSize != 0);
 
             int offset = 0;
-            byte[] finalData = new byte[totalSize];
-            foreach(byte[] seg in segments)
+            var finalData = new byte[totalSize];
+            foreach(var seg in segments)
             {
                 Buffer.BlockCopy(seg, 0, finalData, offset, seg.Length);
                 offset += seg.Length;

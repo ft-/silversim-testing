@@ -61,7 +61,7 @@ namespace SilverSim.Types.StructuredData.Json
         private static string ReadString(StreamReader io, char eos)
         {
             char c;
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
             while(eos != (c = (char) io.Read()))
             {
                 if(c == '\\')
@@ -120,7 +120,7 @@ namespace SilverSim.Types.StructuredData.Json
                     return ParseMap(io);
 
                 default:
-                    StringBuilder inputs = new StringBuilder();
+                    var inputs = new StringBuilder();
                     for (; ;)
                     {
                         c = (char) io.Peek();
@@ -171,10 +171,8 @@ namespace SilverSim.Types.StructuredData.Json
 
         private static AnArray ParseArray(StreamReader io)
         {
-            AnArray array = new AnArray();
-            char c;
-
-            c = (char)io.Peek();
+            var array = new AnArray();
+            var c = (char)io.Peek();
             if(']' == c)
             {
                 c = (char)io.Read();
@@ -220,10 +218,8 @@ namespace SilverSim.Types.StructuredData.Json
 
         private static Map ParseMap(StreamReader io)
         {
-            Map map = new Map();
-            char c;
-
-            c = (char)io.Peek();
+            var map = new Map();
+            var c = (char)io.Peek();
             if('}' == c)
             {
                 c = (char)io.Read();
@@ -232,7 +228,7 @@ namespace SilverSim.Types.StructuredData.Json
 
             for (; ;)
             {
-                IValue key = ParseValue(io);
+                var key = ParseValue(io);
                 c = (char)io.Read();
                 if(c != ':')
                 {
@@ -276,9 +272,9 @@ namespace SilverSim.Types.StructuredData.Json
 
         public static IValue Deserialize(Stream io)
         {
-            using(StreamReader sr = new StreamReader(io))
+            using(var sr = new StreamReader(io))
             {
-                char c = (char)sr.Peek();
+                var c = (char)sr.Peek();
                 if(c != '{' && c != '[')
                 {
                     throw new InvalidJsonSerializationException();
@@ -290,7 +286,7 @@ namespace SilverSim.Types.StructuredData.Json
         #region Main JSON Serialization
         public static string SerializeString(string s)
         {
-            StringBuilder o = new StringBuilder();
+            var o = new StringBuilder();
             for(int i = 0; i < s.Length; ++i)
             {
                 switch(s[i])
@@ -322,7 +318,7 @@ namespace SilverSim.Types.StructuredData.Json
         {
             io.Write('{');
             string needcomma = string.Empty;
-            foreach(KeyValuePair<string, IValue> kvp in map)
+            foreach(var kvp in map)
             {
                 io.Write(needcomma);
                 io.Write("\"" + SerializeString(kvp.Key) + "\":");
@@ -335,7 +331,7 @@ namespace SilverSim.Types.StructuredData.Json
         {
             io.Write('[');
             string needcomma = string.Empty;
-            foreach(IValue val in arr)
+            foreach(var val in arr)
             {
                 io.Write(needcomma);
                 SerializeData(io, val);
@@ -346,7 +342,7 @@ namespace SilverSim.Types.StructuredData.Json
 
         private static void SerializeData(TextWriter io, IValue val)
         {
-            Type t = val.GetType();
+            var t = val.GetType();
 
             if(t == typeof(Map))
             {
@@ -358,13 +354,12 @@ namespace SilverSim.Types.StructuredData.Json
             }
             else if(t == typeof(Date))
             {
-                Date date = (Date)val;
-                DateTime dt = date;
+                DateTime dt = (Date)val;
                 io.Write("\"" + dt.ToUniversalTime().ToString() + "\"");
             }
             else if(t == typeof(ABoolean))
             {
-                ABoolean boolean = (ABoolean)val;
+                var boolean = (ABoolean)val;
                 io.Write(boolean ? "true" : "false");
             }
             else if(t == typeof(Real) || t == typeof(Integer))
@@ -388,7 +383,7 @@ namespace SilverSim.Types.StructuredData.Json
 
         public static void Serialize(IValue val, Stream output)
         {
-            using(TextWriter tw = output.UTF8StreamWriterLeaveOpen())
+            using(var tw = output.UTF8StreamWriterLeaveOpen())
             {
                 SerializeData(tw, val);
             }
@@ -396,7 +391,7 @@ namespace SilverSim.Types.StructuredData.Json
 
         public static string Serialize(IValue val)
         {
-            using(MemoryStream m = new MemoryStream())
+            using(var m = new MemoryStream())
             {
                 Serialize(val, m);
                 return Encoding.UTF8.GetString(m.ToArray());

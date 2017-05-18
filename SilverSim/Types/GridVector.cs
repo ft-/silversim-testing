@@ -44,7 +44,7 @@ namespace SilverSim.Types
 
         public GridVector(string v)
         {
-            string[] x = v.Split(new char[] { ',' });
+            var x = v.Split(new char[] { ',' });
             if(x.Length != 2)
             {
                 throw new ArgumentException("v is not a valid GridVector string");
@@ -57,7 +57,7 @@ namespace SilverSim.Types
 
         public GridVector(string v, uint multiplier)
         {
-            string[] x = v.Split(new char[] { ',' });
+            var x = v.Split(new char[] { ',' });
             if (x.Length != 2)
             {
                 throw new ArgumentException("v is not a valid GridVector string");
@@ -78,19 +78,10 @@ namespace SilverSim.Types
         #endregion
 
         #region Operators
-        public static GridVector operator+(GridVector a, GridVector b)
-        {
-            return new GridVector(a.X + b.X, a.Y + b.Y);
-        }
+        public static GridVector operator +(GridVector a, GridVector b) => new GridVector(a.X + b.X, a.Y + b.Y);
 
-        public static Vector3 operator-(GridVector a, GridVector b)
-        {
-            return new Vector3((double)a.X - (double)b.X, (double)a.Y - (double)b.Y, 0f);
-        }
-        public static implicit operator Vector3(GridVector v)
-        {
-            return new Vector3(v.X / 256f, v.Y / 256f, 0f);
-        }
+        public static Vector3 operator -(GridVector a, GridVector b) => new Vector3((double)a.X - (double)b.X, (double)a.Y - (double)b.Y, 0f);
+        public static implicit operator Vector3(GridVector v) => new Vector3(v.X / 256f, v.Y / 256f, 0f);
         #endregion
 
         #region Properties
@@ -118,9 +109,7 @@ namespace SilverSim.Types
         {
             get
             {
-                ulong val = (ulong)X;
-                val <<= 32;
-                return val | (ulong)Y;
+                return (((ulong)X) << 32) | (ulong)Y;
             }
             set
             {
@@ -129,43 +118,22 @@ namespace SilverSim.Types
             }
         }
 
-        public int Length
-        {
-            get
-            {
-                return (int)Math.Sqrt(X * X + Y * Y);
-            }
-        }
+        public int Length => (int)Math.Sqrt(X * X + Y * Y);
 
         public GridVector AlignToZoomlevel(int zoomlevel)
         {
-            uint zoomborder = (uint)(256 << (zoomlevel - 1));
-            GridVector res = new GridVector();
+            var zoomborder = (uint)(256 << (zoomlevel - 1));
+            var res = new GridVector();
             res.X = X - (X % zoomborder);
             res.Y = Y - (Y % zoomborder);
             return res;
         }
 
-        public static GridVector Zero
-        {
-            get
-            {
-                return new GridVector();
-            }
-        }
+        public static GridVector Zero => new GridVector();
 
-        public override string ToString()
-        {
-            return String.Format("{0},{1}", X, Y);
-        }
+        public override string ToString() => String.Format("{0},{1}", X, Y);
 
-        public string GridLocation
-        {
-            get
-            {
-                return string.Format("{0},{1}", GridX, GridY);
-            }
-        }
+        public string GridLocation => string.Format("{0},{1}", GridX, GridY);
 
         public ushort GridX
         {

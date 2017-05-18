@@ -30,10 +30,5 @@ namespace SilverSim.Types.Friends
         public FriendRightFlags UserGivenFlags;
         /** <summary>flags given to friend</summary> */
         public FriendRightFlags FriendGivenFlags;
-
-        public FriendInfo()
-        {
-
-        }
     }
 }

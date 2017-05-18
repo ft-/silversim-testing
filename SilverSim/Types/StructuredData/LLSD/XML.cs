@@ -99,8 +99,8 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         private static IValue DeserializeBinary(XmlTextReader reader)
         {
-            string attrname = string.Empty;
-            string encoding = "base64";
+            var attrname = string.Empty;
+            var encoding = "base64";
             while (reader.ReadAttributeValue())
             {
                 switch (reader.NodeType)
@@ -173,7 +173,7 @@ namespace SilverSim.Types.StructuredData.Llsd
                     {
                         return new AnArray();
                     }
-                    AnArray array = new AnArray();
+                    var array = new AnArray();
                     while(true)
                     {
                         if(!input.Read())
@@ -248,9 +248,9 @@ namespace SilverSim.Types.StructuredData.Llsd
                     {
                         return new Map();
                     }
-                    Map map = new Map();
-                    bool in_entity = false;
-                    string key = string.Empty;
+                    var map = new Map();
+                    var in_entity = false;
+                    var key = string.Empty;
                     while(true)
                     {
                         if(!input.Read())
@@ -377,7 +377,7 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         public static IValue Deserialize(Stream input)
         {
-            using (XmlTextReader r = new XmlTextReader(input))
+            using (var r = new XmlTextReader(input))
             {
                 return Deserialize(r);
             }
@@ -414,15 +414,15 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         private static void SerializeInternal(IValue input, XmlTextWriter output)
         {
-            Type t = input.GetType();
+            var t = input.GetType();
 
             if (t == typeof(Map))
             {
-                Map i_m = (Map)input;
+                var i_m = (Map)input;
 
                 output.WriteStartElement("map");
 
-                foreach (KeyValuePair<string, IValue> kvp in i_m)
+                foreach (var kvp in i_m)
                 {
                     output.WriteStartElement("key");
                     output.WriteString(kvp.Key);
@@ -434,10 +434,10 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
             else if (t == typeof(AnArray))
             {
-                AnArray i_a = (AnArray)input;
+                var i_a = (AnArray)input;
                 output.WriteStartElement("array");
 
-                foreach (IValue v in i_a)
+                foreach (var v in i_a)
                 {
                     SerializeInternal(v, output);
                 }
@@ -446,7 +446,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
             else if (t == typeof(ABoolean))
             {
-                ABoolean i_bool = (ABoolean)input;
+                var i_bool = (ABoolean)input;
                 output.WriteStartElement("boolean");
                 if (i_bool)
                 {
@@ -460,7 +460,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
             else if (t == typeof(Date))
             {
-                Date i_d = (Date)input;
+                var i_d = (Date)input;
                 output.WriteStartElement("date");
                 output.WriteValue(i_d.ToString());
                 output.WriteEndElement();
@@ -473,7 +473,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
             else if (t == typeof(Quaternion))
             {
-                Quaternion i = (Quaternion)input;
+                var i = (Quaternion)input;
                 output.WriteStartElement("array");
                 output.WriteStartElement("real");
                 output.WriteValue(i.X);
@@ -520,7 +520,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
             else if (t == typeof(Vector3))
             {
-                Vector3 i = (Vector3)input;
+                var i = (Vector3)input;
                 output.WriteStartElement("array");
                 output.WriteStartElement("real");
                 output.WriteValue(i.X);
@@ -535,8 +535,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
             else if(t == typeof(BinaryData))
             {
-                BinaryData i_bin = (BinaryData)input;
-                byte[] data = i_bin;
+                byte[] data = (BinaryData)input;
                 output.WriteStartElement("binary");
                 if (data.Length != 0)
                 {
@@ -553,7 +552,7 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         public static void Serialize(IValue value, Stream output)
         {
-            using (XmlTextWriter text = output.UTF8XmlTextWriter())
+            using (var text = output.UTF8XmlTextWriter())
             {
                 Serialize(value, text);
             }

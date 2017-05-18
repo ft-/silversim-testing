@@ -28,21 +28,9 @@ namespace SilverSim.Types
         readonly Uri m_Value;
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.URI;
-            }
-        }
+        public ValueType Type => ValueType.URI;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.String;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.String;
         #endregion
 
         #region Constructors
@@ -57,26 +45,14 @@ namespace SilverSim.Types
         }
         #endregion
 
-        public override string ToString()
-        {
-            return m_Value.ToString();
-       }
+        public override string ToString() => m_Value.ToString();
 
-        public bool Equals(URI v)
-        {
-            return m_Value.Equals(v.m_Value);
-        }
+        public bool Equals(URI v) => m_Value.Equals(v.m_Value);
 
-        public bool Equals(string v)
-        {
-            return ToString() == v;
-        }
+        public bool Equals(string v) => ToString() == v;
 
         #region Operators
-        public static implicit operator string(URI v)
-        {
-            return v.ToString();
-        }
+        public static implicit operator string(URI v) => v.ToString();
 
         public static explicit operator Uri(URI v)
         {
@@ -97,10 +73,7 @@ namespace SilverSim.Types
             return m_Value == u.m_Value;
         }
 
-        public override int GetHashCode()
-        {
-            return m_Value.GetHashCode();
-        }
+        public override int GetHashCode() => m_Value.GetHashCode();
 
         public static bool operator ==(URI l, URI r)
         {
@@ -137,18 +110,17 @@ namespace SilverSim.Types
         #endregion Operators
 
         #region LSL Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(true); } }
-        public Integer AsInteger { get { return new Integer(1); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(0, 0, 0, 1); } }
+        public ABoolean AsBoolean => new ABoolean(true);
+        public Integer AsInteger => new Integer(1);
+        public Quaternion AsQuaternion => new Quaternion(0, 0, 0, 1);
         public Real AsReal { get { return new Real(1); } }
-        public AString AsString { get { return new AString(ToString()); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(1); } }
-        public uint AsUInt { get { return 1; } }
-        public int AsInt { get { return 1; } }
-        public ulong AsULong { get { return 1; } }
-        public long AsLong { get { return 1; } }
+        public AString AsString => new AString(ToString());
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3(1);
+        public uint AsUInt => 1;
+        public int AsInt => 1;
+        public ulong AsULong => 1;
+        public long AsLong => 1;
         #endregion
-
     }
 }

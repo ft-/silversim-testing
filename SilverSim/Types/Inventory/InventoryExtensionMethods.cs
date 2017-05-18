@@ -27,7 +27,7 @@ namespace SilverSim.Types.Inventory
     {
         public static string FilterToAscii7Printable(this string s)
         {
-            StringBuilder o = new StringBuilder();
+            var o = new StringBuilder();
             foreach(char c in s)
             {
                 o.Append((c >= 32 && c <= 126) ? c.ToString() : "??");
@@ -37,7 +37,7 @@ namespace SilverSim.Types.Inventory
 
         public static string FilterToNonControlChars(this string s)
         {
-            StringBuilder o = new StringBuilder();
+            var o = new StringBuilder();
             foreach (char c in s)
             {
                 o.Append((c >= 32) ? c.ToString() : " ");

@@ -32,10 +32,7 @@ namespace SilverSim.Types
         public Uri HomeURI;
         public bool IsAuthoritative; /* false means Group Data has been validated through any available resolving service */
 
-        public static explicit operator string(UGI v)
-        {
-            return string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.GroupName);
-        }
+        public static explicit operator string(UGI v) => string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.GroupName);
 
         public string GroupData
         {
@@ -106,8 +103,8 @@ namespace SilverSim.Types
 
         public override bool Equals(object obj)
         {
-            UGI u = obj as UGI;
-            return (u != null) && this.Equals(u);
+            var u = obj as UGI;
+            return (u != null) && Equals(u);
         }
 
         public bool Equals(UGI ugi)
@@ -124,7 +121,7 @@ namespace SilverSim.Types
 
         public override int GetHashCode()
         {
-            Uri h = HomeURI;
+            var h = HomeURI;
             return (h != null) ?
                 ID.GetHashCode() ^ GroupName.GetHashCode() ^ h.GetHashCode() :
                 ID.GetHashCode() ^ GroupName.GetHashCode();
@@ -140,7 +137,7 @@ namespace SilverSim.Types
 
         public UGI(string uuiString)
         {
-            string[] parts = uuiString.Split(Semicolon, 3);
+            var parts = uuiString.Split(Semicolon, 3);
             if (parts.Length < 2)
             {
                 ID = new UUID(parts[0]);
@@ -154,22 +151,13 @@ namespace SilverSim.Types
             HomeURI = new Uri(parts[1]);
         }
 
-        public override string ToString()
-        {
-            return (HomeURI != null) ?
+        public override string ToString() => (HomeURI != null) ?
                 String.Format("{0};{1};{2}", ID.ToString(), HomeURI, GroupName) :
                 ID.ToString();
-        }
 
         private static readonly char[] Semicolon = new char[1] { ';' };
 
-        public static UGI Unknown
-        {
-            get
-            {
-                return new UGI();
-            }
-        }
+        public static UGI Unknown => new UGI();
 
         public static bool operator ==(UGI l, UGI r)
         {

@@ -31,10 +31,5 @@ namespace SilverSim.Types.Agent
         public bool IsChild;
         public Dictionary<UInt64, string> ChildrenCapSeeds = new Dictionary<UInt64, string>();
         public string MapServerURL = string.Empty;
-
-        public CircuitInfo()
-        {
-
-        }
     }
 }

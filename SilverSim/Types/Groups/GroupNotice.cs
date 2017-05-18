@@ -35,10 +35,5 @@ namespace SilverSim.Types.Groups
         public string AttachmentName = string.Empty;
         public UUID AttachmentItemID = UUID.Zero;
         public UUI AttachmentOwner = UUI.Unknown;
-
-        public GroupNotice()
-        {
-
-        }
     }
 }

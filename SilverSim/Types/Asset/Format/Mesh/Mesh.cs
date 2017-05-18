@@ -63,7 +63,6 @@ namespace SilverSim.Types.Asset.Format.Mesh
     {
         public MeshLOD()
         {
-
         }
 
         public List<Vector3> Vertices = new List<Vector3>();
@@ -79,7 +78,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
         static Vector3 U16LEBytesToVertex(byte[] data, int offset, Vector3 posMin, Vector3 posMax)
         {
             int offs = offset;
-            byte[] buf = data;
+            var buf = data;
             if(!BitConverter.IsLittleEndian)
             {
                 buf = new byte[6];
@@ -90,19 +89,19 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 offs = 0;
             }
 
-            ushort vx = BitConverter.ToUInt16(buf, offs);
-            ushort vy = BitConverter.ToUInt16(buf, offs + 2);
-            ushort vz = BitConverter.ToUInt16(buf, offs + 4);
-            float x = (float)((vx * (posMax.X - posMin.X)) / 65535f + posMin.X);
-            float y = (float)((vy * (posMax.Y - posMin.Y)) / 65535f + posMin.Y);
-            float z = (float)((vz * (posMax.Z - posMin.Z)) / 65535f + posMin.Z);
+            var vx = BitConverter.ToUInt16(buf, offs);
+            var vy = BitConverter.ToUInt16(buf, offs + 2);
+            var vz = BitConverter.ToUInt16(buf, offs + 4);
+            var x = (vx * (posMax.X - posMin.X) / 65535f) + posMin.X;
+            var y = (vy * (posMax.Y - posMin.Y) / 65535f) + posMin.Y;
+            var z = (vz * (posMax.Z - posMin.Z) / 65535f) + posMin.Z;
             return new Vector3(x, y, z);
         }
 
         static UVCoord U16LEBytesToUV(byte[] data, int offset, UVCoord posMin, UVCoord posMax)
         {
             int offs = offset;
-            byte[] buf = data;
+            var buf = data;
             if (!BitConverter.IsLittleEndian)
             {
                 buf = new byte[6];
@@ -113,16 +112,16 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 offs = 0;
             }
 
-            ushort vx = BitConverter.ToUInt16(buf, offs);
-            ushort vy = BitConverter.ToUInt16(buf, offs + 2);
-            float u = (vx * (posMax.U - posMin.U)) / 65535f + posMin.U;
-            float v = (vy * (posMax.V - posMin.V)) / 65535f + posMin.V;
+            var vx = BitConverter.ToUInt16(buf, offs);
+            var vy = BitConverter.ToUInt16(buf, offs + 2);
+            var u = (vx * (posMax.U - posMin.U) / 65535f) + posMin.U;
+            var v = (vy * (posMax.V - posMin.V) / 65535f) + posMin.V;
             return new UVCoord(u, v);
         }
 
         static float BytesLEToFloat(byte[] data, int offset)
         {
-            byte[] buf = data;
+            var buf = data;
             int offs = offset;
             if(!BitConverter.IsLittleEndian)
             {
@@ -137,7 +136,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
         static ushort BytesLEToU16(byte[] data, int offset)
         {
-            byte[] buf = data;
+            var buf = data;
             int offs = offset;
             if (!BitConverter.IsLittleEndian)
             {
@@ -154,14 +153,14 @@ namespace SilverSim.Types.Asset.Format.Mesh
         public void Optimize()
         {
             /* collapse all identical vertices */
-            List<Vector3> NewVertices = new List<Vector3>();
-            Dictionary<int, int> VertexMap = new Dictionary<int, int>();
-            List<Triangle> NewTriangles = new List<Triangle>();
+            var NewVertices = new List<Vector3>();
+            var VertexMap = new Dictionary<int, int>();
+            var NewTriangles = new List<Triangle>();
 
             /* identify all duplicate meshes */
             for (int i = 0; i < Vertices.Count; ++i)
             {
-                Vector3 v = Vertices[i];
+                var v = Vertices[i];
                 int newIdx = NewVertices.IndexOf(v);
                 if (newIdx < 0)
                 {
@@ -174,7 +173,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             /* remap all vertices */
             for (int i = 0; i < Triangles.Count; ++i)
             {
-                Triangle tri = Triangles[i];
+                var tri = Triangles[i];
                 tri.Vertex1 = VertexMap[tri.Vertex1];
                 tri.Vertex2 = VertexMap[tri.Vertex2];
                 tri.Vertex3 = VertexMap[tri.Vertex3];
@@ -210,33 +209,33 @@ namespace SilverSim.Types.Asset.Format.Mesh
             physOffset += 2;
             physSize -= 2;
             AnArray submeshes;
-            using (MemoryStream ms = new MemoryStream(data, physOffset, physSize))
+            using (var ms = new MemoryStream(data, physOffset, physSize))
             {
-                using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Decompress))
+                using (var gz = new DeflateStream(ms, CompressionMode.Decompress))
                 {
                     submeshes = (AnArray)LlsdBinary.Deserialize(gz);
                 }
             }
             int faceNo = 0;
-            foreach(IValue iv in submeshes)
+            foreach(var iv in submeshes)
             {
-                Map submesh = (Map)iv;
-                Vector3 posMax = new Vector3(0.5, 0.5, 0.5);
-                Vector3 posMin = new Vector3(-0.5, -0.5, -0.5);
-                UVCoord uvMax = new UVCoord();
-                UVCoord uvMin = new UVCoord();
+                var submesh = (Map)iv;
+                var posMax = new Vector3(0.5, 0.5, 0.5);
+                var posMin = new Vector3(-0.5, -0.5, -0.5);
+                var uvMax = new UVCoord();
+                var uvMin = new UVCoord();
 
                 if(submesh.ContainsKey("PositionDomain"))
                 {
-                    Map posDom = (Map)submesh["PositionDomain"];
+                    var posDom = (Map)submesh["PositionDomain"];
                     if (posDom.ContainsKey("Max"))
                     {
-                        AnArray ivdom = (AnArray)posDom["Max"];
+                        var ivdom = (AnArray)posDom["Max"];
                         posMax = new Vector3(ivdom[0].AsReal, ivdom[1].AsReal, ivdom[2].AsReal);
                     }
                     if (posDom.ContainsKey("Min"))
                     {
-                        AnArray ivdom = (AnArray)posDom["Min"];
+                        var ivdom = (AnArray)posDom["Min"];
                         posMin = new Vector3(ivdom[0].AsReal, ivdom[1].AsReal, ivdom[2].AsReal);
                     }
                 }
@@ -250,21 +249,21 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 if(submesh.ContainsKey("TexCoord0"))
                 {
                     texcoordBytes = (BinaryData)submesh["TexCoord0"];
-                    Map texDom = (Map)submesh["TexCoord0Domain"];
+                    var texDom = (Map)submesh["TexCoord0Domain"];
                     if(texDom.ContainsKey("Max"))
                     {
-                        AnArray domData = (AnArray)texDom["Max"];
+                        var domData = (AnArray)texDom["Max"];
                         uvMax.U = (float)domData[0].AsReal;
                         uvMax.V = (float)domData[1].AsReal;
                     }
                     if(texDom.ContainsKey("Min"))
                     {
-                        AnArray domData = (AnArray)texDom["Min"];
+                        var domData = (AnArray)texDom["Min"];
                         uvMin.U = (float)domData[0].AsReal;
                         uvMin.V = (float)domData[1].AsReal;
                     }
                 }
-                ushort faceIndexOffset = (ushort)Vertices.Count;
+                var faceIndexOffset = (ushort)Vertices.Count;
                 int uvBytePos = 0;
                 for(int i = 0; i< posBytes.Length; i += 6)
                 {
@@ -283,13 +282,16 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 byte[] triangleBytes = (BinaryData)submesh["TriangleList"];
                 for(int i = 0; i < triangleBytes.Length; i += 6)
                 {
-                    ushort v1 = (ushort)(BytesLEToU16(triangleBytes, i) + faceIndexOffset);
-                    ushort v2 = (ushort)(BytesLEToU16(triangleBytes, i + 2) + faceIndexOffset);
-                    ushort v3 = (ushort)(BytesLEToU16(triangleBytes, i + 4) + faceIndexOffset);
-                    Triangle t = new Triangle(v1, v2, v3);
-                    t.FaceIdx = faceNo;
+                    var v1 = (ushort)(BytesLEToU16(triangleBytes, i) + faceIndexOffset);
+                    var v2 = (ushort)(BytesLEToU16(triangleBytes, i + 2) + faceIndexOffset);
+                    var v3 = (ushort)(BytesLEToU16(triangleBytes, i + 4) + faceIndexOffset);
+                    var t = new Triangle(v1, v2, v3)
+                    {
+                        FaceIdx = faceNo
+                    };
                     Triangles.Add(t);
                 }
+                ++faceNo;
             }
         }
 
@@ -301,9 +303,9 @@ namespace SilverSim.Types.Asset.Format.Mesh
         public void DumpToBlenderRaw(string filename)
         {
             /* write a blender .raw */
-            using (StreamWriter w = new StreamWriter(filename))
+            using (var w = new StreamWriter(filename))
             {
-                foreach (Triangle tri in Triangles)
+                foreach (var tri in Triangles)
                 {
                     w.WriteLine("{0} {1} {2}",
                         VertexToString(Vertices[tri.Vertex1]),

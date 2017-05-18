@@ -40,21 +40,9 @@ namespace SilverSim.Types
         public double W;
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.Rotation;
-            }
-        }
+        public ValueType Type => ValueType.Rotation;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.Rotation;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Rotation;
         #endregion Properties
 
         #region Constructors
@@ -103,31 +91,15 @@ namespace SilverSim.Types
 
         #region Public Methods
 
-        public bool ApproxEquals(Quaternion quat, double tolerance)
-        {
-            Quaternion diff = this - quat;
-            return (diff.LengthSquared <= tolerance * tolerance);
-        }
+        public bool ApproxEquals(Quaternion quat, double tolerance) => (this - quat).LengthSquared <= tolerance * tolerance;
 
-        public double Length
-        {
-            get
-            {
-                return Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
-            }
-        }
+        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
 
-        public double LengthSquared
-        {
-            get
-            {
-                return (X * X + Y * Y + Z * Z + W * W);
-            }
-        }
+        public double LengthSquared => X * X + Y * Y + Z * Z + W * W;
 
         public Vector3 GetEulerAngles()
         {
-            Vector3 v = new Vector3();
+            var v = new Vector3();
             GetEulerAngles(out v.X, out v.Y, out v.Z);
             return v;
         }
@@ -199,7 +171,7 @@ namespace SilverSim.Types
         /// </summary>
         public static Quaternion CreateFromAxisAngle(double axisX, double axisY, double axisZ, double angle)
         {
-            Vector3 axis = new Vector3(axisX, axisY, axisZ);
+            var axis = new Vector3(axisX, axisY, axisZ);
             return CreateFromAxisAngle(axis, angle);
         }
 
@@ -234,10 +206,7 @@ namespace SilverSim.Types
         /// <param name="eulers">Vector representation of the euler angles in
         /// radians</param>
         /// <returns>Quaternion representation of the euler angles</returns>
-        public static Quaternion CreateFromEulers(Vector3 eulers)
-        {
-            return CreateFromEulers(eulers.X, eulers.Y, eulers.Z);
-        }
+        public static Quaternion CreateFromEulers(Vector3 eulers) => CreateFromEulers(eulers.X, eulers.Y, eulers.Z);
 
         /// <summary>
         /// Creates a quaternion from roll, pitch, and yaw euler angles in
@@ -319,10 +288,7 @@ namespace SilverSim.Types
             return quat;
         }
 
-        public static double Dot(Quaternion q1, Quaternion q2)
-        {
-            return (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W);
-        }
+        public static double Dot(Quaternion q1, Quaternion q2) => (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W);
 
         /// <summary>
         /// Conjugates and renormalizes a vector
@@ -404,7 +370,7 @@ namespace SilverSim.Types
         /// </summary>
         public Quaternion Normalize()
         {
-            Quaternion q = new Quaternion(this);
+            var q = new Quaternion(this);
             q.NormalizeSelf();
             return q;
         }
@@ -567,7 +533,7 @@ namespace SilverSim.Types
             }
             else
             {
-                double[,] mm = new double[3, 3];
+                var mm = new double[3, 3];
                 int i = 0;
                 int j;
                 int k;
@@ -601,7 +567,7 @@ namespace SilverSim.Types
 
                 s = Math.Sqrt(mm[i, i] - mm[j, j] + mm[k, k] + 1.0);
 
-                double[] q = new double[4];
+                var q = new double[4];
                 q[i] = s * 0.5;
 
                 if(s != 0f)
@@ -624,7 +590,7 @@ namespace SilverSim.Types
                 double y;
                 double z;
 
-                Quaternion t = Normalize();
+                var t = Normalize();
 
                 x = t.X * t.X - t.Y * t.Y - t.Z * t.Z + t.W * t.W;
                 y = 2 * (t.X * t.Y + t.Z * t.W);
@@ -641,7 +607,7 @@ namespace SilverSim.Types
                 double y;
                 double z;
 
-                Quaternion t = Normalize();
+                var t = Normalize();
 
                 x = 2 * (t.X * t.Y - t.Z * t.W);
                 y = -t.X * t.X + t.Y * t.Y - t.Z * t.Z + t.W * t.W;
@@ -658,7 +624,7 @@ namespace SilverSim.Types
                 double y;
                 double z;
 
-                Quaternion t = Normalize();
+                var t = Normalize();
 
                 x = 2 * (t.X * t.Z + t.Y * t.W);
                 y = 2 * (-t.X * t.W + t.Y * t.Z);
@@ -670,8 +636,6 @@ namespace SilverSim.Types
 
         public Matrix4 GetMatrix()
         {
-            Matrix4 matrix = new Matrix4();
-
             double xx = X * X;
             double yy = Y * Y;
             double zz = Z * Z;
@@ -682,175 +646,100 @@ namespace SilverSim.Types
             double yz = Y * Z;
             double xw = X * W;
 
-            matrix.M11 = 1f - (2f * (yy + zz));
-            matrix.M12 = 2f * (xy + zw);
-            matrix.M13 = 2f * (zx - yw);
+            return new Matrix4()
+            {
+                M11 = 1f - (2f * (yy + zz)),
+                M12 = 2f * (xy + zw),
+                M13 = 2f * (zx - yw),
 
-            matrix.M21 = 2f * (xy - zw);
-            matrix.M22 = 1f - (2f * (zz + xx));
-            matrix.M23 = 2f * (yz + xw);
+                M21 = 2f * (xy - zw),
+                M22 = 1f - (2f * (zz + xx)),
+                M23 = 2f * (yz + xw),
 
-            matrix.M31 = 2f * (zx + yw);
-            matrix.M32 = 2f * (yz - xw);
-            matrix.M33 = 1f - (2f * (yy + xx));
+                M31 = 2f * (zx + yw),
+                M32 = 2f * (yz - xw),
+                M33 = 1f - (2f * (yy + xx)),
 
-            matrix.M44 = 1f;
-
-            return matrix;
+                M44 = 1f
+            };
         }
 
         #region Overrides
 
-        public override bool Equals(object obj)
-        {
-            return (obj is Quaternion) && this == (Quaternion)obj;
-        }
+        public override bool Equals(object obj) => (obj is Quaternion) && this == (Quaternion)obj;
 
-        public bool Equals(Quaternion other)
-        {
-            return Math.Abs(W - other.W) < Double.Epsilon
+        public bool Equals(Quaternion other) => Math.Abs(W - other.W) < Double.Epsilon
                 && Math.Abs(X - other.X) < Double.Epsilon
                 && Math.Abs(Y - other.Y) < Double.Epsilon
                 && Math.Abs(Z - other.Z) < Double.Epsilon;
-        }
 
-        public override int GetHashCode()
-        {
-            return (X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode() ^ W.GetHashCode());
-        }
+        public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode() ^ W.GetHashCode();
 
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "<{0},{1},{2},{3}>", X, Y, Z, W);
-        }
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "<{0},{1},{2},{3}>", X, Y, Z, W);
 
-        public string X_String
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "{0}", X);
-            }
-        }
+        public string X_String => string.Format(CultureInfo.InvariantCulture, "{0}", X);
 
-        public string Y_String
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "{0}", Y);
-            }
-        }
+        public string Y_String => string.Format(CultureInfo.InvariantCulture, "{0}", Y);
 
-        public string Z_String
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "{0}", Z);
-            }
-        }
+        public string Z_String => string.Format(CultureInfo.InvariantCulture, "{0}", Z);
 
-        public string W_String
-        {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "{0}", W);
-            }
-        }
+        public string W_String => string.Format(CultureInfo.InvariantCulture, "{0}", W);
 
         #endregion Overrides
 
         #region Operators
 
-        public static bool operator ==(Quaternion quaternion1, Quaternion quaternion2)
-        {
-            return quaternion1.Equals(quaternion2);
-        }
+        public static bool operator ==(Quaternion quaternion1, Quaternion quaternion2) => quaternion1.Equals(quaternion2);
 
-        public static bool operator !=(Quaternion quaternion1, Quaternion quaternion2)
-        {
-            return !(quaternion1 == quaternion2);
-        }
+        public static bool operator !=(Quaternion quaternion1, Quaternion quaternion2) => !(quaternion1 == quaternion2);
 
-        public static Quaternion operator +(Quaternion quaternion1, Quaternion quaternion2)
-        {
-            return new Quaternion(quaternion1.X + quaternion2.X,
+        public static Quaternion operator +(Quaternion quaternion1, Quaternion quaternion2) => new Quaternion(quaternion1.X + quaternion2.X,
                 quaternion1.Y + quaternion2.Y,
                 quaternion1.Z + quaternion2.Z,
                 quaternion1.W + quaternion2.W);
-        }
 
         public static AnArray operator+(Quaternion q, AnArray a)
         {
-            AnArray b = new AnArray();
+            var b = new AnArray();
             b.Add(q);
             b.AddRange(a);
             return b;
         }
 
         /** <summary> do not use to produce the inverse rotation. Only use Conjugate() for inversing the rotation</summary> */
-        public static Quaternion operator -(Quaternion quaternion)
-        {
-            return new Quaternion(-quaternion.X, -quaternion.Y, -quaternion.Z, -quaternion.W);
-        }
+        public static Quaternion operator -(Quaternion quaternion) => new Quaternion(-quaternion.X, -quaternion.Y, -quaternion.Z, -quaternion.W);
 
-        public static Quaternion operator -(Quaternion quaternion1, Quaternion quaternion2)
-        {
-            return new Quaternion(quaternion1.X - quaternion2.X,
+        public static Quaternion operator -(Quaternion quaternion1, Quaternion quaternion2) => new Quaternion(quaternion1.X - quaternion2.X,
                 quaternion1.Y - quaternion2.Y,
                 quaternion1.Z - quaternion2.Z,
                 quaternion1.W - quaternion2.W);
-        }
 
-        public static Quaternion operator *(Quaternion a, Quaternion b)
-        {
-            return new Quaternion(
+        public static Quaternion operator *(Quaternion a, Quaternion b) => new Quaternion(
                 a.W * b.X + a.X * b.W + a.Y * b.Z - a.Z * b.Y,
                 a.W * b.Y + a.Y * b.W + a.Z * b.X - a.X * b.Z,
                 a.W * b.Z + a.Z * b.W + a.X * b.Y - a.Y * b.X,
                 a.W * b.W - a.X * b.X - a.Y * b.Y - a.Z * b.Z
             );
-        }
 
-        public static Quaternion operator *(Quaternion quaternion, double scaleFactor)
-        {
-            return new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
-        }
+        public static Quaternion operator *(Quaternion quaternion, double scaleFactor) => 
+            new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
 
-        public static Quaternion operator *(double scaleFactor, Quaternion quaternion)
-        {
-            return new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
-        }
+        public static Quaternion operator *(double scaleFactor, Quaternion quaternion) => 
+            new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
 
-        public Quaternion Conjugate()
-        {
-            return new Quaternion(-X, -Y, -Z, W);
-        }
+        public Quaternion Conjugate() => new Quaternion(-X, -Y, -Z, W);
 
-        public static Quaternion operator /(Quaternion a, Quaternion b)
-        {
-            return a * b.Conjugate();
-        }
+        public static Quaternion operator /(Quaternion a, Quaternion b) => a * b.Conjugate();
 
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public static explicit operator Quaternion(string val)
-        {
-            return Quaternion.Parse(val);
-        }
+        public static explicit operator Quaternion(string val) => Parse(val);
 
-        public static explicit operator string(Quaternion val)
-        {
-            return val.ToString();
-        }
+        public static explicit operator string(Quaternion val) => val.ToString();
 
         #endregion Operators
 
-        public bool IsLSLTrue
-        {
-            get
-            {
-                return !Equals(Identity);
-            }
-        }
+        public bool IsLSLTrue => !Equals(Identity);
 
         #region Byte conversion
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
@@ -858,7 +747,7 @@ namespace SilverSim.Types
         {
             get
             {
-                byte[] bytes = new byte[12];
+                var bytes = new byte[12];
                 ToBytes(bytes, 0);
                 return bytes;
             }
@@ -875,7 +764,7 @@ namespace SilverSim.Types
                 if (!BitConverter.IsLittleEndian)
                 {
                     // Big endian architecture
-                    byte[] conversionBuffer = new byte[16];
+                    var conversionBuffer = new byte[16];
 
                     Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 16);
 
@@ -903,7 +792,7 @@ namespace SilverSim.Types
                 if (!BitConverter.IsLittleEndian)
                 {
                     // Big endian architecture
-                    byte[] conversionBuffer = new byte[16];
+                    var conversionBuffer = new byte[16];
 
                     Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 12);
 
@@ -972,17 +861,17 @@ namespace SilverSim.Types
         #endregion
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(Length >= Double.Epsilon); } }
-        public Integer AsInteger { get { return new Integer((int)Length); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(X, Y, Z, W); } }
-        public Real AsReal { get { return new Real(Length); } }
-        public AString AsString { get { return new AString(ToString()); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(X, Y, Z); } }
-        public uint AsUInt { get { return (uint)Length; } }
-        public int AsInt { get { return (int)Length; } }
-        public ulong AsULong { get { return (ulong)Length; } }
-        public long AsLong { get { return (long)Length; } }
+        public ABoolean AsBoolean => new ABoolean(Length >= Double.Epsilon);
+        public Integer AsInteger => new Integer((int)Length);
+        public Quaternion AsQuaternion => new Quaternion(X, Y, Z, W);
+        public Real AsReal => new Real(Length);
+        public AString AsString => new AString(ToString());
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3(X, Y, Z);
+        public uint AsUInt => (uint)Length;
+        public int AsInt => (int)Length;
+        public ulong AsULong => (ulong)Length;
+        public long AsLong => (long)Length;
         #endregion
 
         /// <summary>A quaternion with a value of 0,0,0,1</summary>

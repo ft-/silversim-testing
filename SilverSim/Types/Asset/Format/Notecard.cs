@@ -38,15 +38,14 @@ namespace SilverSim.Types.Asset.Format
         #region Constructors
         public Notecard()
         {
-
         }
 
         public Notecard(AssetData asset)
         {
-            using(Stream assetdata = asset.InputStream)
+            using(var assetdata = asset.InputStream)
             {
-                string line = ReadLine(assetdata);
-                string[] versioninfo = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                var line = ReadLine(assetdata);
+                var versioninfo = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 if(versioninfo.Length < 2 || versioninfo[0] != "Linden" || versioninfo[1] != "text")
                 {
                     /* Viewers handle notecards without this header as plain text notecard */
@@ -64,8 +63,8 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                List<UUID> reflist = new List<UUID>();
-                foreach(NotecardInventoryItem item in Inventory.Values)
+                var reflist = new List<UUID>();
+                foreach(var item in Inventory.Values)
                 {
                     if (!reflist.Contains(item.AssetID))
                     {
@@ -75,15 +74,15 @@ namespace SilverSim.Types.Asset.Format
 
                 if(Text.StartsWith("<llsd>"))
                 {
-                    byte[] d = Text.ToUTF8Bytes();
+                    var d = Text.ToUTF8Bytes();
                     /* could be an agent appearance notecard, so let us try that */
                     Map im;
-                    using (Stream i = new MemoryStream(d))
+                    using (var i = new MemoryStream(d))
                     {
                         im = LlsdXml.Deserialize(i) as Map;
                     }
                     if (null != im &&
-                        im.ContainsKey("serial") && 
+                        im.ContainsKey("serial") &&
                         im.ContainsKey("height") &&
                         im.ContainsKey("wearables") &&
                         im.ContainsKey("textures") &&
@@ -94,19 +93,19 @@ namespace SilverSim.Types.Asset.Format
                         {
                             if (im["wearables"] is AnArray)
                             {
-                                foreach (IValue w in (AnArray)im["wearables"])
+                                foreach (var w in (AnArray)im["wearables"])
                                 {
-                                    AnArray aw = w as AnArray;
+                                    var aw = w as AnArray;
                                     if (aw != null)
                                     {
-                                        foreach (IValue wi in aw)
+                                        foreach (var wi in aw)
                                         {
-                                            Map awm = wi as Map;
+                                            var awm = wi as Map;
                                             if (null != awm)
                                             {
                                                 try
                                                 {
-                                                    UUID assetID = awm["asset"].AsUUID;
+                                                    var assetID = awm["asset"].AsUUID;
                                                     if (!reflist.Contains(assetID))
                                                     {
                                                         reflist.Add(assetID);
@@ -121,17 +120,17 @@ namespace SilverSim.Types.Asset.Format
                                     }
                                 }
                             }
-                            AnArray attarray = im["attachments"] as AnArray;
+                            var attarray = im["attachments"] as AnArray;
                             if (attarray != null)
                             {
-                                foreach (IValue a in attarray)
+                                foreach (var a in attarray)
                                 {
-                                    Map am = a as Map;
+                                    var am = a as Map;
                                     if (null != am)
                                     {
                                         try
                                         {
-                                            UUID assetID = am["asset"].AsUUID;
+                                            var assetID = am["asset"].AsUUID;
                                             if (!reflist.Contains(assetID))
                                             {
                                                 reflist.Add(assetID);
@@ -161,7 +160,7 @@ namespace SilverSim.Types.Asset.Format
         string ReadLine(Stream stream)
         {
             int c;
-            StringBuilder data = new StringBuilder();
+            var data = new StringBuilder();
 
             while('\n' != (c = stream.ReadByte()) && c != -1)
             {
@@ -179,16 +178,16 @@ namespace SilverSim.Types.Asset.Format
             }
             while(true)
             {
-                string line = ReadLine(assetdata);
+                var line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
                 }
 
-                string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                var data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 uint uval;
                 switch(data[0])
-                { 
+                {
                     case "base_mask":
                         if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
                         {
@@ -196,7 +195,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         item.Permissions.Base = (InventoryPermissionsMask)uval;
                         break;
-                
+
                     case "owner_mask":
                         if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
                         {
@@ -220,7 +219,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         item.Permissions.EveryOne = (InventoryPermissionsMask)uval;
                         break;
-    
+
                     case "next_owner_mask":
                         if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
                         {
@@ -259,13 +258,13 @@ namespace SilverSim.Types.Asset.Format
             }
             while(true)
             {
-                string line = ReadLine(assetdata);
+                var line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
                 }
 
-                string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                var data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 int ival;
                 uint uval;
                 switch(data[0])
@@ -273,7 +272,7 @@ namespace SilverSim.Types.Asset.Format
                     case "sale_type":
                         item.SaleInfo.TypeName = data[1];
                         break;
-                
+
                     case "sale_price":
                         if (!int.TryParse(data[1], out ival))
                         {
@@ -281,7 +280,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         item.SaleInfo.Price = ival;
                         break;
-                
+
                     case "perm_mask":
                         if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
                         {
@@ -298,20 +297,20 @@ namespace SilverSim.Types.Asset.Format
 
         NotecardInventoryItem ReadInventoryItem(Stream assetdata)
         {
-            NotecardInventoryItem item = new NotecardInventoryItem();
+            var item = new NotecardInventoryItem();
             if(ReadLine(assetdata) != "{")
             {
                 throw new NotANotecardFormatException();
             }
             while(true)
             {
-                string line = ReadLine(assetdata);
+                var line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return item;
                 }
 
-                string[] data = line.Split(new char[] {' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
+                var data = line.Split(new char[] {' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
                 if(data[0] == "item_id")
                 {
                     item.ID = data[1];
@@ -322,7 +321,7 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(data[0] == "permissions")
                 {
-                    ReadInventoryPermissions(assetdata, ref item);  
+                    ReadInventoryPermissions(assetdata, ref item);
                 }
                 else if(data[0] == "asset_id" && data.Length == 2)
                 {
@@ -345,7 +344,7 @@ namespace SilverSim.Types.Asset.Format
                     }
                     item.Flags = (InventoryFlags)uval;
                 }
-                else if(data[0] == "sale_info")   
+                else if(data[0] == "sale_info")
                 {
                     ReadInventorySaleInfo(assetdata, ref item);
                 }
@@ -369,7 +368,7 @@ namespace SilverSim.Types.Asset.Format
                 else
                 {
                     throw new NotANotecardFormatException();
-                }       
+                }
             }
         }
 
@@ -383,7 +382,7 @@ namespace SilverSim.Types.Asset.Format
             }
             while(true)
             {
-                string line = ReadLine(assetdata);
+                var line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     if(item == null)
@@ -393,7 +392,7 @@ namespace SilverSim.Types.Asset.Format
                     return item;
                 }
 
-                string[] data = line.Split(new char[] {'\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                var data = line.Split(new char[] {'\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 if(data.Length == 4 && data[0] == "ext" && data[1] == "char" && data[2] == "index")
                 {
                     if(!uint.TryParse(data[3], out extcharindex))
@@ -422,13 +421,13 @@ namespace SilverSim.Types.Asset.Format
             }
             while(true)
             {
-                string line = ReadLine(assetdata);
+                var line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
                 }
 
-                string[] data = line.Split(new char[] { ' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
+                var data = line.Split(new char[] { ' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
                 if(data[0] == "count")
                 {
                     uint count;
@@ -438,7 +437,7 @@ namespace SilverSim.Types.Asset.Format
                     }
                     for (uint i = 0; i < count; ++i)
                     {
-                        NotecardInventoryItem item = ReadInventoryItems(assetdata);
+                        var item = ReadInventoryItems(assetdata);
                         Inventory.Add(item.ID, item);
                     }
                 }
@@ -457,13 +456,13 @@ namespace SilverSim.Types.Asset.Format
             }
             while(true)
             {
-                string line = ReadLine(assetdata);
+                var line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
                 }
 
-                string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                var data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 if(data[0] == "LLEmbeddedItems")
                 {
                     ReadInventory(assetdata);
@@ -475,7 +474,7 @@ namespace SilverSim.Types.Asset.Format
                     {
                         throw new NotANotecardFormatException();
                     }
-                    byte[] buffer = new byte[datalen];
+                    var buffer = new byte[datalen];
                     if(datalen != assetdata.Read(buffer, 0, datalen))
                     {
                         throw new NotANotecardFormatException();
@@ -553,32 +552,31 @@ namespace SilverSim.Types.Asset.Format
                 );
         }
 
-        public AssetData Asset()
-        {
-            return (AssetData)this;
-        }
+        public AssetData Asset() => this;
 
         public static implicit operator AssetData(Notecard v)
         {
-            StringBuilder notecard = new StringBuilder("Linden text version 2\n{\n");
-            NotecardInventory inventory = v.Inventory;
+            var notecard = new StringBuilder("Linden text version 2\n{\n");
+            var inventory = v.Inventory;
             notecard.AppendFormat("LLEmbeddedItems version 1\n{{\ncount {0}\n", inventory != null ? v.Inventory.Count : 0);
 
             if (inventory != null)
             {
-                foreach (NotecardInventoryItem item in inventory.Values)
+                foreach (var item in inventory.Values)
                 {
                     notecard.Append(ItemToString(item));
                 }
             }
 
             notecard.Append("}\n");
-            byte[] TextData = v.Text.ToUTF8Bytes();
+            var TextData = v.Text.ToUTF8Bytes();
             notecard.AppendFormat("Text length {0}\n", TextData.Length);
-            byte[] NotecardHeader = notecard.ToString().ToUTF8Bytes();
+            var NotecardHeader = notecard.ToString().ToUTF8Bytes();
 
-            AssetData asset = new AssetData();
-            asset.Data = new byte[TextData.Length + NotecardHeader.Length + 2];
+            var asset = new AssetData()
+            {
+                Data = new byte[TextData.Length + NotecardHeader.Length + 2]
+            };
             Buffer.BlockCopy(NotecardHeader, 0, asset.Data, 0, NotecardHeader.Length);
             Buffer.BlockCopy(TextData, 0, asset.Data, NotecardHeader.Length, TextData.Length);
             asset.Data[NotecardHeader.Length + TextData.Length] = (byte)'}';
@@ -590,10 +588,7 @@ namespace SilverSim.Types.Asset.Format
             return asset;
         }
 
-        public static implicit operator string[](Notecard v)
-        {
-            return v.Text.Split('\n');
-        }
+        public static implicit operator string[] (Notecard v) => v.Text.Split('\n');
         #endregion
     }
 }

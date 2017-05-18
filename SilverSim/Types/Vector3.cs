@@ -35,21 +35,9 @@ namespace SilverSim.Types
         public double Z;
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.Vector;
-            }
-        }
+        public ValueType Type => ValueType.Vector;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.Vector;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Vector;
         #endregion Properties
 
         #region Constructors
@@ -86,29 +74,11 @@ namespace SilverSim.Types
 
         #region Properties
         /** <summary>Delivers X and Y length only. No Z component</summary> */
-        public double HorizontalLength
-        {
-            get
-            {
-                return Math.Sqrt(X * X + Y * Y);
-            }
-        }
+        public double HorizontalLength => Math.Sqrt(X * X + Y * Y);
 
-        public double Length
-        {
-            get
-            {
-                return Math.Sqrt(X * X + Y * Y + Z * Z);
-            }
-        }
+        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
 
-        public double LengthSquared
-        {
-            get
-            {
-                return X * X + Y * Y + Z * Z;
-            }
-        }
+        public double LengthSquared => X * X + Y * Y + Z * Z;
         #endregion Properties
 
         /// <summary>
@@ -120,19 +90,12 @@ namespace SilverSim.Types
         /// between the two vectors</param>
         /// <returns>True if the magnitude of difference between the two vectors
         /// is less than the given tolerance, otherwise false</returns>
-        public bool ApproxEquals(Vector3 vec, double tolerance)
-        {
-            Vector3 diff = this - vec;
-            return (diff.LengthSquared <= tolerance * tolerance);
-        }
+        public bool ApproxEquals(Vector3 vec, double tolerance) => (this - vec).LengthSquared <= tolerance * tolerance;
 
         /// <summary>
         /// IComparable.CompareTo implementation
         /// </summary>
-        public int CompareTo(Vector3 vector)
-        {
-            return Length.CompareTo(vector.Length);
-        }
+        public int CompareTo(Vector3 vector) => Length.CompareTo(vector.Length);
 
         /// <summary>
         /// Builds a vector from a byte array
@@ -144,7 +107,7 @@ namespace SilverSim.Types
             if (!BitConverter.IsLittleEndian)
             {
                 // Big endian architecture
-                byte[] conversionBuffer = new byte[12];
+                var conversionBuffer = new byte[12];
 
                 Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 12);
 
@@ -185,16 +148,9 @@ namespace SilverSim.Types
             }
         }
 
-        public double Dot(Vector3 value2)
-        {
-            return X * value2.X + Y * value2.Y + Z * value2.Z;
-        }
+        public double Dot(Vector3 value2) => X * value2.X + Y * value2.Y + Z * value2.Z;
 
-        public static Vector3 Normalize(Vector3 value)
-        {
-            Vector3 ov = new Vector3(value);
-            return ov.Normalize();
-        }
+        public static Vector3 Normalize(Vector3 value) => new Vector3(value).Normalize();
 
         public Vector3 Normalize()
         {
@@ -235,7 +191,7 @@ namespace SilverSim.Types
         {
             result = default(Vector3);
             char[] splitChar = { ',' };
-            string[] split = val.Replace("<", System.String.Empty).Replace(">", System.String.Empty).Split(splitChar);
+            var split = val.Replace("<", System.String.Empty).Replace(">", System.String.Empty).Split(splitChar);
             if(split.Length != 3)
             {
                 return false;
@@ -263,10 +219,10 @@ namespace SilverSim.Types
         public static Quaternion RotationBetween(Vector3 a, Vector3 b)
         {
             double dotProduct = a.Dot(b);
-            Vector3 crossProduct = a.Cross(b);
+            var crossProduct = a.Cross(b);
             double magProduct = a.Length * b.Length;
             double angle = Math.Acos(dotProduct / magProduct);
-            Vector3 axis = Normalize(crossProduct);
+            var axis = Normalize(crossProduct);
             double s = Math.Sin(angle / 2d);
 
             return new Quaternion(
@@ -276,63 +232,36 @@ namespace SilverSim.Types
                 Math.Cos(angle / 2d));
         }
 
-        public static Vector3 Transform(Vector3 position, Matrix4 matrix)
-        {
-            return new Vector3(
+        public static Vector3 Transform(Vector3 position, Matrix4 matrix) => new Vector3(
                 (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
                 (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
                 (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43);
-        }
 
-        public static Vector3 TransformNormal(Vector3 position, Matrix4 matrix)
-        {
-            return new Vector3(
+        public static Vector3 TransformNormal(Vector3 position, Matrix4 matrix) => new Vector3(
                 (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31),
                 (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32),
                 (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33));
-        }
 
-        public override bool Equals(object obj)
-        {
-            return (obj is Vector3) && this == (Vector3)obj;
-        }
+        public override bool Equals(object obj) => (obj is Vector3) && this == (Vector3)obj;
 
-        public bool Equals(Vector3 other)
-        {
-            return this == other;
-        }
+        public bool Equals(Vector3 other) => this == other;
 
-        public override int GetHashCode()
-        {
-            return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
-        }
+        public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
 
-        public Vector3 ComponentMin(Vector3 b)
-        {
-            Vector3 res = new Vector3();
-            res.X = Math.Min(X, b.X);
-            res.Y = Math.Min(Y, b.Y);
-            res.Z = Math.Min(Z, b.Z);
-            return res;
-        }
+        public Vector3 ComponentMin(Vector3 b) => new Vector3(
+                Math.Min(X, b.X),
+                Math.Min(Y, b.Y),
+                Math.Min(Z, b.Z));
 
-        public Vector3 ComponentMax(Vector3 b)
-        {
-            Vector3 res = new Vector3();
-            res.X = Math.Max(X, b.X);
-            res.Y = Math.Max(Y, b.Y);
-            res.Z = Math.Max(Z, b.Z);
-            return res;
-        }
+        public Vector3 ComponentMax(Vector3 b) => new Vector3(Math.Max(X, b.X),
+                Math.Max(Y, b.Y),
+                Math.Max(Z, b.Z));
 
         /// <summary>
         /// Get a formatted string representation of the vector
         /// </summary>
         /// <returns>A string representation of the vector</returns>
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "<{0},{1},{2}>", X, Y, Z);
-        }
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "<{0},{1},{2}>", X, Y, Z);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string X_String
@@ -373,66 +302,38 @@ namespace SilverSim.Types
             }
         }
 
-        public static Vector3 Lerp(Vector3 lhs, Vector3 rhs, double c)
-        {
-            return lhs + (rhs - lhs) * c;
-        }
+        public static Vector3 Lerp(Vector3 lhs, Vector3 rhs, double c) => lhs + (rhs - lhs) * c;
 
-        public Vector3 ElementDivide(Vector3 b)
-        {
-            return new Vector3(X / b.X, Y / b.Y, Z / b.Z);
-        }
+        public Vector3 ElementDivide(Vector3 b) => new Vector3(X / b.X, Y / b.Y, Z / b.Z);
 
-        public Vector3 ElementMultiply(Vector3 b)
-        {
-            return new Vector3(X * b.X, Y * b.Y, Z * b.Z);
-        }
+        public Vector3 ElementMultiply(Vector3 b) => new Vector3(X * b.X, Y * b.Y, Z * b.Z);
 
         #region Operators
-        public static bool operator ==(Vector3 value1, Vector3 value2)
-        {
-            return Math.Abs(value1.X - value2.X) < Double.Epsilon
+        public static bool operator ==(Vector3 value1, Vector3 value2) => Math.Abs(value1.X - value2.X) < Double.Epsilon
                 && Math.Abs(value1.Y - value2.Y) < Double.Epsilon
                 && Math.Abs(value1.Z - value2.Z) < Double.Epsilon;
-        }
 
-        public static bool operator !=(Vector3 value1, Vector3 value2)
-        {
-            return !(value1 == value2);
-        }
+        public static bool operator !=(Vector3 value1, Vector3 value2) => !(value1 == value2);
 
-        public static Vector3 operator +(Vector3 value1, Vector3 value2)
-        {
-            return new Vector3(value1.X + value2.X, value1.Y + value2.Y, value1.Z + value2.Z);
-        }
+        public static Vector3 operator +(Vector3 value1, Vector3 value2) => new Vector3(value1.X + value2.X, value1.Y + value2.Y, value1.Z + value2.Z);
 
         public static AnArray operator +(Vector3 v, AnArray a)
         {
-            AnArray b = new AnArray();
-            b.Add(v);
+            var b = new AnArray
+            {
+                v
+            };
             b.AddRange(a);
             return b;
         }
 
-        public static Vector3 operator -(Vector3 value)
-        {
-            return new Vector3(-value.X, -value.Y, -value.Z);
-        }
+        public static Vector3 operator -(Vector3 value) => new Vector3(-value.X, -value.Y, -value.Z);
 
-        public static Vector3 operator -(Vector3 value1, Vector3 value2)
-        {
-            return new Vector3(value1.X - value2.X, value1.Y - value2.Y, value1.Z - value2.Z);
-        }
+        public static Vector3 operator -(Vector3 value1, Vector3 value2) => new Vector3(value1.X - value2.X, value1.Y - value2.Y, value1.Z - value2.Z);
 
-        public static Vector3 operator *(Vector3 value, double scaleFactor)
-        {
-            return new Vector3(value.X * scaleFactor, value.Y * scaleFactor, value.Z * scaleFactor);
-        }
+        public static Vector3 operator *(Vector3 value, double scaleFactor) => new Vector3(value.X * scaleFactor, value.Y * scaleFactor, value.Z * scaleFactor);
 
-        public static Vector3 operator *(double scaleFactor, Vector3 value)
-        {
-            return new Vector3(value.X * scaleFactor, value.Y * scaleFactor, value.Z * scaleFactor);
-        }
+        public static Vector3 operator *(double scaleFactor, Vector3 value) => new Vector3(value.X * scaleFactor, value.Y * scaleFactor, value.Z * scaleFactor);
 
         public static Vector3 operator *(Vector3 vec, Quaternion rot)
         {
@@ -448,25 +349,13 @@ namespace SilverSim.Types
             return vec;
         }
 
-        public static Vector3 operator /(Vector3 vec, Quaternion rot)
-        {
-            return vec * rot.Conjugate();
-        }
+        public static Vector3 operator /(Vector3 vec, Quaternion rot) => vec * rot.Conjugate();
 
-        public static Vector3 operator *(Vector3 vector, Matrix4 matrix)
-        {
-            return Transform(vector, matrix);
-        }
+        public static Vector3 operator *(Vector3 vector, Matrix4 matrix) => Transform(vector, matrix);
 
-        public static double operator*(Vector3 v1, Vector3 v2)
-        {
-            return v1.Dot(v2);
-        }
+        public static double operator *(Vector3 v1, Vector3 v2) => v1.Dot(v2);
 
-        public static Vector3 operator %(Vector3 v1, Vector3 v2)
-        {
-            return v1.Cross(v2);
-        }
+        public static Vector3 operator %(Vector3 v1, Vector3 v2) => v1.Cross(v2);
 
         public static Vector3 operator /(Vector3 value, double divider)
         {
@@ -477,43 +366,31 @@ namespace SilverSim.Types
         /// <summary>
         /// Cross product between two vectors
         /// </summary>
-        public Vector3 Cross(Vector3 value2)
-        {
-            return new Vector3(
+        public Vector3 Cross(Vector3 value2) => new Vector3(
                 Y * value2.Z - value2.Y * Z,
                 Z * value2.X - value2.Z * X,
                 X * value2.Y - value2.X * Y);
-        }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public static explicit operator Vector3(string val)
-        {
-            return Vector3.Parse(val);
-        }
+        public static explicit operator Vector3(string val) => Parse(val);
 
-        public static explicit operator string(Vector3 val)
-        {
-            return val.ToString();
-        }
+        public static explicit operator string(Vector3 val) => val.ToString();
 
-        public static explicit operator GridVector(Vector3 v)
-        {
-            return new GridVector((uint)(v.X * 256f), (uint)(v.Y * 256f));
-        }
+        public static explicit operator GridVector(Vector3 v) => new GridVector((uint)(v.X * 256f), (uint)(v.Y * 256f));
         #endregion Operators
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(Length >= Single.Epsilon); } }
-        public Integer AsInteger { get { return new Integer((int)Length); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(X, Y, Z, 1); } }
-        public Real AsReal { get { return new Real(Length); } }
-        public AString AsString { get { return new AString(ToString()); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(X, Y, Z); } }
-        public uint AsUInt { get { return (uint)Length; } }
-        public int AsInt { get { return (int)Length; } }
-        public ulong AsULong { get { return (ulong)Length; } }
-        public long AsLong { get { return (long)Length; } }
+        public ABoolean AsBoolean => new ABoolean(Length >= Single.Epsilon);
+        public Integer AsInteger => new Integer((int)Length);
+        public Quaternion AsQuaternion => new Quaternion(X, Y, Z, 1);
+        public Real AsReal => new Real(Length);
+        public AString AsString => new AString(ToString());
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3(X, Y, Z);
+        public uint AsUInt => (uint)Length;
+        public int AsInt => (int)Length;
+        public ulong AsULong => (ulong)Length;
+        public long AsLong => (long)Length;
         #endregion
 
         /// <summary>A vector with a value of 0,0,0</summary>

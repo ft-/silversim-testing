@@ -40,10 +40,5 @@ namespace SilverSim.Types.Groups
         public bool IsOpenEnrollment;
         public int MembershipFee;
         public bool IsShownInList;
-
-        public GroupMembership()
-        {
-
-        }
     }
 }

@@ -99,7 +99,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private static AssetData ParseAssetDataInternal(XmlTextReader reader)
         {
-            AssetData asset = new AssetData();
+            var asset = new AssetData();
             while (true)
             {
                 if (!reader.Read())
@@ -107,8 +107,8 @@ namespace SilverSim.Types.StructuredData.AssetXml
                     throw new InvalidAssetSerializationException();
                 }
 
-                bool isEmptyElement = reader.IsEmptyElement;
-                string nodeName = reader.Name;
+                var isEmptyElement = reader.IsEmptyElement;
+                var nodeName = reader.Name;
 
                 switch (reader.NodeType)
                 {
@@ -164,7 +164,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
                                 }
                                 else
                                 {
-                                    string creatorID = reader.ReadElementValueAsString();
+                                    var creatorID = reader.ReadElementValueAsString();
                                     UUI uui;
                                     asset.Creator = UUI.TryParse(creatorID, out uui) ? uui : UUI.Unknown;
                                 }
@@ -172,11 +172,10 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
                             case "Flags":
                                 asset.Flags = AssetFlags.Normal;
-                                string flags = reader.ReadElementValueAsString();
+                                var flags = reader.ReadElementValueAsString();
                                 if (flags != "Normal")
                                 {
-                                    string[] flaglist = flags.Split(',');
-                                    foreach (string flag in flaglist)
+                                    foreach (var flag in flags.Split(','))
                                     {
                                         if (flag == "Maptile")
                                         {
@@ -215,7 +214,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
         public static AssetData ParseAssetData(Stream input)
         {
-            using (XmlTextReader reader = new XmlTextReader(input))
+            using (var reader = new XmlTextReader(input))
             {
                 while (true)
                 {
@@ -274,7 +273,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
         private static AssetMetadata ParseAssetMetadataInternal(XmlTextReader reader)
         {
-            AssetMetadata asset = new AssetMetadata();
+            var asset = new AssetMetadata();
             while (true)
             {
                 if (!reader.Read())
@@ -324,8 +323,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
                                 string flags = reader.ReadElementValueAsString();
                                 if (flags != "Normal")
                                 {
-                                    string[] flaglist = flags.Split(',');
-                                    foreach (string flag in flaglist)
+                                    foreach (var flag in flags.Split(','))
                                     {
                                         if (flag == "Maptile")
                                         {
@@ -364,7 +362,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
         public static AssetMetadata ParseAssetMetadata(Stream input)
         {
-            using (XmlTextReader reader = new XmlTextReader(input))
+            using (var reader = new XmlTextReader(input))
             {
                 while (true)
                 {
@@ -392,8 +390,6 @@ namespace SilverSim.Types.StructuredData.AssetXml
                 }
             }
         }
-
         #endregion
-
     }
 }

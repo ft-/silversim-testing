@@ -30,29 +30,11 @@ namespace SilverSim.Types
         private DateTime m_Value;
 
         #region Properties
-        public static Date Now
-        {
-            get
-            {
-                return new Date();
-            }
-        }
+        public static Date Now => new Date();
 
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.Date;
-            }
-        }
+        public ValueType Type => ValueType.Date;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.Invalid;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Invalid;
         #endregion Properties
 
         public Date()
@@ -80,19 +62,13 @@ namespace SilverSim.Types
             FromBytes(data, pos);
         }
 
-        public int CompareTo(Date v)
-        {
-            return m_Value.CompareTo(v.m_Value);
-        }
+        public int CompareTo(Date v) => m_Value.CompareTo(v.m_Value);
 
-        public bool Equals(Date v)
-        {
-            return m_Value.Equals(v.m_Value);
-        }
+        public bool Equals(Date v) => m_Value.Equals(v.m_Value);
 
         public override bool Equals(object o)
         {
-            Date v = o as Date;
+            var v = o as Date;
             if(null == v)
             {
                 return false;
@@ -100,72 +76,35 @@ namespace SilverSim.Types
             return Equals(v);
         }
 
-        public override int GetHashCode()
-        {
-            return m_Value.GetHashCode();
-        }
+        public override int GetHashCode() => m_Value.GetHashCode();
 
         public override string ToString()
         {
-            string format;
-            format = (m_Value.Millisecond > 0) ?
+            var format = (m_Value.Millisecond > 0) ?
                 "yyyy-MM-ddTHH:mm:ss.ffZ" :
                 "yyyy-MM-ddTHH:mm:ssZ";
             return m_Value.ToUniversalTime().ToString(format);
         }
 
-        public string Iso8601
-        {
-            get
-            {
-                return m_Value.ToString("yyyyMMdd'T'HH':'mm':'ss", DateTimeFormatInfo.InvariantInfo);
-            }
-        }
+        public string Iso8601 => m_Value.ToString("yyyyMMdd'T'HH':'mm':'ss", DateTimeFormatInfo.InvariantInfo);
 
-        public string ToString(string format, IFormatProvider culture)
-        {
-            return m_Value.ToString(format, culture);
-        }
+        public string ToString(string format, IFormatProvider culture) => m_Value.ToString(format, culture);
 
-        public static implicit operator DateTime(Date v)
-        {
-            return v.m_Value;
-        }
+        public static implicit operator DateTime(Date v) => v.m_Value;
 
-        public static explicit operator string(Date v)
-        {
-            return v.ToString();
-        }
+        public static explicit operator string(Date v) => v.ToString();
 
-        public static explicit operator ulong(Date v)
-        {
-            return v.DateTimeToUnixTime();
-        }
+        public static explicit operator ulong(Date v) => v.DateTimeToUnixTime();
 
         /// <summary>
         /// Gets a unix timestamp for the current time
         /// </summary>
         /// <returns>An unsigned integer representing a unix timestamp for now</returns>
-        public static ulong GetUnixTime()
-        {
-            return (ulong)(DateTime.UtcNow - Epoch).TotalSeconds;
-        }
+        public static ulong GetUnixTime() => (ulong)(DateTime.UtcNow - Epoch).TotalSeconds;
 
-        public static Date UnixTimeToDateTime(ulong timestamp)
-        {
-            DateTime dateTime = Epoch;
+        public static Date UnixTimeToDateTime(ulong timestamp) => new Date(Epoch.AddSeconds(timestamp));
 
-            // Add the number of seconds in our UNIX timestamp
-            dateTime = dateTime.AddSeconds(timestamp);
-
-            return new Date(dateTime);
-        }
-
-        public ulong DateTimeToUnixTime()
-        {
-            TimeSpan ts = (m_Value - Epoch);
-            return (ulong)ts.TotalSeconds;
-        }
+        public ulong DateTimeToUnixTime() => (ulong)((m_Value - Epoch).TotalSeconds);
 
         #region Serialization
         public void FromBytes(byte[] byteArray, int pos)
@@ -174,11 +113,11 @@ namespace SilverSim.Types
             if (!BitConverter.IsLittleEndian)
             {
                 // Big endian architecture
-                byte[] conversionBuffer = new byte[8];
+                var conversionBuffer = new byte[8];
 
                 Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 8);
 
-                System.Array.Reverse(conversionBuffer, 0, 8);
+                Array.Reverse(conversionBuffer, 0, 8);
 
                 val = BitConverter.ToDouble(conversionBuffer, 0);
             }
@@ -194,7 +133,7 @@ namespace SilverSim.Types
         public void ToBytes(byte[] dest, int pos)
         {
             double val;
-            TimeSpan ts = (m_Value - Epoch);
+            var ts = m_Value - Epoch;
 
             val = ts.Ticks / 10000000f;
 
@@ -202,23 +141,23 @@ namespace SilverSim.Types
 
             if (!BitConverter.IsLittleEndian)
             {
-                System.Array.Reverse(dest, pos + 0, 8);
+                Array.Reverse(dest, pos + 0, 8);
             }
         }
         #endregion Serialization
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(true); } }
-        public Integer AsInteger { get { return new Integer((int)DateTimeToUnixTime()); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(); } }
-        public Real AsReal { get { return new Real(DateTimeToUnixTime()); } }
-        public AString AsString { get { return new AString(ToString()); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(); } }
-        public uint AsUInt { get { return (uint)DateTimeToUnixTime(); } }
-        public int AsInt { get { return (int)DateTimeToUnixTime(); } }
-        public ulong AsULong { get { return DateTimeToUnixTime(); } }
-        public long AsLong { get { return (long)DateTimeToUnixTime(); } }
+        public ABoolean AsBoolean => new ABoolean(true);
+        public Integer AsInteger => new Integer((int)DateTimeToUnixTime());
+        public Quaternion AsQuaternion => new Quaternion();
+        public Real AsReal => new Real(DateTimeToUnixTime());
+        public AString AsString => new AString(ToString());
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3();
+        public uint AsUInt => (uint)DateTimeToUnixTime();
+        public int AsInt => (int)DateTimeToUnixTime();
+        public ulong AsULong => DateTimeToUnixTime();
+        public long AsLong => (long)DateTimeToUnixTime();
         #endregion
 
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0);

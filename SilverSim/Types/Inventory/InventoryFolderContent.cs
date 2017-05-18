@@ -31,10 +31,5 @@ namespace SilverSim.Types.Inventory
         public UUID FolderID = UUID.Zero;
         public UUI Owner = UUI.Unknown;
         public int Version;
-
-        public InventoryFolderContent()
-        {
-
-        }
     }
 }

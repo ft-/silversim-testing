@@ -42,10 +42,10 @@ namespace SilverSim.Types.Asset.Format
 
         public Landmark(AssetData asset)
         {
-            string input = Encoding.ASCII.GetString(asset.Data);
+            var input = Encoding.ASCII.GetString(asset.Data);
             input = input.Replace('\t', ' ');
-            string[] lines = input.Split('\n');
-            string[] versioninfo = lines[0].Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
+            var lines = input.Split('\n');
+            var versioninfo = lines[0].Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
             if(versioninfo[0] != "Landmark")
             {
                 throw new NotALandmarkFormatException();
@@ -53,8 +53,8 @@ namespace SilverSim.Types.Asset.Format
 
             for(int idx = 1; idx < lines.Length; ++idx)
             {
-                string line = lines[idx];
-                string[] para = line.Split(' ');
+                var line = lines[idx];
+                var para = line.Split(' ');
                 if(para.Length == 2 && para[0] == "region_id")
                 {
                     RegionID = para[1];
@@ -94,21 +94,19 @@ namespace SilverSim.Types.Asset.Format
 
         public AssetData Asset()
         {
-            return (AssetData)this;
+            return this;
         }
 
         public static implicit operator AssetData(Landmark v)
         {
-            AssetData asset = new AssetData();
-            string landmarkdata;
-
-            landmarkdata = (v.GatekeeperURI != null) ?
-                String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
+            var asset = new AssetData();
+            string landmarkdata = (v.GatekeeperURI != null) ?
+                string.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
                     v.RegionID,
                     v.LocalPos.X, v.LocalPos.Y, v.LocalPos.Z,
                     v.Location.RegionHandle,
                     v.GatekeeperURI) :
-                String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
+                string.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
                     v.RegionID,
                     v.LocalPos.X, v.LocalPos.Y, v.LocalPos.Z,
                     v.Location.RegionHandle);

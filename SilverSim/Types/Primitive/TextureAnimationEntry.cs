@@ -56,7 +56,7 @@ namespace SilverSim.Types.Primitive
         {
             if (!BitConverter.IsLittleEndian)
             {
-                byte[] newBytes = new byte[4];
+                var newBytes = new byte[4];
                 Buffer.BlockCopy(bytes, pos, newBytes, 0, 4);
                 Array.Reverse(newBytes, 0, 4);
                 return BitConverter.ToSingle(newBytes, 0);
@@ -69,7 +69,7 @@ namespace SilverSim.Types.Primitive
 
         private static byte[] FloatToBytes(float value)
         {
-            byte[] bytes = BitConverter.GetBytes(value);
+            var bytes = BitConverter.GetBytes(value);
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(bytes);
@@ -94,7 +94,7 @@ namespace SilverSim.Types.Primitive
 
         public byte[] GetBytes()
         {
-            byte[] data = new byte[16];
+            var data = new byte[16];
 
             data[0] = (byte)Flags;
             data[1] = (byte)Face;

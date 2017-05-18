@@ -43,6 +43,7 @@ namespace SilverSim.Types.Inventory
                 m_Name = value.FilterToAscii7Printable().TrimToMaxLength(63);
             }
         }
+
         string m_Description = string.Empty;
         public string Description
         {
@@ -55,6 +56,7 @@ namespace SilverSim.Types.Inventory
                 m_Description = value.FilterToNonControlChars().TrimToMaxLength(127);
             }
         }
+
         public InventoryType InventoryType = InventoryType.Unknown;
         public InventoryFlags Flags;
         public UUI Owner = new UUI();
@@ -69,12 +71,9 @@ namespace SilverSim.Types.Inventory
         #region Permissions
         public InventoryPermissionsData Permissions;
 
-        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
-        {
-            return (IsGroupOwned) ?
+        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (IsGroupOwned) ?
                 Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted) :
                 Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
-        }
         #endregion
 
         #region SaleInfo
@@ -88,6 +87,7 @@ namespace SilverSim.Types.Inventory
                 Copy = 2,
                 Content = 3
             }
+
             public int Price;
             public SaleType Type;
             public InventoryPermissionsMask PermMask;
@@ -129,6 +129,7 @@ namespace SilverSim.Types.Inventory
             }
             #endregion
         }
+
         public SaleInfoData SaleInfo;
         #endregion
 

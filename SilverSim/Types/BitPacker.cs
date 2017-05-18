@@ -45,42 +45,18 @@ namespace SilverSim.Types
             m_BitPos = 0;
         }
 
-        public int BitLength
-        {
-            get
-            {
-                return m_BitPos;
-            }
-        }
+        public int BitLength => m_BitPos;
 
-        public int BitPos
-        {
-            get
-            {
-                return m_BitPos % 8;
-            }
-        }
+        public int BitPos => m_BitPos % 8;
 
-        public int BytePos
-        {
-            get
-            {
-                return m_BitPos / 8;
-            }
-        }
+        public int BytePos => m_BitPos / 8;
 
-        public int NumBytes
-        {
-            get
-            {
-                return (m_BitPos + 7) / 8;
-            }
-        }
+        public int NumBytes => (m_BitPos + 7) / 8;
 
         #region Pack/Unpack functions
         public int UnpackSignedBits(int bitCount)
         {
-            byte[] d = UnpackBitsFromArray(bitCount);
+            var d = UnpackBitsFromArray(bitCount);
 
             if (!BitConverter.IsLittleEndian)
             {
@@ -91,7 +67,7 @@ namespace SilverSim.Types
 
         public uint UnpackUnsignedBits(int bitCount)
         {
-            byte[] d = UnpackBitsFromArray(bitCount);
+            var d = UnpackBitsFromArray(bitCount);
 
             if (!BitConverter.IsLittleEndian)
             {
@@ -102,7 +78,7 @@ namespace SilverSim.Types
 
         public void PackBits(int data, int bitCount)
         {
-            byte[] d = BitConverter.GetBytes(data);
+            var d = BitConverter.GetBytes(data);
             if(!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(d);
@@ -112,7 +88,7 @@ namespace SilverSim.Types
 
         public void PackBits(uint data, int bitCount)
         {
-            byte[] d = BitConverter.GetBytes(data);
+            var d = BitConverter.GetBytes(data);
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(d);
@@ -127,7 +103,7 @@ namespace SilverSim.Types
         {
             get
             {
-                byte[] b = UnpackBitsFromArray(32);
+                var b = UnpackBitsFromArray(32);
                 if(!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(b);
@@ -136,7 +112,7 @@ namespace SilverSim.Types
             }
             set
             {
-                byte[] b = BitConverter.GetBytes(value);
+                var b = BitConverter.GetBytes(value);
                 if(!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(b);
@@ -151,7 +127,6 @@ namespace SilverSim.Types
             {
                 return UnpackUnsignedBits(32);
             }
-
             set
             {
                 PackBits(value, 32);
@@ -164,7 +139,6 @@ namespace SilverSim.Types
             {
                 return UnpackSignedBits(32);
             }
-
             set
             {
                 PackBits(value, 32);
@@ -179,7 +153,7 @@ namespace SilverSim.Types
             }
             set
             {
-                PackBits((int)value, 16);
+                PackBits(value, 16);
             }
         }
 
@@ -216,7 +190,7 @@ namespace SilverSim.Types
                     throw new InvalidOperationException();
                 }
 
-                UUID val = new UUID(Data, m_BitPos / 8);
+                var val = new UUID(Data, m_BitPos / 8);
                 m_BitPos += (16 * 8);
                 return val;
             }
@@ -250,13 +224,11 @@ namespace SilverSim.Types
         {
             get
             {
-                byte[] b = UnpackBitsFromArray(32);
-                return new ColorAlpha(b);
+                return new ColorAlpha(UnpackBitsFromArray(32));
             }
             set
             {
-                byte[] b = value.AsByte;
-                PackBitsToArray(b, 32);
+                PackBitsToArray(value.AsByte, 32);
             }
         }
         #endregion
@@ -264,8 +236,7 @@ namespace SilverSim.Types
         #region Pack/Unpack Fixed
         public void PackFixed(float data, bool isSigned, int intBits, int fracBits)
         {
-            int unsignedBits = intBits + fracBits;
-            int totalBits = unsignedBits;
+            int totalBits = intBits + fracBits;
             int min;
             int max;
 
@@ -283,13 +254,13 @@ namespace SilverSim.Types
             max = 1 << intBits;
 
             float fixedVal = data;
-            if(data < (float)min)
+            if(data < min)
             {
-                data = (float)min;
+                data = min;
             }
-            if(data > (float)max)
+            if(data > max)
             {
-                data = (float)max;
+                data = max;
             }
             if (isSigned)
             {
@@ -318,8 +289,7 @@ namespace SilverSim.Types
         public float UnpackFixed(bool signed, int intBits, int fracBits)
         {
             int maxVal;
-            int unsignedBits = intBits + fracBits;
-            int totalBits = unsignedBits;
+            int totalBits = intBits + fracBits;
             float fixedVal;
 
             if (signed)
@@ -330,15 +300,15 @@ namespace SilverSim.Types
 
             if (totalBits <= 8)
             {
-                fixedVal = (float)ByteValue;
+                fixedVal = ByteValue;
             }
             else if (totalBits <= 16)
             {
-                fixedVal = (float)UshortValue;
+                fixedVal = UshortValue;
             }
             else if (totalBits <= 31)
             {
-                fixedVal = (float)UintValue;
+                fixedVal = UintValue;
             }
             else
             {
@@ -359,7 +329,7 @@ namespace SilverSim.Types
         #region Pack/Unpack string
         public void PackString(string s)
         {
-            byte[] d = UTF8Encoding.UTF8.GetBytes(s);
+            var d = UTF8Encoding.UTF8.GetBytes(s);
             if (m_BitPos != 0 || m_BitPos / 8 + d.Length > Data.Length)
             {
                 throw new InvalidOperationException();
@@ -398,7 +368,7 @@ namespace SilverSim.Types
 
                 while(count-- > 0)
                 {
-                    byte curBitMask = (byte)(0x80 >> (m_BitPos % 8));
+                    var curBitMask = (byte)(0x80 >> (m_BitPos % 8));
 
                     if((data[curBytePos] & (0x01 << count)) != 0)
                     {
@@ -429,7 +399,7 @@ namespace SilverSim.Types
         private byte[] UnpackBitsFromArray(int bitCount)
         {
             int count = 0;
-            byte[] output = new byte[4];
+            var output = new byte[4];
             int outputBytePos = 0;
 
             while(bitCount > 0)
@@ -485,7 +455,7 @@ namespace SilverSim.Types
                 byte srcBits = src.Data[curBytePos];
                 while (count-- > 0)
                 {
-                    byte curBitMask = (byte)(0x80 >> (m_BitPos % 8));
+                    var curBitMask = (byte)(0x80 >> (m_BitPos % 8));
 
                     if ((srcBits & 0x80) != 0)
                     {

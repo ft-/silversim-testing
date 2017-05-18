@@ -47,32 +47,29 @@ namespace SilverSim.Types.IM
         public bool ResultInfo;
         /* informational in certain modules */
 
-        public GridInstantMessage()
-        {
-
-        }
-
         public GridInstantMessage Clone()
         {
-            GridInstantMessage gim = new GridInstantMessage();
-            gim.FromAgent = FromAgent;
-            gim.FromGroup = FromGroup;
-            gim.ToAgent = ToAgent;
-            gim.Dialog = Dialog;
-            gim.IsFromGroup = IsFromGroup;
-            gim.Message = Message;
-            gim.IMSessionID = IMSessionID;
-            gim.IsOffline = IsOffline;
-            gim.Position = Position;
-            gim.BinaryBucket = new byte[BinaryBucket.Length];
+            var gim = new GridInstantMessage()
+            {
+                FromAgent = FromAgent,
+                FromGroup = FromGroup,
+                ToAgent = ToAgent,
+                Dialog = Dialog,
+                IsFromGroup = IsFromGroup,
+                Message = Message,
+                IMSessionID = IMSessionID,
+                IsOffline = IsOffline,
+                Position = Position,
+                BinaryBucket = new byte[BinaryBucket.Length],
+                ParentEstateID = ParentEstateID,
+                RegionID = RegionID,
+                Timestamp = new Date(Timestamp),
+                OnResult = OnResult,
+                NoOfflineIMStore = NoOfflineIMStore,
+                IsSystemMessage = IsSystemMessage,
+                ResultInfo = ResultInfo
+            };
             Buffer.BlockCopy(BinaryBucket, 0, gim.BinaryBucket, 0, BinaryBucket.Length);
-            gim.ParentEstateID = ParentEstateID;
-            gim.RegionID = RegionID;
-            gim.Timestamp = new Date(Timestamp);
-            gim.OnResult = OnResult;
-            gim.NoOfflineIMStore = NoOfflineIMStore;
-            gim.IsSystemMessage = IsSystemMessage;
-            gim.ResultInfo = ResultInfo;
             return gim;
         }
     }

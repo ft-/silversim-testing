@@ -97,7 +97,7 @@ namespace SilverSim.Types
 
         public static Matrix4 CreateTransformationMatrix(Quaternion quat, Vector3 scale, Vector3 translation)
         {
-            Matrix4 m = quat.GetMatrix();
+            var m = quat.GetMatrix();
             m.M11 *= scale.X;
             m.M12 *= scale.X;
             m.M13 *= scale.X;
@@ -180,19 +180,12 @@ namespace SilverSim.Types
 
         #region Public Methods
 
-        public double Determinant
-        {
-            get
-            {
-                return
-                    M14 * M23 * M32 * M41 - M13 * M24 * M32 * M41 - M14 * M22 * M33 * M41 + M12 * M24 * M33 * M41 +
+        public double Determinant => M14 * M23 * M32 * M41 - M13 * M24 * M32 * M41 - M14 * M22 * M33 * M41 + M12 * M24 * M33 * M41 +
                     M13 * M22 * M34 * M41 - M12 * M23 * M34 * M41 - M14 * M23 * M31 * M42 + M13 * M24 * M31 * M42 +
                     M14 * M21 * M33 * M42 - M11 * M24 * M33 * M42 - M13 * M21 * M34 * M42 + M11 * M23 * M34 * M42 +
                     M14 * M22 * M31 * M43 - M12 * M24 * M31 * M43 - M14 * M21 * M32 * M43 + M11 * M24 * M32 * M43 +
                     M12 * M21 * M34 * M43 - M11 * M22 * M34 * M43 - M13 * M22 * M31 * M44 + M12 * M23 * M31 * M44 +
                     M13 * M21 * M32 * M44 - M11 * M23 * M32 * M44 - M12 * M21 * M33 * M44 + M11 * M22 * M33 * M44;
-            }
-        }
 
         public double Determinant3x3
         {
@@ -301,12 +294,12 @@ namespace SilverSim.Types
         /// <returns>A quaternion representation of this rotation matrix</returns>
         public Quaternion GetQuaternion()
         {
-            Quaternion quat = new Quaternion();
-            double trace = Trace() + 1f;
+            var quat = new Quaternion();
+            var trace = Trace() + 1.0;
 
             if (trace > Single.Epsilon)
             {
-                double s = 0.5f / Math.Sqrt(trace);
+                var s = 0.5f / Math.Sqrt(trace);
 
                 quat.X = (M32 - M23) * s;
                 quat.Y = (M13 - M31) * s;
@@ -317,7 +310,7 @@ namespace SilverSim.Types
             {
                 if (M11 > M22 && M11 > M33)
                 {
-                    double s = 2.0f * Math.Sqrt(1.0f + M11 - M22 - M33);
+                    var s = 2.0f * Math.Sqrt(1.0 + M11 - M22 - M33);
 
                     quat.X = 0.25f * s;
                     quat.Y = (M12 + M21) / s;
@@ -326,7 +319,7 @@ namespace SilverSim.Types
                 }
                 else if (M22 > M33)
                 {
-                    double s = 2.0f * Math.Sqrt(1.0f + M22 - M11 - M33);
+                    var s = 2.0f * Math.Sqrt(1.0 + M22 - M11 - M33);
 
                     quat.X = (M12 + M21) / s;
                     quat.Y = 0.25f * s;
@@ -335,7 +328,7 @@ namespace SilverSim.Types
                 }
                 else
                 {
-                    double s = 2.0f * Math.Sqrt(1.0f + M33 - M11 - M22);
+                    var s = 2.0f * Math.Sqrt(1.0 + M33 - M11 - M22);
 
                     quat.X = (M13 + M31) / s;
                     quat.Y = (M23 + M32) / s;
@@ -353,7 +346,7 @@ namespace SilverSim.Types
 
         public static Matrix4 operator+(Matrix4 matrix1, Matrix4 matrix2)
         {
-            Matrix4 matrix = new Matrix4();
+            var matrix = new Matrix4();
             matrix.M11 = matrix1.M11 + matrix2.M11;
             matrix.M12 = matrix1.M12 + matrix2.M12;
             matrix.M13 = matrix1.M13 + matrix2.M13;
@@ -378,7 +371,7 @@ namespace SilverSim.Types
 
         public static Matrix4 CreateFromAxisAngle(Vector3 axis, double angle)
         {
-            Matrix4 matrix = new Matrix4();
+            var matrix = new Matrix4();
 
             double x = axis.X;
             double y = axis.Y;
@@ -504,9 +497,9 @@ namespace SilverSim.Types
         {
             Matrix4 matrix;
 
-            Vector3 z = Vector3.Normalize(cameraPosition - cameraTarget);
-            Vector3 x = Vector3.Normalize(cameraUpVector.Cross(z));
-            Vector3 y = z.Cross(x);
+            var z = Vector3.Normalize(cameraPosition - cameraTarget);
+            var x = Vector3.Normalize(cameraUpVector.Cross(z));
+            var y = z.Cross(x);
 
             matrix.M11 = x.X;
             matrix.M12 = y.X;
@@ -683,7 +676,7 @@ namespace SilverSim.Types
             forward.Normalize();
 
             // Calculate right vector
-            Vector3 right = forward.Cross(up);
+            var right = forward.Cross(up);
             right.Normalize();
 
             // Recalculate up vector
@@ -744,7 +737,7 @@ namespace SilverSim.Types
         {
             Matrix4 matrix;
 
-            double oodivider = 1f / divider;
+            double oodivider = 1.0 / divider;
             matrix.M11 = matrix1.M11 * oodivider;
             matrix.M12 = matrix1.M12 * oodivider;
             matrix.M13 = matrix1.M13 * oodivider;
@@ -768,36 +761,30 @@ namespace SilverSim.Types
             return matrix;
         }
 
-        public static Matrix4 Lerp(Matrix4 matrix1, Matrix4 matrix2, double amount)
+        public static Matrix4 Lerp(Matrix4 matrix1, Matrix4 matrix2, double amount) => new Matrix4()
         {
-            Matrix4 matrix;
+            M11 = matrix1.M11 + ((matrix2.M11 - matrix1.M11) * amount),
+            M12 = matrix1.M12 + ((matrix2.M12 - matrix1.M12) * amount),
+            M13 = matrix1.M13 + ((matrix2.M13 - matrix1.M13) * amount),
+            M14 = matrix1.M14 + ((matrix2.M14 - matrix1.M14) * amount),
 
-            matrix.M11 = matrix1.M11 + ((matrix2.M11 - matrix1.M11) * amount);
-            matrix.M12 = matrix1.M12 + ((matrix2.M12 - matrix1.M12) * amount);
-            matrix.M13 = matrix1.M13 + ((matrix2.M13 - matrix1.M13) * amount);
-            matrix.M14 = matrix1.M14 + ((matrix2.M14 - matrix1.M14) * amount);
+            M21 = matrix1.M21 + ((matrix2.M21 - matrix1.M21) * amount),
+            M22 = matrix1.M22 + ((matrix2.M22 - matrix1.M22) * amount),
+            M23 = matrix1.M23 + ((matrix2.M23 - matrix1.M23) * amount),
+            M24 = matrix1.M24 + ((matrix2.M24 - matrix1.M24) * amount),
 
-            matrix.M21 = matrix1.M21 + ((matrix2.M21 - matrix1.M21) * amount);
-            matrix.M22 = matrix1.M22 + ((matrix2.M22 - matrix1.M22) * amount);
-            matrix.M23 = matrix1.M23 + ((matrix2.M23 - matrix1.M23) * amount);
-            matrix.M24 = matrix1.M24 + ((matrix2.M24 - matrix1.M24) * amount);
+            M31 = matrix1.M31 + ((matrix2.M31 - matrix1.M31) * amount),
+            M32 = matrix1.M32 + ((matrix2.M32 - matrix1.M32) * amount),
+            M33 = matrix1.M33 + ((matrix2.M33 - matrix1.M33) * amount),
+            M34 = matrix1.M34 + ((matrix2.M34 - matrix1.M34) * amount),
 
-            matrix.M31 = matrix1.M31 + ((matrix2.M31 - matrix1.M31) * amount);
-            matrix.M32 = matrix1.M32 + ((matrix2.M32 - matrix1.M32) * amount);
-            matrix.M33 = matrix1.M33 + ((matrix2.M33 - matrix1.M33) * amount);
-            matrix.M34 = matrix1.M34 + ((matrix2.M34 - matrix1.M34) * amount);
+            M41 = matrix1.M41 + ((matrix2.M41 - matrix1.M41) * amount),
+            M42 = matrix1.M42 + ((matrix2.M42 - matrix1.M42) * amount),
+            M43 = matrix1.M43 + ((matrix2.M43 - matrix1.M43) * amount),
+            M44 = matrix1.M44 + ((matrix2.M44 - matrix1.M44) * amount)
+        };
 
-            matrix.M41 = matrix1.M41 + ((matrix2.M41 - matrix1.M41) * amount);
-            matrix.M42 = matrix1.M42 + ((matrix2.M42 - matrix1.M42) * amount);
-            matrix.M43 = matrix1.M43 + ((matrix2.M43 - matrix1.M43) * amount);
-            matrix.M44 = matrix1.M44 + ((matrix2.M44 - matrix1.M44) * amount);
-
-            return matrix;
-        }
-
-        public static Matrix4 operator*(Matrix4 matrix1, Matrix4 matrix2)
-        {
-            return new Matrix4(
+        public static Matrix4 operator *(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4(
                 matrix1.M11 * matrix2.M11 + matrix1.M12 * matrix2.M21 + matrix1.M13 * matrix2.M31 + matrix1.M14 * matrix2.M41,
                 matrix1.M11 * matrix2.M12 + matrix1.M12 * matrix2.M22 + matrix1.M13 * matrix2.M32 + matrix1.M14 * matrix2.M42,
                 matrix1.M11 * matrix2.M13 + matrix1.M12 * matrix2.M23 + matrix1.M13 * matrix2.M33 + matrix1.M14 * matrix2.M43,
@@ -818,32 +805,29 @@ namespace SilverSim.Types
                 matrix1.M41 * matrix2.M13 + matrix1.M42 * matrix2.M23 + matrix1.M43 * matrix2.M33 + matrix1.M44 * matrix2.M43,
                 matrix1.M41 * matrix2.M14 + matrix1.M42 * matrix2.M24 + matrix1.M43 * matrix2.M34 + matrix1.M44 * matrix2.M44
             );
-        }
 
-        public static Matrix4 operator*(Matrix4 matrix1, double scaleFactor)
+        public static Matrix4 operator *(Matrix4 matrix1, double scaleFactor) => new Matrix4()
         {
-            Matrix4 matrix;
-            matrix.M11 = matrix1.M11 * scaleFactor;
-            matrix.M12 = matrix1.M12 * scaleFactor;
-            matrix.M13 = matrix1.M13 * scaleFactor;
-            matrix.M14 = matrix1.M14 * scaleFactor;
+            M11 = matrix1.M11 * scaleFactor,
+            M12 = matrix1.M12 * scaleFactor,
+            M13 = matrix1.M13 * scaleFactor,
+            M14 = matrix1.M14 * scaleFactor,
 
-            matrix.M21 = matrix1.M21 * scaleFactor;
-            matrix.M22 = matrix1.M22 * scaleFactor;
-            matrix.M23 = matrix1.M23 * scaleFactor;
-            matrix.M24 = matrix1.M24 * scaleFactor;
+            M21 = matrix1.M21 * scaleFactor,
+            M22 = matrix1.M22 * scaleFactor,
+            M23 = matrix1.M23 * scaleFactor,
+            M24 = matrix1.M24 * scaleFactor,
 
-            matrix.M31 = matrix1.M31 * scaleFactor;
-            matrix.M32 = matrix1.M32 * scaleFactor;
-            matrix.M33 = matrix1.M33 * scaleFactor;
-            matrix.M34 = matrix1.M34 * scaleFactor;
+            M31 = matrix1.M31 * scaleFactor,
+            M32 = matrix1.M32 * scaleFactor,
+            M33 = matrix1.M33 * scaleFactor,
+            M34 = matrix1.M34 * scaleFactor,
 
-            matrix.M41 = matrix1.M41 * scaleFactor;
-            matrix.M42 = matrix1.M42 * scaleFactor;
-            matrix.M43 = matrix1.M43 * scaleFactor;
-            matrix.M44 = matrix1.M44 * scaleFactor;
-            return matrix;
-        }
+            M41 = matrix1.M41 * scaleFactor,
+            M42 = matrix1.M42 * scaleFactor,
+            M43 = matrix1.M43 * scaleFactor,
+            M44 = matrix1.M44 * scaleFactor
+        };
 
         public static Matrix4 operator-(Matrix4 matrix)
         {
@@ -870,30 +854,28 @@ namespace SilverSim.Types
             return result;
         }
 
-        public static Matrix4 operator-(Matrix4 matrix1, Matrix4 matrix2)
+        public static Matrix4 operator -(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4()
         {
-            Matrix4 matrix = new Matrix4();
-            matrix.M11 = matrix1.M11 - matrix2.M11;
-            matrix.M12 = matrix1.M12 - matrix2.M12;
-            matrix.M13 = matrix1.M13 - matrix2.M13;
-            matrix.M14 = matrix1.M14 - matrix2.M14;
+            M11 = matrix1.M11 - matrix2.M11,
+            M12 = matrix1.M12 - matrix2.M12,
+            M13 = matrix1.M13 - matrix2.M13,
+            M14 = matrix1.M14 - matrix2.M14,
 
-            matrix.M21 = matrix1.M21 - matrix2.M21;
-            matrix.M22 = matrix1.M22 - matrix2.M22;
-            matrix.M23 = matrix1.M23 - matrix2.M23;
-            matrix.M24 = matrix1.M24 - matrix2.M24;
+            M21 = matrix1.M21 - matrix2.M21,
+            M22 = matrix1.M22 - matrix2.M22,
+            M23 = matrix1.M23 - matrix2.M23,
+            M24 = matrix1.M24 - matrix2.M24,
 
-            matrix.M31 = matrix1.M31 - matrix2.M31;
-            matrix.M32 = matrix1.M32 - matrix2.M32;
-            matrix.M33 = matrix1.M33 - matrix2.M33;
-            matrix.M34 = matrix1.M34 - matrix2.M34;
+            M31 = matrix1.M31 - matrix2.M31,
+            M32 = matrix1.M32 - matrix2.M32,
+            M33 = matrix1.M33 - matrix2.M33,
+            M34 = matrix1.M34 - matrix2.M34,
 
-            matrix.M41 = matrix1.M41 - matrix2.M41;
-            matrix.M42 = matrix1.M42 - matrix2.M42;
-            matrix.M43 = matrix1.M43 - matrix2.M43;
-            matrix.M44 = matrix1.M44 - matrix2.M44;
-            return matrix;
-        }
+            M41 = matrix1.M41 - matrix2.M41,
+            M42 = matrix1.M42 - matrix2.M42,
+            M43 = matrix1.M43 - matrix2.M43,
+            M44 = matrix1.M44 - matrix2.M44
+        };
 
         public static Matrix4 Transform(Matrix4 value, Quaternion rotation)
         {
@@ -936,32 +918,28 @@ namespace SilverSim.Types
             return matrix;
         }
 
-        public static Matrix4 Transpose(Matrix4 matrix)
+        public static Matrix4 Transpose(Matrix4 matrix) => new Matrix4()
         {
-            Matrix4 result;
+            M11 = matrix.M11,
+            M12 = matrix.M21,
+            M13 = matrix.M31,
+            M14 = matrix.M41,
 
-            result.M11 = matrix.M11;
-            result.M12 = matrix.M21;
-            result.M13 = matrix.M31;
-            result.M14 = matrix.M41;
+            M21 = matrix.M12,
+            M22 = matrix.M22,
+            M23 = matrix.M32,
+            M24 = matrix.M42,
 
-            result.M21 = matrix.M12;
-            result.M22 = matrix.M22;
-            result.M23 = matrix.M32;
-            result.M24 = matrix.M42;
+            M31 = matrix.M13,
+            M32 = matrix.M23,
+            M33 = matrix.M33,
+            M34 = matrix.M43,
 
-            result.M31 = matrix.M13;
-            result.M32 = matrix.M23;
-            result.M33 = matrix.M33;
-            result.M34 = matrix.M43;
-
-            result.M41 = matrix.M14;
-            result.M42 = matrix.M24;
-            result.M43 = matrix.M34;
-            result.M44 = matrix.M44;
-
-            return result;
-        }
+            M41 = matrix.M14,
+            M42 = matrix.M24,
+            M43 = matrix.M34,
+            M44 = matrix.M44
+        };
 
         public static Matrix4 Inverse3x3(Matrix4 matrix)
         {
@@ -975,7 +953,7 @@ namespace SilverSim.Types
 
         public static Matrix4 Adjoint3x3(Matrix4 matrix)
         {
-            Matrix4 adjointMatrix = new Matrix4();
+            var adjointMatrix = new Matrix4();
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -995,12 +973,12 @@ namespace SilverSim.Types
                 throw new ArgumentException("Singular matrix inverse not possible");
             }
 
-            return (Adjoint(matrix) / matrix.Determinant);
+            return Adjoint(matrix) / matrix.Determinant;
         }
 
         public static Matrix4 Adjoint(Matrix4 matrix)
         {
-            Matrix4 adjointMatrix = new Matrix4();
+            var adjointMatrix = new Matrix4();
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -1015,7 +993,7 @@ namespace SilverSim.Types
 
         public static Matrix4 Minor(Matrix4 matrix, int row, int col)
         {
-            Matrix4 minor = new Matrix4();
+            var minor = new Matrix4();
             int m = 0;
             int n = 0;
 
@@ -1045,50 +1023,31 @@ namespace SilverSim.Types
 
         #region Overrides
 
-        public override bool Equals(object obj)
-        {
-            return (obj is Matrix4) && this == (Matrix4)obj;
-        }
+        public override bool Equals(object obj) => (obj is Matrix4) && this == (Matrix4)obj;
 
-        public bool Equals(Matrix4 other)
-        {
-            return this == other;
-        }
+        public bool Equals(Matrix4 other) => this == other;
 
-        public override int GetHashCode()
-        {
-            return
-                M11.GetHashCode() ^ M12.GetHashCode() ^ M13.GetHashCode() ^ M14.GetHashCode() ^
+        public override int GetHashCode() => M11.GetHashCode() ^ M12.GetHashCode() ^ M13.GetHashCode() ^ M14.GetHashCode() ^
                 M21.GetHashCode() ^ M22.GetHashCode() ^ M23.GetHashCode() ^ M24.GetHashCode() ^
                 M31.GetHashCode() ^ M32.GetHashCode() ^ M33.GetHashCode() ^ M34.GetHashCode() ^
                 M41.GetHashCode() ^ M42.GetHashCode() ^ M43.GetHashCode() ^ M44.GetHashCode();
-        }
 
         /// <summary>
         /// Get a formatted string representation of the vector
         /// </summary>
         /// <returns>A string representation of the vector</returns>
         [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture,
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture,
                 "|{0}, {1}, {2}, {3}|\n|{4}, {5}, {6}, {7}|\n|{8}, {9}, {10}, {11}|\n|{12}, {13}, {14}, {15}|",
                 M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44);
-        }
 
         #endregion Overrides
 
         #region Operators
 
-        public static bool operator ==(Matrix4 left, Matrix4 right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(Matrix4 left, Matrix4 right) => left.Equals(right);
 
-        public static bool operator !=(Matrix4 left, Matrix4 right)
-        {
-            return !left.Equals(right);
-        }
+        public static bool operator !=(Matrix4 left, Matrix4 right) => !left.Equals(right);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public double this[int row, int column]

@@ -25,63 +25,34 @@ namespace SilverSim.Types
 {
     public sealed class Undef : IEquatable<Undef>, IValue
     {
-        public Undef()
-        {
+        public int CompareTo(Undef v) => 0;
 
-        }
-
-        public int CompareTo(Undef v)
-        {
-            return 0;
-        }
-
-        public bool Equals(Undef v)
-        {
-            return true;
-        }
+        public bool Equals(Undef v) => true;
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.Undef;
-            }
-        }
+        public ValueType Type => ValueType.Undef;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.Invalid;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Invalid;
         #endregion Properties
 
         #region Operators
-        public static implicit operator bool(Undef v)
-        {
-            return false;
-        }
+        public static implicit operator bool(Undef v) => false;
         #endregion Operators
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(); } }
-        public Integer AsInteger { get { return new Integer(); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(); } }
-        public Real AsReal { get { return new Real(); } }
-        public AString AsString { get { return new AString(); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(); } }
-        public uint AsUInt { get { return 0; } }
-        public int AsInt { get { return 0; } }
-        public ulong AsULong { get { return 0; } }
-        public long AsLong { get { return 0; } }
+        public ABoolean AsBoolean => new ABoolean();
+        public Integer AsInteger => new Integer();
+        public Quaternion AsQuaternion => new Quaternion();
+        public Real AsReal => new Real();
+        public AString AsString => new AString();
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3();
+        public uint AsUInt => 0;
+        public int AsInt => 0;
+        public ulong AsULong => 0;
+        public long AsLong => 0;
         #endregion
 
-        public override string ToString()
-        {
-            return "undef";
-        }
+        public override string ToString() => "undef";
     }
 }

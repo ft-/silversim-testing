@@ -42,10 +42,5 @@ namespace SilverSim.Types.Economy
         public double PriceObjectScaleFactor = 1;
         public Int32 PriceParcelRent;
         public Int32 PriceGroupCreate;
-
-        public EconomyInfo()
-        {
-
-        }
     }
 }

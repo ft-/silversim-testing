@@ -32,7 +32,6 @@ namespace SilverSim.Types
         #region Constructors
         public Color()
         {
-
         }
 
         public static Color FromRgb(uint r, uint g, uint b)
@@ -63,73 +62,34 @@ namespace SilverSim.Types
         #endregion
 
         #region Operators
-        public static implicit operator Vector3(Color v)
-        {
-            return new Vector3(v.R, v.G, v.B);
-        }
+        public static implicit operator Vector3(Color v) => new Vector3(v.R, v.G, v.B);
 
-        public static Color operator+(Color a, Color b)
-        {
-            return new Color(
+        public static Color operator +(Color a, Color b) => new Color(
                 (a.R + b.R).Clamp(0, 1),
                 (a.G + b.G).Clamp(0, 1),
                 (a.B + b.B).Clamp(0, 1));
-        }
 
-        public Color Lerp(Color b, double mix)
-        {
-            return new Color(
+        public Color Lerp(Color b, double mix) => new Color(
                 R.Lerp(b.R, mix),
                 G.Lerp(b.G, mix),
                 B.Lerp(b.B, mix));
-        }
 
-        public static Color operator*(Color a, Color b)
-        {
-            return new Color(
+        public static Color operator *(Color a, Color b) => new Color(
                 (a.R * b.R).Clamp(0, 1),
                 (a.G * b.G).Clamp(0, 1),
                 (a.B * b.B).Clamp(0, 1));
-        }
 
-        public static Color operator*(Color a, double b)
-        {
-            return new Color(
+        public static Color operator *(Color a, double b) => new Color(
                 (a.R * b).Clamp(0, 1),
                 (a.G * b).Clamp(0, 1),
                 (a.B * b).Clamp(0, 1));
-        }
         #endregion
 
         #region Properties
-        public double GetR
-        {
-            get
-            {
-                return R;
-            }
-        }
-        public double GetG
-        {
-            get
-            {
-                return G;
-            }
-        }
-        public double GetB
-        {
-            get
-            {
-                return B;
-            }
-        }
-        public Vector3 AsVector3
-        {
-            get
-            {
-                return new Vector3(R, G, B);
-            }
-        }
+        public double GetR => R;
+        public double GetG => G;
+        public double GetB => B;
+        public Vector3 AsVector3 => new Vector3(R, G, B);
 
         public byte R_AsByte
         {
@@ -201,24 +161,17 @@ namespace SilverSim.Types
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
-        public virtual byte[] AsByte
-        {
-            get
-            {
-                return new byte[] { R_AsByte, G_AsByte, B_AsByte };
-            }
-        }
+        public virtual byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte };
         #endregion
     }
 
     public class ColorAlpha : Color
     {
-        public double A = 0f;
+        public double A;
 
         #region Constructors
         public ColorAlpha()
         {
-            
         }
 
         public ColorAlpha(double r, double g, double b, double alpha)
@@ -290,13 +243,7 @@ namespace SilverSim.Types
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
-        public override byte[] AsByte
-        {
-            get
-            {
-                return new byte[] { R_AsByte, G_AsByte, B_AsByte, A_AsByte };
-            }
-        }
+        public override byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte, A_AsByte };
         #endregion
 
         /// <summary>A Color4 with zero RGB values and fully opaque (alpha 1.0)</summary>

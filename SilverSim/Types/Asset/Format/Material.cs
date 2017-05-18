@@ -75,7 +75,7 @@ namespace SilverSim.Types.Asset.Format
             NormRepeatX = m["NormRepeatX"].AsInt;
             NormRepeatY = m["NormRepeatY"].AsInt;
             NormRotation = m["NormRotation"].AsInt;
-            AnArray a = (AnArray)m["SpecColor"];
+            var a = (AnArray)m["SpecColor"];
             SpecColor.R_AsByte = (byte)a[0].AsUInt;
             SpecColor.G_AsByte = (byte)a[1].AsUInt;
             SpecColor.B_AsByte = (byte)a[2].AsUInt;
@@ -92,7 +92,7 @@ namespace SilverSim.Types.Asset.Format
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Material(AssetData asset)
         {
-            Map m = LlsdXml.Deserialize(asset.InputStream) as Map;
+            var m = LlsdXml.Deserialize(asset.InputStream) as Map;
             if(null == m)
             {
                 throw new NotAMaterialFormatException();
@@ -109,7 +109,7 @@ namespace SilverSim.Types.Asset.Format
             NormRepeatX = m["NormRepeatX"].AsInt;
             NormRepeatY = m["NormRepeatY"].AsInt;
             NormRotation = m["NormRotation"].AsInt;
-            AnArray a = (AnArray)m["SpecColor"];
+            var a = (AnArray)m["SpecColor"];
             SpecColor.R_AsByte = (byte)a[0].AsUInt;
             SpecColor.G_AsByte = (byte)a[1].AsUInt;
             SpecColor.B_AsByte = (byte)a[2].AsUInt;
@@ -130,7 +130,7 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                List<UUID> reflist = new List<UUID>();
+                var reflist = new List<UUID>();
                 if(NormMap != UUID.Zero)
                 {
                     reflist.Add(NormMap);
@@ -174,7 +174,7 @@ namespace SilverSim.Types.Asset.Format
 
         public AssetData Asset()
         {
-            return (AssetData)this;
+            return this;
         }
 
         public void WriteMap(XmlTextWriter w)
@@ -210,7 +210,7 @@ namespace SilverSim.Types.Asset.Format
 
         public Map WriteMap()
         {
-            Map w = new Map();
+            var w = new Map();
             w.Add("AlphaMaskCutoff", AlphaMaskCutoff);
             w.Add("DiffuseAlphaMode", DiffuseAlphaMode);
             w.Add("EnvIntensity", EnvIntensity);
@@ -220,7 +220,7 @@ namespace SilverSim.Types.Asset.Format
             w.Add("NormRepeatX", NormRepeatX);
             w.Add("NormRepeatY", NormRepeatY);
             w.Add("NormRotation", NormRotation);
-            AnArray spec = new AnArray();
+            var spec = new AnArray();
             spec.Add(SpecColor.R_AsByte);
             spec.Add(SpecColor.G_AsByte);
             spec.Add(SpecColor.B_AsByte);
@@ -238,12 +238,12 @@ namespace SilverSim.Types.Asset.Format
 
         public static implicit operator AssetData(Material v)
         {
-            AssetData asset = new AssetData();
+            var asset = new AssetData();
             asset.ID = v.MaterialID;
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
 
-                using (XmlTextWriter w = ms.UTF8XmlTextWriter())
+                using (var w = ms.UTF8XmlTextWriter())
                 {
                     w.WriteStartElement("llsd");
                     v.WriteMap(w);

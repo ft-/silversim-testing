@@ -73,6 +73,7 @@ namespace SilverSim.Types.Grid
         public string ProductName = string.Empty; /* e.g. "Mainland" */
         public string ProtocolVariant = string.Empty; /* see ProtocolVariantId */
         public string GridURI = string.Empty; /* empty when addressing local grid */
+
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public static class ProtocolVariantId
         {

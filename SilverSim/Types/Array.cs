@@ -34,18 +34,16 @@ namespace SilverSim.Types
         #region Constructors
         public AnArray()
         {
-
         }
 
         public AnArray(AnArray v)
             : base(v)
         {
-
         }
 
         public AnArray(List<IValue> ival)
         {
-            foreach(IValue v in ival)
+            foreach(var v in ival)
             {
                 Add(v);
             }
@@ -53,29 +51,17 @@ namespace SilverSim.Types
         #endregion Constructors
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.Array;
-            }
-        }
+        public ValueType Type => ValueType.Array;
 
-        public LSLValueType LSL_Type 
-        { 
-            get
-            {
-                return LSLValueType.Invalid;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Invalid;
 
         #endregion Properties
 
         public override string ToString()
         {
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
             bool first = true;
-            foreach(IValue iv in this)
+            foreach(var iv in this)
             {
                 if(!first)
                 {
@@ -120,40 +106,30 @@ namespace SilverSim.Types
 
         public static AnArray operator +(AnArray a, AnArray b)
         {
-            AnArray n = new AnArray(a);
+            var n = new AnArray(a);
             n.AddRange(b);
             return n;
         }
-        public static AnArray operator +(AnArray a, int b)
-        {
-            AnArray n = new AnArray(a);
-            n.Add(b);
-            return n;
-        }
-        public static AnArray operator +(AnArray a, double b)
-        {
-            AnArray n = new AnArray(a);
-            n.Add(b);
-            return n;
-        }
-        public static AnArray operator +(AnArray a, string b)
-        {
-            AnArray n = new AnArray(a);
-            n.Add(b);
-            return n;
-        }
-        public static AnArray operator +(AnArray a, Vector3 b)
-        {
-            AnArray n = new AnArray(a);
-            n.Add(b);
-            return n;
-        }
-        public static AnArray operator +(AnArray a, Quaternion b)
-        {
-            AnArray n = new AnArray(a);
-            n.Add(b);
-            return n;
-        }
+        public static AnArray operator +(AnArray a, int b) => new AnArray(a)
+            {
+                b
+            };
+        public static AnArray operator +(AnArray a, double b) => new AnArray(a)
+            {
+                b
+            };
+        public static AnArray operator +(AnArray a, string b) => new AnArray(a)
+            {
+                b
+            };
+        public static AnArray operator +(AnArray a, Vector3 b) => new AnArray(a)
+            {
+                b
+            };
+        public static AnArray operator +(AnArray a, Quaternion b) => new AnArray(a)
+            {
+                b
+            };
         #endregion Add methods
 
         public bool TryGetValue<T>(int key, out T val)
@@ -180,36 +156,24 @@ namespace SilverSim.Types
         }
 
         #region Helper
-        public ABoolean AsBoolean { get { return new ABoolean(); } }
-        public Integer AsInteger { get { return new Integer(); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(); } }
-        public Real AsReal { get { return new Real(); } }
-        public AString AsString { get { return new AString(); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(); } }
-        public uint AsUInt { get { return 0; } }
-        public int AsInt { get { return 0; } }
-        public ulong AsULong { get { return 0; } }
-        public long AsLong { get { return 0; } }
-        #endregion 
+        public ABoolean AsBoolean => new ABoolean();
+        public Integer AsInteger => new Integer();
+        public Quaternion AsQuaternion => new Quaternion();
+        public Real AsReal => new Real();
+        public AString AsString => new AString();
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3();
+        public uint AsUInt => 0;
+        public int AsInt => 0;
+        public ulong AsULong => 0;
+        public long AsLong => 0;
+        #endregion
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        public Vector4 ElementsToVector4
-        {
-            get
-            {
-                return new Vector4(this[0].AsReal, this[1].AsReal, this[2].AsReal, this[3].AsReal);
-            }
-        }
+        public Vector4 ElementsToVector4 => new Vector4(this[0].AsReal, this[1].AsReal, this[2].AsReal, this[3].AsReal);
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        public Vector3 ElementsToVector3
-        {
-            get
-            {
-                return new Vector3(this[0].AsReal, this[1].AsReal, this[2].AsReal);
-            }
-        }
+        public Vector3 ElementsToVector3 => new Vector3(this[0].AsReal, this[1].AsReal, this[2].AsReal);
 
         #region Stateful Enumerator
         public sealed class MarkEnumerator : IEnumerator<IValue>, IEnumerator, IDisposable
@@ -223,21 +187,9 @@ namespace SilverSim.Types
                 m_Array = array;
                 m_CurrentIndex = -1;
             }
-            public IValue Current 
-            { 
-                get
-                {
-                    return m_Array[m_CurrentIndex];
-                }
-            }
+            public IValue Current => m_Array[m_CurrentIndex];
 
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
+            object IEnumerator.Current => Current;
 
             public void Dispose()
             {
@@ -249,10 +201,7 @@ namespace SilverSim.Types
                 m_CurrentIndex = -1;
             }
 
-            public bool MoveNext()
-            {
-                return ++m_CurrentIndex < m_Array.Count;
-            }
+            public bool MoveNext() => ++m_CurrentIndex < m_Array.Count;
 
             public void MarkPosition()
             {
@@ -265,10 +214,7 @@ namespace SilverSim.Types
             }
         }
 
-        public MarkEnumerator GetMarkEnumerator()
-        {
-            return new MarkEnumerator(this);
-        }
+        public MarkEnumerator GetMarkEnumerator() => new MarkEnumerator(this);
         #endregion
     }
 }

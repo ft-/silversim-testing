@@ -33,10 +33,5 @@ namespace SilverSim.Types.Groups
         #region Informational fields
         public uint Members;
         #endregion
-
-        public GroupRole()
-        {
-
-        }
     }
 }

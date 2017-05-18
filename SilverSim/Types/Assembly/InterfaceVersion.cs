@@ -35,6 +35,6 @@ namespace SilverSim.Types.Assembly
             Version = version;
         }
 
-        public string Version { get; private set; }
+        public string Version { get; }
     }
 }

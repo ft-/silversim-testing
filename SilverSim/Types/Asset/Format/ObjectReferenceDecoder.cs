@@ -31,14 +31,14 @@ namespace SilverSim.Types.Asset.Format
     {
         public static List<UUID> GetReferences(AssetData data)
         {
-            List<UUID> reflist = new List<UUID>();
+            var reflist = new List<UUID>();
             GetReferences(data.InputStream, string.Empty, reflist);
             return reflist;
         }
 
         public static void GetReferences(Stream xmlstream, string parentNodeName, List<UUID> reflist)
         {
-            using (XmlTextReader reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
+            using (var reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
             {
                 GetReferences(reader, parentNodeName, reflist);
             }
@@ -73,8 +73,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         else if(nodeName == "TextureEntry")
                         {
-                            List<UUID> texlist = new TextureEntry(data.ReadContentAsBase64()).References;
-                            foreach(UUID tex in texlist)
+                            foreach(var tex in new TextureEntry(data.ReadContentAsBase64()).References)
                             {
                                 if(!reflist.Contains(tex))
                                 {
@@ -84,8 +83,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         else if(nodeName == "ParticleSystem")
                         {
-                            List<UUID> texlist = new ParticleSystem(data.ReadContentAsBase64(), 0).References;
-                            foreach(UUID tex in texlist)
+                            foreach(var tex in new ParticleSystem(data.ReadContentAsBase64(), 0).References)
                             {
                                 if(!reflist.Contains(tex))
                                 {
@@ -112,8 +110,8 @@ namespace SilverSim.Types.Asset.Format
                                     {
                                         break;
                                     }
-                                    ushort type = (ushort)(extraparams[pos] | (extraparams[pos + 1] << 8));
-                                    UInt32 len = (UInt32)(extraparams[pos + 2] | (extraparams[pos + 3] << 8) | (extraparams[pos + 4] << 16) | (extraparams[pos + 5] << 24));
+                                    var type = (ushort)(extraparams[pos] | (extraparams[pos + 1] << 8));
+                                    var len = (UInt32)(extraparams[pos + 2] | (extraparams[pos + 3] << 8) | (extraparams[pos + 4] << 16) | (extraparams[pos + 5] << 24));
                                     pos += 6;
 
                                     if (pos + len > extraparams.Length)
@@ -138,7 +136,7 @@ namespace SilverSim.Types.Asset.Format
                                             {
                                                 break;
                                             }
-                                            UUID sculptTexture = new UUID(extraparams, pos);
+                                            var sculptTexture = new UUID(extraparams, pos);
                                             if(!reflist.Contains(sculptTexture))
                                             {
                                                 reflist.Add(sculptTexture);
@@ -151,7 +149,7 @@ namespace SilverSim.Types.Asset.Format
                                             {
                                                 break;
                                             }
-                                            UUID projectionTextureID = new UUID(extraparams, pos);
+                                            var projectionTextureID = new UUID(extraparams, pos);
                                             if(projectionTextureID != UUID.Zero && !reflist.Contains(projectionTextureID))
                                             {
                                                 reflist.Add(projectionTextureID);

@@ -36,10 +36,6 @@ namespace SilverSim.Types.Asset
         public Date CreateTime = new Date();
         public Date AccessTime = new Date();
 
-        public AssetMetadata()
-        {
-        }
-
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string FileExtension
         {
@@ -163,8 +159,7 @@ namespace SilverSim.Types.Asset
                 }
 
                 int lastOf = value.LastIndexOf('/');
-                string fname;
-                fname = (lastOf >= 0) ?
+                var fname = (lastOf >= 0) ?
                     value.Substring(lastOf + 1) :
                     value;
                 fname = fname.Substring(0, fname.IndexOf('_'));

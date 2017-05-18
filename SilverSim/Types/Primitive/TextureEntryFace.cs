@@ -58,16 +58,11 @@ namespace SilverSim.Types.Primitive
         private const byte TEX_MAP_MASK = 0x06;
 
         #region References accessor
-        public List<UUID> References
-        {
-            get
-            {
-                List<UUID> reflist = new List<UUID>();
-                reflist.Add(m_TextureID);
-                reflist.Add(m_MaterialID);
-                return reflist;
-            }
-        }
+        public List<UUID> References => new List<UUID>
+                {
+                    m_TextureID,
+                    m_MaterialID
+                };
         #endregion
 
         internal byte Material
@@ -232,7 +227,7 @@ namespace SilverSim.Types.Primitive
             set
             {
                 Material &= 0x3F;
-                byte v = (byte)value;
+                var v = (byte)value;
                 Material |= (byte)(v & SHINY_MASK);
             }
         }
@@ -318,32 +313,27 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        public object Clone()
+        public object Clone() => new TextureEntryFace(m_DefaultTexture)
         {
-            TextureEntryFace ret = new TextureEntryFace(m_DefaultTexture);
-            ret.TextureColor = TextureColor;
-            ret.RepeatU = RepeatU;
-            ret.RepeatV = RepeatV;
-            ret.OffsetU = OffsetU;
-            ret.OffsetV = OffsetV;
-            ret.Rotation = Rotation;
-            ret.Glow = Glow;
-            ret.Material = Material;
-            ret.Media = Media;
-            ret.TextureID = TextureID;
-            ret.MaterialID = MaterialID;
-            ret.m_AttributeFlags = m_AttributeFlags;
-            return ret;
-        }
+            TextureColor = TextureColor,
+            RepeatU = RepeatU,
+            RepeatV = RepeatV,
+            OffsetU = OffsetU,
+            OffsetV = OffsetV,
+            Rotation = Rotation,
+            Glow = Glow,
+            Material = Material,
+            Media = Media,
+            TextureID = TextureID,
+            MaterialID = MaterialID,
+            m_AttributeFlags = m_AttributeFlags
+        };
 
         [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
-        public override string ToString()
-        {
-            return String.Format("Color: {0} RepeatU: {1} RepeatV: {2} OffsetU: {3} OffsetV: {4} " +
+        public override string ToString() => String.Format("Color: {0} RepeatU: {1} RepeatV: {2} OffsetU: {3} OffsetV: {4} " +
                 "Rotation: {5} Bump: {6} Shiny: {7} Fullbright: {8} Mapping: {9} Media: {10} Glow: {11} ID: {12} MaterialID: {13}",
                 TextureColor.ToString(), RepeatU, RepeatV, OffsetU, OffsetV, Rotation, Bump.ToString(), Shiny.ToString(), FullBright, TexMapType.ToString(),
                 MediaFlags, Glow, TextureID.ToString(), MaterialID.ToString());
-        }
 
         public TextureEntryFace(TextureEntryFace defaultTexture)
         {

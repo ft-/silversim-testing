@@ -26,11 +26,6 @@ namespace SilverSim.Types.Groups
         public UGI ID = UGI.Unknown;
         public int MemberCount;
         public float SearchOrder;
-
-        public DirGroupInfo()
-        {
-
-        }
     }
 
     public class GroupInfo
@@ -50,10 +45,5 @@ namespace SilverSim.Types.Groups
         public int MemberCount;
         public int RoleCount;
         #endregion
-
-        public GroupInfo()
-        {
-
-        }
     }
 }

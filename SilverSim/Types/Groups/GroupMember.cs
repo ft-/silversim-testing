@@ -30,10 +30,5 @@ namespace SilverSim.Types.Groups
         public bool IsListInProfile;
         public bool IsAcceptNotices;
         public string AccessToken = string.Empty;
-
-        public GroupMember()
-        {
-
-        }
     }
 }

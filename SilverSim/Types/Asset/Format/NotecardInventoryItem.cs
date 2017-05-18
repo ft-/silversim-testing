@@ -32,7 +32,6 @@ namespace SilverSim.Types.Asset.Format
         #region Constructor
         public NotecardInventoryItem()
         {
-
         }
 
         public NotecardInventoryItem(InventoryItem item)

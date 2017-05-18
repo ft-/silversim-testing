@@ -34,23 +34,17 @@ namespace SilverSim.Types
         public Uri HomeURI;
         public bool IsAuthoritative; /* false means User Data has been validated through any available resolving service */
 
-        public static explicit operator string(UUI v)
-        {
-            return (v.HomeURI != null) ?
+        public static explicit operator string(UUI v) => (v.HomeURI != null) ?
                 string.Format("{0};{1};{2} {3}", v.ID.ToString(), v.HomeURI.ToString(), v.FirstName, v.LastName) :
                 string.Format("{0}", v.ID.ToString());
-        }
 
         public override bool Equals(object obj)
         {
-            UUI u = obj as UUI;
+            var u = obj as UUI;
             return (null != u) && EqualsGrid(u);
         }
 
-        public bool Equals(UUI uui)
-        {
-            return EqualsGrid(uui);
-        }
+        public bool Equals(UUI uui) => EqualsGrid(uui);
 
         public bool EqualsGrid(UUI uui)
         {
@@ -72,7 +66,7 @@ namespace SilverSim.Types
         [SuppressMessage("Gendarme.Rules.Correctness", "ReviewInconsistentIdentityRule")]
         public override int GetHashCode()
         {
-            Uri h = HomeURI;
+            var h = HomeURI;
             return (h != null) ? 
                 ID.GetHashCode() ^ h.GetHashCode() : 
                 ID.GetHashCode();
@@ -90,13 +84,13 @@ namespace SilverSim.Types
             }
             set
             {
-                string[] parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
+                var parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
                 if (parts.Length < 2)
                 {
                     throw new ArgumentException("\"" + value + "\" is not a valid CreatorData string");
                 }
                 HomeURI = new Uri(parts[0]);
-                string[] names = parts[1].Split(new char[] { ' ' }, 2, StringSplitOptions.None);
+                var names = parts[1].Split(new char[] { ' ' }, 2, StringSplitOptions.None);
                 FirstName = names[0];
                 LastName = (names.Length > 1) ?
                     names[1] :
@@ -114,8 +108,7 @@ namespace SilverSim.Types
                 }
                 else
                 {
-                    string hostName;
-                    hostName = HomeURI.IsDefaultPort ?
+                    var hostName = HomeURI.IsDefaultPort ?
                         HomeURI.Host :
                         HomeURI.Host + ":" + HomeURI.Port.ToString();
 
@@ -124,7 +117,7 @@ namespace SilverSim.Types
             }
             set
             {
-                string[] names = value.Split(new char[] { ' ' }, 2, StringSplitOptions.None);
+                var names = value.Split(new char[] { ' ' }, 2, StringSplitOptions.None);
                 if (names.Length < 2)
                 {
                     FirstName = names[0];
@@ -158,10 +151,10 @@ namespace SilverSim.Types
 
         public UUI(UUI uui)
         {
-            this.ID = uui.ID;
-            this.FirstName = uui.FirstName;
-            this.LastName = uui.LastName;
-            this.HomeURI = uui.HomeURI;
+            ID = uui.ID;
+            FirstName = uui.FirstName;
+            LastName = uui.LastName;
+            HomeURI = uui.HomeURI;
         }
 
         public UUI(UUID ID)
@@ -187,12 +180,12 @@ namespace SilverSim.Types
         public UUI(UUID ID, string creatorData)
         {
             this.ID = ID;
-            string[] parts = creatorData.Split(Semicolon, 2);
+            var parts = creatorData.Split(Semicolon, 2);
             if (parts.Length < 2)
             {
                 throw new ArgumentException("Invald UUI");
             }
-            string[] names = parts[1].Split(Whitespace, 2);
+            var names = parts[1].Split(Whitespace, 2);
             if (names.Length == 2)
             {
                 LastName = names[1];
@@ -203,7 +196,7 @@ namespace SilverSim.Types
 
         public UUI(string uuiString)
         {
-            string[] parts = uuiString.Split(Semicolon, 4); /* 4 allows for secret from friends entries */
+            var parts = uuiString.Split(Semicolon, 4); /* 4 allows for secret from friends entries */
             if (parts.Length < 2)
             {
                 ID = new UUID(parts[0]);
@@ -212,7 +205,7 @@ namespace SilverSim.Types
             ID = new UUID(parts[0]);
             if (parts.Length > 2)
             {
-                string[] names = parts[2].Split(Whitespace, 2);
+                var names = parts[2].Split(Whitespace, 2);
                 if (names.Length == 2)
                 {
                     LastName = names[1];
@@ -225,11 +218,11 @@ namespace SilverSim.Types
         public static bool TryParse(string uuiString, out UUI uui)
         {
             UUID id;
-            string firstName = string.Empty;
-            string lastName = string.Empty;
+            var firstName = string.Empty;
+            var lastName = string.Empty;
             Uri homeURI;
             uui = default(UUI);
-            string[] parts = uuiString.Split(Semicolon, 4); /* 4 allows for secrets from friends entries */
+            var parts = uuiString.Split(Semicolon, 4); /* 4 allows for secrets from friends entries */
             if (parts.Length < 2)
             {
                 if(!UUID.TryParse(parts[0], out id))
@@ -245,7 +238,7 @@ namespace SilverSim.Types
             }
             if (parts.Length > 2)
             {
-                string[] names = parts[2].Split(Whitespace, 2);
+                var names = parts[2].Split(Whitespace, 2);
                 if (names.Length == 2)
                 {
                     lastName = names[1];
@@ -260,23 +253,14 @@ namespace SilverSim.Types
             return true;
         }
 
-        public override string ToString()
-        {
-            return (HomeURI != null) ?
-                String.Format("{0};{1};{2} {3}", ID.ToString(), HomeURI, FirstName.Replace(' ', '.'), LastName.Replace(' ', '.')) :
+        public override string ToString() => (HomeURI != null) ?
+                string.Format("{0};{1};{2} {3}", ID.ToString(), HomeURI, FirstName.Replace(' ', '.'), LastName.Replace(' ', '.')) :
                 ID.ToString();
-        }
 
         private static readonly char[] Semicolon = new char[1] { ';' };
         private static readonly char[] Whitespace = new char[1] { ' ' };
 
-        public static UUI Unknown
-        {
-            get
-            {
-                return new UUI();
-            }
-        }
+        public static UUI Unknown => new UUI();
 
         public static bool operator ==(UUI l, UUI r)
         {

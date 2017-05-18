@@ -29,11 +29,6 @@ namespace SilverSim.Types.Asset
     {
         public byte[] Data = new byte[0];
 
-        public AssetData()
-        {
-
-        }
-
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         public Stream InputStream
         {

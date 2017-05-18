@@ -80,15 +80,9 @@ namespace SilverSim.Types
 
         #region Public Methods
 
-        public double Length()
-        {
-            return Math.Sqrt(DistanceSquared(this, Zero));
-        }
+        public double Length => Math.Sqrt(DistanceSquared(this, Zero));
 
-        public double LengthSquared()
-        {
-            return DistanceSquared(this, Zero);
-        }
+        public double LengthSquared => DistanceSquared(this, Zero);
 
         public void Normalize()
         {
@@ -98,25 +92,22 @@ namespace SilverSim.Types
         public bool ApproxEquals(Vector4 vec, double tolerance)
         {
             Vector4 diff = this - vec;
-            return (diff.LengthSquared() <= tolerance * tolerance);
+            return (diff.LengthSquared <= tolerance * tolerance);
         }
 
         public int CompareTo(Vector4 vector)
         {
-            return Length().CompareTo(vector.Length());
+            return Length.CompareTo(vector.Length);
         }
 
-        public bool IsFinite()
-        {
-            return (X.IsFinite() && Y.IsFinite() && Z.IsFinite() && W.IsFinite());
-        }
+        public bool IsFinite() => X.IsFinite() && Y.IsFinite() && Z.IsFinite() && W.IsFinite();
 
         public void FromBytes(byte[] byteArray, int pos)
         {
             if (!BitConverter.IsLittleEndian)
             {
                 // Big endian architecture
-                byte[] conversionBuffer = new byte[16];
+                var conversionBuffer = new byte[16];
 
                 Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 16);
 
@@ -146,7 +137,7 @@ namespace SilverSim.Types
         /// <returns>A 16 byte array containing X, Y, Z, and W</returns>
         public byte[] GetBytes()
         {
-            byte[] byteArray = new byte[16];
+            var byteArray = new byte[16];
             ToBytes(byteArray, 0);
             return byteArray;
         }
@@ -177,10 +168,7 @@ namespace SilverSim.Types
 
         #region Static Methods
 
-        public static Vector3 Lerp(Vector3 lhs, Vector3 rhs, double c)
-        {
-            return lhs + (rhs - lhs) * c;
-        }
+        public static Vector3 Lerp(Vector3 lhs, Vector3 rhs, double c) => lhs + (rhs - lhs) * c;
 
         public static Vector4 Add(Vector4 value1, Vector4 value2)
         {
@@ -191,28 +179,18 @@ namespace SilverSim.Types
             return value1;
         }
 
-        public static Vector4 Clamp(Vector4 value1, Vector4 min, Vector4 max)
-        {
-            return new Vector4(
+        public static Vector4 Clamp(Vector4 value1, Vector4 min, Vector4 max) => new Vector4(
                 value1.X.Clamp(min.X, max.X),
                 value1.Y.Clamp(min.Y, max.Y),
                 value1.Z.Clamp(min.Z, max.Z),
                 value1.W.Clamp(min.W, max.W));
-        }
 
-        public static double Distance(Vector4 value1, Vector4 value2)
-        {
-            return Math.Sqrt(DistanceSquared(value1, value2));
-        }
+        public static double Distance(Vector4 value1, Vector4 value2) => Math.Sqrt(DistanceSquared(value1, value2));
 
-        public static double DistanceSquared(Vector4 value1, Vector4 value2)
-        {
-            return
-                (value1.W - value2.W) * (value1.W - value2.W) +
+        public static double DistanceSquared(Vector4 value1, Vector4 value2) => (value1.W - value2.W) * (value1.W - value2.W) +
                 (value1.X - value2.X) * (value1.X - value2.X) +
                 (value1.Y - value2.Y) * (value1.Y - value2.Y) +
                 (value1.Z - value2.Z) * (value1.Z - value2.Z);
-        }
 
         public static Vector4 Divide(Vector4 value1, Vector4 value2)
         {
@@ -233,28 +211,19 @@ namespace SilverSim.Types
             return value1;
         }
 
-        public static double Dot(Vector4 vector1, Vector4 vector2)
-        {
-            return vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z + vector1.W * vector2.W;
-        }
+        public static double Dot(Vector4 vector1, Vector4 vector2) => vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z + vector1.W * vector2.W;
 
-        public static Vector4 Max(Vector4 value1, Vector4 value2)
-        {
-            return new Vector4(
+        public static Vector4 Max(Vector4 value1, Vector4 value2) => new Vector4(
                Math.Max(value1.X, value2.X),
                Math.Max(value1.Y, value2.Y),
                Math.Max(value1.Z, value2.Z),
                Math.Max(value1.W, value2.W));
-        }
 
-        public static Vector4 Min(Vector4 value1, Vector4 value2)
-        {
-            return new Vector4(
+        public static Vector4 Min(Vector4 value1, Vector4 value2) => new Vector4(
                Math.Min(value1.X, value2.X),
                Math.Min(value1.Y, value2.Y),
                Math.Min(value1.Z, value2.Z),
                Math.Min(value1.W, value2.W));
-        }
 
         public static Vector4 Multiply(Vector4 value1, Vector4 value2)
         {
@@ -314,23 +283,17 @@ namespace SilverSim.Types
             return value1;
         }
 
-        public static Vector4 Transform(Vector3 position, Matrix4 matrix)
-        {
-            return new Vector4(
+        public static Vector4 Transform(Vector3 position, Matrix4 matrix) => new Vector4(
                 (position.X * matrix.M11) + (position.Y * matrix.M21) + (position.Z * matrix.M31) + matrix.M41,
                 (position.X * matrix.M12) + (position.Y * matrix.M22) + (position.Z * matrix.M32) + matrix.M42,
                 (position.X * matrix.M13) + (position.Y * matrix.M23) + (position.Z * matrix.M33) + matrix.M43,
                 (position.X * matrix.M14) + (position.Y * matrix.M24) + (position.Z * matrix.M34) + matrix.M44);
-        }
 
-        public static Vector4 Transform(Vector4 vector, Matrix4 matrix)
-        {
-            return new Vector4(
+        public static Vector4 Transform(Vector4 vector, Matrix4 matrix) => new Vector4(
                 (vector.X * matrix.M11) + (vector.Y * matrix.M21) + (vector.Z * matrix.M31) + (vector.W * matrix.M41),
                 (vector.X * matrix.M12) + (vector.Y * matrix.M22) + (vector.Z * matrix.M32) + (vector.W * matrix.M42),
                 (vector.X * matrix.M13) + (vector.Y * matrix.M23) + (vector.Z * matrix.M33) + (vector.W * matrix.M43),
                 (vector.X * matrix.M14) + (vector.Y * matrix.M24) + (vector.Z * matrix.M34) + (vector.W * matrix.M44));
-        }
 
         public static Vector4 Parse(string val)
         {
@@ -346,7 +309,7 @@ namespace SilverSim.Types
         {
             result = default(Vector4);
             char[] splitChar = { ',' };
-            string[] split = val.Replace("<", String.Empty).Replace(">", String.Empty).Split(splitChar);
+            var split = val.Replace("<", String.Empty).Replace(">", String.Empty).Split(splitChar);
 
             if (split.Length != 4)
             {
@@ -373,45 +336,27 @@ namespace SilverSim.Types
 
         #region Overrides
 
-        public override bool Equals(object obj)
-        {
-            return (obj is Vector4) && this == (Vector4)obj;
-        }
+        public override bool Equals(object obj) => (obj is Vector4) && this == (Vector4)obj;
 
-        public bool Equals(Vector4 other)
-        {
-            return Math.Abs(W - other.W) < Double.Epsilon
+        public bool Equals(Vector4 other) => Math.Abs(W - other.W) < Double.Epsilon
                 && Math.Abs(X - other.X) < Double.Epsilon
                 && Math.Abs(Y - other.Y) < Double.Epsilon
                 && Math.Abs(Z - other.Z) < Double.Epsilon;
-        }
 
-        public override int GetHashCode()
-        {
-            return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode() ^ W.GetHashCode();
-        }
+        public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode() ^ W.GetHashCode();
 
-        public override string ToString()
-        {
-            return String.Format(CultureInfo.InvariantCulture, "<{0}, {1}, {2}, {3}>", X, Y, Z, W);
-        }
+        public override string ToString() => String.Format(CultureInfo.InvariantCulture, "<{0}, {1}, {2}, {3}>", X, Y, Z, W);
 
         #endregion Overrides
 
         #region Operators
 
-        public static bool operator ==(Vector4 value1, Vector4 value2)
-        {
-            return Math.Abs(value1.W - value2.W) < Double.Epsilon
+        public static bool operator ==(Vector4 value1, Vector4 value2) => Math.Abs(value1.W - value2.W) < Double.Epsilon
                 && Math.Abs(value1.X - value2.X) < Double.Epsilon
                 && Math.Abs(value1.Y - value2.Y) < Double.Epsilon
                 && Math.Abs(value1.Z - value2.Z) < Double.Epsilon;
-        }
 
-        public static bool operator !=(Vector4 value1, Vector4 value2)
-        {
-            return !(value1 == value2);
-        }
+        public static bool operator !=(Vector4 value1, Vector4 value2) => !(value1 == value2);
 
         public static Vector4 operator +(Vector4 value1, Vector4 value2)
         {
@@ -422,10 +367,7 @@ namespace SilverSim.Types
             return value1;
         }
 
-        public static Vector4 operator -(Vector4 value)
-        {
-            return new Vector4(-value.X, -value.Y, -value.Z, -value.W);
-        }
+        public static Vector4 operator -(Vector4 value) => new Vector4(-value.X, -value.Y, -value.Z, -value.W);
 
         public static Vector4 operator -(Vector4 value1, Vector4 value2)
         {

@@ -29,10 +29,5 @@ namespace SilverSim.Types.Groups
 
         /* informative field */
         public GroupPowers Powers;
-
-        public GroupRolemember()
-        {
-
-        }
     }
 }

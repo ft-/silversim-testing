@@ -47,8 +47,8 @@ namespace SilverSim.Types
         public UUID(byte[] source, int pos)
         {
             int a = (source[pos + 0] << 24) | (source[pos + 1] << 16) | (source[pos + 2] << 8) | source[pos + 3];
-            short b = (short)((source[pos + 4] << 8) | source[pos + 5]);
-            short c = (short)((source[pos + 6] << 8) | source[pos + 7]);
+            var b = (short)((source[pos + 4] << 8) | source[pos + 5]);
+            var c = (short)((source[pos + 6] << 8) | source[pos + 7]);
 
             m_Guid = new Guid(a, b, c, source[pos + 8], source[pos + 9], source[pos + 10], source[pos + 11],
                 source[pos + 12], source[pos + 13], source[pos + 14], source[pos + 15]);
@@ -58,8 +58,8 @@ namespace SilverSim.Types
         public void FromBytes(byte[] source, int pos)
         {
             int a = (source[pos + 0] << 24) | (source[pos + 1] << 16) | (source[pos + 2] << 8) | source[pos + 3];
-            short b = (short)((source[pos + 4] << 8) | source[pos + 5]);
-            short c = (short)((source[pos + 6] << 8) | source[pos + 7]);
+            var b = (short)((source[pos + 4] << 8) | source[pos + 5]);
+            var c = (short)((source[pos + 6] << 8) | source[pos + 7]);
 
             m_Guid = new Guid(a, b, c, source[pos + 8], source[pos + 9], source[pos + 10], source[pos + 11],
                 source[pos + 12], source[pos + 13], source[pos + 14], source[pos + 15]);
@@ -67,7 +67,7 @@ namespace SilverSim.Types
 
         public void ToBytes(byte[] dest, int pos)
         {
-            byte[] bytes = m_Guid.ToByteArray();
+            var bytes = m_Guid.ToByteArray();
             dest[pos + 0] = bytes[3];
             dest[pos + 1] = bytes[2];
             dest[pos + 2] = bytes[1];
@@ -81,15 +81,12 @@ namespace SilverSim.Types
 
         public byte[] GetBytes()
         {
-            byte[] n = new byte[16];
+            var n = new byte[16];
             ToBytes(n, 0);
             return n;
         }
 
-        public static UUID Parse(string val)
-        {
-            return new UUID(val);
-        }
+        public static UUID Parse(string val) => new UUID(val);
 
         public static bool TryParse(string val, out UUID result)
         {
@@ -114,41 +111,23 @@ namespace SilverSim.Types
             return m_Guid == ((UUID)o).m_Guid;
         }
 
-        public bool Equals(UUID uuid)
-        {
-            return m_Guid == uuid.m_Guid;
-        }
+        public bool Equals(UUID uuid) => m_Guid == uuid.m_Guid;
 
-        public override string ToString()
-        {
-            return m_Guid.ToString();
-        }
+        public override string ToString() => m_Guid.ToString();
 
-        public override int GetHashCode()
-        {
-            return m_Guid.GetHashCode();
-        }
+        public override int GetHashCode() => m_Guid.GetHashCode();
 
-        public int CompareTo(UUID id)
-        {
-            return m_Guid.CompareTo(id.m_Guid);
-        }
+        public int CompareTo(UUID id) => m_Guid.CompareTo(id.m_Guid);
 
         #region Operators
-        public static bool operator ==(UUID l, UUID r)
-        {
-            return l.m_Guid == r.m_Guid;
-        }
+        public static bool operator ==(UUID l, UUID r) => l.m_Guid == r.m_Guid;
 
-        public static bool operator !=(UUID l, UUID r)
-        {
-            return l.m_Guid != r.m_Guid;
-        }
+        public static bool operator !=(UUID l, UUID r) => l.m_Guid != r.m_Guid;
 
         public static UUID operator^(UUID a, UUID b)
         {
-            byte[] ab = new byte[16];
-            byte[] bb = new byte[16];
+            var ab = new byte[16];
+            var bb = new byte[16];
             a.ToBytes(ab, 0);
             b.ToBytes(bb, 0);
 
@@ -160,64 +139,37 @@ namespace SilverSim.Types
             return new UUID(ab, 0);
         }
 
-        public static implicit operator UUID(string val)
-        {
-            return new UUID(val);
-        }
+        public static implicit operator UUID(string val) => new UUID(val);
 
-        public static implicit operator UUID(Guid val)
-        {
-            return new UUID(val);
-        }
+        public static implicit operator UUID(Guid val) => new UUID(val);
 
-        public static explicit operator string(UUID val)
-        {
-            return val.ToString();
-        }
+        public static explicit operator string(UUID val) => val.ToString();
         #endregion
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(!this.Equals(Zero)); } }
-        public Integer AsInteger { get { return new Integer(this.Equals(Zero) ? 0 : 1); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(0, 0, 0, this.Equals(Zero) ? 0 : 1); } }
-        public Real AsReal { get { return new Real(this.Equals(Zero) ? 0 : 1); } }
-        public AString AsString { get { return new AString(ToString()); } }
-        public UUID AsUUID { get { return new UUID(m_Guid); } }
-        public Vector3 AsVector3 { get { return new Vector3(this.Equals(Zero) ? 0 : 1); } }
-        public uint AsUInt { get { return this.Equals(Zero) ? 0 : (uint) 1; } }
-        public int AsInt { get { return this.Equals(Zero) ? 0 : 1; } }
-        public ulong AsULong { get { return this.Equals(Zero) ? 0 : (ulong)1; } }
-        public long AsLong { get { return this.Equals(Zero) ? 0 : (long)1; } }
+        public ABoolean AsBoolean => new ABoolean(!Equals(Zero));
+        public Integer AsInteger => new Integer(Equals(Zero) ? 0 : 1);
+        public Quaternion AsQuaternion => new Quaternion(0, 0, 0, Equals(Zero) ? 0 : 1);
+        public Real AsReal => new Real(Equals(Zero) ? 0 : 1);
+        public AString AsString => new AString(ToString());
+        public UUID AsUUID => new UUID(m_Guid);
+        public Vector3 AsVector3 => new Vector3(Equals(Zero) ? 0 : 1);
+        public uint AsUInt => Equals(Zero) ? 0 : (uint)1;
+        public int AsInt => Equals(Zero) ? 0 : 1;
+        public ulong AsULong => Equals(Zero) ? 0 : (ulong)1;
+        public long AsLong => Equals(Zero) ? 0 : 1;
         #endregion
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.UUID;
-            }
-        }
+        public ValueType Type => ValueType.UUID;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.Invalid;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Invalid;
 
-        public static UUID Random
-        {
-            get
-            {
-                return new UUID(Guid.NewGuid());
-            }
-        }
+        public static UUID Random => new UUID(Guid.NewGuid());
 
         public static UUID RandomFixedFirst(UInt32 val)
         {
-            byte[] ub = Guid.NewGuid().ToByteArray();
+            var ub = Guid.NewGuid().ToByteArray();
             ub[0] = (byte)((val >> 24) & 0xFF);
             ub[1] = (byte)((val >> 16) & 0xFF);
             ub[2] = (byte)((val >> 8) & 0xFF);
@@ -231,7 +183,7 @@ namespace SilverSim.Types
             get
             {
                 uint retval = 0;
-                byte[] bytes = m_Guid.ToByteArray();
+                var bytes = m_Guid.ToByteArray();
 
                 retval += (uint)((bytes[3] << 24) + (bytes[2] << 16) + (bytes[1] << 8) + bytes[0]);
                 retval += (uint)((bytes[7] << 24) + (bytes[6] << 16) + (bytes[5] << 8) + bytes[4]);

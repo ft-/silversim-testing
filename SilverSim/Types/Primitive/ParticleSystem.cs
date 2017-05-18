@@ -203,7 +203,7 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                List<UUID> reflist = new List<UUID>();
+                var reflist = new List<UUID>();
                 if(Texture != UUID.Zero)
                 {
                     reflist.Add(Texture);
@@ -217,20 +217,11 @@ namespace SilverSim.Types.Primitive
         /// Can this particle system be packed in a legacy compatible way
         /// </summary>
         /// <returns>True if the particle system doesn't use new particle system features</returns>
-        public bool IsLegacyCompatible()
-        {
-            return !HasGlow() && !HasBlendFunc();
-        }
+        public bool IsLegacyCompatible() => !HasGlow() && !HasBlendFunc();
 
-        public bool HasGlow()
-        {
-            return PartStartGlow > 0f || PartEndGlow > 0f;
-        }
+        public bool HasGlow() => PartStartGlow > 0f || PartEndGlow > 0f;
 
-        public bool HasBlendFunc()
-        {
-            return BlendFuncSource != BlendFunc.SourceAlpha || BlendFuncDest != BlendFunc.OneMinusSourceAlpha;
-        }
+        public bool HasBlendFunc() => BlendFuncSource != BlendFunc.SourceAlpha || BlendFuncDest != BlendFunc.OneMinusSourceAlpha;
 
         public ParticleSystem()
         {
@@ -267,7 +258,7 @@ namespace SilverSim.Types.Primitive
             PartEndScaleY = 0.0f;
 
             int size = data.Length - pos;
-            BitPacker pack = new BitPacker(data, pos);
+            var pack = new BitPacker(data, pos);
 
             if (size == LegacyDataBlockSize)
             {
@@ -369,8 +360,8 @@ namespace SilverSim.Types.Primitive
                 size += 2; // two bytes for start end end blend function
             }
 
-            byte[] bytes = new byte[size];
-            BitPacker pack = new BitPacker(bytes, 0);
+            var bytes = new byte[size];
+            var pack = new BitPacker(bytes, 0);
 
             if (IsLegacyCompatible())
             {

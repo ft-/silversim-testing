@@ -36,21 +36,9 @@ namespace SilverSim.Types
         }
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.Real;
-            }
-        }
+        public ValueType Type => ValueType.Real;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.Float;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Float;
         #endregion Properties
 
         public Real(float val)
@@ -63,15 +51,9 @@ namespace SilverSim.Types
             m_Value = val;
         }
 
-        public int CompareTo(Real v)
-        {
-            return m_Value.CompareTo(v.m_Value);
-        }
+        public int CompareTo(Real v) => m_Value.CompareTo(v.m_Value);
 
-        public bool Equals(Real v)
-        {
-            return m_Value.Equals(v.m_Value);
-        }
+        public bool Equals(Real v) => m_Value.Equals(v.m_Value);
 
         public override bool Equals(object v)
         {
@@ -82,18 +64,15 @@ namespace SilverSim.Types
             return false;
         }
 
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "{0}", m_Value);
-        }
+        public override string ToString() => string.Format(CultureInfo.InvariantCulture, "{0}", m_Value);
 
         #region Serialization
-        public void FromBytes(byte[] byteArray, int pos, bool normalized)
+        public void FromBytes(byte[] byteArray, int pos)
         {
             if (!BitConverter.IsLittleEndian)
             {
                 // Big endian architecture
-                byte[] conversionBuffer = new byte[8];
+                var conversionBuffer = new byte[8];
 
                 Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 8);
 
@@ -121,102 +100,48 @@ namespace SilverSim.Types
 
 
         #region Operators
-        public static Real operator -(Real v)
-        {
-            return new Real(-v.m_Value);
-        }
+        public static Real operator -(Real v) => new Real(-v.m_Value);
 
-        public static Real operator +(Real a, Real b)
-        {
-            return new Real(a.m_Value + b.m_Value);
-        }
+        public static Real operator +(Real a, Real b) => new Real(a.m_Value + b.m_Value);
 
-        public static Real operator -(Real a, Real b)
-        {
-            return new Real(a.m_Value - b.m_Value);
-        }
+        public static Real operator -(Real a, Real b) => new Real(a.m_Value - b.m_Value);
 
-        public static Real operator *(Real a, Real b)
-        {
-            return new Real(a.m_Value * b.m_Value);
-        }
+        public static Real operator *(Real a, Real b) => new Real(a.m_Value * b.m_Value);
 
-        public static Real operator /(Real a, Real b)
-        {
-            return new Real(a.m_Value / b.m_Value);
-        }
+        public static Real operator /(Real a, Real b) => new Real(a.m_Value / b.m_Value);
 
-        public static Real operator %(Real a, Real b)
-        {
-            return new Real(a.m_Value % b.m_Value);
-        }
+        public static Real operator %(Real a, Real b) => new Real(a.m_Value % b.m_Value);
 
-        public static explicit operator Integer(Real v)
-        {
-            return new Integer((Int32)v.m_Value);
-        }
+        public static explicit operator Integer(Real v) => new Integer((Int32)v.m_Value);
 
-        public static explicit operator AString(Real v)
-        {
-            return new AString(v.m_Value.ToString());
-        }
+        public static explicit operator AString(Real v) => new AString(v.m_Value.ToString());
 
-        public static explicit operator string(Real v)
-        {
-            return v.m_Value.ToString();
-        }
+        public static explicit operator string(Real v) => v.m_Value.ToString();
 
-        public static implicit operator double(Real v)
-        {
-            return v.m_Value;
-        }
-        public static bool operator ==(Real a, Real b)
-        {
-            return Math.Abs(a.m_Value - b.m_Value) < Double.Epsilon;
-        }
+        public static implicit operator double(Real v) => v.m_Value;
+        public static bool operator ==(Real a, Real b) => Math.Abs(a.m_Value - b.m_Value) < Double.Epsilon;
 
-        public static bool operator !=(Real a, Real b)
-        {
-            return Math.Abs(a.m_Value - b.m_Value) >= Double.Epsilon;
-        }
+        public static bool operator !=(Real a, Real b) => Math.Abs(a.m_Value - b.m_Value) >= Double.Epsilon;
 
-        public static bool operator <(Real a, Real b)
-        {
-            return a.m_Value < b.m_Value;
-        }
+        public static bool operator <(Real a, Real b) => a.m_Value < b.m_Value;
 
-        public static bool operator >(Real a, Real b)
-        {
-            return a.m_Value > b.m_Value;
-        }
+        public static bool operator >(Real a, Real b) => a.m_Value > b.m_Value;
 
-        public static bool operator <=(Real a, Real b)
-        {
-            return a.m_Value <= b.m_Value;
-        }
+        public static bool operator <=(Real a, Real b) => a.m_Value <= b.m_Value;
 
-        public static bool operator >=(Real a, Real b)
-        {
-            return a.m_Value >= b.m_Value;
-        }
+        public static bool operator >=(Real a, Real b) => a.m_Value >= b.m_Value;
 
-        public override int GetHashCode()
-        {
-            return (int)m_Value;
-        }
+        public override int GetHashCode() => (int)m_Value;
         #endregion Operators
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public static Real Parse(string v)
-        {
-            return new Real(Double.Parse(v.Trim(), CultureInfo.InvariantCulture));
-        }
+        public static Real Parse(string v) => new Real(Double.Parse(v.Trim(), CultureInfo.InvariantCulture));
 
         public static bool TryParse(string v, out Real res)
         {
             res = default(Real);
             double f;
-            if(!Double.TryParse(v.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out f))
+            if(!double.TryParse(v.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out f))
             {
                 return false;
             }
@@ -225,17 +150,17 @@ namespace SilverSim.Types
         }
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(Math.Abs(m_Value) >= Single.Epsilon); } }
-        public Integer AsInteger { get { return new Integer((int)m_Value); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(0, 0, 0, m_Value); } }
-        public Real AsReal { get { return new Real(m_Value); } }
-        public AString AsString { get { return new AString(ToString()); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(m_Value); } }
-        public uint AsUInt { get { return (uint)m_Value; } }
-        public int AsInt { get { return (int)m_Value; } }
-        public ulong AsULong { get { return (ulong)m_Value; } }
-        public long AsLong { get { return (long)m_Value; } }
+        public ABoolean AsBoolean => new ABoolean(Math.Abs(m_Value) >= Single.Epsilon);
+        public Integer AsInteger => new Integer((int)m_Value);
+        public Quaternion AsQuaternion => new Quaternion(0, 0, 0, m_Value);
+        public Real AsReal => new Real(m_Value);
+        public AString AsString => new AString(ToString());
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3(m_Value);
+        public uint AsUInt => (uint)m_Value;
+        public int AsInt => (int)m_Value;
+        public ulong AsULong => (ulong)m_Value;
+        public long AsLong => (long)m_Value;
         #endregion
     }
 }

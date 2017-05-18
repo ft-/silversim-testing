@@ -54,7 +54,7 @@ namespace SilverSim.Types.Agent
                     m_RwLock.AcquireReaderLock(-1);
                     try
                     {
-                        UUID[] textures = new UUID[TextureCount];
+                        var textures = new UUID[TextureCount];
                         for (int i = 0; i < TextureCount; ++i)
                         {
                             textures[i] = new UUID(m_AvatarTextures[i]);
@@ -146,13 +146,7 @@ namespace SilverSim.Types.Agent
         public UInt32 Serial = 1;
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
-        public byte[] BakeIndices
-        {
-            get
-            {
-                return new byte[] { 8, 9, 10, 11, 19, 20 };
-            }
-        }
+        public byte[] BakeIndices => new byte[] { 8, 9, 10, 11, 19, 20 };
 
         [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
         public static readonly int MaxVisualParams = 255;
@@ -167,7 +161,7 @@ namespace SilverSim.Types.Agent
                 m_VisualParamsLock.AcquireReaderLock(-1);
                 try
                 {
-                    byte[] res = new byte[m_VisualParams.Length];
+                    var res = new byte[m_VisualParams.Length];
                     Buffer.BlockCopy(m_VisualParams, 0, res, 0, m_VisualParams.Length);
                     return res;
                 }
@@ -190,11 +184,6 @@ namespace SilverSim.Types.Agent
                     m_VisualParamsLock.ReleaseWriterLock();
                 }
             }
-        }
-
-        public AppearanceInfo()
-        {
-
         }
 
         [Serializable]
@@ -226,51 +215,52 @@ namespace SilverSim.Types.Agent
 
         public static AppearanceInfo FromNotecard(Notecard nc)
         {
-            using (MemoryStream ms = new MemoryStream(nc.Text.ToUTF8Bytes()))
+            using (var ms = new MemoryStream(nc.Text.ToUTF8Bytes()))
             {
-                Map m = LlsdXml.Deserialize(ms) as Map;
+                var m = LlsdXml.Deserialize(ms) as Map;
                 if(m == null)
                 {
                     throw new InvalidAppearanceInfoSerializationException();
                 }
 
-                AppearanceInfo appearanceInfo = new AppearanceInfo();
-                appearanceInfo.AvatarHeight = m["height"].AsReal;
-                AnArray wearables = m["wearables"] as AnArray;
-                AnArray textures = m["textures"] as AnArray;
-                AnArray attachments = m["attachments"] as AnArray;
-                BinaryData visualparams = m["visualparams"] as BinaryData;
-
-                appearanceInfo.VisualParams = visualparams;
-                foreach(IValue iv in attachments)
+                var appearanceInfo = new AppearanceInfo()
                 {
-                    Map im = iv as Map;
+                    AvatarHeight = m["height"].AsReal,
+                    VisualParams = m["visualparams"] as BinaryData
+                };
+                var wearables = m["wearables"] as AnArray;
+                var textures = m["textures"] as AnArray;
+                foreach(var iv in m["attachments"] as AnArray)
+                {
+                    var im = iv as Map;
                     if(im == null)
                     {
                         throw new InvalidAppearanceInfoSerializationException();
                     }
-                    AttachmentPoint ap = (AttachmentPoint)im["point"].AsInt;
+                    var ap = (AttachmentPoint)im["point"].AsInt;
 
                     appearanceInfo.Attachments[ap][im["item"].AsUUID] = im["asset"].AsUUID;
                 }
                 
                 for(int i = 0; i < wearables.Count; ++i)
                 {
-                    AnArray wearablesAt = wearables[i] as AnArray;
+                    var wearablesAt = wearables[i] as AnArray;
                     if(null == wearablesAt)
                     {
                         throw new InvalidAppearanceInfoSerializationException();
                     }
-                    foreach(IValue ivw in wearablesAt)
+                    foreach(var ivw in wearablesAt)
                     {
-                        Map mw = ivw as Map;
+                        var mw = ivw as Map;
                         if(mw == null)
                         {
                             throw new InvalidAppearanceInfoSerializationException();
                         }
-                        AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
-                        wi.ItemID = mw["item"].AsUUID;
-                        wi.AssetID = mw["asset"].AsUUID;
+                        var wi = new AgentWearables.WearableInfo()
+                        {
+                            ItemID = mw["item"].AsUUID,
+                            AssetID = mw["asset"].AsUUID
+                        };
                         appearanceInfo.Wearables[(WearableType)i].Add(wi);
                     }
                 }
@@ -289,9 +279,9 @@ namespace SilverSim.Types.Agent
 
         public static explicit operator Notecard(AppearanceInfo appearanceInfo)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
+                using (var writer = ms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     {
@@ -306,8 +296,7 @@ namespace SilverSim.Types.Agent
                                 {
                                     writer.WriteStartElement("array");
                                     {
-                                        List<AgentWearables.WearableInfo> wearables = appearanceInfo.Wearables[(WearableType)i];
-                                        foreach (AgentWearables.WearableInfo wearable in wearables)
+                                        foreach (var wearable in appearanceInfo.Wearables[(WearableType)i])
                                         {
                                             writer.WriteStartElement("map");
                                             {
@@ -325,7 +314,7 @@ namespace SilverSim.Types.Agent
                             writer.WriteNamedValue("key", "textures");
                             writer.WriteStartElement("array");
                             {
-                                foreach (UUID tex in appearanceInfo.AvatarTextures.All)
+                                foreach (var tex in appearanceInfo.AvatarTextures.All)
                                 {
                                     writer.WriteNamedValue("uuid", tex);
                                 }
@@ -338,9 +327,9 @@ namespace SilverSim.Types.Agent
                             writer.WriteNamedValue("key", "attachments");
                             writer.WriteStartElement("array");
                             {
-                                foreach (KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvpAp in appearanceInfo.Attachments)
+                                foreach (var kvpAp in appearanceInfo.Attachments)
                                 {
-                                    foreach (KeyValuePair<UUID, UUID> attachmentKvp in kvpAp.Value)
+                                    foreach (var attachmentKvp in kvpAp.Value)
                                     {
                                         writer.WriteStartElement("map");
                                         {
@@ -358,10 +347,11 @@ namespace SilverSim.Types.Agent
                     }
                     writer.WriteEndElement();
                 }
-                
-                Notecard nc = new Notecard();
-                nc.Text = ms.ToArray().FromUTF8Bytes();
-                return nc;
+
+                return new Notecard()
+                {
+                    Text = ms.ToArray().FromUTF8Bytes()
+                };
             }
         }
     }

@@ -192,21 +192,9 @@ namespace SilverSim.Types.Parcel
             readonly ReaderWriterLock m_LandBitmapRwLock;
             readonly ParcelInfo m_ParcelInfo;
 
-            public int BitmapWidth
-            {
-                get
-                {
-                    return m_BitmapWidth;
-                }
-            }
+            public int BitmapWidth => m_BitmapWidth;
 
-            public int BitmapHeight
-            {
-                get
-                {
-                    return m_BitmapHeight;
-                }
-            }
+            public int BitmapHeight => m_BitmapHeight;
 
             public ParcelDataLandBitmap(byte[,] landBitmap, int bitmapWidth, int bitmapHeight, ReaderWriterLock landBitmapRwLock, ParcelInfo parcelInfo)
             {
@@ -254,7 +242,7 @@ namespace SilverSim.Types.Parcel
                     m_LandBitmapRwLock.AcquireReaderLock(-1);
                     try
                     {
-                        byte[] b = new byte[m_LandBitmap.Length];
+                        var b = new byte[m_LandBitmap.Length];
                         Buffer.BlockCopy(m_LandBitmap, 0, b, 0, m_LandBitmap.Length);
                         return b;
                     }
@@ -332,7 +320,7 @@ namespace SilverSim.Types.Parcel
                 {
                     return false;
                 }
-                return (this[x / 4, y / 4]);
+                return this[x / 4, y / 4];
             }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -469,7 +457,7 @@ namespace SilverSim.Types.Parcel
             }
         }
 
-        public ParcelDataLandBitmap LandBitmap { get; private set; }
+        public ParcelDataLandBitmap LandBitmap { get; }
 
         public ParcelInfo(int bitmapWidth, int bitmapHeight)
         {

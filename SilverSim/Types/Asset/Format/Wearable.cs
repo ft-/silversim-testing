@@ -75,9 +75,9 @@ namespace SilverSim.Types.Asset.Format
         [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidComplexMethodsRule")]
         public Wearable(AssetData asset)
         {
-            string[] lines = Encoding.UTF8.GetString(asset.Data).Split('\n');
+            var lines = Encoding.UTF8.GetString(asset.Data).Split('\n');
 
-            string[] versioninfo = lines[0].Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            var versioninfo = lines[0].Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
             if(versioninfo[0] != "LLWearable")
             {
                 throw new NotAWearableFormatException();
@@ -91,8 +91,8 @@ namespace SilverSim.Types.Asset.Format
             int idx = 2;
             while(++idx < lines.Length)
             {
-                string line = lines[idx].Trim();
-                string[] para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
+                var line = lines[idx].Trim();
+                var para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
                 if(para.Length == 2 && para[0] == "type")
                 {
                     int i;
@@ -294,7 +294,7 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                List<UUID> refs = new List<UUID>();
+                var refs = new List<UUID>();
                 foreach(UUID tex in Textures.Values)
                 {
                     if(!refs.Contains(tex))
@@ -334,7 +334,7 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                StringBuilder fmt = new StringBuilder("LLWearable version 22\n");
+                var fmt = new StringBuilder("LLWearable version 22\n");
                 fmt.Append(Name + "\n");
                 fmt.Append(Description + "\n");
                 fmt.AppendFormat(WearableFormat,
@@ -351,12 +351,12 @@ namespace SilverSim.Types.Asset.Format
                     SaleInfo.Price,
                     (uint)Type);
                 fmt.AppendFormat("parameters {0}\n", Params.Count);
-                foreach(KeyValuePair<uint, double> kvp in Params)
+                foreach(var kvp in Params)
                 {
                     fmt.AppendFormat("{0}\t{1}\n", kvp.Key, kvp.Value);
                 }
                 fmt.AppendFormat("textures {0}\n", Textures.Count);
-                foreach(KeyValuePair<AvatarTextureIndex, UUID> kvp in Textures)
+                foreach(var kvp in Textures)
                 {
                     fmt.AppendFormat("{0}\t{1}\n", (int)kvp.Key, kvp.Value);
                 }
@@ -367,12 +367,12 @@ namespace SilverSim.Types.Asset.Format
 
         public AssetData Asset()
         {
-            return (AssetData)this;
+            return this;
         }
 
         public static implicit operator AssetData(Wearable v)
         {
-            AssetData asset = new AssetData();
+            var asset = new AssetData();
 
             switch(v.Type)
             {
@@ -470,7 +470,7 @@ namespace SilverSim.Types.Asset.Format
 
         static Color CalcColor(double val, Color[] table)
         {
-            Color paramColor = new Color(0, 0, 0);
+            var paramColor = new Color(0, 0, 0);
 
             if(table.Length == 1)
             {
@@ -507,7 +507,7 @@ namespace SilverSim.Types.Asset.Format
 
         public Color GetTint()
         {
-            Color col = new Color(1, 1, 1);
+            var col = new Color(1, 1, 1);
             double val;
 
             switch (Type)
@@ -516,11 +516,11 @@ namespace SilverSim.Types.Asset.Format
                     col = new Color(0, 0, 0);
                     if (Params.TryGetValue(99, out val))
                     {
-                        col = col + CalcColor(val, EyeColors);
+                        col += CalcColor(val, EyeColors);
                     }
                     if(Params.TryGetValue(98, out val))
                     {
-                        col = col + new Color(val, val, val);
+                        col += new Color(val, val, val);
                     }
                     break;
 
@@ -528,7 +528,7 @@ namespace SilverSim.Types.Asset.Format
                     col = new Color(0, 0, 0);
                     if (Params.TryGetValue(108, out val))
                     {
-                        col = col + CalcColor(val, SkinColors);
+                        col += CalcColor(val, SkinColors);
                     }
                     if(Params.TryGetValue(110, out val))
                     {
@@ -536,7 +536,7 @@ namespace SilverSim.Types.Asset.Format
                     }
                     if(Params.TryGetValue(111, out val))
                     {
-                        col = col + CalcColor(val, PigmentColors);
+                        col += CalcColor(val, PigmentColors);
                     }
                     /*
             Params[108] = new VisualParam(108, "Rainbow Color", 0, "skin", String.Empty, "None", "Wild", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(255, 0, 255, 255), new Color4(255, 0, 0, 255), new Color4(255, 255, 0, 255), new Color4(0, 255, 0, 255), new Color4(0, 255, 255, 255), new Color4(0, 0, 255, 255), new Color4(255, 0, 255, 255) }));
@@ -552,22 +552,22 @@ namespace SilverSim.Types.Asset.Format
                     col = new Color(0, 0, 0);
                     if(Params.TryGetValue(112, out val))
                     {
-                        col = col + CalcColor(val, RainbowHairColors);
+                        col += CalcColor(val, RainbowHairColors);
                     }
 
                     if(Params.TryGetValue(113, out val))
                     {
-                        col = col + CalcColor(val, RedHairColors);
+                        col += CalcColor(val, RedHairColors);
                     }
 
                     if(Params.TryGetValue(114, out val))
                     {
-                        col = col + CalcColor(val, BlondeHairColors);
+                        col += CalcColor(val, BlondeHairColors);
                     }
 
                     if(Params.TryGetValue(115, out val))
                     {
-                        col = col + new Color(val, val, val);
+                        col += new Color(val, val, val);
                     }
                     break;
 

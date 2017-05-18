@@ -29,21 +29,9 @@ namespace SilverSim.Types
         private Int32 m_Value;
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.Integer;
-            }
-        }
+        public ValueType Type => ValueType.Integer;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.Integer;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.Integer;
         #endregion Properties
 
         public Integer()
@@ -55,20 +43,11 @@ namespace SilverSim.Types
             m_Value = val;
         }
 
-        public override string ToString()
-        {
-            return m_Value.ToString();
-        }
+        public override string ToString() => m_Value.ToString();
 
-        public int CompareTo(Integer v)
-        {
-            return m_Value.CompareTo(v.m_Value);
-        }
+        public int CompareTo(Integer v) => m_Value.CompareTo(v.m_Value);
 
-        public bool Equals(Integer v)
-        {
-            return m_Value.Equals(v.m_Value);
-        }
+        public bool Equals(Integer v) => m_Value.Equals(v.m_Value);
 
         public override bool Equals(object v)
         {
@@ -80,83 +59,35 @@ namespace SilverSim.Types
         }
 
         #region Operators
-        public static Integer operator-(Integer v)
-        {
-            return new Integer(-v.m_Value);
-        }
+        public static Integer operator -(Integer v) => new Integer(-v.m_Value);
 
-        public static Integer operator+(Integer a, Integer b)
-        {
-            return new Integer(a.m_Value + b.m_Value);
-        }
+        public static Integer operator +(Integer a, Integer b) => new Integer(a.m_Value + b.m_Value);
 
-        public static Integer operator-(Integer a, Integer b)
-        {
-            return new Integer(a.m_Value - b.m_Value);
-        }
+        public static Integer operator -(Integer a, Integer b) => new Integer(a.m_Value - b.m_Value);
 
-        public static Integer operator *(Integer a, Integer b)
-        {
-            return new Integer(a.m_Value * b.m_Value);
-        }
+        public static Integer operator *(Integer a, Integer b) => new Integer(a.m_Value * b.m_Value);
 
-        public static Integer operator /(Integer a, Integer b)
-        {
-            return new Integer(a.m_Value / b.m_Value);
-        }
+        public static Integer operator /(Integer a, Integer b) => new Integer(a.m_Value / b.m_Value);
 
-        public static Integer operator %(Integer a, Integer b)
-        {
-            return new Integer(a.m_Value % b.m_Value);
-        }
+        public static Integer operator %(Integer a, Integer b) => new Integer(a.m_Value % b.m_Value);
 
-        public static implicit operator ABoolean(Integer v)
-        {
-            return new ABoolean(v.m_Value != 0);
-        }
+        public static implicit operator ABoolean(Integer v) => new ABoolean(v.m_Value != 0);
 
-        public static implicit operator bool(Integer v)
-        {
-            return v.m_Value != 0;
-        }
-        public static implicit operator Int32(Integer v)
-        {
-            return v.m_Value;
-        }
-        public static bool operator==(Integer a, Integer b)
-        {
-            return a.m_Value == b.m_Value;
-        }
+        public static implicit operator bool(Integer v) => v.m_Value != 0;
+        public static implicit operator Int32(Integer v) => v.m_Value;
+        public static bool operator ==(Integer a, Integer b) => a.m_Value == b.m_Value;
 
-        public static bool operator!=(Integer a, Integer b)
-        {
-            return a.m_Value != b.m_Value;
-        }
+        public static bool operator !=(Integer a, Integer b) => a.m_Value != b.m_Value;
 
-        public static bool operator<(Integer a, Integer b)
-        {
-            return a.m_Value < b.m_Value;
-        }
+        public static bool operator <(Integer a, Integer b) => a.m_Value < b.m_Value;
 
-        public static bool operator>(Integer a, Integer b)
-        {
-            return a.m_Value > b.m_Value;
-        }
+        public static bool operator >(Integer a, Integer b) => a.m_Value > b.m_Value;
 
-        public static bool operator<=(Integer a, Integer b)
-        {
-            return a.m_Value <= b.m_Value;
-        }
+        public static bool operator <=(Integer a, Integer b) => a.m_Value <= b.m_Value;
 
-        public static bool operator >=(Integer a, Integer b)
-        {
-            return a.m_Value >= b.m_Value;
-        }
+        public static bool operator >=(Integer a, Integer b) => a.m_Value >= b.m_Value;
 
-        public override int GetHashCode()
-        {
-            return m_Value;
-        }
+        public override int GetHashCode() => m_Value;
         #endregion Operators
 
         public static Integer Parse(string v)
@@ -187,10 +118,10 @@ namespace SilverSim.Types
             if (!BitConverter.IsLittleEndian)
             {
                 // Big endian architecture
-                byte[] conversionBuffer = new byte[4];
+                var conversionBuffer = new byte[4];
 
                 Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 4);
-                System.Array.Reverse(conversionBuffer, 0, 4);
+                Array.Reverse(conversionBuffer, 0, 4);
                 m_Value = BitConverter.ToInt32(conversionBuffer, 0);
             }
             else
@@ -205,23 +136,23 @@ namespace SilverSim.Types
             Buffer.BlockCopy(BitConverter.GetBytes(m_Value), 0, dest, pos + 0, 4);
             if (!BitConverter.IsLittleEndian)
             {
-                System.Array.Reverse(dest, pos + 0, 4);
+                Array.Reverse(dest, pos + 0, 4);
             }
         }
         #endregion Serialization
 
         #region  Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(m_Value != 0); } }
-        public Integer AsInteger { get { return new Integer(m_Value); } }
-        public Quaternion AsQuaternion { get { return new Quaternion(0, 0, 0, m_Value); } }
-        public Real AsReal { get { return new Real(m_Value); } }
-        public AString AsString { get { return new AString(ToString()); } }
-        public UUID AsUUID { get { return new UUID(); } }
-        public Vector3 AsVector3 { get { return new Vector3(m_Value); } }
-        public uint AsUInt { get { return (uint)m_Value; } }
-        public int AsInt { get { return m_Value; } }
-        public ulong AsULong { get { return (ulong)m_Value; } }
-        public long AsLong { get { return m_Value; } }
+        public ABoolean AsBoolean => new ABoolean(m_Value != 0);
+        public Integer AsInteger => new Integer(m_Value);
+        public Quaternion AsQuaternion => new Quaternion(0, 0, 0, m_Value);
+        public Real AsReal => new Real(m_Value);
+        public AString AsString => new AString(ToString());
+        public UUID AsUUID => new UUID();
+        public Vector3 AsVector3 => new Vector3(m_Value);
+        public uint AsUInt => (uint)m_Value;
+        public int AsInt => m_Value;
+        public ulong AsULong => (ulong)m_Value;
+        public long AsLong => m_Value;
         #endregion
     }
 }

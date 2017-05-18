@@ -46,7 +46,7 @@ namespace SilverSim.Types.Agent
 
         public AgentWearables()
         {
-            for(WearableType type = WearableType.Shape; type < WearableType.NumWearables; ++type)
+            for(var type = WearableType.Shape; type < WearableType.NumWearables; ++type)
             {
                 m_Wearables[type] = new List<WearableInfo>();
             }
@@ -62,8 +62,8 @@ namespace SilverSim.Types.Agent
                 {
                     /* do not give access to our internal data via references */
                     List<WearableInfo> s = m_Wearables[type];
-                    List<WearableInfo> l = new List<WearableInfo>();
-                    foreach(WearableInfo i in s)
+                    var l = new List<WearableInfo>();
+                    foreach(var i in s)
                     {
                         l.Add(i);
                     }
@@ -77,13 +77,13 @@ namespace SilverSim.Types.Agent
 
             set
             {
-                List<WearableInfo> nl = new List<WearableInfo>();
+                var nl = new List<WearableInfo>();
                 if(value.Count > 5)
                 {
                     throw new ArgumentException("Too many elements in list");
                 }
                 /* do not give access to our internal data */
-                foreach(WearableInfo wi in value)
+                foreach(var wi in value)
                 {
                     nl.Add(wi);
                 }
@@ -130,7 +130,7 @@ namespace SilverSim.Types.Agent
                 m_WearablesUpdateLock.AcquireWriterLock(-1);
                 try
                 {
-                    List<WearableInfo> wearableList = m_Wearables[type];
+                    var wearableList = m_Wearables[type];
                     if (wearableList.Count <= index)
                     {
                         if(index >= 5)
@@ -165,8 +165,8 @@ namespace SilverSim.Types.Agent
                 m_WearablesUpdateLock.AcquireReaderLock(-1);
                 try
                 {
-                    Dictionary<WearableType, List<WearableInfo>> od = new Dictionary<WearableType, List<WearableInfo>>();
-                    foreach(KeyValuePair<WearableType, List<WearableInfo>> kvp in m_Wearables)
+                    var od = new Dictionary<WearableType, List<WearableInfo>>();
+                    foreach(var kvp in m_Wearables)
                     {
                         od.Add(kvp.Key, new List<WearableInfo>(kvp.Value));
                     }
@@ -182,12 +182,12 @@ namespace SilverSim.Types.Agent
                 m_WearablesUpdateLock.AcquireWriterLock(-1);
                 try
                 {
-                    foreach(List<WearableInfo> lwi in m_Wearables.Values)
+                    foreach(var lwi in m_Wearables.Values)
                     {
                         lwi.Clear();
                     }
 
-                    foreach (KeyValuePair<WearableType, List<WearableInfo>> kvp in value)
+                    foreach (var kvp in value)
                     {
                         if (kvp.Key < WearableType.NumWearables)
                         {

@@ -29,11 +29,13 @@ namespace SilverSim.Types.StructuredData.Json
     {
         public static string SerializeRequest(string method, string jsonId, IValue param)
         {
-            Map request = new Map();
-            request.Add("jsonrpc", "2.0");
-            request.Add("id", jsonId);
-            request.Add("method", method);
-            request.Add("params", param);
+            var request = new Map
+            {
+                { "jsonrpc", "2.0" },
+                { "id", jsonId },
+                { "method", method },
+                { "params", param }
+            };
             return Json.Serialize(request);
         }
 
@@ -101,7 +103,7 @@ namespace SilverSim.Types.StructuredData.Json
 
         public static IValue DeserializeResponse(Stream stream)
         {
-            Map m = Json.Deserialize(stream) as Map;
+            var m = Json.Deserialize(stream) as Map;
             if(null == m)
             {
                 throw new InvalidJson20RpcResponseException();
@@ -110,8 +112,8 @@ namespace SilverSim.Types.StructuredData.Json
             if (m.ContainsKey("error"))
             {
                 int faultCode = -1;
-                string faultString = string.Empty;
-                Map error = (Map)m["error"];
+                var faultString = string.Empty;
+                var error = (Map)m["error"];
                 if(error.ContainsKey("code"))
                 {
                     faultCode = error["code"].AsInt;

@@ -201,11 +201,7 @@ namespace SilverSim.Types
             return (T)Enum.Parse(typeof(T), value);
         }
 
-        public static T ReadContentAsEnumValue<T>(this XmlTextReader reader)
-        {
-            string value = reader.ReadElementValueAsString();
-            return (T)Enum.Parse(typeof(T), value);
-        }
+        public static T ReadContentAsEnumValue<T>(this XmlTextReader reader) => (T)Enum.Parse(typeof(T), reader.ReadElementValueAsString());
 
         public static UUID ReadContentAsUUID(this XmlTextReader reader)
         {
@@ -230,7 +226,7 @@ namespace SilverSim.Types
                 return new UUID(reader.ReadContentAsString()); /* they did three types of serialization for this and this is the third without inner element */
             }
 
-            UUID res = new UUID(reader.ReadElementValueAsString());
+            var res = new UUID(reader.ReadElementValueAsString());
             do
             {
                 if (!reader.Read())
@@ -354,7 +350,7 @@ namespace SilverSim.Types
         public static ColorAlpha ReadElementChildsAsColorAlpha(this XmlTextReader reader)
         {
             string tagname = reader.Name;
-            ColorAlpha v = ColorAlpha.White;
+            var v = ColorAlpha.White;
             if (reader.IsEmptyElement)
             {
                 return v;
@@ -366,7 +362,7 @@ namespace SilverSim.Types
                     throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
                 }
 
-                string nodeName = reader.Name;
+                var nodeName = reader.Name;
 
                 switch (reader.NodeType)
                 {
@@ -411,8 +407,8 @@ namespace SilverSim.Types
 
         public static Vector3 ReadElementChildsAsVector3(this XmlTextReader reader)
         {
-            string tagname = reader.Name;
-            Vector3 v = Vector3.Zero;
+            var tagname = reader.Name;
+            var v = Vector3.Zero;
             if(reader.IsEmptyElement)
             {
                 return v;
@@ -424,7 +420,7 @@ namespace SilverSim.Types
                     throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
                 }
 
-                string nodeName = reader.Name;
+                var nodeName = reader.Name;
 
                 switch(reader.NodeType)
                 {
@@ -465,8 +461,8 @@ namespace SilverSim.Types
 
         public static Quaternion ReadElementChildsAsQuaternion(this XmlTextReader reader)
         {
-            string tagname = reader.Name;
-            Quaternion v = Quaternion.Identity;
+            var tagname = reader.Name;
+            var v = Quaternion.Identity;
             if (reader.IsEmptyElement)
             {
                 return v;
@@ -478,7 +474,7 @@ namespace SilverSim.Types
                     throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
                 }
 
-                string nodeName = reader.Name;
+                var nodeName = reader.Name;
 
                 switch (reader.NodeType)
                 {
@@ -523,7 +519,7 @@ namespace SilverSim.Types
 
         public static string ReadElementValueAsString(this XmlTextReader reader)
         {
-            string tagname = reader.Name;
+            var tagname = reader.Name;
             if(reader.IsEmptyElement)
             {
                 return string.Empty;
@@ -589,7 +585,7 @@ namespace SilverSim.Types
 
         public static bool ReadElementValueAsBoolean(this XmlTextReader reader)
         {
-            string tagname = reader.Name;
+            var tagname = reader.Name;
             if (reader.IsEmptyElement)
             {
                 return false;
@@ -609,13 +605,13 @@ namespace SilverSim.Types
 
                     case XmlNodeType.Text:
                         {
-                            string val = reader.ReadContentAsString();
+                            var val = reader.ReadContentAsString().ToLower();
                             int ival;
-                            if(val.ToLower() == "true")
+                            if(val == "true")
                             {
                                 return true;
                             }
-                            else if(val.ToLower() == "false")
+                            else if(val == "false")
                             {
                                 return false;
                             }

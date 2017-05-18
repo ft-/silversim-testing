@@ -31,21 +31,9 @@ namespace SilverSim.Types
         readonly string m_Value;
 
         #region Properties
-        public ValueType Type
-        {
-            get
-            {
-                return ValueType.String;
-            }
-        }
+        public ValueType Type => ValueType.String;
 
-        public LSLValueType LSL_Type
-        {
-            get
-            {
-                return LSLValueType.String;
-            }
-        }
+        public LSLValueType LSL_Type => LSLValueType.String;
         #endregion Properties
 
         public AString()
@@ -58,36 +46,20 @@ namespace SilverSim.Types
             m_Value = val;
         }
 
-        public int CompareTo(AString v)
-        {
-            return m_Value.CompareTo(v.m_Value);
-        }
+        public int CompareTo(AString v) => m_Value.CompareTo(v.m_Value);
 
-        public bool Equals(AString v)
-        {
-            return m_Value.Equals(v.m_Value);
-        }
+        public bool Equals(AString v) => m_Value.Equals(v.m_Value);
 
-        public int CompareTo(string v)
-        {
-            return m_Value.CompareTo(m_Value);
-        }
+        public int CompareTo(string v) => m_Value.CompareTo(m_Value);
 
-        public bool Equals(string v)
-        {
-            return m_Value.Equals(m_Value);
-        }
+        public bool Equals(string v) => m_Value.Equals(m_Value);
 
-        public override string ToString()
-        {
-            return m_Value;
-        }
+        public override string ToString() => m_Value;
 
         public override bool Equals(object obj)
         {
             AString a;
-            string s;
-            s = obj as string;
+            var s = obj as string;
             if(null != s)
             {
                 return m_Value == s;
@@ -102,34 +74,16 @@ namespace SilverSim.Types
             return false;
         }
 
-        public AString Substring(Int32 startIndex)
-        {
-            return new AString(m_Value.Substring(startIndex));
-        }
+        public AString Substring(Int32 startIndex) => new AString(m_Value.Substring(startIndex));
 
-        public AString Substring(Int32 startIndex, Int32 length)
-        {
-            return new AString(m_Value.Substring(startIndex, length));
-        }
+        public AString Substring(Int32 startIndex, Int32 length) => new AString(m_Value.Substring(startIndex, length));
 
-        public Integer Length
-        {
-            get
-            {
-                return new Integer(m_Value.Length);
-            }
-        }
+        public Integer Length => new Integer(m_Value.Length);
 
-        public override int GetHashCode()
-        {
-            return m_Value.GetHashCode();
-        }
+        public override int GetHashCode() => m_Value.GetHashCode();
 
         #region Operators
-        public static AString operator+(AString a, AString b)
-        {
-            return new AString(a.m_Value + b.m_Value);
-        }
+        public static AString operator +(AString a, AString b) => new AString(a.m_Value + b.m_Value);
 
         public static implicit operator bool(AString v)
         {
@@ -147,70 +101,46 @@ namespace SilverSim.Types
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public static explicit operator Integer(AString v)
-        {
-            return Integer.Parse(v.m_Value);
-        }
+        public static explicit operator Integer(AString v) => Integer.Parse(v.m_Value);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public static explicit operator Real(AString v)
-        {
-            return Real.Parse(v.m_Value);
-        }
+        public static explicit operator Real(AString v) => Real.Parse(v.m_Value);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public static explicit operator double(AString v)
-        {
-            return double.Parse(v.m_Value.Trim(), CultureInfo.InvariantCulture);
-        }
+        public static explicit operator double(AString v) => double.Parse(v.m_Value.Trim(), CultureInfo.InvariantCulture);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public static explicit operator Vector3(AString v)
-        {
-            return new Vector3((double)v);
-        }
+        public static explicit operator Vector3(AString v) => new Vector3((double)v);
         #endregion Operators
 
-        public static AString Format(string format, object arg0)
-        {
-            return new AString(string.Format(format, arg0));
-        }
+        public static AString Format(string format, object arg0) => new AString(string.Format(format, arg0));
 
-        public static AString Format(string format, params object[] args)
-        {
-            return new AString(string.Format(format, args));
-        }
+        public static AString Format(string format, params object[] args) => new AString(string.Format(format, args));
 
-        public static AString Format(string format, object arg0, object arg1)
-        {
-            return new AString(string.Format(format, arg0, arg1));
-        }
+        public static AString Format(string format, object arg0, object arg1) => new AString(string.Format(format, arg0, arg1));
 
-        public static AString Format(string format, object arg0, object arg1, object arg2)
-        {
-            return new AString(string.Format(format, arg0, arg1, arg2));
-        }
+        public static AString Format(string format, object arg0, object arg1, object arg2) => new AString(string.Format(format, arg0, arg1, arg2));
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(!string.IsNullOrEmpty(m_Value)); } }
+        public ABoolean AsBoolean => new ABoolean(!string.IsNullOrEmpty(m_Value));
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Integer AsInteger { get { return new Integer(Int32.Parse(m_Value)); } }
+        public Integer AsInteger => new Integer(Int32.Parse(m_Value));
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Quaternion AsQuaternion { get { return Quaternion.Parse(m_Value); } }
+        public Quaternion AsQuaternion => Quaternion.Parse(m_Value);
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Real AsReal { get { return Real.Parse(m_Value); } }
-        public AString AsString { get { return new AString(m_Value); } }
-        public UUID AsUUID { get { return new UUID(m_Value); } }
+        public Real AsReal => Real.Parse(m_Value);
+        public AString AsString => new AString(m_Value);
+        public UUID AsUUID => new UUID(m_Value);
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Vector3 AsVector3 { get { return Vector3.Parse(m_Value); } }
+        public Vector3 AsVector3 => Vector3.Parse(m_Value);
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public uint AsUInt { get { return uint.Parse(m_Value); } }
+        public uint AsUInt => uint.Parse(m_Value);
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public int AsInt { get { return int.Parse(m_Value); } }
+        public int AsInt => int.Parse(m_Value);
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public ulong AsULong { get { return ulong.Parse(m_Value); } }
+        public ulong AsULong => ulong.Parse(m_Value);
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public long AsLong { get { return long.Parse(m_Value); } }
+        public long AsLong => long.Parse(m_Value);
         #endregion
     }
 }

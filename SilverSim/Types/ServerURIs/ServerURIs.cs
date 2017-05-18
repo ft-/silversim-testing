@@ -41,60 +41,18 @@ namespace SilverSim.Types.ServerURIs
 
         }
 
-        public string IMServerURI
-        {
-            get
-            {
-                return this["IMServerURI"];
-            }
-        }
+        public string IMServerURI => this["IMServerURI"];
 
-        public string AssetServerURI
-        {
-            get
-            {
-                return this["AssetServerURI"];
-            }
-        }
+        public string AssetServerURI => this["AssetServerURI"];
 
-        public string InventoryServerURI
-        {
-            get
-            {
-                return this["InventoryServerURI"];
-            }
-        }
+        public string InventoryServerURI => this["InventoryServerURI"];
 
-        public string ProfileServerURI
-        {
-            get
-            {
-                return this["ProfileServerURI"];
-            }
-        }
+        public string ProfileServerURI => this["ProfileServerURI"];
 
-        public string FriendsServerURI
-        {
-            get
-            {
-                return this["FriendsServerURI"];
-            }
-        }
+        public string FriendsServerURI => this["FriendsServerURI"];
 
-        public string GroupsServerURI
-        {
-            get
-            {
-                return this["GroupsServerURI"];
-            }
-        }
+        public string GroupsServerURI => this["GroupsServerURI"];
 
-        public string HomeURI
-        {
-            get
-            {
-                return this["HomeURI"];
-            }
-        }
+        public string HomeURI => this["HomeURI"];
     }
 }
