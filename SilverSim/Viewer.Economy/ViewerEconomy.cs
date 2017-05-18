@@ -70,7 +70,7 @@ namespace SilverSim.Viewer.Economy
                     continue;
                 }
 
-                Message m = req.Value;
+                var m = req.Value;
 
                 try
                 {
@@ -158,13 +158,15 @@ namespace SilverSim.Viewer.Economy
                 {
                     return;
                 }
-                var mbrep = new MoneyBalanceReply();
-                mbrep.ForceZeroFlag = true; /* lots of NUL at the end of the message */
-                mbrep.AgentID = mbr.AgentID;
-                mbrep.TransactionID = mbr.TransactionID;
+                var mbrep = new MoneyBalanceReply()
+                {
+                    ForceZeroFlag = true, /* lots of NUL at the end of the message */
+                    AgentID = mbr.AgentID,
+                    TransactionID = mbr.TransactionID
+                };
                 try
                 {
-                    EconomyServiceInterface economyService = circuit.Scene.EconomyService;
+                    var economyService = circuit.Scene.EconomyService;
                     mbrep.MoneyBalance= (economyService != null) ?
                         economyService.MoneyBalance[agent.Owner] :
                         0;
@@ -180,7 +182,7 @@ namespace SilverSim.Viewer.Economy
 
         public ShutdownOrder ShutdownOrder
         {
-            get 
+            get
             {
                 return ShutdownOrder.LogoutRegion;
             }
