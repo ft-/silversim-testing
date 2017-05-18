@@ -234,10 +234,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
         }
 
-        static string VertexToString(Vector3 v)
-        {
-            return string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
-        }
+        static string VertexToString(Vector3 v) => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
 
         public void DumpToBlenderRaw(string filename)
         {

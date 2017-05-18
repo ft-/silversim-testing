@@ -46,17 +46,18 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectGrab)]
         public void HandleObjectGrab(Message m)
         {
-            ObjectGrab req = (ObjectGrab)m;
+            var req = (ObjectGrab)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
             }
 
-            TouchEvent e = new TouchEvent();
-            e.Detected = new List<DetectInfo>();
-            e.Type = TouchEvent.TouchType.Start;
-
+            var e = new TouchEvent()
+            {
+                Detected = new List<DetectInfo>(),
+                Type = TouchEvent.TouchType.Start
+            };
             ObjectPart part;
             if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
             {
@@ -69,13 +70,13 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            DetectInfo detectdata = new DetectInfo();
+            var detectdata = new DetectInfo();
             AddDetectAgentData(agent, detectdata);
             detectdata.GrabOffset = req.GrabOffset;
             detectdata.LinkNumber = part.LinkNumber;
             if (req.ObjectData.Count > 0)
             {
-                ObjectGrab.Data grabdata = req.ObjectData[0];
+                var grabdata = req.ObjectData[0];
                 detectdata.TouchBinormal = grabdata.Binormal;
                 detectdata.TouchNormal = grabdata.Normal;
                 detectdata.TouchFace = grabdata.FaceIndex;
@@ -91,17 +92,18 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectGrabUpdate)]
         public void HandleObjectGrabUpdate(Message m)
         {
-            ObjectGrabUpdate req = (ObjectGrabUpdate)m;
+            var req = (ObjectGrabUpdate)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
             }
 
-            TouchEvent e = new TouchEvent();
-            e.Detected = new List<DetectInfo>();
-            e.Type = TouchEvent.TouchType.Continuous;
-
+            var e = new TouchEvent()
+            {
+                Detected = new List<DetectInfo>(),
+                Type = TouchEvent.TouchType.Continuous
+            };
             ObjectPart part;
             if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
             {
@@ -114,13 +116,13 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            DetectInfo detectdata = new DetectInfo();
+            var detectdata = new DetectInfo();
             AddDetectAgentData(agent, detectdata);
             detectdata.GrabOffset = req.GrabPosition;
             detectdata.LinkNumber = part.LinkNumber;
             if (req.ObjectData.Count > 0)
             {
-                ObjectGrabUpdate.Data grabdata = req.ObjectData[0];
+                var grabdata = req.ObjectData[0];
                 detectdata.TouchBinormal = grabdata.Binormal;
                 detectdata.TouchNormal = grabdata.Normal;
                 detectdata.TouchFace = grabdata.FaceIndex;
@@ -136,17 +138,18 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectDeGrab)]
         public void HandleObjectDeGrab(Message m)
         {
-            ObjectDeGrab req = (ObjectDeGrab)m;
+            var req = (ObjectDeGrab)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
             }
 
-            TouchEvent e = new TouchEvent();
-            e.Detected = new List<DetectInfo>();
-            e.Type = TouchEvent.TouchType.End;
-
+            var e = new TouchEvent()
+            {
+                Detected = new List<DetectInfo>(),
+                Type = TouchEvent.TouchType.End
+            };
             ObjectPart part;
             if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
             {
@@ -159,7 +162,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            DetectInfo detectdata = new DetectInfo();
+            var detectdata = new DetectInfo();
             AddDetectAgentData(agent, detectdata);
             detectdata.GrabOffset = Vector3.Zero;
             detectdata.LinkNumber = part.LinkNumber;

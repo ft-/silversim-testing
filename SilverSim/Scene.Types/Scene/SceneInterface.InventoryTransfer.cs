@@ -212,29 +212,33 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         return;
                     }
-                    UUID rootFolderID = folder.ID;
-                    folder = new InventoryFolder();
-                    folder.Owner = m_DestinationAgent;
-                    folder.ParentFolderID = rootFolderID;
-                    folder.InventoryType = InventoryType.Unknown;
-                    folder.Version = 1;
-                    folder.Name = m_DestinationFolder;
-                    folder.ID = UUID.Random;
+                    var rootFolderID = folder.ID;
+                    folder = new InventoryFolder()
+                    {
+                        Owner = m_DestinationAgent,
+                        ParentFolderID = rootFolderID,
+                        InventoryType = InventoryType.Unknown,
+                        Version = 1,
+                        Name = m_DestinationFolder,
+                        ID = UUID.Random
+                    };
                     m_InventoryService.Folder.Add(folder);
 
                     if (agent != null)
                     {
-                        BulkUpdateInventory msg = new BulkUpdateInventory();
-                        msg.AgentID = m_DestinationAgent.ID;
-                        msg.TransactionID = UUID.Zero;
+                        var msg = new BulkUpdateInventory()
+                        {
+                            AgentID = m_DestinationAgent.ID,
+                            TransactionID = UUID.Zero
+                        };
                         msg.AddInventoryFolder(folder);
                         agent.SendMessageAlways(msg, m_SceneID);
                     }
                 }
 
-                foreach(InventoryItem sellItem in m_Items)
+                foreach(var sellItem in m_Items)
                 {
-                    InventoryItem item = new InventoryItem(sellItem);
+                    var item = new InventoryItem(sellItem);
                     item.LastOwner = item.Owner;
                     item.Owner = m_DestinationAgent;
                     item.ParentFolderID = folder.ID;
@@ -242,8 +246,10 @@ namespace SilverSim.Scene.Types.Scene
                     m_InventoryService.Item.Add(item);
                     if (null != agent)
                     {
-                        UpdateCreateInventoryItem msg = new UpdateCreateInventoryItem();
-                        msg.AgentID = m_DestinationAgent.ID;
+                        var msg = new UpdateCreateInventoryItem()
+                        {
+                            AgentID = m_DestinationAgent.ID
+                        };
                         msg.AddItem(item, 0);
                         msg.SimApproved = true;
                         agent.SendMessageAlways(msg, m_SceneID);

@@ -29,25 +29,21 @@ namespace SilverSim.Scene.Types.Object
     {
         public InvalidObjectXmlException()
         {
-
         }
 
         public InvalidObjectXmlException(string message)
             : base(message)
         {
-
         }
 
         protected InvalidObjectXmlException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public InvalidObjectXmlException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -56,25 +52,21 @@ namespace SilverSim.Scene.Types.Object
     {
         public ObjectDeserializationFailedDueKeyException()
         {
-
         }
 
         public ObjectDeserializationFailedDueKeyException(string message)
             : base(message)
         {
-
         }
 
         protected ObjectDeserializationFailedDueKeyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public ObjectDeserializationFailedDueKeyException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 }

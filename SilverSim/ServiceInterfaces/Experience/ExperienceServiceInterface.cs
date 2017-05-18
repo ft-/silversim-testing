@@ -27,11 +27,6 @@ namespace SilverSim.ServiceInterfaces.Experience
 {
     public abstract class ExperienceServiceInterface
     {
-        public ExperienceServiceInterface()
-        {
-
-        }
-
         public interface IExperienceInterface
         {
             ExperienceInfo this[UUID experienceID] { get; set; }

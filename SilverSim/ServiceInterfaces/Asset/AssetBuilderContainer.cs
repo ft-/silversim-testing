@@ -39,53 +39,17 @@ namespace SilverSim.ServiceInterfaces.Asset
         }
 
         #region AssetServiceInterface
-        public override AssetData this[UUID key]
-        {
-            get
-            {
-                return m_Assets[key];
-            }
-        }
+        public override AssetData this[UUID key] => m_Assets[key];
 
-        Stream IAssetDataServiceInterface.this[UUID key]
-        {
-            get
-            {
-                return m_Assets[key].InputStream;
-            }
-        }
+        Stream IAssetDataServiceInterface.this[UUID key] => m_Assets[key].InputStream;
 
-        AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
-        {
-            get
-            {
-                return m_Assets[key];
-            }
-        }
+        AssetMetadata IAssetMetadataServiceInterface.this[UUID key] => m_Assets[key];
 
-        public override IAssetDataServiceInterface Data
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetDataServiceInterface Data => this;
 
-        public override IAssetMetadataServiceInterface Metadata
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetMetadataServiceInterface Metadata => this;
 
-        public override AssetReferencesServiceInterface References
-        {
-            get
-            {
-                return m_DefReferences;
-            }
-        }
+        public override AssetReferencesServiceInterface References => m_DefReferences;
 
         public override void Delete(UUID id)
         {
@@ -94,7 +58,7 @@ namespace SilverSim.ServiceInterfaces.Asset
 
         public override Dictionary<UUID, bool> Exists(List<UUID> assets)
         {
-            Dictionary<UUID, bool> v = new Dictionary<UUID, bool>();
+            var v = new Dictionary<UUID, bool>();
             foreach(UUID k in assets)
             {
                 v[k] = m_Assets.ContainsKey(k);
@@ -102,20 +66,14 @@ namespace SilverSim.ServiceInterfaces.Asset
             return v;
         }
 
-        public override bool Exists(UUID key)
-        {
-            return m_Assets.ContainsKey(key);
-        }
+        public override bool Exists(UUID key) => m_Assets.ContainsKey(key);
 
         public override void Store(AssetData asset)
         {
             m_Assets.Add(asset.ID, asset);
         }
 
-        public override bool TryGetValue(UUID key, out AssetData assetData)
-        {
-            return m_Assets.TryGetValue(key, out assetData);
-        }
+        public override bool TryGetValue(UUID key, out AssetData assetData) => m_Assets.TryGetValue(key, out assetData);
 
         bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
         {

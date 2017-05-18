@@ -190,11 +190,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
         readonly object m_VehicleParamLock = new object();
 
-        public VehicleParams()
-        {
-
-        }
-
         public void DecayDirections(double dt)
         {
             lock(m_VehicleParamLock)

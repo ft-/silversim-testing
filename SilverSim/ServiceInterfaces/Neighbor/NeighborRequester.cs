@@ -33,11 +33,11 @@ namespace SilverSim.ServiceInterfaces.Neighbor
 
         public static bool IsNeighbor(this RegionInfo ownRegion, RegionInfo neighborRegion)
         {
-            GridVector southWestCorner = ownRegion.Location;
-            GridVector northEastCorner = ownRegion.Location + ownRegion.Size;
+            var southWestCorner = ownRegion.Location;
+            var northEastCorner = ownRegion.Location + ownRegion.Size;
 
-            GridVector southWestViewCorner = ownRegion.Location;
-            GridVector northEastViewCorner = ownRegion.Location + ownRegion.Size;
+            var southWestViewCorner = ownRegion.Location;
+            var northEastViewCorner = ownRegion.Location + ownRegion.Size;
 
             southWestViewCorner.X -= MAXIMUM_VIEW_RANGE;
             southWestViewCorner.Y -= MAXIMUM_VIEW_RANGE;
@@ -49,7 +49,7 @@ namespace SilverSim.ServiceInterfaces.Neighbor
             northEastCorner.X += MAXIMUM_VIEW_RANGE;
             northEastCorner.Y += MAXIMUM_VIEW_RANGE;
 
-            GridVector northEastNeighborCorner = neighborRegion.Location + neighborRegion.Size;
+            var northEastNeighborCorner = neighborRegion.Location + neighborRegion.Size;
 
             if (ownRegion.ID == neighborRegion.ID)
             {
@@ -76,11 +76,11 @@ namespace SilverSim.ServiceInterfaces.Neighbor
 
         public static List<RegionInfo> GetNeighbors(this GridServiceInterface gridService, RegionInfo ownRegion)
         {
-            GridVector southWestCorner = ownRegion.Location;
-            GridVector northEastCorner = ownRegion.Location + ownRegion.Size;
+            var southWestCorner = ownRegion.Location;
+            var northEastCorner = ownRegion.Location + ownRegion.Size;
 
-            GridVector southWestViewCorner = ownRegion.Location;
-            GridVector northEastViewCorner = ownRegion.Location + ownRegion.Size;
+            var southWestViewCorner = ownRegion.Location;
+            var northEastViewCorner = ownRegion.Location + ownRegion.Size;
 
             southWestViewCorner.X -= MAXIMUM_VIEW_RANGE;
             southWestViewCorner.Y -= MAXIMUM_VIEW_RANGE;
@@ -92,12 +92,12 @@ namespace SilverSim.ServiceInterfaces.Neighbor
             northEastCorner.X += MAXIMUM_VIEW_RANGE;
             northEastCorner.Y += MAXIMUM_VIEW_RANGE;
 
-            List<RegionInfo> regions = gridService.GetRegionsByRange(ownRegion.ScopeID, southWestCorner, northEastCorner);
-            List<RegionInfo> actualNeighbors = new List<RegionInfo>();
+            var regions = gridService.GetRegionsByRange(ownRegion.ScopeID, southWestCorner, northEastCorner);
+            var actualNeighbors = new List<RegionInfo>();
 
-            foreach(RegionInfo ri in regions)
+            foreach(var ri in regions)
             {
-                GridVector northEastNeighborCorner = ri.Location + ri.Size;
+                var northEastNeighborCorner = ri.Location + ri.Size;
                 if (ownRegion.ID == ri.ID)
                 {
                     /* skip we are not our own neighbor */

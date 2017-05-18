@@ -74,13 +74,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_ReferencesService = new DefaultAssetReferencesService(si);
             }
 
-            public override IAssetMetadataServiceInterface Metadata 
-            { 
-                get
-                {
-                    return this;
-                }
-            }
+            public override IAssetMetadataServiceInterface Metadata => this;
 
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
@@ -125,21 +119,9 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 return false;
             }
-            public override AssetReferencesServiceInterface References 
-            { 
-                get
-                {
-                    return m_ReferencesService;
-                }
-            }
+            public override AssetReferencesServiceInterface References => m_ReferencesService;
 
-            public override IAssetDataServiceInterface Data
-            {
-                get
-                {
-                    return this;
-                }
-            }
+            public override IAssetDataServiceInterface Data => this;
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -286,7 +268,6 @@ namespace SilverSim.Scene.Types.Scene
                     m_Scene.PersistentAssetService.Store(asset);
                 }
             }
-
         }
     }
 }

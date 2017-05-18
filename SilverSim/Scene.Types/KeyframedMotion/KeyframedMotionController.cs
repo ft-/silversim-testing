@@ -128,7 +128,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
         void KeyframeTimer(object o, ElapsedEventArgs args)
         {
-            SceneInterface scene = ObjectGroup.Scene;
+            var scene = ObjectGroup.Scene;
             if(!scene.IsKeyframedMotionEnabled)
             {
                 return;
@@ -151,8 +151,8 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                     m_Program.CurrentTimePosition += KEYFRAME_TIME_STEP;
                 }
 
-                Keyframe curFrame = m_Program[m_Program.CurrentFrame];
-                KeyframedMotion.DataFlags flags = m_Program.Flags;
+                var curFrame = m_Program[m_Program.CurrentFrame];
+                var flags = m_Program.Flags;
 
                 if (curFrame.Duration < m_Program.CurrentTimePosition)
                 {
@@ -235,13 +235,13 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                 {
                     if((flags & KeyframedMotion.DataFlags.Translation) != 0)
                     {
-                        Vector3 distance = curFrame.TargetPosition;
+                        var distance = curFrame.TargetPosition;
                         ObjectGroup.Velocity = distance / curFrame.Duration;
                     }
 
                     if((flags & KeyframedMotion.DataFlags.Rotation) != 0)
                     {
-                        Vector3 angularDistance = curFrame.TargetRotation.GetEulerAngles();
+                        var angularDistance = curFrame.TargetRotation.GetEulerAngles();
                         ObjectGroup.AngularVelocity = angularDistance / curFrame.Duration;
                     }
                 }

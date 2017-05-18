@@ -49,20 +49,18 @@ namespace SilverSim.Scene.Types.Scene
 
         public UInt32 ObjectAdd(ObjectAdd p)
         {
-            RezObjectParams rezparams = new RezObjectParams();
-            Object.ObjectGroup group = new Object.ObjectGroup();
-            ObjectPart part = new ObjectPart();
+            var rezparams = new RezObjectParams();
+            var group = new Object.ObjectGroup();
+            var part = new ObjectPart();
             part.ID = UUID.Random;
             group.Add(1, part.ID, part);
             group.Name = "Primitive";
-            IAgent agent;
-            agent = Agents[p.AgentID];
+            IAgent agent = Agents[p.AgentID];
             UUI agentOwner = agent.Owner;
             group.Owner = agentOwner;
             group.LastOwner = agentOwner;
             part.Creator = agentOwner;
-            ObjectPart.PrimitiveShape pshape;
-            pshape = part.Shape;
+            ObjectPart.PrimitiveShape pshape = part.Shape;
             pshape.PCode = p.PCode;
             part.Material = p.Material;
             pshape.PathCurve = p.PathCurve;
@@ -107,9 +105,8 @@ namespace SilverSim.Scene.Types.Scene
             /* initial setup of object */
             part.UpdateData(ObjectPart.UpdateDataFlags.All);
 
-            RwLockedList<UUID> selectedList = agent.SelectedObjects(ID);
-            IList<UUID> oldList = selectedList.GetAndClear();
-            foreach(UUID old in oldList)
+            var selectedList = agent.SelectedObjects(ID);
+            foreach(UUID old in selectedList.GetAndClear())
             {
                 ObjectPart oldSelectedPart;
                 if(Primitives.TryGetValue(old, out oldSelectedPart))

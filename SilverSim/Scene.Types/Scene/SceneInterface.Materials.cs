@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_MaterialsRwLock.AcquireReaderLock(-1);
                 try
                 {
-                    byte[] outb = new byte[m_MaterialsData.Length];
+                    var outb = new byte[m_MaterialsData.Length];
                     Buffer.BlockCopy(m_MaterialsData, 0, outb, 0, m_MaterialsData.Length);
                     return outb;
                 }
@@ -161,15 +161,14 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void AddLegacyMaterials(ObjectGroup sog)
         {
-            List<Material> mats = new List<Material>();
+            var mats = new List<Material>();
             foreach(ObjectPart part in sog.Values)
             {
-                Map m;
                 if(!part.DynAttrs.ContainsKey("OpenSim"))
                 {
                     continue;
                 }
-                m = (Map)part.DynAttrs["OpenSim"];
+                var m = (Map)part.DynAttrs["OpenSim"];
 
                 if(!m.ContainsKey("Materials"))
                 {
@@ -182,7 +181,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 foreach(IValue iv in (AnArray)m["Materials"])
                 {
-                    Map mmap = iv as Map;
+                    var mmap = iv as Map;
                     if(null == mmap)
                     {
                         continue;
@@ -226,29 +225,30 @@ namespace SilverSim.Scene.Types.Scene
         void UpdateMaterials()
         {
             byte[] buf;
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                byte[] zlibheader = new byte[2] { 0x78, 0xDA };
+                var zlibheader = new byte[2] { 0x78, 0xDA };
                 ms.Write(zlibheader, 0, 2);
 
-                AnArray matArray = new AnArray();
-                foreach(KeyValuePair<UUID, Material> kvp in m_Materials)
+                var matArray = new AnArray();
+                foreach(var kvp in m_Materials)
                 {
-                    Map matData = new Map();
-                    matData.Add("ID", kvp.Key);
-                    matData.Add("Material", kvp.Value.WriteMap());
-                    matArray.Add(matData);
+                    matArray.Add(new Map
+                    {
+                        { "ID", kvp.Key },
+                        { "Material", kvp.Value.WriteMap() }
+                    });
                 }
 
-                using (DeflateStream gz = new DeflateStream(ms, CompressionMode.Compress))
+                using (var gz = new DeflateStream(ms, CompressionMode.Compress))
                 {
                     LlsdBinary.Serialize(matArray, gz);
                 }
                 buf = ms.ToArray();
             }
-            using(MemoryStream ms = new MemoryStream())
+            using(var ms = new MemoryStream())
             {
-                using(XmlTextWriter writer = ms.UTF8XmlTextWriter())
+                using(var writer = ms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     writer.WriteNamedValue("key", "Zipped");

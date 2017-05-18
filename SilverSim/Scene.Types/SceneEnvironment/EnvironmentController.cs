@@ -35,7 +35,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public IWindModel Wind
         {
-            get; private set;
+            get;
         }
 
         readonly SceneInterface m_Scene;

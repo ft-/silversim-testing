@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.WindLight
             BlurMultiplier = m["blurMultiplier"].AsReal;
             FresnelOffset = m["fresnelOffset"].AsReal;
             FresnelScale = m["fresnelScale"].AsReal;
-            AnArray a = (AnArray)m["normScale"];
+            var a = (AnArray)m["normScale"];
             NormScale = a.ElementsToVector3;
             NormalMap = m["normalMap"].AsUUID;
             ScaleAbove = m["scaleAbove"].AsReal;

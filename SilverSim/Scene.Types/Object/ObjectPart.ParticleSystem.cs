@@ -72,7 +72,7 @@ namespace SilverSim.Scene.Types.Object
                 m_ParticleSystemLock.AcquireReaderLock(-1);
                 try
                 {
-                    byte[] o = new byte[m_ParticleSystem.Length];
+                    var o = new byte[m_ParticleSystem.Length];
                     Buffer.BlockCopy(m_ParticleSystem, 0, o, 0, m_ParticleSystem.Length);
                     return o;
                 }

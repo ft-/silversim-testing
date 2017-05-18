@@ -83,15 +83,15 @@ namespace SilverSim.Scene.Types.Object
         {
             part = null;
             int primCount = Count;
-            Vector3 rootPos = part.GlobalPosition;
-            Quaternion rootRot = part.GlobalRotation;
+            var rootPos = part.GlobalPosition;
+            var rootRot = part.GlobalRotation;
             ObjectPart newRoot;
             if (!TryGetValue(2, out newRoot))
             {
                 return false;
             }
-            Vector3 offsetPos = newRoot.Position;
-            Quaternion offsetRot = newRoot.Rotation;
+            var offsetPos = newRoot.Position;
+            var offsetRot = newRoot.Rotation;
             part.Inventory.SuspendScripts();
             part.ObjectGroup.StopKeyframedMotion();
             if (!Remove(LINK_ROOT))
@@ -108,7 +108,7 @@ namespace SilverSim.Scene.Types.Object
                 ChangeKey(i - 1, i);
                 if (i > 2)
                 {
-                    ObjectPart linkPart = this[i - 1];
+                    var linkPart = this[i - 1];
                     linkPart.Position -= offsetPos;
                     linkPart.Rotation /= offsetRot;
                 }

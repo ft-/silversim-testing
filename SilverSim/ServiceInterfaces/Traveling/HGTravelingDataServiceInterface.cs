@@ -27,11 +27,6 @@ namespace SilverSim.ServiceInterfaces.Traveling
 {
     public abstract class TravelingDataServiceInterface
     {
-        protected TravelingDataServiceInterface()
-        {
-
-        }
-
         public abstract TravelingDataInfo GetTravelingData(UUID sessionID);
         public abstract TravelingDataInfo GetTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress);
         public abstract List<TravelingDataInfo> GetTravelingDatasByAgentUUID(UUID agentID);

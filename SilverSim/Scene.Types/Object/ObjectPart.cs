@@ -70,14 +70,12 @@ namespace SilverSim.Scene.Types.Object
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 1] = (byte)((value >> 8) & 0xFF);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 2] = (byte)((value >> 16) & 0xFF);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 3] = (byte)((value >> 24) & 0xFF);
-                    m_ObjectUpdateInfo.LocalID = value;
+                    UpdateInfo.LocalID = value;
                     m_LocalID = value;
                 }
                 UpdateData(UpdateDataFlags.All, incSerial);
             }
         }
-
-        readonly ObjectUpdateInfo m_ObjectUpdateInfo;
         private UUID m_ID = UUID.Zero;
         private string m_Name = string.Empty;
         private string m_Description = string.Empty;
@@ -105,13 +103,7 @@ namespace SilverSim.Scene.Types.Object
         bool m_AllowUnsit = true;
         bool m_IsScriptedSitOnly;
 
-        public Map DynAttrs
-        {
-            get
-            {
-                return m_DynAttrMap;
-            }
-        }
+        public Map DynAttrs => m_DynAttrMap;
 
         private InventoryPermissionsData m_Permissions = new InventoryPermissionsData();
 
@@ -119,7 +111,7 @@ namespace SilverSim.Scene.Types.Object
 
         public int LoadedLinkNumber; /* not authoritative, just for loading from XML */
 
-        PathfindingType m_PathfindingType = PathfindingType.LegacyLinkset;
+        PathfindingType m_PathfindingType;
 
         public PathfindingType PathfindingType
         {
@@ -167,12 +159,6 @@ namespace SilverSim.Scene.Types.Object
 
         public class OmegaParam
         {
-            #region Constructor
-            public OmegaParam()
-            {
-            }
-            #endregion
-
             #region Fields
             public Vector3 Axis = Vector3.Zero;
             public double Spinrate;
@@ -195,7 +181,7 @@ namespace SilverSim.Scene.Types.Object
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;
             m_TextureEntryBytes = m_TextureEntry.GetBytes();
-            m_ObjectUpdateInfo = new ObjectUpdateInfo(this);
+            UpdateInfo = new ObjectUpdateInfo(this);
         }
         #endregion
 
@@ -297,20 +283,11 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Permissions
-        public bool IsLocked
-        {
-            get
-            {
-                return (m_Permissions.Current & InventoryPermissionsMask.Modify) == 0;
-            }
-        }
+        public bool IsLocked => (m_Permissions.Current & InventoryPermissionsMask.Modify) == 0;
 
-        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
-        {
-            return (ObjectGroup.IsGroupOwned) ?
+        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (ObjectGroup.IsGroupOwned) ?
                 m_Permissions.CheckGroupPermissions(Creator, ObjectGroup.Group, accessor, accessorgroup, wanted) :
                 m_Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
-        }
         #endregion
 
         public void GetBoundingBox(out BoundingBox box)
@@ -322,38 +299,32 @@ namespace SilverSim.Scene.Types.Object
 
         public void SendKillObject()
         {
-            m_ObjectUpdateInfo.KillObject();
-            ObjectGroup grp = ObjectGroup;
+            UpdateInfo.KillObject();
+            var grp = ObjectGroup;
             if (null != grp)
             {
-                SceneInterface scene = grp.Scene;
+                var scene = grp.Scene;
                 if (null != scene)
                 {
-                    scene.ScheduleUpdate(m_ObjectUpdateInfo);
+                    scene.ScheduleUpdate(UpdateInfo);
                 }
             }
         }
 
         public void SendObjectUpdate()
         {
-            ObjectGroup grp = ObjectGroup;
+            var grp = ObjectGroup;
             if (null != grp)
             {
-                SceneInterface scene = grp.Scene;
+                var scene = grp.Scene;
                 if (null != scene)
                 {
-                    scene.ScheduleUpdate(m_ObjectUpdateInfo);
+                    scene.ScheduleUpdate(UpdateInfo);
                 }
             }
         }
 
-        public ObjectUpdateInfo UpdateInfo
-        {
-            get
-            {
-                return m_ObjectUpdateInfo;
-            }
-        }
+        public ObjectUpdateInfo UpdateInfo { get; }
 
         void OnInventoryChange(ObjectPartInventory.ChangeAction action, UUID primID, UUID itemID)
         {
@@ -411,7 +382,7 @@ namespace SilverSim.Scene.Types.Object
             UpdateData(UpdateDataFlags.All);
             if (ObjectGroup.Scene != null)
             {
-                ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+                ObjectGroup.Scene.ScheduleUpdate(UpdateInfo);
             }
         }
 
@@ -442,7 +413,7 @@ namespace SilverSim.Scene.Types.Object
             UpdateData(UpdateDataFlags.All);
             if (ObjectGroup.Scene != null)
             {
-                ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+                ObjectGroup.Scene.ScheduleUpdate(UpdateInfo);
             }
         }
 
@@ -473,17 +444,12 @@ namespace SilverSim.Scene.Types.Object
             UpdateData(UpdateDataFlags.Full | UpdateDataFlags.Terse);
             if (ObjectGroup.Scene != null)
             {
-                ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+                ObjectGroup.Scene.ScheduleUpdate(UpdateInfo);
             }
         }
 
-        public AssetServiceInterface AssetService /* specific for attachments usage */
-        {
-            get
-            {
-                return ObjectGroup.AssetService;
-            }
-        }
+        public AssetServiceInterface AssetService
+            => ObjectGroup.AssetService; /* specific for attachments usage */
 
         public DetectedTypeFlags DetectedType
         {
@@ -2011,7 +1977,7 @@ namespace SilverSim.Scene.Types.Object
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         static void ShapeFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
         {
-            PrimitiveShape shape = new PrimitiveShape();
+            var shape = new PrimitiveShape();
             bool have_attachpoint = false;
 
             for (; ; )
@@ -2131,15 +2097,15 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "ProfileShape":
-                                { 
-                                    byte p =  (byte)reader.ReadContentAsEnumValue<PrimitiveProfileShape>();
+                                {
+                                    var p =  (byte)reader.ReadContentAsEnumValue<PrimitiveProfileShape>();
                                     shape.ProfileCurve = (byte)((shape.ProfileCurve & (byte)0xF0) | p);
                                 }
                                 break;
 
                             case "HollowShape":
                                 {
-                                    byte p = (byte)reader.ReadContentAsEnumValue<PrimitiveProfileHollowShape>();
+                                    var p = (byte)reader.ReadContentAsEnumValue<PrimitiveProfileHollowShape>();
                                     shape.ProfileCurve = (byte)((shape.ProfileCurve & (byte)0x0F) | p);
                                 }
                                 break;
@@ -2150,7 +2116,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiSoftness":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
+                                    var flexparam = part.Flexible;
                                     flexparam.Softness = reader.ReadElementValueAsInt();
                                     part.Flexible = flexparam;
                                 }
@@ -2158,7 +2124,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiTension":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
+                                    var flexparam = part.Flexible;
                                     flexparam.Tension = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
@@ -2166,7 +2132,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiDrag":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
+                                    var flexparam = part.Flexible;
                                     flexparam.Friction = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
@@ -2174,7 +2140,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiGravity":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
+                                    var flexparam = part.Flexible;
                                     flexparam.Gravity = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
@@ -2182,7 +2148,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiWind":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
+                                    var flexparam = part.Flexible;
                                     flexparam.Wind = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
@@ -2190,8 +2156,8 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiForceX":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
-                                    Vector3 v = flexparam.Force;
+                                    var flexparam = part.Flexible;
+                                    var v = flexparam.Force;
                                     v.X = reader.ReadElementValueAsDouble();
                                     flexparam.Force = v;
                                     part.Flexible = flexparam;
@@ -2200,8 +2166,8 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiForceY":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
-                                    Vector3 v = flexparam.Force;
+                                    var flexparam = part.Flexible;
+                                    var v = flexparam.Force;
                                     v.Y = reader.ReadElementValueAsDouble();
                                     flexparam.Force = v;
                                     part.Flexible = flexparam;
@@ -2210,8 +2176,8 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiForceZ":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
-                                    Vector3 v = flexparam.Force;
+                                    var flexparam = part.Flexible;
+                                    var v = flexparam.Force;
                                     v.Z = reader.ReadElementValueAsDouble();
                                     flexparam.Force = v;
                                     part.Flexible = flexparam;
@@ -2220,8 +2186,8 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightColorR":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
-                                    Color c = lightparam.LightColor;
+                                    var lightparam = part.PointLight;
+                                    var c = lightparam.LightColor;
                                     c.R = reader.ReadElementValueAsDouble().Clamp(0, 1);
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
@@ -2230,8 +2196,8 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightColorG":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
-                                    Color c = lightparam.LightColor;
+                                    var lightparam = part.PointLight;
+                                    var c = lightparam.LightColor;
                                     c.G = reader.ReadElementValueAsDouble().Clamp(0, 1);
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
@@ -2240,8 +2206,8 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightColorB":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
-                                    Color c = lightparam.LightColor;
+                                    var lightparam = part.PointLight;
+                                    var c = lightparam.LightColor;
                                     c.B = reader.ReadElementValueAsDouble().Clamp(0, 1);
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
@@ -2250,7 +2216,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightRadius":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
+                                    var lightparam = part.PointLight;
                                     lightparam.Radius = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
@@ -2258,7 +2224,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightCutoff":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
+                                    var lightparam = part.PointLight;
                                     lightparam.Cutoff = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
@@ -2266,7 +2232,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightFalloff":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
+                                    var lightparam = part.PointLight;
                                     lightparam.Falloff = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
@@ -2274,7 +2240,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightIntensity":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
+                                    var lightparam = part.PointLight;
                                     lightparam.Intensity = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
@@ -2282,7 +2248,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "FlexiEntry":
                                 {
-                                    FlexibleParam flexparam = part.Flexible;
+                                    var flexparam = part.Flexible;
                                     flexparam.IsFlexible = reader.ReadElementValueAsBoolean();
                                     part.Flexible = flexparam;
                                 }
@@ -2290,7 +2256,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LightEntry":
                                 {
-                                    PointLightParam lightparam = part.PointLight;
+                                    var lightparam = part.PointLight;
                                     lightparam.IsLight = reader.ReadElementValueAsBoolean();
                                     part.PointLight = lightparam;
                                 }
@@ -2344,10 +2310,10 @@ namespace SilverSim.Scene.Types.Object
             {
                 return new Map();
             }
-            Map damap = LlsdXml.Deserialize(reader) as Map;
+            var damap = LlsdXml.Deserialize(reader) as Map;
             if (null != damap)
             {
-                foreach (string key in damap.Keys)
+                foreach (var key in damap.Keys)
                 {
                     if (!(damap[key] is Map))
                     {
@@ -2386,7 +2352,7 @@ namespace SilverSim.Scene.Types.Object
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
         {
-            ObjectPart part = new ObjectPart();
+            var part = new ObjectPart();
             part.Owner = currentOwner;
             int InventorySerial = 1;
             bool IsPassCollisionsAlways = false;
@@ -2432,7 +2398,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "CreatorID":
                                 {
-                                    UUI creator = part.Creator;
+                                    var creator = part.Creator;
                                     creator.ID = reader.ReadContentAsUUID();
                                     part.Creator = creator;
                                 }
@@ -2441,7 +2407,7 @@ namespace SilverSim.Scene.Types.Object
                             case "CreatorData":
                                 try
                                 {
-                                    UUI creator = part.Creator;
+                                    var creator = part.Creator;
                                     creator.CreatorData = reader.ReadElementValueAsString();
                                     part.Creator = creator;
                                 }
@@ -2568,7 +2534,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "Color":
                                 {
-                                    TextParam tp = part.Text;
+                                    var tp = part.Text;
                                     tp.TextColor = reader.ReadElementChildsAsColorAlpha();
                                     part.Text = tp;
                                 }
@@ -2576,7 +2542,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "Text":
                                 {
-                                    TextParam tp = part.Text;
+                                    var tp = part.Text;
                                     tp.Text = reader.ReadElementValueAsString();
                                     part.Text = tp;
                                 }

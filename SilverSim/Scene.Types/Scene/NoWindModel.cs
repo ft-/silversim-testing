@@ -41,21 +41,9 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public IWindModelPreset PresetWind
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public IWindModelPreset PresetWind => this;
 
-        public Vector3 PrevailingWind
-        {
-            get
-            {
-                return new Vector3();
-            }
-        }
+        public Vector3 PrevailingWind => new Vector3();
 
         public void UpdateModel(EnvironmentController.SunData sunData, double dt)
         {

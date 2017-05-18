@@ -80,7 +80,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                foreach (ObjectPartInventoryItem item in ValuesByKey2)
+                foreach (var item in ValuesByKey2)
                 {
                     if(type == item.InventoryType)
                     {
@@ -99,7 +99,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                foreach (ObjectPartInventoryItem item in ValuesByKey2)
+                foreach (var item in ValuesByKey2)
                 {
                     if (index-- == 0)
                     {
@@ -115,7 +115,7 @@ namespace SilverSim.Scene.Types.Object
         public int CountType(InventoryType type)
         {
             int n = 0;
-            foreach(ObjectPartInventoryItem item in this.Values)
+            foreach(var item in this.Values)
             {
                 if(item.InventoryType == type)
                 {
@@ -131,7 +131,7 @@ namespace SilverSim.Scene.Types.Object
             get
             {
                 int n = 0;
-                foreach (ObjectPartInventoryItem item in this.Values)
+                foreach (var item in this.Values)
                 {
                     if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
                     {
@@ -148,11 +148,11 @@ namespace SilverSim.Scene.Types.Object
             get
             {
                 int n = 0;
-                foreach (ObjectPartInventoryItem item in this.Values)
+                foreach (var item in this.Values)
                 {
                     if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
                     {
-                        ScriptInstance script = item.ScriptInstance;
+                        var script = item.ScriptInstance;
                         if(script != null &&
                             script.IsRunning)
                         {
@@ -174,7 +174,7 @@ namespace SilverSim.Scene.Types.Object
                 if (nameChangeAllowed)
                 {
                     int index = 1;
-                    string name = item.Name;
+                    var name = item.Name;
                     while (ContainsKey(name))
                     {
                         name = string.Format("{0} {1}", item.Name, index++);
@@ -198,7 +198,7 @@ namespace SilverSim.Scene.Types.Object
             var addDelegate = OnChange;
             if(addDelegate != null)
             {
-                foreach (Action<ChangeAction, UUID, UUID> d in addDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                foreach (var d in addDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                 {
                     d(ChangeAction.Add, PartID, item.ID);
                 }
@@ -216,7 +216,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Change, PartID, item.ID);
                     }
@@ -235,7 +235,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.NextOwnerAssetID, PartID, item.ID);
                     }
@@ -257,7 +257,7 @@ namespace SilverSim.Scene.Types.Object
             var updateDelegate = OnChange;
             if(updateDelegate != null)
             {
-                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                 {
                     d(ChangeAction.Change, PartID, item.ID);
                 }
@@ -285,7 +285,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Change, PartID, item.ID);
                     }
@@ -318,7 +318,7 @@ namespace SilverSim.Scene.Types.Object
             var updateDelegate = OnChange;
             if (updateDelegate != null)
             {
-                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                 {
                     d(ChangeAction.Add, PartID, newItem.ID);
                 }
@@ -339,7 +339,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, key1);
                     }
@@ -363,7 +363,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -386,7 +386,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -409,7 +409,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -428,7 +428,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
+                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
                     {
                         d(ChangeAction.Remove, PartID, key1);
                     }
@@ -442,9 +442,9 @@ namespace SilverSim.Scene.Types.Object
         #region XML Deserialization
         ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner)
         {
-            ObjectPartInventoryItem item = new ObjectPartInventoryItem();
+            var item = new ObjectPartInventoryItem();
             item.Owner = currentOwner;
-            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+            var grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
             bool ownerChanged = false;
 
             for (; ; )
@@ -570,7 +570,7 @@ namespace SilverSim.Scene.Types.Object
 
         public void FillFromXml(XmlTextReader reader, UUI currentOwner)
         {
-            ObjectPart part = new ObjectPart();
+            var part = new ObjectPart();
             part.Owner = currentOwner;
             if(reader.IsEmptyElement)
             {
@@ -628,7 +628,7 @@ namespace SilverSim.Scene.Types.Object
             writer.WriteNamedValue("InventorySerial", InventorySerial);
             writer.WriteStartElement("TaskInventory");
             {
-                ForEach(delegate(ObjectPartInventoryItem item)
+                ForEach((ObjectPartInventoryItem item) =>
                 {
                     writer.WriteStartElement("TaskInventoryItem");
                     {
@@ -658,12 +658,12 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteUUID("LastOwnerID", item.LastOwner.ID);
                         writer.WriteNamedValue("Name", item.Name);
                         writer.WriteNamedValue("NextPermissions", (uint)item.Permissions.NextOwner);
-                        if((options & XmlSerializationOptions.WriteOwnerInfo) != XmlSerializationOptions.None)
+                        if ((options & XmlSerializationOptions.WriteOwnerInfo) != XmlSerializationOptions.None)
                         {
                             writer.WriteUUID("OwnerID", item.Owner.ID);
                             writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.Current);
                         }
-                        else if((options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None)
+                        else if ((options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None)
                         {
                             writer.WriteUUID("OwnerID", nextOwner.ID);
                             writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.NextOwner);
@@ -675,7 +675,7 @@ namespace SilverSim.Scene.Types.Object
                         }
                         writer.WriteUUID("ParentID", item.ParentFolderID);
                         writer.WriteUUID("ParentPartID", item.ParentFolderID);
-                        ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
+                        var grantinfo = item.PermsGranter;
                         writer.WriteUUID("PermsGranter", grantinfo.PermsGranter.ID);
                         writer.WriteNamedValue("PermsMask", (uint)grantinfo.PermsMask);
                         writer.WriteNamedValue("Type", (int)item.AssetType);

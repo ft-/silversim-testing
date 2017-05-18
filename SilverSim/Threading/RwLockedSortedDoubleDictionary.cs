@@ -337,7 +337,7 @@ namespace SilverSim.Threading
                 m_RwLock.AcquireWriterLock(-1);
                 try
                 {
-                    KeyValuePair<TKey2, TValue> kvp = m_Dictionary_K1[key];
+                    var kvp = m_Dictionary_K1[key];
                     m_Dictionary_K2[kvp.Key] = new KeyValuePair<TKey1, TValue>(key, value);
                     m_Dictionary_K1[key] = new KeyValuePair<TKey2, TValue>(kvp.Key, value);
                 }
@@ -367,7 +367,7 @@ namespace SilverSim.Threading
                 m_RwLock.AcquireWriterLock(-1);
                 try
                 {
-                    KeyValuePair<TKey1, TValue> kvp = m_Dictionary_K2[key];
+                    var kvp = m_Dictionary_K2[key];
                     m_Dictionary_K2[key] = new KeyValuePair<TKey1, TValue>(kvp.Key, value);
                     m_Dictionary_K1[kvp.Key] = new KeyValuePair<TKey2, TValue>(key, value);
                 }
@@ -385,7 +385,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey1, KeyValuePair<TKey2, TValue>> kvp in m_Dictionary_K1)
+                foreach (var kvp in m_Dictionary_K1)
                 {
                     result.Add(kvp.Key, kvp.Value.Value);
                 }
@@ -403,7 +403,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey2, KeyValuePair<TKey1, TValue>> kvp in m_Dictionary_K2)
+                foreach (var kvp in m_Dictionary_K2)
                 {
                     result.Add(kvp.Key, kvp.Value.Value);
                 }
@@ -423,7 +423,7 @@ namespace SilverSim.Threading
                 {
                     throw new ChangeKeyFailedException("New key already exists: " + newKey.ToString());
                 }
-                KeyValuePair<TKey2, TValue> kvp = m_Dictionary_K1[oldKey];
+                var kvp = m_Dictionary_K1[oldKey];
                 m_Dictionary_K1.Remove(oldKey);
 
                 /* re-adjust dictionaries */
@@ -445,7 +445,7 @@ namespace SilverSim.Threading
                 {
                     throw new ChangeKeyFailedException("New key already exists: " + newKey.ToString());
                 }
-                KeyValuePair<TKey1, TValue> kvp = m_Dictionary_K2[oldKey];
+                var kvp = m_Dictionary_K2[oldKey];
                 m_Dictionary_K2.Remove(oldKey);
 
                 /* re-adjust dictionaries */
@@ -463,7 +463,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey2, TValue> kvp in m_Dictionary_K1.Values)
+                foreach (var kvp in m_Dictionary_K1.Values)
                 {
                     d(kvp.Value);
                 }
@@ -479,7 +479,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey1, KeyValuePair<TKey2, TValue>> kvp in m_Dictionary_K1)
+                foreach (var kvp in m_Dictionary_K1)
                 {
                     d(new KeyValuePair<TKey1, TValue>(kvp.Key, kvp.Value.Value));
                 }
@@ -495,7 +495,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey2, KeyValuePair<TKey1, TValue>> kvp in m_Dictionary_K2)
+                foreach (var kvp in m_Dictionary_K2)
                 {
                     d(new KeyValuePair<TKey2, TValue>(kvp.Key, kvp.Value.Value));
                 }
@@ -510,11 +510,11 @@ namespace SilverSim.Threading
         {
             get
             {
-                List<TValue> result = new List<TValue>();
+                var result = new List<TValue>();
                 m_RwLock.AcquireReaderLock(-1);
                 try
                 {
-                    foreach (KeyValuePair<TKey2, TValue> kvp in m_Dictionary_K1.Values)
+                    foreach (var kvp in m_Dictionary_K1.Values)
                     {
                         result.Add(kvp.Value);
                     }
@@ -544,7 +544,7 @@ namespace SilverSim.Threading
                 m_RwLock.AcquireReaderLock(-1);
                 try
                 {
-                    foreach (KeyValuePair<TKey1, TValue> kvp in m_Dictionary_K2.Values)
+                    foreach (var kvp in m_Dictionary_K2.Values)
                     {
                         result.Add(kvp.Value);
                     }

@@ -39,7 +39,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 throw new InvalidSculptMeshAssetException();
             }
-            using (Stream s = data.InputStream)
+            using (var s = data.InputStream)
             {
                 return s.SculptMeshToMesh(shape);
             }
@@ -47,9 +47,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         internal static MeshLOD SculptMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape)
         {
-            using (Image im = J2kImage.FromStream(st))
+            using (var im = J2kImage.FromStream(st))
             {
-                using (Bitmap bitmap = new Bitmap(im))
+                using (var bitmap = new Bitmap(im))
                 {
                     return bitmap.SculptMeshToMesh(shape);
                 }
@@ -58,8 +58,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         static Vector3 GetVertex(this Bitmap bm, int x, int y, bool mirror)
         {
-            Vector3 v = new Vector3();
-            System.Drawing.Color c = bm.GetPixel(x, y);
+            var v = new Vector3();
+            var c = bm.GetPixel(x, y);
             v.X = mirror ?
                 -(c.R / 255f - 0.5) :
                 c.R / 255f - 0.5;
@@ -73,7 +73,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         internal static MeshLOD SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape, bool generate_uv = false)
         {
             bool mirror = shape.IsSculptMirrored;
-            MeshLOD mesh = new MeshLOD();
+            var mesh = new MeshLOD();
             bool reverse_horizontal = shape.IsSculptInverted ? !mirror : mirror;
             PrimitiveSculptType sculptType = shape.SculptType;
 
@@ -84,7 +84,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 sculptVerts = 32 * 32;
             }
-            double ratio = (double)bitmap.Width / (double)bitmap.Height;
+            double ratio = (double)bitmap.Width / bitmap.Height;
 
             sculptSizeS = (int)Math.Sqrt(sculptVerts / ratio);
 
@@ -146,10 +146,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     mesh.Vertices.Add(v);
                     if(generate_uv)
                     {
-                        UVCoord uv = new UVCoord();
-                        uv.U = (float)reversed_t / (sculptSizeS - t);
-                        uv.V = (float)s / (sculptSizeS - 1);
-
+                        var uv = new UVCoord()
+                        {
+                            U = (float)reversed_t / (sculptSizeS - t),
+                            V = (float)s / (sculptSizeS - 1)
+                        };
                         mesh.UVCoords.Add(uv);
                     }
                 }
@@ -162,16 +163,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 int row2Index = rowIndex + sculptSizeT;
                 for(int col = 0; col < sculptSizeT - 1; ++col)
                 {
-                    Triangle tri = new Triangle();
-                    tri.Vertex1 = rowIndex + col;
-                    tri.Vertex2 = row2Index + col + 1;
-                    tri.Vertex3 = rowIndex + col + 1;
+                    var tri = new Triangle()
+                    {
+                        Vertex1 = rowIndex + col,
+                        Vertex2 = row2Index + col + 1,
+                        Vertex3 = rowIndex + col + 1
+                    };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle();
-                    tri.Vertex1 = rowIndex + col;
-                    tri.Vertex2 = row2Index + col;
-                    tri.Vertex3 = row2Index + col + 1;
+                    tri = new Triangle()
+                    {
+                        Vertex1 = rowIndex + col,
+                        Vertex2 = row2Index + col,
+                        Vertex3 = row2Index + col + 1
+                    };
                     mesh.Triangles.Add(tri);
                 }
             }

@@ -56,13 +56,7 @@ namespace SilverSim.Scene.Types.Scene
                 regionID, value);
         }
 
-        bool DoNotAddScriptsToTrashFolder
-        {
-            get
-            {
-                return m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal ? m_DoNotAddScriptsToTrashFolderUpdatedLocal : m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
-            }
-        }
+        bool DoNotAddScriptsToTrashFolder => m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal ? m_DoNotAddScriptsToTrashFolderUpdatedLocal : m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
 
         bool TryGetServices(UUI targetAgentId, out InventoryServiceInterface inventoryService, out AssetServiceInterface assetService)
         {
@@ -73,8 +67,8 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return false;
             }
-            string homeUri = targetAgentId.HomeURI.ToString();
-            Dictionary<string, string> heloheaders = ServicePluginHelo.HeloRequest(homeUri);
+            var homeUri = targetAgentId.HomeURI.ToString();
+            var heloheaders = ServicePluginHelo.HeloRequest(homeUri);
             foreach (IUserAgentServicePlugin userAgentPlugin in UserAgentServicePlugins)
             {
                 if (userAgentPlugin.IsProtocolSupported(homeUri, heloheaders))
@@ -119,7 +113,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleUpdateTaskInventory(Message m)
         {
-            UpdateTaskInventory req = (UpdateTaskInventory)m;
+            var req = (UpdateTaskInventory)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -215,7 +209,7 @@ namespace SilverSim.Scene.Types.Scene
                 agentItem.AssetType == req.AssetType &&
                 agentItem.InventoryType == req.InvType)
             {
-                ObjectPartInventoryItem item = new ObjectPartInventoryItem(agentItem);
+                var item = new ObjectPartInventoryItem(agentItem);
                 item.ID = UUID.Random;
                 AdjustPermissionsAccordingly(agent, part.Owner, item);
                 item.LastOwner = item.Owner;
@@ -306,7 +300,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             if (agent.SelectedObjects(ID).Contains(part.ID))
             {
-                using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+                using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
                 {
                     propHandler.Send(part);
                 }
@@ -317,7 +311,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleMoveTaskInventory(Message m)
         {
-            MoveTaskInventory req = (MoveTaskInventory)m;
+            var req = (MoveTaskInventory)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -342,10 +336,11 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            InventoryItem newItem = new InventoryItem(item);
-            newItem.ID = UUID.Random;
-
-            if(item.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
+            var newItem = new InventoryItem(item)
+            {
+                ID = UUID.Random
+            };
+            if (item.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
             {
                 /* permissions okay */
             }
@@ -369,7 +364,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRemoveTaskInventory(Message m)
         {
-            RemoveTaskInventory req = (RemoveTaskInventory)m;
+            var req = (RemoveTaskInventory)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -394,7 +389,7 @@ namespace SilverSim.Scene.Types.Scene
                 part.Inventory.TryGetValue(req.ItemID, out item))
             {
                 UUI owner = item.Owner;
-                InventoryItem deletedItem = new InventoryItem(item);
+                var deletedItem = new InventoryItem(item);
                 part.Inventory.Remove(req.ItemID);
                 InventoryServiceInterface inventoryService;
                 AssetServiceInterface assetService;
@@ -432,7 +427,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleRequestTaskInventory(Message m)
         {
-            RequestTaskInventory req = (RequestTaskInventory)m;
+            var req = (RequestTaskInventory)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -456,16 +451,18 @@ namespace SilverSim.Scene.Types.Scene
             List<ObjectPartInventoryItem> items = part.Inventory.Values;
             if(items.Count == 0)
             {
-                ReplyTaskInventoryNone res = new ReplyTaskInventoryNone();
-                res.Serial = (short)part.Inventory.InventorySerial;
-                res.TaskID = part.ID;
+                var res = new ReplyTaskInventoryNone()
+                {
+                    Serial = (short)part.Inventory.InventorySerial,
+                    TaskID = part.ID
+                };
                 agent.SendMessageAlways(res, ID);
             }
             else
             {
-                using(MemoryStream ms = new MemoryStream())
+                using(var ms = new MemoryStream())
                 {
-                    using(TextWriter w = ms.UTF8StreamWriter())
+                    using(var w = ms.UTF8StreamWriter())
                     {
                         w.Write(InvFile_Header);
                         w.Write(string.Format(InvFile_NameValueLine, "obj_id", part.ID));
@@ -529,10 +526,12 @@ namespace SilverSim.Scene.Types.Scene
                     string fname = "inventory_" + UUID.Random.ToString() + ".tmp";
                     agent.AddNewFile(fname, ms.ToArray());
 
-                    ReplyTaskInventory res = new ReplyTaskInventory();
-                    res.Serial = (short)part.Inventory.InventorySerial;
-                    res.Filename = fname;
-                    res.TaskID = part.ID;
+                    var res = new ReplyTaskInventory()
+                    {
+                        Serial = (short)part.Inventory.InventorySerial,
+                        Filename = fname,
+                        TaskID = part.ID
+                    };
                     agent.SendMessageAlways(res, ID);
                 }
             }

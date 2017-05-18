@@ -178,7 +178,7 @@ namespace SilverSim.Scene.Types.Scene
         internal void HandleDeRezObject(Message m)
         {
             Viewer.Messages.Object.DeRezAck ackres;
-            Viewer.Messages.Object.DeRezObject req = (Viewer.Messages.Object.DeRezObject)m;
+            var req = (Viewer.Messages.Object.DeRezObject)m;
             if (req.AgentID != m.CircuitAgentID ||
                 req.SessionID != m.CircuitSessionID)
             {
@@ -186,7 +186,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            List<ObjectGroup> objectgroups = new List<ObjectGroup>();
+            var objectgroups = new List<ObjectGroup>();
             if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
@@ -248,9 +248,11 @@ namespace SilverSim.Scene.Types.Scene
                         else if (!CanReturn(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToReturnObjectToOwner", "No permission to return object '{0}' to owner"), grp.Name), ID);
-                            ackres = new Viewer.Messages.Object.DeRezAck();
-                            ackres.TransactionID = req.TransactionID;
-                            ackres.Success = false;
+                            ackres = new Viewer.Messages.Object.DeRezAck()
+                            {
+                                TransactionID = req.TransactionID,
+                                Success = false
+                            };
                             agent.SendMessageAlways(ackres, ID);
                             return;
                         }
@@ -258,9 +260,11 @@ namespace SilverSim.Scene.Types.Scene
                     break;
 
                 case DeRezAction.SaveIntoAgentInventory:
-                    ackres = new Viewer.Messages.Object.DeRezAck();
-                    ackres.TransactionID = req.TransactionID;
-                    ackres.Success = false;
+                    ackres = new Viewer.Messages.Object.DeRezAck()
+                    {
+                        TransactionID = req.TransactionID,
+                        Success = false
+                    };
                     agent.SendMessageAlways(ackres, ID);
                     return;
 
@@ -274,9 +278,11 @@ namespace SilverSim.Scene.Types.Scene
                         else if (!CanTake(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToTakeObject", "No permission to take object '{0}'"), grp.Name), ID);
-                            ackres = new Viewer.Messages.Object.DeRezAck();
-                            ackres.TransactionID = req.TransactionID;
-                            ackres.Success = false;
+                            ackres = new Viewer.Messages.Object.DeRezAck()
+                            {
+                                TransactionID = req.TransactionID,
+                                Success = false
+                            };
                             agent.SendMessageAlways(ackres, ID);
                             return;
                         }
@@ -289,9 +295,11 @@ namespace SilverSim.Scene.Types.Scene
                         if (!CanTakeCopy(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToCopyObject", "No permission to copy object '{0}'"), grp.Name), ID);
-                            ackres = new Viewer.Messages.Object.DeRezAck();
-                            ackres.TransactionID = req.TransactionID;
-                            ackres.Success = false;
+                            ackres = new Viewer.Messages.Object.DeRezAck()
+                            {
+                                TransactionID = req.TransactionID,
+                                Success = false
+                            };
                             agent.SendMessageAlways(ackres, ID);
                             return;
                         }
@@ -300,14 +308,16 @@ namespace SilverSim.Scene.Types.Scene
 
                 default:
                     agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "InvalidDerezRequestByViewer", "Invalid derez request by viewer"), ID);
-                    ackres = new Viewer.Messages.Object.DeRezAck();
-                    ackres.TransactionID = req.TransactionID;
-                    ackres.Success = false;
+                    ackres = new Viewer.Messages.Object.DeRezAck()
+                    {
+                        TransactionID = req.TransactionID,
+                        Success = false
+                    };
                     agent.SendMessageAlways(ackres, ID);
                     return;
             }
 
-            Dictionary<UUI, List<InventoryItem>> copyItems = new Dictionary<UUI, List<InventoryItem>>();
+            var copyItems = new Dictionary<UUI, List<InventoryItem>>();
             if (req.Destination != DeRezAction.ReturnToOwner)
             {
                 foreach (ObjectGroup grp in objectgroups)
@@ -351,16 +361,18 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         copyItems.Add(targetAgent, new List<InventoryItem>());
                     }
-                    InventoryItem item = new InventoryItem();
-                    item.AssetID = assetID;
-                    item.AssetType = AssetType.Object;
-                    item.InventoryType = InventoryType.Object;
-                    item.Name = grp.Name;
-                    item.Description = grp.Description;
-                    item.LastOwner = grp.Owner;
-                    item.Owner = targetAgent;
-                    item.Creator = grp.RootPart.Creator;
-                    item.CreationDate = grp.RootPart.CreationDate;
+                    var item = new InventoryItem()
+                    {
+                        AssetID = assetID,
+                        AssetType = AssetType.Object,
+                        InventoryType = InventoryType.Object,
+                        Name = grp.Name,
+                        Description = grp.Description,
+                        LastOwner = grp.Owner,
+                        Owner = targetAgent,
+                        Creator = grp.RootPart.Creator,
+                        CreationDate = grp.RootPart.CreationDate
+                    };
                     item.Permissions.Base = changePermissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
                     item.Permissions.Current = item.Permissions.Base;
                     item.Permissions.Group = InventoryPermissionsMask.None;
@@ -372,7 +384,7 @@ namespace SilverSim.Scene.Types.Scene
 
             foreach(KeyValuePair<UUI, List<InventoryItem>> kvp in copyItems)
             {
-                List<UUID> assetIDs = new List<UUID>();
+                var assetIDs = new List<UUID>();
                 IAgent toAgent;
                 foreach (InventoryItem item in kvp.Value)
                 {
@@ -415,9 +427,11 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            ackres = new Viewer.Messages.Object.DeRezAck();
-            ackres.TransactionID = req.TransactionID;
-            ackres.Success = true;
+            ackres = new Viewer.Messages.Object.DeRezAck()
+            {
+                TransactionID = req.TransactionID,
+                Success = true
+            };
             agent.SendMessageAlways(ackres, ID);
         }
     }

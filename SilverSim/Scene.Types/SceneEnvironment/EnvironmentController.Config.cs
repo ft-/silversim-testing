@@ -186,24 +186,20 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             public InvalidEnvironmentControllerSerializationException()
             {
-
             }
 
             public InvalidEnvironmentControllerSerializationException(string message)
                 : base(message)
             {
-
             }
             public InvalidEnvironmentControllerSerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected InvalidEnvironmentControllerSerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
         }

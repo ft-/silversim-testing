@@ -87,11 +87,6 @@ namespace SilverSim.ServiceInterfaces.Economy
             bool TryGetValue(UUI agentID, out Int32 balance);
         }
 
-        public EconomyServiceInterface()
-        {
-
-        }
-
         public abstract void Login(UUI agentID, UUID sessionID, UUID secureSessionID);
 
         public abstract void Logout(UUI agentID, UUID sessionID, UUID secureSessionID);

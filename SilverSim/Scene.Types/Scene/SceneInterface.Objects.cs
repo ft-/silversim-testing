@@ -49,7 +49,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Send(ObjectPart part)
             {
-                byte[] propUpdate = part.PropertiesUpdateData;
+                var propUpdate = part.PropertiesUpdateData;
                 if (null == propUpdate)
                 {
                     return;
@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.RequestPayPrice)]
         public void HandleRequestPayPrice(Message m)
         {
-            RequestPayPrice req = (RequestPayPrice)m;
+            var req = (RequestPayPrice)m;
 
             IAgent agent;
             if (!Agents.TryGetValue(req.CircuitAgentID, out agent))
@@ -131,7 +131,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectSpinUpdate)]
         public void HandleObjectSpinUpdate(Message m)
         {
-            ObjectSpinUpdate req = (ObjectSpinUpdate)m;
+            var req = (ObjectSpinUpdate)m;
             if(req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -146,7 +146,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectSpinStop)]
         public void HandleObjectSpinStop(Message m)
         {
-            ObjectSpinStop req = (ObjectSpinStop)m;
+            var req = (ObjectSpinStop)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -161,7 +161,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectShape)]
         public void HandleObjectShape(Message m)
         {
-            ObjectShape req = (ObjectShape)m;
+            var req = (ObjectShape)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -218,7 +218,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.MultipleObjectUpdate)]
         public void HandleMultipleObjectUpdate(Message m)
         {
-            MultipleObjectUpdate req = (MultipleObjectUpdate)m;
+            var req = (MultipleObjectUpdate)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -264,7 +264,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 if ((d.Flags & MultipleObjectUpdate.UpdateFlags.UpdatePosition) != 0)
                 {
-                    Vector3 pos = new Vector3();
+                    var pos = new Vector3();
                     pos.FromBytes(d.Data, datapos);
                     datapos += 12;
                     if (prim.ObjectGroup.RootPart != prim && CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
@@ -279,7 +279,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 if ((d.Flags & MultipleObjectUpdate.UpdateFlags.UpdateRotation) != 0)
                 {
-                    Quaternion rot = new Quaternion();
+                    var rot = new Quaternion();
                     rot.FromBytes(d.Data, datapos, true);
                     datapos += 12;
                     if (prim.ObjectGroup.RootPart != prim && CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
@@ -307,7 +307,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectRotation)]
         public void HandleObjectRotation(Message m)
         {
-            ObjectRotation req = (ObjectRotation)m;
+            var req = (ObjectRotation)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -347,7 +347,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectPosition)]
         public void HandleObjectPosition(Message m)
         {
-            ObjectPosition req = (ObjectPosition)m;
+            var req = (ObjectPosition)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -387,7 +387,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectScale)]
         public void HandleObjectScale(Message m)
         {
-            ObjectScale req = (ObjectScale)m;
+            var req = (ObjectScale)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -427,7 +427,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectPermissions)]
         public void HandleObjectPermissions(Message m)
         {
-            ObjectPermissions req = (ObjectPermissions)m;
+            var req = (ObjectPermissions)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -454,14 +454,14 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         continue;
                     }
-                    Object.ObjectGroup grp = prim.ObjectGroup;
-                    InventoryPermissionsMask setmask = InventoryPermissionsMask.Every;
+                    var grp = prim.ObjectGroup;
+                    var setmask = InventoryPermissionsMask.Every;
                     if (!isGod)
                     {
                         setmask = grp.RootPart.OwnerMask;
                     }
 
-                    InventoryPermissionsMask clrmask = InventoryPermissionsMask.None;
+                    var clrmask = InventoryPermissionsMask.None;
 
                     switch (d.ChangeType)
                     {
@@ -530,7 +530,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectOwner)]
         public void HandleObjectOwner(Message m)
         {
-            ObjectOwner req = (ObjectOwner)m;
+            var req = (ObjectOwner)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -581,7 +581,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectName)]
         public void HandleObjectName(Message m)
         {
-            ObjectName req = (ObjectName)m;
+            var req = (ObjectName)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -594,7 +594,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectName.Data d in req.ObjectData)
                 {
@@ -622,7 +622,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectLink)]
         public void HandleObjectLink(Message m)
         {
-            ObjectLink req = (ObjectLink)m;
+            var req = (ObjectLink)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -665,7 +665,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            List<UUID> primids = new List<UUID>();
+            var primids = new List<UUID>();
             foreach(uint id in req.ObjectList)
             {
                 ObjectPart part;
@@ -682,7 +682,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectGroup)]
         public void HandleObjectGroup(Message m)
         {
-            Viewer.Messages.Object.ObjectGroup req = (Viewer.Messages.Object.ObjectGroup)m;
+            var req = (Viewer.Messages.Object.ObjectGroup)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -695,7 +695,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (UInt32 d in req.ObjectList)
                 {
@@ -722,7 +722,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectIncludeInSearch)]
         public void HandleObjectIncludeInSearch(Message m)
         {
-            ObjectIncludeInSearch req = (ObjectIncludeInSearch)m;
+            var req = (ObjectIncludeInSearch)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -735,7 +735,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectIncludeInSearch.Data d in req.ObjectData)
                 {
@@ -754,7 +754,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectFlagUpdate)]
         public void HandleObjectFlagUpdate(Message m)
         {
-            ObjectFlagUpdate req = (ObjectFlagUpdate)m;
+            var req = (ObjectFlagUpdate)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -779,7 +779,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 grp.IsPhantom = req.IsPhantom;
                 grp.IsTempOnRez = req.IsTemporary;
@@ -804,7 +804,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectMaterial)]
         public void HandleObjectMaterial(Message m)
         {
-            ObjectMaterial req = (ObjectMaterial)m;
+            var req = (ObjectMaterial)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -817,7 +817,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectMaterial.Data d in req.ObjectData)
                 {
@@ -844,7 +844,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectExtraParams)]
         public void HandleObjectExtraParams(Message m)
         {
-            ObjectExtraParams req = (ObjectExtraParams)m;
+            var req = (ObjectExtraParams)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -856,7 +856,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach(ObjectExtraParams.Data data in req.ObjectData)
+            foreach(var data in req.ObjectData)
             {
 #if DEBUG
                 m_Log.DebugFormat("ObjectExtraParams localid={0}", data.ObjectLocalID);
@@ -879,7 +879,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectImage)]
         public void HandleObjectImage(Message m)
         {
-            ObjectImage req = (ObjectImage)m;
+            var req = (ObjectImage)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -914,7 +914,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectExportSelected)]
         public void HandleObjectExportSelected(Message m)
         {
-            ObjectExportSelected req = (ObjectExportSelected)m;
+            var req = (ObjectExportSelected)m;
             if (req.CircuitAgentID != req.AgentID)
             {
                 return;
@@ -924,7 +924,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectSelect)]
         public void HandleObjectSelect(Message m)
         {
-            ObjectSelect req = (ObjectSelect)m;
+            var req = (ObjectSelect)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -937,7 +937,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ObjectPart part;
-            RwLockedList<UUID> selectedObjects = agent.SelectedObjects(ID);
+            var selectedObjects = agent.SelectedObjects(ID);
 
             foreach (uint primLocalID in req.ObjectData)
             {
@@ -961,7 +961,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectDrop)]
         public void HandleObjectDrop(Message m)
         {
-            ObjectDrop req = (ObjectDrop)m;
+            var req = (ObjectDrop)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -973,7 +973,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectAttach)]
         public void HandleObjectAttach(Message m)
         {
-            ObjectAttach req = (ObjectAttach)m;
+            var req = (ObjectAttach)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -985,7 +985,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectDescription)]
         public void HandleObjectDescription(Message m)
         {
-            ObjectDescription req = (ObjectDescription)m;
+            var req = (ObjectDescription)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -998,7 +998,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectDescription.Data d in req.ObjectData)
                 {
@@ -1025,7 +1025,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectDeselect)]
         public void HandleObjectDeselect(Message m)
         {
-            ObjectDeselect req = (ObjectDeselect)m;
+            var req = (ObjectDeselect)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -1055,7 +1055,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectClickAction)]
         public void HandleObjectClickAction(Message m)
         {
-            ObjectClickAction req = (ObjectClickAction)m;
+            var req = (ObjectClickAction)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -1068,7 +1068,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectClickAction.Data data in req.ObjectData)
                 {
@@ -1094,7 +1094,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectCategory)]
         public void HandleObjectCategory(Message m)
         {
-            ObjectCategory req = (ObjectCategory)m;
+            var req = (ObjectCategory)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -1107,7 +1107,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectCategory.Data data in req.ObjectData)
                 {
@@ -1133,7 +1133,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.RequestObjectPropertiesFamily)]
         public void HandleRequestObjectPropertiesFamily(Message m)
         {
-            RequestObjectPropertiesFamily req = (RequestObjectPropertiesFamily)m;
+            var req = (RequestObjectPropertiesFamily)m;
             if(req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {

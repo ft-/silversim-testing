@@ -29,25 +29,21 @@ namespace SilverSim.Scene.Types.Object.Mesh
     {
         public InvalidSculptMeshAssetException()
         {
-
         }
 
         public InvalidSculptMeshAssetException(string message)
             : base(message)
         {
-
         }
 
         protected InvalidSculptMeshAssetException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public InvalidSculptMeshAssetException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 }

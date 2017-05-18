@@ -71,22 +71,16 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            public IList<string> Names
-            {
-                get
-                {
-                    return new List<string>(m_ScriptCompilers.Keys);
-                }
-            }
+            public IList<string> Names => new List<string>(m_ScriptCompilers.Keys);
 
             private IScriptCompiler DetermineShBangs(
                 Dictionary<int, string> shbangs,
                 CultureInfo currentCulture)
             {
-                string language = DefaultCompilerName;
-                bool useDefault = true;
+                var language = DefaultCompilerName;
+                var useDefault = true;
                 int lineno = 0;
-                foreach (KeyValuePair<int, string> shbang in shbangs)
+                foreach (var shbang in shbangs)
                 {
                     if (shbang.Value.StartsWith("//#!Engine:"))
                     {
@@ -116,13 +110,11 @@ namespace SilverSim.Scripting.Common
 
             static Assembly ResolveAssembly(object sender, ResolveEventArgs args)
             {
-                AssemblyName aName = new AssemblyName(args.Name);
+                var aName = new AssemblyName(args.Name);
 
-                string[] pathList = new string[] { CoreUpdater.Instance.BinariesPath, CoreUpdater.Instance.PluginsPath };
-
-                foreach (string s in pathList)
+                foreach (var s in new string[] { CoreUpdater.Instance.BinariesPath, CoreUpdater.Instance.PluginsPath })
                 {
-                    string assemblyName = Path.Combine(s, aName.Name + ".dll");
+                    var assemblyName = Path.Combine(s, aName.Name + ".dll");
                     if (File.Exists(assemblyName))
                     {
                         return Assembly.LoadFile(assemblyName);
@@ -133,17 +125,17 @@ namespace SilverSim.Scripting.Common
 
             private IScriptAssembly Compile(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
-                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
+                var compiler = DetermineShBangs(shbangs, cultureInfo);
 
-                object[] attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectModeAttribute), false);
-                object[] attrs2 = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesInMemoryCompilationAttribute), false);
+                var attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectModeAttribute), false);
+                var attrs2 = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesInMemoryCompilationAttribute), false);
                 if(attrs.Length != 0 || attrs2.Length != 0)
                 {
                     return compiler.Compile(AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber, cultureInfo);
                 }
                 else
                 {
-                    AppDomain appDom = AppDomain.CreateDomain(
+                    var appDom = AppDomain.CreateDomain(
                         "Script Domain " + assetID.ToString(), 
                         AppDomain.CurrentDomain.Evidence);
                     appDom.AssemblyResolve += ResolveAssembly;
@@ -153,7 +145,7 @@ namespace SilverSim.Scripting.Common
                     appDom.Load("SilverSim.Scripting.Common");
                     try
                     {
-                        IScriptAssembly assembly = compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber, cultureInfo);
+                        var assembly = compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber, cultureInfo);
                         ScriptLoader.RegisterAppDomain(assetID, appDom);
                         return assembly;
                     }
@@ -167,14 +159,14 @@ namespace SilverSim.Scripting.Common
 
             private void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
-                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
+                var compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber, cultureInfo);
             }
 
             private void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null)
             {
-                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
+                var compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 compiler.SyntaxCheckAndDump(s, user, shbangs, assetID, reader, linenumber, cultureInfo);
             }
@@ -200,12 +192,9 @@ namespace SilverSim.Scripting.Common
                         m_InnerReader.Dispose();
                     }
                 }
-                public override int Peek()
-                {
-                    return m_Header.Length != 0 ?
+                public override int Peek() => m_Header.Length != 0 ?
                         m_Header[0] :
                         m_InnerReader.Peek();
-                }
                 public override int Read()
                 {
                     if (m_Header.Length != 0)
@@ -276,20 +265,17 @@ namespace SilverSim.Scripting.Common
                     }
                 }
 
-                public override string ReadToEnd()
-                {
-                    return m_Header + m_InnerReader.ReadToEnd();
-                }
+                public override string ReadToEnd() => m_Header + m_InnerReader.ReadToEnd();
             }
 
             public IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
-                Dictionary<int, string> shbangs = new Dictionary<int, string>();
-                StringBuilder header = new StringBuilder();
+                var shbangs = new Dictionary<int, string>();
+                var header = new StringBuilder();
                 while (reader.Peek() == '/')
                 {
-                    string shbang = reader.ReadLine();
+                    var shbang = reader.ReadLine();
                     header.AppendLine(shbang);
                     if (shbang.StartsWith("//#!"))
                     {
@@ -298,7 +284,7 @@ namespace SilverSim.Scripting.Common
                     ++linenumber;
                 }
 
-                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
+                using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
                     return Compile(user, shbangs, assetID, headReader, 1, cultureInfo);
                 }
@@ -307,11 +293,11 @@ namespace SilverSim.Scripting.Common
             public void SyntaxCheck(UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
-                Dictionary<int, string> shbangs = new Dictionary<int, string>();
-                StringBuilder header = new StringBuilder();
+                var shbangs = new Dictionary<int, string>();
+                var header = new StringBuilder();
                 while (reader.Peek() == '/')
                 {
-                    string shbang = reader.ReadLine();
+                    var shbang = reader.ReadLine();
                     header.AppendLine(shbang);
                     if (shbang.StartsWith("//#!"))
                     {
@@ -320,7 +306,7 @@ namespace SilverSim.Scripting.Common
                     ++linenumber;
                 }
 
-                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
+                using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
                     Compile(user, shbangs, assetID, headReader, 1, cultureInfo);
                 }
@@ -329,8 +315,8 @@ namespace SilverSim.Scripting.Common
             public void SyntaxCheckAndDump(Stream s, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
-                Dictionary<int, string> shbangs = new Dictionary<int, string>();
-                StringBuilder header = new StringBuilder();
+                var shbangs = new Dictionary<int, string>();
+                var header = new StringBuilder();
                 while (reader.Peek() == '/')
                 {
                     string shbang = reader.ReadLine();
@@ -341,7 +327,7 @@ namespace SilverSim.Scripting.Common
                     }
                     ++linenumber;
                 }
-                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
+                using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
                     SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, 1, cultureInfo);
                 }
@@ -350,11 +336,11 @@ namespace SilverSim.Scripting.Common
             public void CompileToDisk(string filename, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null)
             {
                 int linenumber = 1;
-                Dictionary<int, string> shbangs = new Dictionary<int, string>();
-                StringBuilder header = new StringBuilder();
+                var shbangs = new Dictionary<int, string>();
+                var header = new StringBuilder();
                 while (reader.Peek() == '/')
                 {
-                    string shbang = reader.ReadLine();
+                    var shbang = reader.ReadLine();
                     header.AppendLine(shbang);
                     if (shbang.StartsWith("//#!"))
                     {
@@ -363,9 +349,9 @@ namespace SilverSim.Scripting.Common
                     ++linenumber;
                 }
 
-                IScriptCompiler compiler = DetermineShBangs(shbangs, cultureInfo);
+                var compiler = DetermineShBangs(shbangs, cultureInfo);
 
-                using (StreamReaderAddHead headReader = new StreamReaderAddHead(header.ToString(), reader))
+                using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
                     compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, 1, cultureInfo);
                 }

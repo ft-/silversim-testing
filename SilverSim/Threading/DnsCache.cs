@@ -90,14 +90,8 @@ namespace SilverSim.Threading
             return addresses;
         }
 
-        public static ICollection<string> GetCachedDnsEntries()
-        {
-            return m_DnsCache.Keys;
-        }
+        public static ICollection<string> GetCachedDnsEntries() => m_DnsCache.Keys;
 
-        public static bool RemoveCachedDnsEntry(string hostname)
-        {
-            return m_DnsCache.Remove(hostname);
-        }
+        public static bool RemoveCachedDnsEntry(string hostname) => m_DnsCache.Remove(hostname);
     }
 }

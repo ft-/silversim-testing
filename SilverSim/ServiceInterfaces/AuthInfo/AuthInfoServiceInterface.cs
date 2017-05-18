@@ -31,25 +31,21 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
     {
         public VerifyTokenFailedException()
         {
-
         }
 
         public VerifyTokenFailedException(string message)
              : base(message)
         {
-
         }
 
         protected VerifyTokenFailedException(SerializationInfo info, StreamingContext context)
         : base(info, context)
         {
-
         }
 
         public VerifyTokenFailedException(string message, Exception innerException)
         : base(message, innerException)
         {
-
         }
     }
 
@@ -58,35 +54,26 @@ namespace SilverSim.ServiceInterfaces.AuthInfo
     {
         public AuthenticationFailedException()
         {
-
         }
 
         public AuthenticationFailedException(string message)
              : base(message)
         {
-
         }
 
         protected AuthenticationFailedException(SerializationInfo info, StreamingContext context)
         : base(info, context)
         {
-
         }
 
         public AuthenticationFailedException(string message, Exception innerException)
         : base(message, innerException)
         {
-
         }
     }
 
     public abstract class AuthInfoServiceInterface
     {
-        protected AuthInfoServiceInterface()
-        {
-
-        }
-
         public abstract UserAuthInfo this[UUID accountid] { get; }
         public abstract void Store(UserAuthInfo info);
 

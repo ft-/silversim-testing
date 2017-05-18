@@ -25,11 +25,6 @@ namespace SilverSim.Scene.Types.Agent
 {
     public class AgentServiceList : List<object>
     {
-        public AgentServiceList()
-        {
-
-        }
-
         public new void Add(object v)
         {
             if(v == null)
@@ -61,7 +56,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public List<T> GetAll<T>()
         {
-            List<T> result = new List<T>();
+            var result = new List<T>();
             foreach(object c in this)
             {
                 if(typeof(T).IsAssignableFrom(c.GetType()))

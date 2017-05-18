@@ -104,10 +104,7 @@ namespace SilverSim.Threading
             }
         }
 
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         public bool Remove(T value)
         {
@@ -251,10 +248,7 @@ namespace SilverSim.Threading
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /* support for non-copy enumeration */
         public void ForEach(Action<T> action)
@@ -276,10 +270,6 @@ namespace SilverSim.Threading
         [Serializable]
         public class ValueAlreadyExistsException : Exception
         {
-            public ValueAlreadyExistsException()
-            {
-
-            }
         }
 
         public void AddIfNotExists(T val)

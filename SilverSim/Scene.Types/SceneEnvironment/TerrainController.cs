@@ -186,8 +186,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 int y;
                 int x;
-                List<LayerData> mlist = new List<LayerData>();
-                List<LayerPatch> dirtyPatches = new List<LayerPatch>();
+                var mlist = new List<LayerData>();
+                var dirtyPatches = new List<LayerPatch>();
                 RwLockedDictionary<uint, uint> agentSceneSerials = agent.TransmittedTerrainSerials[m_Scene.ID];
 
                 for (y = 0; y < m_Scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
@@ -210,7 +210,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                         }
                     }
                 }
-                LayerData.LayerDataType layerType = LayerData.LayerDataType.Land;
+                var layerType = LayerData.LayerDataType.Land;
 
                 if (BASE_REGION_SIZE < m_Scene.SizeX || BASE_REGION_SIZE < m_Scene.SizeY)
                 {
@@ -234,8 +234,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public void UpdateTerrainDataToSingleClient(IAgent agent, bool forceUpdate)
         {
-            List<LayerData> mlist = CompileTerrainData(agent, forceUpdate);
-            foreach (LayerData m in mlist)
+            foreach (LayerData m in CompileTerrainData(agent, forceUpdate))
             {
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
@@ -245,8 +244,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             foreach (IAgent agent in m_Scene.Agents)
             {
-                List<LayerData> mlist = CompileTerrainData(agent, false);
-                foreach (LayerData m in mlist)
+                foreach (LayerData m in CompileTerrainData(agent, false))
                 {
                     agent.SendMessageAlways(m, m_Scene.ID);
                 }
@@ -295,7 +293,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
              * Example: A 'cliff' would have a slope of approximately <0, 0, -1> (pointing down).
              */
             Vector3 vsl = vsn;
-            vsl.Z = (((vsn.X * vsn.X) + (vsn.Y * vsn.Y)) / (-1 * vsn.Z));
+            vsl.Z = ((vsn.X * vsn.X) + (vsn.Y * vsn.Y)) / (-1 * vsn.Z);
 
             return vsl;
         }
@@ -476,7 +474,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 int xPatches = (int)m_Scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
                 int yPatches = (int)m_Scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
 
-                List<LayerPatch> patches = new List<LayerPatch>();
+                var patches = new List<LayerPatch>();
                 for (int y = 0; y < yPatches; ++y)
                 {
                     for (int x = 0; x < xPatches; ++x)

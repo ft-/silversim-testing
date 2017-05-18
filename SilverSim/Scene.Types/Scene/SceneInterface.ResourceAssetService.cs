@@ -41,24 +41,22 @@ namespace SilverSim.Scene.Types.Scene
                 m_Resources = new List<string>(GetType().Assembly.GetManifestResourceNames());
             }
 
-            public bool ContainsAsset(UUID key)
-            {
-                string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
-                return m_Resources.Contains(resourcename);
-            }
+            string GetAssetResourceName(UUID key) => "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
+
+            public bool ContainsAsset(UUID key) => m_Resources.Contains(GetAssetResourceName(key));
 
             public AssetData GetAsset(UUID key)
             {
-                return this.GetOrAddIfNotExists(key, delegate()
+                return GetOrAddIfNotExists(key, () =>
                 {
-                    string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
-                    if(!m_Resources.Contains(resourcename))
+                    string resourcename = GetAssetResourceName(key);
+                    if (!m_Resources.Contains(resourcename))
                     {
                         throw new AssetNotFoundException(key);
                     }
-                    using (Stream resource = GetType().Assembly.GetManifestResourceStream(resourcename))
+                    using (var resource = GetType().Assembly.GetManifestResourceStream(resourcename))
                     {
-                        using (GZipStream gz = new GZipStream(resource, CompressionMode.Decompress))
+                        using (var gz = new GZipStream(resource, CompressionMode.Decompress))
                         {
                             return AssetXml.ParseAssetData(gz);
                         }
@@ -66,11 +64,7 @@ namespace SilverSim.Scene.Types.Scene
                 });
             }
 
-            public bool Exists(UUID key)
-            {
-                string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
-                return m_Resources.Contains(resourcename);
-            }
+            public bool Exists(UUID key) => m_Resources.Contains(GetAssetResourceName(key));
         }
 
         public class ResourceAssetService : AssetServiceInterface, IAssetDataServiceInterface, IAssetMetadataServiceInterface
@@ -84,30 +78,25 @@ namespace SilverSim.Scene.Types.Scene
                 m_ReferencesService = new SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
             }
 
-            public override IAssetMetadataServiceInterface Metadata
-            {
-                get
-                {
-                    return this;
-                }
-            }
+            public override IAssetMetadataServiceInterface Metadata => this;
 
             AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
             {
                 get
                 {
                     AssetData ad = m_ResourceAssets.GetAsset(key);
-                    AssetMetadata md = new AssetMetadata();
-                    md.AccessTime = ad.AccessTime;
-                    md.CreateTime = ad.CreateTime;
-                    md.Creator = ad.Creator;
-                    md.Flags = ad.Flags;
-                    md.ID = ad.ID;
-                    md.Local = ad.Local;
-                    md.Name = ad.Name;
-                    md.Temporary = ad.Temporary;
-                    md.Type = ad.Type;
-                    return md;
+                    return new AssetMetadata()
+                    {
+                        AccessTime = ad.AccessTime,
+                        CreateTime = ad.CreateTime,
+                        Creator = ad.Creator,
+                        Flags = ad.Flags,
+                        ID = ad.ID,
+                        Local = ad.Local,
+                        Name = ad.Name,
+                        Temporary = ad.Temporary,
+                        Type = ad.Type
+                    };
                 }
             }
 
@@ -121,31 +110,12 @@ namespace SilverSim.Scene.Types.Scene
                 metadata = this[key];
                 return true;
             }
-            public override AssetReferencesServiceInterface References
-            {
-                get
-                {
-                    return m_ReferencesService;
-                }
-            }
+            public override AssetReferencesServiceInterface References => m_ReferencesService;
 
-            public override IAssetDataServiceInterface Data
-            {
-                get
-                {
-                    return this;
-                }
-            }
+            public override IAssetDataServiceInterface Data => this;
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            Stream IAssetDataServiceInterface.this[UUID key]
-            {
-                get
-                {
-                    AssetData ad = m_ResourceAssets.GetAsset(key);
-                    return new MemoryStream(ad.Data);
-                }
-            }
+            Stream IAssetDataServiceInterface.this[UUID key] => new MemoryStream(m_ResourceAssets.GetAsset(key).Data);
 
             bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
             {
@@ -158,13 +128,7 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
-            public override AssetData this[UUID key]
-            {
-                get
-                {
-                    return m_ResourceAssets.GetAsset(key);
-                }
-            }
+            public override AssetData this[UUID key] => m_ResourceAssets.GetAsset(key);
 
             public override bool TryGetValue(UUID key, out AssetData assetData)
             {

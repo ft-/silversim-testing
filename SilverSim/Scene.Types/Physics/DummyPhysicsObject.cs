@@ -76,29 +76,11 @@ namespace SilverSim.Scene.Types.Physics
         }
         #endregion
 
-        public Vector3 Torque
-        {
-            get
-            {
-                return Vector3.Zero;
-            }
-        }
+        public Vector3 Torque => Vector3.Zero;
 
-        public Vector3 Force
-        {
-            get
-            {
-                return Vector3.Zero;
-            }
-        }
+        public Vector3 Force => Vector3.Zero;
 
-        public double Mass 
-        { 
-            get
-            {
-                return 0;
-            }
-        }
+        public double Mass => 0;
 
         public double Buoyancy
         {

@@ -153,10 +153,7 @@ namespace SilverSim.Types.Agent
         #endregion
 
         #region Replacement accessor
-        public static implicit operator Dictionary<WearableType, List<WearableInfo>>(AgentWearables aw)
-        {
-            return aw.All;
-        }
+        public static implicit operator Dictionary<WearableType, List<WearableInfo>>(AgentWearables aw) => aw.All;
 
         public Dictionary<WearableType, List<WearableInfo>> All
         {

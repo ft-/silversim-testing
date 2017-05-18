@@ -50,10 +50,5 @@ namespace SilverSim.Scene.Types.Pathfinding
         public double MaxSpeed = 13;
         public bool AccountForSkippedFrames = true;
         public bool StayWithinParcel = true;
-
-        public CharacterInfo()
-        {
-
-        }
     }
 }

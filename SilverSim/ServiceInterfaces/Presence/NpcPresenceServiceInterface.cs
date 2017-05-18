@@ -47,11 +47,6 @@ namespace SilverSim.ServiceInterfaces.Presence
 
     public abstract class NpcPresenceServiceInterface
     {
-        public NpcPresenceServiceInterface()
-        {
-
-        }
-
         public abstract List<NpcPresenceInfo> this[UUID regionID]
         {
             get;

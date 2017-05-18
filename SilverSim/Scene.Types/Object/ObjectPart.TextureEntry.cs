@@ -127,7 +127,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 UpdateChangedFlags flags = 0;
-                TextureEntry copy = new TextureEntry(value.GetBytes());
+                var copy = new TextureEntry(value.GetBytes());
                 m_TextureEntryLock.AcquireWriterLock(-1);
                 try
                 {
@@ -150,7 +150,7 @@ namespace SilverSim.Scene.Types.Object
                 m_TextureEntryLock.AcquireReaderLock(-1);
                 try
                 {
-                    byte[] b = new byte[m_TextureEntryBytes.Length];
+                    var b = new byte[m_TextureEntryBytes.Length];
                     Buffer.BlockCopy(m_TextureEntryBytes, 0, b, 0, m_TextureEntryBytes.Length);
                     return b;
                 }
@@ -230,7 +230,7 @@ namespace SilverSim.Scene.Types.Object
                 m_TextureAnimationLock.AcquireReaderLock(-1);
                 try
                 {
-                    byte[] b = new byte[m_TextureAnimationBytes.Length];
+                    var b = new byte[m_TextureAnimationBytes.Length];
                     Buffer.BlockCopy(m_TextureEntryBytes, 0, b, 0, m_TextureAnimationBytes.Length);
                     return b;
                 }

@@ -88,13 +88,7 @@ namespace SilverSim.Threading
             m_Dictionary = new Dictionary<TKey,TValue>(capacity, comparer);
         }
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsReadOnly => false;
         public int Count 
         {
             get

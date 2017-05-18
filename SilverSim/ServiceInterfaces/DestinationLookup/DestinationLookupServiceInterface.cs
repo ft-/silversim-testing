@@ -19,18 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace SilverSim.ServiceInterfaces.DestinationLookup
 {
     public abstract class DestinationLookupServiceInterface
     {
-        public DestinationLookupServiceInterface()
-        {
-
-        }
     }
 }

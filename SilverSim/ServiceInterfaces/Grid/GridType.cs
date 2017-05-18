@@ -32,9 +32,6 @@ namespace SilverSim.ServiceInterfaces.Grid
             Name = name;
         }
 
-        public bool Equals(GridType other)
-        {
-            return Name == other.Name;
-        }
+        public bool Equals(GridType other) => Name == other.Name;
     }
 }

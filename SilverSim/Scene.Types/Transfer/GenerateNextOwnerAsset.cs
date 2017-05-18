@@ -32,9 +32,9 @@ namespace SilverSim.Scene.Types.Transfer
     {
         public static UUID GenerateNextOwnerAsset(this AssetServiceInterface assetService, UUID firstLevelAssetID)
         {
-            List<UUID> assetIDs = new List<UUID>();
-            Dictionary<UUID, UUID> replaceAssets = new Dictionary<UUID, UUID>();
-            List<UUID> objectAssetIDs = new List<UUID>();
+            var assetIDs = new List<UUID>();
+            var replaceAssets = new Dictionary<UUID, UUID>();
+            var objectAssetIDs = new List<UUID>();
             assetIDs.Add(firstLevelAssetID);
             int pos = 0;
             while (pos < assetIDs.Count)
@@ -61,7 +61,7 @@ namespace SilverSim.Scene.Types.Transfer
                         {
                             objectAssetIDs.Add(assetid);
                         }
-                        Notecard nc = new Notecard(assetService[assetid]);
+                        var nc = new Notecard(assetService[assetid]);
                         foreach (NotecardInventoryItem item in nc.Inventory.Values)
                         {
                             if ((item.AssetType == AssetType.Object || item.AssetType == AssetType.Notecard) &&
@@ -118,7 +118,7 @@ namespace SilverSim.Scene.Types.Transfer
                             break;
 
                         case AssetType.Notecard:
-                            Notecard nc = new Notecard(data);
+                            var nc = new Notecard(data);
                             foreach (NotecardInventoryItem item in nc.Inventory.Values)
                             {
                                 UUID replace;

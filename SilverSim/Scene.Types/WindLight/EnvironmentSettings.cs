@@ -70,7 +70,7 @@ namespace SilverSim.Scene.Types.WindLight
 
         public void Serialize(Stream s, UUID regionID)
         {
-            using(XmlTextWriter writer = s.UTF8XmlTextWriter())
+            using(var writer = s.UTF8XmlTextWriter())
             {
                 Serialize(writer, regionID);
             }
@@ -143,16 +143,16 @@ namespace SilverSim.Scene.Types.WindLight
 
         public static EnvironmentSettings Deserialize(Stream input)
         {
-            EnvironmentSettings env = new EnvironmentSettings();
-            AnArray a = LlsdXml.Deserialize(input) as AnArray;
+            var env = new EnvironmentSettings();
+            var a = LlsdXml.Deserialize(input) as AnArray;
             if(null == a)
             {
                 throw new EnvironmentSettingsSerializationException();
             }
 
-            AnArray dayCycleArray = a[1] as AnArray;
-            Map skyArray = a[2] as Map;
-            Map waterSettings = a[3] as Map;
+            var dayCycleArray = a[1] as AnArray;
+            var skyArray = a[2] as Map;
+            var waterSettings = a[3] as Map;
 
             if (dayCycleArray != null && skyArray != null)
             {

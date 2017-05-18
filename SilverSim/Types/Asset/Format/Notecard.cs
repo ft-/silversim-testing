@@ -526,9 +526,7 @@ namespace SilverSim.Types.Asset.Format
                 "}}\n";
 
         [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
-        static string ItemToString(NotecardInventoryItem item)
-        {
-            return string.Format(ItemFormatString,
+        static string ItemToString(NotecardInventoryItem item) => string.Format(ItemFormatString,
                 item.ExtCharIndex,
                 item.ID, item.ParentFolderID,
                 (uint)item.Permissions.Base,
@@ -550,7 +548,6 @@ namespace SilverSim.Types.Asset.Format
                 item.Description,
                 item.CreationDate.AsULong
                 );
-        }
 
         public AssetData Asset() => this;
 

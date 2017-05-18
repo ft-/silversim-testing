@@ -26,6 +26,7 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using SilverSim.Viewer.Messages;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -46,7 +47,7 @@ namespace SilverSim.Scene.Types.Scene
         private Viewer.Messages.Message AgentToObjectUpdate(IAgent agent)
         {
             Viewer.Messages.Object.UnreliableObjectUpdate m;
-            ObjectGroup sittingOn = agent.SittingOnObject;
+            var sittingOn = agent.SittingOnObject;
             if (sittingOn != null)
             {
                 m = new Viewer.Messages.Object.ObjectUpdate();
@@ -55,7 +56,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 m = new Viewer.Messages.Object.UnreliableObjectUpdate();
             }
-            Viewer.Messages.Object.UnreliableObjectUpdate.ObjData d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData();
+            var d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData();
             d.Data = new byte[0];
             d.ExtraParams = new byte[1];
             d.FullID = agent.ID;
@@ -106,14 +107,14 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAgentObjectToAgent(IAgent agent, IAgent targetAgent)
         {
-            SilverSim.Viewer.Messages.Message m = AgentToObjectUpdate(agent);
+            var m = AgentToObjectUpdate(agent);
             targetAgent.SendMessageAlways(m, ID);
             targetAgent.SendMessageAlways(agent.GetAvatarAppearanceMsg(), ID);
         }
 
         public void SendAgentObjectToAllAgents(IAgent agent)
         {
-            SilverSim.Viewer.Messages.Message m = AgentToObjectUpdate(agent);
+            var m = AgentToObjectUpdate(agent);
             foreach (IAgent a in Agents)
             {
                 a.SendMessageAlways(m, ID);
@@ -122,7 +123,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAgentAppearanceToAllAgents(IAgent agent)
         {
-            SilverSim.Viewer.Messages.Message am = agent.GetAvatarAppearanceMsg();
+            var am = agent.GetAvatarAppearanceMsg();
             foreach (IAgent a in Agents)
             {
                 a.SendMessageAlways(am, ID);
@@ -146,7 +147,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendKillObjectToAgents(List<UInt32> localids)
         {
-            SilverSim.Viewer.Messages.Object.KillObject m = new Viewer.Messages.Object.KillObject();
+            var m = new Viewer.Messages.Object.KillObject();
             m.LocalIDs.AddRange(localids);
             
             foreach(IAgent a in Agents)
@@ -157,7 +158,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendKillObjectToAgents(UInt32 localid)
         {
-            SilverSim.Viewer.Messages.Object.KillObject m = new Viewer.Messages.Object.KillObject();
+            var m = new Viewer.Messages.Object.KillObject();
             m.LocalIDs.Add(localid);
 
             foreach (IAgent a in Agents)

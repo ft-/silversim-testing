@@ -32,25 +32,21 @@ namespace SilverSim.ServiceInterfaces.Estate
     {
         public EstateUpdateFailedException()
         {
-
         }
 
         public EstateUpdateFailedException(string message)
             : base(message)
         {
-
         }
 
         protected EstateUpdateFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public EstateUpdateFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 }

@@ -42,7 +42,7 @@ namespace SilverSim.Scene.Types.Scene
             get
             {
                 int n = 0;
-                foreach(ObjectGroup g in this)
+                foreach(var g in this)
                 {
                     ++n;
                 }
@@ -54,7 +54,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             get
             {
-                ObjectGroup obj = m_Scene.Objects[id] as ObjectGroup;
+                var obj = m_Scene.Objects[id] as ObjectGroup;
                 if(null != obj)
                 {
                     return obj;
@@ -76,16 +76,10 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        public IEnumerator<ObjectGroup> GetEnumerator()
-        {
-            return new ObjectGroupEnumerator(m_Scene.Objects.GetEnumerator());
-        }
+        public IEnumerator<ObjectGroup> GetEnumerator() => new ObjectGroupEnumerator(m_Scene.Objects.GetEnumerator());
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public sealed class ObjectGroupEnumerator : IEnumerator<ObjectGroup>
         {
@@ -101,21 +95,9 @@ namespace SilverSim.Scene.Types.Scene
                 /* intentionally left empty */
             }
 
-            public ObjectGroup Current
-            {
-                get
-                {
-                    return (ObjectGroup)m_Enum.Current;
-                }
-            }
+            public ObjectGroup Current => (ObjectGroup)m_Enum.Current;
 
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return Current;
-                }
-            }
+            object IEnumerator.Current => Current;
 
             public bool MoveNext()
             {

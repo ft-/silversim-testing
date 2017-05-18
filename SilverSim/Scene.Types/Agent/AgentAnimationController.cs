@@ -125,11 +125,11 @@ namespace SilverSim.Scene.Types.Agent
 
         public void SendAnimations()
         {
-            AvatarAnimation m = new AvatarAnimation();
+            var m = new AvatarAnimation();
             m.Sender = m_AgentID;
             lock (m_Lock)
             {
-                foreach (AnimationInfo ai in m_ActiveAnimations)
+                foreach (var ai in m_ActiveAnimations)
                 {
                     m.AnimationList.Add(new AvatarAnimation.AnimationData(ai.AnimID, ai.AnimSeq, ai.SourceID));
                 }
@@ -261,10 +261,10 @@ namespace SilverSim.Scene.Types.Agent
 
         public List<UUID> GetPlayingAnimations()
         {
-            List<UUID> res = new List<UUID>();
+            var res = new List<UUID>();
             lock(m_Lock)
             {
-                foreach(AnimationInfo info in m_ActiveAnimations)
+                foreach(var info in m_ActiveAnimations)
                 {
                     res.Add(info.AnimID);
                 }

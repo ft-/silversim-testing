@@ -41,7 +41,7 @@ namespace SilverSim.Scene.Types.Physics
         {
             if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
-                IAgent agent = (IAgent)obj;
+                var agent = (IAgent)obj;
                 agent.PhysicsActors.Add(m_SceneID, new AgentUfoPhysics(agent, m_SceneID));
                 m_Agents.Add(obj);
             }
@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Types.Physics
         {
             if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
-                IAgent agent = (IAgent)obj;
+                var agent = (IAgent)obj;
                 IPhysicsObject physobj;
                 m_Agents.Remove(agent);
                 agent.PhysicsActors.Remove(m_SceneID, out physobj);
@@ -60,7 +60,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public void Shutdown()
         {
-            foreach (IObject obj in m_Agents)
+            foreach (var obj in m_Agents)
             {
                 Remove(obj);
             }
@@ -68,75 +68,30 @@ namespace SilverSim.Scene.Types.Physics
 
         public void RemoveAll()
         {
-            foreach(IObject obj in m_Agents)
+            foreach(var obj in m_Agents)
             {
                 Remove(obj);
             }
         }
 
-        public string PhysicsEngineName
-        {
-            get
-            {
-                return "Dummy";
-            }
-        }
+        public string PhysicsEngineName => "Dummy";
 
-        public double PhysicsDilationTime
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public double PhysicsDilationTime => 0;
 
-        public double PhysicsExecutionTime
-        {
-            get
-            {
-                return 0f;
-            }
-        }
+        public double PhysicsExecutionTime => 0f;
 
-        public double PhysicsFPS
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public double PhysicsFPS => 0;
 
-        public uint PhysicsFrameNumber
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public uint PhysicsFrameNumber => 0;
 
-        public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld)
-        {
-            return new RayResult[0];
-        }
+        public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld) => new RayResult[0];
 
-        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld)
-        {
-            return new RayResult[0];
-        }
+        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld) => new RayResult[0];
 
-        public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags)
-        {
-            return new RayResult[0];
-        }
+        public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags) => new RayResult[0];
 
-        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags)
-        {
-            return new RayResult[0];
-        }
+        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags) => new RayResult[0];
 
-        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits)
-        {
-            return new RayResult[0];
-        }
+        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits) => new RayResult[0];
     }
 }

@@ -37,13 +37,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public IPhysicsObject PhysicsActor
-        {
-            get
-            {
-                return RootPart.PhysicsActor;
-            }
-        }
+        public IPhysicsObject PhysicsActor => RootPart.PhysicsActor;
 
 
         public void PhysicsUpdate(PhysicsStateData value)

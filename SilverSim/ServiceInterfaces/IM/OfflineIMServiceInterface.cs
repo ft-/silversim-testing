@@ -32,25 +32,21 @@ namespace SilverSim.ServiceInterfaces.IM
     {
         public IMOfflineStoreFailedException()
         {
-
         }
 
         public IMOfflineStoreFailedException(string message)
             : base(message)
         {
-
         }
 
         protected IMOfflineStoreFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public IMOfflineStoreFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -59,37 +55,26 @@ namespace SilverSim.ServiceInterfaces.IM
     {
         public IMOfflineRetrieveFailedException()
         {
-
         }
 
         public IMOfflineRetrieveFailedException(string message)
             : base(message)
         {
-
         }
 
         protected IMOfflineRetrieveFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public IMOfflineRetrieveFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     public abstract class OfflineIMServiceInterface
     {
-        #region Constructor
-        public OfflineIMServiceInterface()
-        {
-
-        }
-        #endregion
-
         #region Methods
         public abstract void StoreOfflineIM(GridInstantMessage im);
         public abstract List<GridInstantMessage> GetOfflineIMs(UUID principalID);

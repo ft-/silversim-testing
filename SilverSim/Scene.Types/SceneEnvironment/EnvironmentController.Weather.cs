@@ -26,11 +26,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         class WeatherConfig
         {
             public bool EnableLightShareControl;
-
-            public WeatherConfig()
-            {
-
-            }
         }
 
         readonly WeatherConfig m_WeatherConfig = new WeatherConfig();

@@ -28,13 +28,7 @@ namespace SilverSim.Threading
     {
         static readonly RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
 
-        public static IList<Thread> Threads
-        {
-            get
-            {
-                return new List<Thread>(m_Threads);
-            }
-        }
+        public static IList<Thread> Threads => new List<Thread>(m_Threads);
 
         class ThreadStartContext
         {
@@ -80,32 +74,32 @@ namespace SilverSim.Threading
         }
         public static Thread CreateThread(ThreadStart start)
         {
-            ThreadStartContext tsc = new ThreadStartContext(start);
-            Thread t = new Thread(tsc.StartThread);
+            var tsc = new ThreadStartContext(start);
+            var t = new Thread(tsc.StartThread);
             tsc.Thread = t;
             return t;
         }
 
         public static Thread CreateThread(ParameterizedThreadStart start)
         {
-            ThreadStartContext tsc = new ThreadStartContext(start);
-            Thread t = new Thread(tsc.StartThreadParameterized);
+            var tsc = new ThreadStartContext(start);
+            var t = new Thread(tsc.StartThreadParameterized);
             tsc.Thread = t;
             return t;
         }
 
         public static Thread CreateThread(ThreadStart start, int maxStackSize)
         {
-            ThreadStartContext tsc = new ThreadStartContext(start);
-            Thread t = new Thread(tsc.StartThread, maxStackSize);
+            var tsc = new ThreadStartContext(start);
+            var t = new Thread(tsc.StartThread, maxStackSize);
             tsc.Thread = t;
             return t;
         }
 
         public static Thread CreateThread(ParameterizedThreadStart start, int maxStackSize)
         {
-            ThreadStartContext tsc = new ThreadStartContext(start);
-            Thread t = new Thread(tsc.StartThreadParameterized, maxStackSize);
+            var tsc = new ThreadStartContext(start);
+            var t = new Thread(tsc.StartThreadParameterized, maxStackSize);
             tsc.Thread = t;
             return t;
         }

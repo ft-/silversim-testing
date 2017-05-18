@@ -57,13 +57,6 @@ namespace SilverSim.ServiceInterfaces.Account
 
     public abstract class UserAccountServiceInterface : IUserAccountDeleteServiceInterface
     {
-        #region Constructor
-        public UserAccountServiceInterface()
-        {
-
-        }
-        #endregion
-
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UserAccount this[UUID scopeID, UUID accountID]
         {

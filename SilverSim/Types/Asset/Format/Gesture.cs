@@ -45,73 +45,40 @@ namespace SilverSim.Types.Asset.Format
 
         public class StepAnimation : IStep
         {
-            public StepType Type
-            {
-                get
-                {
-                    return StepType.Animation;
-                }
-            }
+            public StepType Type => StepType.Animation;
 
             public bool AnimationStart = true;
             public UUID AssetID = UUID.Zero;
             public string Name;
 
-            public string Serialize()
-            {
-                return string.Format("{0}\n{1}\n{2}\n{3}\n",
+            public string Serialize() => string.Format("{0}\n{1}\n{2}\n{3}\n",
                     (int)Type, Name, AssetID, AnimationStart ? "1" : "0");
-            }
         }
 
         public class StepSound : IStep
         {
-            public StepType Type
-            {
-                get
-                {
-                    return StepType.Sound;
-                }
-            }
+            public StepType Type => StepType.Sound;
 
             public UUID AssetID = UUID.Zero;
             public string Name;
 
-            public string Serialize()
-            {
-                return string.Format("{0}\n{1}\n{2}\n",
+            public string Serialize() => string.Format("{0}\n{1}\n{2}\n",
                     (int)Type, Name, AssetID);
-            }
         }
 
         public class StepChat : IStep
         {
-            public StepType Type
-            {
-                get
-                {
-                    return StepType.Chat;
-                }
-            }
+            public StepType Type => StepType.Chat;
 
             public string Text;
 
-            public string Serialize()
-            {
-                return string.Format("{0}\n{1}\n0\n",
+            public string Serialize() => string.Format("{0}\n{1}\n0\n",
                     (int)Type, Text);
-            }
         }
 
         public class StepWait : IStep
         {
-            public StepType Type
-            {
-                get
-                {
-                    return StepType.Wait;
-                }
-            }
+            public StepType Type => StepType.Wait;
 
             public bool WaitForAnimation;
             public bool WaitForTime;
@@ -136,18 +103,9 @@ namespace SilverSim.Types.Asset.Format
 
         public class StepEndOfGesture : IStep
         {
-            public StepType Type
-            {
-                get
-                {
-                    return StepType.EndOfGesture;
-                }
-            }
+            public StepType Type => StepType.EndOfGesture;
 
-            public string Serialize()
-            {
-                return ((int)Type).ToString();
-            }
+            public string Serialize() => ((int)Type).ToString();
         }
 
         #endregion
@@ -370,10 +328,7 @@ namespace SilverSim.Types.Asset.Format
 
         #region Operators
 
-        public AssetData Asset()
-        {
-            return this;
-        }
+        public AssetData Asset() => this;
 
         public static implicit operator AssetData(Gesture v)
         {

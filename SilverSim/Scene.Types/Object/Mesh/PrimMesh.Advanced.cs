@@ -32,10 +32,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
         #region extrude advanced
         static List<Vector3> ExtrudeAdvanced(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
         {
-            List<Vector3> extrusionPath = new List<Vector3>();
+            var extrusionPath = new List<Vector3>();
             double twist;
             double angle = 0.0.Lerp(shape.Revolutions * 2 * Math.PI, cut);
-            Vector3 taper = new Vector3();
+            var taper = new Vector3();
             double radiusOffset;
 
             twist = twistBegin.Lerp(twistEnd, cut);
@@ -59,9 +59,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* generate extrusions */
             double pathscale = shape.PathScale.Y;
             double skew = shape.Skew;
-            foreach (Vector3 vertex in path.Vertices)
+            foreach (var vertex in path.Vertices)
             {
-                Vector3 outvertex = vertex;
+                var outvertex = vertex;
                 outvertex.Z *= taper.X;
                 outvertex.Y *= taper.Y;
                 outvertex = outvertex.Rotate2D_YZ(twist);
@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         {
             double twist;
             double angle = 0.0.Lerp(shape.Revolutions * 2 * Math.PI, cut);
-            Vector3 taper = new Vector3();
+            var taper = new Vector3();
             double radiusOffset;
 
             twist = twistBegin.Lerp(twistEnd, cut);
@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* generate extrusions */
             double pathscale = shape.PathScale.Y;
             double skew = shape.Skew;
-            Vector3 outvertex = Vector3.Zero;
+            var outvertex = Vector3.Zero;
             outvertex.Z *= taper.X;
             outvertex.Y *= taper.Y;
             outvertex = outvertex.Rotate2D_YZ(twist);
@@ -163,7 +163,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double neededSteps = Math.Min(1, Math.Ceiling((shape.TwistEnd - shape.TwistBegin) / (5 * Math.PI / 180) * (cutEnd - cut)));
             cutStep /= neededSteps;
 
-            MeshLOD mesh = new MeshLOD();
+            var mesh = new MeshLOD();
             for (; cut < cutEnd; cut += cutStep)
             {
                 mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cut));
@@ -204,16 +204,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     /* p2 and p3 are on next row */
                     int z2 = z + verticeRowCount;
                     int l2 = (l + 1) % verticeRowCount; /* loop closure */
-                    Triangle tri = new Triangle();
-                    tri.Vertex1 = z + l;
-                    tri.Vertex2 = z2 + l2;
-                    tri.Vertex3 = z + l2;
+                    var tri = new Triangle()
+                    {
+                        Vertex1 = z + l,
+                        Vertex2 = z2 + l2,
+                        Vertex3 = z + l2
+                    };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle();
-                    tri.Vertex1 = z + l;
-                    tri.Vertex2 = z2 + l;
-                    tri.Vertex3 = z2 + l2;
+                    tri = new Triangle()
+                    {
+                        Vertex1 = z + l,
+                        Vertex2 = z2 + l,
+                        Vertex3 = z2 + l2
+                    };
                     mesh.Triangles.Add(tri);
                 }
             }
@@ -229,28 +233,36 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     int l2 = verticeRowCount - l - 1;
 
-                    Triangle tri = new Triangle();
-                    tri.Vertex1 = l;
-                    tri.Vertex2 = l2;
-                    tri.Vertex3 = l + 1;
+                    var tri = new Triangle()
+                    {
+                        Vertex1 = l,
+                        Vertex2 = l2,
+                        Vertex3 = l + 1
+                    };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle();
-                    tri.Vertex1 = l + 1;
-                    tri.Vertex2 = l2;
-                    tri.Vertex3 = l2 - 1;
+                    tri = new Triangle()
+                    {
+                        Vertex1 = l + 1,
+                        Vertex2 = l2,
+                        Vertex3 = l2 - 1
+                    };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle();
-                    tri.Vertex1 = l + bottomIndex;
-                    tri.Vertex2 = l2 + bottomIndex;
-                    tri.Vertex3 = l + 1 + bottomIndex;
+                    tri = new Triangle()
+                    {
+                        Vertex1 = l + bottomIndex,
+                        Vertex2 = l2 + bottomIndex,
+                        Vertex3 = l + 1 + bottomIndex
+                    };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle();
-                    tri.Vertex1 = l + 1 + bottomIndex;
-                    tri.Vertex2 = l2 + bottomIndex;
-                    tri.Vertex3 = l2 - 1 + bottomIndex;
+                    tri = new Triangle()
+                    {
+                        Vertex1 = l + 1 + bottomIndex,
+                        Vertex2 = l2 + bottomIndex,
+                        Vertex3 = l2 - 1 + bottomIndex
+                    };
                     mesh.Triangles.Add(tri);
                 }
             }
@@ -266,16 +278,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     int l2 = (l + 1) % verticeRowCount;
 
-                    Triangle tri = new Triangle();
-                    tri.Vertex1 = l;
-                    tri.Vertex2 = l2;
-                    tri.Vertex3 = centerpointTop;
+                    var tri = new Triangle()
+                    {
+                        Vertex1 = l,
+                        Vertex2 = l2,
+                        Vertex3 = centerpointTop
+                    };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle();
-                    tri.Vertex1 = l + bottomIndex;
-                    tri.Vertex2 = l2 + bottomIndex;
-                    tri.Vertex3 = centerpointBottom;
+                    tri = new Triangle()
+                    {
+                        Vertex1 = l + bottomIndex,
+                        Vertex2 = l2 + bottomIndex,
+                        Vertex3 = centerpointBottom
+                    };
                     mesh.Triangles.Add(tri);
                 }
             }

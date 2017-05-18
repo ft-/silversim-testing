@@ -35,7 +35,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleScriptReset(Message m)
         {
-            ScriptReset req = (ScriptReset)m;
+            var req = (ScriptReset)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -71,7 +71,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleGetScriptRunning(Message m)
         {
-            GetScriptRunning req = (GetScriptRunning)m;
+            var req = (GetScriptRunning)m;
 
             IAgent agent;
             Script.ScriptInstance instance;
@@ -87,11 +87,12 @@ namespace SilverSim.Scene.Types.Scene
             }
             instance = item.ScriptInstance;
 
-            ScriptRunningReply reply = new ScriptRunningReply();
-            reply.ItemID = req.ItemID;
-            reply.ObjectID = req.ObjectID;
-            reply.IsRunning = instance != null && instance.IsRunning ? instance.IsRunning : false;
-
+            var reply = new ScriptRunningReply()
+            {
+                ItemID = req.ItemID,
+                ObjectID = req.ObjectID,
+                IsRunning = instance != null && instance.IsRunning ? instance.IsRunning : false
+            };
             agent.SendMessageAlways(reply, ID);
         }
 
@@ -99,7 +100,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleScriptAnswerYes(Message m)
         {
-            ScriptAnswerYes req = (ScriptAnswerYes)m;
+            var req = (ScriptAnswerYes)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -120,10 +121,11 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            RuntimePermissionsEvent e = new RuntimePermissionsEvent();
-            e.PermissionsKey = req.CircuitAgentOwner;
-            e.Permissions = (ScriptPermissions)req.Questions;
-
+            var e = new RuntimePermissionsEvent()
+            {
+                PermissionsKey = req.CircuitAgentOwner,
+                Permissions = (ScriptPermissions)req.Questions
+            };
             instance.PostEvent(e);
         }
 
@@ -131,7 +133,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRevokePermissions(Message m)
         {
-            RevokePermissions req = (RevokePermissions)m;
+            var req = (RevokePermissions)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -141,17 +143,17 @@ namespace SilverSim.Scene.Types.Scene
             IObject iobj;
             if(Objects.TryGetValue(req.ObjectID, out iobj))
             {
-                ObjectGroup o = iobj as ObjectGroup;
+                var o = iobj as ObjectGroup;
                 if (o != null)
                 {
-                    o.ForEach(delegate(ObjectPart p)
+                    o.ForEach((ObjectPart p) =>
                     {
-                        p.Inventory.ForEach(delegate(ObjectPartInventoryItem i)
+                        p.Inventory.ForEach((ObjectPartInventoryItem i) =>
                         {
                             Script.ScriptInstance instance = i.ScriptInstance;
-                            if(instance != null)
+                            if (instance != null)
                             {
-                                instance.RevokePermissions(req.AgentID, (ScriptPermissions)req.ObjectPermissions);
+                                instance.RevokePermissions(req.AgentID, req.ObjectPermissions);
                             }
                         });
                     });

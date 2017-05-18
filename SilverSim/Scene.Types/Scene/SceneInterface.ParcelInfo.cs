@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.Scene
         private ParcelOverlayType GetParcelLayerByte(int x, int y, UUI agentID)
         {
             ParcelInfo pi;
-            ParcelOverlayType ov = ParcelOverlayType.Public;
+            var ov = ParcelOverlayType.Public;
             Int32 parcelLocalID = m_ParcelLayer[x, y];
             if (m_Parcels.TryGetValue(parcelLocalID, out pi))
             {
@@ -110,7 +110,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAllParcelOverlaysTo(IAgent agent)
         {
-            byte[] c = new byte[SizeX * SizeY / PARCEL_BLOCK_SIZE / PARCEL_BLOCK_SIZE];
+            var c = new byte[SizeX * SizeY / PARCEL_BLOCK_SIZE / PARCEL_BLOCK_SIZE];
             m_ParcelLayerRwLock.AcquireReaderLock(-1);
             try
             {
@@ -190,7 +190,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelInfoRequest(Message m)
         {
-            ParcelInfoRequest req = (ParcelInfoRequest)m;
+            var req = (ParcelInfoRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -200,7 +200,7 @@ namespace SilverSim.Scene.Types.Scene
             ParcelInfo pinfo;
             if(Parcels.TryGetValue(req.ParcelID, out pinfo))
             {
-                ParcelInfoReply reply = new ParcelInfoReply();
+                var reply = new ParcelInfoReply();
                 reply.AgentID = req.AgentID;
                 reply.OwnerID = pinfo.Owner.ID;
                 reply.Name = pinfo.Name;
@@ -217,96 +217,93 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, ParcelProperties.RequestResultType requestResult)
+        public ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, ParcelProperties.RequestResultType requestResult) => 
+            new ParcelProperties()
         {
-            ParcelProperties prop = new ParcelProperties();
-            
-            prop.RequestResult = requestResult;
-            prop.SequenceID = sequenceId;
-            prop.SnapSelection = false;
+            RequestResult = requestResult,
+            SequenceID = sequenceId,
+            SnapSelection = false,
 #warning Implement user-specific counts
-            prop.SelfCount = 0; /* TODO: */
-            prop.OtherCount = 0;
-            prop.PublicCount = 0;
-            prop.LocalID = pinfo.LocalID;
-            prop.IsGroupOwned = pinfo.GroupOwned;
-            prop.OwnerID = (prop.IsGroupOwned) ? 
-                pinfo.Group.ID : 
-                pinfo.Owner.ID;
-            prop.AuctionID = pinfo.AuctionID;
-            prop.ClaimDate = pinfo.ClaimDate;
-            prop.ClaimPrice = pinfo.ClaimPrice;
-            prop.RentPrice = pinfo.RentPrice;
-            prop.AABBMax = pinfo.AABBMax;
-            prop.AABBMin = pinfo.AABBMin;
-            prop.Bitmap = pinfo.LandBitmap.Data;
-            prop.Area = pinfo.Area;
-            prop.Status = pinfo.Status;
-            prop.SimWideMaxPrims = 15000;
-            prop.SimWideTotalPrims = 15000;
-            prop.MaxPrims = 15000;
-            prop.TotalPrims = 15000;
-            prop.OwnerPrims = 0;
-            prop.GroupPrims = 0;
-            prop.OtherPrims = 0;
-            prop.SelectedPrims = 0;
-            prop.ParcelPrimBonus = pinfo.ParcelPrimBonus;
-            prop.OtherCleanTime = pinfo.OtherCleanTime;
-            prop.ParcelFlags = pinfo.Flags;
-            prop.SalePrice = pinfo.SalePrice;
-            prop.Name = pinfo.Name;
-            prop.Description = pinfo.Description;
-            prop.MusicURL = pinfo.MusicURI ?? string.Empty;
-            prop.MediaURL = pinfo.MediaURI ?? string.Empty;
-            prop.MediaID = pinfo.MediaID;
-            prop.MediaAutoScale = pinfo.MediaAutoScale;
-            prop.GroupID = pinfo.Group.ID;
-            prop.PassPrice = pinfo.PassPrice;
-            prop.PassHours = pinfo.PassHours;
-            prop.Category = pinfo.Category;
-            prop.AuthBuyerID = pinfo.AuthBuyer.ID;
-            prop.SnapshotID = pinfo.SnapshotID;
-            prop.UserLocation = pinfo.LandingPosition;
-            prop.UserLookAt = pinfo.LandingLookAt;
-            prop.LandingType = pinfo.LandingType;
-            prop.RegionPushOverride = false;
-            prop.RegionDenyAnonymous = false;
-            prop.RegionDenyIdentified = false;
-            prop.RegionDenyTransacted = false;
-            prop.RegionDenyAgeUnverified = false;
+            SelfCount = 0, /* TODO: */
+            OtherCount = 0,
+            PublicCount = 0,
+            LocalID = pinfo.LocalID,
+            IsGroupOwned = pinfo.GroupOwned,
+            OwnerID = (pinfo.GroupOwned) ?
+                pinfo.Group.ID :
+                pinfo.Owner.ID,
+            AuctionID = pinfo.AuctionID,
+            ClaimDate = pinfo.ClaimDate,
+            ClaimPrice = pinfo.ClaimPrice,
+            RentPrice = pinfo.RentPrice,
+            AABBMax = pinfo.AABBMax,
+            AABBMin = pinfo.AABBMin,
+            Bitmap = pinfo.LandBitmap.Data,
+            Area = pinfo.Area,
+            Status = pinfo.Status,
+            SimWideMaxPrims = 15000,
+            SimWideTotalPrims = 15000,
+            MaxPrims = 15000,
+            TotalPrims = 15000,
+            OwnerPrims = 0,
+            GroupPrims = 0,
+            OtherPrims = 0,
+            SelectedPrims = 0,
+            ParcelPrimBonus = pinfo.ParcelPrimBonus,
+            OtherCleanTime = pinfo.OtherCleanTime,
+            ParcelFlags = pinfo.Flags,
+            SalePrice = pinfo.SalePrice,
+            Name = pinfo.Name,
+            Description = pinfo.Description,
+            MusicURL = pinfo.MusicURI ?? string.Empty,
+            MediaURL = pinfo.MediaURI ?? string.Empty,
+            MediaID = pinfo.MediaID,
+            MediaAutoScale = pinfo.MediaAutoScale,
+            GroupID = pinfo.Group.ID,
+            PassPrice = pinfo.PassPrice,
+            PassHours = pinfo.PassHours,
+            Category = pinfo.Category,
+            AuthBuyerID = pinfo.AuthBuyer.ID,
+            SnapshotID = pinfo.SnapshotID,
+            UserLocation = pinfo.LandingPosition,
+            UserLookAt = pinfo.LandingLookAt,
+            LandingType = pinfo.LandingType,
+            RegionPushOverride = false,
+            RegionDenyAnonymous = false,
+            RegionDenyIdentified = false,
+            RegionDenyTransacted = false,
+            RegionDenyAgeUnverified = false,
 #warning Other Parcel Details here
-            prop.Privacy = pinfo.IsPrivate;
-            prop.SeeAVs = pinfo.SeeAvatars;
-            prop.AnyAVSounds = pinfo.AnyAvatarSounds;
-            prop.GroupAVSounds = pinfo.GroupAvatarSounds;
-            prop.MediaDesc = pinfo.MediaDescription;
-            prop.MediaHeight = pinfo.MediaHeight;
-            prop.MediaWidth = pinfo.MediaWidth;
-            prop.MediaLoop = pinfo.MediaLoop;
-            prop.MediaType = pinfo.MediaType;
-            prop.ObscureMedia = pinfo.ObscureMedia;
-            prop.ObscureMusic = pinfo.ObscureMusic;
-
-            return prop;
-        }
+            Privacy = pinfo.IsPrivate,
+            SeeAVs = pinfo.SeeAvatars,
+            AnyAVSounds = pinfo.AnyAvatarSounds,
+            GroupAVSounds = pinfo.GroupAvatarSounds,
+            MediaDesc = pinfo.MediaDescription,
+            MediaHeight = pinfo.MediaHeight,
+            MediaWidth = pinfo.MediaWidth,
+            MediaLoop = pinfo.MediaLoop,
+            MediaType = pinfo.MediaType,
+            ObscureMedia = pinfo.ObscureMedia,
+            ObscureMusic = pinfo.ObscureMusic
+        };
 
         [PacketHandler(MessageType.ParcelPropertiesRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelPropertiesRequest(Message m)
         {
-            Dictionary<UUID, ParcelInfo> results = new Dictionary<UUID, ParcelInfo>();
-            ParcelPropertiesRequest req = (ParcelPropertiesRequest)m;
+            var results = new Dictionary<UUID, ParcelInfo>();
+            var req = (ParcelPropertiesRequest)m;
             if(req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
             }
 
-            int start_x = (int)(req.West + 0.5);
-            int start_y = (int)(req.South + 0.5);
-            int end_x = (int)(req.East + 0.5);
-            int end_y = (int)(req.North + 0.5);
+            var start_x = (int)(req.West + 0.5);
+            var start_y = (int)(req.South + 0.5);
+            var end_x = (int)(req.East + 0.5);
+            var end_y = (int)(req.North + 0.5);
             if(start_x < 0)
             {
                 start_x = 0;
@@ -364,7 +361,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelPropertiesRequestByID(Message m)
         {
-            ParcelPropertiesRequestByID req = (ParcelPropertiesRequestByID)m;
+            var req = (ParcelPropertiesRequestByID)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -382,7 +379,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleParcelGodForceOwner(Message m)
         {
-            ParcelGodForceOwner req = (ParcelGodForceOwner)m;
+            var req = (ParcelGodForceOwner)m;
             UUI agentID;
             ParcelInfo pInfo;
             IAgent godAgent;

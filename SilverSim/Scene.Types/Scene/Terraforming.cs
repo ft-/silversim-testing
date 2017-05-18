@@ -76,7 +76,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             foreach (MethodInfo mi in typeof(Terraforming).GetMethods(BindingFlags.Static | BindingFlags.Public))
             {
-                PaintEffectAttribute pe = (PaintEffectAttribute)Attribute.GetCustomAttribute(mi, typeof(PaintEffectAttribute));
+                var pe = (PaintEffectAttribute)Attribute.GetCustomAttribute(mi, typeof(PaintEffectAttribute));
                 if (pe == null)
                 {
                     continue;
@@ -105,7 +105,7 @@ namespace SilverSim.Scene.Types.Scene
                     PaintEffects.Add(pe.Effect, (Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>)
                         Delegate.CreateDelegate(typeof(Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>), null, mi));
                 }
-                FloodEffectAttribute fe = (FloodEffectAttribute)Attribute.GetCustomAttribute(mi, typeof(FloodEffectAttribute));
+                var fe = (FloodEffectAttribute)Attribute.GetCustomAttribute(mi, typeof(FloodEffectAttribute));
                 if (fe == null)
                 {
                     continue;
@@ -141,7 +141,7 @@ namespace SilverSim.Scene.Types.Scene
         [PaintEffect(StandardTerrainEffect.Raise)]
         public static void RaiseSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
 
             int xFrom = (int)(data.West - data.BrushSize + 0.5);
             int xTo = (int)(data.West + data.BrushSize + 0.5);
@@ -176,7 +176,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 for (int y = yFrom; y <= yTo; y++)
                 {
-                    Vector3 pos = new Vector3(x, y, 0);
+                    var pos = new Vector3(x, y, 0);
                     if (!scene.CanTerraform(agentOwner, pos))
                     {
                         continue;
@@ -210,7 +210,7 @@ namespace SilverSim.Scene.Types.Scene
         [PaintEffect(StandardTerrainEffect.Lower)]
         public static void LowerSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
 
             int xFrom = (int)(data.West - data.BrushSize + 0.5);
             int xTo = (int)(data.West + data.BrushSize + 0.5);
@@ -275,7 +275,7 @@ namespace SilverSim.Scene.Types.Scene
         [PaintEffect(StandardTerrainEffect.Flatten)]
         public static void FlattenSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
 
             double strength = MetersToSphericalStrength(data.BrushSize);
 
@@ -357,7 +357,7 @@ namespace SilverSim.Scene.Types.Scene
         [PaintEffect(StandardTerrainEffect.Smooth)]
         public static void SmoothSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
 
             int n = (int)(data.BrushSize + 0.5f);
             if (data.BrushSize > 6)
@@ -428,7 +428,7 @@ namespace SilverSim.Scene.Types.Scene
         [PaintEffect(StandardTerrainEffect.Noise)]
         public static void NoiseSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
 
             int n = (int)(data.BrushSize + 0.5f);
             if (data.BrushSize > 6)

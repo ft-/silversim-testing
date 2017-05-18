@@ -30,11 +30,11 @@ namespace SilverSim.Scene.Types.Scene
         public void UnlinkObjects(List<UUID> primids)
         {
             ObjectPart part;
-            foreach (UUID primid in primids)
+            foreach (var primid in primids)
             {
                 if (Primitives.TryGetValue(primid, out part))
                 {
-                    ObjectGroup grp = part.ObjectGroup;
+                    var grp = part.ObjectGroup;
                     if(null == grp)
                     {
                         continue;
@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void LinkObjects(List<UUID> objectids)
         {
-            List<ObjectGroup> groups = new List<ObjectGroup>();
+            var groups = new List<ObjectGroup>();
             foreach(UUID objectid in objectids)
             {
                 ObjectPart part;
@@ -75,18 +75,18 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ObjectGroup targetGrp = groups[0];
-            Vector3 newRootPos = targetGrp.GlobalPosition;
-            Quaternion newRootRot = targetGrp.GlobalRotation;
+            var targetGrp = groups[0];
+            var newRootPos = targetGrp.GlobalPosition;
+            var newRootRot = targetGrp.GlobalRotation;
             
             for(int groupidx = 1; groupidx < groups.Count; ++groupidx)
             {
-                ObjectGroup srcGrp = groups[groupidx];
-                foreach(ObjectPart part in srcGrp.Values)
+                var srcGrp = groups[groupidx];
+                foreach(var part in srcGrp.Values)
                 {
                     part.Inventory.SuspendScripts();
-                    Vector3 newChildPos = part.GlobalPosition - newRootPos;
-                    Quaternion newChildRot = part.GlobalRotation / newRootRot;
+                    var newChildPos = part.GlobalPosition - newRootPos;
+                    var newChildRot = part.GlobalRotation / newRootRot;
                     srcGrp.Remove(part.ID);
                     part.Position = newChildPos;
                     part.Rotation = newChildRot;

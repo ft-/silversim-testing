@@ -28,13 +28,6 @@ namespace SilverSim.Scene.Types.Object
     {
         public class TextParam
         {
-            #region Constructor
-            public TextParam()
-            {
-
-            }
-            #endregion
-
             #region Fields
             public string Text = string.Empty;
             public ColorAlpha TextColor = new ColorAlpha(0, 0, 0, 0);
@@ -45,7 +38,7 @@ namespace SilverSim.Scene.Types.Object
                 get
                 {
                     byte[] textBytes = Text.ToUTF8Bytes();
-                    byte[] serialization = new byte[4 + textBytes.Length];
+                    var serialization = new byte[4 + textBytes.Length];
                     Buffer.BlockCopy(textBytes, 0, serialization, 4, textBytes.Length);
                     serialization[0] = TextColor.R_AsByte;
                     serialization[1] = TextColor.G_AsByte;
@@ -76,7 +69,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                TextParam res = new TextParam();
+                var res = new TextParam();
                 lock (m_Text)
                 {
                     res.Text = m_Text.Text;

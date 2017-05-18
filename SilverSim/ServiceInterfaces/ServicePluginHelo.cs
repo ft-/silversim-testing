@@ -29,11 +29,6 @@ namespace SilverSim.ServiceInterfaces
 {
     public abstract class ServicePluginHelo
     {
-        public ServicePluginHelo()
-        {
-
-        }
-
         public static Dictionary<string, string> HeloRequest(string uri)
         {
             if (!uri.EndsWith("="))
@@ -50,12 +45,12 @@ namespace SilverSim.ServiceInterfaces
                 uri = uri.TrimEnd('/') + "/helo/";
             }
 
-            Dictionary<string, string> headers = new Dictionary<string, string>();
+            var headers = new Dictionary<string, string>();
             try
             {
-                using (Stream responseStream = HttpClient.DoStreamRequest("HEAD", uri, null, string.Empty, string.Empty, false, 20000, headers))
+                using (var responseStream = HttpClient.DoStreamRequest("HEAD", uri, null, string.Empty, string.Empty, false, 20000, headers))
                 {
-                    using (StreamReader reader = new StreamReader(responseStream))
+                    using (var reader = new StreamReader(responseStream))
                     {
                         reader.ReadToEnd();
                     }
@@ -71,7 +66,7 @@ namespace SilverSim.ServiceInterfaces
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static string[] HeloRequest_HandleType(string uri, Dictionary<string, string> cachedheaders = null)
         {
-            Dictionary<string, string> headers = cachedheaders != null ? cachedheaders : HeloRequest(uri);
+            var headers = cachedheaders != null ? cachedheaders : HeloRequest(uri);
             string protocols;
             if(!headers.TryGetValue("x-protocols-provided", out protocols) &&
                 !headers.TryGetValue("x-handlers-provided",out protocols))
@@ -83,14 +78,8 @@ namespace SilverSim.ServiceInterfaces
 
         public abstract string Name { get; }
 
-        public bool IsProtocolSupported(string url)
-        {
-            return HeloRequest_HandleType(url).Contains(Name);
-        }
+        public bool IsProtocolSupported(string url) => HeloRequest_HandleType(url).Contains(Name);
 
-        public bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders)
-        {
-            return HeloRequest_HandleType(url, cachedheaders).Contains(Name);
-        }
+        public bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders) => HeloRequest_HandleType(url, cachedheaders).Contains(Name);
     }
 }

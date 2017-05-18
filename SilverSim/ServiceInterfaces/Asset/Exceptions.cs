@@ -31,7 +31,6 @@ namespace SilverSim.ServiceInterfaces.Asset
     {
         public HGAccessNotSupportedException()
         {
-
         }
 
         public HGAccessNotSupportedException(string message)
@@ -55,7 +54,7 @@ namespace SilverSim.ServiceInterfaces.Asset
     [Serializable]
     public class AssetNotFoundException : KeyNotFoundException
     {
-        public UUID ID { get; private set; }
+        public UUID ID { get; }
 
         public AssetNotFoundException(UUID key)
             : base(string.Format("Asset {0} not found", key))
@@ -65,13 +64,11 @@ namespace SilverSim.ServiceInterfaces.Asset
 
         public AssetNotFoundException()
         {
-
         }
 
         public AssetNotFoundException(string message)
             : base(message)
         {
-
         }
 
         protected AssetNotFoundException(SerializationInfo info, StreamingContext context)
@@ -82,14 +79,13 @@ namespace SilverSim.ServiceInterfaces.Asset
         public AssetNotFoundException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     [Serializable]
     public class AssetNotDeletedException : Exception
     {
-        public UUID ID { get; private set; }
+        public UUID ID { get; }
 
         public AssetNotDeletedException(UUID key)
             : base(string.Format("Asset {0} not deleted", key))
@@ -99,13 +95,11 @@ namespace SilverSim.ServiceInterfaces.Asset
 
         public AssetNotDeletedException()
         {
-
         }
 
         public AssetNotDeletedException(string message)
             : base(message)
         {
-
         }
 
         protected AssetNotDeletedException(SerializationInfo info, StreamingContext context)
@@ -116,14 +110,13 @@ namespace SilverSim.ServiceInterfaces.Asset
         public AssetNotDeletedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     [Serializable]
     public class AssetStoreFailedException : Exception
     {
-        public UUID ID { get; private set; }
+        public UUID ID { get; }
 
         public AssetStoreFailedException(UUID key)
             : base(string.Format("Asset {0} not stored", key))
@@ -133,13 +126,11 @@ namespace SilverSim.ServiceInterfaces.Asset
 
         public AssetStoreFailedException()
         {
-
         }
 
         public AssetStoreFailedException(string message)
             : base(message)
         {
-
         }
 
         protected AssetStoreFailedException(SerializationInfo info, StreamingContext context)
@@ -150,7 +141,6 @@ namespace SilverSim.ServiceInterfaces.Asset
         public AssetStoreFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 

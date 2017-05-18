@@ -31,37 +31,30 @@ namespace SilverSim.Scene.Types.Object
 {
     public static class ObjectXML
     {
-        public static AssetData Asset(this ObjectGroup grp, XmlSerializationOptions options = XmlSerializationOptions.None)
-        {
-            return grp.Asset(UUI.Unknown, Vector3.Zero, options, false);
-        }
+        public static AssetData Asset(this ObjectGroup grp, XmlSerializationOptions options = XmlSerializationOptions.None) => 
+            grp.Asset(UUI.Unknown, Vector3.Zero, options, false);
 
-        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
-        {
-            return grp.Asset(nextOwner, Vector3.Zero, options, false);
-        }
+        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None) => 
+            grp.Asset(nextOwner, Vector3.Zero, options, false);
 
         public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
+                using (var writer = ms.UTF8XmlTextWriter())
                 {
                     grp.ToXml(writer, nextOwner, offsetpos, options, writeOffsetPos);
                     writer.Flush();
                 }
 
-                AssetData asset = new AssetData();
+                var asset = new AssetData();
                 asset.Type = AssetType.Object;
                 asset.Data = ms.ToArray();
                 return asset;
             }
         }
 
-        public static AssetData Asset(this List<ObjectGroup> objlist, XmlSerializationOptions options)
-        {
-            return objlist.Asset(UUI.Unknown, options);
-        }
+        public static AssetData Asset(this List<ObjectGroup> objlist, XmlSerializationOptions options) => objlist.Asset(UUI.Unknown, options);
 
         public static AssetData Asset(this List<ObjectGroup> objlist, UUI nextOwner, XmlSerializationOptions options)
         {
@@ -71,12 +64,12 @@ namespace SilverSim.Scene.Types.Object
             }
             Vector3 basepos = objlist[0].Position;
 
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
+                using (var writer = ms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("CoalescedObject");
-                    foreach (ObjectGroup grp in objlist)
+                    foreach (var grp in objlist)
                     {
                         grp.ToXml(writer, nextOwner, basepos, options);
                     }
@@ -85,7 +78,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.Flush();
                 }
 
-                AssetData asset = new AssetData();
+                var asset = new AssetData();
                 asset.Type = AssetType.Object;
                 asset.Data = ms.ToArray();
                 return asset;
@@ -99,7 +92,7 @@ namespace SilverSim.Scene.Types.Object
                 throw new InvalidObjectXmlException();
             }
 
-            using (Stream xmlstream = data.InputStream)
+            using (var xmlstream = data.InputStream)
             {
                 return FromXml(xmlstream, currentOwner);
             }
@@ -107,7 +100,7 @@ namespace SilverSim.Scene.Types.Object
 
         public static List<ObjectGroup> FromXml(Stream xmlstream, UUI currentOwner)
         {
-            using (XmlTextReader reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
+            using (var reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
             {
                 return FromXml(reader, currentOwner);
             }
@@ -141,7 +134,7 @@ namespace SilverSim.Scene.Types.Object
 
         static List<ObjectGroup> FromXmlSingleObject(XmlTextReader reader, UUI currentOwner)
         {
-            List<ObjectGroup> list = new List<ObjectGroup>();
+            var list = new List<ObjectGroup>();
 
             list.Add(ObjectGroup.FromXml(reader, currentOwner));
             return list;
@@ -150,7 +143,7 @@ namespace SilverSim.Scene.Types.Object
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         static List<ObjectGroup> FromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner)
         {
-            List<ObjectGroup> list = new List<ObjectGroup>();
+            var list = new List<ObjectGroup>();
             for(;;)
             {
                 if(!reader.Read())
@@ -168,7 +161,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                Vector3 sogpos = new Vector3();
+                                var sogpos = new Vector3();
                                 if (reader.MoveToFirstAttribute())
                                 {
                                     do
@@ -193,7 +186,7 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     while (reader.MoveToNextAttribute());
                                 }
-                                ObjectGroup grp = FromXmlSingleWithinCoalescedObject(reader, currentOwner);
+                                var grp = FromXmlSingleWithinCoalescedObject(reader, currentOwner);
                                 grp.Position = sogpos;
                                 list.Add(grp);
                                 break;

@@ -142,13 +142,7 @@ namespace SilverSim.Scene.Types.Object
 
         readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
-        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
-        {
-            get
-            {
-                return m_PhysicsActors;
-            }
-        }
+        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors => m_PhysicsActors;
 
         public IPhysicsObject PhysicsActor
         {
@@ -178,12 +172,12 @@ namespace SilverSim.Scene.Types.Object
         {
             lock (m_PhysicsUpdateLock)
             {
-                ObjectGroup group = ObjectGroup;
+                var group = ObjectGroup;
                 if(null == group)
                 {
                     return;
                 }
-                SceneInterface scene = group.Scene;
+                var scene = group.Scene;
                 if (null != scene && scene.ID == value.SceneID)
                 {
                     Position = value.Position;

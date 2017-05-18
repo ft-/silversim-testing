@@ -25,11 +25,6 @@ namespace SilverSim.ServiceInterfaces.Grid
 {
     public abstract class ForeignGridConnector
     {
-        public ForeignGridConnector()
-        {
-
-        }
-
         public abstract RegionInfo this[string name] /* specifying empty string results in DefaultRegion lookup */
         {
             get;

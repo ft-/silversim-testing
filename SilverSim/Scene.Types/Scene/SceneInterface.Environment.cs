@@ -50,7 +50,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public LocationInfo At(Vector3 pos)
             {
-                LocationInfo locInfo = new LocationInfo();
+                var locInfo = new LocationInfo();
                 locInfo.WaterHeight = m_RegionSettings.WaterHeight;
                 locInfo.GroundHeight = m_TerrainController[pos];
 
@@ -58,10 +58,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public LocationInfoProvider GetLocationInfoProvider()
-        {
-            return new LocationInfoProvider(Terrain, RegionSettings);
-        }
+        public LocationInfoProvider GetLocationInfoProvider() => new LocationInfoProvider(Terrain, RegionSettings);
 
         public void UpdateEnvironmentSettings()
         {
@@ -93,7 +90,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             get
             {
-                EnvironmentSettings envSettings = m_EnvironmentSettings;
+                var envSettings = m_EnvironmentSettings;
                 if (envSettings == null)
                 {
                     return null;

@@ -110,12 +110,5 @@ namespace SilverSim.ServiceInterfaces.Inventory
             VerifyInventoryFolder(principalID, rootFolder.ID, "Favorites", AssetType.FavoriteFolder);
         }
         #endregion
-
-        #region Constructor
-        public InventoryServiceInterface()
-        {
-
-        }
-        #endregion
     }
 }

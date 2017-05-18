@@ -30,37 +30,26 @@ namespace SilverSim.ServiceInterfaces.IM
     {
         public IMSendFailedException()
         {
-
         }
 
         public IMSendFailedException(string message)
             : base(message)
         {
-
         }
 
         protected IMSendFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public IMSendFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     public abstract class IMServiceInterface
     {
-        #region Constructor
-        public IMServiceInterface()
-        {
-
-        }
-        #endregion
-
         #region Methods
         public abstract void Send(GridInstantMessage im);
         #endregion

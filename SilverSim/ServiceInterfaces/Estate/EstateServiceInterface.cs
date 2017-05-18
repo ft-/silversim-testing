@@ -29,11 +29,6 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public abstract class EstateServiceInterface
     {
-        public EstateServiceInterface()
-        {
-
-        }
-
         public abstract EstateInfo this[uint estateID]
         {
             get;

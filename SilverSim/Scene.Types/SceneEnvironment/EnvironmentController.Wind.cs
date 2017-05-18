@@ -34,10 +34,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #region Update of Wind Data
         private List<LayerData> CompileWindData(Vector3 basepos)
         {
-            List<LayerData> mlist = new List<LayerData>();
-            List<LayerPatch> patchesList = new List<LayerPatch>();
-            LayerPatch patchX = new LayerPatch();
-            LayerPatch patchY = new LayerPatch();
+            var mlist = new List<LayerData>();
+            var patchesList = new List<LayerPatch>();
+            var patchX = new LayerPatch();
+            var patchY = new LayerPatch();
 
             /* round to nearest low pos */
             bool rX = basepos.X % 256 >= 128;
@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             patchesList.Add(patchX);
             patchesList.Add(patchY);
 
-            LayerData.LayerDataType layerType = LayerData.LayerDataType.Wind;
+            var layerType = LayerData.LayerDataType.Wind;
 
             if (BASE_REGION_SIZE < m_Scene.SizeX || BASE_REGION_SIZE < m_Scene.SizeY)
             {
@@ -88,8 +88,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public void UpdateWindDataToSingleClient(IAgent agent)
         {
-            List<LayerData> mlist = CompileWindData(agent.GlobalPosition);
-            foreach (LayerData m in mlist)
+            foreach (LayerData m in CompileWindData(agent.GlobalPosition))
             {
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
@@ -99,8 +98,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             foreach (IAgent agent in m_Scene.Agents)
             {
-                List<LayerData> mlist = CompileWindData(agent.GlobalPosition);
-                foreach (LayerData m in mlist)
+                foreach (LayerData m in CompileWindData(agent.GlobalPosition))
                 {
                     agent.SendMessageAlways(m, m_Scene.ID);
                 }

@@ -555,7 +555,7 @@ namespace SilverSim.Threading
         {
             get
             {
-                List<TValue> result = new List<TValue>();
+                var result = new List<TValue>();
                 m_RwLock.AcquireReaderLock(-1);
                 try
                 {

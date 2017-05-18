@@ -39,11 +39,6 @@ namespace SilverSim.ServiceInterfaces.UserAgents
             public string UserTitle;
         }
 
-        public UserAgentServiceInterface()
-        {
-
-        }
-
         public abstract IDisplayNameAccessor DisplayName { get; }
 
         public abstract void VerifyAgent(UUID sessionID, string token);
@@ -69,25 +64,21 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         {
             public RequestFailedException()
             {
-
             }
 
             public RequestFailedException(string message)
                 : base(message)
             {
-
             }
 
             protected RequestFailedException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public RequestFailedException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
     }

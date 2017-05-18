@@ -38,11 +38,6 @@ namespace SilverSim.Scripting.Common
         static readonly RwLockedDictionary<UUID, IScriptAssembly> m_LoadedAssemblies = new RwLockedDictionary<UUID, IScriptAssembly>();
         static readonly RwLockedDictionary<UUID, RwLockedList<ScriptInstance>> m_LoadedInstances = new RwLockedDictionary<UUID, RwLockedList<ScriptInstance>>();
 
-        static ScriptLoader()
-        {
-
-        }
-
         public static void Remove(UUID assetID, ScriptInstance instance)
         {
             m_CompilerLock.AcquireWriterLock(-1);
@@ -79,10 +74,9 @@ namespace SilverSim.Scripting.Common
             m_CompilerLock.AcquireReaderLock(-1);
             try
             {
-                IScriptAssembly assembly;
-                assembly = m_LoadedAssemblies.GetOrAddIfNotExists(data.ID, delegate()
+                var assembly = m_LoadedAssemblies.GetOrAddIfNotExists(data.ID, delegate()
                 {
-                    using (TextReader reader = new StreamReader(data.InputStream))
+                    using (var reader = new StreamReader(data.InputStream))
                     {
                         return CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, user, data.ID, reader, currentCulture);
                     }
@@ -104,7 +98,7 @@ namespace SilverSim.Scripting.Common
 
         public static void SyntaxCheck(UUI user, AssetData data, CultureInfo currentCulture)
         {
-            using(TextReader reader = new StreamReader(data.InputStream))
+            using(var reader = new StreamReader(data.InputStream))
             {
                 CompilerRegistry.ScriptCompilers.SyntaxCheck(user, data.ID, reader, currentCulture);
             }

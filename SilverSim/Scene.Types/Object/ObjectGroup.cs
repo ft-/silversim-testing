@@ -214,13 +214,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public DetectedTypeFlags DetectedType
-        {
-            get
-            {
-                return RootPart.DetectedType;
-            }
-        }
+        public DetectedTypeFlags DetectedType => RootPart.DetectedType;
 
         public double PhysicsGravityMultiplier
         {
@@ -750,13 +744,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public ObjectPart RootPart
-        {
-            get
-            {
-                return this[LINK_ROOT]; /* we always count from one here */
-            }
-        }
+        public ObjectPart RootPart => this[LINK_ROOT];
 
         public Vector3 Velocity
         {
@@ -858,10 +846,7 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        public bool IsInScene(SceneInterface scene)
-        {
-            return true;
-        }
+        public bool IsInScene(SceneInterface scene) => true;
 
         public void InvokeOnPositionUpdate(IObject obj)
         {
@@ -1028,7 +1013,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case LINK_ALL_CHILDREN:
                                 enumerator.MarkPosition();
-                                ForEach(delegate(KeyValuePair<int, ObjectPart> kvp)
+                                ForEach((KeyValuePair<int, ObjectPart> kvp) =>
                                 {
                                     if (kvp.Key != LINK_ROOT)
                                     {
@@ -1045,7 +1030,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case LINK_ALL_OTHERS:
                                 enumerator.MarkPosition();
-                                ForEach(delegate(KeyValuePair<int, ObjectPart> kvp)
+                                ForEach((KeyValuePair<int, ObjectPart> kvp) =>
                                 {
                                     if (kvp.Key != linkThis)
                                     {
@@ -1053,7 +1038,7 @@ namespace SilverSim.Scene.Types.Object
                                         kvp.Value.SetPrimitiveParams(enumerator);
                                     }
                                 });
-                                m_SittingAgents.ForEach(delegate(IAgent agent)
+                                m_SittingAgents.ForEach((IAgent agent) =>
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
@@ -1106,27 +1091,15 @@ namespace SilverSim.Scene.Types.Object
                 m_Group = group;
             }
 
-            public IAgent this[ObjectPart p]
-            {
-                get
-                {
-                    return m_Group.m_SittingAgents[p];
-                }
-            }
+            public IAgent this[ObjectPart p] => m_Group.m_SittingAgents[p];
 
-            public bool TryGetValue(ObjectPart p, out IAgent agent)
-            {
-                return m_Group.m_SittingAgents.TryGetValue(p, out agent);
-            }
+            public bool TryGetValue(ObjectPart p, out IAgent agent) => m_Group.m_SittingAgents.TryGetValue(p, out agent);
 
-            public bool TryGetValue(IAgent agent, out ObjectPart part)
-            {
-                return m_Group.m_SittingAgents.TryGetValue(agent, out part);
-            }
+            public bool TryGetValue(IAgent agent, out ObjectPart part) => m_Group.m_SittingAgents.TryGetValue(agent, out part);
 
             public bool TryGetValue(UUID agentid, out IAgent agent)
             {
-                foreach(IAgent ag in m_Group.m_SittingAgents.Keys1)
+                foreach(var ag in m_Group.m_SittingAgents.Keys1)
                 {
                     if(ag.ID == agentid)
                     {
@@ -1147,7 +1120,7 @@ namespace SilverSim.Scene.Types.Object
 
             public void Sit(IAgent agent, Vector3 preferedOffset, int preferedLinkNumber = -1)
             {
-                ObjectGroup sitOn = (ObjectGroup)agent.SittingOnObject;
+                var sitOn = (ObjectGroup)agent.SittingOnObject;
                 if(sitOn != null)
                 {
                     sitOn.m_SittingAgents.Remove(agent);
@@ -1179,7 +1152,7 @@ namespace SilverSim.Scene.Types.Object
 
                 agent.SetDefaultAnimation("sitting");
 
-                SceneInterface scene = m_Group.Scene;
+                var scene = m_Group.Scene;
                 if (null != scene)
                 {
                     scene.SendAgentObjectToAllAgents(agent);
@@ -1280,7 +1253,7 @@ namespace SilverSim.Scene.Types.Object
         #region Script Events
         public void PostEvent(IScriptEvent ev)
         {
-            ForEach(delegate(ObjectPart item)
+            ForEach((ObjectPart item) =>
             {
                 item.PostEvent(ev);
             });
@@ -1298,9 +1271,9 @@ namespace SilverSim.Scene.Types.Object
             if (rebuildBoundingBox)
             {
                 box = new BoundingBox();
-                Vector3 min = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
-                Vector3 max = new Vector3(double.MinValue, double.MinValue, double.MinValue);
-                foreach(ObjectPart p in ValuesByKey1)
+                var min = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
+                var max = new Vector3(double.MinValue, double.MinValue, double.MinValue);
+                foreach(var p in ValuesByKey1)
                 {
                     BoundingBox inner;
                     p.GetBoundingBox(out inner);
@@ -1467,7 +1440,7 @@ namespace SilverSim.Scene.Types.Object
         static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart part;
-            SortedDictionary<int, ObjectPart> links = new SortedDictionary<int, ObjectPart>();
+            var links = new SortedDictionary<int, ObjectPart>();
             if (reader.IsEmptyElement)
             {
                 throw new InvalidObjectXmlException();
@@ -1597,7 +1570,7 @@ namespace SilverSim.Scene.Types.Object
 
         public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, bool inRootPart = false)
         {
-            ObjectGroup group = new ObjectGroup();
+            var group = new ObjectGroup();
             ObjectPart rootPart = null;
             if(reader.IsEmptyElement)
             {
@@ -1712,7 +1685,7 @@ namespace SilverSim.Scene.Types.Object
 
         static void FromXmlGroupScriptStates(XmlTextReader reader, ObjectGroup group)
         {
-            UUID itemID = UUID.Zero;
+            var itemID = UUID.Zero;
 
             for(;;)
             {
@@ -1781,7 +1754,7 @@ namespace SilverSim.Scene.Types.Object
         static void FromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             string tagname = reader.Name;
-            Dictionary<string, string> attrs = new Dictionary<string, string>();
+            var attrs = new Dictionary<string, string>();
             if (reader.MoveToFirstAttribute())
             {
                 do

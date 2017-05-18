@@ -172,10 +172,7 @@ namespace SilverSim.Types.Asset.Format
             w.WriteEndElement();
         }
 
-        public AssetData Asset()
-        {
-            return this;
-        }
+        public AssetData Asset() => this;
 
         public void WriteMap(XmlTextWriter w)
         {

@@ -263,9 +263,9 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 }
             }
 
-            Vector3 sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
+            var sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
             sunDirection *= tiltRot;
-            Vector3 sunVelocity = new Vector3(0, 0, DailyOmega);
+            var sunVelocity = new Vector3(0, 0, DailyOmega);
             if (sunFixed || m_WindlightValid)
             {
                 sunVelocity = Vector3.Zero;
@@ -286,17 +286,15 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #endregion
 
         #region Viewer time message update
-        SimulatorViewerTimeMessage BuildTimeMessage()
+        SimulatorViewerTimeMessage BuildTimeMessage() => new SimulatorViewerTimeMessage()
         {
-            SimulatorViewerTimeMessage m = new SimulatorViewerTimeMessage();
-            m.SunPhase = m_SunData.SunPhase;
-            m.UsecSinceStart = Date.GetUnixTime() * 1000000;
-            m.SunDirection = m_SunData.SunDirection;
-            m.SunAngVelocity = m_SunData.SunAngVelocity;
-            m.SecPerYear = m_SunData.SecPerYear;
-            m.SecPerDay = m_SunData.SecPerDay;
-            return m;
-        }
+            SunPhase = m_SunData.SunPhase,
+            UsecSinceStart = Date.GetUnixTime() * 1000000,
+            SunDirection = m_SunData.SunDirection,
+            SunAngVelocity = m_SunData.SunAngVelocity,
+            SecPerYear = m_SunData.SecPerYear,
+            SecPerDay = m_SunData.SecPerDay
+        };
 
         private void SendSimulatorTimeMessageToAllClients()
         {

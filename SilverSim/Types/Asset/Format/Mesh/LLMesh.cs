@@ -61,10 +61,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             Physics
         }
 
-        public bool HasConvexPhysics()
-        {
-            return m_MeshData.ContainsKey("physics_convex");
-        }
+        public bool HasConvexPhysics() => m_MeshData.ContainsKey("physics_convex");
 
         public PhysicsConvexShape GetConvexPhysics()
         {

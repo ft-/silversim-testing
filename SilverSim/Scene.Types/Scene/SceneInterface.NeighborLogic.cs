@@ -86,7 +86,7 @@ namespace SilverSim.Scene.Types.Scene
             else
             {
                 string[] parts = value.Split(',');
-                List<UUID> new_ids = new List<UUID>();
+                var new_ids = new List<UUID>();
                 foreach(string part in parts)
                 {
                     UUID id;
@@ -100,7 +100,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
 
-                RwLockedList<UUID> activelist = regionId != UUID.Zero ? locallist : globallist;
+                var activelist = regionId != UUID.Zero ? locallist : globallist;
 
                 foreach (UUID id in new List<UUID>(activelist))
                 {
@@ -151,7 +151,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void ChatPassInbound(UUID fromRegionID, ListenEvent ev)
         {
-            RwLockedList<UUID> activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
+            var activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
             if(activelist.Count == 0 || activelist.Contains(UUID.Zero) || activelist.Contains(ev.ID))
             {
                 SendChatPass(ev);
@@ -160,11 +160,11 @@ namespace SilverSim.Scene.Types.Scene
 
         protected void ChatPassLocalNeighbors(ListenEvent le)
         {
-            RwLockedList<UUID> activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
-            foreach (KeyValuePair<UUID, NeighborEntry> kvp in Neighbors)
+            var activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
+            foreach (var kvp in Neighbors)
             {
                 SceneInterface remoteScene;
-                TryGetSceneDelegate m_TryGetScene = TryGetScene;
+                var m_TryGetScene = TryGetScene;
                 if(!(activelist.Count == 0 || activelist.Contains(le.ID) || activelist.Contains(UUID.Zero)))
                 {
                     continue;
@@ -178,16 +178,17 @@ namespace SilverSim.Scene.Types.Scene
                         newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&
                         newPosition.Y <= kvp.Value.RemoteRegionData.Size.Y + le.Distance)
                     {
-                        ChatPass cp = new ChatPass();
-                        cp.ChatType = (ChatType)(byte)le.Type;
-                        cp.Name = le.Name;
-                        cp.Message = le.Message;
-                        cp.Position = newPosition;
-                        cp.ID = le.ID;
-                        cp.SourceType = (ChatSourceType)(byte)le.SourceType;
-                        cp.OwnerID = le.OwnerID;
-                        cp.Channel = le.Channel;
-                        kvp.Value.RemoteCircuit.SendMessage(cp);
+                        kvp.Value.RemoteCircuit.SendMessage(new ChatPass()
+                        {
+                            ChatType = (ChatType)(byte)le.Type,
+                            Name = le.Name,
+                            Message = le.Message,
+                            Position = newPosition,
+                            ID = le.ID,
+                            SourceType = (ChatSourceType)(byte)le.SourceType,
+                            OwnerID = le.OwnerID,
+                            Channel = le.Channel
+                        });
                     }
                 }
                 else if (null != m_TryGetScene && m_TryGetScene(kvp.Key, out remoteScene))
@@ -198,11 +199,11 @@ namespace SilverSim.Scene.Types.Scene
                         newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&
                         newPosition.Y <= kvp.Value.RemoteRegionData.Size.Y + le.Distance)
                     {
-                        ListenEvent routedle = new ListenEvent(le);
-                        routedle.OriginSceneID = ID;
-                        routedle.GlobalPosition = newPosition;
-
-                        remoteScene.SendChatPass(routedle);
+                        remoteScene.SendChatPass(new ListenEvent(le)
+                        {
+                            OriginSceneID = ID,
+                            GlobalPosition = newPosition
+                        });
                     }
                 }
             }
@@ -240,21 +241,22 @@ namespace SilverSim.Scene.Types.Scene
             {
                 if(!Neighbors.ContainsKey(rinfo.ID))
                 {
-                    NeighborEntry lne = new NeighborEntry();
-                    lne.RemoteOffset = rinfo.Location - GridPosition;
-                    lne.RemoteRegionData = rinfo;
-                    Neighbors[rinfo.ID] = lne;
+                    Neighbors[rinfo.ID] = new NeighborEntry()
+                    {
+                        RemoteOffset = rinfo.Location - GridPosition,
+                        RemoteRegionData = rinfo
+                    };
                     CheckAgentsForNeighbors();
                 }
                 return;
             }
 
-            Dictionary<string, string> headers = new Dictionary<string,string>();
+            var headers = new Dictionary<string,string>();
             try
             {
-                using (Stream responseStream = HttpClient.DoStreamRequest("HEAD", rinfo.ServerURI + "helo", null, string.Empty, string.Empty, false, 20000, headers))
+                using (var responseStream = HttpClient.DoStreamRequest("HEAD", rinfo.ServerURI + "helo", null, string.Empty, string.Empty, false, 20000, headers))
                 {
-                    using (StreamReader reader = new StreamReader(responseStream))
+                    using (var reader = new StreamReader(responseStream))
                     {
                         reader.ReadToEnd();
                     }
@@ -268,12 +270,13 @@ namespace SilverSim.Scene.Types.Scene
             if(headers.ContainsKey("X-UDP-InterSim"))
             {
                 /* neighbor supports UDP Inter-Sim connects */
-                UUID randomID = UUID.Random;
+                var randomID = UUID.Random;
                 uint circuitID;
-                NeighborEntry lne = new NeighborEntry();
-                lne.RemoteOffset = rinfo.Location - GridPosition;
-                lne.RemoteRegionData = rinfo;
-                Neighbors[rinfo.ID] = lne;
+                Neighbors[rinfo.ID] = new NeighborEntry()
+                {
+                    RemoteOffset = rinfo.Location - GridPosition,
+                    RemoteRegionData = rinfo
+                };
                 EnableSimCircuit(rinfo, out randomID, out circuitID);
             }
             else
@@ -284,12 +287,14 @@ namespace SilverSim.Scene.Types.Scene
 
         void EnableSimCircuit(RegionInfo destinationInfo, out UUID sessionID, out uint circuitCode)
         {
-            Map reqmap = new Map();
-            reqmap["to_region_id"] = destinationInfo.ID;
-            reqmap["from_region_id"] = ID;
-            reqmap["scope_id"] = ScopeID;
+            var reqmap = new Map
+            {
+                ["to_region_id"] = destinationInfo.ID,
+                ["from_region_id"] = ID,
+                ["scope_id"] = ScopeID
+            };
             byte[] reqdata;
-            using(MemoryStream ms = new MemoryStream())
+            using(var ms = new MemoryStream())
             {
                 LlsdXml.Serialize(reqmap, ms);
                 reqdata = ms.ToArray();
@@ -297,10 +302,10 @@ namespace SilverSim.Scene.Types.Scene
 
             /* try DNS lookup before triggering add circuit code */
             IPAddress[] addresses = Dns.GetHostAddresses(destinationInfo.ServerIP);
-            IPEndPoint ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
+            var ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
 
             Map resmap;
-            using(Stream responseStream = 
+            using(var responseStream = 
                 HttpClient.DoStreamRequest(
                     "POST", 
                     destinationInfo.ServerURI + "circuit",
@@ -320,15 +325,14 @@ namespace SilverSim.Scene.Types.Scene
 
             circuitCode = resmap["circuit_code"].AsUInt;
             sessionID = resmap["session_id"].AsUUID;
-            ICircuit simCircuit = UDPServer.UseSimCircuit(
-                ep, 
-                sessionID, 
-                this, 
-                destinationInfo.ID, 
-                circuitCode, 
-                destinationInfo.Location, 
+            Neighbors[destinationInfo.ID].RemoteCircuit = UDPServer.UseSimCircuit(
+                ep,
+                sessionID,
+                this,
+                destinationInfo.ID,
+                circuitCode,
+                destinationInfo.Location,
                 destinationInfo.Location - GridPosition);
-            Neighbors[destinationInfo.ID].RemoteCircuit = simCircuit;
             CheckAgentsForNeighbors();
         }
     }

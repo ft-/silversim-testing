@@ -29,10 +29,6 @@ namespace SilverSim.Scripting.Common
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class CompilerUsesRunAndCollectModeAttribute : Attribute
     {
-        public CompilerUsesRunAndCollectModeAttribute()
-        {
-
-        }
     }
 
     [Serializable]
@@ -40,9 +36,5 @@ namespace SilverSim.Scripting.Common
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class CompilerUsesInMemoryCompilationAttribute : Attribute
     {
-        public CompilerUsesInMemoryCompilationAttribute()
-        {
-
-        }
     }
 }

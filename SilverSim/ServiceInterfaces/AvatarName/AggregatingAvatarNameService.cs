@@ -108,7 +108,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             {
                 try
                 {
-                    foreach (UUI uui in service.Search(names))
+                    foreach (var uui in service.Search(names))
                     {
                         if (!results.ContainsKey(uui.ID))
                         {
@@ -128,7 +128,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
         {
             uui = null;
             bool notFoundFirst = false;
-            foreach (AvatarNameServiceInterface service in m_ServiceList)
+            foreach (var service in m_ServiceList)
             {
                 try
                 {
@@ -191,7 +191,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
         public override void Store(UUI uui)
         {
-            foreach (AvatarNameServiceInterface service in m_ServiceList)
+            foreach (var service in m_ServiceList)
             {
                 try
                 {
@@ -207,7 +207,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
         public override bool Remove(UUID key)
         {
             bool isRemoved = false;
-            foreach (AvatarNameServiceInterface service in m_ServiceList)
+            foreach (var service in m_ServiceList)
             {
                 try
                 {

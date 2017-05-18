@@ -46,31 +46,22 @@ namespace SilverSim.ServiceInterfaces.Authorization
         {
             public NotAuthorizedException()
             {
-
             }
 
             public NotAuthorizedException(string message)
                 : base(message)
             {
-
             }
 
             protected NotAuthorizedException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public NotAuthorizedException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
-        }
-
-        public AuthorizationServiceInterface()
-        {
-
         }
 
         /* throws NotAuthorizedException when not allowed */

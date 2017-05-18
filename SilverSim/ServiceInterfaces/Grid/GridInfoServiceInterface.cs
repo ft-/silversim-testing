@@ -23,11 +23,6 @@ namespace SilverSim.ServiceInterfaces.Grid
 {
     public abstract class GridInfoServiceInterface
     {
-        public GridInfoServiceInterface()
-        {
-
-        }
-
         public abstract string GridNick { get; }
         public abstract string GridName { get; }
         public abstract string LoginURI { get; }

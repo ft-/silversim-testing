@@ -168,13 +168,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public string ProductName { get; set; }
 
-        public Date RegionStartTime
-        {
-            get
-            {
-                return new Date(m_StartTime);
-            }
-        }
+        public Date RegionStartTime => new Date(m_StartTime);
 
         public virtual uint FrameNumber
         {
@@ -244,42 +238,32 @@ namespace SilverSim.Scene.Types.Scene
 
         public virtual void TriggerParameterUpdated(UUID regionID, string parametername, string value)
         {
-
         }
 
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
 
         protected ExternalHostNameServiceInterface m_ExternalHostNameService;
-        public string ExternalHostName
-        {
-            get
-            {
-                return m_ExternalHostNameService.ExternalHostName;
-            }
-        }
+        public string ExternalHostName => m_ExternalHostNameService.ExternalHostName;
 
-        public RegionInfo GetRegionInfo()
+        public RegionInfo GetRegionInfo() => new RegionInfo()
         {
-            RegionInfo reg = new RegionInfo();
-            reg.Access = Access;
-            reg.Flags = RegionFlags.RegionOnline;
-            reg.ID = ID;
-            reg.Location = GridPosition;
-            reg.Name = Name;
-            reg.Owner = Owner;
-            reg.ServerURI = ServerURI;
-            reg.ServerHttpPort = ServerHttpPort;
-            reg.ParcelMapTexture = ParcelMapTexture;
-            reg.RegionMapTexture = RegionMapTexture;
-            reg.RegionSecret = (string)RegionSecret;
-            reg.ScopeID = UUID.Zero;
-            reg.ServerIP = ExternalHostName;
-            reg.ServerPort = RegionPort;
-            reg.Size.X = SizeX;
-            reg.Size.Y = SizeY;
-            return reg;
-        }
+            Access = Access,
+            Flags = RegionFlags.RegionOnline,
+            ID = ID,
+            Location = GridPosition,
+            Name = Name,
+            Owner = Owner,
+            ServerURI = ServerURI,
+            ServerHttpPort = ServerHttpPort,
+            ParcelMapTexture = ParcelMapTexture,
+            RegionMapTexture = RegionMapTexture,
+            RegionSecret = (string)RegionSecret,
+            ScopeID = UUID.Zero,
+            ServerIP = ExternalHostName,
+            ServerPort = RegionPort,
+            Size = new GridVector(SizeX, SizeY)
+        };
 
         public uint ParentEstateID
         {
@@ -357,10 +341,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public T GetService<T>()
-        {
-            return (T)GetService(typeof(T));
-        }
+        public T GetService<T>() => (T)GetService(typeof(T));
 
         private const uint PARCEL_BLOCK_SIZE = 4;
 

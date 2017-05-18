@@ -32,7 +32,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
     [Serializable]
     public class ServerParamAttribute : Attribute
     {
-        public string ParameterName { get; private set; }
+        public string ParameterName { get; }
         public string Description { get; set; }
         public ServerParamType Type { get; set; }
         public Type ParameterType { get; set; }
@@ -51,7 +51,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
     [Serializable]
     public class ServerParamStartsWithAttribute : Attribute
     {
-        public string ParameterNameStartsWith { get; private set; }
+        public string ParameterNameStartsWith { get; }
         public ServerParamStartsWithAttribute(string namestartswith)
         {
             ParameterNameStartsWith = namestartswith;

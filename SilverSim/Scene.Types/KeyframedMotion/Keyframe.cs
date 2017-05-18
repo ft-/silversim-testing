@@ -30,10 +30,5 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         /** <summary>Target rotation relative from current rotation</summary> */
         public Quaternion TargetRotation { get; set; }
         public double Duration { get; set; }
-
-        public Keyframe()
-        {
-
-        }
     }
 }

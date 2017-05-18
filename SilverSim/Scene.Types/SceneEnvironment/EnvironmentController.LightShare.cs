@@ -54,10 +54,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 Y = y;
             }
 
-            public static implicit operator Vector3(WLVector2 v)
-            {
-                return new Vector3(v.X, v.Y, 0);
-            }
+            public static implicit operator Vector3(WLVector2 v) => new Vector3(v.X, v.Y, 0);
         }
 
         public struct WLVector4
@@ -83,10 +80,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 W = w;
             }
 
-            public static implicit operator Quaternion(WLVector4 v)
-            {
-                return new Quaternion(v.X, v.Y, v.Z, v.W);
-            }
+            public static implicit operator Quaternion(WLVector4 v) => new Quaternion(v.X, v.Y, v.Z, v.W);
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
@@ -117,40 +111,33 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public WLVector4 SunMoonColor;
             public double SunMoonPosition;
 
-            public static WindlightSkyData Defaults
+            public static WindlightSkyData Defaults => new WindlightSkyData()
             {
-                get
-                {
-                    WindlightSkyData skyData = new WindlightSkyData();
-                    skyData.Horizon = new WLVector4(0.25, 0.25, 0.32, 0.32);
-                    skyData.HazeHorizon = 0.19;
-                    skyData.BlueDensity = new WLVector4(0.12, 0.22, 0.38, 0.38);
-                    skyData.HazeDensity = 0.7;
-                    skyData.DensityMultiplier = 0.18;
-                    skyData.DistanceMultiplier = 0.8;
-                    skyData.MaxAltitude = 1605;
-                    skyData.SunMoonPosition = 0.317;
-                    skyData.SunMoonColor = new WLVector4(0.24, 0.26, 0.30, 0.30);
-                    skyData.Ambient = new WLVector4(0.35, 0.35, 0.35, 0.35);
-                    skyData.EastAngle = 0;
-                    skyData.SunGlowFocus = 0.1;
-                    skyData.SunGlowSize = 1.75;
-                    skyData.SceneGamma = 1.0;
-                    skyData.StarBrightness = 0;
-                    skyData.CloudColor = new WLVector4(0.41, 0.41, 0.41, 0.41);
-                    skyData.CloudXYDensity = new Vector3(1.0, 0.53, 1.0);
-                    skyData.CloudCoverage = 0.27;
-                    skyData.CloudScale = 0.42;
-                    skyData.CloudDetailXYDensity = new Vector3(1.0, 0.52, 0.12);
-                    skyData.CloudScroll.X = 0.2;
-                    skyData.CloudScroll.Y = 0.01;
-                    skyData.DrawClassicClouds = true;
-                    skyData.CloudScrollXLock = false;
-                    skyData.CloudScrollYLock = false;
-
-                    return skyData;
-                }
-            }
+                Horizon = new WLVector4(0.25, 0.25, 0.32, 0.32),
+                HazeHorizon = 0.19,
+                BlueDensity = new WLVector4(0.12, 0.22, 0.38, 0.38),
+                HazeDensity = 0.7,
+                DensityMultiplier = 0.18,
+                DistanceMultiplier = 0.8,
+                MaxAltitude = 1605,
+                SunMoonPosition = 0.317,
+                SunMoonColor = new WLVector4(0.24, 0.26, 0.30, 0.30),
+                Ambient = new WLVector4(0.35, 0.35, 0.35, 0.35),
+                EastAngle = 0,
+                SunGlowFocus = 0.1,
+                SunGlowSize = 1.75,
+                SceneGamma = 1.0,
+                StarBrightness = 0,
+                CloudColor = new WLVector4(0.41, 0.41, 0.41, 0.41),
+                CloudXYDensity = new Vector3(1.0, 0.53, 1.0),
+                CloudCoverage = 0.27,
+                CloudScale = 0.42,
+                CloudDetailXYDensity = new Vector3(1.0, 0.52, 0.12),
+                CloudScroll = new WLVector2(0.2, 0.01),
+                DrawClassicClouds = true,
+                CloudScrollXLock = false,
+                CloudScrollYLock = false
+            };
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
@@ -169,27 +156,21 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public Color Color;
             public double FogDensityExponent;
 
-            public static WindlightWaterData Defaults
+            public static WindlightWaterData Defaults => new WindlightWaterData()
             {
-                get
-                {
-                    WindlightWaterData waterData = new WindlightWaterData();
-                    waterData.Color = new Color(4 / 255f, 38 / 255f, 64 / 255f);
-                    waterData.FogDensityExponent = 4;
-                    waterData.UnderwaterFogModifier = 0.25;
-                    waterData.ReflectionWaveletScale = new Vector3(2.0, 2.0, 2.0);
-                    waterData.FresnelScale = 0.4;
-                    waterData.FresnelOffset = 0.5;
-                    waterData.RefractScaleAbove = 0.03;
-                    waterData.RefractScaleBelow = 0.2;
-                    waterData.BlurMultiplier = 0.04;
-                    waterData.BigWaveDirection = new WLVector2(1.05, -0.42);
-                    waterData.LittleWaveDirection = new WLVector2(1.11, -1.16);
-                    waterData.NormalMapTexture = new UUID("822ded49-9a6c-f61c-cb89-6df54f42cdf4");
-
-                    return waterData;
-                }
-            }
+                Color = new Color(4 / 255f, 38 / 255f, 64 / 255f),
+                FogDensityExponent = 4,
+                UnderwaterFogModifier = 0.25,
+                ReflectionWaveletScale = new Vector3(2.0, 2.0, 2.0),
+                FresnelScale = 0.4,
+                FresnelOffset = 0.5,
+                RefractScaleAbove = 0.03,
+                RefractScaleBelow = 0.2,
+                BlurMultiplier = 0.04,
+                BigWaveDirection = new WLVector2(1.05, -0.42),
+                LittleWaveDirection = new WLVector2(1.11, -1.16),
+                NormalMapTexture = new UUID("822ded49-9a6c-f61c-cb89-6df54f42cdf4")
+            };
         }
 
         #region Client-specific update of Windlight Data
@@ -217,9 +198,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #region Update of Windlight Data
         private void UpdateWindlightProfileToClients()
         {
-            GenericMessage m;
-
-            m = (m_WindlightValid) ?
+            var m = (m_WindlightValid) ?
                 CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight) :
                 CompileResetWindlightSettings();
 
@@ -236,9 +215,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public void UpdateWindlightProfileToClient(IAgent agent)
         {
-            GenericMessage m;
-
-            m = (m_WindlightValid) ?
+            var m = (m_WindlightValid) ?
                 CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight) :
                 CompileResetWindlightSettings();
 
@@ -379,7 +356,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #region Windlight message compiler
         private GenericMessage CompileResetWindlightSettings()
         {
-            GenericMessage m = new GenericMessage();
+            var m = new GenericMessage();
             m.Method = "WindlightReset";
             m.ParamList.Add(new byte[0]);
             return m;
@@ -387,9 +364,9 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         private GenericMessage CompileWindlightSettings(WindlightSkyData skyWindlight, WindlightWaterData waterWindlight)
         {
-            GenericMessage m = new GenericMessage();
+            var m = new GenericMessage();
             m.Method = "Windlight";
-            byte[] mBlock = new byte[249];
+            var mBlock = new byte[249];
             int pos = 0;
             AddToCompiledWL(waterWindlight.Color, ref mBlock, ref pos);
             AddToCompiledWL(waterWindlight.FogDensityExponent, ref mBlock, ref pos);

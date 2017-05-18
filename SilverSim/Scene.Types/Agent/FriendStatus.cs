@@ -29,7 +29,6 @@ namespace SilverSim.Scene.Types.Agent
 
         public FriendStatus()
         {
-
         }
 
         public FriendStatus(FriendInfo fi)

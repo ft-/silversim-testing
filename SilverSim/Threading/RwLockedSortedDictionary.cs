@@ -37,7 +37,6 @@ namespace SilverSim.Threading
             public KeyAlreadyExistsException(string message)
                 : base(message)
             {
-
             }
         }
 
@@ -61,13 +60,7 @@ namespace SilverSim.Threading
             m_Dictionary = new SortedDictionary<TKey, TValue>(dictionary, comparer);
         }
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsReadOnly => false;
         public int Count
         {
             get
@@ -141,7 +134,7 @@ namespace SilverSim.Threading
             }
             catch (KeyNotFoundException)
             {
-                LockCookie lc = m_RwLock.UpgradeToWriterLock(-1);
+                var lc = m_RwLock.UpgradeToWriterLock(-1);
                 try
                 {
                     if (m_Dictionary.ContainsKey(key))
@@ -244,7 +237,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (var kvp in m_Dictionary)
                 {
                     if (kvp.Value.Equals(value))
                     {
@@ -354,7 +347,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (var kvp in m_Dictionary)
                 {
                     array[arrayIndex++] = kvp;
                 }
@@ -378,10 +371,7 @@ namespace SilverSim.Threading
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /* support for non-copy enumeration */
         public void ForEach(Action<KeyValuePair<TKey, TValue>> action)
@@ -389,7 +379,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (var kvp in m_Dictionary)
                 {
                     action(kvp);
                 }
@@ -406,7 +396,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (var kvp in m_Dictionary)
                 {
                     action(kvp.Key);
                 }
@@ -423,7 +413,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (var kvp in m_Dictionary)
                 {
                     action(kvp.Value);
                 }
@@ -439,7 +429,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                TKey[] __keys = new TKey[m_Dictionary.Count];
+                var __keys = new TKey[m_Dictionary.Count];
                 m_Dictionary.Keys.CopyTo(__keys, 0);
                 return __keys;
             }
@@ -499,13 +489,13 @@ namespace SilverSim.Threading
             m_RwLock.AcquireReaderLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (var kvp in m_Dictionary)
                 {
                     if (!del(kvp.Key, kvp.Value))
                     {
                         continue;
                     }
-                    LockCookie lc = m_RwLock.UpgradeToWriterLock(-1);
+                    var lc = m_RwLock.UpgradeToWriterLock(-1);
                     try
                     {
                         if (m_Dictionary.ContainsKey(kvp.Key))
@@ -534,7 +524,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireWriterLock(-1);
             try
             {
-                foreach (TKey key in keys)
+                foreach (var key in keys)
                 {
                     m_Dictionary.Remove(key);
                 }
@@ -585,7 +575,7 @@ namespace SilverSim.Threading
             m_RwLock.AcquireWriterLock(-1);
             try
             {
-                foreach (KeyValuePair<TKey, TValue> kvp in items)
+                foreach (var kvp in items)
                 {
                     m_Dictionary.Add(kvp.Key, kvp.Value);
                 }
@@ -634,7 +624,7 @@ namespace SilverSim.Threading
                 }
                 catch (KeyNotFoundException)
                 {
-                    LockCookie lc = m_RwLock.UpgradeToWriterLock(-1);
+                    var lc = m_RwLock.UpgradeToWriterLock(-1);
                     try
                     {
                         return m_Dictionary[key] = m_AutoAddDelegate();

@@ -49,10 +49,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             }
         }
 
-        public bool ContainsKey(UUID principalID, UUID folderID)
-        {
-            return m_Service.ContainsKey(principalID, folderID);
-        }
+        public bool ContainsKey(UUID principalID, UUID folderID) => m_Service.ContainsKey(principalID, folderID);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -60,8 +57,8 @@ namespace SilverSim.ServiceInterfaces.Inventory
         {
             get
             {
-                List<InventoryFolderContent> res = new List<InventoryFolderContent>();
-                foreach(UUID folder in folderIDs)
+                var res = new List<InventoryFolderContent>();
+                foreach(var folder in folderIDs)
                 {
                     try
                     {
@@ -83,9 +80,8 @@ namespace SilverSim.ServiceInterfaces.Inventory
         {
             get 
             {
-                InventoryFolderContent folderContent = new InventoryFolderContent();
-                InventoryFolder folder;
-                folder = m_Service[principalID, folderID];
+                var folderContent = new InventoryFolderContent();
+                InventoryFolder folder = m_Service[principalID, folderID];
 
                 folderContent.Version = folder.Version;
                 folderContent.Owner = folder.Owner;

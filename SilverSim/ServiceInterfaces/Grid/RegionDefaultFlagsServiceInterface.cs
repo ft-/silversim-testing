@@ -27,11 +27,6 @@ namespace SilverSim.ServiceInterfaces.Grid
 {
     public abstract class RegionDefaultFlagsServiceInterface
     {
-        public RegionDefaultFlagsServiceInterface()
-        {
-
-        }
-
         /* function does not fail if no data is defined */
         public abstract RegionFlags GetRegionDefaultFlags(UUID regionId);
         public abstract void ChangeRegionDefaultFlags(UUID regionId, RegionFlags addFlags, RegionFlags removeFlags);

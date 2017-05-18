@@ -54,64 +54,26 @@ namespace SilverSim.Scene.Types
         #endregion
 
         #region Operators
-        public static Angle operator+(Angle a, Angle b)
-        {
-            Angle o;
-            o.Radians = a.Radians + b.Radians;
-            return o;
-        }
+        public static Angle operator +(Angle a, Angle b) => new Angle(a.Radians + b.Radians);
 
-        public static Angle operator -(Angle a, Angle b)
-        {
-            Angle o;
-            o.Radians = a.Radians - b.Radians;
-            return o;
-        }
+        public static Angle operator -(Angle a, Angle b) => new Angle(a.Radians - b.Radians);
 
-        public static bool operator==(Angle a, Angle b)
-        {
-            return a.Equals(b);
-        }
+        public static bool operator ==(Angle a, Angle b) => a.Equals(b);
 
-        public static bool operator!=(Angle a, Angle b)
-        {
-            return !a.Equals(b);
-        }
+        public static bool operator !=(Angle a, Angle b) => !a.Equals(b);
 
-        public static bool operator>(Angle a, Angle b)
-        {
-            return a.Radians > b.Radians;
-        }
+        public static bool operator >(Angle a, Angle b) => a.Radians > b.Radians;
 
-        public static bool operator <(Angle a, Angle b)
-        {
-            return a.Radians < b.Radians;
-        }
+        public static bool operator <(Angle a, Angle b) => a.Radians < b.Radians;
         #endregion
 
-        public int CompareTo(Angle a)
-        {
-            return Radians.CompareTo(a.Radians);
-        }
+        public int CompareTo(Angle a) => Radians.CompareTo(a.Radians);
 
-        public bool Equals(Angle a)
-        {
-            return Radians.Equals(a.Radians);
-        }
+        public bool Equals(Angle a) => Radians.Equals(a.Radians);
 
-        public override bool Equals(object a)
-        {
-            if (a is Angle)
-            {
-                return Radians.Equals((Angle)a);
-            }
-            return false;
-        }
+        public override bool Equals(object a) => (a is Angle) ? Radians.Equals((Angle)a) : false;
 
-        public override int GetHashCode()
-        {
-            return Radians.GetHashCode();
-        }
+        public override int GetHashCode() => Radians.GetHashCode();
 
         public static readonly Angle Zero = new Angle(0f);
     }

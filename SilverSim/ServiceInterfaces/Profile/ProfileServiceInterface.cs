@@ -82,11 +82,6 @@ namespace SilverSim.ServiceInterfaces.Profile
             ProfileProperties this[UUI user, PropertiesUpdateFlags flags] { set; }
         }
 
-        public ProfileServiceInterface()
-        {
-
-        }
-
         public abstract IClassifiedsInterface Classifieds { get; }
         public abstract IPicksInterface Picks { get; }
         public abstract INotesInterface Notes { get; }
@@ -95,9 +90,6 @@ namespace SilverSim.ServiceInterfaces.Profile
 
         public abstract void Remove(UUID scopeID, UUID accountID);
 
-        public virtual List<UUID> GetUserImageAssets(UUI userId)
-        {
-            return new List<UUID>();
-        }
+        public virtual List<UUID> GetUserImageAssets(UUI userId) => new List<UUID>();
     }
 }

@@ -123,7 +123,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* calculate a half-sphere here 
              * starting from UnitX to -UnitX
              */
-            PathDetails Path = new PathDetails();
+            var Path = new PathDetails();
 
             double startangle = Math.PI * shape.ProfileBegin;
             double endangle = Math.PI * (1f - shape.ProfileEnd);

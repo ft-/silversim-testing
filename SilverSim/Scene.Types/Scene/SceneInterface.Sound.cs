@@ -33,11 +33,12 @@ namespace SilverSim.Scene.Types.Scene
     {
         public void SendPreloadSound(ObjectPart objpart, UUID sound)
         {
-            PreloadSound req = new PreloadSound();
-            req.OwnerID = objpart.ObjectGroup.Owner.ID;
-            req.SoundID = sound;
-            req.ObjectID = objpart.ID;
-
+            var req = new PreloadSound()
+            {
+                OwnerID = objpart.ObjectGroup.Owner.ID,
+                SoundID = sound,
+                ObjectID = objpart.ID
+            };
             foreach (IAgent agent in Agents)
             {
                 agent.SendMessageAlways(req, ID);
@@ -46,12 +47,13 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAttachedSound(ObjectPart objpart, UUID sound, double gain, double soundradius, PrimitiveSoundFlags flags)
         {
-            AttachedSound req = new AttachedSound();
-            req.OwnerID = objpart.ObjectGroup.Owner.ID;
-            req.SoundID = sound;
-            req.ObjectID = objpart.ID;
-            req.Flags = flags;
-
+            var req = new AttachedSound()
+            {
+                OwnerID = objpart.ObjectGroup.Owner.ID,
+                SoundID = sound,
+                ObjectID = objpart.ID,
+                Flags = flags
+            };
             if (gain < 0)
             {
                 gain = 0;
@@ -86,10 +88,11 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAttachedSoundGainChange(ObjectPart objpart, double gain, double soundradius)
         {
-            AttachedSoundGainChange req = new AttachedSoundGainChange();
-            req.ObjectID = objpart.ID;
-            req.Gain = gain.Clamp(0, 1);
-
+            var req = new AttachedSoundGainChange()
+            {
+                ObjectID = objpart.ID,
+                Gain = gain.Clamp(0, 1)
+            };
             if (objpart.ObjectGroup.IsAttachedToPrivate)
             {
                 IAgent agent;
@@ -113,18 +116,19 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendTriggerSound(ObjectPart objpart, UUID sound, double gain, double soundradius)
         {
-            SoundTrigger req = new SoundTrigger();
-            req.OwnerID = objpart.ObjectGroup.Owner.ID;
-            req.SoundID = sound;
-            req.ObjectID = objpart.ID;
-            req.ParentID = (objpart.LinkNumber != 1) ?
+            var req = new SoundTrigger()
+            {
+                OwnerID = objpart.ObjectGroup.Owner.ID,
+                SoundID = sound,
+                ObjectID = objpart.ID,
+                ParentID = (objpart.LinkNumber != 1) ?
                 objpart.ObjectGroup.ID :
-                UUID.Zero;
+                UUID.Zero,
 
-            req.Position = objpart.GlobalPosition;
-            req.Gain = gain.Clamp(0, 1);
-            req.GridPosition = GridPosition;
-
+                Position = objpart.GlobalPosition,
+                Gain = gain.Clamp(0, 1),
+                GridPosition = GridPosition
+            };
             if (objpart.ObjectGroup.IsAttachedToPrivate)
             {
                 IAgent agent;
@@ -148,18 +152,19 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendTriggerSound(ObjectPart objpart, UUID sound, double gain, double soundradius, Vector3 top_north_east, Vector3 bottom_south_west)
         {
-            SoundTrigger req = new SoundTrigger();
-            req.OwnerID = objpart.ObjectGroup.Owner.ID;
-            req.SoundID = sound;
-            req.ObjectID = objpart.ID;
-            req.GridPosition = GridPosition;
+            var req = new SoundTrigger()
+            {
+                OwnerID = objpart.ObjectGroup.Owner.ID,
+                SoundID = sound,
+                ObjectID = objpart.ID,
+                GridPosition = GridPosition,
 
-            req.ParentID = (objpart.LinkNumber != 1) ?
+                ParentID = (objpart.LinkNumber != 1) ?
                 objpart.ObjectGroup.ID :
-                UUID.Zero;
-            req.Position = objpart.GlobalPosition;
-            req.Gain = gain.Clamp(0, 1);
-
+                UUID.Zero,
+                Position = objpart.GlobalPosition,
+                Gain = gain.Clamp(0, 1)
+            };
             if (objpart.ObjectGroup.IsAttachedToPrivate)
             {
                 IAgent agent;
@@ -186,7 +191,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleSoundTrigger(Message m)
         {
-            SoundTrigger req = (SoundTrigger)m;
+            var req = (SoundTrigger)m;
             if(req.OwnerID != UUID.Zero && req.ObjectID != req.CircuitAgentID)
             {
                 m_Log.DebugFormat("Ignoring Sound Trigger {0} {1}", req.ObjectID, req.SoundID);
@@ -210,8 +215,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            Vector3 pos = ownAgent.Position;
-            req.Position = pos;
+            req.Position = ownAgent.Position;
             req.GridPosition = GridPosition;
 
             if(req.Gain < 0)

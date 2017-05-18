@@ -34,11 +34,6 @@ namespace SilverSim.Scene.Types.Agent
         private readonly Dictionary<UUID, AttachmentPoint> m_AttachedTo = new Dictionary<UUID,AttachmentPoint>();
         private readonly Dictionary<AttachmentPoint, Dictionary<UUID, ObjectGroup>> m_AttachmentsPerPoint = new Dictionary<AttachmentPoint,Dictionary<UUID,ObjectGroup>>();
 
-        public AgentAttachments()
-        {
-
-        }
-
         public ObjectGroup this[UUID id]
         {
             get
@@ -166,8 +161,8 @@ namespace SilverSim.Scene.Types.Agent
             m_AttachmentsRwLock.AcquireWriterLock(-1);
             try
             {
-                List<ObjectGroup> attachments = new List<ObjectGroup>(m_AllAttachments.Values);
-                foreach(Dictionary<UUID, ObjectGroup> dict in m_AttachmentsPerPoint.Values)
+                var attachments = new List<ObjectGroup>(m_AllAttachments.Values);
+                foreach(var dict in m_AttachmentsPerPoint.Values)
                 {
                     dict.Clear();
                 }

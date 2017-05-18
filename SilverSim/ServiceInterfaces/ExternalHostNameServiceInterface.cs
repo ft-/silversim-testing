@@ -26,20 +26,8 @@ namespace SilverSim.ServiceInterfaces
 {
     public abstract class ExternalHostNameServiceInterface
     {
-        public ExternalHostNameServiceInterface()
-        {
-
-        }
-
         public abstract string ExternalHostName { get; }
 
-        public string ResolvedIP
-        {
-            get
-            {
-                IPAddress[] addresses = DnsNameCache.GetHostAddresses(ExternalHostName, true);
-                return addresses[0].ToString();
-            }
-        }
+        public string ResolvedIP => DnsNameCache.GetHostAddresses(ExternalHostName, true)[0].ToString();
     }
 }

@@ -103,7 +103,7 @@ namespace SilverSim.Scene.Types.Physics
                 }
                 m_StateData.Position += controlTarget / 10f;
                 m_StateData.Velocity = controlTarget;
-                IAgent agent = m_Agent;
+                var agent = m_Agent;
                 if (agent != null)
                 {
                     m_StateData.Rotation = agent.BodyRotation;
@@ -145,21 +145,9 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
-        public Vector3 Torque
-        {
-            get
-            {
-                return Vector3.Zero;
-            }
-        }
+        public Vector3 Torque => Vector3.Zero;
 
-        public Vector3 Force
-        {
-            get
-            {
-                return Vector3.Zero;
-            }
-        }
+        public Vector3 Force => Vector3.Zero;
 
         public bool IsPhysicsActive
         {

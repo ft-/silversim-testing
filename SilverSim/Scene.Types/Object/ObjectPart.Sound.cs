@@ -29,13 +29,6 @@ namespace SilverSim.Scene.Types.Object
     {
         public class SoundParam
         {
-            #region Constructor
-            public SoundParam()
-            {
-
-            }
-            #endregion
-
             #region Fields
             public UUID SoundID;
             public double Gain;
@@ -47,7 +40,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    byte[] serialized = new byte[33];
+                    var serialized = new byte[33];
                     SoundID.ToBytes(serialized, 0);
                     Buffer.BlockCopy(BitConverter.GetBytes(Gain), 0, serialized, 16, 8);
                     Buffer.BlockCopy(BitConverter.GetBytes(Radius), 0, serialized, 24, 8);
@@ -87,7 +80,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                SoundParam p = new SoundParam();
+                var p = new SoundParam();
                 lock(m_Sound)
                 {
                     p.Flags = m_Sound.Flags;
@@ -140,13 +133,6 @@ namespace SilverSim.Scene.Types.Object
 
         public class CollisionSoundParam
         {
-            #region Constructor
-            public CollisionSoundParam()
-            {
-
-            }
-            #endregion
-
             #region Fields
             public UUID ImpactSound = UUID.Zero;
             public double ImpactVolume;
@@ -156,7 +142,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    byte[] serialized = new byte[24];
+                    var serialized = new byte[24];
                     ImpactSound.ToBytes(serialized, 0);
                     Buffer.BlockCopy(BitConverter.GetBytes(ImpactVolume), 0, serialized, 16, 8);
                     if(!BitConverter.IsLittleEndian)
@@ -193,7 +179,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                CollisionSoundParam res = new CollisionSoundParam();
+                var res = new CollisionSoundParam();
                 lock (m_CollisionSound)
                 {
                     res.ImpactSound = m_CollisionSound.ImpactSound;

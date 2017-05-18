@@ -118,32 +118,28 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         {
             public KeyframeFormatException()
             {
-
             }
 
             public KeyframeFormatException(string message)
                 : base(message)
             {
-
             }
 
             public KeyframeFormatException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected KeyframeFormatException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
         }
 
         public static KeyframedMotion Deserialize(Stream input)
         {
-            Map data = (Map)LlsdBinary.Deserialize(input);
-            KeyframedMotion m = new KeyframedMotion();
+            var data = (Map)LlsdBinary.Deserialize(input);
+            var m = new KeyframedMotion();
             AnArray pos = null;
             AnArray rot = null;
             AnArray durations;
@@ -174,7 +170,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
             for(int i = 0; i < durations.Count; ++i)
             {
-                Keyframe frame = new Keyframe();
+                var frame = new Keyframe();
                 frame.Duration = durations[i].AsReal;
                 if(rot != null)
                 {

@@ -33,15 +33,13 @@ namespace SilverSim.Scripting.Common
     public abstract class ScriptEventInstance : ScriptInstance
     {
         readonly object m_Lock = new object();
-        readonly ObjectPart m_Part;
-        readonly ObjectPartInventoryItem m_Item;
         readonly NonblockingQueue<IScriptEvent> m_Events = new NonblockingQueue<IScriptEvent>();
         double m_ExecutionTime;
 
-        public ScriptEventInstance(ObjectPart part, ObjectPartInventoryItem item, byte[] state)
+        protected ScriptEventInstance(ObjectPart part, ObjectPartInventoryItem item, byte[] state)
         {
-            m_Part = part;
-            m_Item = item;
+            Part = part;
+            Item = item;
         }
 
         public override double ExecutionTime
@@ -62,47 +60,17 @@ namespace SilverSim.Scripting.Common
             }
         }
 
-        public override bool HasEventsPending
-        {
-            get
-            {
-                return m_Events.Count != 0;
-            }
-        }
+        public override bool HasEventsPending => m_Events.Count != 0;
 
-        public override bool IsLinkMessageReceiver
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool IsLinkMessageReceiver => false;
 
         public override bool IsRunning { get; set; }
 
-        public override ObjectPartInventoryItem Item
-        {
-            get
-            {
-                return m_Item;
-            }
-        }
+        public override ObjectPartInventoryItem Item { get; }
 
-        public override ObjectPart Part
-        {
-            get
-            {
-                return m_Part;
-            }
-        }
+        public override ObjectPart Part { get; }
 
-        public override IScriptState ScriptState
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public override IScriptState ScriptState => null;
 
         public override void PostEvent(IScriptEvent e)
         {

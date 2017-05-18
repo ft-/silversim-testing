@@ -35,13 +35,7 @@ namespace SilverSim.Scene.Types.Object
         #region Media Properties
         public PrimitiveMedia m_Media;
 
-        public PrimitiveMedia Media
-        {
-            get
-            {
-                return m_Media;
-            }
-        }
+        public PrimitiveMedia Media => m_Media;
 
         public void ClearMedia()
         {

@@ -79,7 +79,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             List<GroupRole> roles = GroupsService.Roles[agentOwner, group, agentOwner];
-            GroupPowers powers = GroupPowers.None;
+            var powers = GroupPowers.None;
             foreach (GroupRole role in roles)
             {
                 powers |= role.Powers;
@@ -88,10 +88,7 @@ namespace SilverSim.Scene.Types.Scene
             return GroupPowers.None;
         }
 
-        public bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power)
-        {
-            return (GetGroupPowers(agentOwner, group) & power) != 0;
-        }
+        public bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power) => (GetGroupPowers(agentOwner, group) & power) != 0;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         bool IsGroupMember(UUI agentOwner, UGI group)
@@ -119,14 +116,7 @@ namespace SilverSim.Scene.Types.Scene
             return true;
         }
 
-        public bool IsRegionOwner(UUI agent)
-        {
-            if (agent.EqualsGrid(Owner))
-            {
-                return true;
-            }
-            return false;
-        }
+        public bool IsRegionOwner(UUI agent) => agent.EqualsGrid(Owner);
 
         /** <summary>This function also returns true if EO is passed</summary> */
         public bool IsEstateManager(UUI agent)
@@ -154,13 +144,7 @@ namespace SilverSim.Scene.Types.Scene
         bool m_EstateManagerIsGodGlobal;
         bool m_EstateManagerIsGodSetToLocal;
 
-        bool EstateManagerIsGod
-        {
-            get
-            {
-                return m_EstateManagerIsGodSetToLocal ? m_EstateManagerIsGodLocal : m_EstateManagerIsGodGlobal;
-            }
-        }
+        bool EstateManagerIsGod => m_EstateManagerIsGodSetToLocal ? m_EstateManagerIsGodLocal : m_EstateManagerIsGodGlobal;
 
         [ServerParam("estate_manager_is_god", ParameterType = typeof(bool))]
         public void EstateManagerIsGodUpdated(UUID regionID, string value)
@@ -243,24 +227,15 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool IsPossibleGod(UUI agent)
-        {
-            return agent.EqualsGrid(Owner) ||
+        public bool IsPossibleGod(UUI agent) => agent.EqualsGrid(Owner) ||
                 (EstateManagerIsGod && IsEstateManager(agent)) ||
                 IsInGodAgents(agent);
-        }
 
         bool m_RegionOwnerIsSimConsoleUserLocal;
         bool m_RegionOwnerIsSimConsoleUserGlobal;
         bool m_RegionOwnerIsSimConsoleUserSetToLocal;
 
-        bool RegionOwnerIsSimConsoleUser
-        {
-            get
-            {
-                return m_RegionOwnerIsSimConsoleUserSetToLocal ? m_RegionOwnerIsSimConsoleUserLocal : m_RegionOwnerIsSimConsoleUserGlobal;
-            }
-        }
+        bool RegionOwnerIsSimConsoleUser => m_RegionOwnerIsSimConsoleUserSetToLocal ? m_RegionOwnerIsSimConsoleUserLocal : m_RegionOwnerIsSimConsoleUserGlobal;
 
         [ServerParam("region_owner_is_simconsole_user", ParameterType = typeof(bool))]
         public void RegionOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
@@ -277,13 +252,7 @@ namespace SilverSim.Scene.Types.Scene
         bool m_EstateOwnerIsSimConsoleUserGlobal;
         bool m_EstateOwnerIsSimConsoleUserSetToLocal;
 
-        bool EstateOwnerIsSimConsoleUser
-        {
-            get
-            {
-                return m_EstateOwnerIsSimConsoleUserSetToLocal ? m_EstateOwnerIsSimConsoleUserLocal : m_EstateOwnerIsSimConsoleUserGlobal;
-            }
-        }
+        bool EstateOwnerIsSimConsoleUser => m_EstateOwnerIsSimConsoleUserSetToLocal ? m_EstateOwnerIsSimConsoleUserLocal : m_EstateOwnerIsSimConsoleUserGlobal;
 
         [ServerParam("estate_owner_is_simconsole_user", ParameterType = typeof(bool))]
         public void EstateOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
@@ -300,13 +269,7 @@ namespace SilverSim.Scene.Types.Scene
         bool m_EstateManagerIsSimConsoleUserGlobal;
         bool m_EstateManagerIsSimConsoleUserSetToLocal;
 
-        bool EstateManagerIsSimConsoleUser
-        {
-            get
-            {
-                return m_EstateManagerIsSimConsoleUserSetToLocal ? m_EstateManagerIsSimConsoleUserLocal : m_EstateManagerIsSimConsoleUserGlobal;
-            }
-        }
+        bool EstateManagerIsSimConsoleUser => m_EstateManagerIsSimConsoleUserSetToLocal ? m_EstateManagerIsSimConsoleUserLocal : m_EstateManagerIsSimConsoleUserGlobal;
 
         [ServerParam("estate_manager_is_simconsole_user", ParameterType = typeof(bool))]
         public void EstateManagerIsSimConsoleUserUpdated(UUID regionId, string value)
@@ -696,13 +659,7 @@ namespace SilverSim.Scene.Types.Scene
         bool m_ParcelOwnerIsAdminGlobal;
         bool m_ParcelOwnerIsAdminSetToLocal;
 
-        bool ParcelOwnerIsAdmin
-        {
-            get
-            {
-                return m_ParcelOwnerIsAdminSetToLocal ? m_ParcelOwnerIsAdminLocal : m_ParcelOwnerIsAdminGlobal;
-            }
-        }
+        bool ParcelOwnerIsAdmin => m_ParcelOwnerIsAdminSetToLocal ? m_ParcelOwnerIsAdminLocal : m_ParcelOwnerIsAdminGlobal;
 
         [ServerParam("parcel_owner_is_admin", ParameterType = typeof(bool))]
         public void ParcelOwnerIsAdminUpdated(UUID regionId, string value)

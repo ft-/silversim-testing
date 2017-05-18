@@ -25,28 +25,23 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        public ObjectPropertiesFamily PropertiesFamily
+        public ObjectPropertiesFamily PropertiesFamily => new ObjectPropertiesFamily()
         {
-            get
-            {
-                ObjectPropertiesFamily fam = new ObjectPropertiesFamily();
-                fam.ObjectID = ID;
-                fam.OwnerID = Owner.ID;
-                fam.GroupID = ObjectGroup.Group.ID;
-                fam.BaseMask = m_Permissions.Base;
-                fam.OwnerMask = m_Permissions.Current;
-                fam.GroupMask = m_Permissions.Group;
-                fam.EveryoneMask = m_Permissions.EveryOne;
-                fam.NextOwnerMask = m_Permissions.NextOwner;
-                fam.OwnershipCost = ObjectGroup.OwnershipCost;
-                fam.SaleType = ObjectGroup.SaleType;
-                fam.SalePrice = ObjectGroup.SalePrice;
-                fam.Category = ObjectGroup.Category;
-                fam.LastOwnerID = ObjectGroup.LastOwner.ID;
-                fam.Name = Name;
-                fam.Description = Description;
-                return fam;
-            }
-        }
+            ObjectID = ID,
+            OwnerID = Owner.ID,
+            GroupID = ObjectGroup.Group.ID,
+            BaseMask = m_Permissions.Base,
+            OwnerMask = m_Permissions.Current,
+            GroupMask = m_Permissions.Group,
+            EveryoneMask = m_Permissions.EveryOne,
+            NextOwnerMask = m_Permissions.NextOwner,
+            OwnershipCost = ObjectGroup.OwnershipCost,
+            SaleType = ObjectGroup.SaleType,
+            SalePrice = ObjectGroup.SalePrice,
+            Category = ObjectGroup.Category,
+            LastOwnerID = ObjectGroup.LastOwner.ID,
+            Name = Name,
+            Description = Description
+        };
     }
 }

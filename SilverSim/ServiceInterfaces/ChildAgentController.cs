@@ -40,35 +40,32 @@ namespace SilverSim.ServiceInterfaces
             public ChildConnectionState State;
             public string ServerURI = string.Empty;
             public RegionInfo RegionInfo; /* only valid when Establish is set */
-
-            public ChildConnection()
-            {
-
-            }
         }
 
         public static void LookupChildConnections(Dictionary<UInt64, ChildConnection> childList, GridServiceInterface gridService, RegionInfo ownRegion)
         {
-            List<RegionInfo> ourNeighbors = NeighborRequester.GetNeighbors(gridService, ownRegion);
-            Dictionary<UInt64, RegionInfo> ourNeighborsDict = new Dictionary<ulong,RegionInfo>();
+            var ourNeighbors = NeighborRequester.GetNeighbors(gridService, ownRegion);
+            var ourNeighborsDict = new Dictionary<ulong,RegionInfo>();
 
             /* find the regions that require childs */
-            foreach(RegionInfo ri in ourNeighbors)
+            foreach(var ri in ourNeighbors)
             {
                 ourNeighborsDict.Add(ri.Location.RegionHandle, ri);
 
                 if(!childList.ContainsKey(ri.Location.RegionHandle))
                 {
-                    ChildConnection childConn = new ChildConnection();
-                    childConn.State = ChildConnectionState.Establish;
-                    childConn.RegionInfo = ri;
-                    childConn.ServerURI = ri.ServerURI;
+                    var childConn = new ChildConnection()
+                    {
+                        State = ChildConnectionState.Establish,
+                        RegionInfo = ri,
+                        ServerURI = ri.ServerURI
+                    };
                     childList.Add(ri.Location.RegionHandle, childConn);
                 }
             }
 
             /* find the childs to be removed */
-            foreach(KeyValuePair<UInt64, ChildConnection> kvp in childList)
+            foreach(var kvp in childList)
             {
                 if (!ourNeighborsDict.ContainsKey(kvp.Key))
                 {

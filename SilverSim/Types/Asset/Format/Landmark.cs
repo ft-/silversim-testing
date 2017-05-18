@@ -92,10 +92,7 @@ namespace SilverSim.Types.Asset.Format
 
         #region Operators
 
-        public AssetData Asset()
-        {
-            return this;
-        }
+        public AssetData Asset() => this;
 
         public static implicit operator AssetData(Landmark v)
         {

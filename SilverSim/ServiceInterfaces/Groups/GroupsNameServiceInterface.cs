@@ -30,11 +30,6 @@ namespace SilverSim.ServiceInterfaces.Groups
 {
     public abstract class GroupsNameServiceInterface
     {
-        public GroupsNameServiceInterface()
-        {
-
-        }
-
         public abstract UGI this[UUID groupID]
         {
             get;

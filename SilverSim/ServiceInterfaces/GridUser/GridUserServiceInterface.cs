@@ -32,25 +32,21 @@ namespace SilverSim.ServiceInterfaces.GridUser
     {
         public GridUserNotFoundException()
         {
-
         }
 
         public GridUserNotFoundException(string message)
             : base(message)
         {
-
         }
 
         protected GridUserNotFoundException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public GridUserNotFoundException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -59,25 +55,21 @@ namespace SilverSim.ServiceInterfaces.GridUser
     {
         public GridUserSetHomeNotPossibleForForeignerException()
         {
-
         }
 
         public GridUserSetHomeNotPossibleForForeignerException(string message)
             : base(message)
         {
-
         }
 
         protected GridUserSetHomeNotPossibleForForeignerException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public GridUserSetHomeNotPossibleForForeignerException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -86,35 +78,26 @@ namespace SilverSim.ServiceInterfaces.GridUser
     {
         public GridUserUpdateFailedException()
         {
-
         }
 
         public GridUserUpdateFailedException(string message)
             : base(message)
         {
-
         }
 
         protected GridUserUpdateFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public GridUserUpdateFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     public abstract class GridUserServiceInterface
     {
-        public GridUserServiceInterface()
-        {
-
-        }
-
         public abstract GridUserInfo this[UUID userID]
         {
             get;

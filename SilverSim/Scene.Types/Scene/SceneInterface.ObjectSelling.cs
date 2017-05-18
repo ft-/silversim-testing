@@ -42,7 +42,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectSaleInfo)]
         public void HandleObjectSaleInfo(Message m)
         {
-            ObjectSaleInfo req = (ObjectSaleInfo)m;
+            var req = (ObjectSaleInfo)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (ObjectSaleInfo.Data d in req.ObjectData)
                 {
@@ -203,7 +203,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectBuy)]
         public void HandleObjectBuy(Message m)
         {
-            ObjectBuy req = (ObjectBuy)m;
+            var req = (ObjectBuy)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -216,7 +216,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void HandleObjectBuyWorkItem(object o)
         {
-            ObjectBuy req = (ObjectBuy)o;
+            var req = (ObjectBuy)o;
             IAgent agent;
             if (!Agents.TryGetValue(req.AgentID, out agent))
             {
@@ -243,8 +243,8 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     else
                     {
-                        List<UUID> assetids = new List<UUID>();
-                        List<InventoryItem> items = new List<InventoryItem>();
+                        var assetids = new List<UUID>();
+                        var items = new List<InventoryItem>();
                         bool foundNoTransfer = false;
                         AssetData newAsset;
                         switch (grp.SaleType)
@@ -319,7 +319,7 @@ namespace SilverSim.Scene.Types.Scene
                                 {
                                     continue;
                                 }
-                                InventoryItem objectItem = new InventoryItem();
+                                var objectItem = new InventoryItem();
                                 objectItem.Permissions.Base = agent.Owner.EqualsGrid(grp.Owner) ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
                                 objectItem.Permissions.EveryOne = grp.RootPart.EveryoneMask;
                                 objectItem.Permissions.Group = InventoryPermissionsMask.None;
@@ -359,7 +359,7 @@ namespace SilverSim.Scene.Types.Scene
                                         /* create next owner asset id */
                                         item.NextOwnerAssetID = AssetService.GenerateNextOwnerAsset(assetID);
                                     }
-                                    InventoryItem newItem = new InventoryItem(item);
+                                    var newItem = new InventoryItem(item);
                                     if(!item.Owner.EqualsGrid(agent.Owner))
                                     {
                                         newItem.AssetID = item.NextOwnerAssetID;
@@ -447,7 +447,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.BuyObjectInventory)]
         public void HandleBuyObjectInventory(Message m)
         {
-            BuyObjectInventory req = (BuyObjectInventory)m;
+            var req = (BuyObjectInventory)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {

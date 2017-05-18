@@ -47,21 +47,9 @@ namespace SilverSim.Scene.Types.Scene
         string m_SpawnPointRoutingGlobal;
         bool m_SpawnPointRoutingSetToLocal;
 
-        bool EnableLandingOverride
-        {
-            get
-            {
-                return m_EnableLandingOverrideSetToLocal ? m_EnableLandingOverrideLocal : m_EnableLandingOverrideGlobal;
-            }
-        }
+        bool EnableLandingOverride => m_EnableLandingOverrideSetToLocal ? m_EnableLandingOverrideLocal : m_EnableLandingOverrideGlobal;
 
-        string SpawnPointRouting
-        {
-            get
-            {
-                return m_SpawnPointRoutingSetToLocal ? m_SpawnPointRoutingLocal : m_SpawnPointRoutingGlobal;
-            }
-        }
+        string SpawnPointRouting => m_SpawnPointRoutingSetToLocal ? m_SpawnPointRoutingLocal : m_SpawnPointRoutingGlobal;
 
         [ServerParam("EnableLandingOverride", ParameterType = typeof(bool))]
         public void EnableLandingOverrideUpdated(UUID regionID, string value)
@@ -107,25 +95,21 @@ namespace SilverSim.Scene.Types.Scene
         {
             public ParcelAccessDeniedException()
             {
-
             }
 
             public ParcelAccessDeniedException(string msg)
                 : base(msg)
             {
-
             }
 
             protected ParcelAccessDeniedException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public ParcelAccessDeniedException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -392,13 +376,13 @@ namespace SilverSim.Scene.Types.Scene
                     IObject obj;
                     if (Objects.TryGetValue(RegionSettings.TelehubObject, out obj))
                     {
-                        List<Vector3> relativeSpawns = SpawnPoints;
-                        List<Vector3> absoluteSpawns = new List<Vector3>();
+                        var relativeSpawns = SpawnPoints;
+                        var absoluteSpawns = new List<Vector3>();
                         switch(SpawnPointRouting)
                         {
                             case "random":
                                 {
-                                    Random rand = new Random();
+                                    var rand = new Random();
                                     while(relativeSpawns.Count > 0)
                                     {
                                         absoluteSpawns.Add(relativeSpawns[rand.Next(relativeSpawns.Count - 1).Clamp(0, relativeSpawns.Count - 1)] * obj.GlobalRotation + obj.GlobalPosition);
@@ -408,8 +392,8 @@ namespace SilverSim.Scene.Types.Scene
 
                             case "emptiest":
                                 {
-                                    List<Vector3> agentLocations = new List<Vector3>();
-                                    foreach(IAgent retAgent in RootAgents)
+                                    var agentLocations = new List<Vector3>();
+                                    foreach(var retAgent in RootAgents)
                                     {
                                         agentLocations.Add(retAgent.GlobalPosition);
                                     }
@@ -474,7 +458,7 @@ namespace SilverSim.Scene.Types.Scene
                                 break;
                         }
 
-                        foreach (Vector3 spawn in absoluteSpawns)
+                        foreach (var spawn in absoluteSpawns)
                         {
                             ParcelInfo spawnParcel;
                             if (Parcels.TryGetValue(spawn, out spawnParcel) &&

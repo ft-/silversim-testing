@@ -67,7 +67,7 @@ namespace SilverSim.Scene.Types.Transfer
         {
             List<UUID> new_assetids = m_AssetIDList;
             List<UUID> current_assetids;
-            List<UUID> processed_assetids = new List<UUID>();
+            var processed_assetids = new List<UUID>();
 
             try
             {
@@ -120,7 +120,7 @@ namespace SilverSim.Scene.Types.Transfer
 
         static void HandleWorkItem(object o)
         {
-            AssetTransferWorkItem wi = (AssetTransferWorkItem)o;
+            var wi = (AssetTransferWorkItem)o;
             wi.ProcessAssetTransfer();
         }
 

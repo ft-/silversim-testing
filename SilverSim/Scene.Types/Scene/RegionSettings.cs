@@ -28,7 +28,6 @@ namespace SilverSim.Scene.Types.Scene
     {
         public RegionSettings()
         {
-
         }
 
         public RegionSettings(RegionSettings src)

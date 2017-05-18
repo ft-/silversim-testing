@@ -260,13 +260,6 @@ namespace SilverSim.ServiceInterfaces.Groups
             void Delete(UUI requestingAgent, UUID groupNoticeID);
         }
 
-        #region Constructor
-        public GroupsServiceInterface()
-        {
-
-        }
-        #endregion
-
         public abstract IGroupsInterface Groups
         {
             get;
@@ -317,31 +310,27 @@ namespace SilverSim.ServiceInterfaces.Groups
         {
             public AccessFailedException()
             {
-
             }
 
             public AccessFailedException(string message)
                 : base(message)
             {
-
             }
 
             protected AccessFailedException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public AccessFailedException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
         public virtual GroupInfo CreateGroup(UUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
         {
-            GroupRole role_everyone = new GroupRole()
+            var role_everyone = new GroupRole()
             {
                 ID = UUID.Zero,
                 Group = ginfo.ID,
@@ -350,7 +339,7 @@ namespace SilverSim.ServiceInterfaces.Groups
                 Title = "Member of " + ginfo.ID.GroupName,
                 Powers = everyonePowers
             };
-            GroupRole role_owner = new GroupRole()
+            var role_owner = new GroupRole()
             {
                 ID = UUID.Random,
                 Group = ginfo.ID,
@@ -361,13 +350,13 @@ namespace SilverSim.ServiceInterfaces.Groups
             };
             ginfo.OwnerRoleID = role_owner.ID;
 
-            GroupRolemember gmemrole_owner = new GroupRolemember()
+            var gmemrole_owner = new GroupRolemember()
             {
                 Group = ginfo.ID,
                 RoleID = role_owner.ID,
                 Principal = ginfo.Founder
             };
-            GroupRolemember gmemrole_everyone = new GroupRolemember()
+            var gmemrole_everyone = new GroupRolemember()
             {
                 Group = ginfo.ID,
                 RoleID = role_everyone.ID,
@@ -408,7 +397,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             {
                 if (!Rolemembers.ContainsKey(requestingAgent, group, UUID.Zero, agent))
                 {
-                    GroupRolemember rolemember = new GroupRolemember()
+                    var rolemember = new GroupRolemember()
                     {
                         Group = group,
                         Principal = agent,
@@ -419,7 +408,7 @@ namespace SilverSim.ServiceInterfaces.Groups
 
                 if(UUID.Zero != roleid)
                 {
-                    GroupRolemember rolemember = new GroupRolemember()
+                    var rolemember = new GroupRolemember()
                     {
                         Group = group,
                         Principal = agent,
@@ -430,8 +419,8 @@ namespace SilverSim.ServiceInterfaces.Groups
 
                 try
                 {
-                    List<GroupInvite> invites = Invites[requestingAgent, group, roleid, agent];
-                    foreach(GroupInvite invite in invites)
+                    var invites = Invites[requestingAgent, group, roleid, agent];
+                    foreach(var invite in invites)
                     {
                         invites.Remove(invite);
                     }
@@ -454,9 +443,9 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public virtual GroupPowers GetAgentPowers(UGI group, UUI agent)
         {
-            List<GroupRolemember> rolemembers = Rolemembers[agent, group];
-            GroupPowers powers = GroupPowers.None;
-            foreach(GroupRolemember rolemember in rolemembers)
+            var rolemembers = Rolemembers[agent, group];
+            var powers = GroupPowers.None;
+            foreach(var rolemember in rolemembers)
             {
                 GroupRole role;
                 if(Roles.TryGetValue(agent, group, rolemember.RoleID, out role))
@@ -474,9 +463,9 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public void VerifyAgentPowers(UGI group, UUI agent, GroupPowers[] powers)
         {
-            GroupPowers agentPowers = GetAgentPowers(group, agent);
+            var agentPowers = GetAgentPowers(group, agent);
 
-            foreach(GroupPowers power in powers)
+            foreach(var power in powers)
             {
                 if(!agentPowers.HasFlag(power))
                 {
@@ -491,7 +480,6 @@ namespace SilverSim.ServiceInterfaces.Groups
             public GroupInsufficientPowersException(GroupPowers power)
                 : base(string.Format("Missing group permission {0}", power.ToString()))
             {
-
             }
         }
     }

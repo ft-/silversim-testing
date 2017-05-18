@@ -33,24 +33,21 @@ namespace SilverSim.Scripting.Common
         {
             public StackEmptyException()
             {
-
             }
 
             public StackEmptyException(string message)
                 : base(message)
             {
-
             }
 
             public StackEmptyException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected StackEmptyException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
-            { 
+            {
             }
         }
 
@@ -59,24 +56,21 @@ namespace SilverSim.Scripting.Common
         {
             public EndOfStringException()
             {
-
             }
 
             public EndOfStringException(string message)
                 : base(message)
             {
-
             }
 
             public EndOfStringException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected EndOfStringException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
-            { 
+            {
             }
         }
 
@@ -85,24 +79,21 @@ namespace SilverSim.Scripting.Common
         {
             public EndOfFileException()
             {
-
             }
 
             public EndOfFileException(string message)
                 : base(message)
             {
-
             }
 
             public EndOfFileException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected EndOfFileException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
-            { 
+            {
             }
         }
 
@@ -111,24 +102,21 @@ namespace SilverSim.Scripting.Common
         {
             public PreprocessorLineErrorException()
             {
-
             }
 
             public PreprocessorLineErrorException(string message)
                 : base(message)
             {
-
             }
 
             public PreprocessorLineErrorException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected PreprocessorLineErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
-            { 
+            {
             }
         }
 
@@ -138,24 +126,21 @@ namespace SilverSim.Scripting.Common
             public ParenthesisMismatchErrorException()
                 : base("')' has no matching '('")
             {
-
             }
 
             public ParenthesisMismatchErrorException(string message)
                 : base(message)
             {
-
             }
 
             public ParenthesisMismatchErrorException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected ParenthesisMismatchErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
-            { 
+            {
             }
         }
 
@@ -164,24 +149,21 @@ namespace SilverSim.Scripting.Common
         {
             public FileIoErrorException()
             {
-
             }
 
             public FileIoErrorException(string message)
                 : base(message)
             {
-
             }
 
             public FileIoErrorException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected FileIoErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
-            { 
+            {
             }
         }
 
@@ -191,23 +173,20 @@ namespace SilverSim.Scripting.Common
             public CircularIncludeException(string msg)
                 : base(msg)
             {
-
             }
 
             public CircularIncludeException()
             {
-
             }
 
             public CircularIncludeException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected CircularIncludeException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
-            { 
+            {
             }
         }
 
@@ -216,7 +195,8 @@ namespace SilverSim.Scripting.Common
             public string FileName;
             public TextReader Reader;
             public int LineNumberCounter;
-        };
+        }
+
         readonly List<ParserInput> m_ParserInputs = new List<ParserInput>();
 
         protected ParserBase()
@@ -234,10 +214,12 @@ namespace SilverSim.Scripting.Common
 
         public void Push(TextReader stream, string filename, int lineNumber = 1)
         {
-            ParserInput pi = new ParserInput();
-            pi.FileName = filename;
-            pi.Reader = stream;
-            pi.LineNumberCounter = lineNumber;
+            var pi = new ParserInput()
+            {
+                FileName = filename,
+                Reader = stream,
+                LineNumberCounter = lineNumber
+            };
             m_ParserInputs.Add(pi);
             cur_linenumber = pi.LineNumberCounter;
             cur_filename = pi.FileName;
@@ -249,7 +231,7 @@ namespace SilverSim.Scripting.Common
 
             if(m_ParserInputs.Count != 0)
             {
-                ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
+                var pi = m_ParserInputs[m_ParserInputs.Count - 1];
                 cur_linenumber = pi.LineNumberCounter;
                 cur_filename = pi.FileName;
             }
@@ -309,7 +291,7 @@ namespace SilverSim.Scripting.Common
             {
                 throw new StackEmptyException();
             }
-            ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
+            var pi = m_ParserInputs[m_ParserInputs.Count - 1];
             if(pi.Reader == null)
             {
                 throw new FileIoErrorException();
@@ -317,8 +299,7 @@ namespace SilverSim.Scripting.Common
 
             for(;;)
             {
-                int c;
-                c = pi.Reader.Read();
+                int c = pi.Reader.Read();
                 if(c == -1)
                 {
                     Pop();

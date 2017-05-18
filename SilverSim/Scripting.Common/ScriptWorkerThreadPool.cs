@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using log4net;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -45,12 +44,8 @@ namespace SilverSim.Scripting.Common
             public ScriptInstance CurrentScriptInstance;
             public Thread ScriptThread;
             public ScriptWorkerThreadPool ThreadPool;
-
-            public ScriptThreadContext()
-            {
-
-            }
         }
+
         readonly RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
 
         public int MinimumThreads
@@ -94,11 +89,13 @@ namespace SilverSim.Scripting.Common
             m_Log.InfoFormat("Starting {0} minimum threads for {1}", minimumThreads, m_SceneID.ToString());
             for (int threadCount = 0; threadCount < m_MinimumThreads; ++threadCount)
             {
-                ScriptThreadContext tc = new ScriptThreadContext();
-                tc.ScriptThread = ThreadManager.CreateThread(ThreadMain);
+                var tc = new ScriptThreadContext()
+                {
+                    ScriptThread = ThreadManager.CreateThread(ThreadMain),
+                    ThreadPool = this
+                };
                 tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
                 tc.ScriptThread.IsBackground = true;
-                tc.ThreadPool = this;
                 tc.ScriptThread.Start(tc);
                 m_Threads.Add(tc);
             }
@@ -129,7 +126,7 @@ namespace SilverSim.Scripting.Common
             }
 
             if(enqueued)
-            { 
+            {
                 int threadsCount = m_Threads.Count;
                 if (m_ScriptTriggerQueue.Count > threadsCount && threadsCount < m_MaximumThreads)
                 {
@@ -137,9 +134,11 @@ namespace SilverSim.Scripting.Common
                     {
                         try
                         {
-                            ScriptThreadContext tc = new ScriptThreadContext();
-                            tc.ScriptThread = ThreadManager.CreateThread(ThreadMain);
-                            tc.ThreadPool = this;
+                            var tc = new ScriptThreadContext()
+                            {
+                                ScriptThread = ThreadManager.CreateThread(ThreadMain),
+                                ThreadPool = this
+                            };
                             tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
                             tc.ScriptThread.IsBackground = true;
                             tc.ScriptThread.Start(tc);
@@ -156,7 +155,7 @@ namespace SilverSim.Scripting.Common
 
         public void AbortScript(ScriptInstance script)
         {
-            m_Threads.ForEach(delegate(ScriptThreadContext tc)
+            m_Threads.ForEach((ScriptThreadContext tc) =>
             {
                 lock (tc)
                 {
@@ -183,11 +182,11 @@ namespace SilverSim.Scripting.Common
                 {
                     /* we have to abort threads */
                     m_Log.InfoFormat("Killing blocked instances of region {0}", m_SceneID.ToString());
-                    foreach(ScriptThreadContext tc in m_Threads)
+                    foreach(var tc in m_Threads)
                     {
                         lock(tc)
                         {
-                            ScriptInstance instance = tc.CurrentScriptInstance;
+                            var instance = tc.CurrentScriptInstance;
                             if (null != instance)
                             {
                                 lock (instance)
@@ -205,8 +204,8 @@ namespace SilverSim.Scripting.Common
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void ThreadMain(object obj)
         {
-            ScriptThreadContext tc = (ScriptThreadContext)obj;
-            ScriptWorkerThreadPool pool = tc.ThreadPool;
+            var tc = (ScriptThreadContext)obj;
+            var pool = tc.ThreadPool;
             ScriptInstance ev;
             while (!m_ShutdownThreads)
             {
@@ -244,8 +243,8 @@ namespace SilverSim.Scripting.Common
                 {
                     /* no in script event should abort us */
                     Thread.ResetAbort();
-                    ObjectPartInventoryItem item = ev.Item;
-                    ScriptInstance instance = item.ScriptInstance;
+                    var item = ev.Item;
+                    var instance = item.ScriptInstance;
                     item.ScriptInstance = null;
                     try
                     {
@@ -263,8 +262,8 @@ namespace SilverSim.Scripting.Common
                 }
                 catch(ScriptAbortException)
                 {
-                    ObjectPartInventoryItem item = ev.Item;
-                    ScriptInstance instance = item.ScriptInstance;
+                    var item = ev.Item;
+                    var instance = item.ScriptInstance;
                     instance.AbortBegin();
                     try
                     {
@@ -283,8 +282,8 @@ namespace SilverSim.Scripting.Common
                 }
                 catch(InvalidProgramException e)
                 {
-                    ObjectPartInventoryItem item = ev.Item;
-                    ScriptInstance instance = item.ScriptInstance;
+                    var item = ev.Item;
+                    var instance = item.ScriptInstance;
                     /* stop the broken script */
                     m_Log.WarnFormat("Automatically stopped script {0} ({1}) of {2} ({3}) in {4} ({5}) due to program error: {6}\n{7}",
                         item.Name, item.AssetID.ToString(),
@@ -297,8 +296,8 @@ namespace SilverSim.Scripting.Common
                 }
                 catch(Exception e)
                 {
-                    ObjectPartInventoryItem item = ev.Item;
-                    ScriptInstance instance = item.ScriptInstance;
+                    var item = ev.Item;
+                    var instance = item.ScriptInstance;
                     m_Log.WarnFormat("Exception at script {0} ({1}) of {2} ({3}) in {4} ({5}) due to program error: {6}\n{7}",
                         item.Name, item.AssetID.ToString(),
                         ev.Part.Name, ev.Part.ID.ToString(),

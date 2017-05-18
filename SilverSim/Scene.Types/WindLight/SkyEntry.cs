@@ -57,9 +57,7 @@ namespace SilverSim.Scene.Types.WindLight
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public SkyEntry(Map m)
         {
-            AnArray a;
-
-            a = (AnArray)m["ambient"];
+            AnArray a = (AnArray)m["ambient"];
             Ambient = a.ElementsToVector4;
             a = (AnArray)m["blue_density"];
             BlueDensity = a.ElementsToVector4;

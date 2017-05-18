@@ -35,31 +35,22 @@ namespace SilverSim.ServiceInterfaces.Friends
         {
             public FriendUpdateFailedException()
             {
-
             }
 
             public FriendUpdateFailedException(string message)
                 : base(message)
             {
-
             }
 
             protected FriendUpdateFailedException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public FriendUpdateFailedException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
-        }
-
-        public FriendsServiceInterface()
-        {
-
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]

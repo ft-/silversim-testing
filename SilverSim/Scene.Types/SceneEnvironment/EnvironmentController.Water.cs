@@ -31,11 +31,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public double TidalBaseHeight = 20;
             public double TidalMoonAmplitude = 0.5;
             public double TidalSunAmplitude = 0.1;
-
-            public WaterConfig()
-            {
-
-            }
         }
 
         readonly WaterConfig m_WaterConfig = new WaterConfig();

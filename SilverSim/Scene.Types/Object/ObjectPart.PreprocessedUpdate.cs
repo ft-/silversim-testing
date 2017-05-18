@@ -264,7 +264,7 @@ namespace SilverSim.Scene.Types.Object
                     flags |= UpdateDataFlags.Compressed;
                 }
 
-                uint primUpdateFlags = (uint)m_PrimitiveFlags;
+                var primUpdateFlags = (uint)m_PrimitiveFlags;
                 uint parentID = 0;
                 string name = string.Empty;
 
@@ -278,7 +278,7 @@ namespace SilverSim.Scene.Types.Object
                     PrimitiveFlags.Temporary |
                     PrimitiveFlags.TemporaryOnRez));
 
-                ObjectGroup objectGroup = ObjectGroup;
+                var objectGroup = ObjectGroup;
                 if (objectGroup != null)
                 {
                     if (IsAllowedDrop)
@@ -346,13 +346,13 @@ namespace SilverSim.Scene.Types.Object
                 #region ObjectUpdate
                 if ((flags & UpdateDataFlags.Full) != 0)
                 {
-                    byte[] textureEntry = TextureEntryBytes;
-                    byte[] textureAnimEntry = TextureAnimationBytes;
-                    TextParam text = Text;
-                    byte[] textBytes = text.Text.ToUTF8Bytes();
-                    byte[] psBlock = ParticleSystemBytes;
-                    byte[] extraParams = ExtraParamsBytes;
-                    byte[] mediaUrlBytes = MediaURL.ToUTF8Bytes();
+                    var textureEntry = TextureEntryBytes;
+                    var textureAnimEntry = TextureAnimationBytes;
+                    var text = Text;
+                    var textBytes = text.Text.ToUTF8Bytes();
+                    var psBlock = ParticleSystemBytes;
+                    var extraParams = ExtraParamsBytes;
+                    var mediaUrlBytes = MediaURL.ToUTF8Bytes();
 
                     byte[] data;
                     switch (m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode])
@@ -390,7 +390,7 @@ namespace SilverSim.Scene.Types.Object
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] = ObjectGroup.RootPart.Shape.State;
                     }
 
-                    byte[] nameBytes = name.ToUTF8Bytes();
+                    var nameBytes = name.ToUTF8Bytes();
 
                     int blockSize = m_FullUpdateFixedBlock1.Length + m_FullUpdateFixedBlock2.Length;
                     blockSize += textureEntry.Length + 2;
@@ -403,7 +403,7 @@ namespace SilverSim.Scene.Types.Object
                     blockSize += mediaUrlBytes.Length + 2;
                     blockSize += 4;
 
-                    byte[] newFullData = new byte[blockSize];
+                    var newFullData = new byte[blockSize];
                     int offset = 0;
 
                     Buffer.BlockCopy(m_FullUpdateFixedBlock1, 0, newFullData, 0, m_FullUpdateFixedBlock1.Length);
@@ -462,9 +462,9 @@ namespace SilverSim.Scene.Types.Object
                 if ((flags & UpdateDataFlags.Terse) != 0)
                 {
                     byte[] terseData = TerseData;
-                    byte[] textureEntry = m_TextureEntryBytes;
+                    byte[] textureEntry = TextureEntryBytes;
 
-                    byte[] newTerseData = new byte[3 + terseData.Length + textureEntry.Length];
+                    var newTerseData = new byte[3 + terseData.Length + textureEntry.Length];
 
                     int offset = 0;
                     newTerseData[offset++] = (byte)terseData.Length;
@@ -481,22 +481,22 @@ namespace SilverSim.Scene.Types.Object
                 #region CompressedUpdate
                 if((flags & UpdateDataFlags.Compressed) != 0)
                 {
-                    byte[] partsystem = ParticleSystemBytes;
+                    var partsystem = ParticleSystemBytes;
                     if ((partsystem.Length != 0 && partsystem.Length != 86) || Velocity.Length > double.Epsilon)
                     {
                         m_CompressedUpdateData = null;
                     }
                     else
                     {
-                        ObjectUpdateCompressed.CompressedFlags compressedflags = ObjectUpdateCompressed.CompressedFlags.None;
+                        var compressedflags = ObjectUpdateCompressed.CompressedFlags.None;
                         TextParam textparam = Text;
                         int compressedSize = 80;
                         byte[] textbytes = null;
                         byte[] mediaurlbytes = null;
                         byte[] namebytes = null;
-                        byte[] textureanimbytes = TextureAnimationBytes;
-                        byte[] textureentry = TextureEntryBytes;
-                        byte[] extrabytes = ExtraParamsBytes;
+                        var textureanimbytes = TextureAnimationBytes;
+                        var textureentry = TextureEntryBytes;
+                        var extrabytes = ExtraParamsBytes;
 
                         if(extrabytes == null || extrabytes.Length == 0)
                         {
@@ -550,13 +550,13 @@ namespace SilverSim.Scene.Types.Object
                             compressedSize += partsystem.Length;
                         }
 
-                        byte[] compressedData = new byte[compressedSize];
+                        var compressedData = new byte[compressedSize];
                         ID.ToBytes(compressedData, 0);
                         compressedData[16] = (byte)(LocalID & 0xFF);
                         compressedData[17] = (byte)((LocalID >> 8) & 0xFF);
                         compressedData[18] = (byte)((LocalID >> 16) & 0xFF);
                         compressedData[19] = (byte)((LocalID >> 24) & 0xFF);
-                        PrimitiveShape shape = Shape;
+                        var shape = Shape;
                         compressedData[20] = (byte)shape.PCode;
                         compressedData[21] = shape.State;
                         //CRC
@@ -661,10 +661,10 @@ namespace SilverSim.Scene.Types.Object
                 #region ObjectProperties
                 if ((flags & UpdateDataFlags.Properties) != 0)
                 {
-                    byte[] nameBytes = Name.ToUTF8Bytes();
-                    byte[] descriptionBytes = Description.ToUTF8Bytes();
-                    byte[] touchNameBytes = TouchText.ToUTF8Bytes();
-                    byte[] sitNameBytes = SitText.ToUTF8Bytes();
+                    var nameBytes = Name.ToUTF8Bytes();
+                    var descriptionBytes = Description.ToUTF8Bytes();
+                    var touchNameBytes = TouchText.ToUTF8Bytes();
+                    var sitNameBytes = SitText.ToUTF8Bytes();
                     
                     int propDataLength = m_PropUpdateFixedBlock.Length + 9 + 
                         nameBytes.Length + 
@@ -672,7 +672,7 @@ namespace SilverSim.Scene.Types.Object
                         touchNameBytes.Length + 
                         sitNameBytes.Length;
 
-                    byte[] newPropData = new byte[propDataLength];
+                    var newPropData = new byte[propDataLength];
 
                     int offset = 0;
 

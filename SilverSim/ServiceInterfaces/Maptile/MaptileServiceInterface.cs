@@ -27,11 +27,6 @@ namespace SilverSim.ServiceInterfaces.Maptile
 {
     public abstract class MaptileServiceInterface
     {
-        public MaptileServiceInterface()
-        {
-
-        }
-
         public MaptileData this[UUID scopeid, GridVector location, int zoomlevel]
         {
             get

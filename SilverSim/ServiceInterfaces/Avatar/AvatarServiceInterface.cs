@@ -43,31 +43,21 @@ namespace SilverSim.ServiceInterfaces.Avatar
         public AvatarUpdateFailedException(string message)
             : base(message)
         {
-
         }
 
         protected AvatarUpdateFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public AvatarUpdateFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     public abstract class AvatarServiceInterface
     {
-        #region Constructor
-        public AvatarServiceInterface()
-        {
-
-        }
-        #endregion
-
         public abstract Dictionary<string, string> this[UUID avatarID]
         {
             get;
@@ -130,7 +120,7 @@ namespace SilverSim.ServiceInterfaces.Avatar
             }
             foreach(KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvp in aInfo.Attachments)
             {
-                List<string> itemIds = new List<string>();
+                var itemIds = new List<string>();
                 foreach (KeyValuePair<UUID, UUID> kvpAttachment in kvp.Value)
                 {
                     itemIds.Add(kvpAttachment.Key.ToString());
@@ -142,7 +132,7 @@ namespace SilverSim.ServiceInterfaces.Avatar
 
         public bool TryGetAppearanceInfo(UUID avatarID, out AppearanceInfo aInfo)
         {
-            Dictionary<string, string> items = this[avatarID];
+            var items = this[avatarID];
 
             aInfo = new AppearanceInfo();
 
@@ -168,8 +158,8 @@ namespace SilverSim.ServiceInterfaces.Avatar
             }
             if(items.TryGetValue("VisualParams", out val))
             {
-                string[] vals = val.Split(',');
-                byte[] vp = new byte[vals.Length];
+                var vals = val.Split(',');
+                var vp = new byte[vals.Length];
                 for(int i = 0; i < vals.Length; ++i)
                 {
                     vp[i] = byte.Parse(vals[i]);
@@ -183,17 +173,17 @@ namespace SilverSim.ServiceInterfaces.Avatar
                 aInfo.AvatarTextures[i] = new UUID("c228d1cf-4b5d-4ba8-84f4-899a0796aa97");
             }
 
-            Regex wearable_match = new Regex(@"/^Wearable ([0-9]*)\:([0-9]*)$/");
-            Dictionary<WearableType, List<AgentWearables.WearableInfo>> wearables = new Dictionary<WearableType, List<AgentWearables.WearableInfo>>();
-            foreach (KeyValuePair<string, string> kvp in items)
+            var wearable_match = new Regex(@"/^Wearable ([0-9]*)\:([0-9]*)$/");
+            var wearables = new Dictionary<WearableType, List<AgentWearables.WearableInfo>>();
+            foreach (var kvp in items)
             {
-                Match m = wearable_match.Match(kvp.Key);
+                var m = wearable_match.Match(kvp.Key);
                 if(m.Success)
                 {
                     int pos = int.Parse(m.Groups[1].Value);
                     int no = int.Parse(m.Groups[2].Value);
-                    string[] va = kvp.Value.Split(':');
-                    AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
+                    var va = kvp.Value.Split(':');
+                    var wi = new AgentWearables.WearableInfo();
                     wi.ItemID = UUID.Parse(va[0]);
                     if(va.Length > 1)
                     {

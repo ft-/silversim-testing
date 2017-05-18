@@ -34,25 +34,21 @@ namespace SilverSim.ServiceInterfaces.Presence
     {
         public PresenceUpdateFailedException()
         {
-
         }
 
         public PresenceUpdateFailedException(string message)
             : base(message)
         {
-
         }
 
         PresenceUpdateFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public PresenceUpdateFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -61,25 +57,21 @@ namespace SilverSim.ServiceInterfaces.Presence
     {
         public PresenceNotFoundException()
         {
-
         }
 
         public PresenceNotFoundException(string message)
             : base(message)
         {
-
         }
 
         PresenceNotFoundException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public PresenceNotFoundException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -93,19 +85,16 @@ namespace SilverSim.ServiceInterfaces.Presence
         public PresenceLogoutRegionFailedException(string message)
             : base(message)
         {
-
         }
 
         PresenceLogoutRegionFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public PresenceLogoutRegionFailedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -115,11 +104,6 @@ namespace SilverSim.ServiceInterfaces.Presence
         {
             Login,
             Report
-        }
-
-        public PresenceServiceInterface()
-        {
-
         }
 
         public abstract List<PresenceInfo> this[UUID userID]

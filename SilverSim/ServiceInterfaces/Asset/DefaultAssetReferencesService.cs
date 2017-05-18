@@ -55,7 +55,7 @@ namespace SilverSim.ServiceInterfaces.Asset
                     return new List<UUID>(result);
                 }
 
-                AssetData data = m_Service[key];
+                var data = m_Service[key];
                 try
                 {
                     result = data.References;

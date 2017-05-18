@@ -71,16 +71,6 @@ namespace SilverSim.ServiceInterfaces.Asset
         public abstract void Delete(UUID id);
         #endregion
 
-        public virtual bool IsSameServer(AssetServiceInterface other)
-        {
-            return false;
-        }
-
-        #region Constructors
-        public AssetServiceInterface()
-        {
-
-        }
-        #endregion
+        public virtual bool IsSameServer(AssetServiceInterface other) => false;
     }
 }

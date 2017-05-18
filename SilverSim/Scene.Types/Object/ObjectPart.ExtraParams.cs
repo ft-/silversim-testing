@@ -135,13 +135,6 @@ namespace SilverSim.Scene.Types.Object
 
         public class FlexibleParam
         {
-            #region Constructor
-            public FlexibleParam()
-            {
-
-            }
-            #endregion
-
             #region Fields
             public bool IsFlexible;
             public int Softness;
@@ -156,7 +149,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    byte[] serialized = new byte[49];
+                    var serialized = new byte[49];
                     Force.ToBytes(serialized, 0);
                     Buffer.BlockCopy(BitConverter.GetBytes(Softness), 0, serialized, 12, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(Gravity), 0, serialized, 16, 8);
@@ -212,13 +205,6 @@ namespace SilverSim.Scene.Types.Object
         private readonly FlexibleParam m_Flexible = new FlexibleParam();
         public class PointLightParam
         {
-            #region Constructor
-            public PointLightParam()
-            {
-
-            }
-            #endregion
-
             #region Fields
             public bool IsLight;
             public Color LightColor = new Color();
@@ -232,7 +218,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    byte[] serialized = new byte[36];
+                    var serialized = new byte[36];
                     serialized[0] = IsLight ? (byte)1: (byte)0;
                     serialized[1] = LightColor.R_AsByte;
                     serialized[2] = LightColor.G_AsByte;
@@ -286,13 +272,6 @@ namespace SilverSim.Scene.Types.Object
 
         public class ProjectionParam
         {
-            #region Constructor
-            public ProjectionParam()
-            {
-
-            }
-            #endregion
-
             #region Fields
             public bool IsProjecting;
             public UUID ProjectionTextureID = UUID.Zero;
@@ -305,7 +284,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    byte[] serialized = new byte[41];
+                    var serialized = new byte[41];
                     ProjectionTextureID.ToBytes(serialized, 0);
                     Buffer.BlockCopy(BitConverter.GetBytes(ProjectionFOV), 0, serialized, 16, 8);
                     Buffer.BlockCopy(BitConverter.GetBytes(ProjectionFocus), 0, serialized, 24, 8);
@@ -351,7 +330,7 @@ namespace SilverSim.Scene.Types.Object
 
         private void Float2LEBytes(float v, byte[] b, int offset)
         {
-            byte[] i = BitConverter.GetBytes(v);
+            var i = BitConverter.GetBytes(v);
             if (!BitConverter.IsLittleEndian)
             {
                 Array.Reverse(i);
@@ -363,7 +342,7 @@ namespace SilverSim.Scene.Types.Object
         {
             if (!BitConverter.IsLittleEndian)
             {
-                byte[] i = new byte[4];
+                var i = new byte[4];
                 Buffer.BlockCopy(b, offset, i, 0, 4);
                 Array.Reverse(i);
                 return BitConverter.ToSingle(i, 0);
@@ -381,7 +360,7 @@ namespace SilverSim.Scene.Types.Object
                 m_ExtraParamsLock.AcquireReaderLock(-1);
                 try
                 {
-                    byte[] b = new byte[m_ExtraParamsBytes.Length];
+                    var b = new byte[m_ExtraParamsBytes.Length];
                     Buffer.BlockCopy(m_ExtraParamsBytes, 0, b, 0, m_ExtraParamsBytes.Length);
                     return b;
                 }
@@ -396,9 +375,9 @@ namespace SilverSim.Scene.Types.Object
                 try
                 {
                     m_ExtraParamsBytes = value;
-                    PointLightParam light = new PointLightParam();
-                    ProjectionParam proj = new ProjectionParam();
-                    FlexibleParam flexi = new FlexibleParam();
+                    var light = new PointLightParam();
+                    var proj = new ProjectionParam();
+                    var flexi = new FlexibleParam();
 
                     flexi.IsFlexible = false;
                     proj.IsProjecting = false;
@@ -412,7 +391,7 @@ namespace SilverSim.Scene.Types.Object
                         Flexible = flexi;
                         Projection = proj;
                         PointLight = light;
-                        PrimitiveShape shape = Shape;
+                        var shape = Shape;
                         if (shape.Type == PrimitiveShapeType.Sculpt)
                         {
                             shape.Type = PrimitiveShapeType.Sphere;
@@ -435,8 +414,8 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 break;
                             }
-                            ushort type = (ushort)(value[pos] | (value[pos + 1] << 8));
-                            UInt32 len = (UInt32)(value[pos + 2] | (value[pos + 3] << 8) | (value[pos + 4] << 16) | (value[pos + 5] << 24));
+                            var type = (ushort)(value[pos] | (value[pos + 1] << 8));
+                            var len = (UInt32)(value[pos + 2] | (value[pos + 3] << 8) | (value[pos + 4] << 16) | (value[pos + 5] << 24));
                             pos += 6;
 
                             if (pos + len > value.Length)
@@ -572,10 +551,10 @@ namespace SilverSim.Scene.Types.Object
                 uint totalBytesLength = 1;
                 uint extraParamsNum = 0;
 
-                FlexibleParam flexi = Flexible;
-                PointLightParam light = PointLight;
-                ProjectionParam proj = Projection;
-                PrimitiveShape shape = Shape;
+                var flexi = Flexible;
+                var light = PointLight;
+                var proj = Projection;
+                var shape = Shape;
                 if (flexi.IsFlexible)
                 {
                     ++extraParamsNum;
@@ -604,13 +583,13 @@ namespace SilverSim.Scene.Types.Object
                     totalBytesLength += 2 + 4;
                 }
 
-                byte[] updatebytes = new byte[totalBytesLength];
+                var updatebytes = new byte[totalBytesLength];
                 updatebytes[i++] = (byte)extraParamsNum;
 
                 if (flexi.IsFlexible)
                 {
-                    updatebytes[i++] = (byte)(FlexiEP % 256);
-                    updatebytes[i++] = (byte)(FlexiEP / 256);
+                    updatebytes[i++] = FlexiEP % 256;
+                    updatebytes[i++] = FlexiEP / 256;
 
                     updatebytes[i++] = 16;
                     updatebytes[i++] = 0;
@@ -627,8 +606,8 @@ namespace SilverSim.Scene.Types.Object
 
                 if (shape.Type == PrimitiveShapeType.Sculpt)
                 {
-                    updatebytes[i++] = (byte)(SculptEP % 256);
-                    updatebytes[i++] = (byte)(SculptEP / 256);
+                    updatebytes[i++] = SculptEP % 256;
+                    updatebytes[i++] = SculptEP / 256;
                     updatebytes[i++] = 17;
                     updatebytes[i++] = 0;
                     updatebytes[i++] = 0;
@@ -640,10 +619,10 @@ namespace SilverSim.Scene.Types.Object
 
                 if (light.IsLight &&
                     (!m_IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint)) &&
-                    (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
+                    (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
                 {
-                    updatebytes[i++] = (byte)(LightEP % 256);
-                    updatebytes[i++] = (byte)(LightEP / 256);
+                    updatebytes[i++] = LightEP % 256;
+                    updatebytes[i++] = LightEP / 256;
                     updatebytes[i++] = 16;
                     updatebytes[i++] = 0;
                     updatebytes[i++] = 0;
@@ -652,8 +631,8 @@ namespace SilverSim.Scene.Types.Object
                     
                     double intensity = light.Intensity;
                     if (intensity > m_FacelightLimitIntensity && 
-                        (ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.LeftHand ||
-                        ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.RightHand))
+                        (ObjectGroup.AttachPoint == AttachmentPoint.LeftHand ||
+                        ObjectGroup.AttachPoint == AttachmentPoint.RightHand))
                     {
                         intensity = m_FacelightLimitIntensity;
                     }
@@ -675,8 +654,8 @@ namespace SilverSim.Scene.Types.Object
 
                 if (proj.IsProjecting)
                 {
-                    updatebytes[i++] = (byte)(ProjectionEP % 256);
-                    updatebytes[i++] = (byte)(ProjectionEP / 256);
+                    updatebytes[i++] = (ProjectionEP % 256);
+                    updatebytes[i++] = (ProjectionEP / 256);
                     updatebytes[i++] = 28;
                     updatebytes[i++] = 0;
                     updatebytes[i++] = 0;
@@ -701,7 +680,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                FlexibleParam res = new FlexibleParam();
+                var res = new FlexibleParam();
                 lock (m_Flexible)
                 {
                     res.Force = m_Flexible.Force;
@@ -737,7 +716,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                ProjectionParam res = new ProjectionParam();
+                var res = new ProjectionParam();
                 lock (m_Projection)
                 {
                     res.IsProjecting = m_Projection.IsProjecting;
@@ -768,7 +747,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                PointLightParam res = new PointLightParam();
+                var res = new PointLightParam();
                 lock (m_PointLight)
                 {
                     res.Falloff = m_PointLight.Falloff;

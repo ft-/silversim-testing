@@ -30,7 +30,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
         public static UUI FindUUIByName(this List<AvatarNameServiceInterface> list, string firstname, string lastname)
         {
             UUI uui;
-            foreach(AvatarNameServiceInterface service in list)
+            foreach(var service in list)
             {
                 if(service.TryGetValue(firstname, lastname, out uui))
                 {
@@ -43,7 +43,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
         public static UUI FindUUIById(this List<AvatarNameServiceInterface> list, UUID id)
         {
             UUI uui;
-            foreach (AvatarNameServiceInterface service in list)
+            foreach (var service in list)
             {
                 if (service.TryGetValue(id, out uui))
                 {
@@ -56,11 +56,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
     public abstract class AvatarNameServiceInterface
     {
-        public AvatarNameServiceInterface()
-        {
-
-        }
-
         public abstract UUI this[UUID key] { get; }
         public abstract bool TryGetValue(UUID key, out UUI uui);
 

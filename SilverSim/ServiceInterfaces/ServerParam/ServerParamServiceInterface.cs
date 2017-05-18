@@ -37,11 +37,6 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> StartsWithServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(delegate() { return new RwLockedList<IServerParamAnyListener>(); });
 
         private static readonly ILog m_ServerParamUpdateLog = LogManager.GetLogger("SERVER PARAM UPDATE");
-
-        public ServerParamServiceInterface()
-        {
-
-        }
         
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public string this[UUID regionID, string parameter, string defvalue]
@@ -78,7 +73,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                     RwLockedList<Action<UUID, string>> specificList;
                     if(SpecificParamListeners.TryGetValue(parameter, out specificList))
                     {
-                        foreach(Action<UUID, string> del in specificList)
+                        foreach(var del in specificList)
                         {
 #if DEBUG
                             m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", del.GetType().FullName, regionID.ToString(), parameter);
@@ -95,7 +90,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                     }
                     if (GenericServerParamListeners.TryGetValue(parameter, out listenerList))
                     {
-                        foreach (IServerParamAnyListener listener in listenerList)
+                        foreach (var listener in listenerList)
                         {
 #if DEBUG
                             m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", listener.GetType().FullName, regionID.ToString(), parameter);
@@ -110,7 +105,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                             }
                         }
                     }
-                    foreach(IServerParamAnyListener listener in AnyServerParamListeners)
+                    foreach(var listener in AnyServerParamListeners)
                     {
 #if DEBUG
                         m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", listener.GetType().FullName, regionID.ToString(), parameter);
@@ -125,11 +120,11 @@ namespace SilverSim.ServiceInterfaces.ServerParam
                         }
                     }
 
-                    foreach(KeyValuePair<string, RwLockedList<IServerParamAnyListener>> kvp in StartsWithServerParamListeners)
+                    foreach(var kvp in StartsWithServerParamListeners)
                     {
                         if(parameter.StartsWith(kvp.Key))
                         {
-                            foreach (IServerParamAnyListener listener in kvp.Value)
+                            foreach (var listener in kvp.Value)
                             {
 #if DEBUG
                                 m_ServerParamUpdateLog.DebugFormat("sending update to {0} with parameter {1}/{2}", listener.GetType().FullName, regionID.ToString(), parameter);
@@ -174,97 +169,49 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         public abstract bool Remove(UUID regionID, string parameter);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public bool GetBoolean(UUID regionID, string parameter)
-        {
-            return bool.Parse(this[regionID, parameter]);
-        }
+        public bool GetBoolean(UUID regionID, string parameter) => bool.Parse(this[regionID, parameter]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public bool GetBoolean(UUID regionID, string parameter, bool defvalue)
-        {
-            return bool.Parse(this[regionID, parameter, defvalue.ToString()]);
-        }
+        public bool GetBoolean(UUID regionID, string parameter, bool defvalue) => bool.Parse(this[regionID, parameter, defvalue.ToString()]);
 
-        public string GetString(UUID regionID, string parameter)
-        {
-            return this[regionID, parameter];
-        }
+        public string GetString(UUID regionID, string parameter) => this[regionID, parameter];
 
-        public string GetString(UUID regionID, string parameter, string defvalue)
-        {
-            return this[regionID, parameter, defvalue];
-        }
+        public string GetString(UUID regionID, string parameter, string defvalue) => this[regionID, parameter, defvalue];
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public int GetInteger(UUID regionID, string parameter)
-        {
-            return int.Parse(this[regionID, parameter]);
-        }
+        public int GetInteger(UUID regionID, string parameter) => int.Parse(this[regionID, parameter]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public int GetInteger(UUID regionID, string parameter, int defvalue)
-        {
-            return int.Parse(this[regionID, parameter, defvalue.ToString()]);
-        }
+        public int GetInteger(UUID regionID, string parameter, int defvalue) => int.Parse(this[regionID, parameter, defvalue.ToString()]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public float GetFloat(UUID regionID, string parameter)
-        {
-            return float.Parse(this[regionID, parameter], CultureInfo.InvariantCulture);
-        }
+        public float GetFloat(UUID regionID, string parameter) => float.Parse(this[regionID, parameter], CultureInfo.InvariantCulture);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public float GetFloat(UUID regionID, string parameter, float defvalue)
-        {
-            return float.Parse(this[regionID, parameter, defvalue.ToString()], CultureInfo.InvariantCulture);
-        }
+        public float GetFloat(UUID regionID, string parameter, float defvalue) => float.Parse(this[regionID, parameter, defvalue.ToString()], CultureInfo.InvariantCulture);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public double GetDouble(UUID regionID, string parameter)
-        {
-            return double.Parse(this[regionID, parameter], CultureInfo.InvariantCulture);
-        }
+        public double GetDouble(UUID regionID, string parameter) => double.Parse(this[regionID, parameter], CultureInfo.InvariantCulture);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public double GetDouble(UUID regionID, string parameter, double defvalue)
-        {
-            return double.Parse(this[regionID, parameter, defvalue.ToString()], CultureInfo.InvariantCulture);
-        }
+        public double GetDouble(UUID regionID, string parameter, double defvalue) => double.Parse(this[regionID, parameter, defvalue.ToString()], CultureInfo.InvariantCulture);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Vector3 GetVector(UUID regionID, string parameter)
-        {
-            return Vector3.Parse(this[regionID, parameter]);
-        }
+        public Vector3 GetVector(UUID regionID, string parameter) => Vector3.Parse(this[regionID, parameter]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Vector3 GetVector(UUID regionID, string parameter, Vector3 v)
-        {
-            return Vector3.Parse(this[regionID, parameter, v.ToString()]);
-        }
+        public Vector3 GetVector(UUID regionID, string parameter, Vector3 v) => Vector3.Parse(this[regionID, parameter, v.ToString()]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public UUID GetUUID(UUID regionID, string parameter)
-        {
-            return UUID.Parse(this[regionID, parameter]);
-        }
+        public UUID GetUUID(UUID regionID, string parameter) => UUID.Parse(this[regionID, parameter]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public UUID GetUUID(UUID regionID, string parameter, UUID defvalue)
-        {
-            return UUID.Parse(this[regionID, parameter, defvalue.ToString()]);
-        }
+        public UUID GetUUID(UUID regionID, string parameter, UUID defvalue) => UUID.Parse(this[regionID, parameter, defvalue.ToString()]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Quaternion GetQuaternion(UUID regionID, string parameter)
-        {
-            return Quaternion.Parse(this[regionID, parameter]);
-        }
+        public Quaternion GetQuaternion(UUID regionID, string parameter) => Quaternion.Parse(this[regionID, parameter]);
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        public Quaternion GetQuaternion(UUID regionID, string parameter, Quaternion defvalue)
-        {
-            return Quaternion.Parse(this[regionID, parameter, defvalue.ToString()]);
-        }
+        public Quaternion GetQuaternion(UUID regionID, string parameter, Quaternion defvalue) => Quaternion.Parse(this[regionID, parameter, defvalue.ToString()]);
     }
 }

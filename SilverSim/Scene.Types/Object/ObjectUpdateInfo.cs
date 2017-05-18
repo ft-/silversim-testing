@@ -29,7 +29,7 @@ namespace SilverSim.Scene.Types.Object
 
         private bool m_Killed;
         public uint LocalID;
-        public ObjectPart Part { get; private set; }
+        public ObjectPart Part { get; }
 
         public ObjectUpdateInfo(ObjectPart part)
         {
@@ -42,13 +42,7 @@ namespace SilverSim.Scene.Types.Object
             m_Killed = true;
         }
 
-        public bool IsKilled
-        {
-            get
-            {
-                return m_Killed;
-            }
-        }
+        public bool IsKilled => m_Killed;
 
         public bool IsPhysics
         {
@@ -98,12 +92,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public int SerialNumber
-        {
-            get
-            {
-                return Part.SerialNumber;
-            }
-        }
+        public int SerialNumber => Part.SerialNumber;
     }
 }

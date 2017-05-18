@@ -82,13 +82,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            public bool IsLoginEnabled
-            {
-                get
-                {
-                    return m_CurrentFlags == ReadyFlags.None;
-                }
-            }
+            public bool IsLoginEnabled => m_CurrentFlags == ReadyFlags.None;
 
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             void TriggerLoginsEnabled(bool state)
