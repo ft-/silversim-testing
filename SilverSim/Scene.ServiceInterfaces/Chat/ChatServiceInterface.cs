@@ -33,11 +33,6 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
         {
             public abstract void Remove();
 
-            protected Listener()
-            {
-
-            }
-
             public abstract int Channel
             {
                 get;
@@ -53,13 +48,7 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
                 get;
             }
 
-            public virtual bool IsIgnorePosition
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            public virtual bool IsIgnorePosition => false;
 
             public abstract void Send(ListenEvent ev);
 
@@ -71,13 +60,6 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 
             public abstract bool IsMatching(string name, UUID id, string message, Int32 regexBitfield);
         }
-
-        #region Constructor
-        public ChatServiceInterface()
-        {
-
-        }
-        #endregion
 
         public abstract void Send(ListenEvent ev);
 

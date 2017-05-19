@@ -46,10 +46,8 @@ namespace SilverSim.Scene.Types.Script
             m_Param = param;
         }
 
-        public string Localize(ListenEvent le, CultureInfo currentCulture)
-        {
-            return string.Format(m_NlsRefObject.GetLanguageString(currentCulture, m_NlsId, m_NlsDefMessage), m_Param);
-        }
+        public string Localize(ListenEvent le, CultureInfo currentCulture) =>
+            string.Format(m_NlsRefObject.GetLanguageString(currentCulture, m_NlsId, m_NlsDefMessage), m_Param);
     }
 
     public abstract class ScriptInstance
@@ -114,7 +112,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (Action<ScriptInstance> del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
+                foreach (var del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
                 {
                     try
                     {
@@ -134,7 +132,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (Action<ScriptInstance> del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
+                foreach (var del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
                 {
                     try
                     {

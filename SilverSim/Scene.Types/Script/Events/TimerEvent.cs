@@ -23,9 +23,5 @@ namespace SilverSim.Scene.Types.Script.Events
 {
     public class TimerEvent : IScriptEvent
     {
-        public TimerEvent()
-        {
-
-        }
     }
 }

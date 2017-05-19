@@ -26,11 +26,6 @@ namespace SilverSim.Scene.ServiceInterfaces.Scene
 {
     public abstract class SceneFactoryInterface
     {
-        protected SceneFactoryInterface()
-        {
-
-        }
-
         public abstract SceneInterface Instantiate(RegionInfo ri);
     }
 }

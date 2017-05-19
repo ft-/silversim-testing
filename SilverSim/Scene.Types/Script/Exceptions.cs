@@ -27,10 +27,10 @@ namespace SilverSim.Scene.Types.Script
     [Serializable]
     public class LocalizedScriptErrorException : Exception
     {
-        public object NlsRefObject { get; private set; }
-        public string NlsId { get; private set; }
-        public string NlsDefMsg { get; private set; }
-        public object[] NlsParams { get; private set; }
+        public object NlsRefObject { get; }
+        public string NlsId { get; }
+        public string NlsDefMsg { get; }
+        public object[] NlsParams { get; }
 
         public LocalizedScriptErrorException(object nlsRefObject, string nlsId, string nlsDefMessage, params object[] param)
             : base(nlsRefObject.GetLanguageString(null, nlsId, nlsDefMessage))

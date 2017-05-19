@@ -2344,8 +2344,6 @@ namespace SilverSim.Scene.Types.Object
                         return damap;
                 }
             }
-
-            throw new InvalidObjectXmlException();
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]

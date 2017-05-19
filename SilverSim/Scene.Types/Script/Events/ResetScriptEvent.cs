@@ -26,9 +26,5 @@ namespace SilverSim.Scene.Types.Script.Events
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public class ResetScriptEvent : IScriptEvent
     {
-        public ResetScriptEvent()
-        {
-
-        }
     }
 }

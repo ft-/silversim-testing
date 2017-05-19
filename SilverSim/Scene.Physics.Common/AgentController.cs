@@ -39,18 +39,12 @@ namespace SilverSim.Scene.Physics.Common
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT CONTROLLER");
 #endif
 
-        protected IAgent m_Agent { get; private set; }
+        protected IAgent m_Agent { get; }
         protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
         readonly SceneInterface.LocationInfoProvider m_LocInfoProvider;
 
-        protected override SceneInterface.LocationInfoProvider LocationInfoProvider
-        {
-            get
-            {
-                return m_LocInfoProvider;
-            }
-        }
+        protected override SceneInterface.LocationInfoProvider LocationInfoProvider => m_LocInfoProvider;
 
         public abstract Vector3 Torque { get; }
         public abstract Vector3 Force { get; }
@@ -109,13 +103,7 @@ namespace SilverSim.Scene.Physics.Common
         }
 
 
-        public double Mass
-        {
-            get
-            {
-                return 2;
-            }
-        }
+        public double Mass => 2;
 
         public abstract bool IsVolumeDetect { get; set; }
         public abstract bool IsAgentCollisionActive { get; set; }
@@ -273,7 +261,7 @@ namespace SilverSim.Scene.Physics.Common
 
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {
-            List<PositionalForce> forces = new List<PositionalForce>();
+            var forces = new List<PositionalForce>();
             agentTorque = Vector3.Zero;
             Vector3 linearVelocity = m_Agent.Velocity;
             double horizontalVelocity = linearVelocity.HorizontalLength;

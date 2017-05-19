@@ -32,7 +32,7 @@ namespace SilverSim.Scene.Types.Transfer
     {
         readonly AssetServiceInterface m_DestinationAssetService;
         readonly AssetServiceInterface m_SourceAssetService;
-        protected UUID m_AssetID { get; private set; }
+        protected UUID m_AssetID { get; }
         readonly List<UUID> m_AssetIDList;
 
         public enum ReferenceSource

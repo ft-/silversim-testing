@@ -39,25 +39,21 @@ namespace SilverSim.Scene.Types.Script
 
         public CompilerException()
         {
-
         }
 
         public CompilerException(string msg)
             : base(msg)
         {
-
         }
 
         protected CompilerException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public CompilerException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
 
         public CompilerException(int linenumber, string message)
@@ -75,8 +71,8 @@ namespace SilverSim.Scene.Types.Script
         {
             get
             {
-                StringBuilder o = new StringBuilder();
-                foreach(KeyValuePair<int, string> m in Messages)
+                var o = new StringBuilder();
+                foreach(var m in Messages)
                 {
                     if(o.Length != 0)
                     {

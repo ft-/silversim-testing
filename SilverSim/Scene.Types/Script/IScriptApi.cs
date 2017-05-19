@@ -27,7 +27,7 @@ namespace SilverSim.Scene.Types.Script
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class ScriptApiNameAttribute : Attribute
     {
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public ScriptApiNameAttribute(string name)
         {
@@ -39,7 +39,7 @@ namespace SilverSim.Scene.Types.Script
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class ScriptEngineNameAttribute : Attribute
     {
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public ScriptEngineNameAttribute(string name)
         {

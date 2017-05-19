@@ -30,12 +30,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataStorageInterface
     {
-        #region Constructor
-        protected SimulationDataStorageInterface()
-        {
-        }
-        #endregion
-
         public abstract ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes
         {
             get;

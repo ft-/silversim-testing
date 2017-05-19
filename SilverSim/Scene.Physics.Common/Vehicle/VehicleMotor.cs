@@ -36,17 +36,13 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             m_Params = param;
         }
 
-        bool IsMouselookSteerActive(VehicleFlags flags, PhysicsStateData currentState)
-        {
-            return ((flags & VehicleFlags.MouselookSteer) != 0 && currentState.IsAgentInMouselook) ||
+        bool IsMouselookSteerActive(VehicleFlags flags, PhysicsStateData currentState) =>
+            ((flags & VehicleFlags.MouselookSteer) != 0 && currentState.IsAgentInMouselook) ||
                 (flags & VehicleFlags.MousePointSteer) != 0;
-        }
 
-        bool IsMouselookBankActive(VehicleFlags flags, PhysicsStateData currentState)
-        {
-            return ((flags & VehicleFlags.MouselookBank) != 0 && currentState.IsAgentInMouselook) ||
+        bool IsMouselookBankActive(VehicleFlags flags, PhysicsStateData currentState) =>
+            ((flags & VehicleFlags.MouselookBank) != 0 && currentState.IsAgentInMouselook) ||
                 (flags & VehicleFlags.MousePointBank) != 0;
-        }
 
         public void Process(double dt, PhysicsStateData currentState, SceneInterface scene, double mass, double multgravity)
         {
@@ -172,8 +168,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             VEHICLE_FLAG_LIMIT_ROLL_ONLY affects this one to be only affected on roll axis
             */
             Vector3 angularPos = angularOrientaton.GetEulerAngles();
-            Vector3 vertAttractorTorque;
-            vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params[VehicleFloatParamId.VerticalAttractionTimescale] * dt;
+            Vector3 vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params[VehicleFloatParamId.VerticalAttractionTimescale] * dt;
             if((flags & VehicleFlags.LimitRollOnly) !=0)
             {
                 vertAttractorTorque.Y = 0;
@@ -306,9 +301,6 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
     public static class VehicleMotorExtension
     {
-        public static VehicleMotor GetMotor(this VehicleParams param)
-        {
-            return new VehicleMotor(param);
-        }
+        public static VehicleMotor GetMotor(this VehicleParams param) => new VehicleMotor(param);
     }
 }

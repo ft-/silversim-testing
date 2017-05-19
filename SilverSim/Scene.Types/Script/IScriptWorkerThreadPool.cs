@@ -29,25 +29,21 @@ namespace SilverSim.Scene.Types.Script
     {
         public ScriptAbortException()
         {
-
         }
 
         public ScriptAbortException(string message)
             : base(message)
         {
-
         }
 
         protected ScriptAbortException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public ScriptAbortException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 

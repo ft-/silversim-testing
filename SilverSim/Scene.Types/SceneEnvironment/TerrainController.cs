@@ -263,8 +263,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         public Vector3 SurfaceNormal(double posX, double posY)
         {
             // Clamp to valid position
-            uint iposX = (uint)posX.Clamp(0, m_Scene.SizeX);
-            uint iposY = (uint)posY.Clamp(0, m_Scene.SizeY);
+            var iposX = (uint)posX.Clamp(0, m_Scene.SizeX);
+            var iposY = (uint)posY.Clamp(0, m_Scene.SizeY);
 
             uint iposX_plus_1 = iposX + 1;
             uint iposY_plus_1 = iposY + 1;
@@ -403,7 +403,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             m_TerrainRwLock.AcquireWriterLock(-1);
             try
             {
-                LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                var lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                 float val =
                     (float)(lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] * (1 - mix)) +
                     (float)(newval * mix);
@@ -435,8 +435,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             get
             {
-                int x = (int)pos.X.Clamp(0, m_Scene.SizeX - 1);
-                int y = (int)pos.Y.Clamp(0, m_Scene.SizeY - 1);
+                var x = (int)pos.X.Clamp(0, m_Scene.SizeX - 1);
+                var y = (int)pos.Y.Clamp(0, m_Scene.SizeY - 1);
                 return this[(uint)x, (uint)y];
             }
             set
@@ -446,8 +446,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     throw new KeyNotFoundException();
                 }
 
-                uint x = (uint)pos.X;
-                uint y = (uint)pos.Y;
+                var x = (uint)pos.X;
+                var y = (uint)pos.Y;
                 if (value < LowerLimit)
                 {
                     this[x, y] = LowerLimit;

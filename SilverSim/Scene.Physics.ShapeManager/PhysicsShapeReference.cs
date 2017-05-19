@@ -36,9 +36,6 @@ namespace SilverSim.Scene.Physics.ShapeManager
             Interlocked.Increment(ref m_ConvexShape.UseCount);
         }
 
-        public static implicit operator PhysicsConvexShape (PhysicsShapeReference s)
-        {
-            return s.m_ConvexShape;
-        }
+        public static implicit operator PhysicsConvexShape(PhysicsShapeReference s) => s.m_ConvexShape;
     }
 }

@@ -31,11 +31,6 @@ namespace SilverSim.ServiceInterfaces.Teleport
 {
     public abstract class TeleportHandlerServiceInterface : IAgentTeleportServiceInterface
     {
-        protected TeleportHandlerServiceInterface()
-        {
-
-        }
-
         public abstract void Cancel();
         /* <summary>this is the local call for active teleport</summary> */
         [Description("Local call from remote call handlers")]
@@ -50,17 +45,13 @@ namespace SilverSim.ServiceInterfaces.Teleport
 
         public abstract bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags);
 
-        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
-        {
-            return TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, location, position, lookAt, flags);
-        }
+        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags) =>
+            TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, location, position, lookAt, flags);
 
         public abstract bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags);
 
-        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
-        {
-            return TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, regionID, position, lookAt, flags);
-        }
+        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags) =>
+            TeleportTo(sceneInterface, agent, sceneInterface.GatekeeperURI, regionID, position, lookAt, flags);
 
         public abstract bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags);
 

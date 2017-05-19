@@ -31,25 +31,21 @@ namespace SilverSim.Scene.Types.Script
         /* do not throw this exception after calling any XmlTextReader function */
         public ScriptStateLoaderNotImplementedException()
         {
-
         }
 
         public ScriptStateLoaderNotImplementedException(string message)
             : base(message)
         {
-
         }
 
         protected ScriptStateLoaderNotImplementedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public ScriptStateLoaderNotImplementedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 

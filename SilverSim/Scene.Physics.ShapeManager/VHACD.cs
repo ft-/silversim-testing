@@ -83,7 +83,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         [DllImport("kernel32.dll")]
         static extern IntPtr LoadLibrary(string dllToLoad);
 
-        static object m_InitLock = new object();
+        static readonly object m_InitLock = new object();
         static bool m_Inited;
 
         IntPtr m_VHacd;
@@ -134,8 +134,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
             {
                 throw new ObjectDisposedException("VHACD");
             }
-            double[] points = new double[m.Vertices.Count * 3];
-            int[] tris = new int[m.Triangles.Count * 3];
+            var points = new double[m.Vertices.Count * 3];
+            var tris = new int[m.Triangles.Count * 3];
             int idx = 0;
             foreach(Vector3 v in m.Vertices)
             {
@@ -152,7 +152,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 tris[idx++] = t.Vertex3;
             }
 
-            Parameters p = new Parameters();
+            var p = new Parameters();
             if(!VHacd_Compute(m_VHacd, points, 3, (uint)m.Vertices.Count, tris, 3, (uint)m.Triangles.Count, ref p))
             {
                 throw new InvalidDataException();
@@ -162,14 +162,14 @@ namespace SilverSim.Scene.Physics.ShapeManager
             int numhulls = VHacd_GetNConvexHulls(m_VHacd);
             for (uint hullidx = 0; hullidx < numhulls; ++hullidx)
             {
-                ConvexHull hull = new ConvexHull();
+                var hull = new ConvexHull();
                 VHacd_GetConvexHull(m_VHacd, hullidx, ref hull);
-                double[] resPoints = new double[hull.NumPoints * 3];
+                var resPoints = new double[hull.NumPoints * 3];
                 Marshal.Copy(hull.Points, resPoints, 0, hull.NumPoints * 3);
-                int[] resTris = new int[hull.NumTriangles * 3];
+                var resTris = new int[hull.NumTriangles * 3];
                 Marshal.Copy(hull.Triangles, resTris, 0, hull.NumTriangles * 3);
 
-                PhysicsConvexShape.ConvexHull cHull = new PhysicsConvexShape.ConvexHull();
+                var cHull = new PhysicsConvexShape.ConvexHull();
                 for (int vertidx = 0; vertidx < hull.NumPoints * 3; vertidx += 3)
                 {
                     cHull.Vertices.Add(new Vector3(

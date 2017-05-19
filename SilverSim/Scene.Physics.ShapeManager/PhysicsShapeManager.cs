@@ -101,7 +101,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
         static PhysicsConvexShape GenerateDefaultAvatarShape()
         {
-            MeshLOD meshLod = new MeshLOD();
+            var meshLod = new MeshLOD();
 
             meshLod.Vertices.Add(new Vector3(-0.5, -0.5, 0));
             meshLod.Vertices.Add(new Vector3(0.5, -0.5, 0));
@@ -168,8 +168,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             meshLod.Triangles.Add(new Triangle(3, 8, 11));
             #endregion
 
-            PhysicsConvexShape shape = DecomposeConvex(meshLod);
-            return shape;
+            return DecomposeConvex(meshLod);
         }
 
         public PhysicsShapeReference DefaultAvatarConvexShape { get; private set;}
@@ -183,7 +182,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
         static PhysicsConvexShape DecomposeConvex(MeshLOD lod)
         {
-            using (VHACD vhacd = new VHACD())
+            using (var vhacd = new VHACD())
             {
                 return vhacd.Compute(lod);
             }
@@ -253,7 +252,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             PhysicsConvexShape convexShape = null;
             if (shape.Type == PrimitiveShapeType.Sculpt && shape.SculptType == PrimitiveSculptType.Mesh)
             {
-                LLMesh m = new LLMesh(m_AssetService[shape.SculptMap]);
+                var m = new LLMesh(m_AssetService[shape.SculptMap]);
                 if(m.HasConvexPhysics())
                 {
                     convexShape = m.GetConvexPhysics();
@@ -398,28 +397,15 @@ namespace SilverSim.Scene.Physics.ShapeManager
             m_ConvexShapesByPrimShape.Clear();
         }
 
-        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder
-        {
-            get
-            {
-                return HacdCleanCacheOrder.PhysicsShapeManager;
-            }
-        }
+        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder => HacdCleanCacheOrder.PhysicsShapeManager;
     }
 
     [PluginName("PhysicsShapeManager")]
     public class PhysicsShapeManagerFactory : IPluginFactory
     {
-        public PhysicsShapeManagerFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new PhysicsShapeManager(
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => new PhysicsShapeManager(
                 ownSection.GetString("AssetService"),
                 ownSection.GetString("SimulationDataStorage"));
-        }
     }
 }

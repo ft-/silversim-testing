@@ -37,7 +37,7 @@ namespace SilverSim.Scene.Physics.Common
         protected VehicleMotor m_Vehicle;
         protected readonly PhysicsStateData m_StateData;
         readonly object m_Lock = new object();
-        protected UUID SceneID { get; private set; }
+        protected UUID SceneID { get; }
         SceneInterface.LocationInfoProvider m_LocInfoProvider;
 
         protected override SceneInterface.LocationInfoProvider LocationInfoProvider

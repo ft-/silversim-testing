@@ -39,10 +39,6 @@ namespace SilverSim.Scene.Registration
         readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
         SceneList m_Scenes;
 
-        public SceneRegistrar(IConfig ownSection)
-        {
-        }
-
         public void Startup(ConfigurationLoader loader)
         {
             m_Scenes = loader.Scenes;
@@ -88,15 +84,8 @@ namespace SilverSim.Scene.Registration
     [PluginName("SceneRegistrar")]
     public class SceneRegistrarFactory : IPluginFactory
     {
-        public SceneRegistrarFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new SceneRegistrar(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new SceneRegistrar();
     }
     #endregion
 }

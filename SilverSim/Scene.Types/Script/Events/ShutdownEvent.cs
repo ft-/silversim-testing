@@ -25,9 +25,5 @@ namespace SilverSim.Scene.Types.Script.Events
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public class ShutdownEvent : IScriptEvent
     {
-        public ShutdownEvent()
-        {
-
-        }
     }
 }
