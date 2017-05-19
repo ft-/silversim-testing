@@ -33,15 +33,15 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * from groupinvites WHERE PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * from groupinvites WHERE PrincipalID LIKE ?principalid", conn))
                     {
                         cmd.Parameters.AddParameter("?principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            List<GroupInvite> invites = new List<GroupInvite>();
+                            var invites = new List<GroupInvite>();
                             while(reader.Read())
                             {
                                 GroupInvite invite = reader.ToGroupInvite();
@@ -69,29 +69,23 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        bool IGroupInvitesInterface.DoesSupportListGetters
-        {
-            get
-            {
-                return true;
-            }
-        }
+        bool IGroupInvitesInterface.DoesSupportListGetters => true;
 
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * from groupinvites WHERE PrincipalID LIKE ?principalid AND GroupID LIKE ?groupid AND RoleID LIKE ?roleid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * from groupinvites WHERE PrincipalID LIKE ?principalid AND GroupID LIKE ?groupid AND RoleID LIKE ?roleid", conn))
                     {
                         cmd.Parameters.AddParameter("?principalid", principal.ID);
                         cmd.Parameters.AddParameter("?roleid", roleID);
                         cmd.Parameters.AddParameter("?groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            List<GroupInvite> invites = new List<GroupInvite>();
+                            var invites = new List<GroupInvite>();
                             while (reader.Read())
                             {
                                 GroupInvite invite = reader.ToGroupInvite();
@@ -108,13 +102,15 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupInvitesInterface.Add(UUI requestingAgent, GroupInvite invite)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("InviteID", invite.ID);
-            vals.Add("GroupID", invite.Group.ID);
-            vals.Add("RoleID", invite.RoleID);
-            vals.Add("PrincipalID", invite.Principal.ID);
-            vals.Add("Timestamp", invite.Timestamp);
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var vals = new Dictionary<string, object>
+            {
+                { "InviteID", invite.ID },
+                { "GroupID", invite.Group.ID },
+                { "RoleID", invite.RoleID },
+                { "PrincipalID", invite.Principal.ID },
+                { "Timestamp", invite.Timestamp }
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.InsertInto("groupinvites", vals);
@@ -123,10 +119,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         bool IGroupInvitesInterface.ContainsKey(UUI requestingAgent, UUID groupInviteID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT InviteID from groupinvites WHERE InviteID LIKE ?inviteid", conn))
+                using (var cmd = new MySqlCommand("SELECT InviteID from groupinvites WHERE InviteID LIKE ?inviteid", conn))
                 {
                     cmd.Parameters.AddParameter("?inviteid", groupInviteID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -139,10 +135,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupInvitesInterface.Delete(UUI requestingAgent, UUID inviteID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM groupinvites WHERE InviteID LIKE ?inviteid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM groupinvites WHERE InviteID LIKE ?inviteid", conn))
                 {
                     cmd.Parameters.AddParameter("?inviteid", inviteID);
                     cmd.ExecuteNonQuery();
@@ -152,15 +148,15 @@ namespace SilverSim.Database.MySQL.Groups
 
         List<GroupInvite> IGroupInvitesInterface.GetByGroup(UUI requestingAgent, UGI group)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * from groupinvites WHERE GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT * from groupinvites WHERE GroupID LIKE ?groupid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        List<GroupInvite> invites = new List<GroupInvite>();
+                        var invites = new List<GroupInvite>();
                         while (reader.Read())
                         {
                             GroupInvite invite = reader.ToGroupInvite();
@@ -176,10 +172,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         bool IGroupInvitesInterface.TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * from groupinvites WHERE InviteID LIKE ?inviteid", conn))
+                using (var cmd = new MySqlCommand("SELECT * from groupinvites WHERE InviteID LIKE ?inviteid", conn))
                 {
                     cmd.Parameters.AddParameter("?inviteid", groupInviteID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

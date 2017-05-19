@@ -86,33 +86,18 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_Scene = scene;
             }
 
-            public IObject this[UUID id] 
-            {
-                get
-                {
-                    return m_Scene.m_Objects[id];
-                }
-            }
+            public IObject this[UUID id] => m_Scene.m_Objects[id];
 
-            public bool TryGetValue(UUID id, out IObject obj)
-            {
-                return m_Scene.m_Objects.TryGetValue(id, out obj);
-            }
+            public bool TryGetValue(UUID id, out IObject obj) => m_Scene.m_Objects.TryGetValue(id, out obj);
 
-            public int Count
-            {
-                get
-                {
-                    return m_Scene.m_ObjectCount;
-                }
-            }
+            public int Count => m_Scene.m_ObjectCount;
 
             public void ForEach(Vector3 pos, double maxdistance, Action<IObject> d)
             {
                 double maxDistanceSquared = maxdistance * maxdistance;
-                m_Scene.m_Objects.ForEach(delegate(IObject obj)
+                m_Scene.m_Objects.ForEach((IObject obj) =>
                 {
-                    if((obj.GlobalPosition - pos).LengthSquared <= maxDistanceSquared && obj.IsInScene(m_Scene))
+                    if ((obj.GlobalPosition - pos).LengthSquared <= maxDistanceSquared && obj.IsInScene(m_Scene))
                     {
                         d(obj);
                     }
@@ -120,16 +105,10 @@ namespace SilverSim.Scene.Implementation.Basic
             }
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            public IEnumerator<IObject> GetEnumerator()
-            {
-                return m_Scene.m_Objects.Values.GetEnumerator();
-            }
+            public IEnumerator<IObject> GetEnumerator() => m_Scene.m_Objects.Values.GetEnumerator();
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         public sealed class BasicSceneObjectPartsCollection : ISceneObjectParts
@@ -141,51 +120,21 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_Scene = scene;
             }
 
-            public ObjectPart this[UUID id] 
-            {
-                get
-                {
-                    return m_Scene.m_Primitives[id];
-                }
-            }
+            public ObjectPart this[UUID id] => m_Scene.m_Primitives[id];
 
-            public ObjectPart this[UInt32 localID]
-            {
-                get
-                {
-                    return m_Scene.m_Primitives[localID];
-                }
-            }
+            public ObjectPart this[UInt32 localID] => m_Scene.m_Primitives[localID];
 
-            public bool TryGetValue(UUID id, out ObjectPart obj)
-            {
-                return m_Scene.m_Primitives.TryGetValue(id, out obj);
-            }
+            public bool TryGetValue(UUID id, out ObjectPart obj) => m_Scene.m_Primitives.TryGetValue(id, out obj);
 
-            public bool TryGetValue(UInt32 localID, out ObjectPart obj)
-            {
-                return m_Scene.m_Primitives.TryGetValue(localID, out obj);
-            }
+            public bool TryGetValue(UInt32 localID, out ObjectPart obj) => m_Scene.m_Primitives.TryGetValue(localID, out obj);
 
-            public int Count
-            {
-                get
-                {
-                    return m_Scene.m_PrimitiveCount;
-                }
-            }
+            public int Count => m_Scene.m_PrimitiveCount;
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            public IEnumerator<ObjectPart> GetEnumerator()
-            {
-                return m_Scene.m_Primitives.Values.GetEnumerator();
-            }
+            public IEnumerator<ObjectPart> GetEnumerator() => m_Scene.m_Primitives.Values.GetEnumerator();
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         public sealed class BasicSceneParcelsCollection : ISceneParcels
@@ -198,36 +147,18 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_Scene = scene;
             }
 
-            public IParcelAccessList WhiteList
-            {
-                get
-                {
-                    return m_Scene.m_SimulationDataStorage.Parcels.WhiteList;
-                }
-            }
+            public IParcelAccessList WhiteList => m_Scene.m_SimulationDataStorage.Parcels.WhiteList;
 
-            public IParcelAccessList BlackList
-            {
-                get
-                {
-                    return m_Scene.m_SimulationDataStorage.Parcels.BlackList;
-                }
-            }
+            public IParcelAccessList BlackList => m_Scene.m_SimulationDataStorage.Parcels.BlackList;
 
-            public ParcelInfo this[UUID id]
-            {
-                get
-                {
-                    return m_Scene.m_Parcels[id];
-                }
-            }
+            public ParcelInfo this[UUID id] => m_Scene.m_Parcels[id];
 
             public ParcelInfo this[Vector3 pos]
             {
                 get
                 {
-                    int x = (int)pos.X;
-                    int y = (int)pos.Y;
+                    var x = (int)pos.X;
+                    var y = (int)pos.Y;
                     if(pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                     {
                         throw new KeyNotFoundException();
@@ -243,24 +174,15 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
-            public ParcelInfo this[int localID]
-            {
-                get
-                {
-                    return m_Scene.Parcels[localID];
-                }
-            }
+            public ParcelInfo this[int localID] => m_Scene.Parcels[localID];
 
-            public bool TryGetValue(UUID id, out ParcelInfo pinfo)
-            {
-                return m_Scene.m_Parcels.TryGetValue(id, out pinfo);
-            }
+            public bool TryGetValue(UUID id, out ParcelInfo pinfo) => m_Scene.m_Parcels.TryGetValue(id, out pinfo);
 
             public bool TryGetValue(Vector3 pos, out ParcelInfo pinfo)
             {
                 pinfo = null;
-                int x = (int)pos.X;
-                int y = (int)pos.Y;
+                var x = (int)pos.X;
+                var y = (int)pos.Y;
                 if (pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                 {
                     return false;
@@ -276,22 +198,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 return false;
             }
 
-            public bool TryGetValue(int localID, out ParcelInfo pinfo)
-            {
-                return m_Scene.m_Parcels.TryGetValue(localID, out pinfo);
-            }
+            public bool TryGetValue(int localID, out ParcelInfo pinfo) => m_Scene.m_Parcels.TryGetValue(localID, out pinfo);
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            public IEnumerator<ParcelInfo> GetEnumerator()
-            {
-                return m_Scene.m_Parcels.Values.GetEnumerator();
-            }
+            public IEnumerator<ParcelInfo> GetEnumerator() => m_Scene.m_Parcels.Values.GetEnumerator();
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public void Add(ParcelInfo parcelInfo)
             {
@@ -326,7 +239,6 @@ namespace SilverSim.Scene.Implementation.Basic
 
             public void ResetParcels()
             {
-
             }
         }
 
@@ -339,38 +251,17 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_BasicScene = scene;
             }
 
-            public int Count
-            {
-                get
-                {
-                    return m_BasicScene.m_AgentCount;
-                }
-            }
+            public int Count => m_BasicScene.m_AgentCount;
 
-            public IAgent this[UUID id]
-            {
-                get 
-                {
-                    return m_BasicScene.m_Agents[id];
-                }
-            }
+            public IAgent this[UUID id] => m_BasicScene.m_Agents[id];
 
-            public bool TryGetValue(UUID id, out IAgent obj)
-            {
-                return m_BasicScene.m_Agents.TryGetValue(id, out obj);
-            }
+            public bool TryGetValue(UUID id, out IAgent obj) => m_BasicScene.m_Agents.TryGetValue(id, out obj);
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            public IEnumerator<IAgent> GetEnumerator()
-            {
-                return m_BasicScene.m_Agents.Values.GetEnumerator();
-            }
+            public IEnumerator<IAgent> GetEnumerator() => m_BasicScene.m_Agents.Values.GetEnumerator();
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         public sealed class BasicSceneRootAgentsCollection : ISceneAgents
@@ -441,10 +332,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
 
             [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
         #endregion
 
@@ -487,21 +375,9 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #endregion
 
-        public override string ServerURI
-        {
-            get
-            {
-                return m_HttpServer.ServerURI;
-            }
-        }
+        public override string ServerURI => m_HttpServer.ServerURI;
 
-        public override uint ServerHttpPort
-        {
-            get
-            {
-                return m_HttpServer.Port;
-            }
-        }
+        public override uint ServerHttpPort => m_HttpServer.Port;
 
         #region Constructor
         internal BasicScene(
@@ -778,61 +654,19 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        public override ISceneObjects Objects
-        {
-            get
-            {
-                return m_SceneObjects;
-            }
-        }
-        
-        public override ISceneAgents Agents
-        {
-            get
-            {
-                return m_SceneAgents;
-            }
-        }
+        public override ISceneObjects Objects => m_SceneObjects;
 
-        public override ISceneAgents RootAgents
-        {
-            get 
-            {
-                return m_SceneRootAgents;
-            }
-        }
+        public override ISceneAgents Agents => m_SceneAgents;
 
-        public override ISceneObjectGroups ObjectGroups 
-        { 
-            get
-            {
-                return m_SceneObjectGroups;
-            }
-        }
+        public override ISceneAgents RootAgents => m_SceneRootAgents;
 
-        public override ISceneObjectParts Primitives 
-        { 
-            get
-            {
-                return m_SceneObjectParts;
-            }
-        }
+        public override ISceneObjectGroups ObjectGroups => m_SceneObjectGroups;
 
-        public override ISceneParcels Parcels
-        {
-            get
-            {
-                return m_SceneParcels;
-            }    
-        }
+        public override ISceneObjectParts Primitives => m_SceneObjectParts;
 
-        public override IUDPCircuitsManager UDPServer
-        {
-            get
-            {
-                return m_UDPServer;
-            }
-        }
+        public override ISceneParcels Parcels => m_SceneParcels;
+
+        public override IUDPCircuitsManager UDPServer => m_UDPServer;
 
         #endregion
 
@@ -942,7 +776,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     return;
                 }
 
-                SceneInterface scene = (SceneInterface)m_WeakScene.Target;
+                var scene = (SceneInterface)m_WeakScene.Target;
                 if (!m_WeakScene.IsAlive)
                 {
 #if DEBUG
@@ -973,7 +807,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     {
                         m_Log.InfoFormat("Restarting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
                         m_Scenes.Remove(scene,
-                            delegate(System.Globalization.CultureInfo culture)
+                            (System.Globalization.CultureInfo culture) =>
                             {
                                 return this.GetLanguageString(culture, "RegionIsNowRestarting", "Region is now restarting.");
                             });
@@ -1054,10 +888,10 @@ namespace SilverSim.Scene.Implementation.Basic
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Add(IObject obj)
         {
-            ObjectGroup objgroup = obj as ObjectGroup;
+            var objgroup = obj as ObjectGroup;
             if (null != objgroup)
             {
-                List<ObjectPart> removeAgain = new List<ObjectPart>();
+                var removeAgain = new List<ObjectPart>();
 
                 AddLegacyMaterials(objgroup);
                 
@@ -1099,7 +933,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     m_Objects.Add(obj.ID, obj);
                     if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
                     {
-                        IAgent agent = (IAgent)obj;
+                        var agent = (IAgent)obj;
                         m_Agents.Add(obj.ID, agent);
                         Interlocked.Increment(ref m_AgentCount);
                         PhysicsScene.Add(obj);
@@ -1171,30 +1005,31 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void ResetParcels()
         {
-            List<UUID> parcelIDs = m_SimulationDataStorage.Parcels.ParcelsInRegion(ID);
-            foreach(UUID parcelID in parcelIDs)
+            foreach(UUID parcelID in m_SimulationDataStorage.Parcels.ParcelsInRegion(ID))
             {
                 m_SimulationDataStorage.Parcels.Remove(ID, parcelID);
             }
 
-            ParcelInfo pi = new ParcelInfo((int)SizeX / 4, (int)SizeY / 4);
-            pi.AABBMin = new Vector3(0, 0, 0);
-            pi.AABBMax = new Vector3(SizeX - 1, SizeY - 1, 0);
-            pi.ActualArea = (int)(SizeX * SizeY);
-            pi.Area = (int)(SizeX * SizeY);
-            pi.AuctionID = 0;
-            pi.LocalID = 1;
-            pi.ID = UUID.Random;
-            pi.Name = "Your Parcel";
-            pi.Owner = Owner;
-            pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
-            pi.BillableArea = (int)(SizeX * SizeY);
+            var pi = new ParcelInfo((int)SizeX / 4, (int)SizeY / 4)
+            {
+                AABBMin = new Vector3(0, 0, 0),
+                AABBMax = new Vector3(SizeX - 1, SizeY - 1, 0),
+                ActualArea = (int)(SizeX * SizeY),
+                Area = (int)(SizeX * SizeY),
+                AuctionID = 0,
+                LocalID = 1,
+                ID = UUID.Random,
+                Name = "Your Parcel",
+                Owner = Owner,
+                Flags = ParcelFlags.None, /* we keep all flags disabled initially */
+                BillableArea = (int)(SizeX * SizeY),
+                LandingPosition = new Vector3(128, 128, 23),
+                LandingLookAt = new Vector3(1, 0, 0),
+                ClaimDate = new Date(),
+                Status = ParcelStatus.Leased
+            };
             pi.LandBitmap.SetAllBits();
-            pi.LandingPosition = new Vector3(128, 128, 23);
-            pi.LandingLookAt = new Vector3(1, 0, 0);
-            pi.ClaimDate = new Date();
-            pi.Status = ParcelStatus.Leased;
-            lock(m_ParcelUpdateLock)
+            lock (m_ParcelUpdateLock)
             {
                 m_SimulationDataStorage.Parcels.Store(ID, pi);
                 ClearParcels();
@@ -1214,8 +1049,8 @@ namespace SilverSim.Scene.Implementation.Basic
 
             foreach (IAgent agent in RootAgents)
             {
-                int x = (int)agent.Position.X;
-                int y = (int)agent.Position.Y;
+                var x = (int)agent.Position.X;
+                var y = (int)agent.Position.Y;
                 if (agent.Position.X < 0 || agent.Position.Y < 0 || x < 0 || y < 0 || x >= SizeX || y >= SizeY)
                 {
                     continue;
@@ -1247,7 +1082,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void ClearObjects()
         {
-            List<ObjectGroup> objects = new List<ObjectGroup>();
+            var objects = new List<ObjectGroup>();
             foreach(ObjectGroup obj in ObjectGroups)
             {
                 if(!obj.IsAttached)
@@ -1270,7 +1105,7 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 return false;
             }
-            ObjectGroup objgroup = obj as ObjectGroup;
+            var objgroup = obj as ObjectGroup;
             if (null != objgroup)
             {
                 foreach (ObjectPart objpart in objgroup.Values)
@@ -1285,7 +1120,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
             else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
-                IAgent agent = (IAgent)obj;
+                var agent = (IAgent)obj;
                 foreach (IAgentListener aglistener in AgentListeners)
                 {
                     try
@@ -1297,8 +1132,7 @@ namespace SilverSim.Scene.Implementation.Basic
                         m_Log.DebugFormat("Exception {0}\n{1}", e.Message, e.StackTrace);
                     }
                 }
-                List<ObjectGroup> grps = agent.Attachments.RemoveAll();
-                foreach(ObjectGroup grp in grps)
+                foreach(ObjectGroup grp in agent.Attachments.RemoveAll())
                 {
                     Remove(grp);
                 }
@@ -1353,7 +1187,7 @@ namespace SilverSim.Scene.Implementation.Basic
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleRequestRegionInfo(Message m)
         {
-            SilverSim.Viewer.Messages.Region.RequestRegionInfo req = (SilverSim.Viewer.Messages.Region.RequestRegionInfo)m;
+            var req = (Viewer.Messages.Region.RequestRegionInfo)m;
             if(req.SessionID != req.CircuitSessionID || req.AgentID != req.CircuitAgentID)
             {
                 return;
@@ -1362,7 +1196,7 @@ namespace SilverSim.Scene.Implementation.Basic
             IAgent agent;
             if(m_Agents.TryGetValue(req.AgentID, out agent))
             {
-                ViewerAgent viewerAgent = agent as ViewerAgent;
+                var viewerAgent = agent as ViewerAgent;
                 if (null != viewerAgent)
                 {
                     SendRegionInfo(viewerAgent);
@@ -1400,7 +1234,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
             foreach (IAgent agent in Agents)
             {
-                ViewerAgent viewerAgent = agent as ViewerAgent;
+                var viewerAgent = agent as ViewerAgent;
                 if (null != viewerAgent)
                 {
                     SendRegionInfo(viewerAgent);
@@ -1419,7 +1253,7 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             foreach (IAgent agent in Agents)
             {
-                ViewerAgent viewerAgent = agent as ViewerAgent;
+                var viewerAgent = agent as ViewerAgent;
                 if (null != viewerAgent)
                 {
                     SendRegionInfo(viewerAgent);
@@ -1452,27 +1286,40 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void SendRegionInfo(IAgent agent)
         {
-            Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
-            res.AgentID = agent.Owner.ID;
-            res.SessionID = agent.Session.SessionID;
-
             EstateInfo estateInfo;
-            lock(m_EstateDataUpdateLock)
+            lock (m_EstateDataUpdateLock)
             {
                 estateInfo = m_EstateData;
             }
+            estateInfo.Flags &= ~RegionOptionFlags.SunFixed;
 
             RegionOptionFlags regionFlags = RegionSettings.AsFlags;
 
-            res.EstateID = estateInfo.ID;
-            res.ParentEstateID = estateInfo.ParentEstateID;
-            res.BillableFactor = estateInfo.BillableFactor;
-            res.PricePerMeter = estateInfo.PricePerMeter;
+            var res = new Viewer.Messages.Region.RegionInfo()
+            {
+                AgentID = agent.Owner.ID,
+                SessionID = agent.Session.SessionID,
 
-            estateInfo.Flags &= ~RegionOptionFlags.SunFixed;
-            res.SimName = Name;
-            res.RegionFlags = regionFlags;
-            if(RegionSettings.IsSunFixed)
+                EstateID = estateInfo.ID,
+                ParentEstateID = estateInfo.ParentEstateID,
+                BillableFactor = estateInfo.BillableFactor,
+                PricePerMeter = estateInfo.PricePerMeter,
+
+                SimName = Name,
+                RegionFlags = regionFlags,
+                SimAccess = Access,
+                MaxAgents = (uint)RegionSettings.AgentLimit,
+                ObjectBonusFactor = RegionSettings.ObjectBonus,
+                WaterHeight = RegionSettings.WaterHeight,
+                TerrainRaiseLimit = RegionSettings.TerrainRaiseLimit,
+                TerrainLowerLimit = RegionSettings.TerrainLowerLimit,
+                RedirectGridX = 0,
+                RedirectGridY = 0,
+                UseEstateSun = RegionSettings.UseEstateSun,
+                ProductSKU = VersionInfo.SimulatorVersion,
+                ProductName = ProductName
+            };
+            if (RegionSettings.IsSunFixed)
             {
                 res.RegionFlags |= RegionOptionFlags.SunFixed;
                 res.SunHour = RegionSettings.SunPosition + 6;
@@ -1481,17 +1328,6 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 res.SunHour = 0;
             }
-            res.SimAccess = Access;
-            res.MaxAgents = (uint)RegionSettings.AgentLimit;
-            res.ObjectBonusFactor = RegionSettings.ObjectBonus;
-            res.WaterHeight = RegionSettings.WaterHeight;
-            res.TerrainRaiseLimit = RegionSettings.TerrainRaiseLimit;
-            res.TerrainLowerLimit = RegionSettings.TerrainLowerLimit;
-            res.RedirectGridX = 0;
-            res.RedirectGridY = 0;
-            res.UseEstateSun = RegionSettings.UseEstateSun;
-            res.ProductSKU = VersionInfo.SimulatorVersion;
-            res.ProductName = ProductName;
             res.RegionFlagsExtended.Add((ulong)regionFlags);
 
             agent.SendMessageAlways(res, ID);

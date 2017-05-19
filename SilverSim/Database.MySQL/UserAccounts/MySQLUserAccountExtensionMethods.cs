@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
     {
         public static UserAccount ToUserAccount(this MySqlDataReader reader)
         {
-            UserAccount info = new UserAccount();
+            var info = new UserAccount();
 
             info.Principal.ID = reader.GetUUID("ID");
             info.Principal.FirstName = reader.GetString("FirstName");

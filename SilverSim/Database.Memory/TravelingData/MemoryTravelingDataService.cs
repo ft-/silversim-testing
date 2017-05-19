@@ -37,10 +37,8 @@ namespace SilverSim.Database.Memory.TravelingData
     {
         readonly RwLockedDictionary<UUID, TravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, TravelingDataInfo>();
 
-        public override TravelingDataInfo GetTravelingData(UUID sessionID)
-        {
-            return m_HGTravelingDatas[sessionID];
-        }
+        public override TravelingDataInfo GetTravelingData(UUID sessionID) =>
+            m_HGTravelingDatas[sessionID];
 
         public override TravelingDataInfo GetTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
         {
@@ -79,10 +77,8 @@ namespace SilverSim.Database.Memory.TravelingData
             return hgds;
         }
 
-        public override bool Remove(UUID sessionID)
-        {
-            return m_HGTravelingDatas.Remove(sessionID);
-        }
+        public override bool Remove(UUID sessionID) =>
+            m_HGTravelingDatas.Remove(sessionID);
 
         public void Remove(UUID scopeID, UUID accountID)
         {
@@ -127,10 +123,8 @@ namespace SilverSim.Database.Memory.TravelingData
     [PluginName("TravelingData")]
     public class MemoryTravelingDataServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryTravelingDataService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryTravelingDataService();
     }
     #endregion
 }

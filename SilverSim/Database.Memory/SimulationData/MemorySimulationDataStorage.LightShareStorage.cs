@@ -53,9 +53,7 @@ namespace SilverSim.Database.Memory.SimulationData
             m_LightShareData[regionID] = new KeyValuePair<EnvController.WindlightSkyData, EnvController.WindlightWaterData>(skyData, waterData);
         }
 
-        bool ISimulationDataLightShareStorageInterface.Remove(UUID regionID)
-        {
-            return m_LightShareData.Remove(regionID);
-        }
+        bool ISimulationDataLightShareStorageInterface.Remove(UUID regionID) =>
+            m_LightShareData.Remove(regionID);
     }
 }

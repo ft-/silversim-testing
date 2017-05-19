@@ -89,13 +89,13 @@ namespace SilverSim.Main.Cmd.UserServer
             }
             else
             {
-                Dictionary<string, string> serviceurls = new Dictionary<string, string>();
+                var serviceurls = new Dictionary<string, string>();
                 foreach(IServiceURLsGetInterface getter in m_ServiceURLsGetters)
                 {
                     getter.GetServiceURLs(serviceurls);
                 }
 
-                StringBuilder sb = new StringBuilder("Service URLs:\n----------------------------------------\n");
+                var sb = new StringBuilder("Service URLs:\n----------------------------------------\n");
                 foreach(KeyValuePair<string, string> kvp in serviceurls)
                 {
                     sb.AppendFormat("{0}={1}\n", kvp.Key, kvp.Value);
@@ -118,7 +118,7 @@ namespace SilverSim.Main.Cmd.UserServer
             }
             else if(m_UserAccountService.TryGetValue(UUID.Zero, args[2], args[3], out account))
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.AppendFormat("ID: {0}\n", account.Principal.ID);
                 sb.AppendFormat("First Name: {0}\n", account.Principal.FirstName);
                 sb.AppendFormat("Last Name: {0}\n", account.Principal.LastName);
@@ -208,17 +208,20 @@ namespace SilverSim.Main.Cmd.UserServer
             }
             else
             {
-                UserAccount account = new UserAccount();
-                account.IsLocalToGrid = true;
+                var account = new UserAccount()
+                {
+                    IsLocalToGrid = true
+                };
                 account.Principal.ID = UUID.Random;
                 account.Principal.FirstName = args[2];
                 account.Principal.LastName = args[3];
                 account.UserLevel = 0;
 
-                UserAuthInfo authInfo = new UserAuthInfo();
-                authInfo.ID = account.Principal.ID;
-                authInfo.Password = io.GetPass("Password");
-
+                var authInfo = new UserAuthInfo()
+                {
+                    ID = account.Principal.ID,
+                    Password = io.GetPass("Password")
+                };
                 try
                 {
                     m_UserAccountService.Add(account);
@@ -303,14 +306,6 @@ namespace SilverSim.Main.Cmd.UserServer
     [PluginName("UserServerCommands")]
     public class UserServerCommandsFactory : IPluginFactory
     {
-        public UserServerCommandsFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new UserServerCommands(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => new UserServerCommands(ownSection);
     }
 }

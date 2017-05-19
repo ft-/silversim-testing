@@ -31,10 +31,8 @@ namespace SilverSim.Database.Memory.SimulationData
     {
         readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, byte[]>> m_ScriptStateData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, byte[]>>(delegate () { return new RwLockedDictionary<string, byte[]>(); });
 
-        string GenScriptStateKey(UUID primID, UUID itemID)
-        {
-            return primID.ToString() + ":" + itemID.ToString();
-        }
+        string GenScriptStateKey(UUID primID, UUID itemID) =>
+            primID.ToString() + ":" + itemID.ToString();
 
         bool ISimulationDataScriptStateStorageInterface.TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state)
         {

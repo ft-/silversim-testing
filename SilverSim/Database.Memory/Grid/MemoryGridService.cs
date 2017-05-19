@@ -212,15 +212,9 @@ namespace SilverSim.Database.MySQL.Grid
             }
         }
 
-        public override bool TryGetValue(UUID regionID, out RegionInfo rInfo)
-        {
-            return m_Data.TryGetValue(regionID, out rInfo);
-        }
+        public override bool TryGetValue(UUID regionID, out RegionInfo rInfo) => m_Data.TryGetValue(regionID, out rInfo);
 
-        public override bool ContainsKey(UUID regionID)
-        {
-            return m_Data.ContainsKey(regionID);
-        }
+        public override bool ContainsKey(UUID regionID) => m_Data.ContainsKey(regionID);
         #endregion
 
         #region Region Registration
@@ -307,35 +301,17 @@ namespace SilverSim.Database.MySQL.Grid
             return new List<RegionInfo>(res);
         }
 
-        public override List<RegionInfo> GetHyperlinks(UUID scopeID)
-        {
-            return GetRegionsByFlag(scopeID, RegionFlags.Hyperlink);
-        }
+        public override List<RegionInfo> GetHyperlinks(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.Hyperlink);
 
-        public override List<RegionInfo> GetDefaultRegions(UUID scopeID)
-        {
-            return GetRegionsByFlag(scopeID, RegionFlags.DefaultRegion);
-        }
+        public override List<RegionInfo> GetDefaultRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.DefaultRegion);
 
-        public override List<RegionInfo> GetOnlineRegions(UUID scopeID)
-        {
-            return GetRegionsByFlag(scopeID, RegionFlags.RegionOnline);
-        }
+        public override List<RegionInfo> GetOnlineRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.RegionOnline);
 
-        public override List<RegionInfo> GetOnlineRegions()
-        {
-            return GetRegionsByFlag(UUID.Zero, RegionFlags.RegionOnline);
-        }
+        public override List<RegionInfo> GetOnlineRegions() => GetRegionsByFlag(UUID.Zero, RegionFlags.RegionOnline);
 
-        public override List<RegionInfo> GetFallbackRegions(UUID scopeID)
-        {
-            return GetRegionsByFlag(scopeID, RegionFlags.FallbackRegion);
-        }
+        public override List<RegionInfo> GetFallbackRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.FallbackRegion);
 
-        public override List<RegionInfo> GetDefaultHypergridRegions(UUID scopeID)
-        {
-            return GetRegionsByFlag(scopeID, RegionFlags.DefaultHGRegion);
-        }
+        public override List<RegionInfo> GetDefaultHypergridRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.DefaultHGRegion);
 
         public override List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max)
         {
@@ -371,20 +347,14 @@ namespace SilverSim.Database.MySQL.Grid
             return new List<RegionInfo>(res);
         }
 
-        public override List<RegionInfo> GetAllRegions(UUID scopeID)
-        {
-            return new List<RegionInfo>(from region in m_Data.Values where scopeID == UUID.Zero || region.ScopeID == scopeID select new RegionInfo(region));
-        }
+        public override List<RegionInfo> GetAllRegions(UUID scopeID) =>
+            new List<RegionInfo>(from region in m_Data.Values where scopeID == UUID.Zero || region.ScopeID == scopeID select new RegionInfo(region));
 
-        public override List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString)
-        {
-            return new List<RegionInfo>(from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && region.Name.ToLower().StartsWith(searchString.ToLower()) select new RegionInfo(region));
-        }
+        public override List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString) =>
+            new List<RegionInfo>(from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && region.Name.ToLower().StartsWith(searchString.ToLower()) select new RegionInfo(region));
 
-        public override Dictionary<string, string> GetGridExtraFeatures()
-        {
-            return new Dictionary<string, string>();
-        }
+        public override Dictionary<string, string> GetGridExtraFeatures() =>
+            new Dictionary<string, string>();
 
         #endregion
 
@@ -395,10 +365,8 @@ namespace SilverSim.Database.MySQL.Grid
     [PluginName("Grid")]
     public class MemoryGridServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryGridService(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryGridService(ownSection);
     }
     #endregion
 

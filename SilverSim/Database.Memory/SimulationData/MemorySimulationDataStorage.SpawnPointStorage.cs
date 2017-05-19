@@ -45,9 +45,7 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        bool ISimulationDataSpawnPointStorageInterface.Remove(UUID regionID)
-        {
-            return m_SpawnPointData.Remove(regionID);
-        }
+        bool ISimulationDataSpawnPointStorageInterface.Remove(UUID regionID) =>
+            m_SpawnPointData.Remove(regionID);
     }
 }

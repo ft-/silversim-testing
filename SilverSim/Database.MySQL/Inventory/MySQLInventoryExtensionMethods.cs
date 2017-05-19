@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using MySql.Data.MySqlClient;
+using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
@@ -28,30 +29,24 @@ namespace SilverSim.Database.MySQL.Inventory
 {
     public static class MySQLInventoryExtensionMethods
     {
-        public static InventoryFolder ToFolder(this MySqlDataReader reader)
+        public static InventoryFolder ToFolder(this MySqlDataReader reader) => new InventoryFolder(reader.GetUUID("ID"))
         {
-            InventoryFolder folder = new InventoryFolder(reader.GetUUID("ID"));
+            ParentFolderID = reader.GetUUID("ParentFolderID"),
+            Name = reader.GetString("Name"),
+            InventoryType = reader.GetEnum<InventoryType>("InventoryType"),
+            Owner = new UUI(reader.GetUUID("OwnerID")),
+            Version = reader.GetInt32("Version")
+        };
 
-            folder.ParentFolderID = reader.GetUUID("ParentFolderID");
-            folder.Name = reader.GetString("Name");
-            folder.InventoryType = reader.GetEnum<InventoryType>("InventoryType");
-            folder.Owner.ID = reader.GetUUID("OwnerID");
-            folder.Version = reader.GetInt32("Version");
-
-            return folder;
-        }
-
-        public static Dictionary<string, object> ToDictionary(this InventoryFolder folder)
+        public static Dictionary<string, object> ToDictionary(this InventoryFolder folder) => new Dictionary<string, object>
         {
-            Dictionary<string, object> dict = new Dictionary<string, object>();
-            dict["ID"] = folder.ID;
-            dict["ParentFolderID"] = folder.ParentFolderID;
-            dict["Name"] = folder.Name;
-            dict["InventoryType"] = folder.InventoryType;
-            dict["OwnerID"] = folder.Owner.ID;
-            dict["Version"] = folder.Version;
-            return dict;
-        }
+            ["ID"] = folder.ID,
+            ["ParentFolderID"] = folder.ParentFolderID,
+            ["Name"] = folder.Name,
+            ["InventoryType"] = folder.InventoryType,
+            ["OwnerID"] = folder.Owner.ID,
+            ["Version"] = folder.Version
+        };
 
         public static InventoryItem ToItem(this MySqlDataReader reader)
         {
@@ -84,31 +79,28 @@ namespace SilverSim.Database.MySQL.Inventory
             return item;
         }
 
-        public static Dictionary<string, object> ToDictionary(this InventoryItem item)
+        public static Dictionary<string, object> ToDictionary(this InventoryItem item) => new Dictionary<string, object>
         {
-            Dictionary<string, object> dict = new Dictionary<string, object>();
-            dict["ID"] = item.ID;
-            dict["ParentFolderID"] = item.ParentFolderID;
-            dict["Name"] = item.Name;
-            dict["Description"] = item.Description;
-            dict["InventoryType"] = item.InventoryType;
-            dict["Flags"] = item.Flags;
-            dict["OwnerID"] = item.Owner.ID;
-            dict["CreatorID"] = item.Creator.ID;
-            dict["CreationDate"] = item.CreationDate.DateTimeToUnixTime();
-            dict["BasePermissionsMask"] = (uint)item.Permissions.Base;
-            dict["CurrentPermissionsMask"] = (uint)item.Permissions.Current;
-            dict["EveryOnePermissionsMask"] = (uint)item.Permissions.EveryOne;
-            dict["NextOwnerPermissionsMask"] = (uint)item.Permissions.NextOwner;
-            dict["GroupPermissionsMask"] = (uint)item.Permissions.Group;
-            dict["SalePrice"] = item.SaleInfo.Price;
-            dict["SaleType"] = item.SaleInfo.Type;
-            dict["GroupID"] = item.Group.ID;
-            dict["IsGroupOwned"] = item.IsGroupOwned;
-            dict["AssetID"] = item.AssetID;
-            dict["AssetType"] = item.AssetType;
-
-            return dict;
-        }
+            ["ID"] = item.ID,
+            ["ParentFolderID"] = item.ParentFolderID,
+            ["Name"] = item.Name,
+            ["Description"] = item.Description,
+            ["InventoryType"] = item.InventoryType,
+            ["Flags"] = item.Flags,
+            ["OwnerID"] = item.Owner.ID,
+            ["CreatorID"] = item.Creator.ID,
+            ["CreationDate"] = item.CreationDate.DateTimeToUnixTime(),
+            ["BasePermissionsMask"] = (uint)item.Permissions.Base,
+            ["CurrentPermissionsMask"] = (uint)item.Permissions.Current,
+            ["EveryOnePermissionsMask"] = (uint)item.Permissions.EveryOne,
+            ["NextOwnerPermissionsMask"] = (uint)item.Permissions.NextOwner,
+            ["GroupPermissionsMask"] = (uint)item.Permissions.Group,
+            ["SalePrice"] = item.SaleInfo.Price,
+            ["SaleType"] = item.SaleInfo.Type,
+            ["GroupID"] = item.Group.ID,
+            ["IsGroupOwned"] = item.IsGroupOwned,
+            ["AssetID"] = item.AssetID,
+            ["AssetType"] = item.AssetType
+        };
     }
 }

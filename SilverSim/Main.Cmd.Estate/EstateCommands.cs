@@ -66,7 +66,7 @@ namespace SilverSim.Main.Cmd.Estate
             loader.CommandRegistry.AddDeleteCommand("estate", DeleteEstateCmd);
             loader.CommandRegistry.AddAlertCommand("estate", AlertEstateCmd);
 
-            RwLockedList<AvatarNameServiceInterface> avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
+            var avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if(null != sceneConfig)
             {
@@ -105,7 +105,7 @@ namespace SilverSim.Main.Cmd.Estate
             estates = m_EstateService.All;
 
 
-            StringBuilder output = new StringBuilder("Estate List:\n----------------------------------------------");
+            var output = new StringBuilder("Estate List:\n----------------------------------------------");
             foreach (EstateInfo estateInfo in estates)
             {
                 output.AppendFormat("\nEstate {0} [{1}]:\n  Owner={2}\n", estateInfo.Name, estateInfo.ID, ResolveName(estateInfo.Owner).FullName);
@@ -212,8 +212,7 @@ namespace SilverSim.Main.Cmd.Estate
                     }
 
                     /* trigger estate data update */
-                    List<UUID> regionids = m_EstateService.RegionMap[estateInfo.ID];
-                    foreach (UUID regionid in regionids)
+                    foreach (UUID regionid in m_EstateService.RegionMap[estateInfo.ID])
                     {
                         SceneInterface scene;
                         if (m_Scenes.TryGetValue(regionid, out scene))
@@ -346,7 +345,7 @@ namespace SilverSim.Main.Cmd.Estate
                 regions = m_EstateService.RegionMap[estateID];
                 if (m_EstateService.RegionMap[estateID].Count != 0)
                 {
-                    StringBuilder output = new StringBuilder("Please unlink regions from estate first.\n\nLinked Scene List:\n----------------------------------------------");
+                    var output = new StringBuilder("Please unlink regions from estate first.\n\nLinked Scene List:\n----------------------------------------------");
                     foreach (UUID rID in regions)
                     {
                         Types.Grid.RegionInfo rInfo;
@@ -410,14 +409,9 @@ namespace SilverSim.Main.Cmd.Estate
     [PluginName("Commands")]
     public class EstateCommandsFactory : IPluginFactory
     {
-        public EstateCommandsFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            List<string> avatarNameServiceNames = new List<string>();
+            var avatarNameServiceNames = new List<string>();
             string avatarNameServices = ownSection.GetString("AvatarNameServices", string.Empty);
             if (!string.IsNullOrEmpty(avatarNameServices))
             {

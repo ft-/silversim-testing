@@ -33,7 +33,7 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                GroupNotice notice = new GroupNotice();
+                var notice = new GroupNotice();
                 if(!Notices.TryGetValue(requestingAgent, groupNoticeID, out notice))
                 {
                     throw new KeyNotFoundException();
@@ -44,20 +44,21 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupNoticesInterface.Add(UUI requestingAgent, GroupNotice notice)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("GroupID", notice.Group.ID);
-            vals.Add("NoticeID", notice.ID);
-            vals.Add("Timestamp", notice.Timestamp);
-            vals.Add("FromName", notice.Timestamp);
-            vals.Add("Subject", notice.Subject);
-            vals.Add("Message", notice.Message);
-            vals.Add("HasAttachment", notice.HasAttachment);
-            vals.Add("AttachmentType", notice.AttachmentType);
-            vals.Add("AttachmentName", notice.AttachmentName);
-            vals.Add("AttachmentItemID", notice.AttachmentItemID);
-            vals.Add("AttachmentOwnerID", notice.AttachmentOwner.ID);
-
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var vals = new Dictionary<string, object>
+            {
+                { "GroupID", notice.Group.ID },
+                { "NoticeID", notice.ID },
+                { "Timestamp", notice.Timestamp },
+                { "FromName", notice.Timestamp },
+                { "Subject", notice.Subject },
+                { "Message", notice.Message },
+                { "HasAttachment", notice.HasAttachment },
+                { "AttachmentType", notice.AttachmentType },
+                { "AttachmentName", notice.AttachmentName },
+                { "AttachmentItemID", notice.AttachmentItemID },
+                { "AttachmentOwnerID", notice.AttachmentOwner.ID }
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.InsertInto("groupnotices", vals);
@@ -66,10 +67,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupNoticesInterface.Delete(UUI requestingAgent, UUID groupNoticeID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM groupinvites WHERE InviteID LIKE ?inviteid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM groupinvites WHERE InviteID LIKE ?inviteid", conn))
                 {
                     cmd.Parameters.AddParameter("?inviteid", groupNoticeID);
                     if(cmd.ExecuteNonQuery() < 1)
@@ -82,11 +83,11 @@ namespace SilverSim.Database.MySQL.Groups
 
         List<GroupNotice> IGroupNoticesInterface.GetNotices(UUI requestingAgent, UGI group)
         {
-            List<GroupNotice> notices = new List<GroupNotice>();
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var notices = new List<GroupNotice>();
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE GroupID LIKE ?groupid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -107,10 +108,10 @@ namespace SilverSim.Database.MySQL.Groups
         bool IGroupNoticesInterface.TryGetValue(UUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice)
         {
             GroupNotice notice;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE NoticeID LIKE ?noticeid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE NoticeID LIKE ?noticeid", conn))
                 {
                     cmd.Parameters.AddParameter("?noticeid", groupNoticeID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -132,10 +133,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         bool IGroupNoticesInterface.ContainsKey(UUI requestingAgent, UUID groupNoticeID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT NoticeID FROM groupnotices WHERE NoticeID LIKE ?noticeid", conn))
+                using (var cmd = new MySqlCommand("SELECT NoticeID FROM groupnotices WHERE NoticeID LIKE ?noticeid", conn))
                 {
                     cmd.Parameters.AddParameter("?noticeid", groupNoticeID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

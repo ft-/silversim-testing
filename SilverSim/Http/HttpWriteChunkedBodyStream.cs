@@ -28,7 +28,6 @@ namespace SilverSim.Http
     public class HttpWriteChunkedBodyStream : Stream
     {
         private Stream m_Output;
-        readonly long m_WrittenLength;
         readonly byte[] StreamBuffer = new byte[10240];
         private int BufferFill;
         readonly byte[] EOB = new byte[2] { (byte)'\r', (byte)'\n' };
@@ -36,54 +35,24 @@ namespace SilverSim.Http
         public HttpWriteChunkedBodyStream(Stream output)
         {
             m_Output = output;
-            m_WrittenLength = 0;
+            Length = 0;
         }
 
-        public override bool CanRead
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanRead => false;
 
-        public override bool CanSeek 
-        { 
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanTimeout 
-        { 
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanTimeout => true;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanWrite => true;
 
-        public override long Length 
-        { 
-            get
-            {
-                return m_WrittenLength;
-            }
-        }
+        public override long Length { get; }
 
         public override long Position
         {
             get
             {
-                return m_WrittenLength;
+                return Length;
             }
             set
             {
@@ -92,7 +61,7 @@ namespace SilverSim.Http
         }
 
         public override int WriteTimeout 
-        { 
+        {
             get
             {
                 return m_Output.WriteTimeout;

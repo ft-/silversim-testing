@@ -60,7 +60,7 @@ namespace SilverSim.Database.Memory.Avatar
                 }
                 else
                 {
-                    RwLockedDictionary<string, string> data = new RwLockedDictionary<string, string>(value);
+                    var data = new RwLockedDictionary<string, string>(value);
                     m_Data[avatarID] = data;
                 }
             }
@@ -90,11 +90,11 @@ namespace SilverSim.Database.Memory.Avatar
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 else if (itemKeys == null)
                 {
-                    throw new ArgumentNullException("itemKeys");
+                    throw new ArgumentNullException(nameof(itemKeys));
                 }
                 if (itemKeys.Count != value.Count)
                 {
@@ -168,10 +168,8 @@ namespace SilverSim.Database.Memory.Avatar
     [PluginName("Avatar")]
     public class MemoryInventoryServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryAvatarService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryAvatarService();
     }
     #endregion
 }

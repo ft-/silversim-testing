@@ -59,14 +59,10 @@ namespace SilverSim.Database.Memory.SimulationData
             return false;
         }
 
-        bool ISimulationDataRegionSettingsStorageInterface.ContainsKey(UUID regionID)
-        {
-            return m_RegionSettingsData.ContainsKey(regionID);
-        }
+        bool ISimulationDataRegionSettingsStorageInterface.ContainsKey(UUID regionID) =>
+            m_RegionSettingsData.ContainsKey(regionID);
 
-        bool ISimulationDataRegionSettingsStorageInterface.Remove(UUID regionID)
-        {
-            return m_RegionSettingsData.Remove(regionID);
-        }
+        bool ISimulationDataRegionSettingsStorageInterface.Remove(UUID regionID) =>
+            m_RegionSettingsData.Remove(regionID);
     }
 }

@@ -35,9 +35,6 @@ namespace SilverSim.Http
     [Serializable]
     public class NotAWebSocketConnectionException : Exception
     {
-        public NotAWebSocketConnectionException()
-        {
-        }
     }
 
     public class WebSocketClient : HttpWebSocket
@@ -47,7 +44,6 @@ namespace SilverSim.Http
         public WebSocketClient(Stream o)
             : base(o)
         {
-
         }
 
         public static WebSocketClient Connect(string url, string[] protocols = null)
@@ -60,7 +56,7 @@ namespace SilverSim.Http
         static Stream ConnectStream(string url, string[] protocols, out string selectedProtocol)
         {
             Stream stream;
-            Uri uri = new Uri(url, UriKind.Absolute);
+            var uri = new Uri(url, UriKind.Absolute);
             string host = uri.Host;
             int port = uri.Port;
 
@@ -97,11 +93,10 @@ namespace SilverSim.Http
             }
             webSocketRequest += "\r\n";
 
-            string websocketkeyuuid;
-            websocketkeyuuid = webSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            string websocketkeyuuid = webSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
             byte[] websocketacceptdata = Encoding.ASCII.GetBytes(websocketkeyuuid);
             string websocketaccept;
-            using (SHA1 sha1 = SHA1.Create())
+            using (var sha1 = SHA1.Create())
             {
                 websocketaccept = Convert.ToBase64String(sha1.ComputeHash(websocketacceptdata));
             }
@@ -109,9 +104,7 @@ namespace SilverSim.Http
             byte[] reqdata = Encoding.ASCII.GetBytes(webSocketRequest);
             stream.Write(reqdata, 0, reqdata.Length);
 
-            string resline;
-
-            resline = ReadHeaderLine(stream);
+            string resline = ReadHeaderLine(stream);
             string[] splits = resline.Split(new char[] { ' ' }, 3);
             if (splits.Length < 3)
             {
@@ -150,7 +143,7 @@ namespace SilverSim.Http
 
             /* parse Headers */
             string lastHeader = string.Empty;
-            Dictionary<string, string> headers = new Dictionary<string, string>();
+            var headers = new Dictionary<string, string>();
             string headerLine;
             while ((headerLine = ReadHeaderLine(stream)).Length != 0)
             {
@@ -200,7 +193,7 @@ namespace SilverSim.Http
 
         static string ReadHeaderLine(Stream stream)
         {
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
             for (;;)
             {
                 int c = stream.ReadByte();
@@ -230,14 +223,14 @@ namespace SilverSim.Http
 
         static Stream OpenPlainStream(string host, int port)
         {
-            Socket s = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            var s = new Socket(SocketType.Stream, ProtocolType.Tcp);
             s.Connect(host, port);
             return new NetworkStream(s);
         }
 
         static Stream OpenSslStream(string host, int port)
         {
-            SslStream ssl = new SslStream(OpenPlainStream(host, port));
+            var ssl = new SslStream(OpenPlainStream(host, port));
             ssl.AuthenticateAsClient(host, null, SslProtocols.Tls12, true);
             return ssl;
         }

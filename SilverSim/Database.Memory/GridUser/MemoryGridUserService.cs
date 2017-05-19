@@ -61,7 +61,7 @@ namespace SilverSim.Database.Memory.GridUser
 
         public override GridUserInfo this[UUID userID]
         {
-            get 
+            get
             {
                 GridUserInfo info;
                 if(TryGetValue(userID, out info))
@@ -73,18 +73,10 @@ namespace SilverSim.Database.Memory.GridUser
         }
 
 
-        public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo)
-        {
-            return TryGetValue(userID.ID, out gridUserInfo);
-        }
+        public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo) =>
+            TryGetValue(userID.ID, out gridUserInfo);
 
-        public override GridUserInfo this[UUI userID]
-        {
-            get 
-            {
-                return this[userID.ID];
-            }
-        }
+        public override GridUserInfo this[UUI userID] => this[userID.ID];
 
         public override void LoggedInAdd(UUI userID)
         {
@@ -173,10 +165,8 @@ namespace SilverSim.Database.Memory.GridUser
     [PluginName("GridUser")]
     public class MemoryGridUserServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryGridUserService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryGridUserService();
     }
     #endregion
 

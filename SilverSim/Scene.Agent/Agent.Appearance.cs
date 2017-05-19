@@ -36,7 +36,6 @@ namespace SilverSim.Scene.Agent
 {
     partial class Agent
     {
-        private readonly AgentAttachments m_Attachments = new AgentAttachments();
         private readonly AgentWearables m_Wearables = new AgentWearables();
 
         Vector3 m_AvatarSize = new Vector3(0.45, 0.6, 1.9);
@@ -68,13 +67,7 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        public AgentAttachments Attachments
-        {
-            get
-            {
-                return m_Attachments;
-            }
-        }
+        public AgentAttachments Attachments { get; } = new AgentAttachments();
 
         public AgentWearables Wearables
         {
@@ -119,12 +112,16 @@ namespace SilverSim.Scene.Agent
 
         public AvatarAppearance GetAvatarAppearanceMsg()
         {
-            AvatarAppearance appearance = new AvatarAppearance();
-            appearance.Sender = ID;
-            appearance.TextureEntry = TextureEntry;
-            appearance.VisualParams = VisualParams;
-            AvatarAppearance.AppearanceDataEntry e = new AvatarAppearance.AppearanceDataEntry();
-            e.AppearanceVersion = 1;
+            var appearance = new AvatarAppearance()
+            {
+                Sender = ID,
+                TextureEntry = TextureEntry,
+                VisualParams = VisualParams
+            };
+            var e = new AvatarAppearance.AppearanceDataEntry()
+            {
+                AppearanceVersion = 1
+            };
             appearance.AppearanceData.Add(e);
             return appearance;
         }
@@ -133,7 +130,7 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                TextureEntry te = new TextureEntry();
+                var te = new TextureEntry();
                 UUID[] textures = Textures.All;
                 te.DefaultTexture.TextureID = textures[0];
                 for (int i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
@@ -178,7 +175,7 @@ namespace SilverSim.Scene.Agent
                 m_VisualParamsLock.AcquireReaderLock(-1);
                 try
                 {
-                    byte[] res = new byte[m_VisualParams.Length];
+                    var res = new byte[m_VisualParams.Length];
                     Buffer.BlockCopy(m_VisualParams, 0, res, 0, m_VisualParams.Length);
                     return res;
                 }
@@ -229,10 +226,12 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                AppearanceInfo ai = new AppearanceInfo();
-                ai.Wearables = Wearables;
-                ai.VisualParams = VisualParams;
-                ai.AvatarHeight = Size.Z;
+                var ai = new AppearanceInfo()
+                {
+                    Wearables = Wearables,
+                    VisualParams = VisualParams,
+                    AvatarHeight = Size.Z
+                };
                 ai.Attachments.Clear();
                 foreach (ObjectGroup grp in Attachments.All)
                 {

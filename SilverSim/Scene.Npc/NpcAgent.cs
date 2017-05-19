@@ -58,7 +58,6 @@ namespace SilverSim.Scene.Npc
         readonly ProfileServiceInterface m_ProfileService;
         readonly GridUserServiceInterface m_GridUserService;
         readonly PresenceServiceInterface m_PresenceService;
-        readonly NpcPresenceServiceInterface m_NpcPresenceService;
 
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
@@ -79,15 +78,9 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        UUID GetMyUUID()
-        {
-            return ID;
-        }
+        UUID GetMyUUID() => ID;
 
-        Vector3 GetMyPosition()
-        {
-            return GlobalPosition;
-        }
+        Vector3 GetMyPosition() => GlobalPosition;
 
         internal void EnableListen()
         {
@@ -126,7 +119,7 @@ namespace SilverSim.Scene.Npc
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
-            m_NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
+            NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
             OnAppearanceUpdate += HandleAppearanceUpdate;
         }
 
@@ -166,13 +159,7 @@ namespace SilverSim.Scene.Npc
         }
 
         readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
-        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds
-        {
-            get
-            {
-                return m_ActiveChilds;
-            }
-        }
+        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds => m_ActiveChilds;
 
         public override IAgentTeleportServiceInterface ActiveTeleportService
         {
@@ -260,29 +247,18 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        public override ClientInfo Client
+        public override ClientInfo Client => new ClientInfo()
         {
-            get
-            {
-                ClientInfo cInfo = new ClientInfo();
-                cInfo.Channel = VersionInfo.ProductName;
-                cInfo.ClientIP = string.Empty;
-                cInfo.ClientVersion = VersionInfo.Version;
-                cInfo.ID0 = string.Empty;
-                cInfo.Mac = string.Empty;
-                return cInfo;
-            }
-        }
+            Channel = VersionInfo.ProductName,
+            ClientIP = string.Empty,
+            ClientVersion = VersionInfo.Version,
+            ID0 = string.Empty,
+            Mac = string.Empty
+        };
 
-        public override DetectedTypeFlags DetectedType
-        {
-            get
-            {
-                return (SittingOnObject != null) ?
+        public override DetectedTypeFlags DetectedType => (SittingOnObject != null) ?
                     (DetectedTypeFlags.Npc | DetectedTypeFlags.Passive) :
                     (DetectedTypeFlags.Npc | DetectedTypeFlags.Active);
-            }
-        }
 
         public override EconomyServiceInterface EconomyService
         {
@@ -300,13 +276,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        public NpcPresenceServiceInterface NpcPresenceService
-        {
-            get
-            {
-                return m_NpcPresenceService;
-            }
-        }
+        public NpcPresenceServiceInterface NpcPresenceService { get; }
 
         public override GridUserServiceInterface GridUserService
         {
@@ -340,39 +310,13 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        public override bool IsActiveGod
-        {
-            get
-            {
-                /* NPCs are never gods */
-                return false;
-            }
-        }
+        public override bool IsActiveGod => false;
 
-        public override bool IsInMouselook
-        {
-            get
-            {
-                /* NPCs do not have this kind of distinguishing view mode */
-                return false;
-            }
-        }
+        public override bool IsInMouselook => false;
 
-        public override bool IsNpc
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsNpc => true;
 
-        public override RwLockedDictionary<UUID, FriendStatus> KnownFriends
-        {
-            get
-            {
-                return new RwLockedDictionary<UUID, FriendStatus>();
-            }
-        }
+        public override RwLockedDictionary<UUID, FriendStatus> KnownFriends => new RwLockedDictionary<UUID, FriendStatus>();
 
         public override int LastMeasuredLatencyTickCount
         {
@@ -398,13 +342,7 @@ namespace SilverSim.Scene.Npc
         #region Physics Linkage
         readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
-        public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
-        {
-            get
-            {
-                return m_PhysicsActors;
-            }
-        }
+        public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors => m_PhysicsActors;
 
         public override IPhysicsObject PhysicsActor
         {
@@ -448,47 +386,25 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        public override SessionInfo Session
+        public override SessionInfo Session => new SessionInfo()
         {
-            get
-            {
-                SessionInfo sInfo = new SessionInfo();
-                sInfo.SessionID = UUID.Zero;
-                sInfo.SecureSessionID = UUID.Zero;
-                sInfo.ServiceSessionID = string.Empty;
-                return sInfo;
-            }
-        }
+            SessionID = UUID.Zero,
+            SecureSessionID = UUID.Zero,
+            ServiceSessionID = string.Empty
+        };
 
-        public override List<GridType> SupportedGridTypes
-        {
-            get
-            {
-                return new List<GridType>();
-            }
-        }
+        public override List<GridType> SupportedGridTypes => new List<GridType>();
 
         readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate () { return new RwLockedDictionary<uint, uint>(); });
-        public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials
-        {
-            get
-            {
-                return m_TransmittedTerrainSerials;
-            }
-        }
+        public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials => m_TransmittedTerrainSerials;
 
-        public override UserAccount UntrustedAccountInfo
+        public override UserAccount UntrustedAccountInfo => new UserAccount()
         {
-            get
-            {
-                UserAccount acc = new UserAccount();
-                acc.Principal = Owner;
-                acc.IsLocalToGrid = true;
-                acc.ScopeID = UUID.Zero;
-                acc.UserLevel = 0;
-                return acc;
-            }
-        }
+            Principal = Owner,
+            IsLocalToGrid = true,
+            ScopeID = UUID.Zero,
+            UserLevel = 0
+        };
 
         public override UserAgentServiceInterface UserAgentService
         {
@@ -554,10 +470,7 @@ namespace SilverSim.Scene.Npc
         }
 
         readonly RwLockedList<UUID> m_SelectedObjects = new RwLockedList<UUID>();
-        public override RwLockedList<UUID> SelectedObjects(UUID scene)
-        {
-            return m_SelectedObjects;
-        }
+        public override RwLockedList<UUID> SelectedObjects(UUID scene) => m_SelectedObjects;
 
         public override void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {

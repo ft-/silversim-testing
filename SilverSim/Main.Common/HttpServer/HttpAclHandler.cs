@@ -24,16 +24,13 @@ namespace SilverSim.Main.Common.HttpServer
     public class HttpAclHandler
     {
         public bool IsAllowedDefault { get; set; }
-        public string Description { get; private set; }
+        public string Description { get; }
 
         public HttpAclHandler(string description)
         {
             Description = description;
         }
 
-        public bool CheckIfAllowed(HttpRequest req)
-        {
-            return IsAllowedDefault;
-        }
+        public bool CheckIfAllowed(HttpRequest req) => IsAllowedDefault;
     }
 }

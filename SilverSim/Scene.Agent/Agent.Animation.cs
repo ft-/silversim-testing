@@ -75,14 +75,8 @@ namespace SilverSim.Scene.Agent
             m_AnimationController.StopAnimation(animid, objectid);
         }
 
-        public string GetDefaultAnimation()
-        {
-            return m_AnimationController.GetDefaultAnimation();
-        }
+        public string GetDefaultAnimation() => m_AnimationController.GetDefaultAnimation();
 
-        public List<UUID> GetPlayingAnimations()
-        {
-            return m_AnimationController.GetPlayingAnimations();
-        }
+        public List<UUID> GetPlayingAnimations() => m_AnimationController.GetPlayingAnimations();
     }
 }

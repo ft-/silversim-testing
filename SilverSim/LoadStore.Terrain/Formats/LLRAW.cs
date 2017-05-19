@@ -45,30 +45,15 @@ namespace SilverSim.LoadStore.Terrain.Formats
                 Value = value;
             }
 
-            public int CompareTo(HeightmapLookupValue val)
-            {
-                return Value.CompareTo(val.Value);
-            }
+            public int CompareTo(HeightmapLookupValue val) => Value.CompareTo(val.Value);
 
-            public static bool operator ==(HeightmapLookupValue a, HeightmapLookupValue b)
-            {
-                return a.Equals(b);
-            }
+            public static bool operator ==(HeightmapLookupValue a, HeightmapLookupValue b) => a.Equals(b);
 
-            public static bool operator !=(HeightmapLookupValue a, HeightmapLookupValue b)
-            {
-                return !a.Equals(b);
-            }
+            public static bool operator !=(HeightmapLookupValue a, HeightmapLookupValue b) => !a.Equals(b);
 
-            public static bool operator >(HeightmapLookupValue a, HeightmapLookupValue b)
-            {
-                return a.Value > b.Value;
-            }
+            public static bool operator >(HeightmapLookupValue a, HeightmapLookupValue b) => a.Value > b.Value;
 
-            public static bool operator <(HeightmapLookupValue a, HeightmapLookupValue b)
-            {
-                return a.Value < b.Value;
-            }
+            public static bool operator <(HeightmapLookupValue a, HeightmapLookupValue b) => a.Value < b.Value;
 
             [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
             public override bool Equals(object obj)
@@ -80,16 +65,10 @@ namespace SilverSim.LoadStore.Terrain.Formats
                 return false;
             }
 
-            public override int GetHashCode()
-            {
-                return Value.GetHashCode();
-            }
+            public override int GetHashCode() => Value.GetHashCode();
 
             [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
-            public bool Equals(HeightmapLookupValue v)
-            {
-                return Value.Equals(v.Value);
-            }
+            public bool Equals(HeightmapLookupValue v) => Value.Equals(v.Value);
         }
 
         /// <summary>Lookup table to speed up terrain exports</summary>
@@ -106,38 +85,25 @@ namespace SilverSim.LoadStore.Terrain.Formats
                     LookupHeightTable[i + (j * 256)] = new HeightmapLookupValue((ushort)(i + (j * 256)), (float)((double)i * ((double)j / 128.0d)));
                 }
             }
-            Array.Sort<HeightmapLookupValue>(LookupHeightTable);
+            Array.Sort(LookupHeightTable);
         }
 
-        public LLRAW()
-        {
-
-        }
-
-        public string Name
-        {
-            get
-            {
-                return "llraw";
-            }
-        }
+        public string Name => "llraw";
 
         public List<LayerPatch> LoadFile(string filename, int suggested_width, int suggested_height)
         {
-            using (Stream input = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            using (var input = new FileStream(filename, FileMode.Open, FileAccess.Read))
             {
                 return input.LoadLLRawStream(suggested_width, suggested_height);
             }
         }
 
-        public List<LayerPatch> LoadStream(Stream input, int suggested_width, int suggested_height)
-        {
-            return input.LoadLLRawStream(suggested_width, suggested_height);
-        }
+        public List<LayerPatch> LoadStream(Stream input, int suggested_width, int suggested_height) => 
+            input.LoadLLRawStream(suggested_width, suggested_height);
 
         public void SaveFile(string filename, List<LayerPatch> terrain)
         {
-            using (Stream output = new FileStream(filename, FileMode.Create, FileAccess.Write))
+            using (var output = new FileStream(filename, FileMode.Create, FileAccess.Write))
             {
                 SaveStream(output, terrain);
             }
@@ -150,21 +116,9 @@ namespace SilverSim.LoadStore.Terrain.Formats
             output.Write(outdata, 0, outdata.Length);
         }
 
-        public bool SupportsLoading
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool SupportsLoading => true;
 
-        public bool SupportsSaving
-        {
-            get 
-            {
-                return true;
-            }
-        }
+        public bool SupportsSaving => true;
 
         public void Startup(ConfigurationLoader loader)
         {

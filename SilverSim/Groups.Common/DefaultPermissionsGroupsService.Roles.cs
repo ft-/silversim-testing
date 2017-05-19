@@ -31,41 +31,22 @@ namespace SilverSim.Groups.Common
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupRolesInterface
     {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        GroupRole IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUID roleID]
-        {
-            get
-            {
-                return m_InnerService.Roles[requestingAgent, group, roleID];
-            }
-        }
+        GroupRole IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUID roleID] => 
+            m_InnerService.Roles[requestingAgent, group, roleID];
 
-        bool IGroupRolesInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole)
-        {
-            return m_InnerService.Roles.TryGetValue(requestingAgent, group, roleID, out groupRole);
-        }
+        bool IGroupRolesInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole) => 
+            m_InnerService.Roles.TryGetValue(requestingAgent, group, roleID, out groupRole);
 
-        bool IGroupRolesInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID)
-        {
-            return m_InnerService.Roles.ContainsKey(requestingAgent, group, roleID);
-        }
+        bool IGroupRolesInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID) =>
+            m_InnerService.Roles.ContainsKey(requestingAgent, group, roleID);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group]
-        {
-            get
-            {
-                return m_InnerService.Roles[requestingAgent, group];
-            }
-        }
+        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group] =>
+            m_InnerService.Roles[requestingAgent, group];
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUI principal]
-        {
-            get
-            {
-                return m_InnerService.Roles[requestingAgent, group, principal];
-            }
-        }
+        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUI principal] =>
+            m_InnerService.Roles[requestingAgent, group, principal];
 
         void IGroupRolesInterface.Add(UUI requestingAgent, GroupRole role)
         {

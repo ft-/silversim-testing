@@ -51,7 +51,7 @@ namespace SilverSim.Grid.Maptile
 
         static Image FromMaptileData(MaptileData data)
         {
-            using (MemoryStream ms = new MemoryStream(data.Data))
+            using (var ms = new MemoryStream(data.Data))
             {
                 return new Bitmap(ms);
             }
@@ -74,7 +74,7 @@ namespace SilverSim.Grid.Maptile
             {
                 return false;
             }
-            uint zoomsize = (uint)(256 << (zoomlevel - 1));
+            var zoomsize = (uint)(256 << (zoomlevel - 1));
 
             MaptileData map00;
             MaptileData map01;
@@ -110,10 +110,12 @@ namespace SilverSim.Grid.Maptile
             }
             else
             {
-                outmap = new MaptileData();
-                outmap.Location = location;
-                outmap.ZoomLevel = zoomlevel;
-                outmap.ScopeID = scopeid;
+                outmap = new MaptileData()
+                {
+                    Location = location,
+                    ZoomLevel = zoomlevel,
+                    ScopeID = scopeid
+                };
             }
             outmap.LastUpdate = Date.Now;
             outmap.ContentType = "image/jpeg";
@@ -137,7 +139,7 @@ namespace SilverSim.Grid.Maptile
                 map11 = null;
             }
 
-            using (Bitmap bmp = new Bitmap(256, 256, PixelFormat.Format24bppRgb))
+            using (var bmp = new Bitmap(256, 256, PixelFormat.Format24bppRgb))
             {
                 using (Graphics gfx = Graphics.FromImage(bmp))
                 {
@@ -171,7 +173,7 @@ namespace SilverSim.Grid.Maptile
                         }
                     }
                 }
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     bmp.Save(ms, ImageFormat.Jpeg);
                     outmap.Data = ms.ToArray();
@@ -216,11 +218,6 @@ namespace SilverSim.Grid.Maptile
     [PluginName("MaptileZoomGenerator")]
     public class MaptileZoomGeneratorFactory : IPluginFactory
     {
-        public MaptileZoomGeneratorFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MaptileZoomGenerator(ownSection);

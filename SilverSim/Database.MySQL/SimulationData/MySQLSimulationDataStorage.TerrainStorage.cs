@@ -34,20 +34,18 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                List<LayerPatch> patches = new List<LayerPatch>();
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                var patches = new List<LayerPatch>();
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM terrains WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM terrains WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
-                            LayerPatch patch;
-
                             while (dbReader.Read())
                             {
-                                patch = new LayerPatch();
+                                var patch = new LayerPatch();
                                 patch.ExtendedPatchID = dbReader.GetUInt32("PatchID");
                                 patch.Serialization = dbReader.GetBytes("TerrainData");
                                 patches.Add(patch);

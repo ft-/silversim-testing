@@ -29,49 +29,42 @@ namespace SilverSim.Scene.Chat
 {
     public class ListenerInfo : ChatServiceInterface.Listener
     {
-        readonly int m_Channel;
         readonly string m_Name;
         readonly UUID m_ID;
         readonly string m_Message;
-        readonly Func<UUID> m_GetUUID;
-        readonly Func<Vector3> m_GetPos;
         readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
-        readonly bool m_IsAgent;
-        public override bool IsAgent { get { return m_IsAgent; } }
+        public override bool IsAgent { get; }
 
         readonly ChatHandler m_Handler;
 
         internal ListenerInfo(
             ChatHandler handler,
-            int channel, 
+            int channel,
             string name,
             UUID id, 
             string message,
-            Func<UUID> getuuid, 
-            Func<Vector3> getpos, 
+            Func<UUID> getuuid,
+            Func<Vector3> getpos,
             Action<ListenEvent> send,
             bool isAgent)
         {
-            m_IsAgent = isAgent;
+            IsAgent = isAgent;
             IsActive = true;
             m_Handler = handler;
-            m_Channel = channel;
+            Channel = channel;
             m_Name = name;
             m_ID = id;
             m_Message = message;
-            m_GetUUID = getuuid;
-            m_GetPos = getpos;
+            GetUUID = getuuid;
+            GetPosition = getpos;
             m_Send = send;
         }
 
-        public override bool IsMatching(string name, UUID id, string message, Int32 regexBitfield)
-        {
-            return m_Name == name &&
+        public override bool IsMatching(string name, UUID id, string message, Int32 regexBitfield) => m_Name == name &&
                 m_ID == id &&
                 m_Message == message &&
                 0 == regexBitfield;
-        }
 
         public override void Serialize(List<object> res, int handle)
         {
@@ -89,29 +82,11 @@ namespace SilverSim.Scene.Chat
             m_Handler.Remove(this);
         }
 
-        public override int Channel
-        {
-            get
-            {
-                return m_Channel;
-            }
-        }
+        public override int Channel { get; }
 
-        public override Func<Vector3> GetPosition
-        {
-            get
-            {
-                return m_GetPos;
-            }
-        }
+        public override Func<Vector3> GetPosition { get; }
 
-        public override Func<UUID> GetUUID
-        {
-            get
-            {
-                return m_GetUUID;
-            }
-        }
+        public override Func<UUID> GetUUID { get; }
 
         public override void Send(ListenEvent ev)
         {

@@ -33,11 +33,11 @@ namespace SilverSim.Database.MySQL.Profile
     {
         Dictionary<UUID, string> IClassifiedsInterface.GetClassifieds(UUI user)
         {
-            Dictionary<UUID, string> res = new Dictionary<UUID, string>();
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var res = new Dictionary<UUID, string>();
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid, `name` FROM classifieds WHERE creatoruuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT classifieduuid, `name` FROM classifieds WHERE creatoruuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", user.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -55,10 +55,10 @@ namespace SilverSim.Database.MySQL.Profile
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         bool IClassifiedsInterface.TryGetValue(UUI user, UUID id, out ProfileClassified classified)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", id);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -92,10 +92,10 @@ namespace SilverSim.Database.MySQL.Profile
 
         bool IClassifiedsInterface.ContainsKey(UUI user, UUID id)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", id);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -125,23 +125,25 @@ namespace SilverSim.Database.MySQL.Profile
 
         void IClassifiedsInterface.Update(ProfileClassified c)
         {
-            Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-            replaceVals["classifieduuid"] = c.ClassifiedID;
-            replaceVals["creatoruuid"] = c.Creator.ID;
-            replaceVals["creationdate"] = c.CreationDate;
-            replaceVals["expirationdate"] = c.ExpirationDate;
-            replaceVals["category"] = c.Category;
-            replaceVals["name"] = c.Name;
-            replaceVals["description"] = c.Description;
-            replaceVals["parceluuid"] = c.ParcelID;
-            replaceVals["parentestate"] = c.ParentEstate;
-            replaceVals["snapshotuuid"] = c.SnapshotID;
-            replaceVals["simname"] = c.SimName;
-            replaceVals["posglobal"] = c.GlobalPos;
-            replaceVals["parcelname"] = c.ParcelName;
-            replaceVals["classifiedflags"] = c.Flags;
-            replaceVals["priceforlisting"] = c.Price;
-            using(MySqlConnection conn = new MySqlConnection())
+            var replaceVals = new Dictionary<string, object>
+            {
+                ["classifieduuid"] = c.ClassifiedID,
+                ["creatoruuid"] = c.Creator.ID,
+                ["creationdate"] = c.CreationDate,
+                ["expirationdate"] = c.ExpirationDate,
+                ["category"] = c.Category,
+                ["name"] = c.Name,
+                ["description"] = c.Description,
+                ["parceluuid"] = c.ParcelID,
+                ["parentestate"] = c.ParentEstate,
+                ["snapshotuuid"] = c.SnapshotID,
+                ["simname"] = c.SimName,
+                ["posglobal"] = c.GlobalPos,
+                ["parcelname"] = c.ParcelName,
+                ["classifiedflags"] = c.Flags,
+                ["priceforlisting"] = c.Price
+            };
+            using (var conn = new MySqlConnection())
             {
                 conn.Open();
                 conn.ReplaceInto("classifieds", replaceVals);
@@ -150,10 +152,10 @@ namespace SilverSim.Database.MySQL.Profile
 
         void IClassifiedsInterface.Delete(UUID id)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM classifieds WHERE classifieduuid LIKE ?classifieduuid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM classifieds WHERE classifieduuid LIKE ?classifieduuid", conn))
                 {
                     cmd.Parameters.AddParameter("?classifieduuid", id);
                     if (1 > cmd.ExecuteNonQuery())

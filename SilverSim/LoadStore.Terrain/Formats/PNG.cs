@@ -28,20 +28,8 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("PNG Terrain Storage Format Writer")]
     public class PNG : DrawingSaveCommon
     {
-        public override string Name
-        {
-            get
-            {
-                return "png";
-            }
-        }
+        public override string Name => "png";
 
-        protected override ImageFormat TargetImageFormat
-        {
-            get 
-            {
-                return ImageFormat.Png;
-            }
-        }
+        protected override ImageFormat TargetImageFormat => ImageFormat.Png;
     }
 }

@@ -31,11 +31,11 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         bool ISimulationDataScriptStateStorageInterface.TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ScriptState FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("SELECT ScriptState FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -67,15 +67,17 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             set
             {
-                using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using(var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
 
-                    Dictionary<string, object> p = new Dictionary<string, object>();
-                    p["RegionID"] = regionID;
-                    p["PrimID"] = primID;
-                    p["ItemID"] = itemID;
-                    p["ScriptState"] = value;
+                    var p = new Dictionary<string, object>
+                    {
+                        ["RegionID"] = regionID,
+                        ["PrimID"] = primID,
+                        ["ItemID"] = itemID,
+                        ["ScriptState"] = value
+                    };
                     MySQLUtilities.ReplaceInto(connection, "scriptstates", p);
                 }
             }
@@ -83,10 +85,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataScriptStateStorageInterface.Remove(UUID regionID, UUID primID, UUID itemID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }

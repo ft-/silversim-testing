@@ -46,7 +46,7 @@ namespace SilverSim.Database.Memory.Profile
 
         public Dictionary<UUID, string> GetPicks(UUI user)
         {
-            Dictionary<UUID, string> results = new Dictionary<UUID, string>();
+            var results = new Dictionary<UUID, string>();
             RwLockedDictionary<UUID, ProfilePick> picks;
             if(m_Picks.TryGetValue(user.ID, out picks))
             {

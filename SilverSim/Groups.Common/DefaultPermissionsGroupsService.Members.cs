@@ -30,41 +30,20 @@ namespace SilverSim.Groups.Common
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupMembersInterface
     {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        GroupMember IGroupMembersInterface.this[UUI requestingAgent, UGI group, UUI principal]
-        {
-            get
-            {
-                return m_InnerService.Members[requestingAgent, group, principal];
-            }
-        }
+        GroupMember IGroupMembersInterface.this[UUI requestingAgent, UGI group, UUI principal] =>
+            m_InnerService.Members[requestingAgent, group, principal];
 
-        bool IGroupMembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMember gmem)
-        {
-            return m_InnerService.Members.TryGetValue(requestingAgent, group, principal, out gmem);
-        }
+        bool IGroupMembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMember gmem) =>
+            m_InnerService.Members.TryGetValue(requestingAgent, group, principal, out gmem);
 
-        bool IGroupMembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUI principal)
-        {
-            return m_InnerService.Members.ContainsKey(requestingAgent, group, principal);
-        }
+        bool IGroupMembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUI principal) =>
+            m_InnerService.Members.ContainsKey(requestingAgent, group, principal);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UGI group]
-        {
-            get
-            {
-                return m_InnerService.Members[requestingAgent, group];
-            }
-        }
+        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UGI group] => m_InnerService.Members[requestingAgent, group];
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UUI principal]
-        {
-            get
-            {
-                return m_InnerService.Members[requestingAgent, principal];
-            }
-        }
+        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UUI principal] => m_InnerService.Members[requestingAgent, principal];
 
         GroupMember IGroupMembersInterface.Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken)
         {

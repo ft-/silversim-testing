@@ -55,14 +55,12 @@ namespace SilverSim.Database.Memory.Asset
         #endregion
 
         #region Exists methods
-        public override bool Exists(UUID key)
-        {
-            return m_Assets.ContainsKey(key);
-        }
+        public override bool Exists(UUID key) =>
+            m_Assets.ContainsKey(key);
 
         public override Dictionary<UUID, bool> Exists(List<UUID> assets)
         {
-            Dictionary<UUID,bool> res = new Dictionary<UUID,bool>();
+            var res = new Dictionary<UUID,bool>();
             foreach(UUID id in assets)
             {
                 res[id] = m_Assets.ContainsKey(id);
@@ -73,10 +71,8 @@ namespace SilverSim.Database.Memory.Asset
 
         #endregion
 
-        public override bool IsSameServer(AssetServiceInterface other)
-        {
-            return other.GetType() == typeof(MemoryAssetService) && other == this;
-        }
+        public override bool IsSameServer(AssetServiceInterface other) =>
+            other.GetType() == typeof(MemoryAssetService) && other == this;
 
         #region Accessors
         public override bool TryGetValue(UUID key, out AssetData asset)
@@ -118,13 +114,7 @@ namespace SilverSim.Database.Memory.Asset
         #endregion
 
         #region Metadata interface
-        public override IAssetMetadataServiceInterface Metadata
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetMetadataServiceInterface Metadata => this;
 
         AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
         {
@@ -166,23 +156,11 @@ namespace SilverSim.Database.Memory.Asset
         #endregion
 
         #region References interface
-        public override AssetReferencesServiceInterface References
-        {
-            get
-            {
-                return m_ReferencesService;
-            }
-        }
+        public override AssetReferencesServiceInterface References => m_ReferencesService;
         #endregion
 
         #region Data interface
-        public override IAssetDataServiceInterface Data
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetDataServiceInterface Data => this;
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         Stream IAssetDataServiceInterface.this[UUID key]
@@ -272,10 +250,8 @@ namespace SilverSim.Database.Memory.Asset
     [PluginName("Assets")]
     public class MemoryAssetServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryAssetService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryAssetService();
     }
     #endregion
 }

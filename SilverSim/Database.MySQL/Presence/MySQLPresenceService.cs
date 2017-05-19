@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL.Presence
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -65,7 +65,7 @@ namespace SilverSim.Database.MySQL.Presence
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -92,18 +92,18 @@ namespace SilverSim.Database.MySQL.Presence
         #region PresenceServiceInterface
         public override List<PresenceInfo> GetPresencesInRegion(UUID regionId)
         {
-            List<PresenceInfo> presences = new List<PresenceInfo>();
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var presences = new List<PresenceInfo>();
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM presence WHERE RegionID LIKE ?regionID", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM presence WHERE RegionID LIKE ?regionID", conn))
                 {
                     cmd.Parameters.AddParameter("?regionID", regionId);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            PresenceInfo pi = new PresenceInfo();
+                            var pi = new PresenceInfo();
                             pi.UserID.ID = reader.GetUUID("UserID");
                             pi.RegionID = reader.GetUUID("RegionID");
                             pi.SessionID = reader.GetUUID("SessionID");
@@ -120,16 +120,16 @@ namespace SilverSim.Database.MySQL.Presence
         {
             get
             {
-                List<PresenceInfo> presences = new List<PresenceInfo>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var presences = new List<PresenceInfo>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM presence WHERE UserID LIKE ?userID", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM presence WHERE UserID LIKE ?userID", conn))
                     {
                         cmd.Parameters.AddParameter("?userID", userID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            PresenceInfo pi = new PresenceInfo();
+                            var pi = new PresenceInfo();
                             pi.UserID.ID = reader.GetUUID("UserID");
                             pi.RegionID = reader.GetUUID("RegionID");
                             pi.SessionID = reader.GetUUID("SessionID");
@@ -169,10 +169,10 @@ namespace SilverSim.Database.MySQL.Presence
             {
                 if (value == null)
                 {
-                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    using(var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using(MySqlCommand cmd = new MySqlCommand("DELETE FROM presence WHERE SessionID LIKE ?sessionID", conn))
+                        using(var cmd = new MySqlCommand("DELETE FROM presence WHERE SessionID LIKE ?sessionID", conn))
                         {
                             cmd.Parameters.AddParameter("?sessionID", sessionID);
                             if(cmd.ExecuteNonQuery() < 1)
@@ -184,14 +184,15 @@ namespace SilverSim.Database.MySQL.Presence
                 }
                 else if (reportType == SetType.Login)
                 {
-                    Dictionary<string, object> post = new Dictionary<string, object>();
-                    post["UserID"] = value.UserID.ID;
-                    post["SessionID"] = value.SessionID;
-                    post["SecureSessionID"] = value.SecureSessionID;
-                    post["RegionID"] = UUID.Zero;
-                    post["LastSeen"] = Date.Now;
-
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    var post = new Dictionary<string, object>
+                    {
+                        ["UserID"] = value.UserID.ID,
+                        ["SessionID"] = value.SessionID,
+                        ["SecureSessionID"] = value.SecureSessionID,
+                        ["RegionID"] = UUID.Zero,
+                        ["LastSeen"] = Date.Now
+                    };
+                    using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
                         try
@@ -207,10 +208,10 @@ namespace SilverSim.Database.MySQL.Presence
                 }
                 else if (reportType == SetType.Report)
                 {
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand("UPDATE presence SET RegionID = ?regionID WHERE SessionID LIKE ?sessionID", conn))
+                        using (var cmd = new MySqlCommand("UPDATE presence SET RegionID = ?regionID WHERE SessionID LIKE ?sessionID", conn))
                         {
                             cmd.Parameters.AddParameter("?regionID", value.RegionID);
                             cmd.Parameters.AddParameter("?sessionID", value.SessionID);
@@ -227,10 +228,10 @@ namespace SilverSim.Database.MySQL.Presence
 
         public override void LogoutRegion(UUID regionID)
         {
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using(var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("DELETE FROM presence WHERE RegionID LIKE ?regionid", connection))
+                using(var cmd = new MySqlCommand("DELETE FROM presence WHERE RegionID LIKE ?regionid", connection))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     cmd.ExecuteNonQuery();
@@ -241,10 +242,10 @@ namespace SilverSim.Database.MySQL.Presence
 
         public override void Remove(UUID scopeID, UUID userAccount)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM presence WHERE UserID LIKE ?userid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM presence WHERE UserID LIKE ?userid", conn))
                 {
                     cmd.Parameters.AddParameter("?userid", userAccount);
                     cmd.ExecuteNonQuery();
@@ -259,16 +260,9 @@ namespace SilverSim.Database.MySQL.Presence
     public class MySQLPresenceServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
-        public MySQLPresenceServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLPresenceService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLPresenceService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
-
 }

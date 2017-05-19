@@ -35,7 +35,7 @@ namespace SilverSim.Database.MySQL.Groups
     {
         public static GroupInfo ToGroupInfo(this MySqlDataReader reader, string memberCount = "MemberCount")
         {
-            GroupInfo info = new GroupInfo();
+            var info = new GroupInfo();
             info.ID.ID = reader.GetUUID("GroupID");
             string uri = reader.GetString("Location");
             if (!string.IsNullOrEmpty(uri))
@@ -60,14 +60,16 @@ namespace SilverSim.Database.MySQL.Groups
 
         public static GroupRole ToGroupRole(this MySqlDataReader reader, string prefix = "")
         {
-            GroupRole role = new GroupRole();
-            role.Group.ID = reader.GetUUID("GroupID");
-            role.ID = reader.GetUUID("RoleID");
-            role.Name = reader.GetString(prefix + "Name");
-            role.Description = reader.GetString(prefix + "Description");
-            role.Title = reader.GetString(prefix + "Title");
-            role.Powers = reader.GetEnum<GroupPowers>(prefix + "Powers");
-            if(role.ID == UUID.Zero)
+            var role = new GroupRole()
+            {
+                Group = new UGI(reader.GetUUID("GroupID")),
+                ID = reader.GetUUID("RoleID"),
+                Name = reader.GetString(prefix + "Name"),
+                Description = reader.GetString(prefix + "Description"),
+                Title = reader.GetString(prefix + "Title"),
+                Powers = reader.GetEnum<GroupPowers>(prefix + "Powers")
+            };
+            if (role.ID == UUID.Zero)
             {
                 role.Members = reader.GetUInt32("GroupMembers");
             }
@@ -79,93 +81,75 @@ namespace SilverSim.Database.MySQL.Groups
             return role;
         }
 
-        public static GroupMember ToGroupMember(this MySqlDataReader reader)
+        public static GroupMember ToGroupMember(this MySqlDataReader reader) => new GroupMember()
         {
-            GroupMember groupmem = new GroupMember();
-            groupmem.Group.ID = reader.GetUUID("GroupID");
-            groupmem.Principal.ID = reader.GetUUID("PrincipalID");
-            groupmem.SelectedRoleID = reader.GetUUID("SelectedRoleID");
-            groupmem.Contribution = reader.GetInt32("Contribution");
-            groupmem.IsListInProfile = reader.GetBool("ListInProfile");
-            groupmem.IsAcceptNotices = reader.GetBool("AcceptNotices");
-            groupmem.AccessToken = reader.GetString("AccessToken");
+            Group = new UGI(reader.GetUUID("GroupID")),
+            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            SelectedRoleID = reader.GetUUID("SelectedRoleID"),
+            Contribution = reader.GetInt32("Contribution"),
+            IsListInProfile = reader.GetBool("ListInProfile"),
+            IsAcceptNotices = reader.GetBool("AcceptNotices"),
+            AccessToken = reader.GetString("AccessToken")
+        };
 
-            return groupmem;
-        }
-
-        public static GroupRolemember ToGroupRolemember(this MySqlDataReader reader)
+        public static GroupRolemember ToGroupRolemember(this MySqlDataReader reader) => new GroupRolemember()
         {
-            GroupRolemember grouprolemem = new GroupRolemember();
-            grouprolemem.Group.ID = reader.GetUUID("GroupID");
-            grouprolemem.RoleID = reader.GetUUID("RoleID");
-            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
-            grouprolemem.Powers = reader.GetEnum<GroupPowers>("Powers");
+            Group = new UGI(reader.GetUUID("GroupID")),
+            RoleID = reader.GetUUID("RoleID"),
+            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Powers = reader.GetEnum<GroupPowers>("Powers")
+        };
 
-            return grouprolemem;
-        }
-
-        public static GroupRolemember ToGroupRolememberEveryone(this MySqlDataReader reader, GroupPowers powers)
+        public static GroupRolemember ToGroupRolememberEveryone(this MySqlDataReader reader, GroupPowers powers) => new GroupRolemember()
         {
-            GroupRolemember grouprolemem = new GroupRolemember();
-            grouprolemem.Group.ID = reader.GetUUID("GroupID");
-            grouprolemem.RoleID = UUID.Zero;
-            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
-            grouprolemem.Powers = powers;
+            Group = new UGI(reader.GetUUID("GroupID")),
+            RoleID = UUID.Zero,
+            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Powers = powers
+        };
 
-            return grouprolemem;
-        }
-
-        public static GroupRolemembership ToGroupRolemembership(this MySqlDataReader reader)
+        public static GroupRolemembership ToGroupRolemembership(this MySqlDataReader reader) => new GroupRolemembership()
         {
-            GroupRolemembership grouprolemem = new GroupRolemembership();
-            grouprolemem.Group.ID = reader.GetUUID("GroupID");
-            grouprolemem.RoleID = reader.GetUUID("RoleID");
-            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
-            grouprolemem.Powers = reader.GetEnum<GroupPowers>("Powers");
-            grouprolemem.GroupTitle = reader.GetString("Title");
-
-            return grouprolemem;
-        }
+            Group = new UGI(reader.GetUUID("GroupID")),
+            RoleID = reader.GetUUID("RoleID"),
+            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Powers = reader.GetEnum<GroupPowers>("Powers"),
+            GroupTitle = reader.GetString("Title")
+        };
 
         public static GroupRolemembership ToGroupRolemembershipEveryone(this MySqlDataReader reader, GroupPowers powers)
         {
             GroupRolemembership grouprolemem = new GroupRolemembership();
-            grouprolemem.Group.ID = reader.GetUUID("GroupID");
+            grouprolemem.Group = new UGI(reader.GetUUID("GroupID"));
             grouprolemem.RoleID = UUID.Zero;
-            grouprolemem.Principal.ID = reader.GetUUID("PrincipalID");
+            grouprolemem.Principal = new UUI(reader.GetUUID("PrincipalID"));
             grouprolemem.Powers = powers;
 
             return grouprolemem;
         }
 
-        public static GroupInvite ToGroupInvite(this MySqlDataReader reader)
+        public static GroupInvite ToGroupInvite(this MySqlDataReader reader) => new GroupInvite()
         {
-            GroupInvite inv = new GroupInvite();
-            inv.ID = reader.GetUUID("InviteID");
-            inv.Group.ID = reader.GetUUID("GroupID");
-            inv.RoleID = reader.GetUUID("RoleID");
-            inv.Principal.ID = reader.GetUUID("PrincipalID");
-            inv.Timestamp = reader.GetDate("Timestamp");
+            ID = reader.GetUUID("InviteID"),
+            Group = new UGI(reader.GetUUID("GroupID")),
+            RoleID = reader.GetUUID("RoleID"),
+            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Timestamp = reader.GetDate("Timestamp")
+        };
 
-            return inv;
-        }
-
-        public static GroupNotice ToGroupNotice(this MySqlDataReader reader)
+        public static GroupNotice ToGroupNotice(this MySqlDataReader reader) => new GroupNotice()
         {
-            GroupNotice notice = new GroupNotice();
-            notice.Group.ID = reader.GetUUID("GroupID");
-            notice.ID = reader.GetUUID("NoticeID");
-            notice.Timestamp = reader.GetDate("Timestamp");
-            notice.FromName = reader.GetString("FromName");
-            notice.Subject = reader.GetString("Subject");
-            notice.Message = reader.GetString("Message");
-            notice.HasAttachment = reader.GetBool("HasAttachment");
-            notice.AttachmentType = reader.GetEnum<AssetType>("AttachmentType");
-            notice.AttachmentName = reader.GetString("AttachmentName");
-            notice.AttachmentItemID = reader.GetUUID("AttachmentItemID");
-            notice.AttachmentOwner.ID = reader.GetUUID("AttachmentOwnerID");
-
-            return notice;
-        }
+            Group = new UGI(reader.GetUUID("GroupID")),
+            ID = reader.GetUUID("NoticeID"),
+            Timestamp = reader.GetDate("Timestamp"),
+            FromName = reader.GetString("FromName"),
+            Subject = reader.GetString("Subject"),
+            Message = reader.GetString("Message"),
+            HasAttachment = reader.GetBool("HasAttachment"),
+            AttachmentType = reader.GetEnum<AssetType>("AttachmentType"),
+            AttachmentName = reader.GetString("AttachmentName"),
+            AttachmentItemID = reader.GetUUID("AttachmentItemID"),
+            AttachmentOwner = new UUI(reader.GetUUID("AttachmentOwnerID"))
+        };
     }
 }

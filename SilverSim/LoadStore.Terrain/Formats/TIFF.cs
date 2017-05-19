@@ -28,20 +28,8 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("TIFF Terrain Storage Format Writer")]
     public class TIFF : DrawingSaveCommon
     {
-        public override string Name
-        {
-            get
-            {
-                return "tiff";
-            }
-        }
+        public override string Name => "tiff";
 
-        protected override ImageFormat TargetImageFormat
-        {
-            get
-            {
-                return ImageFormat.Tiff;
-            }
-        }
+        protected override ImageFormat TargetImageFormat => ImageFormat.Tiff;
     }
 }

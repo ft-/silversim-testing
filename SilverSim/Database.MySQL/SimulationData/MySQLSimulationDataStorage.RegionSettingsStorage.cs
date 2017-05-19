@@ -30,48 +30,45 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage : ISimulationDataRegionSettingsStorageInterface
     {
-        RegionSettings ToRegionSettings(MySqlDataReader reader)
+        RegionSettings ToRegionSettings(MySqlDataReader reader) => new RegionSettings()
         {
-            RegionSettings settings = new RegionSettings();
-            settings.BlockTerraform = reader.GetBool("BlockTerraform");
-            settings.BlockFly = reader.GetBool("BlockFly");
-            settings.AllowDamage = reader.GetBool("AllowDamage");
-            settings.RestrictPushing = reader.GetBool("RestrictPushing");
-            settings.AllowLandResell = reader.GetBool("AllowLandResell");
-            settings.AllowLandJoinDivide = reader.GetBool("AllowLandJoinDivide");
-            settings.BlockShowInSearch = reader.GetBool("BlockShowInSearch");
-            settings.AgentLimit = reader.GetInt32("AgentLimit");
-            settings.ObjectBonus = reader.GetDouble("ObjectBonus");
-            settings.DisableScripts = reader.GetBool("DisableScripts");
-            settings.DisableCollisions = reader.GetBool("DisableCollisions");
-            settings.BlockFlyOver = reader.GetBool("BlockFlyOver");
-            settings.Sandbox = reader.GetBool("Sandbox");
-            settings.TerrainTexture1 = reader.GetUUID("TerrainTexture1");
-            settings.TerrainTexture2 = reader.GetUUID("TerrainTexture2");
-            settings.TerrainTexture3 = reader.GetUUID("TerrainTexture3");
-            settings.TerrainTexture4 = reader.GetUUID("TerrainTexture4");
-            settings.TelehubObject = reader.GetUUID("TelehubObject");
-            settings.Elevation1NW = reader.GetDouble("Elevation1NW");
-            settings.Elevation2NW = reader.GetDouble("Elevation2NW");
-            settings.Elevation1NE = reader.GetDouble("Elevation1NE");
-            settings.Elevation2NE = reader.GetDouble("Elevation2NE");
-            settings.Elevation1SE = reader.GetDouble("Elevation1SE");
-            settings.Elevation2SE = reader.GetDouble("Elevation2SE");
-            settings.Elevation1SW = reader.GetDouble("Elevation1SW");
-            settings.Elevation2SW = reader.GetDouble("Elevation2SW");
-            settings.WaterHeight = reader.GetDouble("WaterHeight");
-            settings.TerrainRaiseLimit = reader.GetDouble("TerrainRaiseLimit");
-            settings.TerrainLowerLimit = reader.GetDouble("TerrainLowerLimit");
-            settings.SunPosition = reader.GetDouble("SunPosition");
-            settings.IsSunFixed = reader.GetBoolean("IsSunFixed");
-            settings.UseEstateSun = reader.GetBool("UseEstateSun");
-            settings.BlockDwell = reader.GetBool("BlockDwell");
-            settings.ResetHomeOnTeleport = reader.GetBool("ResetHomeOnTeleport");
-            settings.AllowLandmark = reader.GetBool("AllowLandmark");
-            settings.AllowDirectTeleport = reader.GetBool("AllowDirectTeleport");
-
-            return settings;
-        }
+            BlockTerraform = reader.GetBool("BlockTerraform"),
+            BlockFly = reader.GetBool("BlockFly"),
+            AllowDamage = reader.GetBool("AllowDamage"),
+            RestrictPushing = reader.GetBool("RestrictPushing"),
+            AllowLandResell = reader.GetBool("AllowLandResell"),
+            AllowLandJoinDivide = reader.GetBool("AllowLandJoinDivide"),
+            BlockShowInSearch = reader.GetBool("BlockShowInSearch"),
+            AgentLimit = reader.GetInt32("AgentLimit"),
+            ObjectBonus = reader.GetDouble("ObjectBonus"),
+            DisableScripts = reader.GetBool("DisableScripts"),
+            DisableCollisions = reader.GetBool("DisableCollisions"),
+            BlockFlyOver = reader.GetBool("BlockFlyOver"),
+            Sandbox = reader.GetBool("Sandbox"),
+            TerrainTexture1 = reader.GetUUID("TerrainTexture1"),
+            TerrainTexture2 = reader.GetUUID("TerrainTexture2"),
+            TerrainTexture3 = reader.GetUUID("TerrainTexture3"),
+            TerrainTexture4 = reader.GetUUID("TerrainTexture4"),
+            TelehubObject = reader.GetUUID("TelehubObject"),
+            Elevation1NW = reader.GetDouble("Elevation1NW"),
+            Elevation2NW = reader.GetDouble("Elevation2NW"),
+            Elevation1NE = reader.GetDouble("Elevation1NE"),
+            Elevation2NE = reader.GetDouble("Elevation2NE"),
+            Elevation1SE = reader.GetDouble("Elevation1SE"),
+            Elevation2SE = reader.GetDouble("Elevation2SE"),
+            Elevation1SW = reader.GetDouble("Elevation1SW"),
+            Elevation2SW = reader.GetDouble("Elevation2SW"),
+            WaterHeight = reader.GetDouble("WaterHeight"),
+            TerrainRaiseLimit = reader.GetDouble("TerrainRaiseLimit"),
+            TerrainLowerLimit = reader.GetDouble("TerrainLowerLimit"),
+            SunPosition = reader.GetDouble("SunPosition"),
+            IsSunFixed = reader.GetBoolean("IsSunFixed"),
+            UseEstateSun = reader.GetBool("UseEstateSun"),
+            BlockDwell = reader.GetBool("BlockDwell"),
+            ResetHomeOnTeleport = reader.GetBool("ResetHomeOnTeleport"),
+            AllowLandmark = reader.GetBool("AllowLandmark"),
+            AllowDirectTeleport = reader.GetBool("AllowDirectTeleport")
+        };
 
         RegionSettings ISimulationDataRegionSettingsStorageInterface.this[UUID regionID]
         {
@@ -86,48 +83,49 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             set
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    Dictionary<string, object> data = new Dictionary<string, object>();
-                    data["RegionID"] = regionID;
-                    data["BlockTerraform"] = value.BlockTerraform;
-                    data["BlockFly"] = value.BlockFly;
-                    data["AllowDamage"] = value.AllowDamage;
-                    data["RestrictPushing"] = value.RestrictPushing;
-                    data["AllowLandResell"] = value.AllowLandResell;
-                    data["AllowLandJoinDivide"] = value.AllowLandJoinDivide;
-                    data["BlockShowInSearch"] = value.BlockShowInSearch;
-                    data["AgentLimit"] = value.AgentLimit;
-                    data["ObjectBonus"] = value.ObjectBonus;
-                    data["DisableScripts"] = value.DisableScripts;
-                    data["DisableCollisions"] = value.DisableCollisions;
-                    data["BlockFlyOver"] = value.BlockFlyOver;
-                    data["Sandbox"] = value.Sandbox;
-                    data["TerrainTexture1"] = value.TerrainTexture1;
-                    data["TerrainTexture2"] = value.TerrainTexture2;
-                    data["TerrainTexture3"] = value.TerrainTexture3;
-                    data["TerrainTexture4"] = value.TerrainTexture4;
-                    data["TelehubObject"] = value.TelehubObject;
-                    data["Elevation1NW"] = value.Elevation1NW;
-                    data["Elevation2NW"] = value.Elevation2NW;
-                    data["Elevation1NE"] = value.Elevation1NE;
-                    data["Elevation2NE"] = value.Elevation2NE;
-                    data["Elevation1SE"] = value.Elevation1SE;
-                    data["Elevation2SE"] = value.Elevation2SE;
-                    data["Elevation1SW"] = value.Elevation1SW;
-                    data["Elevation2SW"] = value.Elevation2SW;
-                    data["WaterHeight"] = value.WaterHeight;
-                    data["TerrainRaiseLimit"] = value.TerrainRaiseLimit;
-                    data["TerrainLowerLimit"] = value.TerrainLowerLimit;
-                    data["SunPosition"] = value.SunPosition;
-                    data["IsSunFixed"] = value.IsSunFixed;
-                    data["UseEstateSun"] = value.UseEstateSun;
-                    data["BlockDwell"] = value.BlockDwell;
-                    data["ResetHomeOnTeleport"] = value.ResetHomeOnTeleport;
-                    data["AllowLandmark"] = value.AllowLandmark;
-                    data["AllowDirectTeleport"] = value.AllowDirectTeleport;
-
+                    var data = new Dictionary<string, object>
+                    {
+                        ["RegionID"] = regionID,
+                        ["BlockTerraform"] = value.BlockTerraform,
+                        ["BlockFly"] = value.BlockFly,
+                        ["AllowDamage"] = value.AllowDamage,
+                        ["RestrictPushing"] = value.RestrictPushing,
+                        ["AllowLandResell"] = value.AllowLandResell,
+                        ["AllowLandJoinDivide"] = value.AllowLandJoinDivide,
+                        ["BlockShowInSearch"] = value.BlockShowInSearch,
+                        ["AgentLimit"] = value.AgentLimit,
+                        ["ObjectBonus"] = value.ObjectBonus,
+                        ["DisableScripts"] = value.DisableScripts,
+                        ["DisableCollisions"] = value.DisableCollisions,
+                        ["BlockFlyOver"] = value.BlockFlyOver,
+                        ["Sandbox"] = value.Sandbox,
+                        ["TerrainTexture1"] = value.TerrainTexture1,
+                        ["TerrainTexture2"] = value.TerrainTexture2,
+                        ["TerrainTexture3"] = value.TerrainTexture3,
+                        ["TerrainTexture4"] = value.TerrainTexture4,
+                        ["TelehubObject"] = value.TelehubObject,
+                        ["Elevation1NW"] = value.Elevation1NW,
+                        ["Elevation2NW"] = value.Elevation2NW,
+                        ["Elevation1NE"] = value.Elevation1NE,
+                        ["Elevation2NE"] = value.Elevation2NE,
+                        ["Elevation1SE"] = value.Elevation1SE,
+                        ["Elevation2SE"] = value.Elevation2SE,
+                        ["Elevation1SW"] = value.Elevation1SW,
+                        ["Elevation2SW"] = value.Elevation2SW,
+                        ["WaterHeight"] = value.WaterHeight,
+                        ["TerrainRaiseLimit"] = value.TerrainRaiseLimit,
+                        ["TerrainLowerLimit"] = value.TerrainLowerLimit,
+                        ["SunPosition"] = value.SunPosition,
+                        ["IsSunFixed"] = value.IsSunFixed,
+                        ["UseEstateSun"] = value.UseEstateSun,
+                        ["BlockDwell"] = value.BlockDwell,
+                        ["ResetHomeOnTeleport"] = value.ResetHomeOnTeleport,
+                        ["AllowLandmark"] = value.AllowLandmark,
+                        ["AllowDirectTeleport"] = value.AllowDirectTeleport
+                    };
                     conn.ReplaceInto("regionsettings", data);
                 }
             }
@@ -135,10 +133,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataRegionSettingsStorageInterface.TryGetValue(UUID regionID, out RegionSettings settings)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                 {
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -156,14 +154,14 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataRegionSettingsStorageInterface.ContainsKey(UUID regionID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT RegionID FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("SELECT RegionID FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                 {
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        return (reader.Read());
+                        return reader.Read();
                     }
                 }
             }

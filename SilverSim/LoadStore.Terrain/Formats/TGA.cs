@@ -34,18 +34,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("Targa Terrain Format")]
     public class TGA : ITerrainFileStorage, IPlugin
     {
-        public TGA()
-        {
-
-        }
-
-        public string Name
-        {
-            get
-            {
-                return "tga";
-            }
-        }
+        public string Name => "tga";
 
         public List<LayerPatch> LoadFile(string filename, int suggested_width, int suggested_height)
         {
@@ -73,21 +62,9 @@ namespace SilverSim.LoadStore.Terrain.Formats
             throw new NotSupportedException();
         }
 
-        public bool SupportsLoading
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool SupportsLoading => true;
 
-        public bool SupportsSaving
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportsSaving => false;
 
         public void Startup(ConfigurationLoader loader)
         {

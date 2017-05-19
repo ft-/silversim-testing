@@ -30,10 +30,10 @@ namespace SilverSim.Database.MySQL.Estate
     {
         bool IEstateOwnerServiceInterface.TryGetValue(uint estateID, out UUI uui)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -54,11 +54,11 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get
             {
-                List<uint> estates = new List<uint>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var estates = new List<uint>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID, Owner FROM estates WHERE Owner LIKE \"" + owner.ID.ToString() + "%\"", conn))
+                    using (var cmd = new MySqlCommand("SELECT ID, Owner FROM estates WHERE Owner LIKE \"" + owner.ID.ToString() + "%\"", conn))
                     {
                         cmd.Parameters.AddParameter("?id", owner.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -92,10 +92,10 @@ namespace SilverSim.Database.MySQL.Estate
             }
             set
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("UPDATE estates SET Owner = ?ownerid WHERE ID = ?id", conn))
+                    using (var cmd = new MySqlCommand("UPDATE estates SET Owner = ?ownerid WHERE ID = ?id", conn))
                     {
                         cmd.Parameters.AddParameter("?id", estateID);
                         cmd.Parameters.AddParameter("?ownerid", value);

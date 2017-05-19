@@ -33,22 +33,11 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("RAW32 Terrain Format")]
     public class RAW32 : ITerrainFileStorage, IPlugin
     {
-        public RAW32()
-        {
-
-        }
-
-        public string Name
-        {
-            get 
-            {
-                return "raw32";
-            }
-        }
+        public string Name => "raw32";
 
         public List<LayerPatch> LoadFile(string filename, int suggested_width, int suggested_height)
         {
-            using(Stream input = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            using(var input = new FileStream(filename, FileMode.Open, FileAccess.Read))
             {
                 return LoadStream(input, suggested_width, suggested_height);
             }
@@ -56,10 +45,10 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public List<LayerPatch> LoadStream(Stream input, int suggested_width, int suggested_height)
         {
-            List<LayerPatch> patches = new List<LayerPatch>();
-            float[,] vals = new float[LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, suggested_width];
+            var patches = new List<LayerPatch>();
+            var vals = new float[LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, suggested_width];
 
-            using(BinaryReader bs = new BinaryReader(input))
+            using(var bs = new BinaryReader(input))
             {
                 for (uint patchy = 0; patchy < suggested_height / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++patchy)
                 {
@@ -75,7 +64,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
                     /* now build patches from those 16 lines */
                     for(uint patchx = 0; patchx < suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++patchx)
                     {
-                        LayerPatch patch = new LayerPatch();
+                        var patch = new LayerPatch();
                         patch.X = patchx;
                         patch.Y = patchy;
                         for(uint y = 0; y < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
@@ -95,7 +84,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public void SaveFile(string filename, List<LayerPatch> terrain)
         {
-            using(Stream output = new FileStream(filename, FileMode.Create, FileAccess.Write))
+            using(var output = new FileStream(filename, FileMode.Create, FileAccess.Write))
             {
                 SaveStream(output, terrain);
             }
@@ -103,7 +92,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public void SaveStream(Stream output, List<LayerPatch> terrain)
         {
-            float[] outdata = new float[terrain.Count * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+            var outdata = new float[terrain.Count * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
             uint minX = terrain[0].X;
             uint minY = terrain[0].Y;
             uint maxX = terrain[0].X;
@@ -132,7 +121,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
                 }
             }
 
-            using(BinaryWriter bs = new BinaryWriter(output))
+            using(var bs = new BinaryWriter(output))
             {
                 foreach(float f in outdata)
                 {
@@ -141,21 +130,9 @@ namespace SilverSim.LoadStore.Terrain.Formats
             }
         }
 
-        public bool SupportsLoading
-        {
-            get 
-            {
-                return true;
-            }
-        }
+        public bool SupportsLoading => true;
 
-        public bool SupportsSaving
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool SupportsSaving => true;
 
         public void Startup(ConfigurationLoader loader)
         {

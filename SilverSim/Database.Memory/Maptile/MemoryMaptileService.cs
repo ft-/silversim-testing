@@ -35,15 +35,11 @@ namespace SilverSim.Database.Memory.Maptile
     {
         readonly RwLockedDictionary<string, MaptileData> m_Maptiles = new RwLockedDictionary<string, MaptileData>();
 
-        static string GetKey(UUID scopeid, GridVector loc, int zoomlevel)
-        {
-            return string.Format("{0}-{1}-{2}-{3}", scopeid.ToString(), loc.X, loc.Y, zoomlevel);
-        }
+        static string GetKey(UUID scopeid, GridVector loc, int zoomlevel) =>
+            string.Format("{0}-{1}-{2}-{3}", scopeid.ToString(), loc.X, loc.Y, zoomlevel);
 
-        static string GetKey(MaptileData data)
-        {
-            return GetKey(data.ScopeID, data.Location, data.ZoomLevel);
-        }
+        static string GetKey(MaptileData data) =>
+            GetKey(data.ScopeID, data.Location, data.ZoomLevel);
 
         public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
         {
@@ -70,23 +66,17 @@ namespace SilverSim.Database.Memory.Maptile
             m_Maptiles[GetKey(data)] = ndata;
         }
 
-        public override bool Remove(UUID scopeid, GridVector location, int zoomlevel)
-        {
-            return m_Maptiles.Remove(GetKey(scopeid, location, zoomlevel));
-        }
+        public override bool Remove(UUID scopeid, GridVector location, int zoomlevel) =>
+            m_Maptiles.Remove(GetKey(scopeid, location, zoomlevel));
 
-        public override bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data)
-        {
-            return m_Maptiles.TryGetValue(GetKey(scopeid, location, zoomlevel), out data);
-        }
+        public override bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data) =>
+            m_Maptiles.TryGetValue(GetKey(scopeid, location, zoomlevel), out data);
     }
 
     [PluginName("Maptile")]
     public class MemoryMaptileServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryMaptileService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryMaptileService();
     }
 }

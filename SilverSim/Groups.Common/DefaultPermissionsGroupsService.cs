@@ -37,77 +37,23 @@ namespace SilverSim.Groups.Common
             m_GroupsServiceName = ownSection.GetString("GroupsStorage", "GroupsStorage");
         }
 
-        public override IGroupSelectInterface ActiveGroup
-        {
-            get
-            {
-                return m_InnerService.ActiveGroup;
-            }
-        }
+        public override IGroupSelectInterface ActiveGroup => m_InnerService.ActiveGroup;
 
-        public override IActiveGroupMembershipInterface ActiveMembership
-        {
-            get
-            {
-                return m_InnerService.ActiveMembership;
-            }
-        }
+        public override IActiveGroupMembershipInterface ActiveMembership => m_InnerService.ActiveMembership;
 
-        public override IGroupsInterface Groups
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupsInterface Groups => this;
 
-        public override IGroupInvitesInterface Invites
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupInvitesInterface Invites => this;
 
-        public override IGroupMembersInterface Members
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupMembersInterface Members => this;
 
-        public override IGroupMembershipsInterface Memberships
-        {
-            get
-            {
-                return m_InnerService.Memberships;
-            }
-        }
+        public override IGroupMembershipsInterface Memberships => m_InnerService.Memberships;
 
-        public override IGroupNoticesInterface Notices
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupNoticesInterface Notices => this;
 
-        public override IGroupRolemembersInterface Rolemembers
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupRolemembersInterface Rolemembers => this;
 
-        public override IGroupRolesInterface Roles
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupRolesInterface Roles => this;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -118,10 +64,7 @@ namespace SilverSim.Groups.Common
             }
         }
 
-        public override GroupPowers GetAgentPowers(UGI group, UUI agent)
-        {
-            return m_InnerService.GetAgentPowers(group, agent);
-        }
+        public override GroupPowers GetAgentPowers(UGI group, UUI agent) => m_InnerService.GetAgentPowers(group, agent);
 
         bool IsGroupOwner(UGI group, UUI agent)
         {
@@ -144,14 +87,7 @@ namespace SilverSim.Groups.Common
     [PluginName("DefaultPermissions")]
     public class DefaultPermissionsGroupServiceFactory : IPluginFactory
     {
-        public DefaultPermissionsGroupServiceFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new DefaultPermissionsGroupsService(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new DefaultPermissionsGroupsService(ownSection);
     }
 }

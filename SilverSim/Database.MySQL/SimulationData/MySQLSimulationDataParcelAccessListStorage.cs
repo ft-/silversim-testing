@@ -44,24 +44,26 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                List<ParcelAccessEntry> result = new List<ParcelAccessEntry>();
+                var result = new List<ParcelAccessEntry>();
 
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt <> 0", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt <> 0", connection))
                     {
                         cmd.ExecuteNonQuery();
                     }
 
                     /* we use a specific implementation to reduce the result set here */
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "\"%", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "\"%", connection))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            ParcelAccessEntry entry = new ParcelAccessEntry();
-                            entry.ParcelID = reader.GetUUID("ParcelID");
-                            entry.Accessor = reader.GetUUI("Accessor");
+                            var entry = new ParcelAccessEntry()
+                            {
+                                ParcelID = reader.GetUUID("ParcelID"),
+                                Accessor = reader.GetUUI("Accessor")
+                            };
                             ulong val = reader.GetUInt64("ExpiresAt");
                             if (val != 0)
                             {
@@ -82,25 +84,27 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                List<ParcelAccessEntry> result = new List<ParcelAccessEntry>();
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                var result = new List<ParcelAccessEntry>();
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt > 0", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt > 0", connection))
                     {
                         cmd.ExecuteNonQuery();
                     }
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                ParcelAccessEntry entry = new ParcelAccessEntry();
-                                entry.RegionID = reader.GetUUID("RegionID");
-                                entry.ParcelID = reader.GetUUID("ParcelID");
-                                entry.Accessor = reader.GetUUI("Accessor");
+                                var entry = new ParcelAccessEntry()
+                                {
+                                    RegionID = reader.GetUUID("RegionID"),
+                                    ParcelID = reader.GetUUID("ParcelID"),
+                                    Accessor = reader.GetUUI("Accessor")
+                                };
                                 ulong val = reader.GetUInt64("ExpiresAt");
                                 if (val != 0)
                                 {
@@ -117,29 +121,31 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public void Store(ParcelAccessEntry entry)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt > 0", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt > 0", connection))
                 {
                     cmd.ExecuteNonQuery();
                 }
 
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data["RegionID"] = entry.RegionID;
-                data["ParcelID"] = entry.ParcelID;
-                data["Accessor"] = entry.Accessor;
-                data["ExpiresAt"] = entry.ExpiresAt != null ? entry.ExpiresAt.AsULong : (ulong)0;
+                var data = new Dictionary<string, object>
+                {
+                    ["RegionID"] = entry.RegionID,
+                    ["ParcelID"] = entry.ParcelID,
+                    ["Accessor"] = entry.Accessor,
+                    ["ExpiresAt"] = entry.ExpiresAt != null ? entry.ExpiresAt.AsULong : (ulong)0
+                };
                 connection.ReplaceInto(m_TableName, data);
             }
         }
 
         public bool RemoveAllFromRegion(UUID regionID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -148,10 +154,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public bool Remove(UUID regionID, UUID parcelID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -160,10 +166,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public bool Remove(UUID regionID, UUID parcelID, UUI accessor)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }

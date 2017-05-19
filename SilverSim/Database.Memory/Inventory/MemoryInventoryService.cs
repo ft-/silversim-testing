@@ -50,31 +50,13 @@ namespace SilverSim.Database.Memory.Inventory
             m_Items = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryItem>>(delegate () { return new RwLockedDictionary<UUID, InventoryItem>(); });
         }
 
-        IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content
-        {
-            get
-            {
-                return m_ContentService;
-            }
-        }
+        IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content => m_ContentService;
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override IInventoryFolderServiceInterface Folder
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IInventoryFolderServiceInterface Folder => this;
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override IInventoryItemServiceInterface Item
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IInventoryItemServiceInterface Item => this;
 
         public override List<InventoryItem> GetActiveGestures(UUID principalID)
         {
@@ -101,10 +83,8 @@ namespace SilverSim.Database.Memory.Inventory
     [PluginName("Inventory")]
     public class MemoryInventoryServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryInventoryService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryInventoryService();
     }
     #endregion
 }

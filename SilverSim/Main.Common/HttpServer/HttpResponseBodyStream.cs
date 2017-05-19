@@ -29,14 +29,13 @@ namespace SilverSim.Main.Common.HttpServer
         private Stream m_Output;
         private long m_RemainingLength;
         readonly bool m_HasLimitedLength;
-        readonly long m_ContentLength;
         static readonly byte[] FillBytes = new byte[10240];
 
         public HttpResponseBodyStream(Stream output, long contentLength)
         {
             m_RemainingLength = contentLength;
             m_Output = output;
-            m_ContentLength = contentLength;
+            Length = contentLength;
             m_HasLimitedLength = true;
         }
 
@@ -44,54 +43,24 @@ namespace SilverSim.Main.Common.HttpServer
         {
             m_RemainingLength = 0;
             m_Output = output;
-            m_ContentLength = 0;
+            Length = 0;
         }
 
-        public override bool CanRead
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanRead => false;
 
-        public override bool CanSeek 
-        { 
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanTimeout 
-        { 
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanTimeout => true;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanWrite => true;
 
-        public override long Length 
-        { 
-            get
-            {
-                return m_ContentLength;
-            }
-        }
+        public override long Length { get; }
 
         public override long Position
         {
             get
             {
-                return m_ContentLength - m_RemainingLength;
+                return Length - m_RemainingLength;
             }
             set
             {
@@ -100,7 +69,7 @@ namespace SilverSim.Main.Common.HttpServer
         }
 
         public override int WriteTimeout 
-        { 
+        {
             get
             {
                 return m_Output.WriteTimeout;

@@ -72,20 +72,8 @@ namespace SilverSim.Database.Memory.SimulationData
             m_ParcelData[regionID][parcel.ID] = new ParcelInfo(parcel);
         }
 
-        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList
-        {
-            get
-            {
-                return m_WhiteListStorage;
-            }
-        }
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList => m_WhiteListStorage;
 
-        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList
-        {
-            get
-            {
-                return m_BlackListStorage;
-            }
-        }
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList => m_BlackListStorage;
     }
 }

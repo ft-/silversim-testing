@@ -42,7 +42,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
             /* load gradient map from assembly resources */
             using (Stream s = typeof(MapConverters).Assembly.GetManifestResourceStream("SilverSim.LoadStore.Terrain.Resources.defaultstripe.png"))
             {
-                using (Bitmap stripe = new Bitmap(s))
+                using (var stripe = new Bitmap(s))
                 {
                     m_GradientMap = new Color[stripe.Height];
                     for (int i = 0; i < stripe.Height; ++i)
@@ -53,35 +53,11 @@ namespace SilverSim.LoadStore.Terrain.Formats
             }
         }
 
+        public string Name => "jpeg";
 
-        public JPEG()
-        {
+        public bool SupportsLoading => false;
 
-        }
-
-        public string Name 
-        { 
-            get
-            {
-                return "jpeg";
-            }
-        }
-
-        public bool SupportsLoading
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public bool SupportsSaving
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool SupportsSaving => true;
 
         public List<LayerPatch> LoadFile(string filename, int suggested_width, int suggested_height)
         {

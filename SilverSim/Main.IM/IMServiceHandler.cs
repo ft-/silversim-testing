@@ -45,7 +45,7 @@ namespace SilverSim.Main.IM
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IMSendThread(object s)
         {
-            IMServiceHandler service = (IMServiceHandler)s;
+            var service = (IMServiceHandler)s;
             Thread thread = Thread.CurrentThread;
             thread.Name = "IM:Send Thread";
             service.m_Threads.Add(thread);
@@ -102,15 +102,8 @@ namespace SilverSim.Main.IM
     [PluginName("IMService")]
     public class IMServiceHandlerFactory : IPluginFactory
     {
-        public IMServiceHandlerFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new IMServiceHandler((uint)ownSection.GetInt("MaxThreads"));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new IMServiceHandler((uint)ownSection.GetInt("MaxThreads"));
     }
     #endregion
 }

@@ -30,35 +30,27 @@ namespace SilverSim.Http
     {
         public HttpHeaderFormatException()
         {
-
         }
 
         public HttpHeaderFormatException(string message)
             : base(message)
         {
-
         }
 
         protected HttpHeaderFormatException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public HttpHeaderFormatException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     [Serializable]
     public abstract class AbstractHttpStream : Stream
     {
-        protected AbstractHttpStream()
-        {
-        }
-
         public abstract string ReadHeaderLine();
     }
 }

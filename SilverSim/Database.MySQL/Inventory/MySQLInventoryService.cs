@@ -104,38 +104,20 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override IInventoryFolderServiceInterface Folder
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IInventoryFolderServiceInterface Folder => this;
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override IInventoryItemServiceInterface Item
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IInventoryItemServiceInterface Item => this;
 
-        IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content
-        {
-            get
-            {
-                return m_ContentService;
-            }
-        }
+        IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content => m_ContentService;
 
         public override List<InventoryItem> GetActiveGestures(UUID principalID)
         {
-            List<InventoryItem> items = new List<InventoryItem>();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var items = new List<InventoryItem>();
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND AssetType = ?assettype AND (flags & 1) <>0", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND AssetType = ?assettype AND (flags & 1) <>0", connection))
                 {
                     cmd.Parameters.AddParameter("?ownerid", principalID);
                     cmd.Parameters.AddParameter("?assettype", AssetType.Gesture);
@@ -154,11 +136,11 @@ namespace SilverSim.Database.MySQL.Inventory
 
         public override List<InventoryFolder> GetInventorySkeleton(UUID principalID)
         {
-            List<InventoryFolder> folders = new List<InventoryFolder>();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var folders = new List<InventoryFolder>();
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE ?ownerid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE ?ownerid", connection))
                 {
                     cmd.Parameters.AddParameter("?ownerid", principalID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -176,7 +158,7 @@ namespace SilverSim.Database.MySQL.Inventory
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -185,7 +167,7 @@ namespace SilverSim.Database.MySQL.Inventory
         #region Table migrations
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -201,17 +183,17 @@ namespace SilverSim.Database.MySQL.Inventory
 
         public override void Remove(UUID scopeID, UUID userAccount)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate()
+                connection.InsideTransaction(() =>
                 {
-                    using(MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("?ownerid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE ?ownerid", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE ?ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("?ownerid", userAccount);
                         cmd.ExecuteNonQuery();
@@ -227,18 +209,12 @@ namespace SilverSim.Database.MySQL.Inventory
     public class MySQLInventoryServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
-        public MySQLInventoryServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLInventoryService(
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLInventoryService(
                 MySQLUtilities.BuildConnectionString(ownSection, m_Log),
                 ownSection.GetString("ItemTable", "inventoryitems"),
                 ownSection.GetString("FolderTable", "inventoryfolders"));
-        }
     }
     #endregion
 }

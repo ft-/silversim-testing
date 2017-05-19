@@ -28,20 +28,8 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("GIF Terrain Storage Format Writer")]
     public class GIF : DrawingSaveCommon
     {
-        public override string Name
-        {
-            get
-            {
-                return "gif";
-            }
-        }
+        public override string Name => "gif";
 
-        protected override ImageFormat TargetImageFormat
-        {
-            get
-            {
-                return ImageFormat.Gif;
-            }
-        }
+        protected override ImageFormat TargetImageFormat => ImageFormat.Gif;
     }
 }

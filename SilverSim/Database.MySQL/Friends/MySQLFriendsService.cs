@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.Friends
     {
         public static FriendInfo ToFriendInfo(this MySqlDataReader reader)
         {
-            FriendInfo fi = new FriendInfo();
+            var fi = new FriendInfo();
             fi.User.ID = reader.GetUUID("User");
             fi.Friend.ID = reader.GetUUID("Friend");
             fi.Secret = reader.GetString("Secret");
@@ -85,11 +85,11 @@ namespace SilverSim.Database.MySQL.Friends
         {
             get
             {
-                List<FriendInfo> fis = new List<FriendInfo>();
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                var fis = new List<FriendInfo>();
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?id", user.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -124,10 +124,10 @@ namespace SilverSim.Database.MySQL.Friends
 
         public override void Delete(FriendInfo fi)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM friends WHERE (UserID LIKE ?userid AND FriendID LIKE ?friendid) OR (UserID LIKE ?friendid AND FriendID LIKE ?userid)", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM friends WHERE (UserID LIKE ?userid AND FriendID LIKE ?friendid) OR (UserID LIKE ?friendid AND FriendID LIKE ?userid)", connection))
                 {
                     cmd.Parameters.AddParameter("?userid", fi.User.ID);
                     cmd.Parameters.AddParameter("?friendid", fi.Friend.ID);
@@ -138,7 +138,7 @@ namespace SilverSim.Database.MySQL.Friends
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -147,10 +147,10 @@ namespace SilverSim.Database.MySQL.Friends
 
         public void Remove(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM friends WHERE UserID LIKE ?id OR FriendID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM friends WHERE UserID LIKE ?id OR FriendID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountID);
                     cmd.ExecuteNonQuery();
@@ -160,7 +160,7 @@ namespace SilverSim.Database.MySQL.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
-            RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
+            var avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
             foreach(string avatarnameservicename in m_AvatarNameServiceNames)
             {
                 avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(avatarnameservicename.Trim()));
@@ -170,12 +170,12 @@ namespace SilverSim.Database.MySQL.Friends
 
         public override void Store(FriendInfo fi)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate ()
+                connection.InsideTransaction(() =>
                 {
-                    Dictionary<string, object> vals = new Dictionary<string, object>();
+                    var vals = new Dictionary<string, object>();
                     vals.Add("UserID", fi.User.ID);
                     vals.Add("FriendID", fi.Friend.ID);
                     vals.Add("Secret", fi.Secret);
@@ -194,24 +194,26 @@ namespace SilverSim.Database.MySQL.Friends
 
         public override void StoreOffer(FriendInfo fi)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                Dictionary<string, object> vals = new Dictionary<string, object>();
-                vals.Add("UserID", fi.Friend.ID);
-                vals.Add("FriendID", fi.User.ID);
-                vals.Add("Secret", fi.Secret);
-                vals.Add("RightsToFriend", FriendRightFlags.None);
+                var vals = new Dictionary<string, object>
+                {
+                    { "UserID", fi.Friend.ID },
+                    { "FriendID", fi.User.ID },
+                    { "Secret", fi.Secret },
+                    { "RightsToFriend", FriendRightFlags.None }
+                };
                 connection.ReplaceInto("friends", vals);
             }
         }
 
         public override void StoreRights(FriendInfo fi)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE friends SET RightsToFriend = ?rights WHERE UserID LIKE ?userid AND FriendID LIKE ?friendid", connection))
+                using (var cmd = new MySqlCommand("UPDATE friends SET RightsToFriend = ?rights WHERE UserID LIKE ?userid AND FriendID LIKE ?friendid", connection))
                 {
                     cmd.Parameters.AddParameter("?rights", fi.FriendGivenFlags);
                     cmd.Parameters.AddParameter("?userid", fi.User.ID);
@@ -226,10 +228,10 @@ namespace SilverSim.Database.MySQL.Friends
 
         public override bool TryGetValue(UUI user, UUI friend, out FriendInfo fInfo)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE ?userid AND A.FriendID LIKE ?friendid", connection))
+                using (var cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE ?userid AND A.FriendID LIKE ?friendid", connection))
                 {
                     cmd.Parameters.AddParameter("?userid", user.ID);
                     cmd.Parameters.AddParameter("?friendid", friend.ID);
@@ -249,7 +251,7 @@ namespace SilverSim.Database.MySQL.Friends
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -274,16 +276,10 @@ namespace SilverSim.Database.MySQL.Friends
     public class MySQLFriendsServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL FRIENDS SERVICE");
-        public MySQLFriendsServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLFriendsService(MySQLUtilities.BuildConnectionString(ownSection, m_Log),
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLFriendsService(MySQLUtilities.BuildConnectionString(ownSection, m_Log),
                 ownSection.GetString("AvatarNameServices", string.Empty));
-        }
     }
     #endregion
 

@@ -33,11 +33,11 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get
             {
-                List<UGI> estategroups = new List<UGI>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var estategroups = new List<UGI>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid", conn))
+                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid", conn))
                     {
                         cmd.Parameters.AddParameter("?estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -60,10 +60,10 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid", conn))
                     {
                         cmd.Parameters.AddParameter("?estateid", estateID);
                         cmd.Parameters.AddParameter("?groupid", group.ID);
@@ -80,10 +80,10 @@ namespace SilverSim.Database.MySQL.Estate
                     "REPLACE INTO estate_groups (EstateID, GroupID) VALUES (?estateid, ?groupid)" : 
                     "DELETE FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid";
 
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    using (var cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddParameter("?estateid", estateID);
                         cmd.Parameters.AddParameter("?groupid", group.ID);
@@ -96,12 +96,6 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        IEstateGroupsServiceListAccessInterface IEstateGroupsServiceInterface.All
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        IEstateGroupsServiceListAccessInterface IEstateGroupsServiceInterface.All => this;
     }
 }

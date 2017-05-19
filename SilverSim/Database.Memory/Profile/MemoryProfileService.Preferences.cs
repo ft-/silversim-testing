@@ -48,14 +48,10 @@ namespace SilverSim.Database.Memory.Profile
             }
         }
 
-        public bool ContainsKey(UUI user)
-        {
-            return m_Preferences.ContainsKey(user.ID);
-        }
+        public bool ContainsKey(UUI user) =>
+            m_Preferences.ContainsKey(user.ID);
 
-        public bool TryGetValue(UUI user, out ProfilePreferences profilePrefs)
-        {
-            return m_Preferences.TryGetValue(user.ID, out profilePrefs);
-        }
+        public bool TryGetValue(UUI user, out ProfilePreferences profilePrefs) =>
+            m_Preferences.TryGetValue(user.ID, out profilePrefs);
     }
 }

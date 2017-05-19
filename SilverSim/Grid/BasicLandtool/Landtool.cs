@@ -74,7 +74,7 @@ namespace SilverSim.Grid.BasicLandtool
                 }
             }
 
-            Map resdata = new Map();
+            var resdata = new Map();
             if(!validated)
             {
                 resdata.Add("success", false);
@@ -83,23 +83,30 @@ namespace SilverSim.Grid.BasicLandtool
             }
             else
             {
-                Map membership_level = new Map();
-                membership_level.Add("id", UUID.Zero);
-                membership_level.Add("description", "some level");
-                Map membership_levels = new Map();
-                membership_levels.Add("level", membership_level);
-
-                Map landUse = new Map();
-                landUse.Add("upgrade", false);
-                landUse.Add("action", m_HttpServer.ServerURI);
-                Map currency = new Map();
-                currency.Add("estimatedCost", "200.00");
-
-                Map membership = new Map();
-                membership.Add("upgrade", false);
-                membership.Add("action", m_HttpServer.ServerURI);
-                membership.Add("levels", membership_levels);
-
+                var membership_level = new Map
+                {
+                    { "id", UUID.Zero },
+                    { "description", "some level" }
+                };
+                var membership_levels = new Map
+                {
+                    { "level", membership_level }
+                };
+                var landUse = new Map
+                {
+                    { "upgrade", false },
+                    { "action", m_HttpServer.ServerURI }
+                };
+                var currency = new Map
+                {
+                    { "estimatedCost", "200.00" }
+                };
+                var membership = new Map
+                {
+                    { "upgrade", false },
+                    { "action", m_HttpServer.ServerURI },
+                    { "levels", membership_levels }
+                };
                 resdata.Add("success", true);
                 resdata.Add("membership", membership);
                 resdata.Add("landUse", landUse);
@@ -114,14 +121,7 @@ namespace SilverSim.Grid.BasicLandtool
     [PluginName("BasicLandtool")]
     public class LandtoolFactory : IPluginFactory
     {
-        public LandtoolFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new Landtool(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new Landtool(ownSection);
     }
 }

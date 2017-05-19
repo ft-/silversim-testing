@@ -38,28 +38,6 @@ namespace SilverSim.Http
         [Serializable]
         public class TimeoutException : Exception
         {
-            public TimeoutException()
-            {
-
-            }
-
-            public TimeoutException(string message)
-                : base(message)
-            {
-
-            }
-
-            protected TimeoutException(SerializationInfo info, StreamingContext context)
-                : base(info, context)
-            {
-
-            }
-
-            public TimeoutException(string message, Exception innerException)
-                : base(message, innerException)
-            {
-
-            }
         }
 
         public HttpStream(Socket sock)
@@ -82,9 +60,9 @@ namespace SilverSim.Http
 
         public int ReadBytesInternal(byte[] buffer, int maxbytes, int timeoutms)
         {
-            ArrayList readList = new ArrayList();
+            var readList = new ArrayList();
             readList.Add(m_Socket);
-            ArrayList errorList = new ArrayList();
+            var errorList = new ArrayList();
             errorList.Add(m_Socket);
             Socket.Select(readList, null, errorList, timeoutms * 1000);
             if(errorList.Count > 0 && readList.Count == 0)
@@ -117,7 +95,7 @@ namespace SilverSim.Http
 
         public override string ReadHeaderLine()
         {
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
             for (; ;)
             {
                 if (m_BufferFill == m_BufferPos)
@@ -201,37 +179,13 @@ namespace SilverSim.Http
             }
         }
 
-        public override bool CanTimeout
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanTimeout => true;
 
-        public override bool CanRead
-        {
-            get
-            { 
-                return true; 
-            }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek
-        {
-            get 
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanWrite => true;
 
         public override void Flush()
         {
@@ -240,19 +194,19 @@ namespace SilverSim.Http
 
         public override long Length
         {
-            get 
-            { 
+            get
+            {
                 throw new NotSupportedException();
             }
         }
 
         public override long Position
         {
-            get 
+            get
             {
                 throw new NotSupportedException(); 
             }
-            set 
+            set
             {
                 throw new NotSupportedException(); 
             }
@@ -275,7 +229,7 @@ namespace SilverSim.Http
 
         public override void WriteByte(byte value)
         {
-            byte[] b = new byte[] { value };
+            var b = new byte[] { value };
             Write(b, 0, 1);
         }
         #endregion

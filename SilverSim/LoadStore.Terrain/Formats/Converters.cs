@@ -46,7 +46,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
         #region Sort List by X and then Y
         public static SortedList<uint, LayerPatch> SortPatchesByXY(this List<LayerPatch> inpatches)
         {
-            SortedList<uint, LayerPatch> outpatches = new SortedList<uint, LayerPatch>();
+            var outpatches = new SortedList<uint, LayerPatch>();
             foreach(LayerPatch patch in inpatches)
             {
                 outpatches.Add((patch.Y << 16) | patch.X, patch);
@@ -59,7 +59,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
         #region Bitmap -> LayerPatch Lists
         public static List<LayerPatch> ToPatchesFromGrayscale(this Bitmap bitmap)
         {
-            List<LayerPatch> patches = new List<LayerPatch>();
+            var patches = new List<LayerPatch>();
             if(bitmap.Width % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES != 0 ||
                 (bitmap.Height % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) != 0)
             {
@@ -105,7 +105,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
                 highY = Math.Max(patch.Y + 16, highY);
             }
 
-            Bitmap bitmap = new Bitmap((int)(highX - lowX) * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, (int)(highY - lowY) * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES);
+            var bitmap = new Bitmap((int)(highX - lowX) * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, (int)(highY - lowY) * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES);
             int maxC = colormap.Length - 1;
             int dividerC = 512 / colormap.Length;
 
@@ -129,20 +129,11 @@ namespace SilverSim.LoadStore.Terrain.Formats
             return bitmap;
         }
 
-        public static Bitmap ToGrayScaleBitmap(this List<LayerPatch> patches)
-        {
-            return patches.ToBitmap(m_GrayScaleMap);
-        }
+        public static Bitmap ToGrayScaleBitmap(this List<LayerPatch> patches) => patches.ToBitmap(m_GrayScaleMap);
         #endregion
 
-        public static uint XYToYInverted(this LayerPatch p, uint lineWidth, uint maxY)
-        {
-            return (maxY - p.Y) * lineWidth + p.X;
-        }
+        public static uint XYToYInverted(this LayerPatch p, uint lineWidth, uint maxY) => (maxY - p.Y) * lineWidth + p.X;
 
-        public static uint XYToYNormal(this LayerPatch p, uint lineWidth, uint minY)
-        {
-            return (p.Y - minY) * lineWidth + p.X;
-        }
+        public static uint XYToYNormal(this LayerPatch p, uint lineWidth, uint minY) => (p.Y - minY) * lineWidth + p.X;
     }
 }

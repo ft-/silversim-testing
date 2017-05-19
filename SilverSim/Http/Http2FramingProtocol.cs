@@ -32,10 +32,6 @@ namespace SilverSim.Http
         [Serializable]
         public class ProtocolErrorException : Exception
         {
-            public ProtocolErrorException()
-            {
-
-            }
         }
 
         protected Http2FramingProtocol(Stream originalStream, bool dispose = true)
@@ -132,10 +128,6 @@ namespace SilverSim.Http
             public byte Flags;
             public int StreamIdentifier;
             public byte[] Data;
-
-            public Http2Frame()
-            {
-            }
         }
 
         readonly object m_SendLock = new object();
@@ -143,7 +135,7 @@ namespace SilverSim.Http
 
         protected void SendGoAway(GoAwayReasonCode reason)
         {
-            byte[] goawaydata = new byte[8];
+            var goawaydata = new byte[8];
             goawaydata[0] = (byte)((m_LastReceivedStreamId >> 24) & 0xFF);
             goawaydata[1] = (byte)((m_LastReceivedStreamId >> 16) & 0xFF);
             goawaydata[2] = (byte)((m_LastReceivedStreamId >> 8) & 0xFF);
@@ -167,7 +159,7 @@ namespace SilverSim.Http
             }
             lock (m_SendLock)
             {
-                byte[] hdr = new byte[9];
+                var hdr = new byte[9];
                 hdr[0] = (byte)((length >> 16) & 0xFF);
                 hdr[1] = (byte)((length >> 8) & 0xFF);
                 hdr[2] = (byte)(length & 0xFF);
@@ -188,7 +180,7 @@ namespace SilverSim.Http
             do
             {
                 frame = new Http2Frame();
-                byte[] hdr = new byte[9];
+                var hdr = new byte[9];
                 if (9 != m_OriginalStream.Read(hdr, 0, 9))
                 {
                     SendGoAway(GoAwayReasonCode.ProtocolError);

@@ -50,7 +50,7 @@ namespace SilverSim.Main.Common.HttpServer
         public HttpResponse Response { get; protected set; }
         public string CallerIP { get; protected set; }
         public bool Expect100Continue { get; protected set; }
-        public bool IsSsl { get; private set; }
+        public bool IsSsl { get; }
 
         static protected readonly Dictionary<HttpStatusCode, string> m_StatusCodeMap = new Dictionary<HttpStatusCode, string>();
         static HttpRequest()
@@ -89,13 +89,7 @@ namespace SilverSim.Main.Common.HttpServer
             m_StatusCodeMap.Add(HttpStatusCode.UseProxy, "Use proxy");
         }
 
-        public bool IsChunkedAccepted
-        {
-            get
-            {
-                return m_Headers.ContainsKey("te");
-            }
-        }
+        public bool IsChunkedAccepted => m_Headers.ContainsKey("te");
 
         public string this[string fieldName]
         {
@@ -109,15 +103,9 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        public bool TryGetHeader(string fieldName, out string value)
-        {
-            return m_Headers.TryGetValue(fieldName.ToLowerInvariant(), out value);
-        }
+        public bool TryGetHeader(string fieldName, out string value) => m_Headers.TryGetValue(fieldName.ToLowerInvariant(), out value);
 
-        public bool ContainsHeader(string fieldName)
-        {
-            return m_Headers.ContainsKey(fieldName.ToLowerInvariant());
-        }
+        public bool ContainsHeader(string fieldName) => m_Headers.ContainsKey(fieldName.ToLowerInvariant());
 
         public string ContentType
         {
@@ -173,7 +161,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void ErrorResponse(HttpStatusCode statuscode, string statusDescription)
         {
-            using(HttpResponse res = BeginResponse(statuscode, statusDescription))
+            using(var res = BeginResponse(statuscode, statusDescription))
             {
                 res.ContentType = "text/plain";
             }

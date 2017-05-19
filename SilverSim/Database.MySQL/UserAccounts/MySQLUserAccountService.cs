@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public void VerifyConnection()
         {
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using(var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -95,12 +95,12 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?scopeid", scopeID);
                         cmd.Parameters.AddParameter("?id", accountID);
@@ -115,7 +115,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -134,12 +134,12 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override bool TryGetValue(UUID scopeID, UUID accountID, out UserAccount account)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?scopeid", scopeID);
                         cmd.Parameters.AddParameter("?id", accountID);
@@ -155,7 +155,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -190,10 +190,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override bool ContainsKey(UUID scopeID, string email)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
+                using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
                 {
                     cmd.Parameters.AddParameter("?scopeid", scopeID);
                     cmd.Parameters.AddParameter("?email", email);
@@ -212,10 +212,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override bool TryGetValue(UUID scopeID, string email, out UserAccount account)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
                 {
                     cmd.Parameters.AddParameter("?scopeid", scopeID);
                     cmd.Parameters.AddParameter("?email", email);
@@ -250,12 +250,12 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override bool ContainsKey(UUID scopeID, string firstName, string lastName)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
                         cmd.Parameters.AddParameter("?scopeid", scopeID);
                         cmd.Parameters.AddParameter("?firstname", firstName);
@@ -271,7 +271,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
                         cmd.Parameters.AddParameter("?firstname", firstName);
                         cmd.Parameters.AddParameter("?lastname", lastName);
@@ -291,12 +291,12 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override bool TryGetValue(UUID scopeID, string firstName, string lastName, out UserAccount account)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
                         cmd.Parameters.AddParameter("?scopeid", scopeID);
                         cmd.Parameters.AddParameter("?firstname", firstName);
@@ -313,7 +313,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
                         cmd.Parameters.AddParameter("?firstname", firstName);
                         cmd.Parameters.AddParameter("?lastname", lastName);
@@ -353,10 +353,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
             List<UserAccount> accounts = new List<UserAccount>();
             if(query.Trim().Length == 0)
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts", connection))
                     {
                         cmd.Parameters.AddParameter("?ScopeID", scopeID);
                         using (MySqlDataReader dbreader = cmd.ExecuteReader())
@@ -371,7 +371,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 return accounts;
             }
 
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 string cmdstr = "select * from useraccounts where (ScopeID LIKE ?ScopeID or ScopeID LIKE '00000000-0000-0000-0000-000000000000') and (FirstName LIKE ?word0 or LastName LIKE ?word0)";
@@ -379,7 +379,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 {
                     cmdstr = "select * from useraccounts where (ScopeID LIKE ?ScopeID or ScopeID LIKE '00000000-0000-0000-0000-000000000000') and (FirstName LIKE ?word0 or LastName LIKE ?word1)";
                 }
-                using (MySqlCommand cmd = new MySqlCommand(cmdstr, connection))
+                using (var cmd = new MySqlCommand(cmdstr, connection))
                 {
                     cmd.Parameters.AddParameter("?ScopeID", scopeID);
                     for (int i = 0; i < words.Length; ++i)
@@ -400,19 +400,20 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override void Add(UserAccount userAccount)
         {
-            Dictionary<string, object> data = new Dictionary<string, object>();
-            data["ID"] = userAccount.Principal.ID;
-            data["ScopeID"] = userAccount.ScopeID;
-            data["FirstName"] = userAccount.Principal.FirstName;
-            data["LastName"] = userAccount.Principal.LastName;
-            data["Email"] = userAccount.Email;
-            data["Created"] = userAccount.Created;
-            data["UserLevel"] = userAccount.UserLevel;
-            data["UserFlags"] = userAccount.UserFlags;
-            data["UserTitle"] = userAccount.UserTitle;
-            data["IsEverLoggedIn"] = userAccount.IsEverLoggedIn ? 1 : 0;
-
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var data = new Dictionary<string, object>
+            {
+                ["ID"] = userAccount.Principal.ID,
+                ["ScopeID"] = userAccount.ScopeID,
+                ["FirstName"] = userAccount.Principal.FirstName,
+                ["LastName"] = userAccount.Principal.LastName,
+                ["Email"] = userAccount.Email,
+                ["Created"] = userAccount.Created,
+                ["UserLevel"] = userAccount.UserLevel,
+                ["UserFlags"] = userAccount.UserFlags,
+                ["UserTitle"] = userAccount.UserTitle,
+                ["IsEverLoggedIn"] = userAccount.IsEverLoggedIn ? 1 : 0
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.InsertInto("useraccounts", data);
@@ -421,20 +422,23 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override void Update(UserAccount userAccount)
         {
-            Dictionary<string, object> data = new Dictionary<string, object>();
-            data["FirstName"] = userAccount.Principal.FirstName;
-            data["LastName"] = userAccount.Principal.LastName;
-            data["Email"] = userAccount.Email;
-            data["Created"] = userAccount.Created;
-            data["UserLevel"] = userAccount.UserLevel;
-            data["UserFlags"] = userAccount.UserFlags;
-            data["UserTitle"] = userAccount.UserTitle;
-            data["IsEverLoggedIn"] = userAccount.IsEverLoggedIn ? 1 : 0;
-            Dictionary<string, object> w = new Dictionary<string,object>();
-            w["ScopeID"] = userAccount.ScopeID;
-            w["ID"] = userAccount.Principal.ID;
-
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var data = new Dictionary<string, object>
+            {
+                ["FirstName"] = userAccount.Principal.FirstName,
+                ["LastName"] = userAccount.Principal.LastName,
+                ["Email"] = userAccount.Email,
+                ["Created"] = userAccount.Created,
+                ["UserLevel"] = userAccount.UserLevel,
+                ["UserFlags"] = userAccount.UserFlags,
+                ["UserTitle"] = userAccount.UserTitle,
+                ["IsEverLoggedIn"] = userAccount.IsEverLoggedIn ? 1 : 0
+            };
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = userAccount.ScopeID,
+                ["ID"] = userAccount.Principal.ID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.UpdateSet("useraccounts", data, w);
@@ -443,10 +447,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override void Remove(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM useraccounts WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM useraccounts WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountID);
                     cmd.Parameters.AddParameter("?scopeid", scopeID);
@@ -460,10 +464,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override void SetEverLoggedIn(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE useraccounts SET IsEverLoggedIn=1 WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
+                using (var cmd = new MySqlCommand("UPDATE useraccounts SET IsEverLoggedIn=1 WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountID);
                     cmd.Parameters.AddParameter("?scopeid", scopeID);
@@ -482,16 +486,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
     public class MySQLUserAccountServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
-        public MySQLUserAccountServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLUserAccountService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLUserAccountService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
-
 }

@@ -89,28 +89,16 @@ namespace SilverSim.Scene.Management.Scene
             }
         }
 
-        public SceneInterface this[GridVector gv]
-        {
-            get
-            {
-                return this[gv.RegionHandle];
-            }
-        }
+        public SceneInterface this[GridVector gv] => this[gv.RegionHandle];
 
-        public SceneInterface this[string name]
-        {
-            get
-            {
-                return ((RwLockedDoubleDictionary<UUID, ulong, SceneInterface>)this)[m_RegionNames[name.ToLower()]];
-            }
-        }
+        public SceneInterface this[string name] => this[m_RegionNames[name.ToLower()]];
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool TryGetValue(string name, out SceneInterface scene)
         {
             try
             {
-                scene = ((RwLockedDoubleDictionary<UUID, ulong, SceneInterface>)this)[m_RegionNames[name.ToLower()]];
+                scene = this[m_RegionNames[name.ToLower()]];
                 return true;
             }
             catch
@@ -139,7 +127,7 @@ namespace SilverSim.Scene.Management.Scene
                 var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
                 if (null != ev)
                 {
-                    foreach (Action<SceneInterface> del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
+                    foreach (var del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                     {
                         try
                         {
@@ -171,7 +159,7 @@ namespace SilverSim.Scene.Management.Scene
 
         public void Remove(SceneInterface scene)
         {
-            Remove(scene, delegate (CultureInfo culture) 
+            Remove(scene, (CultureInfo culture) =>
             {
                 return this.GetLanguageString(culture, "RegionIsShuttingDown", "Region is shutting down");
             });
@@ -187,7 +175,7 @@ namespace SilverSim.Scene.Management.Scene
                 var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
                 if (null != ev)
                 {
-                    foreach (Action<SceneInterface> del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
+                    foreach (var del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                     {
                         try
                         {
@@ -201,17 +189,17 @@ namespace SilverSim.Scene.Management.Scene
                 }
             }
 
-            List<IAgent> agentsToLogout = new List<IAgent>(scene.RootAgents);
+            var agentsToLogout = new List<IAgent>(scene.RootAgents);
             int agentCount = agentsToLogout.Count;
 
             if (agentCount > 0)
             {
                 m_Log.InfoFormat("Ensuring agents logout at region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
-                using (Semaphore waitSema = new Semaphore(0, agentCount))
+                using (var waitSema = new Semaphore(0, agentCount))
                 {
                     foreach (IAgent agent in agentsToLogout)
                     {
-                        agent.KickUser(GetLocalizedOutput(agent.CurrentCulture), delegate (bool v)
+                        agent.KickUser(GetLocalizedOutput(agent.CurrentCulture), (bool v) =>
                         {
                             try
                             {

@@ -41,10 +41,8 @@ namespace SilverSim.Scene.Chat
             m_ShoutDistance = shoutDistance;
         }
 
-        public override ChatServiceInterface Instantiate()
-        {
-            return new ChatHandler(m_WhisperDistance, m_SayDistance, m_ShoutDistance);
-        }
+        public override ChatServiceInterface Instantiate() =>
+            new ChatHandler(m_WhisperDistance, m_SayDistance, m_ShoutDistance);
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -57,11 +55,6 @@ namespace SilverSim.Scene.Chat
     [PluginName("Chat")]
     public class HandlerFactory : IPluginFactory
     {
-        public HandlerFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
         {
             double whisperDistance = ownConfig.GetDouble("WhisperDistance", 10f);

@@ -48,18 +48,11 @@ namespace SilverSim.Database.Memory.Presence
         #endregion
 
         #region PresenceServiceInterface
-        public override List<PresenceInfo> GetPresencesInRegion(UUID regionId)
-        {
-            return new List<PresenceInfo>(from presence in m_Data.Values where presence.RegionID == regionId select presence);
-        }
+        public override List<PresenceInfo> GetPresencesInRegion(UUID regionId) =>
+            new List<PresenceInfo>(from presence in m_Data.Values where presence.RegionID == regionId select presence);
 
-        public override List<PresenceInfo> this[UUID userID]
-        {
-            get
-            {
-                return new List<PresenceInfo>(from presence in m_Data.Values where presence.UserID.ID == userID select presence);
-            }
-        }
+        public override List<PresenceInfo> this[UUID userID] =>
+            new List<PresenceInfo>(from presence in m_Data.Values where presence.UserID.ID == userID select presence);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID]
@@ -113,9 +106,7 @@ namespace SilverSim.Database.Memory.Presence
 
         public override void LogoutRegion(UUID regionID)
         {
-            var sessionids = new List<UUID>(from presence in m_Data where presence.Value.RegionID == regionID select presence.Key);
-
-            foreach (UUID sessionid in sessionids)
+            foreach (UUID sessionid in new List<UUID>(from presence in m_Data where presence.Value.RegionID == regionID select presence.Key))
             {
                 m_Data.Remove(sessionid);
             }
@@ -124,9 +115,7 @@ namespace SilverSim.Database.Memory.Presence
 
         public override void Remove(UUID scopeID, UUID userAccount)
         {
-            var sessionids = new List<UUID>(from presence in m_Data where presence.Value.UserID.ID == userAccount select presence.Key);
-
-            foreach(UUID sessionid in sessionids)
+            foreach(UUID sessionid in new List<UUID>(from presence in m_Data where presence.Value.UserID.ID == userAccount select presence.Key))
             {
                 m_Data.Remove(sessionid);
             }
@@ -138,10 +127,8 @@ namespace SilverSim.Database.Memory.Presence
     [PluginName("Presence")]
     public class MemoryPresenceServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryPresenceService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryPresenceService();
     }
     #endregion
 }

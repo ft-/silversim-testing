@@ -32,11 +32,11 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get 
             {
-                List<UUID> regionList = new List<UUID>();
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var regionList = new List<UUID>();
+                using(var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT RegionID FROM estate_regionmap WHERE EstateID = ?estateid", conn))
+                    using (var cmd = new MySqlCommand("SELECT RegionID FROM estate_regionmap WHERE EstateID = ?estateid", conn))
                     {
                         cmd.Parameters.AddParameter("?estateid", estateID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
@@ -54,10 +54,10 @@ namespace SilverSim.Database.MySQL.Estate
 
         bool IEstateRegionMapServiceInterface.TryGetValue(UUID regionID, out uint estateID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = ?regionid", conn))
+                using (var cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = ?regionid", conn))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -77,10 +77,10 @@ namespace SilverSim.Database.MySQL.Estate
 
         bool IEstateRegionMapServiceInterface.Remove(UUID regionID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM estate_regionmap WHERE RegionID = ?regionid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM estate_regionmap WHERE RegionID = ?regionid", conn))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -108,10 +108,10 @@ namespace SilverSim.Database.MySQL.Estate
             }
             set
             {
-                Dictionary<string, object> vals = new Dictionary<string,object>();
+                var vals = new Dictionary<string,object>();
                 vals["EstateID"] = value;
                 vals["RegionID"] = regionID;
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
                     conn.ReplaceInto("estate_regionmap", vals);

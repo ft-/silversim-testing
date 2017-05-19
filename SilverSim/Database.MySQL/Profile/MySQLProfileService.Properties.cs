@@ -34,38 +34,40 @@ namespace SilverSim.Database.MySQL.Profile
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", user.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                ProfileProperties props = new ProfileProperties();
-                                props.User = user;
-                                props.Partner.ID = reader.GetUUID("profilePartner");
-                                props.PublishProfile = reader.GetBool("profileAllowPublish");
-                                props.PublishMature = reader.GetBool("profileMaturePublish");
-                                props.WebUrl = reader.GetString("profileURL");
-                                props.WantToMask = reader.GetUInt32("profileWantToMask");
-                                props.WantToText = reader.GetString("profileWantToText");
-                                props.SkillsMask = reader.GetUInt32("profileSkillsMask");
-                                props.SkillsText = reader.GetString("profileSkillsText");
-                                props.Language = reader.GetString("profileLanguages");
-                                props.ImageID = reader.GetUUID("profileImage");
-                                props.AboutText = reader.GetString("profileAboutText");
-                                props.FirstLifeImageID = reader.GetString("profileFirstImage");
-                                props.FirstLifeText = reader.GetString("profileFirstText");
-                                return props;
+                                return new ProfileProperties()
+                                {
+                                    User = user,
+                                    Partner = new UUI(reader.GetUUID("profilePartner")),
+                                    PublishProfile = reader.GetBool("profileAllowPublish"),
+                                    PublishMature = reader.GetBool("profileMaturePublish"),
+                                    WebUrl = reader.GetString("profileURL"),
+                                    WantToMask = reader.GetUInt32("profileWantToMask"),
+                                    WantToText = reader.GetString("profileWantToText"),
+                                    SkillsMask = reader.GetUInt32("profileSkillsMask"),
+                                    SkillsText = reader.GetString("profileSkillsText"),
+                                    Language = reader.GetString("profileLanguages"),
+                                    ImageID = reader.GetUUID("profileImage"),
+                                    AboutText = reader.GetString("profileAboutText"),
+                                    FirstLifeImageID = reader.GetString("profileFirstImage"),
+                                    FirstLifeText = reader.GetString("profileFirstText")
+                                };
                             }
                             else
                             {
-                                ProfileProperties props = new ProfileProperties();
-                                props.User = user;
-                                return props;
+                                return new ProfileProperties()
+                                {
+                                    User = user
+                                };
                             }
                         }
                     }
@@ -80,8 +82,10 @@ namespace SilverSim.Database.MySQL.Profile
         {
             set
             {
-                Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                replaceVals["useruuid"] = user.ID;
+                var replaceVals = new Dictionary<string, object>
+                {
+                    ["useruuid"] = user.ID
+                };
                 if ((flags & PropertiesUpdateFlags.Properties) != 0)
                 {
                     replaceVals["profileAllowPublish"] = value.PublishProfile;
@@ -101,7 +105,7 @@ namespace SilverSim.Database.MySQL.Profile
                     replaceVals["profileLanguages"] = value.Language;
                 }
 
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using(var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
                     try

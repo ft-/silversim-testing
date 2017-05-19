@@ -30,7 +30,6 @@ namespace SilverSim.Http.Client
         {
             private AbstractHttpStream m_Input;
             private long m_RemainingLength;
-            readonly long m_ContentLength;
             readonly bool m_KeepAlive;
             readonly string m_Scheme;
             readonly string m_Host;
@@ -40,58 +39,28 @@ namespace SilverSim.Http.Client
             {
                 m_RemainingLength = contentLength;
                 m_Input = input;
-                m_ContentLength = contentLength;
+                Length = contentLength;
                 m_KeepAlive = keepAlive;
                 m_Scheme = scheme;
                 m_Host = host;
                 m_Port = port;
             }
 
-            public override bool CanRead
-            {
-                get
-                {
-                    return true;
-                }
-            }
+            public override bool CanRead => true;
 
-            public override bool CanSeek 
-            { 
-                get
-                {
-                    return false;
-                }
-            }
+            public override bool CanSeek => false;
 
-            public override bool CanTimeout 
-            { 
-                get
-                {
-                    return true;
-                }
-            }
+            public override bool CanTimeout => true;
 
-            public override bool CanWrite
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            public override bool CanWrite => false;
 
-            public override long Length 
-            { 
-                get
-                {
-                    return m_ContentLength;
-                }
-            }
+            public override long Length { get; }
 
             public override long Position
             {
                 get
                 {
-                    return m_ContentLength - m_RemainingLength;
+                    return Length - m_RemainingLength;
                 }
                 set
                 {
@@ -140,7 +109,7 @@ namespace SilverSim.Http.Client
             {
                 if (m_Input != null)
                 {
-                    byte[] b = new byte[10240];
+                    var b = new byte[10240];
                     while (m_RemainingLength > 0)
                     {
                         Read(b, 0, m_RemainingLength > b.Length ?
@@ -166,7 +135,7 @@ namespace SilverSim.Http.Client
             {
                 if (m_Input != null && m_RemainingLength > 0)
                 {
-                    byte[] b = new byte[10240];
+                    var b = new byte[10240];
                     while (m_RemainingLength > 0)
                     {
                         Read(b, 0, m_RemainingLength > b.Length ?
@@ -227,7 +196,7 @@ namespace SilverSim.Http.Client
 
             public override int ReadByte()
             {
-                byte[] b = new byte[1];
+                var b = new byte[1];
                 if (0 == Read(b, 0, 1))
                 {
                     return -1;
@@ -249,6 +218,7 @@ namespace SilverSim.Http.Client
             {
                 throw new NotSupportedException();
             }
+
             public override void WriteByte(byte value)
             {
                 throw new NotSupportedException();

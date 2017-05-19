@@ -77,9 +77,7 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        bool ISimulationDataEnvSettingsStorageInterface.Remove(UUID regionID)
-        {
-            return m_EnvSettingsData.Remove(regionID);
-        }
+        bool ISimulationDataEnvSettingsStorageInterface.Remove(UUID regionID) =>
+            m_EnvSettingsData.Remove(regionID);
     }
 }

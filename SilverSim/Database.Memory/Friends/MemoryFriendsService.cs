@@ -184,12 +184,14 @@ namespace SilverSim.Database.Memory.Friends
             fInfo = null;
             if(m_Friends.TryGetValue(user.ID, out friendList) && friendList.TryGetValue(friend.ID, out data))
             {
-                fInfo = new FriendInfo();
-                fInfo.Secret = data.Secret;
-                fInfo.User = user;
-                fInfo.Friend = friend;
-                fInfo.FriendGivenFlags = data.Rights;
-                if(m_Friends.TryGetValue(friend.ID, out friendList) && friendList.TryGetValue(user.ID, out data))
+                fInfo = new FriendInfo()
+                {
+                    Secret = data.Secret,
+                    User = user,
+                    Friend = friend,
+                    FriendGivenFlags = data.Rights
+                };
+                if (m_Friends.TryGetValue(friend.ID, out friendList) && friendList.TryGetValue(user.ID, out data))
                 {
                     fInfo.UserGivenFlags = data.Rights;
                 }
@@ -204,10 +206,8 @@ namespace SilverSim.Database.Memory.Friends
     [PluginName("Friends")]
     public class MemoryFriendsServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryFriendsService(ownSection.GetString("AvatarNameServices", string.Empty));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryFriendsService(ownSection.GetString("AvatarNameServices", string.Empty));
     }
     #endregion
 }

@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Groups
     {
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -115,7 +115,7 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);

@@ -57,90 +57,30 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Properties
-        public override ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes => this;
 
-        public override ISimulationDataEnvControllerStorageInterface EnvironmentController
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataEnvControllerStorageInterface EnvironmentController => this;
 
-        public override ISimulationDataLightShareStorageInterface LightShare
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataLightShareStorageInterface LightShare => this;
 
-        public override ISimulationDataSpawnPointStorageInterface Spawnpoints
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataSpawnPointStorageInterface Spawnpoints => this;
 
-        public override ISimulationDataEnvSettingsStorageInterface EnvironmentSettings
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataEnvSettingsStorageInterface EnvironmentSettings => this;
 
-        public override ISimulationDataObjectStorageInterface Objects
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataObjectStorageInterface Objects => this;
 
-        public override ISimulationDataParcelStorageInterface Parcels
-        {
-            get
-            {
-                return this;
-            }
-        }
-        public override ISimulationDataScriptStateStorageInterface ScriptStates
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataParcelStorageInterface Parcels => this;
+        public override ISimulationDataScriptStateStorageInterface ScriptStates => this;
 
-        public override ISimulationDataTerrainStorageInterface Terrains
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataTerrainStorageInterface Terrains => this;
 
-        public override ISimulationDataRegionSettingsStorageInterface RegionSettings
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataRegionSettingsStorageInterface RegionSettings => this;
         #endregion
 
         #region IDBServiceInterface
         public void VerifyConnection()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
             }
@@ -168,10 +108,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             string regionIdStr = regionID.ToString();
             foreach (string table in Tables)
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + table + " WHERE RegionID LIKE '" + regionIdStr + "'", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE RegionID LIKE '" + regionIdStr + "'", connection))
                     {
                         cmd.ExecuteNonQuery();
                     }
@@ -183,7 +123,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                List<QueueStatAccessor> statFuncs = new List<QueueStatAccessor>();
+                var statFuncs = new List<QueueStatAccessor>();
                 foreach(MySQLTerrainListener terListener in m_TerrainListenerThreads)
                 {
                     statFuncs.Add(new QueueStatAccessor("TerrainStore." + terListener.RegionID.ToString(), terListener.GetStats));
@@ -205,15 +145,9 @@ namespace SilverSim.Database.MySQL.SimulationData
     public class MySQLSimulationDataServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
-        public MySQLSimulationDataServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLSimulationDataStorage(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLSimulationDataStorage(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

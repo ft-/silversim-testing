@@ -39,25 +39,21 @@ namespace SilverSim.Http.Client
         {
             public BadHttpResponseException()
             {
-
             }
 
             public BadHttpResponseException(string message)
                 : base(message)
             {
-
             }
 
             protected BadHttpResponseException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public BadHttpResponseException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -92,13 +88,13 @@ namespace SilverSim.Http.Client
 
         #region Main HTTP Client Functionality
         public static Stream DoStreamRequest(
-            string method, 
-            string url, 
-            IDictionary<string, string> getValues, 
+            string method,
+            string url,
+            IDictionary<string, string> getValues,
             string content_type,
-            string post, 
-            bool compressed, 
-            int timeoutms, 
+            string post,
+            bool compressed,
+            int timeoutms,
             IDictionary<string, string> headers = null)
         {
             if (getValues != null)
@@ -106,7 +102,7 @@ namespace SilverSim.Http.Client
                 url += "?" + BuildQueryString(getValues);
             }
 
-            byte[] buffer = new byte[0];
+            var buffer = new byte[0];
             int content_length = 0;
 
             if (post.Length != 0)
@@ -115,9 +111,9 @@ namespace SilverSim.Http.Client
 
                 if (compressed || content_type == "application/x-gzip")
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    using (var ms = new MemoryStream())
                     {
-                        using (GZipStream comp = new GZipStream(ms, CompressionMode.Compress))
+                        using (var comp = new GZipStream(ms, CompressionMode.Compress))
                         {
                             comp.Write(buffer, 0, buffer.Length);
                             /* The GZIP stream has a CRC-32 and a EOF marker, so we close it first to have it completed */
@@ -130,7 +126,7 @@ namespace SilverSim.Http.Client
                 content_length = buffer.Length;
             }
 
-            return DoStreamRequest(method, url, getValues, content_type, content_length, delegate(Stream s)
+            return DoStreamRequest(method, url, getValues, content_type, content_length, (Stream s) =>
             {
                 s.Write(buffer, 0, buffer.Length);
             }, compressed, timeoutms, headers);
@@ -160,21 +156,21 @@ namespace SilverSim.Http.Client
 
         /*---------------------------------------------------------------------*/
         public static Stream DoStreamRequest(
-            string method, 
-            string url, 
-            IDictionary<string, string> getValues, 
-            string content_type, 
-            int content_length, 
-            Action<Stream> postdelegate, 
-            bool compressed, 
-            int timeoutms, 
+            string method,
+            string url,
+            IDictionary<string, string> getValues,
+            string content_type,
+            int content_length,
+            Action<Stream> postdelegate,
+            bool compressed,
+            int timeoutms,
             IDictionary<string, string> headers = null)
         {
             if (getValues != null)
             {
                 url += "?" + BuildQueryString(getValues);
             }
-            Uri uri = new Uri(url);
+            var uri = new Uri(url);
             byte[] outdata;
 
             string reqdata = uri.IsDefaultPort ?
@@ -323,7 +319,7 @@ namespace SilverSim.Http.Client
                 if (doChunked)
                 {
                     /* append request POST data */
-                    using (HttpWriteChunkedBodyStream reqbody = new HttpWriteChunkedBodyStream(s))
+                    using (var reqbody = new HttpWriteChunkedBodyStream(s))
                     {
                         postdelegate(reqbody);
                     }
@@ -331,7 +327,7 @@ namespace SilverSim.Http.Client
                 else
                 {
                     /* append request POST data */
-                    using (RequestBodyStream reqbody = new RequestBodyStream(s, content_length))
+                    using (var reqbody = new RequestBodyStream(s, content_length))
                     {
                         postdelegate(reqbody);
                     }
@@ -406,11 +402,12 @@ namespace SilverSim.Http.Client
 
             if(headers.TryGetValue("connection", out value))
             {
-                if(value.ToLower() == "keep-alive")
+                value = value.ToLower();
+                if(value == "keep-alive")
                 {
                     keepalive = true;
                 }
-                else if(value.ToLower() == "close")
+                else if(value == "close")
                 {
                     keepalive = false;
                 }

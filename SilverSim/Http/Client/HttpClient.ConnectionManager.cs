@@ -27,7 +27,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Timers;
@@ -100,14 +99,13 @@ namespace SilverSim.Http.Client
 
         static Socket ConnectToTcp(string host, int port)
         {
-            IPAddress[] addresses;
-            addresses = DnsNameCache.GetHostAddresses(host);
+            IPAddress[] addresses = DnsNameCache.GetHostAddresses(host);
 
             if (addresses.Length == 0)
             {
                 throw new SocketException((int)SocketError.HostNotFound);
             }
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.Connect(addresses, port);
             return socket;
         }
@@ -175,7 +173,7 @@ namespace SilverSim.Http.Client
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation)
         {
-            SslStream sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
+            var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
             sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
             if (!sslstream.IsEncrypted)
             {

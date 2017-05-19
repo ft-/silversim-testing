@@ -64,7 +64,7 @@ namespace SilverSim.Http
 
         public override string ReadHeaderLine()
         {
-            StringBuilder s = new StringBuilder();
+            var s = new StringBuilder();
             for (;;)
             {
                 if (m_BufferFill == m_BufferPos)
@@ -148,37 +148,13 @@ namespace SilverSim.Http
             }
         }
 
-        public override bool CanTimeout
-        {
-            get
-            {
-                return m_Stream.CanTimeout;
-            }
-        }
+        public override bool CanTimeout => m_Stream.CanTimeout;
 
-        public override bool CanRead
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanWrite => true;
 
         public override void Flush()
         {
@@ -222,7 +198,7 @@ namespace SilverSim.Http
 
         public override void WriteByte(byte value)
         {
-            byte[] b = new byte[] { value };
+            var b = new byte[] { value };
             Write(b, 0, 1);
         }
         #endregion

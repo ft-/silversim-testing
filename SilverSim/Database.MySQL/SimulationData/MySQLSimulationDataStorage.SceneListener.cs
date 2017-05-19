@@ -48,13 +48,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 m_SceneListenerThreads = sceneListenerThreads;
             }
 
-            public UUID RegionID
-            {
-                get
-                {
-                    return m_RegionID;
-                }
-            }
+            public UUID RegionID => m_RegionID;
 
             public QueueStat GetStats()
             {
@@ -70,16 +64,16 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     m_SceneListenerThreads.Add(this);
                     Thread.CurrentThread.Name = "Storage Main Thread: " + m_RegionID.ToString();
-                    List<string> primDeletionRequests = new List<string>();
-                    List<string> primItemDeletionRequests = new List<string>();
-                    List<string> objectDeletionRequests = new List<string>();
-                    List<string> updateObjectsRequests = new List<string>();
-                    List<string> updatePrimsRequests = new List<string>();
-                    List<string> updatePrimItemsRequests = new List<string>();
+                    var primDeletionRequests = new List<string>();
+                    var primItemDeletionRequests = new List<string>();
+                    var objectDeletionRequests = new List<string>();
+                    var updateObjectsRequests = new List<string>();
+                    var updatePrimsRequests = new List<string>();
+                    var updatePrimItemsRequests = new List<string>();
 
-                    C5.TreeDictionary<uint, int> knownSerialNumbers = new C5.TreeDictionary<uint, int>();
-                    C5.TreeDictionary<uint, int> knownInventorySerialNumbers = new C5.TreeDictionary<uint, int>();
-                    C5.TreeDictionary<uint, List<UUID>> knownInventories = new C5.TreeDictionary<uint, List<UUID>>();
+                    var knownSerialNumbers = new C5.TreeDictionary<uint, int>();
+                    var knownInventorySerialNumbers = new C5.TreeDictionary<uint, int>();
+                    var knownInventories = new C5.TreeDictionary<uint, List<UUID>>();
 
                     string replaceIntoObjects = string.Empty;
                     string replaceIntoPrims = string.Empty;
@@ -187,7 +181,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                         if (updateInventory)
                         {
-                            Dictionary<UUID, ObjectPartInventoryItem> items = new Dictionary<UUID, ObjectPartInventoryItem>();
+                            var items = new Dictionary<UUID, ObjectPartInventoryItem>();
                             foreach (ObjectPartInventoryItem item in req.Part.Inventory.ValuesByKey1)
                             {
                                 items.Add(item.ID, item);
@@ -245,10 +239,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             try
                             {
                                 string command = "DELETE FROM objects WHERE " + elems;
-                                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                                using (var conn = new MySqlConnection(m_ConnectionString))
                                 {
                                     conn.Open();
-                                    using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                                    using (var cmd = new MySqlCommand(command, conn))
                                     {
                                         cmd.ExecuteNonQuery();
                                     }
@@ -267,10 +261,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             try
                             {
                                 string command = "DELETE FROM prims WHERE " + elems;
-                                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                                using (var conn = new MySqlConnection(m_ConnectionString))
                                 {
                                     conn.Open();
-                                    using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                                    using (var cmd = new MySqlCommand(command, conn))
                                     {
                                         cmd.ExecuteNonQuery();
                                     }
@@ -289,10 +283,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             try
                             {
                                 string command = "DELETE FROM primitems WHERE " + elems;
-                                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                                using (var conn = new MySqlConnection(m_ConnectionString))
                                 {
                                     conn.Open();
-                                    using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                                    using (var cmd = new MySqlCommand(command, conn))
                                     {
                                         cmd.ExecuteNonQuery();
                                     }
@@ -310,10 +304,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             string command = "REPLACE INTO objects (" + replaceIntoObjects + ") VALUES " + string.Join(",", updateObjectsRequests);
                             try
                             {
-                                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                                using (var conn = new MySqlConnection(m_ConnectionString))
                                 {
                                     conn.Open();
-                                    using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                                    using (var cmd = new MySqlCommand(command, conn))
                                     {
                                         cmd.ExecuteNonQuery();
                                     }
@@ -332,10 +326,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             string command = "REPLACE INTO prims (" + replaceIntoPrims + ") VALUES " + string.Join(",", updatePrimsRequests);
                             try
                             {
-                                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                                using (var conn = new MySqlConnection(m_ConnectionString))
                                 {
                                     conn.Open();
-                                    using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                                    using (var cmd = new MySqlCommand(command, conn))
                                     {
                                         cmd.ExecuteNonQuery();
                                     }
@@ -354,10 +348,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             string command = "REPLACE INTO primitems (" + replaceIntoPrimItems + ") VALUES " + string.Join(",", updatePrimItemsRequests);
                             try
                             {
-                                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                                using (var conn = new MySqlConnection(m_ConnectionString))
                                 {
                                     conn.Open();
-                                    using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                                    using (var cmd = new MySqlCommand(command, conn))
                                     {
                                         cmd.ExecuteNonQuery();
                                     }
@@ -380,136 +374,133 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             private Dictionary<string, object> GenerateUpdateObjectPartInventoryItem(UUID primID, ObjectPartInventoryItem item)
             {
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("AssetId", item.AssetID);
-                data.Add("AssetType", item.AssetType);
-                data.Add("CreationDate", item.CreationDate);
-                data.Add("Creator", item.Creator);
-                data.Add("Description", item.Description);
-                data.Add("Flags", item.Flags);
-                data.Add("Group", item.Group);
-                data.Add("GroupOwned", item.IsGroupOwned);
-                data.Add("PrimID", primID);
-                data.Add("Name", item.Name);
-                data.Add("InventoryID", item.ID);
-                data.Add("InventoryType", item.InventoryType);
-                data.Add("LastOwner", item.LastOwner);
-                data.Add("Owner", item.Owner);
-                data.Add("ParentFolderID", item.ParentFolderID);
-                data.Add("BasePermissions", item.Permissions.Base);
-                data.Add("CurrentPermissions", item.Permissions.Current);
-                data.Add("EveryOnePermissions", item.Permissions.EveryOne);
-                data.Add("GroupPermissions", item.Permissions.Group);
-                data.Add("NextOwnerPermissions", item.Permissions.NextOwner);
-                data.Add("SaleType", item.SaleInfo.Type);
-                data.Add("SalePrice", item.SaleInfo.Price);
-                data.Add("SalePermMask", item.SaleInfo.PermMask);
                 ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
-                data.Add("PermsGranter", grantinfo.PermsGranter.ToString());
-                data.Add("PermsMask", grantinfo.PermsMask);
-                data.Add("NextOwnerAssetID", item.NextOwnerAssetID);
-                return data;
+                return new Dictionary<string, object>
+                {
+                    { "AssetId", item.AssetID },
+                    { "AssetType", item.AssetType },
+                    { "CreationDate", item.CreationDate },
+                    { "Creator", item.Creator },
+                    { "Description", item.Description },
+                    { "Flags", item.Flags },
+                    { "Group", item.Group },
+                    { "GroupOwned", item.IsGroupOwned },
+                    { "PrimID", primID },
+                    { "Name", item.Name },
+                    { "InventoryID", item.ID },
+                    { "InventoryType", item.InventoryType },
+                    { "LastOwner", item.LastOwner },
+                    { "Owner", item.Owner },
+                    { "ParentFolderID", item.ParentFolderID },
+                    { "BasePermissions", item.Permissions.Base },
+                    { "CurrentPermissions", item.Permissions.Current },
+                    { "EveryOnePermissions", item.Permissions.EveryOne },
+                    { "GroupPermissions", item.Permissions.Group },
+                    { "NextOwnerPermissions", item.Permissions.NextOwner },
+                    { "SaleType", item.SaleInfo.Type },
+                    { "SalePrice", item.SaleInfo.Price },
+                    { "SalePermMask", item.SaleInfo.PermMask },
+                    { "PermsGranter", grantinfo.PermsGranter.ToString() },
+                    { "PermsMask", grantinfo.PermsMask },
+                    { "NextOwnerAssetID", item.NextOwnerAssetID }
+                };
             }
 
-            private Dictionary<string, object> GenerateUpdateObjectGroup(ObjectGroup objgroup)
+            private Dictionary<string, object> GenerateUpdateObjectGroup(ObjectGroup objgroup) => new Dictionary<string, object>
             {
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("ID", objgroup.ID);
-                data.Add("RegionID", objgroup.Scene.ID);
-                data.Add("IsTempOnRez", objgroup.IsTempOnRez);
-                data.Add("Owner", objgroup.Owner);
-                data.Add("LastOwner", objgroup.LastOwner);
-                data.Add("Group", objgroup.Group);
-                data.Add("OriginalAssetID", objgroup.OriginalAssetID);
-                data.Add("NextOwnerAssetID", objgroup.NextOwnerAssetID);
-                data.Add("SaleType", objgroup.SaleType);
-                data.Add("SalePrice", objgroup.SalePrice);
-                data.Add("PayPrice0", objgroup.PayPrice0);
-                data.Add("PayPrice1", objgroup.PayPrice1);
-                data.Add("PayPrice2", objgroup.PayPrice2);
-                data.Add("PayPrice3", objgroup.PayPrice3);
-                data.Add("PayPrice4", objgroup.PayPrice4);
-                data.Add("AttachedPos", objgroup.AttachedPos);
-                data.Add("AttachPoint", objgroup.AttachPoint);
-                data.Add("IsIncludedInSearch", objgroup.IsIncludedInSearch);
-                data.Add("RezzingObjectID", objgroup.RezzingObjectID);
-                return data;
-            }
+                { "ID", objgroup.ID },
+                { "RegionID", objgroup.Scene.ID },
+                { "IsTempOnRez", objgroup.IsTempOnRez },
+                { "Owner", objgroup.Owner },
+                { "LastOwner", objgroup.LastOwner },
+                { "Group", objgroup.Group },
+                { "OriginalAssetID", objgroup.OriginalAssetID },
+                { "NextOwnerAssetID", objgroup.NextOwnerAssetID },
+                { "SaleType", objgroup.SaleType },
+                { "SalePrice", objgroup.SalePrice },
+                { "PayPrice0", objgroup.PayPrice0 },
+                { "PayPrice1", objgroup.PayPrice1 },
+                { "PayPrice2", objgroup.PayPrice2 },
+                { "PayPrice3", objgroup.PayPrice3 },
+                { "PayPrice4", objgroup.PayPrice4 },
+                { "AttachedPos", objgroup.AttachedPos },
+                { "AttachPoint", objgroup.AttachPoint },
+                { "IsIncludedInSearch", objgroup.IsIncludedInSearch },
+                { "RezzingObjectID", objgroup.RezzingObjectID }
+            };
 
             private Dictionary<string, object> GenerateUpdateObjectPart(ObjectPart objpart)
             {
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("ID", objpart.ID);
-                data.Add("LinkNumber", objpart.LinkNumber);
-                data.Add("RootPartID", objpart.ObjectGroup.RootPart.ID);
-                data.Add("Position", objpart.Position);
-                data.Add("Rotation", objpart.Rotation);
-                data.Add("SitText", objpart.SitText);
-                data.Add("TouchText", objpart.TouchText);
-                data.Add("Name", objpart.Name);
-                data.Add("Description", objpart.Description);
-                data.Add("SitTargetOffset", objpart.SitTargetOffset);
-                data.Add("SitTargetOrientation", objpart.SitTargetOrientation);
-                data.Add("PhysicsShapeType", objpart.PhysicsShapeType);
-                data.Add("PathfindingType", objpart.PathfindingType);
-                data.Add("Material", objpart.Material);
-                data.Add("Size", objpart.Size);
-                data.Add("Slice", objpart.Slice);
-                data.Add("MediaURL", objpart.MediaURL);
-                data.Add("Creator", objpart.Creator);
-                data.Add("CreationDate", objpart.CreationDate);
-                data.Add("Flags", objpart.Flags);
-                data.Add("AngularVelocity", objpart.AngularVelocity);
-                data.Add("LightData", objpart.PointLight.Serialization);
-                data.Add("HoverTextData", objpart.Text.Serialization);
-                data.Add("FlexibleData", objpart.Flexible.Serialization);
-                data.Add("LoopedSoundData", objpart.Sound.Serialization);
-                data.Add("ImpactSoundData", objpart.CollisionSound.Serialization);
-                data.Add("PrimitiveShapeData", objpart.Shape.Serialization);
-                data.Add("ParticleSystem", objpart.ParticleSystemBytes);
-                data.Add("TextureEntryBytes", objpart.TextureEntryBytes);
-                data.Add("TextureAnimationBytes", objpart.TextureAnimationBytes);
-                data.Add("ScriptAccessPin", objpart.ScriptAccessPin);
-                data.Add("CameraAtOffset", objpart.CameraAtOffset);
-                data.Add("CameraEyeOffset", objpart.CameraEyeOffset);
-                data.Add("ForceMouselook", objpart.ForceMouselook);
-                data.Add("BasePermissions", objpart.BaseMask);
-                data.Add("CurrentPermissions", objpart.OwnerMask);
-                data.Add("EveryOnePermissions", objpart.EveryoneMask);
-                data.Add("GroupPermissions", objpart.GroupMask);
-                data.Add("NextOwnerPermissions", objpart.NextOwnerMask);
-                data.Add("ClickAction", objpart.ClickAction);
+                var data = new Dictionary<string, object>
+                {
+                    { "ID", objpart.ID },
+                    { "LinkNumber", objpart.LinkNumber },
+                    { "RootPartID", objpart.ObjectGroup.RootPart.ID },
+                    { "Position", objpart.Position },
+                    { "Rotation", objpart.Rotation },
+                    { "SitText", objpart.SitText },
+                    { "TouchText", objpart.TouchText },
+                    { "Name", objpart.Name },
+                    { "Description", objpart.Description },
+                    { "SitTargetOffset", objpart.SitTargetOffset },
+                    { "SitTargetOrientation", objpart.SitTargetOrientation },
+                    { "PhysicsShapeType", objpart.PhysicsShapeType },
+                    { "PathfindingType", objpart.PathfindingType },
+                    { "Material", objpart.Material },
+                    { "Size", objpart.Size },
+                    { "Slice", objpart.Slice },
+                    { "MediaURL", objpart.MediaURL },
+                    { "Creator", objpart.Creator },
+                    { "CreationDate", objpart.CreationDate },
+                    { "Flags", objpart.Flags },
+                    { "AngularVelocity", objpart.AngularVelocity },
+                    { "LightData", objpart.PointLight.Serialization },
+                    { "HoverTextData", objpart.Text.Serialization },
+                    { "FlexibleData", objpart.Flexible.Serialization },
+                    { "LoopedSoundData", objpart.Sound.Serialization },
+                    { "ImpactSoundData", objpart.CollisionSound.Serialization },
+                    { "PrimitiveShapeData", objpart.Shape.Serialization },
+                    { "ParticleSystem", objpart.ParticleSystemBytes },
+                    { "TextureEntryBytes", objpart.TextureEntryBytes },
+                    { "TextureAnimationBytes", objpart.TextureAnimationBytes },
+                    { "ScriptAccessPin", objpart.ScriptAccessPin },
+                    { "CameraAtOffset", objpart.CameraAtOffset },
+                    { "CameraEyeOffset", objpart.CameraEyeOffset },
+                    { "ForceMouselook", objpart.ForceMouselook },
+                    { "BasePermissions", objpart.BaseMask },
+                    { "CurrentPermissions", objpart.OwnerMask },
+                    { "EveryOnePermissions", objpart.EveryoneMask },
+                    { "GroupPermissions", objpart.GroupMask },
+                    { "NextOwnerPermissions", objpart.NextOwnerMask },
+                    { "ClickAction", objpart.ClickAction },
+                    { "PassCollisionMode", objpart.PassCollisionMode },
+                    { "PassTouchMode", objpart.PassTouchMode },
+                    { "Velocity", objpart.Velocity },
+                    { "IsSoundQueueing", objpart.IsSoundQueueing },
+                    { "IsAllowedDrop", objpart.IsAllowedDrop },
+                    { "PhysicsDensity", objpart.PhysicsDensity },
+                    { "PhysicsFriction", objpart.PhysicsFriction },
+                    { "PhysicsRestitution", objpart.PhysicsRestitution },
+                    { "PhysicsGravityMultiplier", objpart.PhysicsGravityMultiplier },
 
-                using (MemoryStream ms = new MemoryStream())
+                    { "IsRotateXEnabled", objpart.IsRotateXEnabled },
+                    { "IsRotateYEnabled", objpart.IsRotateYEnabled },
+                    { "IsRotateZEnabled", objpart.IsRotateZEnabled },
+                    { "IsVolumeDetect", objpart.IsVolumeDetect },
+                    { "IsPhantom", objpart.IsPhantom },
+                    { "IsPhysics", objpart.IsPhysics }
+                };
+                using (var ms = new MemoryStream())
                 {
                     LlsdBinary.Serialize(objpart.DynAttrs, ms);
                     data.Add("DynAttrs", ms.ToArray());
                 }
 
-                data.Add("PassCollisionMode", objpart.PassCollisionMode);
-                data.Add("PassTouchMode", objpart.PassTouchMode);
-                data.Add("Velocity", objpart.Velocity);
-                data.Add("IsSoundQueueing", objpart.IsSoundQueueing);
-                data.Add("IsAllowedDrop", objpart.IsAllowedDrop);
-                data.Add("PhysicsDensity", objpart.PhysicsDensity);
-                data.Add("PhysicsFriction", objpart.PhysicsFriction);
-                data.Add("PhysicsRestitution", objpart.PhysicsRestitution);
-                data.Add("PhysicsGravityMultiplier", objpart.PhysicsGravityMultiplier);
-
-                data.Add("IsRotateXEnabled", objpart.IsRotateXEnabled);
-                data.Add("IsRotateYEnabled", objpart.IsRotateYEnabled);
-                data.Add("IsRotateZEnabled", objpart.IsRotateZEnabled);
-                data.Add("IsVolumeDetect", objpart.IsVolumeDetect);
-                data.Add("IsPhantom", objpart.IsPhantom);
-                data.Add("IsPhysics", objpart.IsPhysics);
-
                 return data;
             }
         }
 
-        public override SceneListener GetSceneListener(UUID regionID)
-        {
-            return new MySQLSceneListener(m_ConnectionString, regionID, m_SceneListenerThreads);
-        }
+        public override SceneListener GetSceneListener(UUID regionID) =>
+            new MySQLSceneListener(m_ConnectionString, regionID, m_SceneListenerThreads);
     }
 }

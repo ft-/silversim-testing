@@ -54,7 +54,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.Grid.Login
@@ -176,7 +175,7 @@ namespace SilverSim.Grid.Login
 
         Dictionary<string, string> CollectGridInfo()
         {
-            Dictionary<string, string> list = new Dictionary<string, string>();
+            var list = new Dictionary<string, string>();
             list.Add("platform", "SilverSim");
             if (m_HttpsServer != null && !m_AllowLoginViaHttpWhenHttpsIsConfigured)
             {
@@ -205,15 +204,15 @@ namespace SilverSim.Grid.Login
 
         void HandleJsonGridInfo(HttpRequest httpreq)
         {
-            Map jsonres = new Map();
+            var jsonres = new Map();
             foreach (KeyValuePair<string, string> kvp in CollectGridInfo())
             {
                 jsonres.Add(kvp.Key, kvp.Value);
             }
 
-            using (HttpResponse res = httpreq.BeginResponse("application/json-rpc"))
+            using (var res = httpreq.BeginResponse("application/json-rpc"))
             {
-                using (Stream s = res.GetOutputStream())
+                using (var s = res.GetOutputStream())
                 {
                     Json.Serialize(jsonres, s);
                 }
@@ -222,9 +221,9 @@ namespace SilverSim.Grid.Login
 
         void HandleGetGridInfo(HttpRequest httpreq)
         {
-            using (HttpResponse res = httpreq.BeginResponse("text/xml"))
+            using (var res = httpreq.BeginResponse("text/xml"))
             {
-                using (XmlTextWriter writer = res.GetOutputStream().UTF8XmlTextWriter())
+                using (var writer = res.GetOutputStream().UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("gridinfo");
                     foreach(KeyValuePair<string, string> kvp in CollectGridInfo())
@@ -238,8 +237,8 @@ namespace SilverSim.Grid.Login
 
         class LoginData
         {
-            static Random m_RandomNumber = new Random();
-            static object m_RandomNumberLock = new object();
+            static readonly Random m_RandomNumber = new Random();
+            static readonly object m_RandomNumberLock = new object();
 
             private static uint NewCircuitCode
             {
@@ -321,9 +320,9 @@ namespace SilverSim.Grid.Login
             catch
             {
                 m_Log.ErrorFormat("Deserialization of login request from {0} failed", httpreq.CallerIP);
-                using (HttpResponse res = httpreq.BeginResponse("text/xml"))
+                using (var res = httpreq.BeginResponse("text/xml"))
                 {
-                    using (Stream s = res.GetOutputStream())
+                    using (var s = res.GetOutputStream())
                     {
                         new XmlRpc.XmlRpcFaultResponse(-32700, "Invalid XML RPC Request").Serialize(s);
                     }
@@ -331,14 +330,15 @@ namespace SilverSim.Grid.Login
                 return;
             }
 
-            using (HttpResponse res = httpreq.BeginResponse("text/xml"))
+            using (var res = httpreq.BeginResponse("text/xml"))
             {
-                using (Stream s = res.GetOutputStream())
+                using (var s = res.GetOutputStream())
                 {
                     HandleLogin(req).Serialize(s);
                 }
             }
         }
+
         XmlRpc.XmlRpcResponse HandleLogin(XmlRpc.XmlRpcRequest req)
         {
             if (!m_AllowLoginViaHttpWhenHttpsIsConfigured && m_HttpsServer != null && !req.IsSsl)
@@ -353,14 +353,14 @@ namespace SilverSim.Grid.Login
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing struct parameter");
             }
 
-            Map structParam = req.Params[0] as Map;
+            var structParam = req.Params[0] as Map;
             if(null == structParam)
             {
                 m_Log.ErrorFormat("Request from {0} does not contain struct parameter", req.CallerIP);
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing struct parameter");
             }
 
-            Dictionary<string, string> loginParams = new Dictionary<string, string>();
+            var loginParams = new Dictionary<string, string>();
             foreach (string reqparam in RequiredParameters)
             {
                 if (!structParam.ContainsKey(reqparam))
@@ -371,7 +371,7 @@ namespace SilverSim.Grid.Login
                 loginParams.Add(reqparam, structParam[reqparam].ToString());
             }
 
-            LoginData loginData = new LoginData();
+            var loginData = new LoginData();
             string firstName = loginParams["first"];
             string lastName = loginParams["last"];
             string passwd = loginParams["passwd"];
@@ -573,10 +573,12 @@ namespace SilverSim.Grid.Login
                 }
             }
 
-            PresenceInfo pInfo = new PresenceInfo();
-            pInfo.UserID = loginData.Account.Principal;
-            pInfo.SessionID = loginData.SessionInfo.SessionID;
-            pInfo.SecureSessionID = loginData.SessionInfo.SecureSessionID;
+            var pInfo = new PresenceInfo()
+            {
+                UserID = loginData.Account.Principal,
+                SessionID = loginData.SessionInfo.SessionID,
+                SecureSessionID = loginData.SessionInfo.SecureSessionID
+            };
             try
             {
                 m_PresenceService[pInfo.SessionID, pInfo.UserID.ID, PresenceServiceInterface.SetType.Login] = pInfo;
@@ -607,8 +609,7 @@ namespace SilverSim.Grid.Login
             }
             catch
             {
-                GridUserInfo gui;
-                gui = m_GridUserService[loginData.Account.Principal];
+                GridUserInfo gui = m_GridUserService[loginData.Account.Principal];
                 m_GridUserService.LoggedOut(gui.User, gui.LastRegionID, gui.LastPosition, gui.LastLookAt);
                 throw;
             }
@@ -616,12 +617,14 @@ namespace SilverSim.Grid.Login
 
         XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
-            TravelingDataInfo hgdata = new TravelingDataInfo();
-            hgdata.SessionID = loginData.SessionInfo.SessionID;
-            hgdata.UserID = loginData.Account.Principal.ID;
-            hgdata.GridExternalName = m_GatekeeperUri;
-            hgdata.ServiceToken = UUID.Random.ToString();
-            hgdata.ClientIPAddress = loginData.ClientInfo.ClientIP;
+            var hgdata = new TravelingDataInfo()
+            {
+                SessionID = loginData.SessionInfo.SessionID,
+                UserID = loginData.Account.Principal.ID,
+                GridExternalName = m_GatekeeperUri,
+                ServiceToken = UUID.Random.ToString(),
+                ClientIPAddress = loginData.ClientInfo.ClientIP
+            };
             loginData.SessionInfo.ServiceSessionID = hgdata.GridExternalName + ";" + UUID.Random.ToString();
 
             try
@@ -647,7 +650,7 @@ namespace SilverSim.Grid.Login
 
         XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
-            TeleportFlags flags = TeleportFlags.None;
+            var flags = TeleportFlags.None;
             if(loginData.Account.UserLevel >= 200)
             {
                 flags |= TeleportFlags.Godlike;
@@ -669,34 +672,44 @@ namespace SilverSim.Grid.Login
                 throw new LoginFailResponseException("key", e.Message);
             }
 
-            XmlRpc.XmlRpcResponse res = new XmlRpc.XmlRpcResponse();
-            Map resStruct = new Map();
-            res.ReturnValue = resStruct;
-            resStruct.Add("look_at", string.Format(CultureInfo.InvariantCulture, "[r{0},r{1},r{2}]", loginData.DestinationInfo.LookAt.X, loginData.DestinationInfo.LookAt.Y, loginData.DestinationInfo.LookAt.Z));
-            resStruct.Add("agent_access_max", "A");
-            resStruct.Add("max-agent-groups", m_MaxAgentGroups);
-            resStruct.Add("seed_capability", seedCapsURI);
-            resStruct.Add("region_x", loginData.DestinationInfo.Location.X);
-            resStruct.Add("region_y", loginData.DestinationInfo.Location.Y);
-            resStruct.Add("region_size_x", loginData.DestinationInfo.Size.X);
-            resStruct.Add("region_size_y", loginData.DestinationInfo.Size.Y);
-            resStruct.Add("circuit_code", (int)loginData.CircuitInfo.CircuitCode);
-            if(loginData.InventoryRoot != null)
+            var resStruct = new Map
             {
-                Map data = new Map();
-                data.Add("folder_id", loginData.InventoryRoot.ID);
-                AnArray ardata = new AnArray();
-                ardata.Add(data);
+                { "look_at", string.Format(CultureInfo.InvariantCulture, "[r{0},r{1},r{2}]", loginData.DestinationInfo.LookAt.X, loginData.DestinationInfo.LookAt.Y, loginData.DestinationInfo.LookAt.Z) },
+                { "agent_access_max", "A" },
+                { "max-agent-groups", m_MaxAgentGroups },
+                { "seed_capability", seedCapsURI },
+                { "region_x", loginData.DestinationInfo.Location.X },
+                { "region_y", loginData.DestinationInfo.Location.Y },
+                { "region_size_x", loginData.DestinationInfo.Size.X },
+                { "region_size_y", loginData.DestinationInfo.Size.Y },
+                { "circuit_code", (int)loginData.CircuitInfo.CircuitCode }
+            };
+            var res = new XmlRpc.XmlRpcResponse()
+            {
+                ReturnValue = resStruct
+            };
+            if (loginData.InventoryRoot != null)
+            {
+                var data = new Map
+                {
+                    { "folder_id", loginData.InventoryRoot.ID }
+                };
+                var ardata = new AnArray
+                {
+                    data
+                };
                 resStruct.Add("inventory-root", ardata);
             }
 
             if(loginData.LoginOptions.Contains(Option_LoginFlags))
             {
-                Map loginFlags = new Map();
-                loginFlags.Add("stipend_since_login", "N");
-                loginFlags.Add("ever_logged_in", loginData.Account.IsEverLoggedIn ? "Y" : "N");
-                loginFlags.Add("gendered", loginData.HaveAppearance ? "Y" : "N");
-                loginFlags.Add("daylight_savings", "N");
+                var loginFlags = new Map
+                {
+                    { "stipend_since_login", "N" },
+                    { "ever_logged_in", loginData.Account.IsEverLoggedIn ? "Y" : "N" },
+                    { "gendered", loginData.HaveAppearance ? "Y" : "N" },
+                    { "daylight_savings", "N" }
+                };
                 resStruct.Add("login-flags", loginFlags);
             }
 
@@ -704,10 +717,14 @@ namespace SilverSim.Grid.Login
 
             if(loginData.InventoryLibRoot != null)
             {
-                Map data = new Map();
-                data.Add("folder_id", loginData.InventoryLibRoot.ID);
-                AnArray ardata = new AnArray();
-                ardata.Add(data);
+                var data = new Map
+                {
+                    { "folder_id", loginData.InventoryLibRoot.ID }
+                };
+                var ardata = new AnArray
+                {
+                    data
+                };
                 resStruct.Add("inventory-lib-root", ardata);
             }
 
@@ -716,8 +733,10 @@ namespace SilverSim.Grid.Login
 
             if(loginData.LoginOptions.Contains(Option_UiConfig))
             {
-                Map uic = new Map();
-                uic.Add("allow_first_life", "Y");
+                var uic = new Map
+                {
+                    { "allow_first_life", "Y" }
+                };
                 resStruct.Add("ui-config", uic);
             }
 
@@ -728,62 +747,82 @@ namespace SilverSim.Grid.Login
 
             if(loginData.LoginOptions.Contains(Option_ClassifiedCategories))
             {
-                AnArray categorylist = new AnArray();
-                Map categorydata;
-
-                categorydata = new Map();
-                categorydata.Add("category_name", "Shopping");
-                categorydata.Add("category_id", 1);
+                var categorylist = new AnArray();
+                var categorydata = new Map
+                {
+                    { "category_name", "Shopping" },
+                    { "category_id", 1 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Land Rental");
-                categorydata.Add("category_id", 2);
+                categorydata = new Map
+                {
+                    { "category_name", "Land Rental" },
+                    { "category_id", 2 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Property Rental");
-                categorydata.Add("category_id", 3);
+                categorydata = new Map
+                {
+                    { "category_name", "Property Rental" },
+                    { "category_id", 3 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Special Attention");
-                categorydata.Add("category_id", 4);
+                categorydata = new Map
+                {
+                    { "category_name", "Special Attention" },
+                    { "category_id", 4 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "New Products");
-                categorydata.Add("category_id", 5);
+                categorydata = new Map
+                {
+                    { "category_name", "New Products" },
+                    { "category_id", 5 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Employment");
-                categorydata.Add("category_id", 6);
+                categorydata = new Map
+                {
+                    { "category_name", "Employment" },
+                    { "category_id", 6 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Wanted");
-                categorydata.Add("category_id", 7);
+                categorydata = new Map
+                {
+                    { "category_name", "Wanted" },
+                    { "category_id", 7 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Service");
-                categorydata.Add("category_id", 8);
+                categorydata = new Map
+                {
+                    { "category_name", "Service" },
+                    { "category_id", 8 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Personal");
-                categorydata.Add("category_id", 9);
+                categorydata = new Map
+                {
+                    { "category_name", "Personal" },
+                    { "category_id", 9 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Shopping");
-                categorydata.Add("category_id", 1);
+                categorydata = new Map
+                {
+                    { "category_name", "Shopping" },
+                    { "category_id", 1 }
+                };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map();
-                categorydata.Add("category_name", "Shopping");
-                categorydata.Add("category_id", 1);
+                categorydata = new Map
+                {
+                    { "category_name", "Shopping" },
+                    { "category_id", 1 }
+                };
                 categorylist.Add(categorydata);
 
                 resStruct.Add("classified_categories", categorylist);
@@ -791,15 +830,17 @@ namespace SilverSim.Grid.Login
 
             if(loginData.InventorySkeleton != null)
             {
-                AnArray folderArray = new AnArray();
+                var folderArray = new AnArray();
                 foreach(InventoryFolder folder in loginData.InventorySkeleton)
                 {
-                    Map folderData = new Map();
-                    folderData.Add("folder_id", folder.ID);
-                    folderData.Add("parent_id", folder.ParentFolderID);
-                    folderData.Add("name", folder.Name);
-                    folderData.Add("type_default", (int)folder.InventoryType);
-                    folderData.Add("version", folder.Version);
+                    var folderData = new Map
+                    {
+                        { "folder_id", folder.ID },
+                        { "parent_id", folder.ParentFolderID },
+                        { "name", folder.Name },
+                        { "type_default", (int)folder.InventoryType },
+                        { "version", folder.Version }
+                    };
                     folderArray.Add(folderData);
                 }
                 resStruct.Add("inventory-skeleton", folderArray);
@@ -810,13 +851,15 @@ namespace SilverSim.Grid.Login
 
             if(loginData.Friends != null)
             {
-                AnArray friendsArray = new AnArray();
+                var friendsArray = new AnArray();
                 foreach(FriendInfo fi in loginData.Friends)
                 {
-                    Map friendData = new Map();
-                    friendData.Add("buddy_id", fi.Friend.ID);
-                    friendData.Add("buddy_rights_given", (int)fi.UserGivenFlags);
-                    friendData.Add("buddy_rights_has", (int)fi.FriendGivenFlags);
+                    var friendData = new Map
+                    {
+                        { "buddy_id", fi.Friend.ID },
+                        { "buddy_rights_given", (int)fi.UserGivenFlags },
+                        { "buddy_rights_has", (int)fi.FriendGivenFlags }
+                    };
                     friendsArray.Add(friendData);
                 }
                 resStruct.Add("buddy-list", friendsArray);
@@ -824,12 +867,14 @@ namespace SilverSim.Grid.Login
 
             if(loginData.ActiveGestures != null)
             {
-                AnArray gestureArray = new AnArray();
+                var gestureArray = new AnArray();
                 foreach(InventoryItem item in loginData.ActiveGestures)
                 {
-                    Map gestureData = new Map();
-                    gestureData.Add("asset_id", item.AssetID);
-                    gestureData.Add("item_id", item.ID);
+                    var gestureData = new Map
+                    {
+                        { "asset_id", item.AssetID },
+                        { "item_id", item.ID }
+                    };
                     gestureArray.Add(gestureData);
                 }
                 resStruct.Add("gestures", gestureArray);
@@ -841,31 +886,41 @@ namespace SilverSim.Grid.Login
 
             if(loginData.HaveGridLibrary && loginData.LoginOptions.Contains(Option_InventoryLibOwner))
             {
-                Map data = new Map();
-                data.Add("agent_id", m_GridLibraryOwner);
-                AnArray ar = new AnArray();
-                ar.Add(data);
+                var data = new Map
+                {
+                    { "agent_id", m_GridLibraryOwner }
+                };
+                var ar = new AnArray
+                {
+                    data
+                };
                 resStruct.Add("inventory-lib-owner", ar);
             }
 
-            Map initial_outfit_data = new Map();
-            initial_outfit_data.Add("folder_name", "Nightclub Female");
-            initial_outfit_data.Add("gender", "female");
-            AnArray initial_outfit_array = new AnArray();
-            initial_outfit_array.Add(initial_outfit_data);
+            var initial_outfit_data = new Map
+            {
+                { "folder_name", "Nightclub Female" },
+                { "gender", "female" }
+            };
+            var initial_outfit_array = new AnArray
+            {
+                initial_outfit_data
+            };
             resStruct.Add("initial-outfit", initial_outfit_array);
 
             if(loginData.InventoryLibSkeleton != null)
             {
-                AnArray folderArray = new AnArray();
+                var folderArray = new AnArray();
                 foreach(InventoryFolder folder in loginData.InventoryLibSkeleton)
                 {
-                    Map folderData = new Map();
-                    folderData.Add("folder_id", folder.ID);
-                    folderData.Add("parent_id", folder.ParentFolderID);
-                    folderData.Add("name", folder.Name);
-                    folderData.Add("type_default", (int)folder.InventoryType);
-                    folderData.Add("version", folder.Version);
+                    var folderData = new Map
+                    {
+                        { "folder_id", folder.ID },
+                        { "parent_id", folder.ParentFolderID },
+                        { "name", folder.Name },
+                        { "type_default", (int)folder.InventoryType },
+                        { "version", folder.Version }
+                    };
                     folderArray.Add(folderData);
                 }
                 resStruct.Add("inventory-skel-lib", folderArray);
@@ -879,11 +934,12 @@ namespace SilverSim.Grid.Login
                 resStruct.Add("event_notifications", new AnArray());
             }
 
-            Map globalTextureData = new Map();
-            globalTextureData.Add("cloud_texture_id", "dc4b9f0b-d008-45c6-96a4-01dd947ac621");
-            globalTextureData.Add("sun_texture_id", "cce0f112-878f-4586-a2e2-a8f104bba271");
-            globalTextureData.Add("moon_texture_id", "ec4b9f0b-d008-45c6-96a4-01dd947ac621");
-
+            var globalTextureData = new Map
+            {
+                { "cloud_texture_id", "dc4b9f0b-d008-45c6-96a4-01dd947ac621" },
+                { "sun_texture_id", "cce0f112-878f-4586-a2e2-a8f104bba271" },
+                { "moon_texture_id", "ec4b9f0b-d008-45c6-96a4-01dd947ac621" }
+            };
             resStruct.Add("global-textures", globalTextureData);
 
             resStruct.Add("login", "true");
@@ -923,9 +979,10 @@ namespace SilverSim.Grid.Login
 
         readonly string[] RequiredParameters = new string[] { "first", "last", "start", "passwd", "channel", "version", "mac", "id0" };
 
+        [Serializable]
         class LoginFailResponseException : Exception
         {
-            public string Reason { get; private set; }
+            public string Reason { get; }
 
             public LoginFailResponseException(string reason, string message)
                 : base(message)
@@ -936,18 +993,21 @@ namespace SilverSim.Grid.Login
 
         XmlRpc.XmlRpcResponse LoginFailResponse(string reason, string message)
         {
-            XmlRpc.XmlRpcResponse res = new XmlRpc.XmlRpcResponse();
-            Map m = new Map();
-            m.Add("reason", reason);
-            m.Add("message", message);
-            m.Add("login", false);
-            res.ReturnValue = m;
-            return res;
+            var m = new Map
+            {
+                { "reason", reason },
+                { "message", message },
+                { "login", false }
+            };
+            return new XmlRpc.XmlRpcResponse()
+            {
+                ReturnValue = m
+            };
         }
 
         public void HandleLoginRedirect(HttpRequest httpreq)
         {
-            using (HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.RedirectKeepVerb, "Permanently moved"))
+            using (var httpres = httpreq.BeginResponse(HttpStatusCode.RedirectKeepVerb, "Permanently moved"))
             {
                 httpres.Headers.Add("Location", m_HttpsServer.ServerURI + "login");
             }
@@ -1140,15 +1200,8 @@ namespace SilverSim.Grid.Login
     [PluginName("XmlRpcLoginHandler")]
     public class XmlRpcLoginHandlerFactory : IPluginFactory
     {
-        public XmlRpcLoginHandlerFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new XmlRpcLoginHandler(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => 
+            new XmlRpcLoginHandler(ownSection);
     }
     #endregion
 }

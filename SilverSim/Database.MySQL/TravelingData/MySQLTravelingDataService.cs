@@ -37,17 +37,15 @@ namespace SilverSim.Database.MySQL.TravelingData
     #region Service implementation
     static class MySQLTravelingDataExtensionMethods
     {
-        public static TravelingDataInfo ToTravelingData(this MySqlDataReader reader)
+        public static TravelingDataInfo ToTravelingData(this MySqlDataReader reader) => new TravelingDataInfo()
         {
-            TravelingDataInfo info = new TravelingDataInfo();
-            info.SessionID = reader.GetUUID("SessionID");
-            info.UserID = reader.GetUUID("UserID");
-            info.GridExternalName = reader.GetString("GridExternalName");
-            info.ServiceToken = reader.GetString("ServiceToken");
-            info.ClientIPAddress = reader.GetString("ClientIPAddress");
-            info.Timestamp = reader.GetDate("Timestamp");
-            return info;
-        }
+            SessionID = reader.GetUUID("SessionID"),
+            UserID = reader.GetUUID("UserID"),
+            GridExternalName = reader.GetString("GridExternalName"),
+            ServiceToken = reader.GetString("ServiceToken"),
+            ClientIPAddress = reader.GetString("ClientIPAddress"),
+            Timestamp = reader.GetDate("Timestamp")
+        };
     }
 
     [Description("MySQL TravelingData Backend")]
@@ -68,10 +66,10 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public override TravelingDataInfo GetTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND GridExternalName NOT LIKE ?homeuri LIMIT 1", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND GridExternalName NOT LIKE ?homeuri LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     cmd.Parameters.AddParameter("?homeuri", homeURI);
@@ -89,10 +87,10 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public override TravelingDataInfo GetTravelingData(UUID sessionID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", sessionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -109,10 +107,10 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public override TravelingDataInfo GetTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND ClientIPAddress LIKE ?ip", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND ClientIPAddress LIKE ?ip", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     cmd.Parameters.AddParameter("?ip", ipAddress);
@@ -130,11 +128,11 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public override List<TravelingDataInfo> GetTravelingDatasByAgentUUID(UUID agentID)
         {
-            List<TravelingDataInfo> infos = new List<TravelingDataInfo>();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var infos = new List<TravelingDataInfo>();
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -151,10 +149,10 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public override bool Remove(UUID sessionID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", sessionID);
                     return cmd.ExecuteNonQuery() > 0;
@@ -164,10 +162,10 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public void Remove(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountID);
                     cmd.ExecuteNonQuery();
@@ -177,10 +175,10 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public override bool RemoveByAgentUUID(UUID agentID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", agentID);
                     return cmd.ExecuteNonQuery() > 0;
@@ -190,14 +188,16 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public override void Store(TravelingDataInfo data)
         {
-            Dictionary<string, object> insertVals = new Dictionary<string, object>();
-            insertVals.Add("SessionID", data.SessionID.ToString());
-            insertVals.Add("UserID", data.UserID.ToString());
-            insertVals.Add("GridExternalName", data.GridExternalName);
-            insertVals.Add("ServiceToken", data.ServiceToken);
-            insertVals.Add("ClientIPAddress", data.ClientIPAddress);
-            insertVals.Add("Timestamp", Date.Now);
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var insertVals = new Dictionary<string, object>
+            {
+                { "SessionID", data.SessionID.ToString() },
+                { "UserID", data.UserID.ToString() },
+                { "GridExternalName", data.GridExternalName },
+                { "ServiceToken", data.ServiceToken },
+                { "ClientIPAddress", data.ClientIPAddress },
+                { "Timestamp", Date.Now }
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.ReplaceInto("travelingdata", insertVals);
@@ -220,7 +220,7 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -228,7 +228,7 @@ namespace SilverSim.Database.MySQL.TravelingData
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -242,15 +242,9 @@ namespace SilverSim.Database.MySQL.TravelingData
     public class MySQLTravelingDataServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL TRAVELINGDATA SERVICE");
-        public MySQLTravelingDataServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLTravelingDataService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLTravelingDataService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

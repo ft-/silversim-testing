@@ -65,10 +65,10 @@ namespace SilverSim.Database.MySQL.Asset
         #region Exists methods
         public override bool Exists(UUID key)
         {
-            using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using(var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT id, access_time FROM assets WHERE id LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assets WHERE id LIKE ?id", conn))
                 {
                     cmd.Parameters.AddWithValue("?id", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -78,10 +78,10 @@ namespace SilverSim.Database.MySQL.Asset
                             if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
-                                using(MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
+                                using(var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using(MySqlCommand ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
+                                    using(var ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("?access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("?id", key);
@@ -99,7 +99,7 @@ namespace SilverSim.Database.MySQL.Asset
 
         public override Dictionary<UUID, bool> Exists(List<UUID> assets)
         {
-            Dictionary<UUID,bool> res = new Dictionary<UUID,bool>();
+            var res = new Dictionary<UUID,bool>();
             if (assets.Count == 0)
             {
                 return res;
@@ -113,10 +113,10 @@ namespace SilverSim.Database.MySQL.Asset
             string ids = "'" + string.Join("','", assets) + "'";
             string sql = string.Format("SELECT id, access_time FROM assets WHERE id IN ({0})", ids);
 
-            using (MySqlConnection dbcon = new MySqlConnection(m_ConnectionString))
+            using (var dbcon = new MySqlConnection(m_ConnectionString))
             {
                 dbcon.Open();
-                using (MySqlCommand cmd = new MySqlCommand(sql, dbcon))
+                using (var cmd = new MySqlCommand(sql, dbcon))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -127,10 +127,10 @@ namespace SilverSim.Database.MySQL.Asset
                             if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
-                                using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
+                                using (var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (MySqlCommand ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
+                                    using (var ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("?access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("?id", id);
@@ -160,7 +160,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assets WHERE id LIKE ?id", conn))
                 {
                     cmd.Parameters.AddWithValue("?id", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -181,10 +181,10 @@ namespace SilverSim.Database.MySQL.Asset
                             if (asset.CreateTime - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
-                                using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
+                                using (var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (MySqlCommand ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
+                                    using (var ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("?access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("?id", key);
@@ -217,13 +217,7 @@ namespace SilverSim.Database.MySQL.Asset
         #endregion
 
         #region Metadata interface
-        public override IAssetMetadataServiceInterface Metadata
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetMetadataServiceInterface Metadata => this;
 
         AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
         {
@@ -240,10 +234,10 @@ namespace SilverSim.Database.MySQL.Asset
 
         bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assets WHERE id=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -270,23 +264,11 @@ namespace SilverSim.Database.MySQL.Asset
         #endregion
 
         #region References interface
-        public override AssetReferencesServiceInterface References
-        {
-            get
-            {
-                return m_ReferencesService;
-            }
-        }
+        public override AssetReferencesServiceInterface References => m_ReferencesService;
         #endregion
 
         #region Data interface
-        public override IAssetDataServiceInterface Data
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetDataServiceInterface Data => this;
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         Stream IAssetDataServiceInterface.this[UUID key]
@@ -304,10 +286,10 @@ namespace SilverSim.Database.MySQL.Asset
 
         bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT data FROM assets WHERE id=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT data FROM assets WHERE id=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -330,11 +312,11 @@ namespace SilverSim.Database.MySQL.Asset
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Store(AssetData asset)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
 
-                using (MySqlCommand cmd =
+                using (var cmd =
                     new MySqlCommand(
                         "INSERT INTO assets(id, name, assetType, temporary, create_time, access_time, asset_flags, CreatorID, data)" +
                         "VALUES(?id, ?name, ?assetType, ?temporary, ?create_time, ?access_time, ?asset_flags, ?CreatorID, ?data)",
@@ -385,10 +367,10 @@ namespace SilverSim.Database.MySQL.Asset
         #region Delete asset method
         public override void Delete(UUID id)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assets WHERE id=?id AND asset_flags <> 0", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assets WHERE id=?id AND asset_flags <> 0", conn))
                 {
                     cmd.Parameters.AddParameter("?id", id);
                     if(cmd.ExecuteNonQuery() < 1)
@@ -403,7 +385,7 @@ namespace SilverSim.Database.MySQL.Asset
         #region DBServiceInterface
         public void VerifyConnection()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 int maxallowedPacket = conn.GetMaxAllowedPacketSize();
@@ -416,7 +398,7 @@ namespace SilverSim.Database.MySQL.Asset
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.MigrateTables(Migrations, m_Log);
@@ -453,15 +435,9 @@ namespace SilverSim.Database.MySQL.Asset
     public class MySQLAssetServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
-        public MySQLAssetServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLAssetService(MySQLUtilities.BuildConnectionString(ownSection, m_Log), loader.KnownConfigurationIssues);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLAssetService(MySQLUtilities.BuildConnectionString(ownSection, m_Log), loader.KnownConfigurationIssues);
     }
     #endregion
 }

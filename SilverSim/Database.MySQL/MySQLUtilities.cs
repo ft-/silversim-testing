@@ -58,7 +58,7 @@ namespace SilverSim.Database.MySQL
                 }
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            StringBuilder connectionString = new StringBuilder();
+            var connectionString = new StringBuilder();
             if (config.Contains("Protocol"))
             {
                 connectionString.AppendFormat("Protocol={0};", config.GetString("Protocol"));
@@ -114,25 +114,21 @@ namespace SilverSim.Database.MySQL
         {
             public MySQLInsertException()
             {
-
             }
 
             public MySQLInsertException(string msg)
                 : base(msg)
             {
-
             }
 
             protected MySQLInsertException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public MySQLInsertException(string msg, Exception innerException)
                 : base(msg, innerException)
             {
-
             }
         }
 
@@ -141,25 +137,21 @@ namespace SilverSim.Database.MySQL
         {
             public MySQLMigrationException()
             {
-
             }
 
             public MySQLMigrationException(string msg)
                 : base(msg)
             {
-
             }
 
             protected MySQLMigrationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public MySQLMigrationException(string msg, Exception innerException)
                 : base(msg, innerException)
             {
-
             }
         }
 
@@ -168,25 +160,21 @@ namespace SilverSim.Database.MySQL
         {
             public MySQLTransactionException()
             {
-
             }
 
             public MySQLTransactionException(string msg)
                 : base(msg)
             {
-
             }
 
             protected MySQLTransactionException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public MySQLTransactionException(string msg, Exception inner)
                 : base(msg, inner)
             {
-
             }
         }
         #endregion
@@ -195,7 +183,7 @@ namespace SilverSim.Database.MySQL
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static void InsideTransaction(this MySqlConnection connection, Action del)
         {
-            using (MySqlCommand cmd = new MySqlCommand("BEGIN", connection))
+            using (var cmd = new MySqlCommand("BEGIN", connection))
             {
                 cmd.ExecuteNonQuery();
             }
@@ -205,13 +193,13 @@ namespace SilverSim.Database.MySQL
             }
             catch(Exception e)
             {
-                using (MySqlCommand cmd = new MySqlCommand("ROLLBACK", connection))
+                using (var cmd = new MySqlCommand("ROLLBACK", connection))
                 {
                     cmd.ExecuteNonQuery();
                 }
                 throw new MySQLTransactionException("Transaction failed", e);
             }
-            using (MySqlCommand cmd = new MySqlCommand("COMMIT", connection))
+            using (var cmd = new MySqlCommand("COMMIT", connection))
             {
                 cmd.ExecuteNonQuery();
             }
@@ -220,7 +208,7 @@ namespace SilverSim.Database.MySQL
 
         public static int GetMaxAllowedPacketSize(this MySqlConnection conn)
         {
-            using (MySqlCommand cmd = new MySqlCommand("SELECT @@max_allowed_packet", conn))
+            using (var cmd = new MySqlCommand("SELECT @@max_allowed_packet", conn))
             {
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -236,23 +224,23 @@ namespace SilverSim.Database.MySQL
         #region Push parameters
         public static void AddParameter(this MySqlParameterCollection mysqlparam, string key, object value)
         {
-            Type t = value != null ? value.GetType() : null;
+            var t = value != null ? value.GetType() : null;
             if (t == typeof(Vector3))
             {
-                Vector3 v = (Vector3)value;
+                var v = (Vector3)value;
                 mysqlparam.AddWithValue(key + "X", v.X);
                 mysqlparam.AddWithValue(key + "Y", v.Y);
                 mysqlparam.AddWithValue(key + "Z", v.Z);
             }
             else if (t == typeof(GridVector))
             {
-                GridVector v = (GridVector)value;
+                var v = (GridVector)value;
                 mysqlparam.AddWithValue(key + "X", v.X);
                 mysqlparam.AddWithValue(key + "Y", v.Y);
             }
             else if (t == typeof(Quaternion))
             {
-                Quaternion v = (Quaternion)value;
+                var v = (Quaternion)value;
                 mysqlparam.AddWithValue(key + "X", v.X);
                 mysqlparam.AddWithValue(key + "Y", v.Y);
                 mysqlparam.AddWithValue(key + "Z", v.Z);
@@ -260,14 +248,14 @@ namespace SilverSim.Database.MySQL
             }
             else if (t == typeof(Color))
             {
-                Color v = (Color)value;
+                var v = (Color)value;
                 mysqlparam.AddWithValue(key + "Red", v.R);
                 mysqlparam.AddWithValue(key + "Green", v.G);
                 mysqlparam.AddWithValue(key + "Blue", v.B);
             }
             else if (t == typeof(ColorAlpha))
             {
-                ColorAlpha v = (ColorAlpha)value;
+                var v = (ColorAlpha)value;
                 mysqlparam.AddWithValue(key + "Red", v.R);
                 mysqlparam.AddWithValue(key + "Green", v.G);
                 mysqlparam.AddWithValue(key + "Blue", v.B);
@@ -275,13 +263,13 @@ namespace SilverSim.Database.MySQL
             }
             else if (t == typeof(EnvironmentController.WLVector2))
             {
-                EnvironmentController.WLVector2 vec = (EnvironmentController.WLVector2)value;
+                var vec = (EnvironmentController.WLVector2)value;
                 mysqlparam.AddWithValue(key + "X", vec.X);
                 mysqlparam.AddWithValue(key + "Y", vec.Y);
             }
             else if (t == typeof(EnvironmentController.WLVector4))
             {
-                EnvironmentController.WLVector4 vec = (EnvironmentController.WLVector4)value;
+                var vec = (EnvironmentController.WLVector4)value;
                 mysqlparam.AddWithValue(key + "Red", vec.X);
                 mysqlparam.AddWithValue(key + "Green", vec.Y);
                 mysqlparam.AddWithValue(key + "Blue", vec.Z);
@@ -297,7 +285,7 @@ namespace SilverSim.Database.MySQL
             }
             else if (t == typeof(AnArray))
             {
-                using (MemoryStream stream = new MemoryStream())
+                using (var stream = new MemoryStream())
                 {
                     LlsdBinary.Serialize((AnArray)value, stream);
                     mysqlparam.AddWithValue(key, stream.ToArray());
@@ -332,12 +320,12 @@ namespace SilverSim.Database.MySQL
         #region Common REPLACE INTO/INSERT INTO helper
         public static void AnyInto(this MySqlConnection connection, string cmd, string tablename, Dictionary<string, object> vals)
         {
-            List<string> q = new List<string>();
+            var q = new List<string>();
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 object value = kvp.Value;
 
-                Type t = value != null ? value.GetType() : null;
+                var t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
@@ -388,8 +376,8 @@ namespace SilverSim.Database.MySQL
                 }
             }
 
-            StringBuilder q1 = new StringBuilder();
-            StringBuilder q2 = new StringBuilder();
+            var q1 = new StringBuilder();
+            var q2 = new StringBuilder();
             q1.Append(cmd);
             q1.Append(" INTO `");
             q1.Append(tablename);
@@ -412,7 +400,7 @@ namespace SilverSim.Database.MySQL
             }
             q1.Append(q2);
             q1.Append(")");
-            using (MySqlCommand command = new MySqlCommand(q1.ToString(), connection))
+            using (var command = new MySqlCommand(q1.ToString(), connection))
             {
                 AddParameters(command.Parameters, vals);
                 if (command.ExecuteNonQuery() < 1)
@@ -426,12 +414,12 @@ namespace SilverSim.Database.MySQL
         #region Generate values
         public static string GenerateFieldNames(Dictionary<string, object> vals)
         {
-            List<string> q = new List<string>();
+            var q = new List<string>();
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 object value = kvp.Value;
 
-                Type t = value != null ? value.GetType() : null;
+                var t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
@@ -478,7 +466,7 @@ namespace SilverSim.Database.MySQL
                 }
             }
 
-            StringBuilder q1 = new StringBuilder();
+            var q1 = new StringBuilder();
             foreach (string p in q)
             {
                 if (q1.Length != 0)
@@ -494,27 +482,27 @@ namespace SilverSim.Database.MySQL
 
         public static string GenerateValues(Dictionary<string, object> vals)
         {
-            List<string> resvals = new List<string>();
+            var resvals = new List<string>();
 
             foreach (object value in vals.Values)
             {
-                Type t = value != null ? value.GetType() : null;
+                var t = value != null ? value.GetType() : null;
                 if (t == typeof(Vector3))
                 {
-                    Vector3 v = (Vector3)value;
+                    var v = (Vector3)value;
                     resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Z.ToString(CultureInfo.InvariantCulture));
                 }
                 else if (t == typeof(GridVector))
                 {
-                    GridVector v = (GridVector)value;
+                    var v = (GridVector)value;
                     resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
                 }
                 else if (t == typeof(Quaternion))
                 {
-                    Quaternion v = (Quaternion)value;
+                    var v = (Quaternion)value;
                     resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Z.ToString(CultureInfo.InvariantCulture));
@@ -522,14 +510,14 @@ namespace SilverSim.Database.MySQL
                 }
                 else if (t == typeof(Color))
                 {
-                    Color v = (Color)value;
+                    var v = (Color)value;
                     resvals.Add(v.R.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.G.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.B.ToString(CultureInfo.InvariantCulture));
                 }
                 else if (t == typeof(ColorAlpha))
                 {
-                    ColorAlpha v = (ColorAlpha)value;
+                    var v = (ColorAlpha)value;
                     resvals.Add(v.R.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.G.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.B.ToString(CultureInfo.InvariantCulture));
@@ -537,13 +525,13 @@ namespace SilverSim.Database.MySQL
                 }
                 else if (t == typeof(EnvironmentController.WLVector2))
                 {
-                    EnvironmentController.WLVector2 v = (EnvironmentController.WLVector2)value;
+                    var v = (EnvironmentController.WLVector2)value;
                     resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
                 }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
-                    EnvironmentController.WLVector4 v = (EnvironmentController.WLVector4)value;
+                    var v = (EnvironmentController.WLVector4)value;
                     resvals.Add(v.X.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Y.ToString(CultureInfo.InvariantCulture));
                     resvals.Add(v.Z.ToString(CultureInfo.InvariantCulture));
@@ -559,7 +547,7 @@ namespace SilverSim.Database.MySQL
                 }
                 else if (t == typeof(AnArray))
                 {
-                    using (MemoryStream stream = new MemoryStream())
+                    using (var stream = new MemoryStream())
                     {
                         LlsdBinary.Serialize((AnArray)value, stream);
                         byte[] b = stream.ToArray();
@@ -568,7 +556,7 @@ namespace SilverSim.Database.MySQL
                 }
                 else if(t == typeof(byte[]))
                 {
-                    byte[] b = (byte[])value;
+                    var b = (byte[])value;
                     resvals.Add(b.Length == 0 ? "''" : "0x" + b.ToHexString());
                 }
                 else if (t == typeof(Date))
@@ -617,12 +605,12 @@ namespace SilverSim.Database.MySQL
         #region UPDATE SET helper
         static List<string> UpdateSetFromVals(Dictionary<string, object> vals)
         {
-            List<string> updates = new List<string>();
+            var updates = new List<string>();
 
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 object value = kvp.Value;
-                Type t = value != null ? value.GetType() : null;
+                var t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
@@ -683,7 +671,7 @@ namespace SilverSim.Database.MySQL
 
             q1 += string.Join(",", UpdateSetFromVals(vals));
 
-            using (MySqlCommand command = new MySqlCommand(q1 + " WHERE " + where, connection))
+            using (var command = new MySqlCommand(q1 + " WHERE " + where, connection))
             {
                 AddParameters(command.Parameters, vals);
                 if (command.ExecuteNonQuery() < 1)
@@ -699,7 +687,7 @@ namespace SilverSim.Database.MySQL
 
             q1 += string.Join(",", UpdateSetFromVals(vals));
 
-            StringBuilder wherestr = new StringBuilder();
+            var wherestr = new StringBuilder();
             foreach(KeyValuePair<string, object> w in where)
             {
                 if(wherestr.Length != 0)
@@ -709,7 +697,7 @@ namespace SilverSim.Database.MySQL
                 wherestr.AppendFormat("{0} LIKE ?w_{0}", w.Key);
             }
 
-            using (MySqlCommand command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))
+            using (var command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))
             {
                 AddParameters(command.Parameters, vals);
                 foreach(KeyValuePair<string, object> w in where)
@@ -725,18 +713,16 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Data parsers
-        public static EnvironmentController.WLVector4 GetWLVector4(this MySqlDataReader dbReader, string prefix)
-        {
-            return new EnvironmentController.WLVector4(
+        public static EnvironmentController.WLVector4 GetWLVector4(this MySqlDataReader dbReader, string prefix) =>
+            new EnvironmentController.WLVector4(
                 (double)dbReader[prefix + "Red"],
                 (double)dbReader[prefix + "Green"],
                 (double)dbReader[prefix + "Blue"],
                 (double)dbReader[prefix + "Value"]);
-        }
 
         public static T GetEnum<T>(this MySqlDataReader dbreader, string prefix)
         {
-            Type enumType = typeof(T).GetEnumUnderlyingType();
+            var enumType = typeof(T).GetEnumUnderlyingType();
             object v = dbreader[prefix];
             return (T)Convert.ChangeType(v, enumType);
         }
@@ -744,7 +730,7 @@ namespace SilverSim.Database.MySQL
         public static UUID GetUUID(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            Type t = v != null ? v.GetType() : null;
+            var t = v != null ? v.GetType() : null;
             if(t == typeof(Guid))
             {
                 return new UUID((Guid)v);
@@ -761,7 +747,7 @@ namespace SilverSim.Database.MySQL
         public static UUI GetUUI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            Type t = v != null ? v.GetType() : null;
+            var t = v != null ? v.GetType() : null;
             if (t == typeof(Guid))
             {
                 return new UUI((Guid)v);
@@ -778,7 +764,7 @@ namespace SilverSim.Database.MySQL
         public static UGI GetUGI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            Type t = v != null ? v.GetType() : null;
+            var t = v != null ? v.GetType() : null;
             if (t == typeof(Guid))
             {
                 return new UGI((Guid)v);
@@ -802,51 +788,41 @@ namespace SilverSim.Database.MySQL
             return Date.UnixTimeToDateTime(v);
         }
 
-        public static EnvironmentController.WLVector2 GetWLVector2(this MySqlDataReader dbReader, string prefix)
-        {
-            return new EnvironmentController.WLVector2(
+        public static EnvironmentController.WLVector2 GetWLVector2(this MySqlDataReader dbReader, string prefix) =>
+            new EnvironmentController.WLVector2(
                 (double)dbReader[prefix + "X"],
                 (double)dbReader[prefix + "Y"]);
-        }
 
-        public static Vector3 GetVector3(this MySqlDataReader dbReader, string prefix)
-        {
-            return new Vector3(
+        public static Vector3 GetVector3(this MySqlDataReader dbReader, string prefix) =>
+            new Vector3(
                 (double)dbReader[prefix + "X"],
                 (double)dbReader[prefix + "Y"],
                 (double)dbReader[prefix + "Z"]);
-        }
 
-        public static Quaternion GetQuaternion(this MySqlDataReader dbReader, string prefix)
-        {
-            return new Quaternion(
+        public static Quaternion GetQuaternion(this MySqlDataReader dbReader, string prefix) =>
+            new Quaternion(
                 (double)dbReader[prefix + "X"],
                 (double)dbReader[prefix + "Y"],
                 (double)dbReader[prefix + "Z"],
                 (double)dbReader[prefix + "W"]);
-        }
 
-        public static Color GetColor(this MySqlDataReader dbReader, string prefix)
-        {
-            return new Color(
+        public static Color GetColor(this MySqlDataReader dbReader, string prefix) =>
+            new Color(
                 (double)dbReader[prefix + "Red"],
                 (double)dbReader[prefix + "Green"],
                 (double)dbReader[prefix + "Blue"]);
-        }
 
-        public static ColorAlpha GetColorAlpha(this MySqlDataReader dbReader, string prefix)
-        {
-            return new ColorAlpha(
+        public static ColorAlpha GetColorAlpha(this MySqlDataReader dbReader, string prefix) =>
+            new ColorAlpha(
                 (double)dbReader[prefix + "Red"],
                 (double)dbReader[prefix + "Green"],
                 (double)dbReader[prefix + "Blue"],
                 (double)dbReader[prefix + "Alpha"]);
-        }
 
         public static bool GetBool(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            Type t = o != null ? o.GetType() : null;
+            var t = o != null ? o.GetType() : null;
             if(t == typeof(uint))
             {
                 return (uint)o != 0;
@@ -872,7 +848,7 @@ namespace SilverSim.Database.MySQL
         public static byte[] GetBytes(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            Type t = o != null ? o.GetType() : null;
+            var t = o != null ? o.GetType() : null;
             if(t == typeof(DBNull))
             {
                 return new byte[0];
@@ -883,12 +859,12 @@ namespace SilverSim.Database.MySQL
         public static Uri GetUri(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            Type t = o != null ? o.GetType() : null;
+            var t = o != null ? o.GetType() : null;
             if(t == typeof(DBNull))
             {
                 return null;
             }
-            string s = (string)o;
+            var s = (string)o;
             if(s.Length == 0)
             {
                 return null;
@@ -896,16 +872,14 @@ namespace SilverSim.Database.MySQL
             return new Uri(s);
         }
 
-        public static GridVector GetGridVector(this MySqlDataReader dbReader, string prefix)
-        {
-            return new GridVector(dbReader.GetUInt32(prefix + "X"), dbReader.GetUInt32(prefix + "Y"));
-        }
+        public static GridVector GetGridVector(this MySqlDataReader dbReader, string prefix) =>
+            new GridVector(dbReader.GetUInt32(prefix + "X"), dbReader.GetUInt32(prefix + "Y"));
         #endregion
 
         #region Migrations helper
         public static uint GetTableRevision(this MySqlConnection connection, string name)
         {
-            using(MySqlCommand cmd = new MySqlCommand("SHOW TABLE STATUS WHERE name=?name", connection))
+            using(var cmd = new MySqlCommand("SHOW TABLE STATUS WHERE name=?name", connection))
             {
                 cmd.Parameters.AddWithValue("?name", name);
                 using (MySqlDataReader dbReader = cmd.ExecuteReader())

@@ -35,7 +35,7 @@ namespace SilverSim.Http
         private string ReadHeaderLine()
         {
             int c;
-            StringBuilder headerLine = new StringBuilder();
+            var headerLine = new StringBuilder();
             while ((c = m_Input.ReadByte()) != '\r')
             {
                 if (c == -1)
@@ -58,40 +58,16 @@ namespace SilverSim.Http
             m_Input = input;
         }
 
-        public override bool CanRead
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek 
-        { 
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanTimeout 
-        { 
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanTimeout => true;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanWrite => false;
 
         public override long Length 
-        { 
+        {
             get
             {
                 throw new NotSupportedException();
@@ -110,8 +86,8 @@ namespace SilverSim.Http
             }
         }
 
-        public override int ReadTimeout 
-        { 
+        public override int ReadTimeout
+        {
             get
             {
                 return m_Input.ReadTimeout;
@@ -129,7 +105,7 @@ namespace SilverSim.Http
 
         public void ReadToEnd()
         {
-            byte[] b = new byte[10240];
+            var b = new byte[10240];
             while (!m_EndOfChunked)
             {
                 if (m_RemainingChunkLength == 0)

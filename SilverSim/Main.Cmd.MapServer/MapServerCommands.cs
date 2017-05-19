@@ -68,7 +68,7 @@ namespace SilverSim.Main.Cmd.MapServer
             }
             else
             {
-                StringBuilder sb = new StringBuilder("Regions:\n--------------------------------------------------\n");
+                var sb = new StringBuilder("Regions:\n--------------------------------------------------\n");
                 foreach (RegionInfo ri in m_GridService.SearchRegionsByName(UUID.Zero, args[2]))
                 {
                     sb.AppendFormat("Region {0}\n- ID: ({1})\n- Flags: {2}\n", ri.Name, ri.ID, ri.Flags.ToString());
@@ -138,7 +138,7 @@ namespace SilverSim.Main.Cmd.MapServer
             }
             else
             {
-                StringBuilder sb = new StringBuilder("Default RegionFlags:\n----------------------------------------------------------------------\n");
+                var sb = new StringBuilder("Default RegionFlags:\n----------------------------------------------------------------------\n");
                 foreach(KeyValuePair<UUID, RegionFlags> kvp in m_RegionDefaultFlagsService.GetAllRegionDefaultFlags())
                 {
                     RegionInfo ri;
@@ -197,8 +197,8 @@ namespace SilverSim.Main.Cmd.MapServer
                     return;
                 }
 
-                RegionFlags setFlags = RegionFlags.None;
-                RegionFlags removeFlags = RegionFlags.None;
+                var setFlags = RegionFlags.None;
+                var removeFlags = RegionFlags.None;
 
                 bool val;
                 for(int argi = 4; argi < args.Count; argi += 2)
@@ -349,11 +349,6 @@ namespace SilverSim.Main.Cmd.MapServer
     [PluginName("MapServerCommands")]
     public class MapServerCommandsFactory : IPluginFactory
     {
-        public MapServerCommandsFactory()
-        {
-
-        }
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new MapServerCommands(ownSection);

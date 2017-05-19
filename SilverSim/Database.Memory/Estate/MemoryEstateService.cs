@@ -74,10 +74,7 @@ namespace SilverSim.Database.Memory.Estate
             return false;
         }
 
-        public override bool ContainsKey(uint estateID)
-        {
-            return m_Data.ContainsKey(estateID);
-        }
+        public override bool ContainsKey(uint estateID) => m_Data.ContainsKey(estateID);
 
         public override bool ContainsKey(string estateName)
         {
@@ -120,69 +117,21 @@ namespace SilverSim.Database.Memory.Estate
             }
         }
 
-        public override List<EstateInfo> All
-        {
-            get 
-            {
-                return new List<EstateInfo>(from estate in m_Data.Values where true select new EstateInfo(estate));
-            }
-        }
+        public override List<EstateInfo> All => new List<EstateInfo>(from estate in m_Data.Values where true select new EstateInfo(estate));
 
-        public override List<uint> AllIDs
-        {
-            get 
-            {
-                return new List<uint>(m_Data.Keys);
-            }
-        }
+        public override List<uint> AllIDs => new List<uint>(m_Data.Keys);
 
-        public override IEstateManagerServiceInterface EstateManager
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IEstateManagerServiceInterface EstateManager => this;
 
-        public override IEstateOwnerServiceInterface EstateOwner
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateOwnerServiceInterface EstateOwner => this;
 
-        public override IEstateAccessServiceInterface EstateAccess
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateAccessServiceInterface EstateAccess => this;
 
-        public override IEstateBanServiceInterface EstateBans
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IEstateBanServiceInterface EstateBans => this;
 
-        public override IEstateGroupsServiceInterface EstateGroup
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateGroupsServiceInterface EstateGroup => this;
 
-        public override IEstateRegionMapServiceInterface RegionMap
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateRegionMapServiceInterface RegionMap => this;
     }
     #endregion
 
@@ -190,10 +139,8 @@ namespace SilverSim.Database.Memory.Estate
     [PluginName("Estate")]
     public class MemoryEstateServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryEstateService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryEstateService();
     }
     #endregion
 

@@ -74,13 +74,7 @@ namespace SilverSim.Database.Memory.AuthInfo
             }
         }
 
-        public override UserAuthInfo this[UUID accountid]
-        {
-            get
-            {
-                return m_AuthInfos[accountid];
-            }
-        }
+        public override UserAuthInfo this[UUID accountid] => m_AuthInfos[accountid];
 
         public override void Store(UserAuthInfo info)
         {
@@ -138,10 +132,8 @@ namespace SilverSim.Database.Memory.AuthInfo
     [PluginName("AuthInfo")]
     public class MemoryAuthInfoServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryAuthInfoService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryAuthInfoService();
     }
     #endregion
 }

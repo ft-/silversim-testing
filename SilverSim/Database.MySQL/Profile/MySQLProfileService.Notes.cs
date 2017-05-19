@@ -22,7 +22,6 @@
 using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Types;
-using SilverSim.Types.Profile;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -32,10 +31,10 @@ namespace SilverSim.Database.MySQL.Profile
     {
         bool INotesInterface.ContainsKey(UUI user, UUI target)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT useruuid FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
+                using (var cmd = new MySqlCommand("SELECT useruuid FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
                 {
                     cmd.Parameters.AddParameter("?user", user.ID);
                     cmd.Parameters.AddParameter("?target", target.ID);
@@ -54,10 +53,10 @@ namespace SilverSim.Database.MySQL.Profile
 
         bool INotesInterface.TryGetValue(UUI user, UUI target, out string notes)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
                 {
                     cmd.Parameters.AddParameter("?user", user.ID);
                     cmd.Parameters.AddParameter("?target", target.ID);
@@ -90,11 +89,13 @@ namespace SilverSim.Database.MySQL.Profile
             }
             set
             {
-                Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                replaceVals["user"] = user.ID;
-                replaceVals["target"] = target.ID;
-                replaceVals["notes"] = value;
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var replaceVals = new Dictionary<string, object>
+                {
+                    ["user"] = user.ID,
+                    ["target"] = target.ID,
+                    ["notes"] = value
+                };
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
                     conn.ReplaceInto("usernotes", replaceVals);

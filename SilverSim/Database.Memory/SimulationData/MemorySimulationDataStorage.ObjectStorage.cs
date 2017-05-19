@@ -42,10 +42,8 @@ namespace SilverSim.Database.Memory.SimulationData
         internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Primitives = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>>(delegate () { return new RwLockedDictionary<UUID, Map>(); });
         internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>> m_PrimItems = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>>(delegate () { return new RwLockedDictionary<string, Map>(); });
 
-        internal static string GenItemKey(UUID primID, UUID itemID)
-        {
-            return primID.ToString() + ":" + itemID.ToString();
-        }
+        internal static string GenItemKey(UUID primID, UUID itemID) =>
+            primID.ToString() + ":" + itemID.ToString();
 
         void RemoveAllObjectsInRegion(UUID key)
         {
@@ -77,27 +75,24 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region helpers
-        ObjectGroup ObjectGroupFromMap(Map map)
+        ObjectGroup ObjectGroupFromMap(Map map) => new ObjectGroup()
         {
-            return new ObjectGroup()
-            {
-                IsTempOnRez = map["IsTempOnRez"].AsBoolean,
-                Owner = new UUI(map["Owner"].ToString()),
-                LastOwner = new UUI(map["LastOwner"].ToString()),
-                Group = new UGI(map["Group"].ToString()),
-                SaleType = (InventoryItem.SaleInfoData.SaleType)map["SaleType"].AsUInt,
-                SalePrice = map["SalePrice"].AsInt,
-                PayPrice0 = map["PayPrice0"].AsInt,
-                PayPrice1 = map["PayPrice1"].AsInt,
-                PayPrice2 = map["PayPrice2"].AsInt,
-                PayPrice3 = map["PayPrice3"].AsInt,
-                PayPrice4 = map["PayPrice4"].AsInt,
-                AttachedPos = map["AttachedPos"].AsVector3,
-                AttachPoint = (AttachmentPoint)map["AttachPoint"].AsUInt,
-                IsIncludedInSearch = map["IsIncludedInSearch"].AsBoolean,
-                RezzingObjectID = map["RezzingObjectID"].AsUUID
-            };
-        }
+            IsTempOnRez = map["IsTempOnRez"].AsBoolean,
+            Owner = new UUI(map["Owner"].ToString()),
+            LastOwner = new UUI(map["LastOwner"].ToString()),
+            Group = new UGI(map["Group"].ToString()),
+            SaleType = (InventoryItem.SaleInfoData.SaleType)map["SaleType"].AsUInt,
+            SalePrice = map["SalePrice"].AsInt,
+            PayPrice0 = map["PayPrice0"].AsInt,
+            PayPrice1 = map["PayPrice1"].AsInt,
+            PayPrice2 = map["PayPrice2"].AsInt,
+            PayPrice3 = map["PayPrice3"].AsInt,
+            PayPrice4 = map["PayPrice4"].AsInt,
+            AttachedPos = map["AttachedPos"].AsVector3,
+            AttachPoint = (AttachmentPoint)map["AttachPoint"].AsUInt,
+            IsIncludedInSearch = map["IsIncludedInSearch"].AsBoolean,
+            RezzingObjectID = map["RezzingObjectID"].AsUUID
+        };
 
         ObjectPart ObjectPartFromMap(Map map)
         {
@@ -235,7 +230,7 @@ namespace SilverSim.Database.Memory.SimulationData
             item.SaleInfo.Price = map["SalePrice"].AsInt;
             item.SaleInfo.PermMask = (InventoryPermissionsMask)map["SalePermMask"].AsInt;
             item.NextOwnerAssetID = map["NextOwnerAssetID"].AsUUID;
-            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+            var grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
             if ((map["PermsGranter"].ToString()).Length != 0)
             {
                 try

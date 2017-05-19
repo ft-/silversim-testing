@@ -53,37 +53,37 @@ namespace SilverSim.Database.MySQL.Profile
 
         public override void Remove(UUID scopeID, UUID userAccount)
         {
-            using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using(var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(delegate()
+                conn.InsideTransaction(() =>
                 {
-                    using(MySqlCommand cmd = new MySqlCommand("DELETE FROM classifieds where creatoruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM classifieds where creatoruuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM userpicks where creatoruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM userpicks where creatoruuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM usernotes where useruuid LIKE ?uuid OR targetuuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM usernotes where useruuid LIKE ?uuid OR targetuuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM usersettings where useruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM usersettings where useruuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM userprofile where useruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM userprofile where useruuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("UPDATE userprofile set profilePartner = '00000000-0000-0000-0000-000000000000' where profilePartner LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("UPDATE userprofile set profilePartner = '00000000-0000-0000-0000-000000000000' where profilePartner LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", userAccount);
                         cmd.ExecuteNonQuery();
@@ -92,49 +92,19 @@ namespace SilverSim.Database.MySQL.Profile
             }
         }
 
-        public override IClassifiedsInterface Classifieds
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IClassifiedsInterface Classifieds => this;
 
-        public override IPicksInterface Picks
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IPicksInterface Picks => this;
 
-        public override INotesInterface Notes
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override INotesInterface Notes => this;
 
-        public override IUserPreferencesInterface Preferences
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IUserPreferencesInterface Preferences => this;
 
-        public override IPropertiesInterface Properties
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IPropertiesInterface Properties => this;
 
         public void VerifyConnection()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
             }
@@ -142,7 +112,7 @@ namespace SilverSim.Database.MySQL.Profile
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.MigrateTables(Migrations, m_Log);
@@ -235,15 +205,9 @@ namespace SilverSim.Database.MySQL.Profile
     public sealed class MySQLProfileServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");
-        public MySQLProfileServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLProfileService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLProfileService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

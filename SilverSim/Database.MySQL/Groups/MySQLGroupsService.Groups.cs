@@ -71,10 +71,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         bool IGroupsInterface.ContainsKey(UUI requestingAgent, string groupName)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` LIKE ?groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` LIKE ?groupname", conn))
                 {
                     cmd.Parameters.AddParameter("?groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -85,17 +85,14 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, UGI group)
-        {
-            return Groups.ContainsKey(requestingAgent, group.ID);
-        }
+        bool IGroupsInterface.ContainsKey(UUI requestingAgent, UGI group) => Groups.ContainsKey(requestingAgent, group.ID);
 
         bool IGroupsInterface.ContainsKey(UUI requestingAgent, UUID groupID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID LIKE ?groupid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -108,21 +105,22 @@ namespace SilverSim.Database.MySQL.Groups
 
         GroupInfo IGroupsInterface.Create(UUI requestingAgent, GroupInfo group)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("GroupID", group.ID.ID);
-            vals.Add("Location", group.ID.HomeURI != null ? group.ID.HomeURI.ToString() : string.Empty);
-            vals.Add("Name", group.ID.GroupName);
-            vals.Add("Charter", group.Charter);
-            vals.Add("InsigniaID", group.InsigniaID);
-            vals.Add("FounderID", group.Founder.ID);
-            vals.Add("MembershipFee", group.MembershipFee);
-            vals.Add("OpenEnrollment", group.IsOpenEnrollment);
-            vals.Add("ShowInList", group.IsShownInList);
-            vals.Add("AllowPublish", group.IsAllowPublish);
-            vals.Add("MaturePublish", group.IsMaturePublish);
-            vals.Add("OwnerRoleID", group.OwnerRoleID);
-
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var vals = new Dictionary<string, object>
+            {
+                { "GroupID", group.ID.ID },
+                { "Location", group.ID.HomeURI != null ? group.ID.HomeURI.ToString() : string.Empty },
+                { "Name", group.ID.GroupName },
+                { "Charter", group.Charter },
+                { "InsigniaID", group.InsigniaID },
+                { "FounderID", group.Founder.ID },
+                { "MembershipFee", group.MembershipFee },
+                { "OpenEnrollment", group.IsOpenEnrollment },
+                { "ShowInList", group.IsShownInList },
+                { "AllowPublish", group.IsAllowPublish },
+                { "MaturePublish", group.IsMaturePublish },
+                { "OwnerRoleID", group.OwnerRoleID }
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.InsertInto("groups", vals);
@@ -132,20 +130,20 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupsInterface.Delete(UUI requestingAgent, UGI group)
         {
-            string[] tablenames = new string[] { "grouproles", "grouprolememberships", "groupnotices", "groupmemberships", "groupinvites", "groups" };
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var tablenames = new string[] { "grouproles", "grouprolememberships", "groupnotices", "groupmemberships", "groupinvites", "groups" };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(delegate ()
+                conn.InsideTransaction(() =>
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID LIKE ?groupid", conn))
                     {
                         cmd.Parameters.AddParameter("?groupid", group.ID);
                         cmd.ExecuteNonQuery();
                     }
                     foreach (string table in tablenames)
                     {
-                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid", conn))
                         {
                             cmd.Parameters.AddParameter("?groupid", group.ID);
                             cmd.ExecuteNonQuery();
@@ -157,11 +155,11 @@ namespace SilverSim.Database.MySQL.Groups
 
         List<DirGroupInfo> IGroupsInterface.GetGroupsByName(UUI requestingAgent, string query)
         {
-            List<DirGroupInfo> groups = new List<DirGroupInfo>();
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var groups = new List<DirGroupInfo>();
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT g.GroupID, g.`Name`, g.Location, " + GCountQuery + " FROM groups AS g WHERE g.Name LIKE ?value", conn))
+                using (var cmd = new MySqlCommand("SELECT g.GroupID, g.`Name`, g.Location, " + GCountQuery + " FROM groups AS g WHERE g.Name LIKE ?value", conn))
                 {
                     cmd.Parameters.AddParameter("?value", "%" + query + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -188,10 +186,10 @@ namespace SilverSim.Database.MySQL.Groups
         bool IGroupsInterface.TryGetValue(UUI requestingAgent, string groupName, out GroupInfo groupInfo)
         {
             groupInfo = null;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` LIKE ?groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` LIKE ?groupname", conn))
                 {
                     cmd.Parameters.AddParameter("?groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -211,10 +209,10 @@ namespace SilverSim.Database.MySQL.Groups
         bool IGroupsInterface.TryGetValue(UUI requestingAgent, UGI group, out GroupInfo groupInfo)
         {
             groupInfo = null;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID LIKE ?groupid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -234,10 +232,10 @@ namespace SilverSim.Database.MySQL.Groups
         bool IGroupsInterface.TryGetValue(UUI requestingAgent, UUID groupID, out UGI ugi)
         {
             ugi = default(UGI);
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID LIKE ?groupid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -262,18 +260,19 @@ namespace SilverSim.Database.MySQL.Groups
 
         GroupInfo IGroupsInterface.Update(UUI requestingAgent, GroupInfo group)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("Charter", group.Charter);
-            vals.Add("InsigniaID", group.InsigniaID);
-            vals.Add("FounderID", group.Founder.ID);
-            vals.Add("MembershipFee", group.MembershipFee);
-            vals.Add("OpenEnrollment", group.IsOpenEnrollment);
-            vals.Add("ShowInList", group.IsShownInList);
-            vals.Add("AllowPublish", group.IsAllowPublish);
-            vals.Add("MaturePublish", group.IsMaturePublish);
-            vals.Add("OwnerRoleID", group.OwnerRoleID);
-
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var vals = new Dictionary<string, object>
+            {
+                { "Charter", group.Charter },
+                { "InsigniaID", group.InsigniaID },
+                { "FounderID", group.Founder.ID },
+                { "MembershipFee", group.MembershipFee },
+                { "OpenEnrollment", group.IsOpenEnrollment },
+                { "ShowInList", group.IsShownInList },
+                { "AllowPublish", group.IsAllowPublish },
+                { "MaturePublish", group.IsMaturePublish },
+                { "OwnerRoleID", group.OwnerRoleID }
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.UpdateSet("groups", vals, "GroupID LIKE \"" + group.ID.ID.ToString() + "\"");

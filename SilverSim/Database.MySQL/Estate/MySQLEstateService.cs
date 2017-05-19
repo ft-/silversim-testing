@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL.Estate
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -65,7 +65,7 @@ namespace SilverSim.Database.MySQL.Estate
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.MigrateTables(Migrations, m_Log);
@@ -155,10 +155,10 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override bool TryGetValue(uint estateID, out EstateInfo estateInfo)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -177,10 +177,10 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override bool TryGetValue(string estateName, out EstateInfo estateInfo)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE Name LIKE ?name", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE Name LIKE ?name", conn))
                 {
                     cmd.Parameters.AddParameter("?name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -199,10 +199,10 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override bool ContainsKey(uint estateID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM estates WHERE ID LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE ID LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -220,10 +220,10 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override bool ContainsKey(string estateName)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM estates WHERE Name LIKE ?name", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE Name LIKE ?name", conn))
                 {
                     cmd.Parameters.AddParameter("?name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -241,19 +241,21 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override void Add(EstateInfo estateInfo)
         {
-            Dictionary<string, object> dict = new Dictionary<string, object>();
-            dict["ID"] = estateInfo.ID;
-            dict["Name"] = estateInfo.Name;
-            dict["Owner"] = estateInfo.Owner;
-            dict["Flags"] = estateInfo.Flags;
-            dict["PricePerMeter"] = estateInfo.PricePerMeter;
-            dict["BillableFactor"] = estateInfo.BillableFactor;
-            dict["SunPosition"] = estateInfo.SunPosition;
-            dict["AbuseEmail"] = estateInfo.AbuseEmail;
-            dict["CovenantID"] = estateInfo.CovenantID;
-            dict["CovenantTimestamp"] = estateInfo.CovenantTimestamp;
-            dict["UseGlobalTime"] = estateInfo.UseGlobalTime;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var dict = new Dictionary<string, object>
+            {
+                ["ID"] = estateInfo.ID,
+                ["Name"] = estateInfo.Name,
+                ["Owner"] = estateInfo.Owner,
+                ["Flags"] = estateInfo.Flags,
+                ["PricePerMeter"] = estateInfo.PricePerMeter,
+                ["BillableFactor"] = estateInfo.BillableFactor,
+                ["SunPosition"] = estateInfo.SunPosition,
+                ["AbuseEmail"] = estateInfo.AbuseEmail,
+                ["CovenantID"] = estateInfo.CovenantID,
+                ["CovenantTimestamp"] = estateInfo.CovenantTimestamp,
+                ["UseGlobalTime"] = estateInfo.UseGlobalTime
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.InsertInto("estates", dict);
@@ -264,10 +266,10 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
                     {
                         cmd.Parameters.AddParameter("?id", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -285,19 +287,21 @@ namespace SilverSim.Database.MySQL.Estate
             {
                 if (value != null)
                 {
-                    Dictionary<string, object> dict = new Dictionary<string, object>();
-                    dict["ID"] = value.ID;
-                    dict["Name"] = value.Name;
-                    dict["Owner"] = value.Owner;
-                    dict["Flags"] = (uint)value.Flags;
-                    dict["PricePerMeter"] = value.PricePerMeter;
-                    dict["BillableFactor"] = value.BillableFactor;
-                    dict["SunPosition"] = value.SunPosition;
-                    dict["AbuseEmail"] = value.AbuseEmail;
-                    dict["CovenantID"] = value.CovenantID;
-                    dict["CovenantTimestamp"] = value.CovenantTimestamp;
-                    dict["UseGlobalTime"] = value.UseGlobalTime;
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    var dict = new Dictionary<string, object>
+                    {
+                        ["ID"] = value.ID,
+                        ["Name"] = value.Name,
+                        ["Owner"] = value.Owner,
+                        ["Flags"] = (uint)value.Flags,
+                        ["PricePerMeter"] = value.PricePerMeter,
+                        ["BillableFactor"] = value.BillableFactor,
+                        ["SunPosition"] = value.SunPosition,
+                        ["AbuseEmail"] = value.AbuseEmail,
+                        ["CovenantID"] = value.CovenantID,
+                        ["CovenantTimestamp"] = value.CovenantTimestamp,
+                        ["UseGlobalTime"] = value.UseGlobalTime
+                    };
+                    using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
                         conn.ReplaceInto("estates", dict);
@@ -305,10 +309,10 @@ namespace SilverSim.Database.MySQL.Estate
                 }
                 else
                 {
-                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    using(var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using(MySqlCommand cmd = new MySqlCommand("DELETE FROM estates WHERE ID LIKE ?id", conn))
+                        using(var cmd = new MySqlCommand("DELETE FROM estates WHERE ID LIKE ?id", conn))
                         {
                             cmd.Parameters.AddParameter("?id", estateID);
                             if(cmd.ExecuteNonQuery() < 1)
@@ -325,12 +329,12 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get 
             {
-                List<EstateInfo> list = new List<EstateInfo>();
+                var list = new List<EstateInfo>();
 
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using(var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates", conn))
+                    using(var cmd = new MySqlCommand("SELECT * FROM estates", conn))
                     {
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -347,14 +351,14 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override List<uint> AllIDs
         {
-            get 
+            get
             {
-                List<uint> list = new List<uint>();
+                var list = new List<uint>();
 
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM estates", conn))
+                    using (var cmd = new MySqlCommand("SELECT ID FROM estates", conn))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -369,53 +373,17 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override IEstateManagerServiceInterface EstateManager
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IEstateManagerServiceInterface EstateManager => this;
 
-        public override IEstateOwnerServiceInterface EstateOwner
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateOwnerServiceInterface EstateOwner => this;
 
-        public override IEstateAccessServiceInterface EstateAccess
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateAccessServiceInterface EstateAccess => this;
 
-        public override IEstateBanServiceInterface EstateBans
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IEstateBanServiceInterface EstateBans => this;
 
-        public override IEstateGroupsServiceInterface EstateGroup
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateGroupsServiceInterface EstateGroup => this;
 
-        public override IEstateRegionMapServiceInterface RegionMap
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override IEstateRegionMapServiceInterface RegionMap => this;
     }
     #endregion
 
@@ -424,15 +392,9 @@ namespace SilverSim.Database.MySQL.Estate
     public class MySQLEstateServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
-        public MySQLEstateServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLEstateService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLEstateService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 

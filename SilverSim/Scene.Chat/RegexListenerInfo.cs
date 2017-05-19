@@ -30,34 +30,22 @@ namespace SilverSim.Scene.Chat
 {
     public sealed class RegexListenerInfo : ChatServiceInterface.Listener
     {
-        readonly int m_Channel;
         readonly Regex m_Name;
         readonly string m_NamePlain = string.Empty;
         readonly UUID m_ID;
         readonly Regex m_Message;
         readonly string m_MessagePlain = string.Empty;
         readonly Int32 m_RegexBitfield;
-        readonly Func<UUID> m_GetUUID;
-        readonly Func<Vector3> m_GetPos;
         readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
-        public override bool IsAgent
-        {
-            get 
-            {
-                return false;
-            }
-        }
+        public override bool IsAgent => false;
 
         readonly ChatHandler m_Handler;
 
-        public override bool IsMatching(string name, UUID id, string message, Int32 regexBitfield)
-        {
-            return m_NamePlain == name &&
+        public override bool IsMatching(string name, UUID id, string message, Int32 regexBitfield) => m_NamePlain == name &&
                 m_ID == id &&
                 m_MessagePlain == message &&
                 m_RegexBitfield == regexBitfield;
-        }
 
         internal RegexListenerInfo(
             ChatHandler handler,
@@ -73,8 +61,8 @@ namespace SilverSim.Scene.Chat
             m_RegexBitfield = regexBitfield;
             IsActive = true;
             m_Handler = handler;
-            m_Channel = channel;
-            if(!String.IsNullOrEmpty(name))
+            Channel = channel;
+            if(!string.IsNullOrEmpty(name))
             {
                 if((m_RegexBitfield & 1) != 0)
                 {
@@ -87,7 +75,7 @@ namespace SilverSim.Scene.Chat
                 }
             }
             m_ID = id;
-            if(!String.IsNullOrEmpty(name))
+            if(!string.IsNullOrEmpty(name))
             {
                 if ((m_RegexBitfield & 2) != 0)
                 {
@@ -99,8 +87,8 @@ namespace SilverSim.Scene.Chat
                     m_MessagePlain = message;
                 }
             }
-            m_GetUUID = getuuid;
-            m_GetPos = getpos;
+            GetUUID = getuuid;
+            GetPosition = getpos;
             m_Send = send;
         }
 
@@ -120,29 +108,11 @@ namespace SilverSim.Scene.Chat
             m_Handler.Remove(this);
         }
 
-        public override int Channel
-        {
-            get
-            {
-                return m_Channel;
-            }
-        }
+        public override int Channel { get; }
 
-        public override Func<Vector3> GetPosition
-        {
-            get
-            {
-                return m_GetPos;
-            }
-        }
+        public override Func<Vector3> GetPosition { get; }
 
-        public override Func<UUID> GetUUID
-        {
-            get
-            {
-                return m_GetUUID;
-            }
-        }
+        public override Func<UUID> GetUUID { get; }
 
         public override void Send(ListenEvent ev)
         {
@@ -155,12 +125,9 @@ namespace SilverSim.Scene.Chat
                         return;
                     }
                 }
-                else
+                else if (m_NamePlain != ev.Name)
                 {
-                    if(m_NamePlain != ev.Name)
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
             if(m_ID != null)
@@ -183,12 +150,9 @@ namespace SilverSim.Scene.Chat
                         return;
                     }
                 }
-                else
+                else if (m_MessagePlain != ev.Message)
                 {
-                    if(m_MessagePlain != ev.Message)
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
 

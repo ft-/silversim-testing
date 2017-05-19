@@ -69,7 +69,7 @@ namespace SilverSim.Database.Memory.Groups
 
         public override List<UGI> GetGroupsByName(string groupName, int limit)
         {
-            List<UGI> groups = new List<UGI>();
+            var groups = new List<UGI>();
             var res = from grp in m_Data.Values
                                    where grp.GroupName.ToLower().Equals(groupName.ToLower())
                                    select grp;
@@ -95,10 +95,8 @@ namespace SilverSim.Database.Memory.Groups
     [PluginName("GroupNames")]
     public class MemoryGroupsNameServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryGroupsNameService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryGroupsNameService();
     }
     #endregion
 }

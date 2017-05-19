@@ -29,61 +29,30 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private Stream m_Input;
         private long m_RemainingLength;
-        readonly long m_ContentLength;
         private bool m_Expect100Continue;
         public HttpRequestBodyStream(Stream input, long contentLength, bool expect100Continue)
         {
             m_RemainingLength = contentLength;
             m_Input = input;
-            m_ContentLength = contentLength;
+            Length = contentLength;
             m_Expect100Continue = expect100Continue;
         }
 
-        public override bool CanRead
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek 
-        { 
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanTimeout 
-        { 
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanTimeout => true;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanWrite => false;
 
-        public override long Length 
-        { 
-            get
-            {
-                return m_ContentLength;
-            }
-        }
+        public override long Length { get; }
 
         public override long Position
         {
             get
             {
-                return m_ContentLength - m_RemainingLength;
+                return Length - m_RemainingLength;
             }
             set
             {
@@ -123,7 +92,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 CheckExpect100();
 
-                byte[] b = new byte[10240];
+                var b = new byte[10240];
                 while(m_RemainingLength > 0)
                 {
                     Read(b, 0, m_RemainingLength > b.Length ? b.Length : (int)m_RemainingLength);
@@ -138,7 +107,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 CheckExpect100();
 
-                byte[] b = new byte[10240];
+                var b = new byte[10240];
                 while (m_RemainingLength > 0)
                 {
                     Read(b, 0, m_RemainingLength > b.Length ? b.Length : (int)m_RemainingLength);
@@ -159,7 +128,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 CheckExpect100();
 
-                byte[] b = new byte[10240];
+                var b = new byte[10240];
                 while (m_RemainingLength > 0)
                 {
                     Read(b, 0, m_RemainingLength > b.Length ? b.Length : (int)m_RemainingLength);
@@ -178,9 +147,7 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     count = (int)m_RemainingLength;
                 }
-                int result;
-                
-                result = m_Input.Read(buffer, offset, count > 10240 ? 10240 : count);
+                int result = m_Input.Read(buffer, offset, count > 10240 ? 10240 : count);
 
                 if (result > 0)
                 {
@@ -195,12 +162,12 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override int ReadByte()
         {
-            byte[] b = new byte[1];
+            var b = new byte[1];
             if (0 == Read(b, 0, 1))
             {
                 return -1;
             }
-            return (int)b[0];
+            return b[0];
         }
 
         public override long Seek(long offset, SeekOrigin origin)

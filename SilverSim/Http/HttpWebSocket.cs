@@ -28,9 +28,6 @@ namespace SilverSim.Http
     [Serializable]
     public class WebSocketClosedException : Exception
     {
-        public WebSocketClosedException()
-        {
-        }
     }
 
     public class HttpWebSocket : IDisposable
@@ -51,16 +48,13 @@ namespace SilverSim.Http
             TryAgainLater = 1013,
             BadGateway = 1014,
         }
+
         [Serializable]
         public class MessageTimeoutException : Exception
         {
-            public MessageTimeoutException()
-            {
-
-            }
         }
 
-        static Random Random = new Random();
+        static readonly Random Random = new Random();
         static byte[] MaskingKey
         {
             get
@@ -136,7 +130,7 @@ namespace SilverSim.Http
             m_WebSocketStream.ReadTimeout = 1000;
             for (;;)
             {
-                byte[] hdr = new byte[2];
+                var hdr = new byte[2];
                 if (m_IsClosed)
                 {
                     throw new WebSocketClosedException();
@@ -158,7 +152,7 @@ namespace SilverSim.Http
                     throw new MessageTimeoutException();
                 }
 
-                OpCode opcode = (OpCode)(hdr[0] & 0xF);
+                var opcode = (OpCode)(hdr[0] & 0xF);
                 if (opcode == OpCode.Close)
                 {
                     m_IsClosed = true;
@@ -167,7 +161,7 @@ namespace SilverSim.Http
                 int payloadlen = hdr[1] & 0x7F;
                 if (payloadlen == 127)
                 {
-                    byte[] leninfo = new byte[8];
+                    var leninfo = new byte[8];
                     if (8 != m_WebSocketStream.Read(leninfo, 0, 8))
                     {
                         m_IsClosed = true;
@@ -181,7 +175,7 @@ namespace SilverSim.Http
                 }
                 else if (payloadlen == 126)
                 {
-                    byte[] leninfo = new byte[2];
+                    var leninfo = new byte[2];
                     if (2 != m_WebSocketStream.Read(leninfo, 0, 2))
                     {
                         m_IsClosed = true;
@@ -197,14 +191,14 @@ namespace SilverSim.Http
                 {
                     payloadlen = hdr[1] & 0x7F;
                 }
-                byte[] maskingkey = new byte[4] { 0, 0, 0, 0 };
+                var maskingkey = new byte[4] { 0, 0, 0, 0 };
                 if ((hdr[1] & 128) != 0 && 4 != m_WebSocketStream.Read(maskingkey, 0, 4))
                 {
                     m_IsClosed = true;
                     throw new WebSocketClosedException();
                 }
 
-                byte[] payload = new byte[payloadlen];
+                var payload = new byte[payloadlen];
                 if (payloadlen != m_WebSocketStream.Read(payload, 0, payloadlen))
                 {
                     m_IsClosed = true;
@@ -217,7 +211,7 @@ namespace SilverSim.Http
 
                 if (opcode == OpCode.Binary)
                 {
-                    Message msg = new Message();
+                    var msg = new Message();
                     msg.Data = payload;
                     msg.Type = MessageType.Binary;
                     msg.IsLastSegment = (hdr[0] & 128) != 0;
@@ -225,7 +219,7 @@ namespace SilverSim.Http
                 }
                 else if (opcode == OpCode.Text)
                 {
-                    Message msg = new Message();
+                    var msg = new Message();
                     msg.Data = payload;
                     msg.Type = MessageType.Text;
                     msg.IsLastSegment = (hdr[0] & 128) != 0;

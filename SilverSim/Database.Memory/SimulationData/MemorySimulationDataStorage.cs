@@ -45,84 +45,24 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region Properties
-        public override ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes => this;
 
-        public override ISimulationDataEnvControllerStorageInterface EnvironmentController
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataEnvControllerStorageInterface EnvironmentController => this;
 
-        public override ISimulationDataLightShareStorageInterface LightShare
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataLightShareStorageInterface LightShare => this;
 
-        public override ISimulationDataSpawnPointStorageInterface Spawnpoints
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataSpawnPointStorageInterface Spawnpoints => this;
 
-        public override ISimulationDataEnvSettingsStorageInterface EnvironmentSettings
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataEnvSettingsStorageInterface EnvironmentSettings => this;
 
-        public override ISimulationDataObjectStorageInterface Objects
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataObjectStorageInterface Objects => this;
 
-        public override ISimulationDataParcelStorageInterface Parcels
-        {
-            get
-            {
-                return this;
-            }
-        }
-        public override ISimulationDataScriptStateStorageInterface ScriptStates
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataParcelStorageInterface Parcels => this;
+        public override ISimulationDataScriptStateStorageInterface ScriptStates => this;
 
-        public override ISimulationDataTerrainStorageInterface Terrains
-        {
-            get 
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataTerrainStorageInterface Terrains => this;
 
-        public override ISimulationDataRegionSettingsStorageInterface RegionSettings
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override ISimulationDataRegionSettingsStorageInterface RegionSettings => this;
         #endregion
 
         public override void RemoveRegion(UUID regionID)
@@ -144,10 +84,8 @@ namespace SilverSim.Database.Memory.SimulationData
     [PluginName("SimulationData")]
     public class MemorySimulationDataServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemorySimulationDataStorage();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemorySimulationDataStorage();
     }
     #endregion
 }

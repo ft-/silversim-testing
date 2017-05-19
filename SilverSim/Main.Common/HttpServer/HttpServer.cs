@@ -51,24 +51,12 @@ namespace SilverSim.Main.Common.HttpServer
         public RwLockedDictionary<string, Action<HttpRequest>> UriHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
         public RwLockedDictionary<string, Action<HttpRequest>> RootUriContentTypeHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
 
-        public uint Port { get; private set; }
+        public uint Port { get; }
         ExternalHostNameServiceInterface m_ExternalHostNameService;
-        public string ExternalHostName
-        {
-            get
-            {
-                return m_ExternalHostNameService.ExternalHostName;
-            }
-        }
+        public string ExternalHostName => m_ExternalHostNameService.ExternalHostName;
 
-        public string ServerURI
-        {
-            get
-            {
-                return string.Format("{0}://{1}:{2}/", Scheme, ExternalHostName, Port);
-            }
-        }
-        public string Scheme { get; private set; }
+        public string ServerURI => string.Format("{0}://{1}:{2}/", Scheme, ExternalHostName, Port);
+        public string Scheme { get; }
 
         readonly bool m_IsBehindProxy;
         bool m_StoppingListeners;
@@ -130,7 +118,7 @@ namespace SilverSim.Main.Common.HttpServer
                 /* however, mono does not have an idea about what this is all about, so we catch that here */
             }
 
-            IPEndPoint ep = new IPEndPoint(IPAddress.Any, (int)Port);
+            var ep = new IPEndPoint(IPAddress.Any, (int)Port);
             m_ListenerSocket.Bind(ep);
             m_ListenerSocket.Listen(128);
 
@@ -202,13 +190,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        public ShutdownOrder ShutdownOrder 
-        { 
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         public void Shutdown()
         {
@@ -334,15 +316,14 @@ namespace SilverSim.Main.Common.HttpServer
         {
             try
             {
-                Socket socket = (Socket)socko;
+                var socket = (Socket)socko;
                 try
                 {
-                    IPEndPoint ep = (IPEndPoint)socket.RemoteEndPoint;
+                    var ep = (IPEndPoint)socket.RemoteEndPoint;
                     string remoteAddr = AddressToString(ep.Address);
                     Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
-                    Stream httpstream;
-                    httpstream = new HttpStream(socket);
+                    Stream httpstream = new HttpStream(socket);
 
                     AcceptedConnection_Internal(httpstream, remoteAddr, false);
                 }
@@ -377,15 +358,15 @@ namespace SilverSim.Main.Common.HttpServer
         {
             try
             {
-                Socket socket = (Socket)socko;
+                var socket = (Socket)socko;
                 try
                 {
-                    IPEndPoint ep = (IPEndPoint)socket.RemoteEndPoint;
+                    var ep = (IPEndPoint)socket.RemoteEndPoint;
                     string remoteAddr = AddressToString(ep.Address);
                     Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
                     /* Start SSL handshake */
-                    SslStream sslstream = new SslStream(new NetworkStream(socket, true));
+                    var sslstream = new SslStream(new NetworkStream(socket, true));
                     try
                     {
                         sslstream.AuthenticateAsServer(m_ServerCertificate, false, m_SslProtocols, false);
@@ -593,7 +574,7 @@ namespace SilverSim.Main.Common.HttpServer
                             }
                         }
 
-                        using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
+                        using (var res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
                         {
                             byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
                             res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);

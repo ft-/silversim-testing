@@ -33,11 +33,11 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                List<GroupRole> roles = new List<GroupRole>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var roles = new List<GroupRole>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid", conn))
                     {
                         cmd.Parameters.AddParameter("?groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -59,11 +59,11 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                List<GroupRole> roles = new List<GroupRole>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var roles = new List<GroupRole>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID LIKE r.RoleID WHERE r.GroupID LIKE ?groupid AND rm.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID LIKE r.RoleID WHERE r.GroupID LIKE ?groupid AND rm.PrincipalID LIKE ?principalid", conn))
                     {
                         cmd.Parameters.AddParameter("?groupid", group.ID);
                         cmd.Parameters.AddParameter("?principalid", principal.ID);
@@ -97,14 +97,16 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupRolesInterface.Add(UUI requestingAgent, GroupRole role)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("GroupID", role.Group.ID);
-            vals.Add("RoleID", role.ID);
-            vals.Add("Name", role.Name);
-            vals.Add("Description", role.Description);
-            vals.Add("Title", role.Title);
-            vals.Add("Powers", role.Powers);
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var vals = new Dictionary<string, object>
+            {
+                { "GroupID", role.Group.ID },
+                { "RoleID", role.ID },
+                { "Name", role.Name },
+                { "Description", role.Description },
+                { "Title", role.Title },
+                { "Powers", role.Powers }
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.InsertInto("grouproles", vals);
@@ -113,10 +115,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         bool IGroupRolesInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT r.GroupID FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?roleid", conn))
+                using (var cmd = new MySqlCommand("SELECT r.GroupID FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?roleid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     cmd.Parameters.AddParameter("?roleid", roleID);
@@ -130,23 +132,23 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupRolesInterface.Delete(UUI requestingAgent, UGI group, UUID roleID)
         {
-            string[] tablenames = new string[] { "groupinvites", "grouprolememberships", "grouproles" };
+            var tablenames = new string[] { "groupinvites", "grouprolememberships", "grouproles" };
 
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(delegate ()
+                conn.InsideTransaction(() =>
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=?zeroid WHERE SelectedRoleID LIKE ?roleid", conn))
+                    using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=?zeroid WHERE SelectedRoleID LIKE ?roleid", conn))
                     {
                         cmd.Parameters.AddParameter("?zeroid", UUID.Zero);
                         cmd.Parameters.AddParameter("?roleid", roleID);
                         cmd.ExecuteNonQuery();
                     }
 
-                    foreach(string table in tablenames)
+                    foreach (string table in tablenames)
                     {
-                        using(MySqlCommand cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid",conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid", conn))
                         {
                             cmd.Parameters.AddParameter("?groupid", group.ID);
                             cmd.Parameters.AddParameter("?roleid", roleID);
@@ -160,10 +162,10 @@ namespace SilverSim.Database.MySQL.Groups
         bool IGroupRolesInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole)
         {
             groupRole = null;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT r.*, " + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?roleid", conn))
+                using (var cmd = new MySqlCommand("SELECT r.*, " + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?roleid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     cmd.Parameters.AddParameter("?roleid", roleID);
@@ -182,10 +184,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupRolesInterface.Update(UUI requestingAgent, GroupRole role)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE grouproles SET Name=?name, Description=?description, Title=?title,Powers=?powers WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid", conn))
+                using (var cmd = new MySqlCommand("UPDATE grouproles SET Name=?name, Description=?description, Title=?title,Powers=?powers WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid", conn))
                 {
                     cmd.Parameters.AddParameter("?name", role.Name);
                     cmd.Parameters.AddParameter("?description", role.Description);

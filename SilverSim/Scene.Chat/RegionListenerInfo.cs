@@ -27,18 +27,9 @@ namespace SilverSim.Scene.Chat
 {
     public class RegionListenerInfo : ListenerInfo
     {
-        public override bool IsIgnorePosition
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsIgnorePosition => true;
 
-        private static Vector3 GetPositionFunc()
-        {
-            return Vector3.Zero;
-        }
+        private static Vector3 GetPositionFunc() => Vector3.Zero;
 
         internal RegionListenerInfo(
             ChatHandler handler,
@@ -50,7 +41,6 @@ namespace SilverSim.Scene.Chat
             Action<ListenEvent> send)
             : base(handler, channel, name, id, message, getuuid, GetPositionFunc, send, false)
         {
-
         }
     }
 }

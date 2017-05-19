@@ -64,12 +64,6 @@ namespace SilverSim.Database.Memory.Estate
             }
         }
 
-        IEstateManagerServiceListAccessInterface IEstateManagerServiceInterface.All
-        {
-            get
-            {
-                return this;
-            }
-        }
+        IEstateManagerServiceListAccessInterface IEstateManagerServiceInterface.All => this;
     }
 }

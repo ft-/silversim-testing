@@ -172,27 +172,17 @@ namespace SilverSim.Scene.Implementation.Basic
             UserAgentServicePlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
             AssetServicePlugins = loader.GetServicesByValue<IAssetServicePlugin>();
             InventoryServicePlugins = loader.GetServicesByValue<IInventoryServicePlugin>();
-    }
-
-    public override SceneInterface Instantiate(RegionInfo ri)
-        {
-            return new BasicScene(
-                this,
-                ri);
         }
+
+        public override SceneInterface Instantiate(RegionInfo ri) => new BasicScene(
+                    this,
+                    ri);
     }
 
     [PluginName("Scene")]
     public class Factory : IPluginFactory
     {
-        public Factory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
-        {
-            return new SceneFactory(ownConfig);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig config) =>
+            new SceneFactory(config);
     }
 }

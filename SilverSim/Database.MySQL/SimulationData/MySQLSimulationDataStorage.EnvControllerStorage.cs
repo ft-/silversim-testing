@@ -28,13 +28,12 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage : ISimulationDataEnvControllerStorageInterface
     {
-
         bool ISimulationDataEnvControllerStorageInterface.TryGetValue(UUID regionID, out byte[] settings)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT SerializedData FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
+                using (var cmd = new MySqlCommand("SELECT SerializedData FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -65,7 +64,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             set
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
                     if (value == null)
@@ -73,7 +72,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 #if DEBUG
                         m_Log.DebugFormat("Removing environment controller settings for {0}", regionID.ToString());
 #endif
-                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
                         {
                             cmd.Parameters.AddParameter("?regionid", regionID);
                             cmd.ExecuteNonQuery();
@@ -84,9 +83,11 @@ namespace SilverSim.Database.MySQL.SimulationData
 #if DEBUG
                         m_Log.DebugFormat("Storing new environment controller settings for {0}", regionID.ToString());
 #endif
-                        Dictionary<string, object> param = new Dictionary<string, object>();
-                        param["RegionID"] = regionID;
-                        param["SerializedData"] = value;
+                        var param = new Dictionary<string, object>
+                        {
+                            ["RegionID"] = regionID,
+                            ["SerializedData"] = value
+                        };
                         conn.ReplaceInto("environmentcontroller", param);
                     }
                 }
@@ -95,10 +96,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataEnvControllerStorageInterface.Remove(UUID regionID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM environmentcontroller WHERE RegionID LIKE ?regionid", conn))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;

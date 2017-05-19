@@ -39,16 +39,18 @@ namespace SilverSim.Scene.Npc
         public void DoSay(int channel, string text)
         {
             ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
-            ListenEvent ev = new ListenEvent();
-            ev.ID = ID;
-            ev.Type = ListenEvent.ChatType.Say;
-            ev.Channel = channel;
-            ev.GlobalPosition = GlobalPosition;
-            ev.Name = Name;
-            ev.TargetID = UUID.Zero;
-            ev.SourceType = ListenEvent.ChatSourceType.Agent;
-            ev.OwnerID = ID;
-            chatService.Send(ev);
+            chatService.Send(new ListenEvent()
+            {
+                ID = ID,
+                Type = ListenEvent.ChatType.Say,
+                Channel = channel,
+                GlobalPosition = GlobalPosition,
+                Name = Name,
+                Message = text,
+                TargetID = UUID.Zero,
+                SourceType = ListenEvent.ChatSourceType.Agent,
+                OwnerID = ID
+            });
         }
 
         public void DoSay(string text)
@@ -58,17 +60,19 @@ namespace SilverSim.Scene.Npc
 
         public void DoShout(int channel, string text)
         {
-            ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
-            ListenEvent ev = new ListenEvent();
-            ev.ID = ID;
-            ev.Type = ListenEvent.ChatType.Shout;
-            ev.Channel = channel;
-            ev.GlobalPosition = GlobalPosition;
-            ev.Name = Name;
-            ev.TargetID = UUID.Zero;
-            ev.SourceType = ListenEvent.ChatSourceType.Agent;
-            ev.OwnerID = ID;
-            chatService.Send(ev);
+            var chatService = CurrentScene.GetService<ChatServiceInterface>();
+            chatService.Send(new ListenEvent()
+            {
+                ID = ID,
+                Type = ListenEvent.ChatType.Shout,
+                Channel = channel,
+                GlobalPosition = GlobalPosition,
+                Name = Name,
+                Message = text,
+                TargetID = UUID.Zero,
+                SourceType = ListenEvent.ChatSourceType.Agent,
+                OwnerID = ID
+            });
         }
 
         public void DoShout(string text)
@@ -79,16 +83,18 @@ namespace SilverSim.Scene.Npc
         public void DoWhisper(int channel, string text)
         {
             ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
-            ListenEvent ev = new ListenEvent();
-            ev.ID = ID;
-            ev.Type = ListenEvent.ChatType.Whisper;
-            ev.Channel = channel;
-            ev.GlobalPosition = GlobalPosition;
-            ev.Name = Name;
-            ev.TargetID = UUID.Zero;
-            ev.SourceType = ListenEvent.ChatSourceType.Agent;
-            ev.OwnerID = ID;
-            chatService.Send(ev);
+            chatService.Send(new ListenEvent()
+            {
+                ID = ID,
+                Type = ListenEvent.ChatType.Whisper,
+                Channel = channel,
+                GlobalPosition = GlobalPosition,
+                Name = Name,
+                Message = text,
+                TargetID = UUID.Zero,
+                SourceType = ListenEvent.ChatSourceType.Agent,
+                OwnerID = ID
+            });
         }
 
         public void DoWhisper(string text)
@@ -108,35 +114,41 @@ namespace SilverSim.Scene.Npc
             {
                 return;
             }
-            DetectInfo dInfo = new DetectInfo();
-            dInfo.LinkNumber = linkNum;
-            dInfo.TouchFace = -1;
-            dInfo.Name = Owner.FullName;
-            dInfo.GrabOffset = part.LocalPosition * -1f;
-            dInfo.Group = Group;
-            dInfo.Key = ID;
-            dInfo.ObjType = DetectedTypeFlags.Npc;
-            dInfo.ObjType |= (SittingOnObject != null) ? DetectedTypeFlags.Passive : DetectedTypeFlags.Active;
-            dInfo.Owner = Owner;
-            dInfo.Position = GlobalPosition;
-            dInfo.Rotation = GlobalRotation;
-            dInfo.TouchBinormal = Vector3.Zero;
-            dInfo.TouchNormal = Vector3.Zero;
-            dInfo.TouchST = new Vector3(-1f, -1f, 0);
-            dInfo.TouchUV = new Vector3(-1f, -1f, 0);
-
-            TouchEvent te = new TouchEvent();
-            te.Type = TouchEvent.TouchType.Start;
+            var dInfo = new DetectInfo()
+            {
+                LinkNumber = linkNum,
+                TouchFace = -1,
+                Name = Owner.FullName,
+                GrabOffset = part.LocalPosition * -1f,
+                Group = Group,
+                Key = ID,
+                ObjType = DetectedTypeFlags.Npc | ((SittingOnObject != null) ? DetectedTypeFlags.Passive : DetectedTypeFlags.Active),
+                Owner = Owner,
+                Position = GlobalPosition,
+                Rotation = GlobalRotation,
+                TouchBinormal = Vector3.Zero,
+                TouchNormal = Vector3.Zero,
+                TouchST = new Vector3(-1f, -1f, 0),
+                TouchUV = new Vector3(-1f, -1f, 0)
+            };
+            var te = new TouchEvent()
+            {
+                Type = TouchEvent.TouchType.Start
+            };
             te.Detected.Add(dInfo);
             part.PostTouchEvent(te);
 
-            te = new TouchEvent();
-            te.Type = TouchEvent.TouchType.Continuous;
+            te = new TouchEvent()
+            {
+                Type = TouchEvent.TouchType.Continuous
+            };
             te.Detected.Add(dInfo);
             part.PostTouchEvent(te);
 
-            te = new TouchEvent();
-            te.Type = TouchEvent.TouchType.End;
+            te = new TouchEvent()
+            {
+                Type = TouchEvent.TouchType.End
+            };
             te.Detected.Add(dInfo);
             part.PostTouchEvent(te);
         }
@@ -179,20 +191,21 @@ namespace SilverSim.Scene.Npc
                                 if (null != instance)
                                 {
                                     /* Translate IM event to mapped channel */
-                                    ListenEvent nev = new ListenEvent();
-                                    nev.ButtonIndex = -1;
-                                    nev.Channel = kvpinner.Value;
-                                    nev.Distance = 0;
-                                    nev.GlobalPosition = Vector3.Zero;
-                                    nev.ID = im.FromAgent.ID;
-                                    nev.Message = im.Message;
-                                    nev.Name = im.FromAgent.FullName;
-                                    nev.OriginSceneID = UUID.Zero;
-                                    nev.OwnerID = im.FromAgent.ID;
-                                    nev.SourceType = im.Dialog == GridInstantMessageDialog.MessageFromObject ? ListenEvent.ChatSourceType.Object : ListenEvent.ChatSourceType.Agent;
-                                    nev.TargetID = ID;
-                                    nev.Type = ListenEvent.ChatType.Say;
-                                    instance.PostEvent(nev);
+                                    instance.PostEvent(new ListenEvent()
+                                    {
+                                        ButtonIndex = -1,
+                                        Channel = kvpinner.Value,
+                                        Distance = 0,
+                                        GlobalPosition = Vector3.Zero,
+                                        ID = im.FromAgent.ID,
+                                        Message = im.Message,
+                                        Name = im.FromAgent.FullName,
+                                        OriginSceneID = UUID.Zero,
+                                        OwnerID = im.FromAgent.ID,
+                                        SourceType = im.Dialog == GridInstantMessageDialog.MessageFromObject ? ListenEvent.ChatSourceType.Object : ListenEvent.ChatSourceType.Agent,
+                                        TargetID = ID,
+                                        Type = ListenEvent.ChatType.Say
+                                    });
                                 }
                             }
                         }
@@ -218,7 +231,7 @@ namespace SilverSim.Scene.Npc
             {
                 itemlist.Remove(itemid);
             }
-            m_ScriptedIMListeners.RemoveIf(objectid, delegate (RwLockedDictionary<UUID, int> list) { return list.Count == 0; });
+            m_ScriptedIMListeners.RemoveIf(objectid, (RwLockedDictionary<UUID, int> list) => list.Count == 0);
         }
 
         readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedChatListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(delegate() { return new RwLockedDictionary<UUID, int>(); });
@@ -239,20 +252,21 @@ namespace SilverSim.Scene.Npc
                             if(null != instance)
                             {
                                 /* Translate listen event to mapped channel */
-                                ListenEvent nev = new ListenEvent();
-                                nev.ButtonIndex = ev.ButtonIndex;
-                                nev.Channel = kvpinner.Value;
-                                nev.Distance = ev.Distance;
-                                nev.GlobalPosition = ev.GlobalPosition;
-                                nev.ID = ev.ID;
-                                nev.Message = ev.Message;
-                                nev.Name = ev.Name;
-                                nev.OriginSceneID = ev.OriginSceneID;
-                                nev.OwnerID = ev.OwnerID;
-                                nev.SourceType = ev.SourceType;
-                                nev.TargetID = ev.TargetID;
-                                nev.Type = ev.Type;
-                                instance.PostEvent(nev);
+                                instance.PostEvent(new ListenEvent()
+                                {
+                                    ButtonIndex = ev.ButtonIndex,
+                                    Channel = kvpinner.Value,
+                                    Distance = ev.Distance,
+                                    GlobalPosition = ev.GlobalPosition,
+                                    ID = ev.ID,
+                                    Message = ev.Message,
+                                    Name = ev.Name,
+                                    OriginSceneID = ev.OriginSceneID,
+                                    OwnerID = ev.OwnerID,
+                                    SourceType = ev.SourceType,
+                                    TargetID = ev.TargetID,
+                                    Type = ev.Type
+                                });
                             }
                         }
                     }
@@ -276,7 +290,7 @@ namespace SilverSim.Scene.Npc
             {
                 itemlist.Remove(itemid);
             }
-            m_ScriptedChatListeners.RemoveIf(objectid, delegate (RwLockedDictionary<UUID, int> list) { return list.Count == 0; });
+            m_ScriptedChatListeners.RemoveIf(objectid, (RwLockedDictionary<UUID, int> list) => list.Count == 0);
         }
     }
 }

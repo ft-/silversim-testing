@@ -58,13 +58,7 @@ namespace SilverSim.Main.Common.CmdIO
 
         readonly object m_RegisterCmdGroupLock = new object();
 
-        public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands
-        {
-            get
-            {
-                return m_Commands;
-            }
-        }
+        public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands => m_Commands;
 
         RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CheckAddCommandType(string cmd, ref RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
         {
@@ -184,10 +178,6 @@ namespace SilverSim.Main.Common.CmdIO
             CheckAddCommandType("kick", ref m_KickCommands).Add(cmd, handler);
         }
 
-        public CommandRegistry()
-        {
-        }
-
         sealed class CommandType
         {
             readonly string m_Command;
@@ -206,7 +196,7 @@ namespace SilverSim.Main.Common.CmdIO
                 {
                     if (args[0] == "help")
                     {
-                        StringBuilder commands = new StringBuilder(m_Command + " command list:\n");
+                        var commands = new StringBuilder(m_Command + " command list:\n");
                         foreach(string cmd in m_Dict.Keys)
                         {
                             commands.AppendFormat("{0} {1}\n", m_Command, cmd);
@@ -258,7 +248,7 @@ namespace SilverSim.Main.Common.CmdIO
             {
                 if (args.Count == 1)
                 {
-                    StringBuilder commands = new StringBuilder("Command list:\n");
+                    var commands = new StringBuilder("Command list:\n");
                     foreach (string cmd in Commands.Keys)
                     {
                         commands.AppendFormat("{0}\n", cmd);

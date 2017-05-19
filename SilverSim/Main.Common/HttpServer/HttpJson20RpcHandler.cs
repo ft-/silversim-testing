@@ -26,7 +26,6 @@ using SilverSim.Types.StructuredData.Json;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
 
@@ -46,25 +45,21 @@ namespace SilverSim.Main.Common.HttpServer
 
             public JSON20RpcException()
             {
-
             }
 
             public JSON20RpcException(string message)
                 : base(message)
             {
-
             }
 
             protected JSON20RpcException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public JSON20RpcException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             public JSON20RpcException(int statusCode, string message)
@@ -105,7 +100,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             else if(null != (reqarr = (req as AnArray)))
             {
-                AnArray o = new AnArray();
+                var o = new AnArray();
                 foreach (IValue v in reqarr)
                 {
                     reqmap = v as Map;
@@ -121,9 +116,9 @@ namespace SilverSim.Main.Common.HttpServer
                 res = FaultResponse(-32700, "Invalid JSON20 RPC Request", string.Empty);
             }
 
-            using (HttpResponse httpres = httpreq.BeginResponse("application/json-rpc"))
+            using (var httpres = httpreq.BeginResponse("application/json-rpc"))
             {
-                using (Stream o = httpres.GetOutputStream())
+                using (var o = httpres.GetOutputStream())
                 {
                     Json.Serialize(res, o);
                 }
@@ -139,7 +134,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 try
                 {
-                    Map res = new Map();
+                    var res = new Map();
                     res.Add("jsonrpc", "2.0");
                     try
                     {
@@ -164,13 +159,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -194,16 +183,16 @@ namespace SilverSim.Main.Common.HttpServer
             Json20RpcMethods.Clear();
         }
 
-        private Map FaultResponse(int statusCode, string statusMessage, string id)
+        private Map FaultResponse(int statusCode, string statusMessage, string id) => new Map
         {
-            Map error = new Map();
-            error.Add("code", statusCode);
-            error.Add("message", statusMessage);
-            Map res = new Map();
-            res.Add("jsonrpc", "2.0");
-            res.Add("error", error);
-            res.Add("id", id);
-            return res;
-        }
+            { "jsonrpc", "2.0" },
+            { "error", new Map
+                {
+                    { "code", statusCode },
+                    { "message", statusMessage }
+                }
+            },
+            { "id", id }
+        };
     }
 }

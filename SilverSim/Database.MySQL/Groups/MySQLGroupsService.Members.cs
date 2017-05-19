@@ -33,11 +33,11 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                List<GroupMember> members = new List<GroupMember>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var members = new List<GroupMember>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.PrincipalID LIKE ?principalid", conn))
                     {
                         cmd.Parameters.AddParameter("?principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -60,11 +60,11 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                List<GroupMember> members = new List<GroupMember>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var members = new List<GroupMember>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.GroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.GroupID LIKE ?groupid", conn))
                     {
                         cmd.Parameters.AddParameter("?groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -98,34 +98,36 @@ namespace SilverSim.Database.MySQL.Groups
 
         GroupMember IGroupMembersInterface.Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("GroupID", group.ID);
-            vals.Add("PrincipalID", principal.ID);
-            vals.Add("SelectedRoleID", roleID);
-            vals.Add("AccessToken", accessToken);
-
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var vals = new Dictionary<string, object>
+            {
+                { "GroupID", group.ID },
+                { "PrincipalID", principal.ID },
+                { "SelectedRoleID", roleID },
+                { "AccessToken", accessToken }
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.InsertInto("groupmemberships", vals);
             }
 
-            GroupMember mem = new GroupMember();
-            mem.Principal = principal;
-            mem.Group = group;
-            mem.IsAcceptNotices = true;
-            mem.IsListInProfile = true;
-            mem.AccessToken = accessToken;
-            mem.SelectedRoleID = roleID;
-            return mem;
+            return new GroupMember()
+            {
+                Principal = principal,
+                Group = group,
+                IsAcceptNotices = true,
+                IsListInProfile = true,
+                AccessToken = accessToken,
+                SelectedRoleID = roleID
+            };
         }
 
         bool IGroupMembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUI principal)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT GroupID FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     cmd.Parameters.AddParameter("?principalid", principal.ID);
@@ -139,10 +141,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupMembersInterface.Delete(UUI requestingAgent, UGI group, UUI principal)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
                 {
                     cmd.Parameters.AddParameter("?principalid", principal.ID);
                     cmd.Parameters.AddParameter("?groupid", group.ID);
@@ -156,10 +158,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupMembersInterface.SetContribution(UUI requestingagent, UGI group, UUI principal, int contribution)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE groupmemberships SET Contribution=?contribution WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("UPDATE groupmemberships SET Contribution=?contribution WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
                 {
                     cmd.Parameters.AddParameter("?contribution", contribution);
                     cmd.Parameters.AddParameter("?principalid", principal.ID);
@@ -175,10 +177,10 @@ namespace SilverSim.Database.MySQL.Groups
         bool IGroupMembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMember gmem)
         {
             gmem = null;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     cmd.Parameters.AddParameter("?principalid", principal.ID);
@@ -199,10 +201,10 @@ namespace SilverSim.Database.MySQL.Groups
 
         void IGroupMembersInterface.Update(UUI requestingagent, UGI group, UUI principal, bool acceptNotices, bool listInProfile)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE groupmemberships SET AcceptNotices=?acceptnotices, ListInProfile=?listinprofile WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("UPDATE groupmemberships SET AcceptNotices=?acceptnotices, ListInProfile=?listinprofile WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
                 {
                     cmd.Parameters.AddParameter("?acceptnotices", acceptNotices);
                     cmd.Parameters.AddParameter("?listinprofile", listInProfile);

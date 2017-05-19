@@ -73,7 +73,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -81,7 +81,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -90,17 +90,17 @@ namespace SilverSim.Database.MySQL.AuthInfo
 
         public void Remove(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.InsideTransaction(delegate ()
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM auth WHERE UserID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM auth WHERE UserID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                         cmd.ExecuteNonQuery();
@@ -113,21 +113,22 @@ namespace SilverSim.Database.MySQL.AuthInfo
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM auth WHERE UserID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM auth WHERE UserID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?id", accountid);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                UserAuthInfo authInfo = new UserAuthInfo();
-                                authInfo.ID = reader.GetUUID("UserID");
-                                authInfo.PasswordHash = reader.GetString("PasswordHash");
-                                authInfo.PasswordSalt = reader.GetString("PasswordSalt");
-                                return authInfo;
+                                return new UserAuthInfo()
+                                {
+                                    ID = reader.GetUUID("UserID"),
+                                    PasswordHash = reader.GetString("PasswordHash"),
+                                    PasswordSalt = reader.GetString("PasswordSalt")
+                                };
                             }
                         }
                     }
@@ -138,11 +139,11 @@ namespace SilverSim.Database.MySQL.AuthInfo
 
         public override void Store(UserAuthInfo info)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
+            var vals = new Dictionary<string, object>();
             vals.Add("UserID", info.ID);
             vals.Add("PasswordHash", info.PasswordHash);
             vals.Add("PasswordSalt", info.PasswordSalt);
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.ReplaceInto("auth", vals);
@@ -152,14 +153,16 @@ namespace SilverSim.Database.MySQL.AuthInfo
         public override void SetPassword(UUID principalId, string password)
         {
             /* we use UserAuthInfo to calculate a new password */
-            UserAuthInfo ai = new UserAuthInfo();
-            ai.Password = password;
-
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("PasswordHash", ai.PasswordHash);
-            vals.Add("PasswordSalt", ai.PasswordSalt);
-
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var ai = new UserAuthInfo()
+            {
+                Password = password
+            };
+            var vals = new Dictionary<string, object>
+            {
+                { "PasswordHash", ai.PasswordHash },
+                { "PasswordSalt", ai.PasswordSalt }
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.UpdateSet("auth", vals, "UserID LIKE \"" + principalId.ToString() + "\"");
@@ -169,13 +172,13 @@ namespace SilverSim.Database.MySQL.AuthInfo
         public override UUID AddToken(UUID principalId, UUID sessionid, int lifetime_in_minutes)
         {
             UUID secureSessionID = UUID.Random;
-            Dictionary<string, object> vals = new Dictionary<string, object>();
+            var vals = new Dictionary<string, object>();
             vals.Add("UserID", principalId);
             vals.Add("SessionID", sessionid);
             vals.Add("Token", secureSessionID);
             ulong d = Date.Now.AsULong + (ulong)lifetime_in_minutes * 30;
             vals.Add("Validity", Date.UnixTimeToDateTime(d));
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.InsertInto("tokens", vals);
@@ -186,10 +189,10 @@ namespace SilverSim.Database.MySQL.AuthInfo
         public override void VerifyToken(UUID principalId, UUID token, int lifetime_extension_in_minutes)
         {
             bool valid;
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE tokens SET Validity=?validity WHERE UserID LIKE ?id AND Token LIKE ?token AND Validity >= ? current", connection))
+                using (var cmd = new MySqlCommand("UPDATE tokens SET Validity=?validity WHERE UserID LIKE ?id AND Token LIKE ?token AND Validity >= ? current", connection))
                 {
                     cmd.Parameters.AddParameter("?id", principalId);
                     cmd.Parameters.AddParameter("?validity", Date.UnixTimeToDateTime(Date.Now.AsULong + (ulong)lifetime_extension_in_minutes * 30));
@@ -199,7 +202,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
                 }
                 if (!valid)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM tokens WHERE Validity <= ? current", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE Validity <= ? current", connection))
                     {
                         cmd.Parameters.AddParameter("?current", Date.Now);
                         cmd.ExecuteNonQuery();
@@ -215,10 +218,10 @@ namespace SilverSim.Database.MySQL.AuthInfo
 
         public override void ReleaseToken(UUID accountId, UUID secureSessionId)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE ?id AND Token LIKE ?token", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE ?id AND Token LIKE ?token", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountId);
                     cmd.Parameters.AddParameter("?token", secureSessionId);
@@ -232,10 +235,10 @@ namespace SilverSim.Database.MySQL.AuthInfo
 
         public override void ReleaseTokenBySession(UUID accountId, UUID sessionId)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE ?id AND SessionID LIKE ?sessionid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE ?id AND SessionID LIKE ?sessionid", connection))
                 {
                     cmd.Parameters.AddParameter("?id", accountId);
                     cmd.Parameters.AddParameter("?sessionid", sessionId);
@@ -254,15 +257,9 @@ namespace SilverSim.Database.MySQL.AuthInfo
     public class MySQLAuthInfoServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AUTHINFO SERVICE");
-        public MySQLAuthInfoServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLAuthInfoService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLAuthInfoService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

@@ -34,22 +34,14 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("Terrain Generic Storage Loader")]
     public class File : ITerrainFileStorage, IPlugin
     {
-        public File()
-        {
-
-        }
-
         public string Name
         {
-            get 
-            { 
-                return "file"; 
-            }
+            get { return "file"; }
         }
 
         public List<LayerPatch> LoadFile(string filename, int suggested_width, int suggested_height)
         {
-            using(Bitmap bitmap = new Bitmap(filename))
+            using(var bitmap = new Bitmap(filename))
             {
                 return bitmap.ToPatchesFromGrayscale();
             }
@@ -57,7 +49,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public List<LayerPatch> LoadStream(Stream input, int suggested_width, int suggested_height)
         {
-            using(Bitmap bitmap = new Bitmap(input))
+            using(var bitmap = new Bitmap(input))
             {
                 return bitmap.ToPatchesFromGrayscale();
             }
@@ -73,21 +65,9 @@ namespace SilverSim.LoadStore.Terrain.Formats
             throw new NotSupportedException();
         }
 
-        public bool SupportsLoading
-        {
-            get
-            {
-                return true; 
-            }
-        }
+        public bool SupportsLoading => true;
 
-        public bool SupportsSaving
-        {
-            get 
-            {
-                return false; 
-            }
-        }
+        public bool SupportsSaving => false;
 
         public void Startup(ConfigurationLoader loader)
         {

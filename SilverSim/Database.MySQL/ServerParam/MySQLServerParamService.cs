@@ -52,11 +52,11 @@ namespace SilverSim.Database.MySQL.ServerParam
 
         public void Startup(ConfigurationLoader loader)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM serverparams", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -73,7 +73,7 @@ namespace SilverSim.Database.MySQL.ServerParam
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -81,7 +81,7 @@ namespace SilverSim.Database.MySQL.ServerParam
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -95,7 +95,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                 RwLockedDictionary<string, string> regParams;
                 if (m_Cache.TryGetValue(regionID, out regParams))
                 {
-                    List<string> list = new List<string>(regParams.Keys);
+                    var list = new List<string>(regParams.Keys);
                     if(m_Cache.TryGetValue(regionID, out regParams) && regionID != UUID.Zero)
                     {
                         foreach(string k in regParams.Keys)
@@ -117,12 +117,12 @@ namespace SilverSim.Database.MySQL.ServerParam
         {
             get
             {
-                List<KeyValuePair<UUID, string>> resultSet = new List<KeyValuePair<UUID, string>>();
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                var resultSet = new List<KeyValuePair<UUID, string>>();
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE parametername LIKE ?parametername", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE parametername LIKE ?parametername", connection))
                     {
                         cmd.Parameters.AddParameter("?parametername", parametername);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -167,11 +167,11 @@ namespace SilverSim.Database.MySQL.ServerParam
                 return true;
             }
 
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     cmd.Parameters.AddParameter("?parametername", parameter);
@@ -201,11 +201,11 @@ namespace SilverSim.Database.MySQL.ServerParam
                 return true;
             }
 
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                 {
                     cmd.Parameters.AddParameter("?regionid", regionID);
                     cmd.Parameters.AddParameter("?parametername", parameter);
@@ -237,15 +237,17 @@ namespace SilverSim.Database.MySQL.ServerParam
             }
             else
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    connection.InsideTransaction(delegate ()
+                    connection.InsideTransaction(() =>
                     {
-                        Dictionary<string, object> param = new Dictionary<string, object>();
-                        param["regionid"] = regionID;
-                        param["parametername"] = parameter;
-                        param["parametervalue"] = value;
+                        var param = new Dictionary<string, object>
+                        {
+                            ["regionid"] = regionID,
+                            ["parametername"] = parameter,
+                            ["parametervalue"] = value
+                        };
                         connection.ReplaceInto("serverparams", param);
                         m_Cache[regionID][parameter] = value;
                     });
@@ -257,13 +259,13 @@ namespace SilverSim.Database.MySQL.ServerParam
         {
             get
             {
-                List<KeyValuePair<UUID, string>> result = new List<KeyValuePair<UUID, string>>();
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                var result = new List<KeyValuePair<UUID, string>>();
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    connection.InsideTransaction(delegate ()
+                    connection.InsideTransaction(() =>
                     {
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT regionid, parametername FROM serverparams", connection))
+                        using (var cmd = new MySqlCommand("SELECT regionid, parametername FROM serverparams", connection))
                         {
                             using (MySqlDataReader dbReader = cmd.ExecuteReader())
                             {
@@ -282,12 +284,12 @@ namespace SilverSim.Database.MySQL.ServerParam
         public override bool Remove(UUID regionID, string parameter)
         {
             bool result = false;
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.InsideTransaction(delegate()
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                     {
                         cmd.Parameters.AddParameter("?regionid", regionID);
                         cmd.Parameters.AddParameter("?parametername", parameter);
@@ -320,13 +322,7 @@ namespace SilverSim.Database.MySQL.ServerParam
             new NamedKeyInfo("parametername", "parametername")
         };
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.LogoutDatabase;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutDatabase;
     }
     #endregion
 
@@ -335,15 +331,9 @@ namespace SilverSim.Database.MySQL.ServerParam
     public class MySQLServerParamServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");
-        public MySQLServerParamServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLServerParamService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLServerParamService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

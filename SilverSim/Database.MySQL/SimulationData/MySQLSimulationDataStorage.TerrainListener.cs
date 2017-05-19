@@ -37,22 +37,15 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             readonly RwLockedList<MySQLTerrainListener> m_TerrainListenerThreads;
             readonly string m_ConnectionString;
-            readonly UUID m_RegionID;
 
             public MySQLTerrainListener(string connectionString, UUID regionID, RwLockedList<MySQLTerrainListener> terrainListenerThreads)
             {
                 m_ConnectionString = connectionString;
-                m_RegionID = regionID;
+                RegionID = regionID;
                 m_TerrainListenerThreads = terrainListenerThreads;
             }
 
-            public UUID RegionID
-            {
-                get
-                {
-                    return m_RegionID;
-                }
-            }
+            public UUID RegionID { get; }
 
             public QueueStat GetStats()
             {
@@ -67,11 +60,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 try
                 {
                     m_TerrainListenerThreads.Add(this);
-                    Thread.CurrentThread.Name = "Storage Terrain Thread: " + m_RegionID.ToString();
+                    Thread.CurrentThread.Name = "Storage Terrain Thread: " + RegionID.ToString();
 
-                    C5.TreeDictionary<uint, uint> knownSerialNumbers = new C5.TreeDictionary<uint, uint>();
+                    var knownSerialNumbers = new C5.TreeDictionary<uint, uint>();
                     string replaceIntoTerrain = string.Empty;
-                    List<string> updateRequests = new List<string>();
+                    var updateRequests = new List<string>();
 
                     while (!m_StopStorageThread || m_StorageTerrainRequestQueue.Count != 0)
                     {
@@ -89,10 +82,12 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                         if (!knownSerialNumbers.Contains(req.ExtendedPatchID) || knownSerialNumbers[req.ExtendedPatchID] != req.Serial)
                         {
-                            Dictionary<string, object> data = new Dictionary<string, object>();
-                            data["RegionID"] = m_RegionID;
-                            data["PatchID"] = req.ExtendedPatchID;
-                            data["TerrainData"] = req.Serialization;
+                            var data = new Dictionary<string, object>
+                            {
+                                ["RegionID"] = RegionID,
+                                ["PatchID"] = req.ExtendedPatchID,
+                                ["TerrainData"] = req.Serialization
+                            };
                             if (replaceIntoTerrain.Length == 0)
                             {
                                 replaceIntoTerrain = "REPLACE INTO terrains (" + MySQLUtilities.GenerateFieldNames(data) + ") VALUES ";
@@ -106,10 +101,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             string elems = string.Join(",", updateRequests);
                             try
                             {
-                                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                                using (var conn = new MySqlConnection(m_ConnectionString))
                                 {
                                     conn.Open();
-                                    using (MySqlCommand cmd = new MySqlCommand(replaceIntoTerrain + elems, conn))
+                                    using (var cmd = new MySqlCommand(replaceIntoTerrain + elems, conn))
                                     {
                                         cmd.ExecuteNonQuery();
                                     }
@@ -131,9 +126,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override TerrainListener GetTerrainListener(UUID regionID)
-        {
-            return new MySQLTerrainListener(m_ConnectionString, regionID, m_TerrainListenerThreads);
-        }
+        public override TerrainListener GetTerrainListener(UUID regionID) =>
+            new MySQLTerrainListener(m_ConnectionString, regionID, m_TerrainListenerThreads);
     }
 }

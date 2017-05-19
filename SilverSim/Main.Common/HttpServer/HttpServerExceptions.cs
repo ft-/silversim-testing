@@ -65,9 +65,5 @@ namespace SilverSim.Main.Common.HttpServer
     [Serializable]
     public class NotAWebSocketRequestException : Exception
     {
-        public NotAWebSocketRequestException()
-        {
-        }
     }
-
 }

@@ -30,61 +30,30 @@ namespace SilverSim.Http.Client
         {
             private Stream m_Output;
             private long m_RemainingLength;
-            readonly long m_ContentLength;
             private static readonly byte[] FillBytes = new byte[10240];
 
             internal RequestBodyStream(Stream output, long contentLength)
             {
                 m_RemainingLength = contentLength;
                 m_Output = output;
-                m_ContentLength = contentLength;
+                Length = contentLength;
             }
 
-            public override bool CanRead
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            public override bool CanRead => false;
 
-            public override bool CanSeek
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            public override bool CanSeek => false;
 
-            public override bool CanTimeout
-            {
-                get
-                {
-                    return true;
-                }
-            }
+            public override bool CanTimeout => true;
 
-            public override bool CanWrite
-            {
-                get
-                {
-                    return true;
-                }
-            }
+            public override bool CanWrite => true;
 
-            public override long Length
-            {
-                get
-                {
-                    return m_ContentLength;
-                }
-            }
+            public override long Length { get; }
 
             public override long Position
             {
                 get
                 {
-                    return m_ContentLength - m_RemainingLength;
+                    return Length - m_RemainingLength;
                 }
                 set
                 {

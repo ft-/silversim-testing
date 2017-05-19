@@ -58,43 +58,25 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, out PhysicsConvexShape shape)
-        {
-            return m_ConvexShapesByMesh.TryGetValue(meshid, out shape);
-        }
+        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, out PhysicsConvexShape shape) =>
+            m_ConvexShapesByMesh.TryGetValue(meshid, out shape);
 
-        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(ObjectPart.PrimitiveShape primShape, out PhysicsConvexShape shape)
-        {
-            return m_ConvexShapesByPrimShape.TryGetValue(primShape, out shape);
-        }
+        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(ObjectPart.PrimitiveShape primShape, out PhysicsConvexShape shape) =>
+            m_ConvexShapesByPrimShape.TryGetValue(primShape, out shape);
 
-        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(UUID meshid)
-        {
-            return m_ConvexShapesByMesh.ContainsKey(meshid);
-        }
+        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(UUID meshid) =>
+            m_ConvexShapesByMesh.ContainsKey(meshid);
 
-        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(ObjectPart.PrimitiveShape primShape)
-        {
-            return m_ConvexShapesByPrimShape.ContainsKey(primShape);
-        }
+        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(ObjectPart.PrimitiveShape primShape) =>
+            m_ConvexShapesByPrimShape.ContainsKey(primShape);
 
-        bool ISimulationDataPhysicsConvexStorageInterface.Remove(UUID meshid)
-        {
-            return m_ConvexShapesByMesh.Remove(meshid);
-        }
+        bool ISimulationDataPhysicsConvexStorageInterface.Remove(UUID meshid) =>
+            m_ConvexShapesByMesh.Remove(meshid);
 
-        bool ISimulationDataPhysicsConvexStorageInterface.Remove(ObjectPart.PrimitiveShape primShape)
-        {
-            return m_ConvexShapesByPrimShape.Remove(primShape);
-        }
+        bool ISimulationDataPhysicsConvexStorageInterface.Remove(ObjectPart.PrimitiveShape primShape) =>
+            m_ConvexShapesByPrimShape.Remove(primShape);
 
-        ICollection<UUID> ISimulationDataPhysicsConvexStorageInterface.KnownMeshIds
-        {
-            get
-            {
-                return m_ConvexShapesByMesh.Keys;
-            }
-        }
+        ICollection<UUID> ISimulationDataPhysicsConvexStorageInterface.KnownMeshIds => m_ConvexShapesByMesh.Keys;
 
         void ISimulationDataPhysicsConvexStorageInterface.RemoveAll()
         {
@@ -107,12 +89,6 @@ namespace SilverSim.Database.Memory.SimulationData
             ((ISimulationDataPhysicsConvexStorageInterface)this).RemoveAll();
         }
 
-        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder
-        {
-            get
-            {
-                return HacdCleanCacheOrder.BeforePhysicsShapeManager;
-            }
-        }
+        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder => HacdCleanCacheOrder.BeforePhysicsShapeManager;
     }
 }

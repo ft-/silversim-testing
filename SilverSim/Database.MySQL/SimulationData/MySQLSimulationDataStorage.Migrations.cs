@@ -28,7 +28,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         public void ProcessMigrations()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.MigrateTables(Migrations_Regions, m_Log);

@@ -54,7 +54,7 @@ namespace SilverSim.Database.MySQL.Presence
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -62,7 +62,7 @@ namespace SilverSim.Database.MySQL.Presence
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -71,19 +71,20 @@ namespace SilverSim.Database.MySQL.Presence
 
         public override void Store(NpcPresenceInfo presenceInfo)
         {
-            Dictionary<string, object> post = new Dictionary<string, object>();
-            post["NpcID"] = presenceInfo.Npc.ID;
-            post["FirstName"] = presenceInfo.Npc.FirstName;
-            post["LastName"] = presenceInfo.Npc.LastName;
-            post["Owner"] = presenceInfo.Owner;
-            post["Group"] = presenceInfo.Group;
-            post["Options"] = presenceInfo.Options;
-            post["RegionID"] = presenceInfo.RegionID;
-            post["Position"] = presenceInfo.Position;
-            post["LookAt"] = presenceInfo.LookAt;
-            post["SittingOnObjectID"] = presenceInfo.SittingOnObjectID;
-
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var post = new Dictionary<string, object>
+            {
+                ["NpcID"] = presenceInfo.Npc.ID,
+                ["FirstName"] = presenceInfo.Npc.FirstName,
+                ["LastName"] = presenceInfo.Npc.LastName,
+                ["Owner"] = presenceInfo.Owner,
+                ["Group"] = presenceInfo.Group,
+                ["Options"] = presenceInfo.Options,
+                ["RegionID"] = presenceInfo.RegionID,
+                ["Position"] = presenceInfo.Position,
+                ["LookAt"] = presenceInfo.LookAt,
+                ["SittingOnObjectID"] = presenceInfo.SittingOnObjectID
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 try
@@ -124,10 +125,10 @@ namespace SilverSim.Database.MySQL.Presence
 
         public override bool ContainsKey(UUID npcid)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE ?npcid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE ?npcid", conn))
                 {
                     cmd.Parameters.AddParameter("?npcid", npcid);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -140,7 +141,7 @@ namespace SilverSim.Database.MySQL.Presence
 
         NpcPresenceInfo ReaderToPresenceInfo(MySqlDataReader reader)
         {
-            NpcPresenceInfo presence = new NpcPresenceInfo();
+            var presence = new NpcPresenceInfo();
             presence.Npc.ID = reader.GetUUID("NpcID");
             presence.Npc.FirstName = reader.GetString("FirstName");
             presence.Npc.LastName = reader.GetString("LastName");
@@ -157,10 +158,10 @@ namespace SilverSim.Database.MySQL.Presence
         public override bool TryGetValue(UUID regionID, string firstname, string lastname, out NpcPresenceInfo presence)
         {
             presence = default(NpcPresenceInfo);
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE ?regionID AND FirstName LIKE ?first AND LastName LIKE ?last", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE ?regionID AND FirstName LIKE ?first AND LastName LIKE ?last", conn))
                 {
                     cmd.Parameters.AddParameter("?regionID", regionID);
                     cmd.Parameters.AddParameter("?first", firstname);
@@ -181,10 +182,10 @@ namespace SilverSim.Database.MySQL.Presence
         public override bool TryGetValue(UUID npcid, out NpcPresenceInfo presence)
         {
             presence = default(NpcPresenceInfo);
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE ?npcid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE ?npcid", conn))
                 {
                     cmd.Parameters.AddParameter("?npcid", npcid);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -204,11 +205,11 @@ namespace SilverSim.Database.MySQL.Presence
         {
             get
             {
-                List<NpcPresenceInfo> presences = new List<NpcPresenceInfo>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var presences = new List<NpcPresenceInfo>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE ?regionID", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE ?regionID", conn))
                     {
                         cmd.Parameters.AddParameter("?regionID", regionID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -231,15 +232,9 @@ namespace SilverSim.Database.MySQL.Presence
     public class MySQLNpcPresenceServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL NPCPRESENCE SERVICE");
-        public MySQLNpcPresenceServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLNpcPresenceService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLNpcPresenceService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

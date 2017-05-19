@@ -54,11 +54,9 @@ namespace SilverSim.Scene.Npc
 
         public void DetachAllAttachments()
         {
-            List<DetachEntry> detachList = new List<DetachEntry>();
-            m_AttachmentsList.ForEach(delegate (KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp)
-            {
-                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value));
-            });
+            var detachList = new List<DetachEntry>();
+            m_AttachmentsList.ForEach((KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp) => 
+                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value)));
             foreach (DetachEntry entry in detachList)
             {
                 DetachAttachment(entry);
@@ -134,14 +132,14 @@ namespace SilverSim.Scene.Npc
             UUID bodypartsFolder = InventoryService.Folder[ID, AssetType.Bodypart].ID;
             UUID clothingFolder = InventoryService.Folder[ID, AssetType.Clothing].ID;
             UUID objectFolder = InventoryService.Folder[ID, AssetType.Object].ID;
-            List<InventoryItem> attachmentsToRez = new List<InventoryItem>();
+            var attachmentsToRez = new List<InventoryItem>();
 
             /* generate inventory entries for wearables */
             foreach (KeyValuePair<WearableType, List<AgentWearables.WearableInfo>> kvp in appearance.Wearables.All)
             {
                 UUID targetFolder = clothingFolder;
-                AssetType assetType = AssetType.Clothing;
-                InventoryType invType = InventoryType.Clothing;
+                var assetType = AssetType.Clothing;
+                var invType = InventoryType.Clothing;
                 switch (kvp.Key)
                 {
                     case WearableType.Shape:
@@ -161,21 +159,23 @@ namespace SilverSim.Scene.Npc
                 int layer = 0;
                 foreach (AgentWearables.WearableInfo wInfo in kvp.Value)
                 {
-                    InventoryItem item = new InventoryItem();
-                    item.AssetID = wInfo.AssetID;
-                    item.ID = wInfo.ItemID;
-                    item.LastOwner = Owner;
-                    item.Owner = Owner;
-                    item.Creator = UUI.Unknown;
-                    item.InventoryType = invType;
-                    item.AssetType = assetType;
-                    item.Flags = (InventoryFlags)(uint)kvp.Key;
+                    var item = new InventoryItem()
+                    {
+                        AssetID = wInfo.AssetID,
+                        ID = wInfo.ItemID,
+                        LastOwner = Owner,
+                        Owner = Owner,
+                        Creator = UUI.Unknown,
+                        InventoryType = invType,
+                        AssetType = assetType,
+                        Flags = (InventoryFlags)(uint)kvp.Key,
+                        Name = wInfo.ItemID.ToString()
+                    };
                     item.Permissions.Base = InventoryPermissionsMask.None;
                     item.Permissions.Current = InventoryPermissionsMask.None;
                     item.Permissions.EveryOne = InventoryPermissionsMask.None;
                     item.Permissions.Group = InventoryPermissionsMask.None;
                     item.Permissions.NextOwner = InventoryPermissionsMask.None;
-                    item.Name = wInfo.ItemID.ToString();
                     try
                     {
                         InventoryService.Item.Add(item);
@@ -185,22 +185,24 @@ namespace SilverSim.Scene.Npc
                         InventoryService.Item.Update(item);
                     }
 
-                    item = new InventoryItem();
-                    item.ID = UUID.Random;
+                    item = new InventoryItem()
+                    {
+                        ID = UUID.Random,
+                        LastOwner = Owner,
+                        Owner = Owner,
+                        Creator = Owner,
+                        InventoryType = invType,
+                        AssetType = AssetType.Link,
+                        ParentFolderID = targetFolder,
+                        Name = wInfo.AssetID.ToString(),
+                        Description = "@" + layer.ToString()
+                    };
                     item.AssetID = item.ID;
-                    item.LastOwner = Owner;
-                    item.Owner = Owner;
-                    item.Creator = Owner;
-                    item.InventoryType = invType;
-                    item.AssetType = AssetType.Link;
-                    item.ParentFolderID = targetFolder;
                     item.Permissions.Base = InventoryPermissionsMask.All;
                     item.Permissions.Current = InventoryPermissionsMask.All;
                     item.Permissions.EveryOne = InventoryPermissionsMask.None;
                     item.Permissions.Group = InventoryPermissionsMask.None;
                     item.Permissions.NextOwner = InventoryPermissionsMask.None;
-                    item.Name = wInfo.AssetID.ToString();
-                    item.Description = "@" + layer.ToString();
                     InventoryService.Item.Add(item);
                 }
             }
@@ -210,22 +212,24 @@ namespace SilverSim.Scene.Npc
             {
                 foreach (KeyValuePair<UUID, UUID> kvpInner in kvp.Value)
                 {
-                    InventoryItem item = new InventoryItem();
-                    item.AssetID = kvpInner.Value;
-                    item.ID = kvpInner.Key;
-                    item.LastOwner = Owner;
-                    item.Owner = Owner;
-                    item.Creator = UUI.Unknown;
-                    item.ParentFolderID = objectFolder;
-                    item.InventoryType = InventoryType.Object;
-                    item.AssetType = AssetType.Object;
-                    item.Flags = (InventoryFlags)(uint)kvp.Key;
+                    var item = new InventoryItem()
+                    {
+                        AssetID = kvpInner.Value,
+                        ID = kvpInner.Key,
+                        LastOwner = Owner,
+                        Owner = Owner,
+                        Creator = UUI.Unknown,
+                        ParentFolderID = objectFolder,
+                        InventoryType = InventoryType.Object,
+                        AssetType = AssetType.Object,
+                        Flags = (InventoryFlags)(uint)kvp.Key,
+                        Name = kvpInner.Key.ToString()
+                    };
                     item.Permissions.Base = InventoryPermissionsMask.None;
                     item.Permissions.Current = InventoryPermissionsMask.None;
                     item.Permissions.EveryOne = InventoryPermissionsMask.None;
                     item.Permissions.Group = InventoryPermissionsMask.None;
                     item.Permissions.NextOwner = InventoryPermissionsMask.None;
-                    item.Name = kvpInner.Key.ToString();
                     try
                     {
                         InventoryService.Item.Add(item);
@@ -313,8 +317,7 @@ namespace SilverSim.Scene.Npc
                 grp.ChangeKey(part.ID, oldID);
             }
 
-            AttachmentPoint attachAt;
-            attachAt = grp.AttachPoint;
+            AttachmentPoint attachAt = grp.AttachPoint;
 
             if (attachAt == AttachmentPoint.NotAttached)
             {

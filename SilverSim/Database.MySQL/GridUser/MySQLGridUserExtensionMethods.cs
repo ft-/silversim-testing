@@ -21,27 +21,24 @@
 
 using MySql.Data.MySqlClient;
 using SilverSim.Types.GridUser;
+using SilverSim.Types;
 
 namespace SilverSim.Database.MySQL.GridUser
 {
     public static class MySQLGridUserExtensionMethods
     {
-        public static GridUserInfo ToGridUser(this MySqlDataReader reader)
+        public static GridUserInfo ToGridUser(this MySqlDataReader reader) => new GridUserInfo()
         {
-            GridUserInfo info = new GridUserInfo();
-
-            info.User.ID = reader.GetUUID("ID");
-            info.HomeRegionID = reader.GetUUID("HomeRegionID");
-            info.HomeLookAt = reader.GetVector3("HomeLookAt");
-            info.HomePosition = reader.GetVector3("HomePosition");
-            info.LastRegionID = reader.GetUUID("LastRegionID");
-            info.LastLookAt = reader.GetVector3("LastLookAt");
-            info.LastPosition = reader.GetVector3("LastPosition");
-            info.IsOnline = reader.GetBool("IsOnline");
-            info.LastLogin = reader.GetDate("LastLogin");
-            info.LastLogout = reader.GetDate("LastLogout");
-
-            return info;
-        }
+            User = new UUI(reader.GetUUID("ID")),
+            HomeRegionID = reader.GetUUID("HomeRegionID"),
+            HomeLookAt = reader.GetVector3("HomeLookAt"),
+            HomePosition = reader.GetVector3("HomePosition"),
+            LastRegionID = reader.GetUUID("LastRegionID"),
+            LastLookAt = reader.GetVector3("LastLookAt"),
+            LastPosition = reader.GetVector3("LastPosition"),
+            IsOnline = reader.GetBool("IsOnline"),
+            LastLogin = reader.GetDate("LastLogin"),
+            LastLogout = reader.GetDate("LastLogout")
+        };
     }
 }

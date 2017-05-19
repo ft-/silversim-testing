@@ -68,11 +68,11 @@ namespace SilverSim.Database.MySQL.Groups
 
         public override bool TryGetValue(UUID groupID, out UGI ugi)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupID LIKE '" + groupID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupID LIKE '" + groupID.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -88,19 +88,17 @@ namespace SilverSim.Database.MySQL.Groups
             return false;
         }
 
-        static UGI ToUGI(MySqlDataReader dbReader)
-        {
-            return new UGI(dbReader.GetUUID("GroupID"), dbReader.GetString("GroupName"), dbReader.GetUri("HomeURI"));
-        }
+        static UGI ToUGI(MySqlDataReader dbReader) =>
+            new UGI(dbReader.GetUUID("GroupID"), dbReader.GetString("GroupName"), dbReader.GetUri("HomeURI"));
 
         public override List<UGI> GetGroupsByName(string groupName, int limit)
         {
-            List<UGI> groups = new List<UGI>();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var groups = new List<UGI>();
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName LIKE ?groupName LIMIT ?limit", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName LIKE ?groupName LIMIT ?limit", connection))
                 {
                     cmd.Parameters.AddParameter("?groupName", groupName);
                     cmd.Parameters.AddParameter("?limit", limit);
@@ -118,11 +116,11 @@ namespace SilverSim.Database.MySQL.Groups
 
         public override void Store(UGI group)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("REPLACE INTO groupnames (GroupID, HomeURI, GroupName) VALUES (?groupID, ?homeURI, ?groupName)", connection))
+                using (var cmd = new MySqlCommand("REPLACE INTO groupnames (GroupID, HomeURI, GroupName) VALUES (?groupID, ?homeURI, ?groupName)", connection))
                 {
                     cmd.Parameters.AddParameter("?groupID", group.ID);
                     cmd.Parameters.AddParameter("?homeURI", group.HomeURI);
@@ -135,7 +133,7 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -143,7 +141,7 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -170,15 +168,9 @@ namespace SilverSim.Database.MySQL.Groups
     public class MySQLGroupsNameServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUP NAMES SERVICE");
-        public MySQLGroupsNameServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLGroupsNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLGroupsNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

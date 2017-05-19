@@ -137,7 +137,7 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.AddClearCommand("hacdcache", ClearHacdCacheCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
-            RwLockedList<AvatarNameServiceInterface> avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
+            var avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
             if (null != sceneConfig)
             {
                 string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
@@ -175,9 +175,9 @@ namespace SilverSim.Main.Cmd.Region
             }
             else
             {
-                List<IPhysicsHacdCleanCache> beforePsm = new List<IPhysicsHacdCleanCache>();
-                List<IPhysicsHacdCleanCache> withPsm = new List<IPhysicsHacdCleanCache>();
-                List<IPhysicsHacdCleanCache> afterPsm = new List<IPhysicsHacdCleanCache>();
+                var beforePsm = new List<IPhysicsHacdCleanCache>();
+                var withPsm = new List<IPhysicsHacdCleanCache>();
+                var afterPsm = new List<IPhysicsHacdCleanCache>();
                 foreach(IPhysicsHacdCleanCache service in m_Loader.GetServicesByValue<IPhysicsHacdCleanCache>())
                 {
                     switch(service.CleanOrder)
@@ -667,9 +667,9 @@ namespace SilverSim.Main.Cmd.Region
                 {
                     if (Uri.IsWellFormedUriString(args[4], UriKind.Absolute))
                     {
-                        using (Stream s = Http.Client.HttpClient.DoStreamGetRequest(args[4], null, 20000))
+                        using (var s = Http.Client.HttpClient.DoStreamGetRequest(args[4], null, 20000))
                         {
-                            using (XmlReader r = XmlReader.Create(s))
+                            using (var r = XmlReader.Create(s))
                             {
                                 cfg = new XmlConfigSource(r);
                             }
@@ -686,7 +686,7 @@ namespace SilverSim.Main.Cmd.Region
                     return;
                 }
 
-                StringBuilder msg = new StringBuilder();
+                var msg = new StringBuilder();
 
                 foreach(IConfig regionEntry in cfg.Configs)
                 {
@@ -699,20 +699,25 @@ namespace SilverSim.Main.Cmd.Region
 
                 foreach (IConfig regionEntry in cfg.Configs)
                 {
-                    RegionInfo r = new RegionInfo();
-                    r.Name = regionEntry.Name;
-                    r.ID = regionEntry.GetString("RegionUUID");
-                    r.Location = new GridVector(regionEntry.GetString("Location"), 256);
-                    r.ServerPort = (uint)regionEntry.GetInt("InternalPort");
-                    r.ServerURI = string.Empty;
-                    r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
-                    r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
-                    r.Flags = RegionFlags.RegionOnline;
-                    r.ProductName = regionEntry.GetString("RegionType", "Mainland");
-                    r.Owner = new UUI(regionEntry.GetString("Owner"));
-                    r.ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000");
-                    r.ServerHttpPort = m_HttpServer.Port;
-                    r.RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000");
+                    var r = new RegionInfo()
+                    {
+                        Name = regionEntry.Name,
+                        ID = regionEntry.GetString("RegionUUID"),
+                        Location = new GridVector(regionEntry.GetString("Location"), 256),
+                        ServerPort = (uint)regionEntry.GetInt("InternalPort"),
+                        ServerURI = string.Empty,
+                        Size = new GridVector
+                        {
+                            X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255),
+                            Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255)
+                        },
+                        Flags = RegionFlags.RegionOnline,
+                        ProductName = regionEntry.GetString("RegionType", "Mainland"),
+                        Owner = new UUI(regionEntry.GetString("Owner")),
+                        ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000"),
+                        ServerHttpPort = m_HttpServer.Port,
+                        RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000")
+                    };
                     switch (regionEntry.GetString("Access", "mature").ToLower())
                     {
                         case "pg":
@@ -743,7 +748,7 @@ namespace SilverSim.Main.Cmd.Region
                     {
                         m_RegionStorage.RegisterRegion(r);
                         List<EstateInfo> allEstates = m_EstateService.All;
-                        List<EstateInfo> ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(r.Owner) select estate);
+                        var ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(r.Owner) select estate);
                         if (ownerEstates.Count != 0)
                         {
                             m_EstateService.RegionMap[r.ID] = ownerEstates[0].ID;
@@ -807,17 +812,18 @@ namespace SilverSim.Main.Cmd.Region
             }
             else
             {
-                rInfo = new RegionInfo();
                 EstateInfo selectedEstate = null;
-                rInfo.Name = args[2];
-                rInfo.ID = UUID.Random;
-                rInfo.Access = RegionAccess.Mature;
-                rInfo.ServerHttpPort = m_HttpServer.Port;
-                rInfo.ScopeID = UUID.Zero;
-                rInfo.ServerIP = string.Empty;
-                rInfo.Size = new GridVector(256, 256);
-                rInfo.ProductName = "Mainland";
-
+                rInfo = new RegionInfo()
+                {
+                    Name = args[2],
+                    ID = UUID.Random,
+                    Access = RegionAccess.Mature,
+                    ServerHttpPort = m_HttpServer.Port,
+                    ScopeID = UUID.Zero,
+                    ServerIP = string.Empty,
+                    Size = new GridVector(256, 256),
+                    ProductName = "Mainland"
+                };
                 if (!uint.TryParse(args[3], out rInfo.ServerPort))
                 {
                     io.WriteFormatted("Port {0} is not valid", args[3]);
@@ -967,7 +973,7 @@ namespace SilverSim.Main.Cmd.Region
                 else
                 {
                     List<EstateInfo> allEstates = m_EstateService.All;
-                    List<EstateInfo> ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(rInfo.Owner) select estate);
+                    var ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(rInfo.Owner) select estate);
                     if (ownerEstates.Count != 0)
                     {
                         m_EstateService.RegionMap[rInfo.ID] = ownerEstates[0].ID;
@@ -1450,7 +1456,7 @@ namespace SilverSim.Main.Cmd.Region
                 selectedScene = io.SelectedScene;
             }
 
-            FormattedListBuilder formattedList = new FormattedListBuilder()
+            var formattedList = new FormattedListBuilder()
                 .AddColumn("Region", 30)
                 .AddColumn("Env FPS", 10)
                 .AddColumn("Phys FPS", 10)
@@ -1508,7 +1514,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (args[2] == "online")
             {
-                List<RegionInfo> regionList = new List<RegionInfo>();
+                var regionList = new List<RegionInfo>();
                 foreach (SceneInterface scene in m_Scenes.Values)
                 {
                     regionList.Add(scene.GetRegionInfo());
@@ -1531,7 +1537,7 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            StringBuilder output = new StringBuilder("Scene List:\n----------------------------------------------");
+            var output = new StringBuilder("Scene List:\n----------------------------------------------");
             foreach (RegionInfo rInfo in regions)
             {
                 if (limitedToScene == UUID.Zero || rInfo.ID == limitedToScene)
@@ -1579,7 +1585,7 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            StringBuilder output = new StringBuilder("Neighbor List:\n----------------------------------------------");
+            var output = new StringBuilder("Neighbor List:\n----------------------------------------------");
             foreach (SceneInterface.NeighborEntry neighborInfo in scene.Neighbors.Values)
             {
                 Vector3 gridcoord = neighborInfo.RemoteRegionData.Location;
@@ -1801,7 +1807,7 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             IEnumerable<IAgent> agents;
-            StringBuilder output = new StringBuilder();
+            var output = new StringBuilder();
             if (args.Count == 3 && args[2] == "full")
             {
                 agents = scene.Agents;
@@ -2492,17 +2498,10 @@ namespace SilverSim.Main.Cmd.Region
     [PluginName("Commands")]
     public class RegionCommandsFactory : IPluginFactory
     {
-        public RegionCommandsFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new RegionCommands(ownSection.GetString("RegionStorage", "RegionStorage"),
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new RegionCommands(ownSection.GetString("RegionStorage", "RegionStorage"),
                 ownSection.GetString("EstateService", "EstateService"),
                 ownSection.GetString("SimulationDataStorage", "SimulationDataStorage"));
-        }
     }
     #endregion
 }

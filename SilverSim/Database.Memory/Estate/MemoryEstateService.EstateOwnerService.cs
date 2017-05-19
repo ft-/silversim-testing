@@ -42,13 +42,8 @@ namespace SilverSim.Database.Memory.Estate
             return false;
         }
 
-        List<uint> IEstateOwnerServiceInterface.this[UUI owner]
-        {
-            get
-            {
-                return new List<uint>(from data in m_EstateOwnerData where data.Value.EqualsGrid(owner) select data.Key);
-            }
-        }
+        List<uint> IEstateOwnerServiceInterface.this[UUI owner] =>
+            new List<uint>(from data in m_EstateOwnerData where data.Value.EqualsGrid(owner) select data.Key);
 
         UUI IEstateOwnerServiceInterface.this[uint estateID]
         {

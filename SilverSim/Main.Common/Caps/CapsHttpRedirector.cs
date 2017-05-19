@@ -92,45 +92,15 @@ namespace SilverSim.Main.Common.Caps
             }
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
-        public string Scheme
-        {
-            get
-            {
-                return m_HttpServer.Scheme;
-            }
-        }
+        public string Scheme => m_HttpServer.Scheme;
 
-        public string ExternalHostName
-        {
-            get
-            {
-                return m_HttpServer.ExternalHostName;
-            }
-        }
+        public string ExternalHostName => m_HttpServer.ExternalHostName;
 
-        public uint Port
-        {
-            get
-            {
-                return m_HttpServer.Port;
-            }
-        }
+        public uint Port => m_HttpServer.Port;
 
-        public string ServerURI
-        {
-            get
-            {
-                return m_HttpServer.ServerURI;
-            }
-        }
+        public string ServerURI => m_HttpServer.ServerURI;
 
         public void Startup(ConfigurationLoader loader)
         {

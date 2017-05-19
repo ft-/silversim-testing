@@ -36,25 +36,21 @@ namespace SilverSim.Main.Common.HttpServer
         {
             public ConnectionCloseException()
             {
-
             }
 
             public ConnectionCloseException(string message)
                 : base(message)
             {
-
             }
 
             protected ConnectionCloseException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public ConnectionCloseException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -63,25 +59,21 @@ namespace SilverSim.Main.Common.HttpServer
         {
             public DisconnectFromThreadException()
             {
-
             }
 
             public DisconnectFromThreadException(string message)
                 : base(message)
             {
-
             }
 
             protected DisconnectFromThreadException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public DisconnectFromThreadException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
         #endregion

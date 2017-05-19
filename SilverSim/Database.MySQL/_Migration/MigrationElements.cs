@@ -24,7 +24,6 @@ using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SilverSim.Database.MySQL._Migration
 {
@@ -35,7 +34,7 @@ namespace SilverSim.Database.MySQL._Migration
 
     public class SqlTable : IMigrationElement
     {
-        public string Name { get; private set; }
+        public string Name { get; }
         public bool IsDynamicRowFormat { get; set; }
         public string Engine { get; set; }
         
@@ -54,22 +53,19 @@ namespace SilverSim.Database.MySQL._Migration
 
     public class ChangeEngine : IMigrationElement
     {
-        public string Engine { get; private set; }
+        public string Engine { get; }
         public ChangeEngine(string engine)
         {
             Engine = engine;
         }
 
-        public string Sql(string tableName)
-        {
-            return "ALTER TABLE " + tableName + " ENGINE=" + Engine;
-        }
+        public string Sql(string tableName) => "ALTER TABLE " + tableName + " ENGINE=" + Engine;
     }
 
     public class PrimaryKeyInfo : IMigrationElement
     {
-        public string[] FieldNames { get; private set; }
-        
+        public string[] FieldNames { get; }
+
         public PrimaryKeyInfo(params string[] fieldNames)
         {
             FieldNames = fieldNames;
@@ -77,7 +73,7 @@ namespace SilverSim.Database.MySQL._Migration
 
         public string FieldSql()
         {
-            List<string> fieldNames = new List<string>();
+            var fieldNames = new List<string>();
             foreach (string fName in FieldNames)
             {
                 fieldNames.Add("`" + MySqlHelper.EscapeString(fName) + "`");
@@ -85,30 +81,19 @@ namespace SilverSim.Database.MySQL._Migration
             return "PRIMARY KEY(" + string.Join(",", fieldNames) + ")";
         }
 
-        public string Sql(string tableName)
-        {
-            return "ALTER TABLE " + tableName + " ADD " + FieldSql() + ";";
-        }
+        public string Sql(string tableName) => "ALTER TABLE " + tableName + " ADD " + FieldSql() + ";";
     }
 
     public class DropPrimaryKeyinfo : IMigrationElement
     {
-        public DropPrimaryKeyinfo()
-        {
-
-        }
-
-        public string Sql(string tableName)
-        {
-            return "ALTER TABLE " + tableName + " DROP PRIMARY KEY;";
-        }
+        public string Sql(string tableName) => "ALTER TABLE " + tableName + " DROP PRIMARY KEY;";
     }
 
     public class NamedKeyInfo : IMigrationElement
     {
         public bool IsUnique { get; set; }
-        public string Name { get; private set; }
-        public string[] FieldNames { get; private set; }
+        public string Name { get; }
+        public string[] FieldNames { get; }
 
         public NamedKeyInfo(string name, params string[] fieldNames)
         {
@@ -118,33 +103,28 @@ namespace SilverSim.Database.MySQL._Migration
 
         public string FieldSql()
         {
-            List<string> fieldNames = new List<string>();
+            var fieldNames = new List<string>();
             foreach(string fName in FieldNames)
             {
                 fieldNames.Add("`" + MySqlHelper.EscapeString(fName) + "`");
             }
             return "KEY `" + MySqlHelper.EscapeString(Name) + "` (" + string.Join(",", fieldNames) + ")";
         }
-        public string Sql(string tableName)
-        {
-            return "ALTER TABLE " + tableName + " ADD " + FieldSql() + ";";
-        }
+
+        public string Sql(string tableName) => "ALTER TABLE " + tableName + " ADD " + FieldSql() + ";";
 
     }
 
     public class DropNamedKeyInfo : IMigrationElement
     {
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public DropNamedKeyInfo(string name)
         {
             Name = name;
         }
 
-        public string Sql(string tableName)
-        {
-            return "ALTER TABLE DROP KEY `" + MySqlHelper.EscapeString(Name) + "`;";
-        }
+        public string Sql(string tableName) => "ALTER TABLE DROP KEY `" + MySqlHelper.EscapeString(Name) + "`;";
     }
 
     #region Table fields
@@ -169,7 +149,7 @@ namespace SilverSim.Database.MySQL._Migration
     {
         public static Dictionary<string, string> ColumnSql(this IColumnInfo colInfo)
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            var result = new Dictionary<string, string>();
             string notNull = colInfo.IsNullAllowed ? string.Empty : "NOT NULL ";
             string typeSql;
             Type f = colInfo.FieldType;
@@ -240,7 +220,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a Vector3 for field " + colInfo.Name);
                     }
 
-                    Vector3 v = (Vector3)colInfo.Default;
+                    var v = (Vector3)colInfo.Default;
                     result.Add(colInfo.Name + "X", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
                     result.Add(colInfo.Name + "Y", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
                     result.Add(colInfo.Name + "Z", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Z));
@@ -262,7 +242,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a GridVector for field " + colInfo.Name);
                     }
 
-                    GridVector v = (GridVector)colInfo.Default;
+                    var v = (GridVector)colInfo.Default;
                     result.Add(colInfo.Name + "X", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
                     result.Add(colInfo.Name + "Y", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
                 }
@@ -282,7 +262,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a Vector4 for field " + colInfo.Name);
                     }
 
-                    Vector4 v = (Vector4)colInfo.Default;
+                    var v = (Vector4)colInfo.Default;
                     result.Add(colInfo.Name + "X", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
                     result.Add(colInfo.Name + "Y", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
                     result.Add(colInfo.Name + "Z", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Z));
@@ -306,7 +286,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a Quaternion for " + colInfo.Name);
                     }
 
-                    Quaternion v = (Quaternion)colInfo.Default;
+                    var v = (Quaternion)colInfo.Default;
                     result.Add(colInfo.Name + "X", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
                     result.Add(colInfo.Name + "Y", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
                     result.Add(colInfo.Name + "Z", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Z));
@@ -330,7 +310,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a EnvironmentController.WLVector4 for field " + colInfo.Name);
                     }
 
-                    EnvironmentController.WLVector2 v = (EnvironmentController.WLVector2)colInfo.Default;
+                    var v = (EnvironmentController.WLVector2)colInfo.Default;
                     result.Add(colInfo.Name + "X", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
                     result.Add(colInfo.Name + "Y", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
                 }
@@ -350,7 +330,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a EnvironmentController.WLVector4 for field " + colInfo.Name);
                     }
 
-                    EnvironmentController.WLVector4 v = (EnvironmentController.WLVector4)colInfo.Default;
+                    var v = (EnvironmentController.WLVector4)colInfo.Default;
                     result.Add(colInfo.Name + "Red", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
                     result.Add(colInfo.Name + "Green", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
                     result.Add(colInfo.Name + "Blue", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Z));
@@ -374,7 +354,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a Color for field " + colInfo.Name);
                     }
 
-                    Color v = (Color)colInfo.Default;
+                    var v = (Color)colInfo.Default;
                     result.Add(colInfo.Name + "Red", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.R));
                     result.Add(colInfo.Name + "Green", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.G));
                     result.Add(colInfo.Name + "Blue", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.B));
@@ -396,7 +376,7 @@ namespace SilverSim.Database.MySQL._Migration
                         throw new ArgumentException("Default is not a ColorAlpha for field " + colInfo.Name);
                     }
 
-                    ColorAlpha v = (ColorAlpha)colInfo.Default;
+                    var v = (ColorAlpha)colInfo.Default;
                     result.Add(colInfo.Name + "Red", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.R));
                     result.Add(colInfo.Name + "Green", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.G));
                     result.Add(colInfo.Name + "Blue", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.B));
@@ -467,15 +447,9 @@ namespace SilverSim.Database.MySQL._Migration
 
     public class AddColumn<T> : IMigrationElement, IAddColumn
     {
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public Type FieldType
-        {
-            get
-            {
-                return typeof(T);
-            }
-        }
+        public Type FieldType => typeof(T);
 
         public uint Cardinality { get; set; }
 
@@ -495,7 +469,7 @@ namespace SilverSim.Database.MySQL._Migration
 
         public string FieldSql()
         {
-            List<string> parts = new List<string>();
+            var parts = new List<string>();
             foreach(KeyValuePair<string, string> kvp in this.ColumnSql())
             {
                 parts.Add("`" + MySqlHelper.EscapeString(kvp.Key) + "` " + kvp.Value);
@@ -503,10 +477,7 @@ namespace SilverSim.Database.MySQL._Migration
             return string.Join(",", parts);
         }
 
-        public string Sql(string tableName)
-        {
-            return string.Format("ALTER TABLE `{0}` ADD ({1})", MySqlHelper.EscapeString(tableName), FieldSql());
-        }
+        public string Sql(string tableName) => string.Format("ALTER TABLE `{0}` ADD ({1})", MySqlHelper.EscapeString(tableName), FieldSql());
     }
 
     public class DropColumn : IMigrationElement
@@ -524,7 +495,7 @@ namespace SilverSim.Database.MySQL._Migration
 
         public string Sql(string tableName, Type formerType)
         {
-            string[] fieldNames = new string[] { Name };
+            var fieldNames = new string[] { Name };
 
             if (formerType == typeof(Vector3))
             {
@@ -586,16 +557,15 @@ namespace SilverSim.Database.MySQL._Migration
     class FormerFieldInfo : IColumnInfo
     {
         readonly IColumnInfo m_ColumnInfo;
-        readonly Type m_OldFieldType;
         public FormerFieldInfo(IColumnInfo columnInfo, Type oldFieldType)
         {
-            m_OldFieldType = oldFieldType;
+            FieldType = oldFieldType;
             m_ColumnInfo = columnInfo;
         }
 
         public uint Cardinality { get { return 0; } }
         public object Default { get { return null; } }
-        public Type FieldType { get { return m_OldFieldType; } }
+        public Type FieldType { get; }
         public bool IsNullAllowed { get { return true; } }
         public bool IsLong { get { return m_ColumnInfo.IsLong; } }
         public bool IsFixed { get { return m_ColumnInfo.IsFixed;  } }
@@ -609,15 +579,9 @@ namespace SilverSim.Database.MySQL._Migration
 
     public class ChangeColumn<T> : IMigrationElement, IChangeColumn
     {
-        public string Name { get; private set; }
+        public string Name { get; }
         public string OldName { get; set; }
-        public Type FieldType
-        {
-            get
-            {
-                return typeof(T);
-            }
-        }
+        public Type FieldType => typeof(T);
 
         public bool IsNullAllowed { get; set; }
         public bool IsLong { get; set; }
@@ -634,7 +598,7 @@ namespace SilverSim.Database.MySQL._Migration
 
         public string FieldSql()
         {
-            List<string> parts = new List<string>();
+            var parts = new List<string>();
             foreach (KeyValuePair<string, string> kvp in this.ColumnSql())
             {
                 parts.Add("`" + MySqlHelper.EscapeString(kvp.Key) + "` " + kvp.Value);
@@ -649,14 +613,14 @@ namespace SilverSim.Database.MySQL._Migration
 
         public string Sql(string tableName, Type formerType)
         {
-            FormerFieldInfo oldField = new FormerFieldInfo(this, formerType);
+            var oldField = new FormerFieldInfo(this, formerType);
             List<string> oldFields;
             Dictionary<string, string> newFields;
 
             oldFields = new List<string>(oldField.ColumnSql().Keys);
             newFields = this.ColumnSql();
 
-            List<string> sqlParts = new List<string>();
+            var sqlParts = new List<string>();
 
             /* remove anything that is not needed anymore */
             foreach (string fieldName in oldFields)
@@ -692,31 +656,25 @@ namespace SilverSim.Database.MySQL._Migration
 
     public class TableRevision : IMigrationElement
     {
-        public uint Revision { get; private set; }
+        public uint Revision { get; }
 
         public TableRevision(uint revision)
         {
             Revision = revision;
         }
 
-        public string Sql(string tableName)
-        {
-            return string.Format("ALTER `{0}` COMMENT='{1}'", MySqlHelper.EscapeString(tableName), Revision);
-        }
+        public string Sql(string tableName) => string.Format("ALTER `{0}` COMMENT='{1}'", MySqlHelper.EscapeString(tableName), Revision);
     }
 
     public class SqlStatement : IMigrationElement
     {
-        public string Statement { get; private set; }
+        public string Statement { get; }
 
         public SqlStatement(string statement)
         {
             Statement = statement;
         }
 
-        public string Sql(string tableName)
-        {
-            return Statement;
-        }
+        public string Sql(string tableName) => Statement;
     }
 }

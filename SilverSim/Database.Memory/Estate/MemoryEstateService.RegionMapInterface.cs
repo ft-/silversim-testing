@@ -32,7 +32,7 @@ namespace SilverSim.Database.Memory.Estate
 
         List<UUID> IEstateRegionMapServiceInterface.this[uint estateID]
         {
-            get 
+            get
             {
                 RwLockedList<UUID> regions;
                 return (m_RegionMapData.TryGetValue(estateID, out regions)) ? new List<UUID>(regions) : new List<UUID>();

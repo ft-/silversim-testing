@@ -44,12 +44,12 @@ namespace SilverSim.Database.MySQL.SimulationData
         #region Objects and Prims within a region by UUID
         List<UUID> ISimulationDataObjectStorageInterface.ObjectsInRegion(UUID key)
         {
-            List<UUID> objects = new List<UUID>();
+            var objects = new List<UUID>();
 
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using(var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID LIKE '" + key.ToString() + "'", connection))
+                using(var cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID LIKE '" + key.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -65,12 +65,12 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         List<UUID> ISimulationDataObjectStorageInterface.PrimitivesInRegion(UUID key)
         {
-            List<UUID> objects = new List<UUID>();
+            var objects = new List<UUID>();
 
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM prims WHERE RegionID LIKE '" + key.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("SELECT ID FROM prims WHERE RegionID LIKE '" + key.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -86,78 +86,77 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region helpers
-        ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader)
+        ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader) => new ObjectGroup()
         {
-            ObjectGroup objgroup = new ObjectGroup();
-            objgroup.IsTempOnRez = dbReader.GetBool("IsTempOnRez");
-            objgroup.Owner = dbReader.GetUUI("Owner");
-            objgroup.LastOwner = dbReader.GetUUI("LastOwner");
-            objgroup.Group = dbReader.GetUGI("Group");
-            objgroup.SaleType = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
-            objgroup.SalePrice = dbReader.GetInt32("SalePrice");
-            objgroup.PayPrice0 = dbReader.GetInt32("PayPrice0");
-            objgroup.PayPrice1 = dbReader.GetInt32("PayPrice1");
-            objgroup.PayPrice2 = dbReader.GetInt32("PayPrice2");
-            objgroup.PayPrice3 = dbReader.GetInt32("PayPrice3");
-            objgroup.PayPrice4 = dbReader.GetInt32("PayPrice4");
-            objgroup.AttachedPos = dbReader.GetVector3("AttachedPos");
-            objgroup.AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint");
-            objgroup.IsIncludedInSearch = dbReader.GetBool("IsIncludedInSearch");
-            objgroup.RezzingObjectID = dbReader.GetUUID("RezzingObjectID");
-            return objgroup;
-        }
+            IsTempOnRez = dbReader.GetBool("IsTempOnRez"),
+            Owner = dbReader.GetUUI("Owner"),
+            LastOwner = dbReader.GetUUI("LastOwner"),
+            Group = dbReader.GetUGI("Group"),
+            SaleType = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType"),
+            SalePrice = dbReader.GetInt32("SalePrice"),
+            PayPrice0 = dbReader.GetInt32("PayPrice0"),
+            PayPrice1 = dbReader.GetInt32("PayPrice1"),
+            PayPrice2 = dbReader.GetInt32("PayPrice2"),
+            PayPrice3 = dbReader.GetInt32("PayPrice3"),
+            PayPrice4 = dbReader.GetInt32("PayPrice4"),
+            AttachedPos = dbReader.GetVector3("AttachedPos"),
+            AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint"),
+            IsIncludedInSearch = dbReader.GetBool("IsIncludedInSearch"),
+            RezzingObjectID = dbReader.GetUUID("RezzingObjectID")
+        };
 
         ObjectPart ObjectPartFromDbReader(MySqlDataReader dbReader)
         {
-            ObjectPart objpart = new ObjectPart();
-            objpart.ID = dbReader.GetUUID("ID");
-            objpart.LoadedLinkNumber = dbReader.GetInt32("LinkNumber");
-            objpart.Position = dbReader.GetVector3("Position");
-            objpart.Rotation = dbReader.GetQuaternion("Rotation");
-            objpart.SitText = dbReader.GetString("SitText");
-            objpart.TouchText = dbReader.GetString("TouchText");
-            objpart.Name = dbReader.GetString("Name");
-            objpart.Description = dbReader.GetString("Description");
-            objpart.SitTargetOffset = dbReader.GetVector3("SitTargetOffset");
-            objpart.SitTargetOrientation = dbReader.GetQuaternion("SitTargetOrientation");
-            objpart.Creator = dbReader.GetUUI("Creator");
-            objpart.CreationDate = dbReader.GetDate("CreationDate");
-            objpart.Flags = dbReader.GetEnum<PrimitiveFlags>("Flags");
+            var objpart = new ObjectPart()
+            {
+                ID = dbReader.GetUUID("ID"),
+                LoadedLinkNumber = dbReader.GetInt32("LinkNumber"),
+                Position = dbReader.GetVector3("Position"),
+                Rotation = dbReader.GetQuaternion("Rotation"),
+                SitText = dbReader.GetString("SitText"),
+                TouchText = dbReader.GetString("TouchText"),
+                Name = dbReader.GetString("Name"),
+                Description = dbReader.GetString("Description"),
+                SitTargetOffset = dbReader.GetVector3("SitTargetOffset"),
+                SitTargetOrientation = dbReader.GetQuaternion("SitTargetOrientation"),
+                Creator = dbReader.GetUUI("Creator"),
+                CreationDate = dbReader.GetDate("CreationDate"),
+                Flags = dbReader.GetEnum<PrimitiveFlags>("Flags"),
 
-            objpart.CameraAtOffset = dbReader.GetVector3("CameraAtOffset");
-            objpart.CameraEyeOffset = dbReader.GetVector3("CameraEyeOffset");
+                CameraAtOffset = dbReader.GetVector3("CameraAtOffset"),
+                CameraEyeOffset = dbReader.GetVector3("CameraEyeOffset"),
 
-            objpart.PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType");
-            objpart.PathfindingType = dbReader.GetEnum<PathfindingType>("PathfindingType");
-            objpart.Material = dbReader.GetEnum<PrimitiveMaterial>("Material");
-            objpart.Size = dbReader.GetVector3("Size");
-            objpart.Slice = dbReader.GetVector3("Slice");
+                PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType"),
+                PathfindingType = dbReader.GetEnum<PathfindingType>("PathfindingType"),
+                Material = dbReader.GetEnum<PrimitiveMaterial>("Material"),
+                Size = dbReader.GetVector3("Size"),
+                Slice = dbReader.GetVector3("Slice"),
 
-            objpart.MediaURL = dbReader.GetString("MediaURL");
+                MediaURL = dbReader.GetString("MediaURL"),
 
-            objpart.AngularVelocity = dbReader.GetVector3("AngularVelocity");
-
-            ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
+                AngularVelocity = dbReader.GetVector3("AngularVelocity")
+            };
+            var lp = new ObjectPart.PointLightParam();
             lp.Serialization = dbReader.GetBytes("LightData");
             objpart.PointLight = lp;
 
-            ObjectPart.TextParam tp = new ObjectPart.TextParam();
+            var tp = new ObjectPart.TextParam();
             tp.Serialization = dbReader.GetBytes("HoverTextData");
             objpart.Text = tp;
 
-            ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
+            var fp = new ObjectPart.FlexibleParam();
             fp.Serialization = dbReader.GetBytes("FlexibleData");
             objpart.Flexible = fp;
 
-            ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
+            var sound = new ObjectPart.SoundParam();
             sound.Serialization = dbReader.GetBytes("LoopedSoundData");
             objpart.Sound = sound;
 
-            ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
+            var collisionsound = new ObjectPart.CollisionSoundParam();
             collisionsound.Serialization = dbReader.GetBytes("ImpactSoundData");
             objpart.CollisionSound = collisionsound;
 
-            ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
+            var ps = new ObjectPart.PrimitiveShape();
             ps.Serialization = dbReader.GetBytes("PrimitiveShapeData");
             objpart.Shape = ps;
 
@@ -178,7 +177,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             objpart.ClickAction = dbReader.GetEnum<ClickActionType>("ClickAction");
 
-            using (MemoryStream ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
+            using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
             {
                 foreach (KeyValuePair<string, IValue> kvp in (Map)LlsdBinary.Deserialize(ms))
                 {
@@ -210,21 +209,23 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         ObjectPartInventoryItem ObjectPartInventoryItemFromDbReader(MySqlDataReader dbReader)
         {
-            ObjectPartInventoryItem item = new ObjectPartInventoryItem();
-            item.AssetID = dbReader.GetUUID("AssetID");
-            item.AssetType = dbReader.GetEnum<AssetType>("AssetType");
-            item.CreationDate = dbReader.GetDate("CreationDate");
-            item.Creator = dbReader.GetUUI("Creator");
-            item.Description = dbReader.GetString("Description");
-            item.Flags = dbReader.GetEnum<InventoryFlags>("Flags");
-            item.Group = dbReader.GetUGI("Group");
-            item.IsGroupOwned = dbReader.GetBool("GroupOwned");
-            item.ID = dbReader.GetUUID("InventoryID");
-            item.InventoryType = dbReader.GetEnum<InventoryType>("InventoryType");
-            item.LastOwner = dbReader.GetUUI("LastOwner");
-            item.Name = dbReader.GetString("Name");
-            item.Owner = dbReader.GetUUI("Owner");
-            item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
+            var item = new ObjectPartInventoryItem()
+            {
+                AssetID = dbReader.GetUUID("AssetID"),
+                AssetType = dbReader.GetEnum<AssetType>("AssetType"),
+                CreationDate = dbReader.GetDate("CreationDate"),
+                Creator = dbReader.GetUUI("Creator"),
+                Description = dbReader.GetString("Description"),
+                Flags = dbReader.GetEnum<InventoryFlags>("Flags"),
+                Group = dbReader.GetUGI("Group"),
+                IsGroupOwned = dbReader.GetBool("GroupOwned"),
+                ID = dbReader.GetUUID("InventoryID"),
+                InventoryType = dbReader.GetEnum<InventoryType>("InventoryType"),
+                LastOwner = dbReader.GetUUI("LastOwner"),
+                Name = dbReader.GetString("Name"),
+                Owner = dbReader.GetUUI("Owner"),
+                ParentFolderID = dbReader.GetUUID("ParentFolderID")
+            };
             item.Permissions.Base = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
             item.Permissions.Current = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
             item.Permissions.EveryOne = dbReader.GetEnum<InventoryPermissionsMask>("EveryOnePermissions");
@@ -234,7 +235,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             item.SaleInfo.Price = dbReader.GetInt32("SalePrice");
             item.SaleInfo.PermMask = dbReader.GetEnum<InventoryPermissionsMask>("SalePermMask");
             item.NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID");
-            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+            var grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
             if (((string)dbReader["PermsGranter"]).Length != 0)
             {
                 try
@@ -258,22 +259,22 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                Dictionary<UUID, ObjectGroup> objGroups = new Dictionary<UUID, ObjectGroup>();
-                Dictionary<UUID, UUID> originalAssetIDs = new Dictionary<UUID, UUID>();
-                Dictionary<UUID, UUID> nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
-                Dictionary<UUID, SortedDictionary<int, ObjectPart>> objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
-                List<UUID> objPartIDs = new List<UUID>();
-                Dictionary<UUID, ObjectPart> objParts = new Dictionary<UUID,ObjectPart>();
-                List<UUID> orphanedPrims = new List<UUID>();
-                List<KeyValuePair<UUID, UUID>> orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
+                var objGroups = new Dictionary<UUID, ObjectGroup>();
+                var originalAssetIDs = new Dictionary<UUID, UUID>();
+                var nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
+                var objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
+                var objPartIDs = new List<UUID>();
+                var objParts = new Dictionary<UUID,ObjectPart>();
+                var orphanedPrims = new List<UUID>();
+                var orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
 
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
                     UUID objgroupID = UUID.Zero;
                     m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
 
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using(var cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -286,8 +287,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                     objgroupID = MySQLUtilities.GetUUID(dbReader, "id");
                                     originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
                                     nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
-                                    ObjectGroup objgroup = ObjectGroupFromDbReader(dbReader);
-                                    objGroups[objgroupID] = objgroup;
+                                    objGroups[objgroupID] = ObjectGroupFromDbReader(dbReader);
                                 }
                                 catch(Exception e)
                                 {
@@ -300,7 +300,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
                     int primcount = 0;
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -337,7 +337,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     int primitemcount = 0;
                     m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -367,7 +367,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
                 }
 
-                List<UUID> removeObjGroups = new List<UUID>();
+                var removeObjGroups = new List<UUID>();
                 foreach(KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
                 {
                     if (!objGroupParts.ContainsKey(kvp.Key))
@@ -406,10 +406,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                     string sqlcmd = "DELETE FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID IN (" +
                         string.Join(",", from id in removeObjGroups.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
                         ")";
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
+                        using (var cmd = new MySqlCommand(sqlcmd, conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -422,10 +422,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                     string sqlcmd = "DELETE FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID IN (" +
                         string.Join(",", from id in orphanedPrims.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
                         ")";
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
+                        using (var cmd = new MySqlCommand(sqlcmd, conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -437,10 +437,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                     string sqlcmd = "DELETE FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "' AND (" +
                         string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt) select 
                                             string.Format("PrimID LIKE '{0}' AND ID LIKE '{1}'", id.Key.ToString(), id.Value.ToString()));
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand(sqlcmd, conn))
+                        using (var cmd = new MySqlCommand(sqlcmd, conn))
                         {
                             cmd.ExecuteNonQuery();
                         }

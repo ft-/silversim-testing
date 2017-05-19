@@ -32,11 +32,11 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                List<Vector3> res = new List<Vector3>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var res = new List<Vector3>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT DistanceX, DistanceY, DistanceZ FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                    using (var cmd = new MySqlCommand("SELECT DistanceX, DistanceY, DistanceZ FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -51,17 +51,17 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             set
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    conn.InsideTransaction(delegate ()
+                    conn.InsideTransaction(() =>
                     {
-                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
 
-                        Dictionary<string, object> data = new Dictionary<string, object>();
+                        var data = new Dictionary<string, object>();
                         data.Add("RegionID", regionID.ToString());
 
                         foreach (Vector3 v in value)
@@ -76,10 +76,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataSpawnPointStorageInterface.Remove(UUID regionID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }

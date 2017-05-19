@@ -28,20 +28,8 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("BMP Terrain Storage Format Writer")]
     public class BMP : DrawingSaveCommon
     {
-        public override string Name
-        {
-            get
-            {
-                return "bmp";
-            }
-        }
+        public override string Name => "bmp";
 
-        protected override ImageFormat TargetImageFormat
-        {
-            get
-            {
-                return ImageFormat.Bmp;
-            }
-        }
+        protected override ImageFormat TargetImageFormat => ImageFormat.Bmp;
     }
 }

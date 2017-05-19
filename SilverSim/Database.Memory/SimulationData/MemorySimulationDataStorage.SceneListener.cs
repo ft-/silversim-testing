@@ -85,15 +85,15 @@ namespace SilverSim.Database.Memory.SimulationData
                         string partID = req.Part.ID.ToString();
                         RwLockedDictionary<UUID, Map> primitiveList;
                         RwLockedDictionary<string, Map> primItemList;
-                        if(m_Primitives.TryGetValue(sceneID, out primitiveList))
+                        if (m_Primitives.TryGetValue(sceneID, out primitiveList))
                         {
                             primitiveList.Remove(partID);
                         }
 
-                        if(m_PrimItems.TryGetValue(sceneID, out primItemList))
+                        if (m_PrimItems.TryGetValue(sceneID, out primItemList))
                         {
-                            var deleteItems = new List<string>(from id in primItemList.Keys where id.StartsWith(partID.ToString()) select id);
-                            foreach(string id in deleteItems)
+                            var deleteItems = new List<string>(from id in primItemList.Keys where id.StartsWith(partID) select id);
+                            foreach (string id in deleteItems)
                             {
                                 m_PrimItems.Remove(id);
                             }
@@ -102,7 +102,7 @@ namespace SilverSim.Database.Memory.SimulationData
                         if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
                         {
                             RwLockedDictionary<UUID, Map> objectList;
-                            if(m_Objects.TryGetValue(sceneID, out objectList))
+                            if (m_Objects.TryGetValue(sceneID, out objectList))
                             {
                                 objectList.Remove(partID);
                             }
@@ -121,7 +121,7 @@ namespace SilverSim.Database.Memory.SimulationData
                             if (m_PrimItems.TryGetValue(sceneID, out primItemList))
                             {
                                 var deleteKeys = new List<string>(from id in primItemList.Keys where id.StartsWith(partID) select id);
-                                foreach(string key in deleteKeys)
+                                foreach (string key in deleteKeys)
                                 {
                                     primItemList.Remove(key);
                                 }
@@ -221,7 +221,8 @@ namespace SilverSim.Database.Memory.SimulationData
 
             private Map GenerateUpdateObjectPartInventoryItem(UUID primID, ObjectPartInventoryItem item)
             {
-                var data = new Map
+                var grantinfo = item.PermsGranter;
+                return new Map
                 {
                     { "AssetId", item.AssetID },
                     { "AssetType", (int)item.AssetType },
@@ -245,40 +246,35 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "NextOwnerPermissions", (int)item.Permissions.NextOwner },
                     { "SaleType", (int)item.SaleInfo.Type },
                     { "SalePrice", item.SaleInfo.Price },
-                    { "SalePermMask", (int)item.SaleInfo.PermMask }
+                    { "SalePermMask", (int)item.SaleInfo.PermMask },
+                    { "PermsGranter", grantinfo.PermsGranter.ToString() },
+                    { "PermsMask", (int)grantinfo.PermsMask },
+                    { "NextOwnerAssetID", item.NextOwnerAssetID }
                 };
-                var grantinfo = item.PermsGranter;
-                data.Add("PermsGranter", grantinfo.PermsGranter.ToString());
-                data.Add("PermsMask", (int)grantinfo.PermsMask);
-                data.Add("NextOwnerAssetID", item.NextOwnerAssetID);
-                return data;
             }
 
-            private Map GenerateUpdateObjectGroup(ObjectGroup objgroup)
+            private Map GenerateUpdateObjectGroup(ObjectGroup objgroup) => new Map
             {
-                return new Map
-                {
-                    { "ID", objgroup.ID },
-                    { "RegionID", objgroup.Scene.ID },
-                    { "IsTempOnRez", objgroup.IsTempOnRez },
-                    { "Owner", objgroup.Owner.ToString() },
-                    { "LastOwner", objgroup.LastOwner.ToString() },
-                    { "Group", objgroup.Group.ToString() },
-                    { "OriginalAssetID", objgroup.OriginalAssetID },
-                    { "NextOwnerAssetID", objgroup.NextOwnerAssetID },
-                    { "SaleType", (int)objgroup.SaleType },
-                    { "SalePrice", objgroup.SalePrice },
-                    { "PayPrice0", objgroup.PayPrice0 },
-                    { "PayPrice1", objgroup.PayPrice1 },
-                    { "PayPrice2", objgroup.PayPrice2 },
-                    { "PayPrice3", objgroup.PayPrice3 },
-                    { "PayPrice4", objgroup.PayPrice4 },
-                    { "AttachedPos", objgroup.AttachedPos },
-                    { "AttachPoint", (int)objgroup.AttachPoint },
-                    { "IsIncludedInSearch", objgroup.IsIncludedInSearch },
-                    { "RezzingObjectID", objgroup.RezzingObjectID }
-                };
-            }
+                { "ID", objgroup.ID },
+                { "RegionID", objgroup.Scene.ID },
+                { "IsTempOnRez", objgroup.IsTempOnRez },
+                { "Owner", objgroup.Owner.ToString() },
+                { "LastOwner", objgroup.LastOwner.ToString() },
+                { "Group", objgroup.Group.ToString() },
+                { "OriginalAssetID", objgroup.OriginalAssetID },
+                { "NextOwnerAssetID", objgroup.NextOwnerAssetID },
+                { "SaleType", (int)objgroup.SaleType },
+                { "SalePrice", objgroup.SalePrice },
+                { "PayPrice0", objgroup.PayPrice0 },
+                { "PayPrice1", objgroup.PayPrice1 },
+                { "PayPrice2", objgroup.PayPrice2 },
+                { "PayPrice3", objgroup.PayPrice3 },
+                { "PayPrice4", objgroup.PayPrice4 },
+                { "AttachedPos", objgroup.AttachedPos },
+                { "AttachPoint", (int)objgroup.AttachPoint },
+                { "IsIncludedInSearch", objgroup.IsIncludedInSearch },
+                { "RezzingObjectID", objgroup.RezzingObjectID }
+            };
 
             private Map GenerateUpdateObjectPart(ObjectPart objpart)
             {
@@ -351,9 +347,7 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        public override SceneListener GetSceneListener(UUID regionID)
-        {
-            return new MemorySceneListener(m_Objects, m_Primitives, m_PrimItems, regionID);
-        }
+        public override SceneListener GetSceneListener(UUID regionID) =>
+            new MemorySceneListener(m_Objects, m_Primitives, m_PrimItems, regionID);
     }
 }

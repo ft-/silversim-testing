@@ -69,7 +69,7 @@ namespace SilverSim.LoadStore.Terrain
 
         void ParseLocation(string inp, out uint x, out uint y)
         {
-            string[] parts = inp.Split(',');
+            var parts = inp.Split(',');
             if(parts.Length != 2)
             {
                 throw new ArgumentException("inp");
@@ -94,7 +94,7 @@ namespace SilverSim.LoadStore.Terrain
             ITerrainFileStorage loader;
             if(args[0] == "help")
             {
-                StringBuilder outp = new StringBuilder("Available commands:\n" +
+                var outp = new StringBuilder("Available commands:\n" +
                     "load terrain <format> <filename>\n" +
                     "load terrain <format> <filename> x,y w,h\n" +
                     "\nAvailable Formats:\n");
@@ -214,7 +214,7 @@ namespace SilverSim.LoadStore.Terrain
             ITerrainFileStorage storer;
             if (args[0] == "help")
             {
-                StringBuilder outp = new StringBuilder("Available commands:\n" +
+                var outp = new StringBuilder("Available commands:\n" +
                     "save terrain <format> <filename>\n" +
                     "save terrain <format> <filename> x,y w,h\n" +
                     "\nAvailable formats:\n");
@@ -292,7 +292,7 @@ namespace SilverSim.LoadStore.Terrain
                     h = nh;
                 }
 
-                List<LayerPatch> patches = new List<LayerPatch>();
+                var patches = new List<LayerPatch>();
                 foreach(LayerPatch patch in scene.Terrain.AllPatches)
                 {
                     if(patch.X >= x && patch.Y >= y && patch.X < x + w && patch.Y < y + h)

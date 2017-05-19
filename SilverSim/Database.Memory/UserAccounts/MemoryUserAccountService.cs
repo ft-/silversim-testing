@@ -225,10 +225,8 @@ namespace SilverSim.Database.Memory.UserAccounts
     [PluginName("UserAccounts")]
     public class MemoryUserAccountServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryUserAccountService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryUserAccountService();
     }
     #endregion
 

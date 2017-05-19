@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL._Migration
         {
             try
             {
-                using (MySqlCommand cmd = new MySqlCommand(command, conn))
+                using (var cmd = new MySqlCommand(command, conn))
                 {
                     cmd.ExecuteNonQuery();
                 }
@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL._Migration
             ILog log)
         {
             log.InfoFormat("Creating table '{0}' at revision {1}", table.Name, tableRevision);
-            List<string> fieldSqls = new List<string>();
+            var fieldSqls = new List<string>();
             foreach(IColumnInfo field in fields.Values)
             {
                 fieldSqls.Add(field.FieldSql());
@@ -84,9 +84,9 @@ namespace SilverSim.Database.MySQL._Migration
 
         public static void MigrateTables(this MySqlConnection conn, IMigrationElement[] processTable, ILog log)
         {
-            Dictionary<string, IColumnInfo> tableFields = new Dictionary<string, IColumnInfo>();
+            var tableFields = new Dictionary<string, IColumnInfo>();
             PrimaryKeyInfo primaryKey = null;
-            Dictionary<string, NamedKeyInfo> tableKeys = new Dictionary<string, NamedKeyInfo>();
+            var tableKeys = new Dictionary<string, NamedKeyInfo>();
             SqlTable table = null;
             ChangeEngine selectedEngine = null;
             uint processingTableRevision = 0;
@@ -151,7 +151,7 @@ namespace SilverSim.Database.MySQL._Migration
                         }
                     }
 
-                    TableRevision rev = (TableRevision)migration;
+                    var rev = (TableRevision)migration;
                     if(rev.Revision != processingTableRevision + 1)
                     {
                         throw new MySQLMigrationException(string.Format("Invalid TableRevision entry. Expected {0}. Got {1}", processingTableRevision + 1, rev.Revision));
@@ -183,7 +183,7 @@ namespace SilverSim.Database.MySQL._Migration
 
                     if(interfaces.Contains(typeof(IAddColumn)))
                     {
-                        IAddColumn columnInfo = (IAddColumn)migration;
+                        var columnInfo = (IAddColumn)migration;
                         if(tableFields.ContainsKey(columnInfo.Name))
                         {
                             throw new ArgumentException("Column " + columnInfo.Name + " was added twice.");
@@ -196,7 +196,7 @@ namespace SilverSim.Database.MySQL._Migration
                     }
                     else if(interfaces.Contains(typeof(IChangeColumn)))
                     {
-                        IChangeColumn columnInfo = (IChangeColumn)migration;
+                        var columnInfo = (IChangeColumn)migration;
                         IColumnInfo oldColumn;
                         if(!tableFields.TryGetValue(columnInfo.Name, out oldColumn))
                         {
@@ -210,7 +210,7 @@ namespace SilverSim.Database.MySQL._Migration
                     }
                     else if(migrationType == typeof(DropColumn))
                     {
-                        DropColumn columnInfo = (DropColumn)migration;
+                        var columnInfo = (DropColumn)migration;
                         if (insideTransaction)
                         {
                             ExecuteStatement(conn, columnInfo.Sql(table.Name, tableFields[columnInfo.Name].FieldType), log);
@@ -219,7 +219,7 @@ namespace SilverSim.Database.MySQL._Migration
                     }
                     else if(migrationType == typeof(ChangeEngine))
                     {
-                        ChangeEngine engineInfo = (ChangeEngine)migration;
+                        var engineInfo = (ChangeEngine)migration;
                         if(insideTransaction)
                         {
                             ExecuteStatement(conn, engineInfo.Sql(table.Name), log);
@@ -248,7 +248,7 @@ namespace SilverSim.Database.MySQL._Migration
                     }
                     else if(migrationType == typeof(NamedKeyInfo))
                     {
-                        NamedKeyInfo namedKey = (NamedKeyInfo)migration;
+                        var namedKey = (NamedKeyInfo)migration;
                         tableKeys.Add(namedKey.Name, namedKey);
                         if (insideTransaction)
                         {
@@ -257,7 +257,7 @@ namespace SilverSim.Database.MySQL._Migration
                     }
                     else if(migrationType == typeof(DropNamedKeyInfo))
                     {
-                        DropNamedKeyInfo namedKey = (DropNamedKeyInfo)migration;
+                        var namedKey = (DropNamedKeyInfo)migration;
                         tableKeys.Remove(namedKey.Name);
                         if (insideTransaction)
                         {

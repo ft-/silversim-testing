@@ -136,13 +136,7 @@ namespace SilverSim.Backend.Common.OfflineIM
             m_IMRouter.OfflineIM.Add(Send);
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public void Shutdown()
         {

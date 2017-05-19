@@ -26,13 +26,8 @@ using System.Text;
 
 namespace SilverSim.Main.Common.CmdIO
 {
-    public abstract class TTY 
+    public abstract class TTY
     {
-        protected TTY()
-        {
-
-        }
-
         public UUID SelectedScene = UUID.Zero;
 
         public abstract void Write(string text);
@@ -42,35 +37,21 @@ namespace SilverSim.Main.Common.CmdIO
             Write(String.Format(format, parms));
         }
 
-        public virtual bool HasPrompt 
-        { 
-            get
-            {
-                return false;
-            }
-        }
+        public virtual bool HasPrompt => false;
 
         public virtual void LockOutput()
         {
-
         }
 
         public virtual void UnlockOutput()
         {
-
         }
 
         public string CmdPrompt { get; set; }
 
-        public virtual string ReadLine(string p, bool echoInput)
-        {
-            return string.Empty;
-        }
+        public virtual string ReadLine(string p, bool echoInput) => string.Empty;
 
-        public string GetInput(string prompt)
-        {
-            return ReadLine(String.Format("{0}: ", prompt), true);
-        }
+        public string GetInput(string prompt) => ReadLine(String.Format("{0}: ", prompt), true);
 
         public string GetInput(string prompt, string defaultvalue)
         {
@@ -83,14 +64,11 @@ namespace SilverSim.Main.Common.CmdIO
             return res;
         }
 
-        public string GetPass(string prompt)
-        {
-            return ReadLine(String.Format("{0}: ", prompt), false);
-        }
+        public string GetPass(string prompt) => ReadLine(String.Format("{0}: ", prompt), false);
 
         public List<string> GetCmdLine(string cmdline)
         {
-            List<string> cmdargs = new List<string>();
+            var cmdargs = new List<string>();
             cmdline = cmdline.Trim();
             if (0 == cmdline.Length)
             {
@@ -101,7 +79,7 @@ namespace SilverSim.Main.Common.CmdIO
             bool insinglequotes = false;
             bool inargument = false;
             bool hasescape = false;
-            StringBuilder argument = new StringBuilder();
+            var argument = new StringBuilder();
 
             foreach (char c in cmdline)
             {

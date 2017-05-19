@@ -19,21 +19,17 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
+using MySql.Data.MySqlClient;
+using Nini.Config;
+using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.IM;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SilverSim.Types;
 using SilverSim.Types.IM;
-using MySql.Data.MySqlClient;
-using log4net;
-using Nini.Config;
-using SilverSim.Database.MySQL._Migration;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.OfflineIM
@@ -52,10 +48,10 @@ namespace SilverSim.Database.MySQL.OfflineIM
 
         public override void DeleteOfflineIM(ulong offlineImID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand command = new MySqlCommand("DELETE FROM offlineim WHERE ID LIKE ?id", connection))
+                using (var command = new MySqlCommand("DELETE FROM offlineim WHERE ID LIKE ?id", connection))
                 {
                     command.Parameters.AddParameter("?id", offlineImID);
                     command.ExecuteNonQuery();
@@ -65,32 +61,34 @@ namespace SilverSim.Database.MySQL.OfflineIM
 
         public override List<GridInstantMessage> GetOfflineIMs(UUID principalID)
         {
-            List<GridInstantMessage> ims = new List<GridInstantMessage>();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var ims = new List<GridInstantMessage>();
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM offlineim WHERE ToAgentID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM offlineim WHERE ToAgentID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", principalID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while(reader.Read())
                         {
-                            GridInstantMessage im = new GridInstantMessage();
-                            im.ID = reader.GetUInt64("ID");
-                            im.FromAgent = reader.GetUUI("FromAgent");
-                            im.FromGroup = reader.GetUGI("FromGroup");
-                            im.ToAgent.ID = reader.GetUUID("ToAgentID");
-                            im.Dialog = reader.GetEnum<GridInstantMessageDialog>("Dialog");
-                            im.IsFromGroup = reader.GetBool("IsFromGroup");
-                            im.Message = reader.GetString("Message");
-                            im.IMSessionID = reader.GetUUID("IMSessionID");
-                            im.Position = reader.GetVector3("Position");
-                            im.BinaryBucket = reader.GetBytes("BinaryBucket");
-                            im.ParentEstateID = reader.GetUInt32("ParentEstateID");
-                            im.RegionID = reader.GetUUID("RegionID");
-                            im.Timestamp = reader.GetDate("Timestamp");
-                            im.IsOffline = true;
+                            var im = new GridInstantMessage()
+                            {
+                                ID = reader.GetUInt64("ID"),
+                                FromAgent = reader.GetUUI("FromAgent"),
+                                FromGroup = reader.GetUGI("FromGroup"),
+                                ToAgent = new UUI(reader.GetUUID("ToAgentID")),
+                                Dialog = reader.GetEnum<GridInstantMessageDialog>("Dialog"),
+                                IsFromGroup = reader.GetBool("IsFromGroup"),
+                                Message = reader.GetString("Message"),
+                                IMSessionID = reader.GetUUID("IMSessionID"),
+                                Position = reader.GetVector3("Position"),
+                                BinaryBucket = reader.GetBytes("BinaryBucket"),
+                                ParentEstateID = reader.GetUInt32("ParentEstateID"),
+                                RegionID = reader.GetUUID("RegionID"),
+                                Timestamp = reader.GetDate("Timestamp"),
+                                IsOffline = true
+                            };
                             ims.Add(im);
                         }
                     }
@@ -101,7 +99,7 @@ namespace SilverSim.Database.MySQL.OfflineIM
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -128,10 +126,10 @@ namespace SilverSim.Database.MySQL.OfflineIM
 
         public void Remove(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand command = new MySqlCommand("DELETE FROM offlineim WHERE ToAgentID LIKE ?id", connection))
+                using (var command = new MySqlCommand("DELETE FROM offlineim WHERE ToAgentID LIKE ?id", connection))
                 {
                     command.Parameters.AddParameter("?id", accountID);
                     command.ExecuteNonQuery();
@@ -146,21 +144,23 @@ namespace SilverSim.Database.MySQL.OfflineIM
 
         public override void StoreOfflineIM(GridInstantMessage im)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>();
-            vals.Add("ID", im.ID);
-            vals.Add("FromAgent", im.FromAgent);
-            vals.Add("FromGroup", im.FromGroup);
-            vals.Add("ToAgentID", im.ToAgent.ID);
-            vals.Add("Dialog", im.Dialog);
-            vals.Add("IsFromGroup", im.IsFromGroup);
-            vals.Add("Message", im.Message);
-            vals.Add("IMSessionID", im.IMSessionID);
-            vals.Add("Position", im.Position);
-            vals.Add("BinaryBucket", im.BinaryBucket);
-            vals.Add("ParentEstateID", im.ParentEstateID);
-            vals.Add("RegionID", im.RegionID);
-            vals.Add("Timestamp", im.Timestamp);
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var vals = new Dictionary<string, object>
+            {
+                { "ID", im.ID },
+                { "FromAgent", im.FromAgent },
+                { "FromGroup", im.FromGroup },
+                { "ToAgentID", im.ToAgent.ID },
+                { "Dialog", im.Dialog },
+                { "IsFromGroup", im.IsFromGroup },
+                { "Message", im.Message },
+                { "IMSessionID", im.IMSessionID },
+                { "Position", im.Position },
+                { "BinaryBucket", im.BinaryBucket },
+                { "ParentEstateID", im.ParentEstateID },
+                { "RegionID", im.RegionID },
+                { "Timestamp", im.Timestamp }
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.InsertInto("offlineim", vals);
@@ -169,7 +169,7 @@ namespace SilverSim.Database.MySQL.OfflineIM
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -182,16 +182,10 @@ namespace SilverSim.Database.MySQL.OfflineIM
     public class MySQLOfflineIMServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
-        public MySQLOfflineIMServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLOfflineIMService(
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLOfflineIMService(
                 MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
     }
     #endregion
 }

@@ -35,9 +35,6 @@ namespace SilverSim.Main.Common.HttpServer
     {
         #region Private Fields
         Stream m_HttpStream;
-        #endregion
-
-        #region Properties
         private HttpRequestBodyStream RawBody;
         #endregion
 
@@ -65,7 +62,7 @@ namespace SilverSim.Main.Common.HttpServer
         private string ReadHeaderLine()
         {
             int c;
-            StringBuilder headerLine = new StringBuilder();
+            var headerLine = new StringBuilder();
             while ((c = m_HttpStream.ReadByte()) != '\r')
             {
                 if (c == -1)
@@ -405,19 +402,18 @@ namespace SilverSim.Main.Common.HttpServer
                 throw new NotAWebSocketRequestException();
             }
 
-            string websocketkeyuuid;
-            websocketkeyuuid = m_Headers["sec-websocket-key"].Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            string websocketkeyuuid = m_Headers["sec-websocket-key"].Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
             byte[] websocketacceptdata = websocketkeyuuid.ToUTF8Bytes();
             string websocketaccept;
-            using (SHA1 sha1 = SHA1.Create())
+            using (var sha1 = SHA1.Create())
             {
                 websocketaccept = Convert.ToBase64String(sha1.ComputeHash(websocketacceptdata));
             }
             SetConnectionClose();
 
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                using (TextWriter w = ms.UTF8StreamWriter())
+                using (var w = ms.UTF8StreamWriter())
                 {
                     w.Write(string.Format("HTTP/{0}.{1} 101 Switching Protocols\r\n", MajorVersion, MinorVersion));
                     w.Write("Upgrade: websocket\r\nConnection: Upgrade\r\n");

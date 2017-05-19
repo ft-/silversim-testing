@@ -62,12 +62,14 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             set
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    Dictionary<string, object> param = new Dictionary<string, object>();
-                    param["MeshID"] = meshid;
-                    param["ConvexData"] = value.SerializedData;
+                    var param = new Dictionary<string, object>
+                    {
+                        ["MeshID"] = meshid,
+                        ["ConvexData"] = value.SerializedData
+                    };
                     conn.ReplaceInto("sculptmeshphysics", param);
                 }
             }
@@ -86,12 +88,14 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             set
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    Dictionary<string, object> param = new Dictionary<string, object>();
-                    param["ShapeKey"] = primShape.Serialization;
-                    param["ConvexData"] = value.SerializedData;
+                    var param = new Dictionary<string, object>
+                    {
+                        ["ShapeKey"] = primShape.Serialization,
+                        ["ConvexData"] = value.SerializedData
+                    };
                     conn.ReplaceInto("primphysics", param);
                 }
             }
@@ -99,18 +103,20 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, out PhysicsConvexShape shape)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ConvexData FROM meshphysics WHERE MeshID=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT ConvexData FROM meshphysics WHERE MeshID=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", meshid);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
                         {
-                            shape = new PhysicsConvexShape();
-                            shape.SerializedData = dbReader.GetBytes("ConvexData");
+                            shape = new PhysicsConvexShape()
+                            {
+                                SerializedData = dbReader.GetBytes("ConvexData")
+                            };
                             return true;
                         }
                     }
@@ -123,18 +129,20 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(ObjectPart.PrimitiveShape primShape, out PhysicsConvexShape shape)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ConvexData FROM primphysics WHERE ShapeKey=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT ConvexData FROM primphysics WHERE ShapeKey=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", primShape.Serialization);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
                         {
-                            shape = new PhysicsConvexShape();
-                            shape.SerializedData = dbReader.GetBytes("ConvexData");
+                            shape = new PhysicsConvexShape()
+                            {
+                                SerializedData = dbReader.GetBytes("ConvexData")
+                            };
                             return true;
                         }
                     }
@@ -147,10 +155,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(UUID sculptmeshid)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT NULL FROM meshphysics WHERE MeshID=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM meshphysics WHERE MeshID=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", sculptmeshid);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -163,10 +171,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(ObjectPart.PrimitiveShape primShape)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT NULL FROM primphysics WHERE ShapeKey=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM primphysics WHERE ShapeKey=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", primShape.Serialization);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -179,10 +187,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataPhysicsConvexStorageInterface.Remove(UUID sculptmeshid)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM meshphysics WHERE MeshID=?id", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM meshphysics WHERE MeshID=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", sculptmeshid);
                     return cmd.ExecuteNonQuery() > 0;
@@ -192,10 +200,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataPhysicsConvexStorageInterface.Remove(ObjectPart.PrimitiveShape primShape)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primphysics WHERE ShapeKey=?id", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM primphysics WHERE ShapeKey=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", primShape.Serialization);
                     return cmd.ExecuteNonQuery() > 0;
@@ -207,11 +215,11 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                List<UUID> sculptids = new List<UUID>();
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var sculptids = new List<UUID>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT MeshID FROM meshphysics", conn))
+                    using (var cmd = new MySqlCommand("SELECT MeshID FROM meshphysics", conn))
                     {
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -228,16 +236,16 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         void ISimulationDataPhysicsConvexStorageInterface.RemoveAll()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(delegate ()
+                conn.InsideTransaction(() =>
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primphysics WHERE 1", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM primphysics WHERE 1", conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM meshphysics WHERE 1", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM meshphysics WHERE 1", conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
@@ -251,12 +259,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             ((ISimulationDataPhysicsConvexStorageInterface)this).RemoveAll();
         }
 
-        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder
-        {
-            get
-            {
-                return HacdCleanCacheOrder.AfterPhysicsShapeManager;
-            }
-        }
+        HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder => HacdCleanCacheOrder.AfterPhysicsShapeManager;
     }
 }

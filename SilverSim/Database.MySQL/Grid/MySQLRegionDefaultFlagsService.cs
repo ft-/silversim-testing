@@ -46,7 +46,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -60,7 +60,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -68,11 +68,11 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override RegionFlags GetRegionDefaultFlags(UUID regionId)
         {
-            RegionFlags flags = RegionFlags.None;
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var flags = RegionFlags.None;
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT flags FROM regiondefaults WHERE uuid LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT flags FROM regiondefaults WHERE uuid LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", regionId);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -89,13 +89,13 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override void ChangeRegionDefaultFlags(UUID regionId, RegionFlags addFlags, RegionFlags removeFlags)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate ()
+                connection.InsideTransaction(() =>
                 {
                     bool haveEntry = false;
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regiondefaults WHERE uuid LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM regiondefaults WHERE uuid LIKE ?id", connection))
                     {
                         cmd.Parameters.AddParameter("?id", regionId);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -106,14 +106,14 @@ namespace SilverSim.Database.MySQL.Grid
 
                     if (haveEntry)
                     {
-                        using (MySqlCommand cmd = new MySqlCommand("UPDATE regiondefaults SET flags = (flags & ?remove) | ?add WHERE uuid LIKE ?id", connection))
+                        using (var cmd = new MySqlCommand("UPDATE regiondefaults SET flags = (flags & ?remove) | ?add WHERE uuid LIKE ?id", connection))
                         {
                             cmd.Parameters.AddParameter("?remove", ~removeFlags);
                             cmd.Parameters.AddParameter("?add", addFlags);
                             cmd.Parameters.AddParameter("?id", regionId);
                             cmd.ExecuteNonQuery();
                         }
-                        using (MySqlCommand cmd = new MySqlCommand("DELETE FROM regiondefaults WHERE flags = 0 AND uuid LIKE ?id", connection))
+                        using (var cmd = new MySqlCommand("DELETE FROM regiondefaults WHERE flags = 0 AND uuid LIKE ?id", connection))
                         {
                             cmd.Parameters.AddParameter("?id", regionId);
                             cmd.ExecuteNonQuery();
@@ -121,9 +121,11 @@ namespace SilverSim.Database.MySQL.Grid
                     }
                     else
                     {
-                        Dictionary<string, object> vals = new Dictionary<string, object>();
-                        vals.Add("uuid", regionId);
-                        vals.Add("flags", addFlags);
+                        var vals = new Dictionary<string, object>
+                        {
+                            { "uuid", regionId },
+                            { "flags", addFlags }
+                        };
                         connection.InsertInto("regiondefaults", vals);
                     }
                 });
@@ -132,11 +134,11 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override Dictionary<UUID, RegionFlags> GetAllRegionDefaultFlags()
         {
-            Dictionary<UUID, RegionFlags> result = new Dictionary<UUID, RegionFlags>();
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var result = new Dictionary<UUID, RegionFlags>();
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regiondefaults", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM regiondefaults", connection))
                 {
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -163,14 +165,8 @@ namespace SilverSim.Database.MySQL.Grid
     public class MySQLRegionDefaultFlagsServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL REGIONDEFAULTFLAGS SERVICE");
-        public MySQLRegionDefaultFlagsServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLRegionDefaultFlagsService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLRegionDefaultFlagsService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
 }

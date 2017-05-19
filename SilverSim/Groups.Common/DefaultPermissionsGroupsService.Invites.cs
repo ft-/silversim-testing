@@ -31,31 +31,17 @@ namespace SilverSim.Groups.Common
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupInvitesInterface
     {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        GroupInvite IGroupInvitesInterface.this[UUI requestingAgent, UUID groupInviteID]
-        {
-            get
-            {
-                return m_InnerService.Invites[requestingAgent, groupInviteID];
-            }
-        }
+        GroupInvite IGroupInvitesInterface.this[UUI requestingAgent, UUID groupInviteID] => m_InnerService.Invites[requestingAgent, groupInviteID];
 
-        bool IGroupInvitesInterface.TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite)
-        {
-            return m_InnerService.Invites.TryGetValue(requestingAgent, groupInviteID, out ginvite);
-        }
+        bool IGroupInvitesInterface.TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite) =>
+            m_InnerService.Invites.TryGetValue(requestingAgent, groupInviteID, out ginvite);
 
         bool IGroupInvitesInterface.ContainsKey(UUI requestingAgent, UUID groupInviteID)
         {
             return m_InnerService.Invites.ContainsKey(requestingAgent, groupInviteID);
         }
 
-        bool IGroupInvitesInterface.DoesSupportListGetters
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool IGroupInvitesInterface.DoesSupportListGetters => false;
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]

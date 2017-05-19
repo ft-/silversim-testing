@@ -96,13 +96,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -132,13 +126,13 @@ namespace SilverSim.Main.Common.HttpServer
         {
             using (HttpResponse response = req.BeginResponse("text/xml"))
             {
-                XmlRpc.XmlRpcFaultResponse res = new XmlRpc.XmlRpcFaultResponse();
-                res.FaultCode = statusCode;
-                res.FaultString = statusMessage;
-
+                var res = new XmlRpc.XmlRpcFaultResponse()
+                {
+                    FaultCode = statusCode,
+                    FaultString = statusMessage
+                };
                 byte[] buffer = res.Serialize();
                 response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
-                response.Close();
             }
         }
     }

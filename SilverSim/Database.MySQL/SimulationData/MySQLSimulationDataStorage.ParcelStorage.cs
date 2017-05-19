@@ -39,10 +39,10 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
                     {
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -51,24 +51,54 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 throw new KeyNotFoundException();
                             }
 
-                            ParcelInfo pi = new ParcelInfo((int)dbReader["BitmapWidth"], (int)dbReader["BitmapHeight"]);
-                            pi.Area = dbReader.GetInt32("Area");
-                            pi.AuctionID = dbReader.GetUInt32("AuctionID");
-                            pi.AuthBuyer = dbReader.GetUUI("AuthBuyer");
-                            pi.Category = dbReader.GetEnum<ParcelCategory>("Category");
-                            pi.ClaimDate = dbReader.GetDate("ClaimDate");
-                            pi.ClaimPrice = dbReader.GetInt32("ClaimPrice");
-                            pi.ID = dbReader.GetUUID("ParcelID");
-                            pi.Group = dbReader.GetUGI("Group");
-                            pi.GroupOwned = dbReader.GetBool("IsGroupOwned");
-                            pi.Description = dbReader.GetString("Description");
-                            pi.Flags = dbReader.GetEnum<ParcelFlags>("Flags");
-                            pi.LandingType = dbReader.GetEnum<TeleportLandingType>("LandingType");
-                            pi.LandingPosition = dbReader.GetVector3("LandingPosition");
-                            pi.LandingLookAt = dbReader.GetVector3("LandingLookAt");
-                            pi.Name = dbReader.GetString("Name");
-                            pi.LocalID = dbReader.GetInt32("LocalID");
-                            string uri = (string)dbReader["MusicURI"];
+                            var pi = new ParcelInfo((int)dbReader["BitmapWidth"], (int)dbReader["BitmapHeight"])
+                            {
+                                Area = dbReader.GetInt32("Area"),
+                                AuctionID = dbReader.GetUInt32("AuctionID"),
+                                AuthBuyer = dbReader.GetUUI("AuthBuyer"),
+                                Category = dbReader.GetEnum<ParcelCategory>("Category"),
+                                ClaimDate = dbReader.GetDate("ClaimDate"),
+                                ClaimPrice = dbReader.GetInt32("ClaimPrice"),
+                                ID = dbReader.GetUUID("ParcelID"),
+                                Group = dbReader.GetUGI("Group"),
+                                GroupOwned = dbReader.GetBool("IsGroupOwned"),
+                                Description = dbReader.GetString("Description"),
+                                Flags = dbReader.GetEnum<ParcelFlags>("Flags"),
+                                LandingType = dbReader.GetEnum<TeleportLandingType>("LandingType"),
+                                LandingPosition = dbReader.GetVector3("LandingPosition"),
+                                LandingLookAt = dbReader.GetVector3("LandingLookAt"),
+                                Name = dbReader.GetString("Name"),
+                                LocalID = dbReader.GetInt32("LocalID"),
+                                MediaID = dbReader.GetUUID("MediaID"),
+                                Owner = dbReader.GetUUI("Owner"),
+                                SnapshotID = dbReader.GetUUID("SnapshotID"),
+                                SalePrice = dbReader.GetInt32("SalePrice"),
+                                OtherCleanTime = dbReader.GetInt32("OtherCleanTime"),
+                                MediaAutoScale = dbReader.GetBool("MediaAutoScale"),
+                                MediaType = dbReader.GetString("MediaType"),
+                                MediaWidth = dbReader.GetInt32("MediaWidth"),
+                                MediaHeight = dbReader.GetInt32("MediaHeight"),
+                                MediaLoop = dbReader.GetBool("MediaLoop"),
+                                ObscureMedia = dbReader.GetBool("ObscureMedia"),
+                                ObscureMusic = dbReader.GetBool("ObscureMusic"),
+                                MediaDescription = dbReader.GetString("MediaDescription"),
+                                RentPrice = dbReader.GetInt32("RentPrice"),
+                                AABBMin = dbReader.GetVector3("AABBMin"),
+                                AABBMax = dbReader.GetVector3("AABBMax"),
+                                ParcelPrimBonus = dbReader.GetDouble("ParcelPrimBonus"),
+                                PassPrice = dbReader.GetInt32("PassPrice"),
+                                PassHours = dbReader.GetDouble("PassHours"),
+                                ActualArea = dbReader.GetInt32("ActualArea"),
+                                BillableArea = dbReader.GetInt32("BillAbleArea"),
+                                Status = dbReader.GetEnum<ParcelStatus>("Status"),
+                                SeeAvatars = dbReader.GetBool("SeeAvatars"),
+                                AnyAvatarSounds = dbReader.GetBool("AnyAvatarSounds"),
+                                GroupAvatarSounds = dbReader.GetBool("GroupAvatarSounds"),
+                                IsPrivate = dbReader.GetBool("IsPrivate")
+                            };
+                            pi.LandBitmap.DataNoAABBUpdate = dbReader.GetBytes("Bitmap");
+
+                            var uri = (string)dbReader["MusicURI"];
                             if (!string.IsNullOrEmpty(uri))
                             {
                                 pi.MusicURI = new URI(uri);
@@ -78,33 +108,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             {
                                 pi.MediaURI = new URI(uri);
                             }
-                            pi.MediaID = dbReader.GetUUID("MediaID");
-                            pi.Owner = dbReader.GetUUI("Owner");
-                            pi.SnapshotID = dbReader.GetUUID("SnapshotID");
-                            pi.SalePrice = dbReader.GetInt32("SalePrice");
-                            pi.OtherCleanTime = dbReader.GetInt32("OtherCleanTime");
-                            pi.MediaAutoScale = dbReader.GetBool("MediaAutoScale");
-                            pi.MediaType = dbReader.GetString("MediaType");
-                            pi.MediaWidth = dbReader.GetInt32("MediaWidth");
-                            pi.MediaHeight = dbReader.GetInt32("MediaHeight");
-                            pi.MediaLoop = dbReader.GetBool("MediaLoop");
-                            pi.ObscureMedia = dbReader.GetBool("ObscureMedia");
-                            pi.ObscureMusic = dbReader.GetBool("ObscureMusic");
-                            pi.MediaDescription = dbReader.GetString("MediaDescription");
-                            pi.RentPrice = dbReader.GetInt32("RentPrice");
-                            pi.AABBMin = dbReader.GetVector3("AABBMin");
-                            pi.AABBMax = dbReader.GetVector3("AABBMax");
-                            pi.ParcelPrimBonus = dbReader.GetDouble("ParcelPrimBonus");
-                            pi.PassPrice = dbReader.GetInt32("PassPrice");
-                            pi.PassHours = dbReader.GetDouble("PassHours");
-                            pi.ActualArea = dbReader.GetInt32("ActualArea");
-                            pi.BillableArea = dbReader.GetInt32("BillAbleArea");
-                            pi.LandBitmap.DataNoAABBUpdate = dbReader.GetBytes("Bitmap");
-                            pi.Status = dbReader.GetEnum<ParcelStatus>("Status");
-                            pi.SeeAvatars = dbReader.GetBool("SeeAvatars");
-                            pi.AnyAvatarSounds = dbReader.GetBool("AnyAvatarSounds");
-                            pi.GroupAvatarSounds = dbReader.GetBool("GroupAvatarSounds");
-                            pi.IsPrivate = dbReader.GetBool("IsPrivate");
+
                             return pi;
                         }
                     }
@@ -114,10 +118,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataParcelStorageInterface.Remove(UUID regionID, UUID parcelID)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }

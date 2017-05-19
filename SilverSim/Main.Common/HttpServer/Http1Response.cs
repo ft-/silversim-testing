@@ -57,9 +57,9 @@ namespace SilverSim.Main.Common.HttpServer
 
         protected override void SendHeaders()
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                using (TextWriter w = ms.UTF8StreamWriter())
+                using (var w = ms.UTF8StreamWriter())
                 {
                     w.Write(string.Format("HTTP/{0}.{1} {2} {3}\r\n", MajorVersion, MinorVersion, (uint)StatusCode, StatusDescription.Replace("\n", string.Empty).Replace("\r", string.Empty)));
                     foreach (KeyValuePair<string, string> kvp in Headers)

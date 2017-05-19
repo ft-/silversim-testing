@@ -70,10 +70,7 @@ namespace SilverSim.Database.Memory.AvatarName
             }
         }
 
-        public override bool TryGetValue(UUID key, out UUI uui)
-        {
-            return m_Data.TryGetValue(key, out uui);
-        }
+        public override bool TryGetValue(UUID key, out UUI uui) => m_Data.TryGetValue(key, out uui);
 
         public override UUI this[UUID key]
         {
@@ -97,10 +94,7 @@ namespace SilverSim.Database.Memory.AvatarName
             }
         }
 
-        public override bool Remove(UUID key)
-        {
-            return m_Data.Remove(key);
-        }
+        public override bool Remove(UUID key) => m_Data.Remove(key);
 
 
         public override List<UUI> Search(string[] names)
@@ -122,10 +116,8 @@ namespace SilverSim.Database.Memory.AvatarName
     [PluginName("AvatarNames")]
     public class MemoryAvatarNameServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryAvatarNameService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryAvatarNameService();
     }
     #endregion
 }

@@ -122,12 +122,11 @@ namespace SilverSim.Scene.Agent
         public abstract List<GridType> SupportedGridTypes { get; }
         public abstract IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
 
-        public void GetBoundingBox(out BoundingBox box)
+        public void GetBoundingBox(out BoundingBox box) => box = new BoundingBox()
         {
-            box = new BoundingBox();
-            box.CenterOffset = Vector3.Zero;
-            box.Size = Size * Rotation;
-        }
+            CenterOffset = Vector3.Zero,
+            Size = Size * Rotation
+        };
 
         public virtual void InvokeOnPositionUpdate()
         {
@@ -191,13 +190,7 @@ namespace SilverSim.Scene.Agent
         public abstract bool IsRunning { get; }
         public abstract bool IsFlying { get; }
 
-        public UUID ID
-        {
-            get
-            {
-                return m_AgentID;
-            }
-        }
+        public UUID ID => m_AgentID;
 
         public string Name
         {
@@ -223,8 +216,7 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                Vector3 angle = new Vector3(1, 0, 0);
-                return angle * Rotation;
+                return new Vector3(1, 0, 0) * Rotation;
             }
             set
             {
@@ -237,12 +229,13 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                UUI n = new UUI();
-                n.FirstName = FirstName;
-                n.LastName = LastName;
-                n.ID = ID;
-                n.HomeURI = HomeURI;
-                return n;
+                return new UUI()
+                {
+                    FirstName = FirstName,
+                    LastName = LastName,
+                    ID = ID,
+                    HomeURI = HomeURI
+                };
             }
             set
             {
@@ -1026,7 +1019,7 @@ namespace SilverSim.Scene.Agent
             {
                 return false;
             }
-            ObjectGroup grp = (ObjectGroup)obj;
+            var grp = (ObjectGroup)obj;
             return grp.AgentSitting.UnSit(this);
         }
 

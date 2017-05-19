@@ -33,11 +33,11 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get 
             {
-                List<UUI> estatemanagers = new List<UUI>();
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var estatemanagers = new List<UUI>();
+                using(var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_managers WHERE EstateID = ?estateid", conn))
+                    using(var cmd = new MySqlCommand("SELECT UserID FROM estate_managers WHERE EstateID = ?estateid", conn))
                     {
                         cmd.Parameters.AddParameter("?estateid", estateID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
@@ -58,10 +58,10 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"", conn))
+                    using (var cmd = new MySqlCommand("SELECT UserID FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"", conn))
                     {
                         cmd.Parameters.AddParameter("?estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -85,10 +85,10 @@ namespace SilverSim.Database.MySQL.Estate
                     "REPLACE INTO estate_managers (EstateID, UserID) VALUES (?estateid, ?userid)" :
                     "DELETE FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"";
 
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                    using (var cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddParameter("?estateid", estateID);
                         if (value)

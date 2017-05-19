@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.ServerParam;
@@ -27,7 +26,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System;
 
 namespace SilverSim.Database.Memory.ServerParam
 {
@@ -156,10 +154,8 @@ namespace SilverSim.Database.Memory.ServerParam
             }
         }
 
-        public override bool Remove(UUID regionID, string parameter)
-        {
-            return m_Parameters[regionID].Remove(parameter);
-        }
+        public override bool Remove(UUID regionID, string parameter) =>
+            m_Parameters[regionID].Remove(parameter);
     }
     #endregion
 
@@ -167,10 +163,8 @@ namespace SilverSim.Database.Memory.ServerParam
     [PluginName("ServerParams")]
     public class MemoryServerParamServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MemoryServerParamService();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MemoryServerParamService();
     }
     #endregion
 }

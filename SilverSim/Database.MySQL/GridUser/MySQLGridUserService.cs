@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public void VerifyConnection()
         {
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using(var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
@@ -96,10 +96,10 @@ namespace SilverSim.Database.MySQL.GridUser
         #region GridUserServiceInterface
         public override bool TryGetValue(UUID userID, out GridUserInfo userInfo)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", userID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -120,10 +120,10 @@ namespace SilverSim.Database.MySQL.GridUser
         {
             get 
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID LIKE ?id", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID LIKE ?id", conn))
                     {
                         cmd.Parameters.AddParameter("?id", userID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -140,25 +140,17 @@ namespace SilverSim.Database.MySQL.GridUser
         }
 
 
-        public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo)
-        {
-            return TryGetValue(userID.ID, out gridUserInfo);
-        }
+        public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo) =>
+            TryGetValue(userID.ID, out gridUserInfo);
 
-        public override GridUserInfo this[UUI userID]
-        {
-            get 
-            {
-                return this[userID.ID];
-            }
-        }
+        public override GridUserInfo this[UUI userID] => this[userID.ID];
 
         public override void LoggedInAdd(UUI userID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", userID.ID);
                     cmd.Parameters.AddParameter("?curtime", Date.Now);
@@ -168,10 +160,12 @@ namespace SilverSim.Database.MySQL.GridUser
                     }
                 }
 
-                Dictionary<string, object> param = new Dictionary<string,object>();
-                param["ID"] = userID.ID;
-                param["LastLogin"] = Date.Now;
-                param["IsOnline"] = 1;
+                var param = new Dictionary<string, object>
+                {
+                    ["ID"] = userID.ID,
+                    ["LastLogin"] = Date.Now,
+                    ["IsOnline"] = 1
+                };
                 conn.ReplaceInto("griduser", param);
             }
 
@@ -179,10 +173,10 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public override void LoggedIn(UUI userID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", userID.ID);
                     cmd.Parameters.AddParameter("?curtime", Date.Now);
@@ -196,47 +190,59 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public override void LoggedOut(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("IsOnline", false);
-                data.Add("LastLogout", Date.Now);
-                data.Add("LastRegionID", lastRegionID);
-                data.Add("LastPosition", lastPosition);
-                data.Add("LastLookAt", lastLookAt);
-                Dictionary<string, object> where = new Dictionary<string, object>();
-                where.Add("ID", userID.ID);
+                var data = new Dictionary<string, object>
+                {
+                    { "IsOnline", false },
+                    { "LastLogout", Date.Now },
+                    { "LastRegionID", lastRegionID },
+                    { "LastPosition", lastPosition },
+                    { "LastLookAt", lastLookAt }
+                };
+                var where = new Dictionary<string, object>
+                {
+                    { "ID", userID.ID }
+                };
                 conn.UpdateSet("griduser", data, where);
             }
         }
 
         public override void SetHome(UUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("HomeRegionID", homeRegionID);
-                data.Add("HomePosition", homePosition);
-                data.Add("HomeLookAt", homeLookAt);
-                Dictionary<string, object> where = new Dictionary<string, object>();
-                where.Add("ID", userID.ID);
+                var data = new Dictionary<string, object>
+                {
+                    { "HomeRegionID", homeRegionID },
+                    { "HomePosition", homePosition },
+                    { "HomeLookAt", homeLookAt }
+                };
+                var where = new Dictionary<string, object>
+                {
+                    { "ID", userID.ID }
+                };
                 conn.UpdateSet("griduser", data, where);
             }
         }
 
         public override void SetPosition(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data.Add("LastRegionID", lastRegionID);
-                data.Add("LastPosition", lastPosition);
-                data.Add("LastLookAt", lastLookAt);
-                Dictionary<string, object> where = new Dictionary<string, object>();
-                where.Add("ID", userID.ID);
+                var data = new Dictionary<string, object>
+                {
+                    { "LastRegionID", lastRegionID },
+                    { "LastPosition", lastPosition },
+                    { "LastLookAt", lastLookAt }
+                };
+                var where = new Dictionary<string, object>
+                {
+                    { "ID", userID.ID }
+                };
                 conn.UpdateSet("griduser", data, where);
             }
         }
@@ -244,10 +250,10 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public void Remove(UUID scopeID, UUID userAccount)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM griduser WHERE ID LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM griduser WHERE ID LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", userAccount);
                     cmd.ExecuteNonQuery();
@@ -262,15 +268,9 @@ namespace SilverSim.Database.MySQL.GridUser
     public class MySQLGridUserServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
-        public MySQLGridUserServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLGridUserService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLGridUserService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 

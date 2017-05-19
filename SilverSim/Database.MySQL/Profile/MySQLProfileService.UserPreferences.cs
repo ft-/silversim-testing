@@ -31,10 +31,10 @@ namespace SilverSim.Database.MySQL.Profile
     {
         bool IUserPreferencesInterface.ContainsKey(UUI user)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT useruuid FROM usersettings where useruuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT useruuid FROM usersettings where useruuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", user.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -47,10 +47,10 @@ namespace SilverSim.Database.MySQL.Profile
 
         bool IUserPreferencesInterface.TryGetValue(UUI user, out ProfilePreferences prefs)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", user.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -80,29 +80,31 @@ namespace SilverSim.Database.MySQL.Profile
         {
             get
             {
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using(var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
+                    using(var cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddParameter("?uuid", user.ID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())
                             {
-                                ProfilePreferences prefs = new ProfilePreferences();
-                                prefs.User = user;
-                                prefs.IMviaEmail = reader.GetBool("imviaemail");
-                                prefs.Visible = reader.GetBool("visible");
-                                return prefs;
+                                return new ProfilePreferences()
+                                {
+                                    User = user,
+                                    IMviaEmail = reader.GetBool("imviaemail"),
+                                    Visible = reader.GetBool("visible")
+                                };
                             }
                             else
                             {
-                                ProfilePreferences prefs = new ProfilePreferences();
-                                prefs.User = user;
-                                prefs.IMviaEmail = false;
-                                prefs.Visible = false;
-                                return prefs;
+                                return new ProfilePreferences()
+                                {
+                                    User = user,
+                                    IMviaEmail = false,
+                                    Visible = false
+                                };
                             }
                         }
                     }

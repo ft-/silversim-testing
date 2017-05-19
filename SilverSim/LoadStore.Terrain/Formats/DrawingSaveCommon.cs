@@ -32,30 +32,13 @@ namespace SilverSim.LoadStore.Terrain.Formats
 {
     public abstract class DrawingSaveCommon : ITerrainFileStorage, IPlugin
     {
-        public DrawingSaveCommon()
-        {
-
-        }
-
         public abstract string Name { get; }
 
         protected abstract ImageFormat TargetImageFormat { get; }
 
-        public bool SupportsLoading
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool SupportsLoading => false;
 
-        public bool SupportsSaving
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public bool SupportsSaving => true;
 
         public List<LayerPatch> LoadFile(string filename, int suggested_width, int suggested_height)
         {

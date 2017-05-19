@@ -75,13 +75,7 @@ namespace SilverSim.Main.Common.Console
             /* intentionally left empty */
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         public void Shutdown()
         {
@@ -512,10 +506,8 @@ namespace SilverSim.Main.Common.Console
                                 m_CursorYPosition = -1;
                             }
 
-                            string commandLine = m_CommandLineBuffer.ToString();
-
                             // If we're not echoing to screen (e.g. a password) then we probably don't want it in history
-                            return commandLine;
+                            return m_CommandLineBuffer.ToString();
 
                         default:
                             break;

@@ -56,11 +56,11 @@ namespace SilverSim.Database.MySQL.AvatarName
         #region Accessors
         public override bool TryGetValue(string firstName, string lastName, out UUI uui)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstName AND LastName LIKE ?lastName", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstName AND LastName LIKE ?lastName", connection))
                 {
                     cmd.Parameters.AddParameter("?firstName", firstName);
                     cmd.Parameters.AddParameter("?lastName", lastName);
@@ -94,11 +94,11 @@ namespace SilverSim.Database.MySQL.AvatarName
 
         public override bool TryGetValue(UUID key, out UUI uui)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE ?avatarid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE ?avatarid", connection))
                 {
                     cmd.Parameters.AddParameter("?avatarid", key);
                     using (MySqlDataReader dbreader = cmd.ExecuteReader())
@@ -133,12 +133,14 @@ namespace SilverSim.Database.MySQL.AvatarName
         {
             if (value.IsAuthoritative) /* do not store non-authoritative entries */
             {
-                Dictionary<string, object> data = new Dictionary<string, object>();
-                data["AvatarID"] = value.ID;
-                data["HomeURI"] = value.HomeURI;
-                data["FirstName"] = value.FirstName;
-                data["LastName"] = value.LastName;
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                var data = new Dictionary<string, object>
+                {
+                    ["AvatarID"] = value.ID,
+                    ["HomeURI"] = value.HomeURI,
+                    ["FirstName"] = value.FirstName,
+                    ["LastName"] = value.LastName
+                };
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
 
@@ -149,11 +151,11 @@ namespace SilverSim.Database.MySQL.AvatarName
 
         public override bool Remove(UUID key)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     return cmd.ExecuteNonQuery() == 1;
@@ -170,11 +172,11 @@ namespace SilverSim.Database.MySQL.AvatarName
 
             if(names.Length == 1)
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?name OR LastName LIKE ?name", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?name OR LastName LIKE ?name", connection))
                     {
                         cmd.Parameters.AddParameter("?name", "%" + names[0] + "%");
 
@@ -184,11 +186,11 @@ namespace SilverSim.Database.MySQL.AvatarName
             }
             else
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
                         cmd.Parameters.AddParameter("?firstname", "%" + names[0] + "%");
                         cmd.Parameters.AddParameter("?lastname", "%" + names[1] + "%");
@@ -201,7 +203,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
         List<UUI> GetSearchResults(MySqlCommand cmd)
         {
-            List<UUI> results = new List<UUI>();
+            var results = new List<UUI>();
             using(MySqlDataReader dbreader = cmd.ExecuteReader())
             {
                 while(dbreader.Read())
@@ -215,18 +217,20 @@ namespace SilverSim.Database.MySQL.AvatarName
 
         static UUI ToUUI(MySqlDataReader dbreader)
         {
-            UUI nd = new UUI();
-            nd.ID = dbreader.GetUUID("AvatarID");
-            nd.HomeURI = dbreader.GetUri("HomeURI");
-            nd.FirstName = dbreader.GetString("FirstName");
-            nd.LastName = dbreader.GetString("LastName");
-            nd.IsAuthoritative = true;
+            var nd = new UUI()
+            {
+                ID = dbreader.GetUUID("AvatarID"),
+                HomeURI = dbreader.GetUri("HomeURI"),
+                FirstName = dbreader.GetString("FirstName"),
+                LastName = dbreader.GetString("LastName"),
+                IsAuthoritative = true
+            };
             return nd;
         }
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -234,7 +238,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.MigrateTables(Migrations, m_Log);
@@ -258,15 +262,9 @@ namespace SilverSim.Database.MySQL.AvatarName
     public class MySQLAvatarNameServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR NAMES SERVICE");
-        public MySQLAvatarNameServiceFactory()
-        {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLAvatarNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLAvatarNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

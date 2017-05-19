@@ -63,13 +63,7 @@ namespace SilverSim.Main.Common.Console
             /* intentionally left empty */
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         public void Shutdown()
         {

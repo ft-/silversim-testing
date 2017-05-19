@@ -33,11 +33,11 @@ namespace SilverSim.Database.MySQL.Profile
     {
         Dictionary<UUID, string> IPicksInterface.GetPicks(UUI user)
         {
-            Dictionary<UUID, string> res = new Dictionary<UUID, string>();
-            using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var res = new Dictionary<UUID, string>();
+            using(var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT pickuuid, `name` FROM userpicks WHERE creatoruuid LIKE ?uuid", conn))
+                using(var cmd = new MySqlCommand("SELECT pickuuid, `name` FROM userpicks WHERE creatoruuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", user.ID);
                     using(MySqlDataReader reader = cmd.ExecuteReader())
@@ -54,10 +54,10 @@ namespace SilverSim.Database.MySQL.Profile
 
         bool IPicksInterface.ContainsKey(UUI user, UUID id)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT pickuuid FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT pickuuid FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", id);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -75,10 +75,10 @@ namespace SilverSim.Database.MySQL.Profile
 
         bool IPicksInterface.TryGetValue(UUI user, UUID id, out ProfilePick pick)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
                 {
                     cmd.Parameters.AddParameter("?uuid", id);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -125,21 +125,23 @@ namespace SilverSim.Database.MySQL.Profile
 
         void IPicksInterface.Update(ProfilePick value)
         {
-            Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-            replaceVals["pickuuid"] = value.PickID;
-            replaceVals["creatoruuid"] = value.Creator.ID;
-            replaceVals["toppick"] = value.TopPick;
-            replaceVals["parceluuid"] = value.ParcelID;
-            replaceVals["name"] = value.Name;
-            replaceVals["description"] = value.Description;
-            replaceVals["snapshotuuid"] = value.SnapshotID;
-            replaceVals["parcelname"] = value.ParcelName;
-            replaceVals["originalname"] = value.OriginalName;
-            replaceVals["simname"] = value.SimName;
-            replaceVals["posglobal"] = value.GlobalPosition;
-            replaceVals["sortorder"] = value.SortOrder;
-            replaceVals["enabled"] = value.Enabled;
-            using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            var replaceVals = new Dictionary<string, object>
+            {
+                ["pickuuid"] = value.PickID,
+                ["creatoruuid"] = value.Creator.ID,
+                ["toppick"] = value.TopPick,
+                ["parceluuid"] = value.ParcelID,
+                ["name"] = value.Name,
+                ["description"] = value.Description,
+                ["snapshotuuid"] = value.SnapshotID,
+                ["parcelname"] = value.ParcelName,
+                ["originalname"] = value.OriginalName,
+                ["simname"] = value.SimName,
+                ["posglobal"] = value.GlobalPosition,
+                ["sortorder"] = value.SortOrder,
+                ["enabled"] = value.Enabled
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.ReplaceInto("userpicks", replaceVals);
@@ -148,10 +150,10 @@ namespace SilverSim.Database.MySQL.Profile
 
         void IPicksInterface.Delete(UUID id)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM userpicks WHERE pickuuid LIKE ?pickuuid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM userpicks WHERE pickuuid LIKE ?pickuuid", conn))
                 {
                     cmd.Parameters.AddParameter("?pickuuid", id);
                     if (1 > cmd.ExecuteNonQuery())

@@ -62,85 +62,31 @@ namespace SilverSim.Database.MySQL.Groups
             return Groups.TryGetValue(requestingAgent, group.ID, out resolved) ? resolved : group;
         }
 
-        public override IGroupSelectInterface ActiveGroup
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupSelectInterface ActiveGroup => this;
 
-        public override IActiveGroupMembershipInterface ActiveMembership
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IActiveGroupMembershipInterface ActiveMembership => this;
 
-        public override IGroupsInterface Groups
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupsInterface Groups => this;
 
-        public override IGroupInvitesInterface Invites
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupInvitesInterface Invites => this;
 
-        public override IGroupMembersInterface Members
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupMembersInterface Members => this;
 
-        public override IGroupMembershipsInterface Memberships
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupMembershipsInterface Memberships => this;
 
-        public override IGroupNoticesInterface Notices
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupNoticesInterface Notices => this;
 
-        public override IGroupRolemembersInterface Rolemembers
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupRolemembersInterface Rolemembers => this;
 
-        public override IGroupRolesInterface Roles
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IGroupRolesInterface Roles => this;
 
         bool TryGetGroupRoleRights(UUI requestingAgent, UGI group, UUID roleID, out GroupPowers powers)
         {
             powers = GroupPowers.None;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT Powers FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?grouproleid", conn))
+                using (var cmd = new MySqlCommand("SELECT Powers FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?grouproleid", conn))
                 {
                     cmd.Parameters.AddParameter("?groupid", group.ID);
                     cmd.Parameters.AddParameter("?grouproleid", roleID);
@@ -170,10 +116,10 @@ namespace SilverSim.Database.MySQL.Groups
                 return GroupPowers.None;
             }
 
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand(
+                using (var cmd = new MySqlCommand(
                     "SELECT Powers FROM roles AS r INNER JOIN " +
                     "((grouprolemembers AS rm INNER JOIN groupmembers AS m ON rm.GroupID LIKE m.GroupID AND rm.PrincipalID LIKE m.PrincipalID) ON " +
                     "r.RoleID LIKE rm.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.PrincipalID LIKE ?principalid", conn))
@@ -192,7 +138,7 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void Startup(ConfigurationLoader loader)
         {
-            RwLockedList<AvatarNameServiceInterface> avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
+            var avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
             foreach(string name in m_AvatarNameServiceNames.Trim().Split(','))
             {
                 avatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(name));
@@ -202,24 +148,24 @@ namespace SilverSim.Database.MySQL.Groups
 
         public void Remove(UUID scopeID, UUID accountID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(delegate ()
+                conn.InsideTransaction(() =>
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM groupinvites WHERE PrincipalID LIKE ?id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM groupinvites WHERE PrincipalID LIKE ?id", conn))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE PrincipalID LIKE ?id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE PrincipalID LIKE ?id", conn))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM activegroup WHERE PrincipalID LIKE ?id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE PrincipalID LIKE ?id", conn))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM grouprolememberships WHERE PrincipalID LIKE ?id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM grouprolememberships WHERE PrincipalID LIKE ?id", conn))
                     {
                         cmd.Parameters.AddParameter("?id", accountID);
                     }
@@ -240,14 +186,7 @@ namespace SilverSim.Database.MySQL.Groups
     [PluginName("Groups")]
     public class MySQLGroupsServiceFactory : IPluginFactory
     {
-        public MySQLGroupsServiceFactory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLGroupsService(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => 
+            new MySQLGroupsService(ownSection);
     }
 }

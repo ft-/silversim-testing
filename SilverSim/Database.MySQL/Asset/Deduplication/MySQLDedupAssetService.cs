@@ -63,19 +63,17 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         }
         #endregion
 
-        public override bool IsSameServer(AssetServiceInterface other)
-        {
-            return other.GetType() == typeof(MySQLDedupAssetService) &&
+        public override bool IsSameServer(AssetServiceInterface other) =>
+            other.GetType() == typeof(MySQLDedupAssetService) &&
                 (m_ConnectionString == ((MySQLDedupAssetService)other).m_ConnectionString);
-        }
 
         #region Exists methods
         public override bool Exists(UUID key)
         {
-            using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using(var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT id, access_time FROM assetrefs WHERE id LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assetrefs WHERE id LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -85,10 +83,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
-                                using(MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
+                                using(var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using(MySqlCommand ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
+                                    using(var ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("?access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("?id", key);
@@ -106,7 +104,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         public override Dictionary<UUID, bool> Exists(List<UUID> assets)
         {
-            Dictionary<UUID,bool> res = new Dictionary<UUID,bool>();
+            var res = new Dictionary<UUID,bool>();
             if (assets.Count == 0)
             {
                 return res;
@@ -120,10 +118,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             string ids = "'" + string.Join("','", assets) + "'";
             string sql = string.Format("SELECT id, access_time FROM assetrefs WHERE id IN ({0})", ids);
 
-            using (MySqlConnection dbcon = new MySqlConnection(m_ConnectionString))
+            using (var dbcon = new MySqlConnection(m_ConnectionString))
             {
                 dbcon.Open();
-                using (MySqlCommand cmd = new MySqlCommand(sql, dbcon))
+                using (var cmd = new MySqlCommand(sql, dbcon))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -171,10 +169,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         public override bool TryGetValue(UUID key, out AssetData asset)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id LIKE ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id LIKE ?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -195,10 +193,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
-                                using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
+                                using (var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (MySqlCommand ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = ?access WHERE id LIKE ?id", uconn))
+                                    using (var ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = ?access WHERE id LIKE ?id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("?access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("?id", key);
@@ -218,13 +216,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region Metadata interface
-        public override IAssetMetadataServiceInterface Metadata
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetMetadataServiceInterface Metadata => this;
 
         AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
         {
@@ -241,10 +233,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assetrefs WHERE id=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs WHERE id=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -271,23 +263,11 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region References interface
-        public override AssetReferencesServiceInterface References
-        {
-            get
-            {
-                return m_ReferencesService;
-            }
-        }
+        public override AssetReferencesServiceInterface References => m_ReferencesService;
         #endregion
 
         #region Data interface
-        public override IAssetDataServiceInterface Data
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IAssetDataServiceInterface Data => this;
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         Stream IAssetDataServiceInterface.this[UUID key]
@@ -305,10 +285,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash LIKE assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash LIKE assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=?id", conn))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -331,17 +311,17 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Store(AssetData asset)
         {
-            using (SHA1 sha = new SHA1CryptoServiceProvider())
+            using (var sha = SHA1.Create())
             {
                 byte[] sha1data = sha.ComputeHash(asset.Data);
 
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
 
-                    conn.InsideTransaction(delegate()
+                    conn.InsideTransaction(() =>
                     {
-                        using (MySqlCommand cmd =
+                        using (var cmd =
                             new MySqlCommand(
                                 "INSERT INTO assetdata (hash, assetType, data)" +
                                 "VALUES(?hash, ?assetType, ?data) ON DUPLICATE KEY UPDATE assetType=assetType",
@@ -359,7 +339,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             }
                         }
 
-                        using (MySqlCommand cmd =
+                        using (var cmd =
                             new MySqlCommand(
                                 "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, CreatorID, hash)" +
                                 "VALUES(?id, ?name, ?assetType, ?temporary, ?create_time, ?access_time, ?asset_flags, ?CreatorID, ?hash)",
@@ -408,10 +388,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #region Delete asset method
         public override void Delete(UUID id)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assetrefs WHERE id=?id AND asset_flags <> 0", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE id=?id AND asset_flags <> 0", conn))
                 {
                     cmd.Parameters.AddParameter("?id", id);
                 }
@@ -422,7 +402,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #region DBServiceInterface
         public void VerifyConnection()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 int maxallowedPacket = conn.GetMaxAllowedPacketSize();
@@ -435,7 +415,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         public void ProcessMigrations()
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 conn.MigrateTables(Migrations, m_Log);
@@ -478,10 +458,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
     public class MySQLDedupAssetServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
-        public MySQLDedupAssetServiceFactory()
-        {
-
-        }
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
