@@ -80,7 +80,7 @@ namespace SilverSim.Viewer.Core
             return hgRegionHandle;
         }
 
-        private bool TryGetDestination(GridVector gv, out RegionInfo di)
+        public bool TryGetDestination(GridVector gv, out RegionInfo di)
         {
             KeyValuePair<ulong, RegionInfo> dest;
             di = default(RegionInfo);
@@ -94,102 +94,6 @@ namespace SilverSim.Viewer.Core
             CleanDestinationCache();
 
             return false;
-        }
-
-        [PacketHandler(MessageType.TeleportCancel)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        public void HandleTeleportCancel(Message m)
-        {
-            var req = (TeleportCancel)m;
-            if(req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-
-            m_Log.Warn("Implement TeleportCancel");
-        }
-
-        [PacketHandler(MessageType.TeleportLandmarkRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        public void HandleTeleportLandmarkRequest(Message m)
-        {
-            var req = (TeleportLandmarkRequest)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-
-            m_Log.Warn("Implement TeleportLandmarkRequest");
-        }
-
-        [PacketHandler(MessageType.TeleportLocationRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        public void HandleTeleportLocationRequest(Message m)
-        {
-            var req = (TeleportLocationRequest)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-
-            AgentCircuit circuit;
-            if(Circuits.TryGetValue(req.CircuitSceneID, out circuit))
-            {
-                RegionInfo hgRegionInfo;
-
-                /* check whether HG destination is addressed */
-                if(TryGetDestination(req.GridPosition, out hgRegionInfo))
-                {
-                    if (!TeleportTo(circuit.Scene, hgRegionInfo.GridURI, hgRegionInfo.ID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
-                    {
-                        var failedmsg = new TeleportFailed()
-                        {
-                            AgentID = ID,
-                            Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
-                        };
-                        SendMessageAlways(failedmsg, req.CircuitSceneID);
-                    }
-                }
-                else if(!TeleportTo(circuit.Scene, req.GridPosition, req.Position, req.LookAt, TeleportFlags.ViaLocation))
-                {
-                    var failedmsg = new TeleportFailed()
-                    {
-                        AgentID = ID,
-                        Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
-                    };
-                    SendMessageAlways(failedmsg, req.CircuitSceneID);
-                }
-            }
-        }
-
-        [PacketHandler(MessageType.TeleportRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        public void HandleTeleportRequest(Message m)
-        {
-            var req = (TeleportRequest)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-
-            AgentCircuit circuit;
-            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
-            {
-                /* TODO: we need the specific local list for HG destinations */
-                if (!TeleportTo(circuit.Scene, req.RegionID, req.Position, req.LookAt, Types.Grid.TeleportFlags.ViaLocation))
-                {
-                    var failedmsg = new TeleportFailed()
-                    {
-                        AgentID = ID,
-                        Reason = this.GetLanguageString(CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
-                    };
-                    SendMessageAlways(failedmsg, req.CircuitSceneID);
-                }
-            }
         }
     }
 }

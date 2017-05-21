@@ -22,31 +22,180 @@
 #pragma warning disable IDE0018
 #pragma warning disable RCS1029
 
+using log4net;
 using Nini.Config;
+using SilverSim.Main.Common;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
+using SilverSim.Types.Grid;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
-using SilverSim.Main.Common;
+using SilverSim.Viewer.Messages.Teleport;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Teleport
 {
     [Description("Viewer Teleport Handler")]
     public class ViewerTeleport : IPlugin, IPacketHandlerExtender
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("VIEWER TELEPORT");
+        private SceneList m_Scenes;
+
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_Scenes = loader.Scenes;
+        }
+
+        private bool TryGetAgentCircuit(Message m, out ViewerAgent vagent, out AgentCircuit circuit)
+        {
+            SceneInterface scene;
+            IAgent agent;
+
+            vagent = default(ViewerAgent);
+            circuit = default(AgentCircuit);
+
+            if(m_Scenes.TryGetValue(m.CircuitSceneID, out scene) &&
+                scene.Agents.TryGetValue(m.CircuitAgentID, out agent))
+            {
+                vagent = agent as ViewerAgent;
+                if(vagent == null)
+                {
+                    return false;
+                }
+
+                return vagent.Circuits.TryGetValue(scene.ID, out circuit);
+            }
+
+            return false;
+        }
+
+        [PacketHandler(MessageType.StartLure)]
+        public void HandleStartLure(Message m)
+        {
+            var req = (StartLure)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            m_Log.Warn("Implement StartLure");
+        }
+
+        [PacketHandler(MessageType.TeleportLureRequest)]
+        public void HandleTeleportLureRequest(Message m)
+        {
+            var req = (TeleportLureRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            m_Log.Warn("Implement TeleportLureRequest");
+        }
+
+        [PacketHandler(MessageType.TeleportCancel)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        public void HandleTeleportCancel(Message m)
+        {
+            var req = (TeleportCancel)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            m_Log.Warn("Implement TeleportCancel");
+        }
+
+        [PacketHandler(MessageType.TeleportLandmarkRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        public void HandleTeleportLandmarkRequest(Message m)
+        {
+            var req = (TeleportLandmarkRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            m_Log.Warn("Implement TeleportLandmarkRequest");
+        }
+
+        [PacketHandler(MessageType.TeleportLocationRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        public void HandleTeleportLocationRequest(Message m)
+        {
+            var req = (TeleportLocationRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            AgentCircuit circuit;
+            ViewerAgent agent;
+
+            if(TryGetAgentCircuit(m, out agent, out circuit))
+            {
+                RegionInfo hgRegionInfo;
+
+                /* check whether HG destination is addressed */
+                if (agent.TryGetDestination(req.GridPosition, out hgRegionInfo))
+                {
+                    if (!agent.TeleportTo(circuit.Scene, hgRegionInfo.GridURI, hgRegionInfo.ID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
+                    {
+                        var failedmsg = new TeleportFailed()
+                        {
+                            AgentID = agent.ID,
+                            Reason = agent.GetLanguageString(agent.CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
+                        };
+                        agent.SendMessageAlways(failedmsg, req.CircuitSceneID);
+                    }
+                }
+                else if (!agent.TeleportTo(circuit.Scene, req.GridPosition, req.Position, req.LookAt, TeleportFlags.ViaLocation))
+                {
+                    var failedmsg = new TeleportFailed()
+                    {
+                        AgentID = agent.ID,
+                        Reason = this.GetLanguageString(agent.CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
+                    };
+                    agent.SendMessageAlways(failedmsg, req.CircuitSceneID);
+                }
+            }
         }
 
         [PacketHandler(MessageType.TeleportRequest)]
-        [PacketHandler(MessageType.TeleportLocationRequest)]
-        [PacketHandler(MessageType.TeleportLandmarkRequest)]
-        [PacketHandler(MessageType.StartLure)]
-        [PacketHandler(MessageType.TeleportLureRequest)]
-        [PacketHandler(MessageType.TeleportCancel)]
-        public void HandleMessage(Message m)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        public void HandleTeleportRequest(Message m)
         {
+            var req = (TeleportRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
 
+            AgentCircuit circuit;
+            ViewerAgent agent;
+
+            if (TryGetAgentCircuit(m, out agent, out circuit))
+            {
+                /* TODO: we need the specific local list for HG destinations */
+                if (!agent.TeleportTo(circuit.Scene, req.RegionID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
+                {
+                    var failedmsg = new TeleportFailed()
+                    {
+                        AgentID = agent.ID,
+                        Reason = agent.GetLanguageString(agent.CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
+                    };
+                    agent.SendMessageAlways(failedmsg, req.CircuitSceneID);
+                }
+            }
         }
     }
 
