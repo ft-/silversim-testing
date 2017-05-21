@@ -39,21 +39,18 @@ namespace SilverSim.Viewer.Messages.Profile
         public bool MaturePublish;
         public string ProfileURL;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AvatarPropertiesUpdate()
         {
-            return new AvatarPropertiesUpdate()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                ImageID = p.ReadUUID(),
-                FLImageID = p.ReadUUID(),
-                AboutText = p.ReadStringLen16(),
-                FLAboutText = p.ReadStringLen8(),
-                AllowPublish = p.ReadBoolean(),
-                MaturePublish = p.ReadBoolean(),
-                ProfileURL = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            ImageID = p.ReadUUID(),
+            FLImageID = p.ReadUUID(),
+            AboutText = p.ReadStringLen16(),
+            FLAboutText = p.ReadStringLen8(),
+            AllowPublish = p.ReadBoolean(),
+            MaturePublish = p.ReadBoolean(),
+            ProfileURL = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

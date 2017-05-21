@@ -64,25 +64,22 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteUInt32(AuctionID);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ParcelInfoReply()
         {
-            return new ParcelInfoReply()
-            {
-                AgentID = p.ReadUUID(),
-                ParcelID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                Name = p.ReadStringLen8(),
-                Description = p.ReadStringLen8(),
-                ActualArea = p.ReadInt32(),
-                BillableArea = p.ReadInt32(),
-                Flags = p.ReadUInt8(),
-                GlobalPosition = p.ReadVector3f(),
-                SimName = p.ReadStringLen8(),
-                SnapshotID = p.ReadUUID(),
-                Dwell = p.ReadFloat(),
-                SalePrice = p.ReadInt32(),
-                AuctionID = p.ReadUInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            ParcelID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            Name = p.ReadStringLen8(),
+            Description = p.ReadStringLen8(),
+            ActualArea = p.ReadInt32(),
+            BillableArea = p.ReadInt32(),
+            Flags = p.ReadUInt8(),
+            GlobalPosition = p.ReadVector3f(),
+            SimName = p.ReadStringLen8(),
+            SnapshotID = p.ReadUUID(),
+            Dwell = p.ReadFloat(),
+            SalePrice = p.ReadInt32(),
+            AuctionID = p.ReadUInt32()
+        };
     }
 }

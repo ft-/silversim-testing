@@ -33,15 +33,12 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID SessionID;
         public Int32 LocalID;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ParcelBuyPass()
         {
-            return new ParcelBuyPass()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                LocalID = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            LocalID = p.ReadInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

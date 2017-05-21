@@ -49,18 +49,15 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteStringLen8(LanguagesText);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AvatarInterestsReply()
         {
-            return new AvatarInterestsReply()
-            {
-                AgentID = p.ReadUUID(),
-                AvatarID = p.ReadUUID(),
-                WantToMask = p.ReadUInt32(),
-                WantToText = p.ReadStringLen8(),
-                SkillsMask = p.ReadUInt32(),
-                SkillsText = p.ReadStringLen8(),
-                LanguagesText = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            AvatarID = p.ReadUUID(),
+            WantToMask = p.ReadUInt32(),
+            WantToText = p.ReadStringLen8(),
+            SkillsMask = p.ReadUInt32(),
+            SkillsText = p.ReadStringLen8(),
+            LanguagesText = p.ReadStringLen8()
+        };
     }
 }

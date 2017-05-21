@@ -27,10 +27,7 @@ namespace SilverSim.Viewer.Messages.Economy
     public class EconomyDataRequest : Message
     {
 
-        public static Message Decode(UDPPacket p)
-        {
-            return new EconomyDataRequest();
-        }
+        public static Message Decode(UDPPacket p) => new EconomyDataRequest();
 
         public override void Serialize(UDPPacket p)
         {

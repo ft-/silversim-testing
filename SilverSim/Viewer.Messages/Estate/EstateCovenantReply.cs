@@ -42,15 +42,12 @@ namespace SilverSim.Viewer.Messages.Estate
             p.WriteUUID(EstateOwnerID);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new EstateCovenantReply()
         {
-            return new EstateCovenantReply()
-            {
-                CovenantID = p.ReadUUID(),
-                CovenantTimestamp = p.ReadUInt32(),
-                EstateName = p.ReadStringLen8(),
-                EstateOwnerID = p.ReadUUID()
-            };
-        }
+            CovenantID = p.ReadUUID(),
+            CovenantTimestamp = p.ReadUInt32(),
+            EstateName = p.ReadStringLen8(),
+            EstateOwnerID = p.ReadUUID()
+        };
     }
 }

@@ -64,48 +64,58 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AgentGroupDataUpdate();
-            m.AgentID = p.ReadUUID();
+            var m = new AgentGroupDataUpdate()
+            {
+                AgentID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                var e = new GroupDataEntry();
-                e.GroupID = p.ReadUUID();
-                e.GroupPowers = (GroupPowers)p.ReadUInt64();
-                e.AcceptNotices = p.ReadBoolean();
-                e.GroupInsigniaID = p.ReadUUID();
-                e.Contribution = p.ReadInt32();
-                e.GroupName = p.ReadStringLen8();
-                m.GroupData.Add(e);
+                m.GroupData.Add(new GroupDataEntry()
+                {
+                    GroupID = p.ReadUUID(),
+                    GroupPowers = (GroupPowers)p.ReadUInt64(),
+                    AcceptNotices = p.ReadBoolean(),
+                    GroupInsigniaID = p.ReadUUID(),
+                    Contribution = p.ReadInt32(),
+                    GroupName = p.ReadStringLen8()
+                });
             }
             return m;
         }
 
         public override IValue SerializeEQG()
         {
-            var body = new MapType();
-            var agentDataArray = new AnArray();
-            var agentDataMap = new MapType();
-            agentDataMap.Add("AgentID", AgentID);
-            agentDataArray.Add(agentDataMap);
-            body.Add("AgentData", agentDataArray);
+            var agentDataMap = new MapType
+            {
+                ["AgentID"] = AgentID
+            };
+            var agentDataArray = new AnArray
+            {
+                agentDataMap
+            };
+            var body = new MapType
+            {
+                ["AgentData"] = agentDataArray
+            };
             var groupDataArray = new AnArray();
             foreach(GroupDataEntry e in GroupData)
             {
-                var groupData = new MapType();
-                groupData.Add("ListInProfile", e.ListInProfile);
-                groupData.Add("GroupID", e.GroupID);
-                groupData.Add("GroupInsigniaID", e.GroupInsigniaID);
-                groupData.Add("Contribution", e.Contribution);
                 byte[] groupPowers = BitConverter.GetBytes((UInt64)e.GroupPowers);
                 if(BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(groupPowers);
                 }
-                groupData.Add("GroupPowers", new BinaryData(groupPowers));
-                groupData.Add("GroupName", e.GroupName);
-                groupData.Add("AcceptNotices", e.AcceptNotices);
-                groupDataArray.Add(groupData);
+                groupDataArray.Add(new MapType
+                {
+                    { "ListInProfile", e.ListInProfile },
+                    { "GroupID", e.GroupID },
+                    { "GroupInsigniaID", e.GroupInsigniaID },
+                    { "Contribution", e.Contribution },
+                    { "GroupPowers", new BinaryData(groupPowers) },
+                    { "GroupName", e.GroupName },
+                    { "AcceptNotices", e.AcceptNotices }
+                });
             }
             body.Add("GroupData", groupDataArray);
 

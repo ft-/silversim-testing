@@ -39,14 +39,11 @@ namespace SilverSim.Viewer.Messages.Common
             p.WriteUUID(TransactionID);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new FeatureDisabled()
         {
-            return new FeatureDisabled()
-            {
-                ErrorMessage = p.ReadStringLen8(),
-                AgentID = p.ReadUUID(),
-                TransactionID = p.ReadUUID()
-            };
-        }
+            ErrorMessage = p.ReadStringLen8(),
+            AgentID = p.ReadUUID(),
+            TransactionID = p.ReadUUID()
+        };
     }
 }

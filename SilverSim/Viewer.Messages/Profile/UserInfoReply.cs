@@ -41,15 +41,12 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteStringLen8(EMail);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new UserInfoReply()
         {
-            return new UserInfoReply()
-            {
-                AgentID = p.ReadUUID(),
-                IMViaEmail = p.ReadBoolean(),
-                DirectoryVisibility = p.ReadStringLen8(),
-                EMail = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            IMViaEmail = p.ReadBoolean(),
+            DirectoryVisibility = p.ReadStringLen8(),
+            EMail = p.ReadStringLen8()
+        };
     }
 }

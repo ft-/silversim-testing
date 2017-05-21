@@ -33,16 +33,13 @@ namespace SilverSim.Viewer.Messages.Inventory
         public UUID OwnerID;
         public UUID ItemID;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new RequestInventoryAsset()
         {
-            return new RequestInventoryAsset()
-            {
-                QueryID = p.ReadUUID(),
-                AgentID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                ItemID = p.ReadUUID()
-            };
-        }
+            QueryID = p.ReadUUID(),
+            AgentID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            ItemID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

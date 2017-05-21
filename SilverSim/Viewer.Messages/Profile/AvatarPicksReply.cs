@@ -54,9 +54,11 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AvatarPicksReply();
-            m.AgentID = p.ReadUUID();
-            m.TargetID = p.ReadUUID();
+            var m = new AvatarPicksReply()
+            {
+                AgentID = p.ReadUUID(),
+                TargetID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {

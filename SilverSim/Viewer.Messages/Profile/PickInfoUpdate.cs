@@ -42,24 +42,21 @@ namespace SilverSim.Viewer.Messages.Profile
         public Int32 SortOrder;
         public bool IsEnabled;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new PickInfoUpdate()
         {
-            return new PickInfoUpdate()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                PickID = p.ReadUUID(),
-                CreatorID = p.ReadUUID(),
-                TopPick = p.ReadBoolean(),
-                ParcelID = p.ReadUUID(),
-                Name = p.ReadStringLen8(),
-                Description = p.ReadStringLen16(),
-                SnapshotID = p.ReadUUID(),
-                PosGlobal = p.ReadVector3d(),
-                SortOrder = p.ReadInt32(),
-                IsEnabled = p.ReadBoolean()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            PickID = p.ReadUUID(),
+            CreatorID = p.ReadUUID(),
+            TopPick = p.ReadBoolean(),
+            ParcelID = p.ReadUUID(),
+            Name = p.ReadStringLen8(),
+            Description = p.ReadStringLen16(),
+            SnapshotID = p.ReadUUID(),
+            PosGlobal = p.ReadVector3d(),
+            SortOrder = p.ReadInt32(),
+            IsEnabled = p.ReadBoolean()
+        };
 
         public override void Serialize(UDPPacket p)
         {

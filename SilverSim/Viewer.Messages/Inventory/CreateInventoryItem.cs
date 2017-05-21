@@ -45,24 +45,21 @@ namespace SilverSim.Viewer.Messages.Inventory
         public string Name;
         public string Description;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new CreateInventoryItem()
         {
-            return new CreateInventoryItem()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
 
-                CallbackID = p.ReadUInt32(),
-                FolderID = p.ReadUUID(),
-                TransactionID = p.ReadUUID(),
-                NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                AssetType = (AssetType)p.ReadInt8(),
-                InvType = (InventoryType)p.ReadInt8(),
-                WearableType = (WearableType)p.ReadUInt8(),
-                Name = p.ReadStringLen8(),
-                Description = p.ReadStringLen8()
-            };
-        }
+            CallbackID = p.ReadUInt32(),
+            FolderID = p.ReadUUID(),
+            TransactionID = p.ReadUUID(),
+            NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            AssetType = (AssetType)p.ReadInt8(),
+            InvType = (InventoryType)p.ReadInt8(),
+            WearableType = (WearableType)p.ReadUInt8(),
+            Name = p.ReadStringLen8(),
+            Description = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

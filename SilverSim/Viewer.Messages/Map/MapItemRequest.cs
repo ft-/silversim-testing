@@ -38,21 +38,16 @@ namespace SilverSim.Viewer.Messages.Map
         public MapItemType ItemType;
         public GridVector Location;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new MapItemRequest()
         {
-            var m = new MapItemRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                Flags = (MapAgentFlags)p.ReadUInt32(),
-                EstateID = p.ReadUInt32(),
-                IsGodlike = p.ReadBoolean(),
-                ItemType = (MapItemType)p.ReadUInt32()
-            };
-            m.Location.RegionHandle = p.ReadUInt64();
-
-            return m;
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            Flags = (MapAgentFlags)p.ReadUInt32(),
+            EstateID = p.ReadUInt32(),
+            IsGodlike = p.ReadBoolean(),
+            ItemType = (MapItemType)p.ReadUInt32(),
+            Location = new GridVector(p.ReadUInt64())
+        };
 
         public override void Serialize(UDPPacket p)
         {

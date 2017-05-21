@@ -33,15 +33,12 @@ namespace SilverSim.Viewer.Messages.Region
         public UUID SessionID = UUID.Zero;
         public UInt32 Flags;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new RegionHandshakeReply()
         {
-            return new RegionHandshakeReply()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                Flags = p.ReadUInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            Flags = p.ReadUInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

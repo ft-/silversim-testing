@@ -38,20 +38,17 @@ namespace SilverSim.Viewer.Messages.Search
         public sbyte Category;
         public string SimName;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new PlacesQuery()
         {
-            return new PlacesQuery()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                QueryID = p.ReadUUID(),
-                TransactionID = p.ReadUUID(),
-                QueryText = p.ReadStringLen8(),
-                QueryFlags = p.ReadUInt32(),
-                Category = p.ReadInt8(),
-                SimName = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            QueryID = p.ReadUUID(),
+            TransactionID = p.ReadUUID(),
+            QueryText = p.ReadStringLen8(),
+            QueryFlags = p.ReadUInt32(),
+            Category = p.ReadInt8(),
+            SimName = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

@@ -36,18 +36,15 @@ namespace SilverSim.Viewer.Messages.Land
         public string Filter;
         public Int32 ParcelLocalID;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new LandStatRequest()
         {
-            return new LandStatRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                ReportType = p.ReadUInt32(),
-                RequestFlags = p.ReadUInt32(),
-                Filter = p.ReadStringLen8(),
-                ParcelLocalID = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            ReportType = p.ReadUInt32(),
+            RequestFlags = p.ReadUInt32(),
+            Filter = p.ReadStringLen8(),
+            ParcelLocalID = p.ReadInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

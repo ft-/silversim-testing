@@ -33,12 +33,9 @@ namespace SilverSim.Viewer.Messages.Circuit
             p.WriteBoolean(Frozen);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ViewerFrozenMessage()
         {
-            return new ViewerFrozenMessage()
-            {
-                Frozen = p.ReadBoolean()
-            };
-        }
+            Frozen = p.ReadBoolean()
+        };
     }
 }

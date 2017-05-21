@@ -35,17 +35,14 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ItemID = UUID.Zero;
         public UInt32 Questions;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ScriptAnswerYes()
         {
-            return new ScriptAnswerYes()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                TaskID = p.ReadUUID(),
-                ItemID = p.ReadUUID(),
-                Questions = p.ReadUInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            TaskID = p.ReadUUID(),
+            ItemID = p.ReadUUID(),
+            Questions = p.ReadUInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

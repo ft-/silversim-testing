@@ -32,15 +32,12 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID SessionID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
 
-        public static ActivateGroup Decode(UDPPacket p)
+        public static ActivateGroup Decode(UDPPacket p) => new ActivateGroup()
         {
-            return new ActivateGroup()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            GroupID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

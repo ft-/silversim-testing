@@ -87,7 +87,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         }
 
         /// <summary>Lookup table to speed up terrain exports</summary>
-        static readonly HeightmapLookupValue[] LookupHeightTable;
+        private static readonly HeightmapLookupValue[] LookupHeightTable;
 
         static LLRAWData()
         {
@@ -103,9 +103,9 @@ namespace SilverSim.Viewer.Messages.LayerData
             Array.Sort(LookupHeightTable);
         }
 
-        static float ReadLLRAWElev(Stream input)
+        private static float ReadLLRAWElev(Stream input)
         {
-            byte[] buffer = new byte[13];
+            var buffer = new byte[13];
             if (13 != input.Read(buffer, 0, 13))
             {
                 throw new EndOfStreamException();
@@ -117,7 +117,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         public static List<LayerPatch> LoadLLRawStream(this Stream input, int suggested_width, int suggested_height)
         {
             var res = new List<LayerPatch>();
-            input.LoadLLRawStream(suggested_width, suggested_height, delegate (LayerPatch lp) { res.Add(lp); });
+            input.LoadLLRawStream(suggested_width, suggested_height, (LayerPatch lp) => res.Add(lp));
             return res;
         }
 
@@ -157,7 +157,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             }
         }
 
-        static uint XYToYInverted(this LayerPatch p, uint lineWidth, uint maxY)
+        private static uint XYToYInverted(this LayerPatch p, uint lineWidth, uint maxY)
         {
             return (maxY - p.Y) * lineWidth + p.X;
         }

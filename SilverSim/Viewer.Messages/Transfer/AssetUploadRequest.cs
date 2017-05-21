@@ -35,19 +35,14 @@ namespace SilverSim.Viewer.Messages.Transfer
         public bool StoreLocal;
         public byte[] AssetData = new byte[0];
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AssetUploadRequest()
         {
-            var m = new AssetUploadRequest()
-            {
-                TransactionID = p.ReadUUID(),
-                AssetType = (AssetType)p.ReadInt8(),
-                IsTemporary = p.ReadBoolean(),
-                StoreLocal = p.ReadBoolean()
-            };
-            uint c = p.ReadUInt16();
-            m.AssetData = p.ReadBytes((int)c);
-            return m;
-        }
+            TransactionID = p.ReadUUID(),
+            AssetType = (AssetType)p.ReadInt8(),
+            IsTemporary = p.ReadBoolean(),
+            StoreLocal = p.ReadBoolean(),
+            AssetData = p.ReadBytes((int)p.ReadUInt16())
+        };
 
         public override void Serialize(UDPPacket p)
         {

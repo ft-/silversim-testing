@@ -61,7 +61,6 @@ namespace SilverSim.Viewer.Messages.LayerData
         private static readonly int[] CopyMatrix16 = new int[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
         private static readonly float[] QuantizeTable16 = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
 
-
         static LayerCompressor()
         {
             for (int j = 0; j < LAYER_PATCH_NUM_XY_ENTRIES; j++)

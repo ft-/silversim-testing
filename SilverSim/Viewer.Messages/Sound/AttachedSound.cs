@@ -43,17 +43,14 @@ namespace SilverSim.Viewer.Messages.Sound
             p.WriteFloat((float)Gain);
             p.WriteUInt8((byte)Flags);
         }
-        
-        public static Message Decode(UDPPacket p)
+
+        public static Message Decode(UDPPacket p) => new AttachedSound()
         {
-            return new AttachedSound()
-            {
-                SoundID = p.ReadUUID(),
-                ObjectID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                Gain = p.ReadFloat(),
-                Flags = (PrimitiveSoundFlags)p.ReadUInt8()
-            };
-        }
+            SoundID = p.ReadUUID(),
+            ObjectID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            Gain = p.ReadFloat(),
+            Flags = (PrimitiveSoundFlags)p.ReadUInt8()
+        };
     }
 }

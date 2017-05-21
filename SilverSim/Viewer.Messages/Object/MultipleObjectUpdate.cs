@@ -37,6 +37,7 @@ namespace SilverSim.Viewer.Messages.Object
         [Flags]
         public enum UpdateFlags : byte
         {
+            None = 0,
             UpdatePosition = 1,
             UpdateRotation = 2,
             UpdateScale = 4,

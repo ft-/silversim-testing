@@ -68,27 +68,24 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteStringLen8(Description);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ObjectPropertiesFamily()
         {
-            return new ObjectPropertiesFamily()
-            {
-                RequestFlags = p.ReadUInt32(),
-                ObjectID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                OwnershipCost = p.ReadInt32(),
-                SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
-                SalePrice = p.ReadInt32(),
-                Category = p.ReadUInt32(),
-                LastOwnerID = p.ReadUUID(),
-                Name = p.ReadStringLen8(),
-                Description = p.ReadStringLen8()
-            };
-        }
+            RequestFlags = p.ReadUInt32(),
+            ObjectID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            OwnershipCost = p.ReadInt32(),
+            SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
+            SalePrice = p.ReadInt32(),
+            Category = p.ReadUInt32(),
+            LastOwnerID = p.ReadUUID(),
+            Name = p.ReadStringLen8(),
+            Description = p.ReadStringLen8()
+        };
     }
 }

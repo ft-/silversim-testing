@@ -76,13 +76,12 @@ namespace SilverSim.Viewer.Messages.Circuit
                 { "RegionSizeX", RegionSize.X },
                 { "RegionSizeY", RegionSize.Y }
             };
-            var m = new Types.Map
+            return new Types.Map
             {
                 { "Info", i },
                 { "AgentData", a },
                 { "RegionData", r }
             };
-            return m;
         }
     }
 }

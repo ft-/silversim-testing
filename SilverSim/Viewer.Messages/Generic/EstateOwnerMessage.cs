@@ -28,10 +28,8 @@ namespace SilverSim.Viewer.Messages.Generic
     [NotTrusted]
     public class EstateOwnerMessage : GenericMessageFormat
     {
-        public static Message Decode(UDPPacket p)
-        {
-            return Decode(p, new EstateOwnerMessage());
-        }
+        public static Message Decode(UDPPacket p) =>
+            Decode(p, new EstateOwnerMessage());
     }
 
     [Flags]

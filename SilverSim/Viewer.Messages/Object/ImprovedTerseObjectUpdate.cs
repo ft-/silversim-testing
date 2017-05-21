@@ -35,7 +35,6 @@ namespace SilverSim.Viewer.Messages.Object
 
         public class ObjData
         {
-
             public byte[] Data;
             public byte[] TextureEntry;
         }
@@ -58,9 +57,11 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ImprovedTerseObjectUpdate();
-            m.GridPosition.RegionHandle = p.ReadUInt64();
-            m.TimeDilation = p.ReadUInt16();
+            var m = new ImprovedTerseObjectUpdate()
+            {
+                GridPosition = new GridVector(p.ReadUInt64()),
+                TimeDilation = p.ReadUInt16()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {

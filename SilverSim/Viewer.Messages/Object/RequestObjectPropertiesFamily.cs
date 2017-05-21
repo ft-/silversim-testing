@@ -35,16 +35,13 @@ namespace SilverSim.Viewer.Messages.Object
         public UInt32 RequestFlags;
         public UUID ObjectID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new RequestObjectPropertiesFamily()
         {
-            return new RequestObjectPropertiesFamily()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                RequestFlags = p.ReadUInt32(),
-                ObjectID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            RequestFlags = p.ReadUInt32(),
+            ObjectID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

@@ -56,36 +56,33 @@ namespace SilverSim.Viewer.Messages.Object
         public UInt32 CreationDate;
         public UInt32 CRC;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new RezRestoreToWorld()
         {
-            return new RezRestoreToWorld()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
 
-                ItemID = p.ReadUUID(),
-                FolderID = p.ReadUUID(),
-                CreatorID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                IsGroupOwned = p.ReadBoolean(),
-                TransactionID = p.ReadUUID(),
-                AssetType = (AssetType)p.ReadInt8(),
-                InvType = (InventoryType)p.ReadInt8(),
-                Flags = p.ReadUInt32(),
-                SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
-                SalePrice = p.ReadInt32(),
-                Name = p.ReadStringLen8(),
-                Description = p.ReadStringLen8(),
-                CreationDate = p.ReadUInt32(),
-                CRC = p.ReadUInt32()
-            };
-        }
+            ItemID = p.ReadUUID(),
+            FolderID = p.ReadUUID(),
+            CreatorID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            BaseMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            OwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            IsGroupOwned = p.ReadBoolean(),
+            TransactionID = p.ReadUUID(),
+            AssetType = (AssetType)p.ReadInt8(),
+            InvType = (InventoryType)p.ReadInt8(),
+            Flags = p.ReadUInt32(),
+            SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),
+            SalePrice = p.ReadInt32(),
+            Name = p.ReadStringLen8(),
+            Description = p.ReadStringLen8(),
+            CreationDate = p.ReadUInt32(),
+            CRC = p.ReadUInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

@@ -38,18 +38,16 @@ namespace SilverSim.Viewer.Messages.Agent
         public GroupPowers GroupPowers;
         public string GroupName = string.Empty;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AgentDataUpdate()
         {
-            var m = new AgentDataUpdate();
-            m.AgentID = p.ReadUUID();
-            m.FirstName = p.ReadStringLen8();
-            m.LastName = p.ReadStringLen8();
-            m.GroupTitle = p.ReadStringLen8();
-            m.ActiveGroupID = p.ReadUUID();
-            m.GroupPowers = (GroupPowers)p.ReadUInt64();
-            m.GroupName = p.ReadStringLen8();
-            return m;
-        }
+            AgentID = p.ReadUUID(),
+            FirstName = p.ReadStringLen8(),
+            LastName = p.ReadStringLen8(),
+            GroupTitle = p.ReadStringLen8(),
+            ActiveGroupID = p.ReadUUID(),
+            GroupPowers = (GroupPowers)p.ReadUInt64(),
+            GroupName = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

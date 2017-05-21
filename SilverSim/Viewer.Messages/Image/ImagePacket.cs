@@ -41,14 +41,11 @@ namespace SilverSim.Viewer.Messages.Image
             p.WriteBytes(Data);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ImagePacket()
         {
-            return new ImagePacket()
-            {
-                ID = p.ReadUUID(),
-                Packet = p.ReadUInt16(),
-                Data = p.ReadBytes(p.ReadUInt16())
-            };
-        }
+            ID = p.ReadUUID(),
+            Packet = p.ReadUInt16(),
+            Data = p.ReadBytes(p.ReadUInt16())
+        };
     }
 }

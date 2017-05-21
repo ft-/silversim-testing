@@ -69,28 +69,25 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteUUID(OwnerRoleID);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new GroupProfileReply()
         {
-            return new GroupProfileReply()
-            {
-                AgentID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                Name = p.ReadStringLen8(),
-                Charter = p.ReadStringLen16(),
-                ShowInList = p.ReadBoolean(),
-                MemberTitle = p.ReadStringLen8(),
-                PowersMask = (GroupPowers)p.ReadUInt64(),
-                InsigniaID = p.ReadUUID(),
-                FounderID = p.ReadUUID(),
-                MembershipFee = p.ReadInt32(),
-                OpenEnrollment = p.ReadBoolean(),
-                Money = p.ReadInt32(),
-                GroupMembershipCount = p.ReadInt32(),
-                GroupRolesCount = p.ReadInt32(),
-                AllowPublish = p.ReadBoolean(),
-                MaturePublish = p.ReadBoolean(),
-                OwnerRoleID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            Name = p.ReadStringLen8(),
+            Charter = p.ReadStringLen16(),
+            ShowInList = p.ReadBoolean(),
+            MemberTitle = p.ReadStringLen8(),
+            PowersMask = (GroupPowers)p.ReadUInt64(),
+            InsigniaID = p.ReadUUID(),
+            FounderID = p.ReadUUID(),
+            MembershipFee = p.ReadInt32(),
+            OpenEnrollment = p.ReadBoolean(),
+            Money = p.ReadInt32(),
+            GroupMembershipCount = p.ReadInt32(),
+            GroupRolesCount = p.ReadInt32(),
+            AllowPublish = p.ReadBoolean(),
+            MaturePublish = p.ReadBoolean(),
+            OwnerRoleID = p.ReadUUID()
+        };
     }
 }

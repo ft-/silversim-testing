@@ -41,22 +41,19 @@ namespace SilverSim.Viewer.Messages.Groups
         public bool AllowPublish;
         public bool MaturePublish;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new CreateGroupRequest()
         {
-            return new CreateGroupRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                Name = p.ReadStringLen8(),
-                Charter = p.ReadStringLen16(),
-                ShowInList = p.ReadBoolean(),
-                InsigniaID = p.ReadUUID(),
-                MembershipFee = p.ReadInt32(),
-                OpenEnrollment = p.ReadBoolean(),
-                AllowPublish = p.ReadBoolean(),
-                MaturePublish = p.ReadBoolean()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            Name = p.ReadStringLen8(),
+            Charter = p.ReadStringLen16(),
+            ShowInList = p.ReadBoolean(),
+            InsigniaID = p.ReadUUID(),
+            MembershipFee = p.ReadInt32(),
+            OpenEnrollment = p.ReadBoolean(),
+            AllowPublish = p.ReadBoolean(),
+            MaturePublish = p.ReadBoolean()
+        };
 
         public override void Serialize(UDPPacket p)
         {

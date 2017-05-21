@@ -33,16 +33,13 @@ namespace SilverSim.Viewer.Messages.God
         public bool IsGodlike;
         public UUID Token;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new RequestGodlikePowers()
         {
-            return new RequestGodlikePowers()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                IsGodlike = p.ReadBoolean(),
-                Token = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            IsGodlike = p.ReadBoolean(),
+            Token = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

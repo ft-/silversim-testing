@@ -32,15 +32,12 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID SessionID = UUID.Zero;
         public UUID AvatarID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AvatarPropertiesRequest()
         {
-            return new AvatarPropertiesRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                AvatarID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            AvatarID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

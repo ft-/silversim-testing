@@ -29,7 +29,6 @@ namespace SilverSim.Viewer.Messages.Names
     [NotTrusted]
     public class UUIDNameRequest : Message
     {
-
         public List<UUID> UUIDNameBlock = new List<UUID>();
 
         public static Message Decode(UDPPacket p)
@@ -44,7 +43,6 @@ namespace SilverSim.Viewer.Messages.Names
 
             return m;
         }
-
 
         public override void Serialize(UDPPacket p)
         {

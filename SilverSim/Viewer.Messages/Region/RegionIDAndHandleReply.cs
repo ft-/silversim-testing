@@ -41,9 +41,9 @@ namespace SilverSim.Viewer.Messages.Region
         {
             var m = new RegionIDAndHandleReply()
             {
-                RegionID = p.ReadUUID()
+                RegionID = p.ReadUUID(),
+                RegionPosition = new GridVector(p.ReadUInt64())
             };
-            m.RegionPosition.RegionHandle = p.ReadUInt64();
             return m;
         }
     }

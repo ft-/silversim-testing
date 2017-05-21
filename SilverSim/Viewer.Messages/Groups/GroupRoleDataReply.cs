@@ -45,14 +45,9 @@ namespace SilverSim.Viewer.Messages.Groups
             public GroupPowers Powers;
             public UInt32 Members;
 
-            public int SizeInMessage
-            {
-                get
-                {
-                    return 34 + Title.ToUTF8ByteCount() + Description.ToUTF8ByteCount() + Name.ToUTF8ByteCount();
-                }
-            }
+            public int SizeInMessage => 34 + Title.ToUTF8ByteCount() + Description.ToUTF8ByteCount() + Name.ToUTF8ByteCount();
         }
+
         public List<RoleDataEntry> RoleData = new List<RoleDataEntry>();
 
         public override void Serialize(UDPPacket p)

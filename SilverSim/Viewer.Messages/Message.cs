@@ -54,7 +54,7 @@ namespace SilverSim.Viewer.Messages
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class UDPMessageAttribute : Attribute
     {
-        public MessageType Number { get; private set; }
+        public MessageType Number { get; }
 
         public UDPMessageAttribute(MessageType number)
         {
@@ -65,8 +65,8 @@ namespace SilverSim.Viewer.Messages
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class EventQueueGetAttribute : Attribute
     {
-        public string Name { get; private set; }
-        
+        public string Name { get; }
+
         public EventQueueGetAttribute(string name)
         {
             Name = name;
@@ -76,7 +76,7 @@ namespace SilverSim.Viewer.Messages
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public sealed class PacketHandlerAttribute : Attribute
     {
-        public MessageType Number { get; private set; }
+        public MessageType Number { get; }
         public PacketHandlerAttribute(MessageType number)
         {
             Number = number;
@@ -86,7 +86,7 @@ namespace SilverSim.Viewer.Messages
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public sealed class GenericMessageHandlerAttribute : Attribute
     {
-        public string Method { get; private set; }
+        public string Method { get; }
         public GenericMessageHandlerAttribute(string method)
         {
             Method = method;
@@ -96,7 +96,7 @@ namespace SilverSim.Viewer.Messages
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public sealed class GodlikeMessageHandlerAttribute : Attribute
     {
-        public string Method { get; private set; }
+        public string Method { get; }
         public GodlikeMessageHandlerAttribute(string method)
         {
             Method = method;
@@ -106,7 +106,7 @@ namespace SilverSim.Viewer.Messages
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public sealed class IMMessageHandlerAttribute : Attribute
     {
-        public GridInstantMessageDialog Dialog { get; private set; }
+        public GridInstantMessageDialog Dialog { get; }
         public IMMessageHandlerAttribute(GridInstantMessageDialog dialog)
         {
             Dialog = dialog;
@@ -178,7 +178,7 @@ namespace SilverSim.Viewer.Messages
         public void OnSendComplete(bool flag)
         {
             var ev = OnSendCompletion;
-            if (null != ev)
+            if (ev != null)
             {
                 foreach (Action<bool> del in ev.GetInvocationList().OfType<Action<bool>>())
                 {
@@ -188,35 +188,17 @@ namespace SilverSim.Viewer.Messages
         }
 
         #region Overloaded methods
-        public virtual string TypeDescription
-        {
-            get
-            {
-                return Number.ToString();
-            }
-        }
+        public virtual string TypeDescription => Number.ToString();
 
-        public virtual bool IsReliable
-        {
-            get 
-            {
-                return GetType().GetCustomAttributes(typeof(ReliableAttribute), false).Length != 0;
-            }
-        }
+        public virtual bool IsReliable => GetType().GetCustomAttributes(typeof(ReliableAttribute), false).Length != 0;
 
-        public virtual bool ZeroFlag
-        {
-            get
-            {
-                return GetType().GetCustomAttributes(typeof(ZerocodedAttribute), false).Length != 0;
-            }
-        }
+        public virtual bool ZeroFlag => GetType().GetCustomAttributes(typeof(ZerocodedAttribute), false).Length != 0;
 
         public virtual MessageType Number
         {
             get
             {
-                UDPMessageAttribute a = (UDPMessageAttribute)Attribute.GetCustomAttribute(GetType(), typeof(UDPMessageAttribute));
+                var a = (UDPMessageAttribute)Attribute.GetCustomAttribute(GetType(), typeof(UDPMessageAttribute));
                 if(a == null)
                 {
                     return 0;
@@ -239,7 +221,7 @@ namespace SilverSim.Viewer.Messages
         {
             get
             {
-                EventQueueGetAttribute a = (EventQueueGetAttribute)Attribute.GetCustomAttribute(GetType(), typeof(EventQueueGetAttribute));
+                var a = (EventQueueGetAttribute)Attribute.GetCustomAttribute(GetType(), typeof(EventQueueGetAttribute));
                 if (a == null)
                 {
                     throw new NotSupportedException();

@@ -33,16 +33,13 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID PickID;
         public UUID QueryID;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new PickGodDelete()
         {
-            return new PickGodDelete()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                PickID = p.ReadUUID(),
-                QueryID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            PickID = p.ReadUUID(),
+            QueryID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

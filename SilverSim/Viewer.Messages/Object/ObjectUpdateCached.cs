@@ -56,9 +56,11 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectUpdateCached();
-            m.Location.RegionHandle = p.ReadUInt64();
-            m.TimeDilation = p.ReadUInt16();
+            var m = new ObjectUpdateCached()
+            {
+                Location = new GridVector(p.ReadUInt64()),
+                TimeDilation = p.ReadUInt16()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {

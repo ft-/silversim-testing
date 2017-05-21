@@ -26,6 +26,7 @@ namespace SilverSim.Viewer.Messages.Map
     [Flags]
     public enum MapAgentFlags : uint
     {
+        None = 0,
         LayerData = 2
     }
 }

@@ -41,21 +41,18 @@ namespace SilverSim.Viewer.Messages.Region
         public Int32 RedirectGridX;
         public Int32 RedirectGridY;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new GodUpdateRegionInfo()
         {
-            return new GodUpdateRegionInfo()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                SimName = p.ReadStringLen8(),
-                EstateID = p.ReadUInt32(),
-                ParentEstateID = p.ReadUInt32(),
-                RegionFlags = p.ReadUInt32(),
-                BillableFactor = p.ReadFloat(),
-                PricePerMeter = p.ReadInt32(),
-                RedirectGridX = p.ReadInt32(),
-                RedirectGridY = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            SimName = p.ReadStringLen8(),
+            EstateID = p.ReadUInt32(),
+            ParentEstateID = p.ReadUInt32(),
+            RegionFlags = p.ReadUInt32(),
+            BillableFactor = p.ReadFloat(),
+            PricePerMeter = p.ReadInt32(),
+            RedirectGridX = p.ReadInt32(),
+            RedirectGridY = p.ReadInt32()
+        };
     }
 }

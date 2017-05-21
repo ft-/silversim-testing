@@ -35,6 +35,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             Single = 0,
             Multiple = 1
         }
+
         public RequestResultType RequestResult;
         public Int32 SequenceID;
         public bool SnapSelection;
@@ -99,13 +100,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public bool ObscureMedia;
         public bool ObscureMusic;
 
-        public override MessageType Number
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public override MessageType Number => 0;
 
         public override IValue SerializeEQG()
         {

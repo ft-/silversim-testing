@@ -28,18 +28,19 @@ namespace SilverSim.Viewer.Messages.LayerData
 {
     public static partial class LayerCompressor
     {
-        public static LayerData ToLayerMessage(List<LayerPatch> patches, Messages.LayerData.LayerData.LayerDataType type)
+        public static LayerData ToLayerMessage(List<LayerPatch> patches, LayerData.LayerDataType type)
         {
             int outlength;
             return ToLayerMessage(patches, type, 0, patches.Count, out outlength);
         }
 
-        public static LayerData ToLayerMessage(List<LayerPatch> patches, Messages.LayerData.LayerData.LayerDataType type, int offset, int length, out int outlength)
+        public static LayerData ToLayerMessage(List<LayerPatch> patches, LayerData.LayerDataType type, int offset, int length, out int outlength)
         {
             outlength = 0;
-            var layer = new LayerData();
-            layer.LayerType = type;
-
+            var layer = new LayerData()
+            {
+                LayerType = type
+            };
             bool extended = false;
             switch(type)
             {
@@ -107,13 +108,13 @@ namespace SilverSim.Viewer.Messages.LayerData
                     pheader.QuantWBits = 136;
                     if (extended)
                     {
-                        pheader.PatchIDs = (layerpatch.Y & 0xFFFF);
-                        pheader.PatchIDs += (layerpatch.X << 16);
+                        pheader.PatchIDs = layerpatch.Y & 0xFFFF;
+                        pheader.PatchIDs += layerpatch.X << 16;
                     }
                     else
                     {
-                        pheader.PatchIDs = (layerpatch.Y & 0x1F);
-                        pheader.PatchIDs += (layerpatch.X << 5);
+                        pheader.PatchIDs = layerpatch.Y & 0x1F;
+                        pheader.PatchIDs += layerpatch.X << 5;
                     }
 
                     int[] patch = CompressPatch(layerpatch, pheader, 10);
@@ -166,7 +167,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             int temp;
             int wbits = (header.QuantWBits & 0x0f) + 2;
             uint maxWbits = (uint)wbits + 5;
-            uint minWbits = ((uint)wbits >> 1);
+            uint minWbits = (uint)wbits >> 1;
 
             wbits = (int)minWbits;
 
@@ -196,7 +197,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                 }
             }
 
-            wbits += 1;
+            wbits++;
 
             if(wbits > 17)
             {
@@ -209,11 +210,11 @@ namespace SilverSim.Viewer.Messages.LayerData
 
             header.QuantWBits &= 0xf0;
 
-            header.QuantWBits |= (wbits - 2);
+            header.QuantWBits |= wbits - 2;
 
             output.PackBits(header.QuantWBits, 8);
             output.FloatValue = header.DCOffset;
-            
+
             output.PackBits(header.Range, 16);
             if (extended)
             {
@@ -229,7 +230,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             return wbits;
         }
 
-        static readonly ILog m_Log = LogManager.GetLogger("LAYER COMPRESSOR");
+        private static readonly ILog m_Log = LogManager.GetLogger("LAYER COMPRESSOR");
 
         private static void EncodePatch(BitPacker output, int[] patch, int postquant, int wbits)
         {

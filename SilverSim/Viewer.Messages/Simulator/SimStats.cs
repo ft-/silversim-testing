@@ -78,6 +78,7 @@ namespace SilverSim.Viewer.Messages.Simulator
                 StatID = type;
                 StatValue = 0;
             }
+
             public Data(StatType type, double val)
             {
                 StatID = type;

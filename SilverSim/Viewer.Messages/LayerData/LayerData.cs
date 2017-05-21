@@ -44,13 +44,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         public LayerDataType LayerType;
         public byte[] Data = new byte[0];
 
-        public override string TypeDescription
-        {
-            get
-            {
-                return Number.ToString()+ "." + LayerType.ToString();
-            }
-        }
+        public override string TypeDescription => Number.ToString() + "." + LayerType.ToString();
 
         public override bool ZeroFlag
         {
@@ -84,7 +78,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                     }
                 }
 
-                return (bytecnt < Data.Length);
+                return bytecnt < Data.Length;
             }
         }
 
@@ -95,13 +89,10 @@ namespace SilverSim.Viewer.Messages.LayerData
             p.WriteBytes(Data);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new LayerData()
         {
-            return new LayerData()
-            {
-                LayerType = (LayerDataType)p.ReadUInt8(),
-                Data = p.ReadBytes(p.ReadUInt16())
-            };
-        }
+            LayerType = (LayerDataType)p.ReadUInt8(),
+            Data = p.ReadBytes(p.ReadUInt16())
+        };
     }
 }

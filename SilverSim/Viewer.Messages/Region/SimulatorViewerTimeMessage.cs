@@ -45,17 +45,14 @@ namespace SilverSim.Viewer.Messages.Region
             p.WriteVector3f(SunAngVelocity);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new SimulatorViewerTimeMessage()
         {
-            return new SimulatorViewerTimeMessage()
-            {
-                UsecSinceStart = p.ReadUInt64(),
-                SecPerDay = p.ReadUInt32(),
-                SecPerYear = p.ReadUInt32(),
-                SunDirection = p.ReadVector3f(),
-                SunPhase = p.ReadFloat(),
-                SunAngVelocity = p.ReadVector3f()
-            };
-        }
+            UsecSinceStart = p.ReadUInt64(),
+            SecPerDay = p.ReadUInt32(),
+            SecPerYear = p.ReadUInt32(),
+            SunDirection = p.ReadVector3f(),
+            SunPhase = p.ReadFloat(),
+            SunAngVelocity = p.ReadVector3f()
+        };
     }
 }

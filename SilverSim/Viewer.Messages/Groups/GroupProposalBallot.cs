@@ -35,17 +35,14 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID;
         public string VoteCast;
 
-        public static GroupProposalBallot Decode(UDPPacket p)
+        public static GroupProposalBallot Decode(UDPPacket p) => new GroupProposalBallot()
         {
-            return new GroupProposalBallot()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                ProposalID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                VoteCast = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            ProposalID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            VoteCast = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

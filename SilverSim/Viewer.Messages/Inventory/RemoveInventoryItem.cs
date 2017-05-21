@@ -66,24 +66,23 @@ namespace SilverSim.Viewer.Messages.Inventory
         {
             var llsd = new MapType
             {
+                ["AgentData"] = new AnArray
                 {
-                    "AgentData",
-                    new AnArray
+                    new MapType
                     {
-                        new MapType
-                        {
-                            { "AgentID", AgentID },
-                            { "SessionID", SessionID }
-                        }
+                        ["AgentID"] = AgentID,
+                        ["SessionID"] = SessionID
                     }
                 }
             };
-            AnArray itemDataArray = new AnArray();
+            var itemDataArray = new AnArray();
             foreach(UUID itemID in InventoryData)
             {
-                MapType itemData = new MapType();
-                itemData.Add("ItemID", itemID);
-                itemData.Add("AgentID", AgentID);
+                var itemData = new MapType
+                {
+                    ["ItemID"] = itemID,
+                    ["AgentID"] = AgentID
+                };
                 itemDataArray.Add(itemData);
             }
             llsd.Add("InventoryData", itemDataArray);

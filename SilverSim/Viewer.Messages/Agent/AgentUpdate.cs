@@ -41,23 +41,21 @@ namespace SilverSim.Viewer.Messages.Agent
         public ControlFlags ControlFlags;
         public byte Flags;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AgentUpdate()
         {
-            var m = new AgentUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.BodyRotation = p.ReadLLQuaternion();
-            m.HeadRotation = p.ReadLLQuaternion();
-            m.State = (AgentState)p.ReadUInt8();
-            m.CameraCenter = p.ReadVector3f();
-            m.CameraAtAxis = p.ReadVector3f();
-            m.CameraLeftAxis = p.ReadVector3f();
-            m.CameraUpAxis = p.ReadVector3f();
-            m.Far = p.ReadFloat();
-            m.ControlFlags = (ControlFlags)p.ReadUInt32();
-            m.Flags = p.ReadUInt8();
-            return m;
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            BodyRotation = p.ReadLLQuaternion(),
+            HeadRotation = p.ReadLLQuaternion(),
+            State = (AgentState)p.ReadUInt8(),
+            CameraCenter = p.ReadVector3f(),
+            CameraAtAxis = p.ReadVector3f(),
+            CameraLeftAxis = p.ReadVector3f(),
+            CameraUpAxis = p.ReadVector3f(),
+            Far = p.ReadFloat(),
+            ControlFlags = (ControlFlags)p.ReadUInt32(),
+            Flags = p.ReadUInt8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

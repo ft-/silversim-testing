@@ -39,14 +39,11 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteBoolean(IsReadable);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new InventoryAssetResponse()
         {
-            return new InventoryAssetResponse()
-            {
-                QueryID = p.ReadUUID(),
-                AssetID = p.ReadUUID(),
-                IsReadable = p.ReadBoolean()
-            };
-        }
+            QueryID = p.ReadUUID(),
+            AssetID = p.ReadUUID(),
+            IsReadable = p.ReadBoolean()
+        };
     }
 }

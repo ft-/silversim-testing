@@ -37,6 +37,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             public UUID ItemID;
             public InventoryFlags Flags;
         }
+
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
         public static Message Decode(UDPPacket p)

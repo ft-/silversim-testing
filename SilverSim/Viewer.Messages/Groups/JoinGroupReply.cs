@@ -39,14 +39,11 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteBoolean(Success);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new JoinGroupReply()
         {
-            return new JoinGroupReply()
-            {
-                AgentID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                Success = p.ReadBoolean()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            Success = p.ReadBoolean()
+        };
     }
 }

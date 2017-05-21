@@ -34,24 +34,13 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
         public UUID EjecteeID = UUID.Zero;
 
-        public override MessageType Number
+        public static Message Decode(UDPPacket p) => new EjectGroupMemberRequest()
         {
-            get 
-            {
-                return MessageType.EjectGroupMemberRequest;
-            }
-        }
-
-        public static Message Decode(UDPPacket p)
-        {
-            return new EjectGroupMemberRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                EjecteeID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            EjecteeID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

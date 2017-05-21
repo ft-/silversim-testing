@@ -37,13 +37,10 @@ namespace SilverSim.Viewer.Messages.Transfer
             p.WriteInt32(ChannelType);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new TransferAbort()
         {
-            return new TransferAbort()
-            {
-                TransferID = p.ReadUUID(),
-                ChannelType = p.ReadInt32()
-            };
-        }
+            TransferID = p.ReadUUID(),
+            ChannelType = p.ReadInt32()
+        };
     }
 }

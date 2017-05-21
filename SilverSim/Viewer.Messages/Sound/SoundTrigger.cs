@@ -46,20 +46,15 @@ namespace SilverSim.Viewer.Messages.Sound
             p.WriteFloat((float)Gain);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new SoundTrigger()
         {
-            var m = new SoundTrigger()
-            {
-                SoundID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                ObjectID = p.ReadUUID(),
-                ParentID = p.ReadUUID()
-            };
-            m.GridPosition.RegionHandle = p.ReadUInt64();
-            m.Position = p.ReadVector3f();
-            m.Gain = p.ReadFloat();
-
-            return m;
-        }
+            SoundID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            ObjectID = p.ReadUUID(),
+            ParentID = p.ReadUUID(),
+            GridPosition = new GridVector(p.ReadUInt64()),
+            Position = p.ReadVector3f(),
+            Gain = p.ReadFloat()
+        };
     }
 }

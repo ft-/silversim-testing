@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            RezScript m = new RezScript()
+            var m = new RezScript()
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

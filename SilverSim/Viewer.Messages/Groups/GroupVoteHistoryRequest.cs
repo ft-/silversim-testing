@@ -33,16 +33,13 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
         public UUID TransactionID = UUID.Zero;
 
-        public static GroupVoteHistoryRequest Decode(UDPPacket p)
+        public static GroupVoteHistoryRequest Decode(UDPPacket p) => new GroupVoteHistoryRequest()
         {
-            return new GroupVoteHistoryRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                TransactionID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            TransactionID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

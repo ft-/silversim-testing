@@ -40,11 +40,11 @@ namespace SilverSim.Viewer.Messages
             {
                 if(t.IsSubclassOf(typeof(Message)))
                 {
-                    if(null != Attribute.GetCustomAttribute(t, typeof(TrustedAttribute)) && !allowtrusteddecode)
+                    if(Attribute.GetCustomAttribute(t, typeof(TrustedAttribute)) != null && !allowtrusteddecode)
                     {
                         continue;
                     }
-                    UDPMessageAttribute m = (UDPMessageAttribute)Attribute.GetCustomAttribute(t, typeof(UDPMessageAttribute));
+                    var m = (UDPMessageAttribute)Attribute.GetCustomAttribute(t, typeof(UDPMessageAttribute));
                     if(m != null)
                     {
                         MethodInfo mi = t.GetMethod("Decode", new Type[] { typeof(UDPPacket) });

@@ -66,15 +66,12 @@ namespace SilverSim.Viewer.Messages.Inventory
         {
             var llsd = new MapType
             {
+                ["AgentData"] = new AnArray
                 {
-                    "AgentData",
-                    new AnArray
+                    new MapType
                     {
-                        new MapType
-                        {
-                            { "AgentID", AgentID },
-                            { "SessionID", SessionID }
-                        }
+                        ["AgentID"] = AgentID,
+                        ["SessionID"] = SessionID
                     }
                 }
             };
@@ -84,8 +81,8 @@ namespace SilverSim.Viewer.Messages.Inventory
             {
                 folderDataArray.Add(new MapType
                 {
-                    { "FolderID", folder },
-                    { "AgentID", AgentID }
+                    ["FolderID"] = folder,
+                    ["AgentID"] = AgentID
                 });
             }
             llsd.Add("FolderData", folderDataArray);

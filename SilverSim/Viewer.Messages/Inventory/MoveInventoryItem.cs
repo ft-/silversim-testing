@@ -38,6 +38,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             public UUID FolderID;
             public string NewName;
         }
+
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
         public static Message Decode(UDPPacket p)

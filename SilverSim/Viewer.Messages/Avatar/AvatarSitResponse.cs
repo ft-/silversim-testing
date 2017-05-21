@@ -47,19 +47,15 @@ namespace SilverSim.Viewer.Messages.Avatar
             p.WriteBoolean(ForceMouselook);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AvatarSitResponse()
         {
-            var m = new AvatarSitResponse()
-            {
-                SitObject = p.ReadUUID(),
-                IsAutoPilot = p.ReadBoolean(),
-                SitPosition = p.ReadVector3f(),
-                SitRotation = p.ReadLLQuaternion(),
-                CameraEyeOffset = p.ReadVector3f(),
-                CameraAtOffset = p.ReadVector3f(),
-                ForceMouselook = p.ReadBoolean()
-            };
-            return m;
-        }
+            SitObject = p.ReadUUID(),
+            IsAutoPilot = p.ReadBoolean(),
+            SitPosition = p.ReadVector3f(),
+            SitRotation = p.ReadLLQuaternion(),
+            CameraEyeOffset = p.ReadVector3f(),
+            CameraAtOffset = p.ReadVector3f(),
+            ForceMouselook = p.ReadBoolean()
+        };
     }
 }

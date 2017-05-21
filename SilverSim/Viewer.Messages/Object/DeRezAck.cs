@@ -37,13 +37,10 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteBoolean(Success);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new DeRezAck()
         {
-            return new DeRezAck()
-            {
-                TransactionID = p.ReadUUID(),
-                Success = p.ReadBoolean()
-            };
-        }
+            TransactionID = p.ReadUUID(),
+            Success = p.ReadBoolean()
+        };
     }
 }

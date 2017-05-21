@@ -44,16 +44,13 @@ namespace SilverSim.Viewer.Messages.User
             p.WriteStringLen16(Message);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new KickUser()
         {
-            return new KickUser()
-            {
-                IpAddr = p.ReadUInt32(),
-                Port = p.ReadUInt16(),
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                Message = p.ReadStringLen16()
-            };
-        }
+            IpAddr = p.ReadUInt32(),
+            Port = p.ReadUInt16(),
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            Message = p.ReadStringLen16()
+        };
     }
 }

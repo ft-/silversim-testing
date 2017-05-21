@@ -44,23 +44,20 @@ namespace SilverSim.Viewer.Messages.Object
         public string Name;
         public string Description;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new RezSingleAttachmentFromInv()
         {
-            return new RezSingleAttachmentFromInv()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                ItemID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                AttachmentPoint = (AttachmentPoint)p.ReadUInt8(),
-                ItemFlags = p.ReadUInt32(),
-                GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
-                Name = p.ReadStringLen8(),
-                Description = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            ItemID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            AttachmentPoint = (AttachmentPoint)p.ReadUInt8(),
+            ItemFlags = p.ReadUInt32(),
+            GroupMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32(),
+            Name = p.ReadStringLen8(),
+            Description = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

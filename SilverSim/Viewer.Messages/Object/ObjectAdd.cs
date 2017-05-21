@@ -78,47 +78,44 @@ namespace SilverSim.Viewer.Messages.Object
         public InventoryPermissionsMask EveryOnePermissions;
         public InventoryPermissionsMask CurrentPermissions = InventoryPermissionsMask.Every;
         public InventoryPermissionsMask NextOwnerPermissions;
-        public InventoryPermissionsMask GroupPermissions; 
+        public InventoryPermissionsMask GroupPermissions;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ObjectAdd()
         {
-            return new ObjectAdd()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
 
-                PCode = (PrimitiveCode)p.ReadUInt8(),
-                Material = (PrimitiveMaterial)p.ReadUInt8(),
-                AddFlags = p.ReadUInt32(),
-                PathCurve = p.ReadUInt8(),
-                ProfileCurve = p.ReadUInt8(),
-                PathBegin = p.ReadUInt16(),
-                PathEnd = p.ReadUInt16(),
-                PathScaleX = p.ReadUInt8(),
-                PathScaleY = p.ReadUInt8(),
-                PathShearX = p.ReadUInt8(),
-                PathShearY = p.ReadUInt8(),
-                PathTwist = p.ReadInt8(),
-                PathTwistBegin = p.ReadInt8(),
-                PathRadiusOffset = p.ReadInt8(),
-                PathTaperX = p.ReadInt8(),
-                PathTaperY = p.ReadInt8(),
-                PathRevolutions = p.ReadUInt8(),
-                PathSkew = p.ReadInt8(),
-                ProfileBegin = p.ReadUInt16(),
-                ProfileEnd = p.ReadUInt16(),
-                ProfileHollow = p.ReadUInt16(),
-                BypassRaycast = 0 != p.ReadUInt8(),
-                RayStart = p.ReadVector3f(),
-                RayEnd = p.ReadVector3f(),
-                RayTargetID = p.ReadUUID(),
-                RayEndIsIntersection = 0 != p.ReadUInt8(),
-                Scale = p.ReadVector3f(),
-                Rotation = p.ReadLLQuaternion(),
-                State = p.ReadUInt8()
-            };
-        }
+            PCode = (PrimitiveCode)p.ReadUInt8(),
+            Material = (PrimitiveMaterial)p.ReadUInt8(),
+            AddFlags = p.ReadUInt32(),
+            PathCurve = p.ReadUInt8(),
+            ProfileCurve = p.ReadUInt8(),
+            PathBegin = p.ReadUInt16(),
+            PathEnd = p.ReadUInt16(),
+            PathScaleX = p.ReadUInt8(),
+            PathScaleY = p.ReadUInt8(),
+            PathShearX = p.ReadUInt8(),
+            PathShearY = p.ReadUInt8(),
+            PathTwist = p.ReadInt8(),
+            PathTwistBegin = p.ReadInt8(),
+            PathRadiusOffset = p.ReadInt8(),
+            PathTaperX = p.ReadInt8(),
+            PathTaperY = p.ReadInt8(),
+            PathRevolutions = p.ReadUInt8(),
+            PathSkew = p.ReadInt8(),
+            ProfileBegin = p.ReadUInt16(),
+            ProfileEnd = p.ReadUInt16(),
+            ProfileHollow = p.ReadUInt16(),
+            BypassRaycast = 0 != p.ReadUInt8(),
+            RayStart = p.ReadVector3f(),
+            RayEnd = p.ReadVector3f(),
+            RayTargetID = p.ReadUUID(),
+            RayEndIsIntersection = 0 != p.ReadUInt8(),
+            Scale = p.ReadVector3f(),
+            Rotation = p.ReadLLQuaternion(),
+            State = p.ReadUInt8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

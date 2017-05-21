@@ -42,13 +42,7 @@ namespace SilverSim.Viewer.Messages.Groups
             public bool HasAttachment;
             public AssetType AssetType;
 
-            public int SizeInMessage
-            {
-                get
-                {
-                    return 25 + FromName.Length + Subject.ToUTF8ByteCount();
-                }
-            }
+            public int SizeInMessage => 25 + FromName.Length + Subject.ToUTF8ByteCount();
         }
 
         public List<GroupNoticeData> Data = new List<GroupNoticeData>();

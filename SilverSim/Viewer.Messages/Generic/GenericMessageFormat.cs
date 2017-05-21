@@ -34,11 +34,6 @@ namespace SilverSim.Viewer.Messages.Generic
 
         public List<byte[]> ParamList = new List<byte[]>();
 
-        public GenericMessageFormat()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);

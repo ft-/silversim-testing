@@ -26,6 +26,7 @@ namespace SilverSim.Viewer.Messages.Parcel
     [Flags]
     public enum ParcelAccessList : uint
     {
+        None = 0,
         Access = 1,
         Ban = 2,
         AllowExperience = 8,

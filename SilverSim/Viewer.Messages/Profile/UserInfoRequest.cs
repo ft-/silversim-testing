@@ -31,14 +31,11 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID AgentID;
         public UUID SessionID;
 
-        public static UserInfoRequest Decode(UDPPacket p)
+        public static UserInfoRequest Decode(UDPPacket p) => new UserInfoRequest()
         {
-            return new UserInfoRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

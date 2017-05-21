@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public List<Data> ObjectData = new List<Data>(); 
+        public List<Data> ObjectData = new List<Data>();
 
         public static Message Decode(UDPPacket p)
         {

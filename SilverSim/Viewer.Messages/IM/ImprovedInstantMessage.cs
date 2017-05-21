@@ -77,25 +77,22 @@ namespace SilverSim.Viewer.Messages.IM
             Timestamp = gim.Timestamp ?? new Date();
         }
 
-        public static explicit operator GridInstantMessage(ImprovedInstantMessage m)
+        public static explicit operator GridInstantMessage(ImprovedInstantMessage m) => new GridInstantMessage()
         {
-            var im = new GridInstantMessage();
-            im.FromAgent.ID = m.AgentID;
-            im.FromGroup.ID = m.AgentID;
-            im.IsFromGroup = m.FromGroup;
-            im.ToAgent.ID = m.ToAgentID;
-            im.ParentEstateID = m.ParentEstateID;
-            im.RegionID = m.RegionID;
-            im.Position = m.Position;
-            im.IsOffline = m.IsOffline;
-            im.Dialog = m.Dialog;
-            im.IMSessionID = m.ID;
-            im.Timestamp = m.Timestamp;
-            im.FromAgent.FullName = m.FromAgentName;
-            im.Message = m.Message;
-            im.BinaryBucket = m.BinaryBucket;
-            return im;
-        }
+            FromAgent = new UUI { ID = m.AgentID, FullName = m.FromAgentName },
+            FromGroup = new UGI(m.AgentID),
+            IsFromGroup = m.FromGroup,
+            ToAgent = new UUI(m.ToAgentID),
+            ParentEstateID = m.ParentEstateID,
+            RegionID = m.RegionID,
+            Position = m.Position,
+            IsOffline = m.IsOffline,
+            Dialog = m.Dialog,
+            IMSessionID = m.ID,
+            Timestamp = m.Timestamp,
+            Message = m.Message,
+            BinaryBucket = m.BinaryBucket
+        };
 
         public override void Serialize(UDPPacket p)
         {
@@ -116,25 +113,22 @@ namespace SilverSim.Viewer.Messages.IM
             p.WriteBytes(BinaryBucket);
         }
 
-        public static ImprovedInstantMessage Decode(UDPPacket p)
+        public static ImprovedInstantMessage Decode(UDPPacket p) => new ImprovedInstantMessage()
         {
-            return new ImprovedInstantMessage()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                FromGroup = p.ReadBoolean(),
-                ToAgentID = p.ReadUUID(),
-                ParentEstateID = p.ReadUInt32(),
-                RegionID = p.ReadUUID(),
-                Position = p.ReadVector3f(),
-                IsOffline = p.ReadBoolean(),
-                Dialog = (GridInstantMessageDialog)p.ReadUInt8(),
-                ID = p.ReadUUID(),
-                Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32()),
-                FromAgentName = p.ReadStringLen8(),
-                Message = p.ReadStringLen16(),
-                BinaryBucket = p.ReadBytes((int)(uint)p.ReadUInt16())
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            FromGroup = p.ReadBoolean(),
+            ToAgentID = p.ReadUUID(),
+            ParentEstateID = p.ReadUInt32(),
+            RegionID = p.ReadUUID(),
+            Position = p.ReadVector3f(),
+            IsOffline = p.ReadBoolean(),
+            Dialog = (GridInstantMessageDialog)p.ReadUInt8(),
+            ID = p.ReadUUID(),
+            Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32()),
+            FromAgentName = p.ReadStringLen8(),
+            Message = p.ReadStringLen16(),
+            BinaryBucket = p.ReadBytes((int)(uint)p.ReadUInt16())
+        };
     }
 }

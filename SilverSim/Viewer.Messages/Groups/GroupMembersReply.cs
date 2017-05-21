@@ -47,13 +47,7 @@ namespace SilverSim.Viewer.Messages.Groups
             public string Title;
             public bool IsOwner;
 
-            public int SizeInMessage
-            {
-                get
-                {
-                    return 33 + Title.ToUTF8ByteCount() + OnlineStatus.ToUTF8ByteCount();
-                }
-            }
+            public int SizeInMessage => 33 + Title.ToUTF8ByteCount() + OnlineStatus.ToUTF8ByteCount();
         }
 
         public List<MemberDataEntry> MemberData = new List<MemberDataEntry>();

@@ -62,25 +62,22 @@ namespace SilverSim.Viewer.Messages.Event
             p.WriteUInt32(EventFlags);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new EventInfoReply()
         {
-            return new EventInfoReply()
-            {
-                AgentID = p.ReadUUID(),
-                EventID = p.ReadUInt32(),
-                Creator = p.ReadStringLen8(),
-                Name = p.ReadStringLen8(),
-                Category = p.ReadStringLen8(),
-                Desc = p.ReadStringLen16(),
-                Date = p.ReadStringLen8(),
-                DateUTC = p.ReadUInt32(),
-                Duration = p.ReadUInt32(),
-                Cover = p.ReadUInt32(),
-                Amount = p.ReadUInt32(),
-                SimName = p.ReadStringLen8(),
-                GlobalPos = p.ReadVector3d(),
-                EventFlags = p.ReadUInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            EventID = p.ReadUInt32(),
+            Creator = p.ReadStringLen8(),
+            Name = p.ReadStringLen8(),
+            Category = p.ReadStringLen8(),
+            Desc = p.ReadStringLen16(),
+            Date = p.ReadStringLen8(),
+            DateUTC = p.ReadUInt32(),
+            Duration = p.ReadUInt32(),
+            Cover = p.ReadUInt32(),
+            Amount = p.ReadUInt32(),
+            SimName = p.ReadStringLen8(),
+            GlobalPos = p.ReadVector3d(),
+            EventFlags = p.ReadUInt32()
+        };
     }
 }

@@ -39,18 +39,15 @@ namespace SilverSim.Viewer.Messages.Script
         public Int32 ButtonIndex;
         public string ButtonLabel = string.Empty;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ScriptDialogReply()
         {
-            return new ScriptDialogReply()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                ObjectID = p.ReadUUID(),
-                ChatChannel = p.ReadInt32(),
-                ButtonIndex = p.ReadInt32(),
-                ButtonLabel = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            ObjectID = p.ReadUUID(),
+            ChatChannel = p.ReadInt32(),
+            ButtonIndex = p.ReadInt32(),
+            ButtonLabel = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

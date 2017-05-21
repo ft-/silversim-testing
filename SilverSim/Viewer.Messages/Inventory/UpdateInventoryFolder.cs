@@ -39,6 +39,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             public InventoryType Type;
             public string Name;
         }
+
         public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
         public static Message Decode(UDPPacket p)

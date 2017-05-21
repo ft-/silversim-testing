@@ -83,30 +83,34 @@ namespace SilverSim.Viewer.Messages.Map
 
         public static Message Decode(UDPPacket p)
         {
-            MapBlockReply m = new MapBlockReply();
-            m.AgentID = p.ReadUUID();
-            m.Flags = (MapAgentFlags)p.ReadUInt32();
+            var m = new MapBlockReply()
+            {
+                AgentID = p.ReadUUID(),
+                Flags = (MapAgentFlags)p.ReadUInt32()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                DataEntry d = new DataEntry();
-                d.X = p.ReadUInt16();
-                d.Y = p.ReadUInt16();
-                d.Name = p.ReadStringLen8();
-                d.Access = (RegionAccess)p.ReadUInt8();
-                d.RegionFlags = (RegionOptionFlags)p.ReadUInt32();
-                d.WaterHeight = p.ReadUInt8();
-                d.Agents = p.ReadUInt8();
-                d.MapImageID = p.ReadUUID();
-                m.Data.Add(d);
+                m.Data.Add(new DataEntry()
+                {
+                    X = p.ReadUInt16(),
+                    Y = p.ReadUInt16(),
+                    Name = p.ReadStringLen8(),
+                    Access = (RegionAccess)p.ReadUInt8(),
+                    RegionFlags = (RegionOptionFlags)p.ReadUInt32(),
+                    WaterHeight = p.ReadUInt8(),
+                    Agents = p.ReadUInt8(),
+                    MapImageID = p.ReadUUID()
+                });
             }
             n = p.ReadUInt8();
             while(n--!=0)
             {
-                SizeInfo d = new SizeInfo();
-                d.X = p.ReadUInt16();
-                d.Y = p.ReadUInt16();
-                m.Size.Add(d);
+                m.Size.Add(new SizeInfo()
+                {
+                    X = p.ReadUInt16(),
+                    Y = p.ReadUInt16()
+                });
             }
             return m;
         }

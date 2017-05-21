@@ -32,14 +32,8 @@ namespace SilverSim.Viewer.Messages.Circuit
             /* no data to serialize */
         }
 
-        public static Message Decode(UDPPacket p)
-        {
-            return new DisableSimulator();
-        }
+        public static Message Decode(UDPPacket p) => new DisableSimulator();
 
-        public override Types.IValue SerializeEQG()
-        {
-            return new Types.Map();
-        }
+        public override Types.IValue SerializeEQG() => new Types.Map();
     }
 }

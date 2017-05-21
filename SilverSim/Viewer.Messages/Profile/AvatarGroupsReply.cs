@@ -70,18 +70,19 @@ namespace SilverSim.Viewer.Messages.Profile
 
         public override IValue SerializeEQG()
         {
-            var llsd = new MapType();
-
             var agentDataArray = new AnArray
             {
                 new MapType
-            {
-                { "AgentID", AgentID },
-                { "AvatarID", AvatarID }
-            }
+                {
+                    ["AgentID"] = AgentID,
+                    ["AvatarID"] = AvatarID
+                }
             };
-            llsd.Add("AgentData", agentDataArray);
 
+            var llsd = new MapType
+            {
+                ["AgentData"] = agentDataArray
+            };
             var groupDataArray = new AnArray();
             var newGroupDataArray = new AnArray();
 

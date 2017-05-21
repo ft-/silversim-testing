@@ -50,19 +50,16 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteInt32(Amount);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new GroupAccountDetailsReply()
         {
-            return new GroupAccountDetailsReply()
-            {
-                AgentID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                RequestID = p.ReadUUID(),
-                IntervalDays = p.ReadInt32(),
-                CurrentInterval = p.ReadInt32(),
-                StartDate = p.ReadStringLen8(),
-                Description = p.ReadStringLen8(),
-                Amount = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            RequestID = p.ReadUUID(),
+            IntervalDays = p.ReadInt32(),
+            CurrentInterval = p.ReadInt32(),
+            StartDate = p.ReadStringLen8(),
+            Description = p.ReadStringLen8(),
+            Amount = p.ReadInt32()
+        };
     }
 }

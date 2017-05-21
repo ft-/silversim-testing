@@ -37,18 +37,15 @@ namespace SilverSim.Viewer.Messages.Groups
         public int IntervalDays;
         public int CurrentInterval;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new GroupAccountDetailsRequest()
         {
-            return new GroupAccountDetailsRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                RequestID = p.ReadUUID(),
-                IntervalDays = p.ReadInt32(),
-                CurrentInterval = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            RequestID = p.ReadUUID(),
+            IntervalDays = p.ReadInt32(),
+            CurrentInterval = p.ReadInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

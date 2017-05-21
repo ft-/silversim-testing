@@ -43,26 +43,23 @@ namespace SilverSim.Viewer.Messages.User
         public string Details;
         public string VersionString;
 
-        public static UserReport Decode(UDPPacket p)
+        public static UserReport Decode(UDPPacket p) => new UserReport()
         {
-            return new UserReport()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                ReportType = p.ReadUInt8(),
-                Category = p.ReadUInt8(),
-                Position = p.ReadVector3f(),
-                CheckFlags = p.ReadUInt8(),
-                ScreenshotID = p.ReadUUID(),
-                ObjectID = p.ReadUUID(),
-                AbuserID = p.ReadUUID(),
-                AbuseRegionName = p.ReadStringLen8(),
-                AbuseRegionID = p.ReadUUID(),
-                Summary = p.ReadStringLen8(),
-                Details = p.ReadStringLen16(),
-                VersionString = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            ReportType = p.ReadUInt8(),
+            Category = p.ReadUInt8(),
+            Position = p.ReadVector3f(),
+            CheckFlags = p.ReadUInt8(),
+            ScreenshotID = p.ReadUUID(),
+            ObjectID = p.ReadUUID(),
+            AbuserID = p.ReadUUID(),
+            AbuseRegionName = p.ReadStringLen8(),
+            AbuseRegionID = p.ReadUUID(),
+            Summary = p.ReadStringLen8(),
+            Details = p.ReadStringLen16(),
+            VersionString = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

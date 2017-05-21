@@ -34,16 +34,13 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID TargetID = UUID.Zero;
         public string Notes;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AvatarNotesUpdate()
         {
-            return new AvatarNotesUpdate()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                TargetID = p.ReadUUID(),
-                Notes = p.ReadStringLen16()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            TargetID = p.ReadUUID(),
+            Notes = p.ReadStringLen16()
+        };
 
         public override void Serialize(UDPPacket p)
         {

@@ -33,15 +33,12 @@ namespace SilverSim.Viewer.Messages.Circuit
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new UseCircuitCode()
         {
-            return new UseCircuitCode()
-            {
-                CircuitCode = p.ReadUInt32(),
-                SessionID = p.ReadUUID(),
-                AgentID = p.ReadUUID()
-            };
-        }
+            CircuitCode = p.ReadUInt32(),
+            SessionID = p.ReadUUID(),
+            AgentID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

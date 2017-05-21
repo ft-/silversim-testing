@@ -41,23 +41,21 @@ namespace SilverSim.Viewer.Messages.Agent
         public Vector3 UpAxis;
         public bool ChangedGrid;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ChildAgentPositionUpdate()
         {
-            var m = new ChildAgentPositionUpdate();
-            m.RegionLocation.RegionHandle = p.ReadUInt64();
-            m.ViewerCircuitCode = p.ReadUInt32();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.AgentPosition = p.ReadVector3f();
-            m.AgentVelocity = p.ReadVector3f();
-            m.Center = p.ReadVector3f();
-            m.Size = p.ReadVector3f();
-            m.AtAxis = p.ReadVector3f();
-            m.LeftAxis = p.ReadVector3f();
-            m.UpAxis = p.ReadVector3f();
-            m.ChangedGrid = p.ReadBoolean();
-            return m;
-        }
+            RegionLocation = new GridVector(p.ReadUInt64()),
+            ViewerCircuitCode = p.ReadUInt32(),
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            AgentPosition = p.ReadVector3f(),
+            AgentVelocity = p.ReadVector3f(),
+            Center = p.ReadVector3f(),
+            Size = p.ReadVector3f(),
+            AtAxis = p.ReadVector3f(),
+            LeftAxis = p.ReadVector3f(),
+            UpAxis = p.ReadVector3f(),
+            ChangedGrid = p.ReadBoolean()
+        };
 
         public override void Serialize(UDPPacket p)
         {

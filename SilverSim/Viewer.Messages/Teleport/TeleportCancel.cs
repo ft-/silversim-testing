@@ -31,14 +31,11 @@ namespace SilverSim.Viewer.Messages.Teleport
         public UUID AgentID;
         public UUID SessionID;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new TeleportCancel()
         {
-            return new TeleportCancel()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

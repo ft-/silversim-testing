@@ -31,14 +31,11 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID AgentID;
         public UUID ItemID;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new DetachAttachmentIntoInv()
         {
-            return new DetachAttachmentIntoInv()
-            {
-                AgentID = p.ReadUUID(),
-                ItemID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            ItemID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

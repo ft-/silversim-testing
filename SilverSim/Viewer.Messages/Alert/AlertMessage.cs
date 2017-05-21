@@ -39,7 +39,6 @@ namespace SilverSim.Viewer.Messages.Alert
 
         public AlertMessage()
         {
-
         }
 
         public AlertMessage(string message)

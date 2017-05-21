@@ -41,15 +41,12 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteStringLen8(Message);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new CreateGroupReply()
         {
-            return new CreateGroupReply()
-            {
-                AgentID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                Success = p.ReadBoolean(),
-                Message = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            Success = p.ReadBoolean(),
+            Message = p.ReadStringLen8()
+        };
     }
 }

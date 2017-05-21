@@ -37,19 +37,16 @@ namespace SilverSim.Viewer.Messages.StartLocation
         public Vector3 LocationPos;
         public Vector3 LocationLookAt;
 
-        public static SetStartLocationRequest Decode(UDPPacket p)
+        public static SetStartLocationRequest Decode(UDPPacket p) => new SetStartLocationRequest()
         {
-            return new SetStartLocationRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
 
-                SimName = p.ReadStringLen8(),
-                LocationID = p.ReadUInt32(),
-                LocationPos = p.ReadVector3f(),
-                LocationLookAt = p.ReadVector3f()
-            };
-        }
+            SimName = p.ReadStringLen8(),
+            LocationID = p.ReadUInt32(),
+            LocationPos = p.ReadVector3f(),
+            LocationLookAt = p.ReadVector3f()
+        };
 
         public override void Serialize(UDPPacket p)
         {

@@ -35,17 +35,14 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID InviteeID = UUID.Zero;
         public UUID RoleID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new InviteGroupRequest()
         {
-            return new InviteGroupRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                InviteeID = p.ReadUUID(),
-                RoleID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            InviteeID = p.ReadUUID(),
+            RoleID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

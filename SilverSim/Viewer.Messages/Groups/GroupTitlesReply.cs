@@ -38,13 +38,7 @@ namespace SilverSim.Viewer.Messages.Groups
             public string Title;
             public UUID RoleID;
             public bool Selected;
-            public int SizeInMessage
-            {
-                get
-                {
-                    return 20 + Title.ToUTF8ByteCount();
-                }
-            }
+            public int SizeInMessage => 20 + Title.ToUTF8ByteCount();
         }
 
         public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();

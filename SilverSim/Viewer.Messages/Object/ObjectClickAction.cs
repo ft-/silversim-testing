@@ -44,10 +44,11 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            ObjectClickAction m = new ObjectClickAction();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ObjectClickAction()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {

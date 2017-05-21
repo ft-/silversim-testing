@@ -31,25 +31,16 @@ namespace SilverSim.Viewer.Messages.Circuit
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-
-        public ConfirmEnableSimulator()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ConfirmEnableSimulator()
         {
-            return new ConfirmEnableSimulator()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID()
+        };
     }
 }

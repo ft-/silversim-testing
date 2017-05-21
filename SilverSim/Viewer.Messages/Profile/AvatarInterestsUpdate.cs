@@ -38,19 +38,16 @@ namespace SilverSim.Viewer.Messages.Profile
         public string SkillsText;
         public string LanguagesText;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AvatarInterestsUpdate()
         {
-            return new AvatarInterestsUpdate()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                WantToMask = p.ReadUInt32(),
-                WantToText = p.ReadStringLen8(),
-                SkillsMask = p.ReadUInt32(),
-                SkillsText = p.ReadStringLen8(),
-                LanguagesText = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            WantToMask = p.ReadUInt32(),
+            WantToText = p.ReadStringLen8(),
+            SkillsMask = p.ReadUInt32(),
+            SkillsText = p.ReadStringLen8(),
+            LanguagesText = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

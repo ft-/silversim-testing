@@ -74,18 +74,24 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public override IValue SerializeEQG()
         {
-            var om = new Types.Map();
-            var m = new Types.Map();
-            var array = new AnArray();
-            array.Add(m);
-            om.Add("Info", array);
-            m.Add("AgentID", AgentID);
-            m.Add("LocationID", (int)LocationID);
-            m.Add("RegionHandle", new BinaryData(GridPosition.AsBytes));
-            m.Add("SeedCapability", SeedCapability);
-            m.Add("SimAccess", (byte)SimAccess);
-            m.Add("SimIP", new BinaryData(SimIP.GetAddressBytes()));
-            m.Add("SimPort", SimPort);
+            var m = new Types.Map
+            {
+                { "AgentID", AgentID },
+                { "LocationID", (int)LocationID },
+                { "RegionHandle", new BinaryData(GridPosition.AsBytes) },
+                { "SeedCapability", SeedCapability },
+                { "SimAccess", (byte)SimAccess },
+                { "SimIP", new BinaryData(SimIP.GetAddressBytes()) },
+                { "SimPort", SimPort }
+            };
+            var array = new AnArray
+            {
+                m
+            };
+            var om = new Types.Map
+            {
+                ["Info"] = array
+            };
             byte[] b = BitConverter.GetBytes((ulong)TeleportFlags);
             if (!BitConverter.IsLittleEndian)
             {

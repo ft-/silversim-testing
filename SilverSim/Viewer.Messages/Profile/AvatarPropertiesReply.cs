@@ -58,22 +58,19 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteUInt32(Flags);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AvatarPropertiesReply()
         {
-            return new AvatarPropertiesReply()
-            {
-                AgentID = p.ReadUUID(),
-                AvatarID = p.ReadUUID(),
-                ImageID = p.ReadUUID(),
-                FLImageID = p.ReadUUID(),
-                PartnerID = p.ReadUUID(),
-                AboutText = p.ReadStringLen16(),
-                FLAboutText = p.ReadStringLen8(),
-                BornOn = p.ReadStringLen8(),
-                ProfileURL = p.ReadStringLen8(),
-                CharterMember = p.ReadBytes(p.ReadUInt8()),
-                Flags = p.ReadUInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            AvatarID = p.ReadUUID(),
+            ImageID = p.ReadUUID(),
+            FLImageID = p.ReadUUID(),
+            PartnerID = p.ReadUUID(),
+            AboutText = p.ReadStringLen16(),
+            FLAboutText = p.ReadStringLen8(),
+            BornOn = p.ReadStringLen8(),
+            ProfileURL = p.ReadStringLen8(),
+            CharterMember = p.ReadBytes(p.ReadUInt8()),
+            Flags = p.ReadUInt32()
+        };
     }
 }

@@ -48,7 +48,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         }
 
         public List<FolderDataEntry> FolderData = new List<FolderDataEntry>();
-        
+
         public struct ItemDataEntry
         {
             public UUID ItemID;

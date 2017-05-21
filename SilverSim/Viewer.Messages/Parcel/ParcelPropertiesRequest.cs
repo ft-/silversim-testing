@@ -39,20 +39,17 @@ namespace SilverSim.Viewer.Messages.Parcel
         public double North;
         public bool SnapSelection;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ParcelPropertiesRequest()
         {
-            return new ParcelPropertiesRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                SequenceID = p.ReadInt32(),
-                West = p.ReadFloat(),
-                South = p.ReadFloat(),
-                East = p.ReadFloat(),
-                North = p.ReadFloat(),
-                SnapSelection = p.ReadBoolean()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            SequenceID = p.ReadInt32(),
+            West = p.ReadFloat(),
+            South = p.ReadFloat(),
+            East = p.ReadFloat(),
+            North = p.ReadFloat(),
+            SnapSelection = p.ReadBoolean()
+        };
 
         public override void Serialize(UDPPacket p)
         {

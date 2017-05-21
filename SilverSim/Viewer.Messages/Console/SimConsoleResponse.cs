@@ -38,9 +38,6 @@ namespace SilverSim.Viewer.Messages.Console
             Message = message;
         }
 
-        public override IValue SerializeEQG()
-        {
-            return new AString(Message);
-        }
+        public override IValue SerializeEQG() => new AString(Message);
     }
 }

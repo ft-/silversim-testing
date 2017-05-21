@@ -66,7 +66,6 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public UpdateCreateInventoryItem()
         {
-
         }
 
         public void AddItem(InventoryItem item, UInt32 callbackID)

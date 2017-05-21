@@ -26,6 +26,7 @@ namespace SilverSim.Viewer.Messages.Search
     [Flags]
     public enum SearchFlags : uint
     {
+        None = 0,
         People = 1,
         Online = 2,
         Events = 8,

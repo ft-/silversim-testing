@@ -47,17 +47,14 @@ namespace SilverSim.Viewer.Messages.Transfer
             p.WriteBytes(Params);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new TransferInfo()
         {
-            return new TransferInfo()
-            {
-                TransferID = p.ReadUUID(),
-                ChannelType = p.ReadInt32(),
-                TargetType = p.ReadInt32(),
-                Status = p.ReadInt32(),
-                Size = p.ReadInt32(),
-                Params = p.ReadBytes(p.ReadUInt16())
-            };
-        }
+            TransferID = p.ReadUUID(),
+            ChannelType = p.ReadInt32(),
+            TargetType = p.ReadInt32(),
+            Status = p.ReadInt32(),
+            Size = p.ReadInt32(),
+            Params = p.ReadBytes(p.ReadUInt16())
+        };
     }
 }

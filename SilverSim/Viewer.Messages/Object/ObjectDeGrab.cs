@@ -48,11 +48,12 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            ObjectDeGrab m = new ObjectDeGrab();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ObjectLocalID = p.ReadUInt32();
-
+            var m = new ObjectDeGrab()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID(),
+                ObjectLocalID = p.ReadUInt32()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {

@@ -43,18 +43,15 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public ChangeType Change;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new GroupRoleChanges()
         {
-            return new GroupRoleChanges()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                RoleID = p.ReadUUID(),
-                MemberID = p.ReadUUID(),
-                Change = (ChangeType)p.ReadUInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            GroupID = p.ReadUUID(),
+            RoleID = p.ReadUUID(),
+            MemberID = p.ReadUUID(),
+            Change = (ChangeType)p.ReadUInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

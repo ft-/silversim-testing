@@ -34,17 +34,14 @@ namespace SilverSim.Viewer.Messages.Teleport
         public Vector3 Position;
         public Vector3 LookAt;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new TeleportRequest()
         {
-            return new TeleportRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                RegionID = p.ReadUUID(),
-                Position = p.ReadVector3f(),
-                LookAt = p.ReadVector3f()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            RegionID = p.ReadUUID(),
+            Position = p.ReadVector3f(),
+            LookAt = p.ReadVector3f()
+        };
 
         public override void Serialize(UDPPacket p)
         {

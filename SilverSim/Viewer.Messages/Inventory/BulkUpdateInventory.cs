@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         }
 
         public List<FolderDataEntry> FolderData = new List<FolderDataEntry>();
-        
+
         public struct ItemDataEntry
         {
             public UUID ItemID;
@@ -106,48 +106,49 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public BulkUpdateInventory()
         {
-
         }
 
         public void AddInventoryFolder(InventoryFolder folder)
         {
-            var e = new FolderDataEntry();
-            e.FolderID = folder.ID;
-            e.ParentID = folder.ParentFolderID;
-            e.Type = folder.InventoryType;
-            e.Name = folder.Name;
-            FolderData.Add(e);
+            FolderData.Add(new FolderDataEntry()
+            {
+                FolderID = folder.ID,
+                ParentID = folder.ParentFolderID,
+                Type = folder.InventoryType,
+                Name = folder.Name
+            });
         }
 
         public void AddInventoryItem(InventoryItem item, UInt32 callbackID)
         {
-            var e = new ItemDataEntry();
-            e.ItemID = item.ID;
-            e.CallbackID = callbackID;
-            e.FolderID = item.ParentFolderID;
-            e.CreatorID = item.Creator.ID;
-            e.OwnerID = item.Owner.ID;
-            e.GroupID = item.Group.ID;
-            e.BaseMask = item.Permissions.Base | item.Permissions.Current;
-            e.OwnerMask = item.Permissions.Current;
-            e.GroupMask = item.Permissions.Group;
-            e.EveryoneMask = item.Permissions.EveryOne;
-            e.NextOwnerMask = item.Permissions.NextOwner;
-            e.IsGroupOwned = item.IsGroupOwned;
-            e.AssetID = item.AssetID;
-            e.Type = item.AssetType;
-            e.InvType = item.InventoryType;
-            e.Flags = item.Flags;
-            e.SalePrice = item.SaleInfo.Price;
-            e.SaleType = item.SaleInfo.Type;
-            e.Name = item.Name;
-            e.Description = item.Description;
-            e.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
-            ItemData.Add(e);
+            ItemData.Add(new ItemDataEntry()
+            {
+                ItemID = item.ID,
+                CallbackID = callbackID,
+                FolderID = item.ParentFolderID,
+                CreatorID = item.Creator.ID,
+                OwnerID = item.Owner.ID,
+                GroupID = item.Group.ID,
+                BaseMask = item.Permissions.Base | item.Permissions.Current,
+                OwnerMask = item.Permissions.Current,
+                GroupMask = item.Permissions.Group,
+                EveryoneMask = item.Permissions.EveryOne,
+                NextOwnerMask = item.Permissions.NextOwner,
+                IsGroupOwned = item.IsGroupOwned,
+                AssetID = item.AssetID,
+                Type = item.AssetType,
+                InvType = item.InventoryType,
+                Flags = item.Flags,
+                SalePrice = item.SaleInfo.Price,
+                SaleType = item.SaleInfo.Type,
+                Name = item.Name,
+                Description = item.Description,
+                CreationDate = (uint)item.CreationDate.DateTimeToUnixTime()
+            });
         }
 
         public BulkUpdateInventory(
-            UUID agentID, 
+            UUID agentID,
             UUID transactionID,
             UInt32 callbackID,
             InventoryItem item)
@@ -215,10 +216,11 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new BulkUpdateInventory();
-            m.AgentID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-
+            var m = new BulkUpdateInventory()
+            {
+                AgentID = p.ReadUUID(),
+                TransactionID = p.ReadUUID()
+            };
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
@@ -263,7 +265,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             return m;
         }
 
-        BinaryData EncodeU32ToBinary(uint val)
+        private BinaryData EncodeU32ToBinary(uint val)
         {
             byte[] ret = BitConverter.GetBytes(val);
             if(BitConverter.IsLittleEndian)
@@ -275,17 +277,19 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public override IValue SerializeEQG()
         {
-            var llsd = new MapType();
-
-            var agentDataArray = new AnArray();
-            agentDataArray.Add(new MapType
+            var agentDataArray = new AnArray
             {
-                { "AgentID", AgentID },
-                { "SessionID", SessionID },
-                { "TransactionID", TransactionID }
-            });
-            llsd.Add("AgentData", agentDataArray);
-
+                new MapType
+                {
+                    ["AgentID"] = AgentID,
+                    ["SessionID"] = SessionID,
+                    ["TransactionID"] = TransactionID
+                }
+            };
+            var llsd = new MapType
+            {
+                ["AgentData"] = agentDataArray
+            };
             var folderDataArray = new AnArray();
 
             foreach(var folder in FolderData)

@@ -46,15 +46,13 @@ namespace SilverSim.Viewer.Messages.Agent
             p.WriteBytes(Throttles);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AgentThrottle()
         {
-            var m = new AgentThrottle();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.CircuitCode = p.ReadUInt32();
-            m.GenCounter = p.ReadUInt32();
-            m.Throttles = p.ReadBytes((int)(uint)p.ReadUInt8());
-            return m;
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            CircuitCode = p.ReadUInt32(),
+            GenCounter = p.ReadUInt32(),
+            Throttles = p.ReadBytes((int)(uint)p.ReadUInt8())
+        };
     }
 }

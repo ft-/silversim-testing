@@ -62,21 +62,18 @@ namespace SilverSim.Viewer.Messages.Chat
             p.WriteStringLen16(Message);
         }
 
-        public static ChatPass Decode(UDPPacket p)
+        public static ChatPass Decode(UDPPacket p) => new ChatPass()
         {
-            ChatPass m = new ChatPass();
-            m.Channel = p.ReadInt32();
-            m.Position = p.ReadVector3f();
-            m.ID = p.ReadUUID();
-            m.OwnerID = p.ReadUUID();
-            m.Name = p.ReadStringLen8();
-            m.SourceType = (ChatSourceType)p.ReadUInt8();
-            m.ChatType = (ChatType)p.ReadUInt8();
-            m.Radius = p.ReadFloat();
-            m.SimAccess = (RegionAccess)p.ReadUInt8();
-            m.Message = p.ReadStringLen16();
-
-            return m;
-        }
+            Channel = p.ReadInt32(),
+            Position = p.ReadVector3f(),
+            ID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            Name = p.ReadStringLen8(),
+            SourceType = (ChatSourceType)p.ReadUInt8(),
+            ChatType = (ChatType)p.ReadUInt8(),
+            Radius = p.ReadFloat(),
+            SimAccess = (RegionAccess)p.ReadUInt8(),
+            Message = p.ReadStringLen16()
+        };
     }
 }

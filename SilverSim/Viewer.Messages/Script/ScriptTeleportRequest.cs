@@ -41,15 +41,12 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteVector3f(LookAt);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ScriptTeleportRequest()
         {
-            return new ScriptTeleportRequest()
-            {
-                ObjectName = p.ReadStringLen8(),
-                SimName = p.ReadStringLen8(),
-                SimPosition = p.ReadVector3f(),
-                LookAt = p.ReadVector3f()
-            };
-        }
+            ObjectName = p.ReadStringLen8(),
+            SimName = p.ReadStringLen8(),
+            SimPosition = p.ReadVector3f(),
+            LookAt = p.ReadVector3f()
+        };
     }
 }

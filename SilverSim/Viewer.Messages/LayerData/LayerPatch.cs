@@ -29,17 +29,15 @@ namespace SilverSim.Viewer.Messages.LayerData
         public uint X;
         public uint Y;
 
-        uint m_Serial = 1; /* we use a serial number similar to other places to know what an agent has already got */
+        private uint m_Serial = 1; /* we use a serial number similar to other places to know what an agent has already got */
 
         public uint Serial
         {
-            get
-            {
-                return m_Serial;
-            }
+            get { return m_Serial; }
+
             set
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     m_Serial = (value == 0) ?
                         1 :
@@ -62,16 +60,14 @@ namespace SilverSim.Viewer.Messages.LayerData
         public float[,] Data = new float[16,16];
 
         internal uint PackedSerial;
-        readonly byte[] PackedDataBytes = new byte[651]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
+        private readonly byte[] PackedDataBytes = new byte[651]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
         internal readonly BitPacker PackedData;
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
 
         public uint ExtendedPatchID
         {
-            get
-            {
-                return (X << 16) | Y;
-            }
+            get { return (X << 16) | Y; }
+
             set
             {
                 X = (value >> 16) & 0xFFFF;
@@ -165,13 +161,11 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public float this[int x, int y]
         {
-            get
-            {
-                return Data[y, x];
-            }
+            get { return Data[y, x]; }
+
             set
             {
-                lock(m_Lock)
+                lock (m_Lock)
                 {
                     Data[y, x] = value;
                 }
@@ -180,10 +174,8 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public float this[uint x, uint y]
         {
-            get
-            {
-                return Data[(int)y, (int)x];
-            }
+            get { return Data[(int)y, (int)x]; }
+
             set
             {
                 lock (m_Lock)

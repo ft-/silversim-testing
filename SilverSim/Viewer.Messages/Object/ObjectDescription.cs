@@ -43,10 +43,11 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            ObjectDescription m = new ObjectDescription();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-
+            var m = new ObjectDescription()
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {

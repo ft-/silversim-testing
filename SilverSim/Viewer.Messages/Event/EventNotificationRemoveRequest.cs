@@ -33,15 +33,12 @@ namespace SilverSim.Viewer.Messages.Event
         public UUID SessionID;
         public UInt32 EventID;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new EventNotificationRemoveRequest()
         {
-            return new EventNotificationRemoveRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                EventID = p.ReadUInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            EventID = p.ReadUInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

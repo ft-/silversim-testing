@@ -36,19 +36,16 @@ namespace SilverSim.Viewer.Messages.Event
         public UInt32 QueryFlags;
         public Int32 QueryStart;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new EventGodDelete()
         {
-            return new EventGodDelete()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                EventID = p.ReadUInt32(),
-                QueryID = p.ReadUUID(),
-                QueryText = p.ReadStringLen8(),
-                QueryFlags = p.ReadUInt32(),
-                QueryStart = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            EventID = p.ReadUInt32(),
+            QueryID = p.ReadUUID(),
+            QueryText = p.ReadStringLen8(),
+            QueryFlags = p.ReadUInt32(),
+            QueryStart = p.ReadInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

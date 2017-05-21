@@ -41,22 +41,19 @@ namespace SilverSim.Viewer.Messages.Economy
         public Int32 TransactionType;
         public string Description;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new MoneyTransferRequest()
         {
-            return new MoneyTransferRequest()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                SourceID = p.ReadUUID(),
-                DestID = p.ReadUUID(),
-                Flags = p.ReadUInt8(),
-                Amount = p.ReadInt32(),
-                AggregatePermNextOwner = p.ReadUInt8(),
-                AggregatePermInventory = p.ReadUInt8(),
-                TransactionType = p.ReadInt32(),
-                Description = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            SourceID = p.ReadUUID(),
+            DestID = p.ReadUUID(),
+            Flags = p.ReadUInt8(),
+            Amount = p.ReadInt32(),
+            AggregatePermNextOwner = p.ReadUInt8(),
+            AggregatePermInventory = p.ReadUInt8(),
+            TransactionType = p.ReadInt32(),
+            Description = p.ReadStringLen8()
+        };
 
         public override void Serialize(UDPPacket p)
         {

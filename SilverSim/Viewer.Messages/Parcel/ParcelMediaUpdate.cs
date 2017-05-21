@@ -50,19 +50,16 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteBoolean(MediaLoop);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ParcelMediaUpdate()
         {
-            return new ParcelMediaUpdate()
-            {
-                MediaURL = p.ReadStringLen8(),
-                MediaID = p.ReadUUID(),
-                MediaAutoScale = p.ReadBoolean(),
-                MediaType = p.ReadStringLen8(),
-                MediaDesc = p.ReadStringLen8(),
-                MediaWidth = p.ReadInt32(),
-                MediaHeight = p.ReadInt32(),
-                MediaLoop = p.ReadBoolean()
-            };
-        }
+            MediaURL = p.ReadStringLen8(),
+            MediaID = p.ReadUUID(),
+            MediaAutoScale = p.ReadBoolean(),
+            MediaType = p.ReadStringLen8(),
+            MediaDesc = p.ReadStringLen8(),
+            MediaWidth = p.ReadInt32(),
+            MediaHeight = p.ReadInt32(),
+            MediaLoop = p.ReadBoolean()
+        };
     }
 }

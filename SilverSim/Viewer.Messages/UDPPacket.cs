@@ -73,15 +73,13 @@ namespace SilverSim.Viewer.Messages
 
         public bool IsZeroEncoded
         {
-            get
-            {
-                return (Data[0] & 0x80) != 0;
-            }
+            get { return (Data[0] & 0x80) != 0; }
+
             set
             {
                 byte v = Data[0];
                 v &= 0x7F;
-                if(value)
+                if (value)
                 {
                     v |= 0x80;
                 }
@@ -91,10 +89,8 @@ namespace SilverSim.Viewer.Messages
 
         public bool IsReliable
         {
-            get
-            {
-                return (Data[0] & 0x40) != 0;
-            }
+            get { return (Data[0] & 0x40) != 0; }
+
             set
             {
                 byte v = Data[0];
@@ -109,10 +105,8 @@ namespace SilverSim.Viewer.Messages
 
         public bool IsResent
         {
-            get
-            {
-                return (Data[0] & 0x20) != 0;
-            }
+            get { return (Data[0] & 0x20) != 0; }
+
             set
             {
                 byte v = Data[0];
@@ -127,10 +121,8 @@ namespace SilverSim.Viewer.Messages
 
         public bool HasAckFlag
         {
-            get
-            {
-                return (Data[0] & 0x10) != 0;
-            }
+            get { return (Data[0] & 0x10) != 0; }
+
             set
             {
                 byte v = Data[0];
@@ -142,6 +134,7 @@ namespace SilverSim.Viewer.Messages
                 Data[0] = v;
             }
         }
+
         public int AppendedNumberOfAcks
         {
             get
@@ -164,7 +157,7 @@ namespace SilverSim.Viewer.Messages
                     numacks = Data[DataLength - 1];
                     int AckStartPos = DataLength - 1 - 4 * (int)numacks;
 
-                    List<UInt32> acknumbers = new List<uint>();
+                    var acknumbers = new List<uint>();
 
                     for (uint ackidx = 0; ackidx < numacks; ++ackidx)
                     {
@@ -751,7 +744,7 @@ namespace SilverSim.Viewer.Messages
                 return buf[0];
             }
             byte val = Data[DataPos];
-            DataPos += 1;
+            DataPos++;
             return val;
         }
 
@@ -759,14 +752,14 @@ namespace SilverSim.Viewer.Messages
         {
             if (IsZeroEncoded)
             {
-                byte[] buf = new byte[] { val };
+                var buf = new byte[] { val };
                 WriteZeroEncoded(buf);
             }
             else
             {
-                byte[] buf = new byte[]{val};
+                var buf = new byte[]{val};
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataPos += 1;
+                DataPos++;
                 DataLength = DataPos;
             }
         }
@@ -782,7 +775,7 @@ namespace SilverSim.Viewer.Messages
                 return (sbyte)buf[0];
             }
             sbyte val = (sbyte)Data[DataPos];
-            DataPos += 1;
+            DataPos++;
             return val;
         }
 
@@ -797,7 +790,7 @@ namespace SilverSim.Viewer.Messages
             {
                 byte[] buf = new byte[] { (byte)val };
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataPos += 1;
+                DataPos++;
                 DataLength = DataPos;
             }
         }
@@ -1200,5 +1193,15 @@ namespace SilverSim.Viewer.Messages
             DataLength = DataPos;
         }
         #endregion
+
+        public void WriteGridVector(GridVector v)
+        {
+            WriteUInt64(v.RegionHandle);
+        }
+
+        public GridVector ReadGridVector()
+        {
+            return new GridVector(ReadUInt64());
+        }
     }
 }

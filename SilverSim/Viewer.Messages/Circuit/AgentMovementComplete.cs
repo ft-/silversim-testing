@@ -48,19 +48,15 @@ namespace SilverSim.Viewer.Messages.Circuit
             p.WriteStringLen16(ChannelVersion);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new AgentMovementComplete()
         {
-            var m = new AgentMovementComplete()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                Position = p.ReadVector3f(),
-                LookAt = p.ReadVector3f()
-            };
-            m.GridPosition.RegionHandle = p.ReadUInt64();
-            m.Timestamp = p.ReadUInt32();
-            m.ChannelVersion = p.ReadStringLen16();
-            return m;
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            Position = p.ReadVector3f(),
+            LookAt = p.ReadVector3f(),
+            GridPosition = new GridVector(p.ReadUInt64()),
+            Timestamp = p.ReadUInt32(),
+            ChannelVersion = p.ReadStringLen16()
+        };
     }
 }

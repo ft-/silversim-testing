@@ -42,11 +42,6 @@ namespace SilverSim.Viewer.Messages.Friend
 
         public List<RightsEntry> Rights = new List<RightsEntry>();
 
-        public ChangeUserRights()
-        {
-
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);

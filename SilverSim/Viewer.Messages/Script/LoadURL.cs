@@ -45,17 +45,14 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteStringLen8(URL);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new LoadURL()
         {
-            return new LoadURL()
-            {
-                ObjectName = p.ReadStringLen8(),
-                ObjectID = p.ReadUUID(),
-                OwnerID = p.ReadUUID(),
-                OwnerIsGroup = p.ReadBoolean(),
-                Message = p.ReadStringLen8(),
-                URL = p.ReadStringLen8()
-            };
-        }
+            ObjectName = p.ReadStringLen8(),
+            ObjectID = p.ReadUUID(),
+            OwnerID = p.ReadUUID(),
+            OwnerIsGroup = p.ReadBoolean(),
+            Message = p.ReadStringLen8(),
+            URL = p.ReadStringLen8()
+        };
     }
 }

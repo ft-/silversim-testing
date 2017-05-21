@@ -31,14 +31,11 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ForceScriptControlRelease()
         {
-            return new ForceScriptControlRelease()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID()
+        };
 
         public override void Serialize(UDPPacket p)
         {

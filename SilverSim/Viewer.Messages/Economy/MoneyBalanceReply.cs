@@ -62,25 +62,22 @@ namespace SilverSim.Viewer.Messages.Economy
             p.WriteStringLen8(ItemDescription);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new MoneyBalanceReply()
         {
-            return new MoneyBalanceReply()
-            {
-                AgentID = p.ReadUUID(),
-                TransactionID = p.ReadUUID(),
-                TransactionSuccess = p.ReadBoolean(),
-                MoneyBalance = p.ReadInt32(),
-                SquareMetersCredit = p.ReadInt32(),
-                SquareMetersCommitted = p.ReadInt32(),
-                Description = p.ReadStringLen8(),
-                TransactionType = p.ReadInt32(),
-                SourceID = p.ReadUUID(),
-                IsSourceGroup = p.ReadBoolean(),
-                DestID = p.ReadUUID(),
-                IsDestGroup = p.ReadBoolean(),
-                Amount = p.ReadInt32(),
-                ItemDescription = p.ReadStringLen8()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            TransactionID = p.ReadUUID(),
+            TransactionSuccess = p.ReadBoolean(),
+            MoneyBalance = p.ReadInt32(),
+            SquareMetersCredit = p.ReadInt32(),
+            SquareMetersCommitted = p.ReadInt32(),
+            Description = p.ReadStringLen8(),
+            TransactionType = p.ReadInt32(),
+            SourceID = p.ReadUUID(),
+            IsSourceGroup = p.ReadBoolean(),
+            DestID = p.ReadUUID(),
+            IsDestGroup = p.ReadBoolean(),
+            Amount = p.ReadInt32(),
+            ItemDescription = p.ReadStringLen8()
+        };
     }
 }

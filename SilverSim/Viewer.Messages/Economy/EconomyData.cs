@@ -67,28 +67,25 @@ namespace SilverSim.Viewer.Messages.Economy
             p.WriteInt32(PriceGroupCreate);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new EconomyData()
         {
-            return new EconomyData()
-            {
-                ObjectCapacity = p.ReadInt32(),
-                ObjectCount = p.ReadInt32(),
-                PriceEnergyUnit = p.ReadInt32(),
-                PriceObjectClaim = p.ReadInt32(),
-                PricePublicObjectDecay = p.ReadInt32(),
-                PricePublicObjectDelete = p.ReadInt32(),
-                PriceParcelClaim = p.ReadInt32(),
-                PriceParcelClaimFactor = p.ReadFloat(),
-                PriceUpload = p.ReadInt32(),
-                PriceRentLight = p.ReadInt32(),
-                TeleportMinPrice = p.ReadInt32(),
-                TeleportPriceExponent = p.ReadFloat(),
-                EnergyEfficiency = p.ReadFloat(),
-                PriceObjectRent = p.ReadFloat(),
-                PriceObjectScaleFactor = p.ReadFloat(),
-                PriceParcelRent = p.ReadInt32(),
-                PriceGroupCreate = p.ReadInt32()
-            };
-        }
+            ObjectCapacity = p.ReadInt32(),
+            ObjectCount = p.ReadInt32(),
+            PriceEnergyUnit = p.ReadInt32(),
+            PriceObjectClaim = p.ReadInt32(),
+            PricePublicObjectDecay = p.ReadInt32(),
+            PricePublicObjectDelete = p.ReadInt32(),
+            PriceParcelClaim = p.ReadInt32(),
+            PriceParcelClaimFactor = p.ReadFloat(),
+            PriceUpload = p.ReadInt32(),
+            PriceRentLight = p.ReadInt32(),
+            TeleportMinPrice = p.ReadInt32(),
+            TeleportPriceExponent = p.ReadFloat(),
+            EnergyEfficiency = p.ReadFloat(),
+            PriceObjectRent = p.ReadFloat(),
+            PriceObjectScaleFactor = p.ReadFloat(),
+            PriceParcelRent = p.ReadInt32(),
+            PriceGroupCreate = p.ReadInt32()
+        };
     }
 }

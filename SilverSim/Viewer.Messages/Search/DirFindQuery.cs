@@ -37,18 +37,15 @@ namespace SilverSim.Viewer.Messages.Search
         public SearchFlags QueryFlags;
         public int QueryStart;
 
-        public static DirFindQuery Decode(UDPPacket p)
+        public static DirFindQuery Decode(UDPPacket p) => new DirFindQuery()
         {
-            return new DirFindQuery()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                QueryID = p.ReadUUID(),
-                QueryText = p.ReadStringLen8(),
-                QueryFlags = (SearchFlags)p.ReadUInt32(),
-                QueryStart = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            QueryID = p.ReadUUID(),
+            QueryText = p.ReadStringLen8(),
+            QueryFlags = (SearchFlags)p.ReadUInt32(),
+            QueryStart = p.ReadInt32()
+        };
 
         public override void Serialize(UDPPacket p)
         {

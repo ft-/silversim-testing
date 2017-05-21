@@ -66,27 +66,24 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteInt32(PriceForListing);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ClassifiedInfoReply()
         {
-            return new ClassifiedInfoReply()
-            {
-                AgentID = p.ReadUUID(),
-                ClassifiedID = p.ReadUUID(),
-                CreatorID = p.ReadUUID(),
-                CreationDate = Date.UnixTimeToDateTime(p.ReadUInt32()),
-                ExpirationDate = Date.UnixTimeToDateTime(p.ReadUInt32()),
-                Category = p.ReadInt32(),
-                Name = p.ReadStringLen8(),
-                Description = p.ReadStringLen16(),
-                ParcelID = p.ReadUUID(),
-                ParentEstate = p.ReadInt32(),
-                SnapshotID = p.ReadUUID(),
-                SimName = p.ReadStringLen8(),
-                PosGlobal = p.ReadVector3d(),
-                ParcelName = p.ReadStringLen8(),
-                ClassifiedFlags = p.ReadUInt8(),
-                PriceForListing = p.ReadInt32()
-            };
-        }
+            AgentID = p.ReadUUID(),
+            ClassifiedID = p.ReadUUID(),
+            CreatorID = p.ReadUUID(),
+            CreationDate = Date.UnixTimeToDateTime(p.ReadUInt32()),
+            ExpirationDate = Date.UnixTimeToDateTime(p.ReadUInt32()),
+            Category = p.ReadInt32(),
+            Name = p.ReadStringLen8(),
+            Description = p.ReadStringLen16(),
+            ParcelID = p.ReadUUID(),
+            ParentEstate = p.ReadInt32(),
+            SnapshotID = p.ReadUUID(),
+            SimName = p.ReadStringLen8(),
+            PosGlobal = p.ReadVector3d(),
+            ParcelName = p.ReadStringLen8(),
+            ClassifiedFlags = p.ReadUInt8(),
+            PriceForListing = p.ReadInt32()
+        };
     }
 }
