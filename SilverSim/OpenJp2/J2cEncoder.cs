@@ -30,22 +30,22 @@ namespace OpenJp2.Net
     public static class J2cEncoder
     {
         [DllImport("kernel32.dll")]
-        static extern IntPtr LoadLibrary(string dllToLoad);
+        private static extern IntPtr LoadLibrary(string dllToLoad);
 
         [DllImport("openjp2", EntryPoint = "j2c_encode")]
-        static extern IntPtr J2cEncode(byte[] rawdata, int imagewidth, int imageheight, int imagecomponents, bool lossless);
+        private static extern IntPtr J2cEncode(byte[] rawdata, int imagewidth, int imageheight, int imagecomponents, bool lossless);
 
         [DllImport("openjp2", EntryPoint = "j2c_encoded_get_length")]
-        static extern uint J2cEncodedGetLength(IntPtr dataref);
+        private static extern uint J2cEncodedGetLength(IntPtr dataref);
 
         [DllImport("openjp2", EntryPoint = "j2c_encoded_read")]
-        static extern int J2cEncodedRead(IntPtr dataref, byte[] buffer, int length);
+        private static extern int J2cEncodedRead(IntPtr dataref, byte[] buffer, int length);
 
         [DllImport("openjp2", EntryPoint = "j2c_encoded_free")]
-        static extern void J2cEncodedFree(IntPtr dataref);
+        private static extern void J2cEncodedFree(IntPtr dataref);
 
-        static object m_InitLock = new object();
-        static bool m_Inited;
+        private static readonly object m_InitLock = new object();
+        private static bool m_Inited;
 
         public static byte[] Encode(Bitmap img, bool lossless)
         {
