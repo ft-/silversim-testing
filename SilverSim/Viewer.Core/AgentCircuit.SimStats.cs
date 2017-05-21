@@ -19,10 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Physics;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Types.Estate;
-using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Viewer.Messages.Simulator;
 using System.Diagnostics.CodeAnalysis;
 
@@ -123,6 +120,14 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
             if (scene != null)
             {
+                int rootAgents = scene.RootAgents.Count;
+                int childAgents = scene.Agents.Count - rootAgents;
+                if(childAgents < 0)
+                {
+                    childAgents = 0;
+                }
+                m_SimStatsData[(int)SimStatIndex.Agents].StatValue = rootAgents;
+                m_SimStatsData[(int)SimStatIndex.ChildAgents].StatValue = childAgents;
                 m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = scene.Primitives.Count;
                 m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;
 
