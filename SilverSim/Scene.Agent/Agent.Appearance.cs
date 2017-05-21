@@ -34,7 +34,7 @@ using System.Threading;
 
 namespace SilverSim.Scene.Agent
 {
-    partial class Agent
+    public partial class Agent
     {
         private readonly AgentWearables m_Wearables = new AgentWearables();
 
@@ -137,6 +137,11 @@ namespace SilverSim.Scene.Agent
                 }
                 return te;
             }
+        }
+
+        protected void SetTextureEntryBytes(byte[] data)
+        {
+#warning implement if supporting fallback to non-SSB
         }
 
         public AppearanceInfo.AvatarTextureData Textures

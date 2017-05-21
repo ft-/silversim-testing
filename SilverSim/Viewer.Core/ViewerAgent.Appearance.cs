@@ -20,22 +20,57 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
-using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Appearance;
+using SilverSim.Viewer.Messages.Generic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using SilverSim.Viewer.Messages.Appearance;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        private byte[] m_TextureEntry = new byte[0];
+        [GenericMessageHandler("avatartexturesrequest")]
+        public void HandleAvatarTexturesRequest(Message p)
+        {
+            var gm = (GenericMessage)p;
+            if (gm.AgentID != ID || gm.SessionID != gm.CircuitSessionID || gm.ParamList.Count < 1)
+            {
+                return;
+            }
+
+            UUID avatarId;
+            if(!UUID.TryParse(gm.ParamList[0].FromUTF8Bytes(), out avatarId))
+            {
+                return;
+            }
+
+            IAgent agent;
+            AgentCircuit circuit;
+            SceneInterface scene;
+            if(!Circuits.TryGetValue(gm.CircuitSceneID, out circuit))
+            {
+                return;
+            }
+
+            scene = circuit.Scene;
+
+            if(scene == null)
+            {
+                return;
+            }
+
+            if(scene.RootAgents.TryGetValue(avatarId, out agent))
+            {
+                SendMessageAlways(agent.GetAvatarAppearanceMsg(), SceneID);
+            }
+        }
 
         [PacketHandler(MessageType.AgentSetAppearance)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
@@ -65,25 +100,12 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            m_TextureEntry = m.ObjectData;
+            SetTextureEntryBytes(m.ObjectData);
 
             VisualParams = m.VisualParams;
             Size = m.Size;
-            var res = new AvatarAppearance()
-            {
-                Sender = ID,
-                IsTrial = false,
-                VisualParams = VisualParams,
-                TextureEntry = m_TextureEntry
-            };
-            var appearanceData = new AvatarAppearance.AppearanceDataEntry()
-            {
-                CofVersion = 0,
-                AppearanceVersion = 1
-            };
-            res.AppearanceData.Add(appearanceData);
 
-            SendMessageAlways(res, SceneID);
+            HandleAppearanceUpdate(this);
         }
 
         [PacketHandler(MessageType.AgentWearablesRequest)]
@@ -106,10 +128,12 @@ namespace SilverSim.Viewer.Core
             {
                 foreach (var wi in kvp.Value)
                 {
-                    var d = new AgentWearablesUpdate.WearableDataEntry();
-                    d.ItemID = wi.ItemID;
-                    d.AssetID = wi.AssetID;
-                    d.WearableType = kvp.Key;
+                    var d = new AgentWearablesUpdate.WearableDataEntry()
+                    {
+                        ItemID = wi.ItemID,
+                        AssetID = wi.AssetID,
+                        WearableType = kvp.Key
+                    };
                     awu.WearableData.Add(d);
                 }
             }
