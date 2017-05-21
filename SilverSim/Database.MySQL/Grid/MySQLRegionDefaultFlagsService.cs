@@ -36,7 +36,7 @@ namespace SilverSim.Database.MySQL.Grid
     [Description("MySQL RegionDefaultFlags Backend")]
     public class MySQLRegionDefaultFlagsService : RegionDefaultFlagsServiceInterface, IPlugin, IDBServiceInterface
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL REGIONDEFAULTFLAGS SERVICE");
 
         public MySQLRegionDefaultFlagsService(string connectionString)
@@ -123,8 +123,8 @@ namespace SilverSim.Database.MySQL.Grid
                     {
                         var vals = new Dictionary<string, object>
                         {
-                            { "uuid", regionId },
-                            { "flags", addFlags }
+                            ["uuid"] = regionId,
+                            ["flags"] = addFlags
                         };
                         connection.InsertInto("regiondefaults", vals);
                     }
@@ -152,7 +152,7 @@ namespace SilverSim.Database.MySQL.Grid
             return result;
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("regiondefaults"),
             new AddColumn<UUID>("uuid") { IsNullAllowed = false, Default = UUID.Zero },

@@ -30,14 +30,29 @@ namespace SilverSim.Http
 {
     public class HttpStream : AbstractHttpStream
     {
-        readonly Socket m_Socket;
-        readonly byte[] m_Buffer;
-        int m_BufferPos;
-        int m_BufferFill;
+        private readonly Socket m_Socket;
+        private readonly byte[] m_Buffer;
+        private int m_BufferPos;
+        private int m_BufferFill;
 
         [Serializable]
         public class TimeoutException : Exception
         {
+            public TimeoutException()
+            {
+            }
+
+            public TimeoutException(string message) : base(message)
+            {
+            }
+
+            public TimeoutException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected TimeoutException(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+            }
         }
 
         public HttpStream(Socket sock)
@@ -60,10 +75,14 @@ namespace SilverSim.Http
 
         public int ReadBytesInternal(byte[] buffer, int maxbytes, int timeoutms)
         {
-            var readList = new ArrayList();
-            readList.Add(m_Socket);
-            var errorList = new ArrayList();
-            errorList.Add(m_Socket);
+            var readList = new ArrayList
+            {
+                m_Socket
+            };
+            var errorList = new ArrayList
+            {
+                m_Socket
+            };
             Socket.Select(readList, null, errorList, timeoutms * 1000);
             if(errorList.Count > 0 && readList.Count == 0)
             {
@@ -169,14 +188,9 @@ namespace SilverSim.Http
 
         public override int WriteTimeout
         {
-            get
-            {
-                return m_Socket.SendTimeout;
-            }
-            set
-            {
-                m_Socket.SendTimeout = value;
-            }
+            get { return m_Socket.SendTimeout; }
+
+            set { m_Socket.SendTimeout = value; }
         }
 
         public override bool CanTimeout => true;
@@ -194,22 +208,14 @@ namespace SilverSim.Http
 
         public override long Length
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public override long Position
         {
-            get
-            {
-                throw new NotSupportedException(); 
-            }
-            set
-            {
-                throw new NotSupportedException(); 
-            }
+            get { throw new NotSupportedException(); }
+
+            set { throw new NotSupportedException(); }
         }
 
         public override long Seek(long offset, SeekOrigin origin)

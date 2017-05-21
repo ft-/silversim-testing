@@ -35,9 +35,9 @@ namespace SilverSim.Grid.Maptile
     [Description("Generator for maptile zoom levels")]
     public class MaptileZoomGenerator : MaptileServiceInterface, IPlugin
     {
-        readonly string m_MaptileServiceName;
-        MaptileServiceInterface m_MaptileService;
-        const int MaxZoomLevel = 10;
+        private readonly string m_MaptileServiceName;
+        private MaptileServiceInterface m_MaptileService;
+        private const int MaxZoomLevel = 10;
 
         public MaptileZoomGenerator(IConfig ownSection)
         {
@@ -49,7 +49,7 @@ namespace SilverSim.Grid.Maptile
             m_MaptileService = loader.GetService<MaptileServiceInterface>(m_MaptileServiceName);
         }
 
-        static Image FromMaptileData(MaptileData data)
+        private static Image FromMaptileData(MaptileData data)
         {
             using (var ms = new MemoryStream(data.Data))
             {

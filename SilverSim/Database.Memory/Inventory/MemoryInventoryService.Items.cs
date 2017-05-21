@@ -71,7 +71,6 @@ namespace SilverSim.Database.Memory.Inventory
             }
         }
 
-
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<InventoryItem> IInventoryItemServiceInterface.this[UUID principalID, List<UUID> keys]
         {
@@ -115,7 +114,7 @@ namespace SilverSim.Database.Memory.Inventory
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryItem IInventoryItemServiceInterface.this[UUID principalID, UUID key]
         {
-            get 
+            get
             {
                 InventoryItem item;
                 if(!Item.TryGetValue(principalID, key, out item))
@@ -184,7 +183,7 @@ namespace SilverSim.Database.Memory.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void IncrementVersion(UUID principalID, UUID folderID)
+        private void IncrementVersion(UUID principalID, UUID folderID)
         {
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
             InventoryFolder folder;

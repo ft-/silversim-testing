@@ -39,7 +39,7 @@ namespace SilverSim.LoadStore.Terrain
     public class TerrainLoadStore : IPlugin
     {
         private readonly Dictionary<string, ITerrainFileStorage> m_TerrainFileStorages = new Dictionary<string, ITerrainFileStorage>();
-        SceneList m_Scenes;
+        private SceneList m_Scenes;
 
         public TerrainLoadStore(ConfigurationLoader loader)
         {
@@ -67,7 +67,7 @@ namespace SilverSim.LoadStore.Terrain
             }
         }
 
-        void ParseLocation(string inp, out uint x, out uint y)
+        private void ParseLocation(string inp, out uint x, out uint y)
         {
             var parts = inp.Split(',');
             if(parts.Length != 2)
@@ -191,9 +191,8 @@ namespace SilverSim.LoadStore.Terrain
                         io.Write("Terrain data from file exceeds given size\n");
                         return;
                     }
-                    patch.X += (x / 16);
-                    patch.Y += (y / 16);
-
+                    patch.X += x / 16;
+                    patch.Y += y / 16;
                 }
 
                 scene.Terrain.AllPatches = patches;

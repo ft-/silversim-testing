@@ -26,11 +26,11 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public static class SslSelfSignCertUtil
     {
-        static Action<string, string> m_SelfSignCertFunc;
+        private static Action<string, string> m_SelfSignCertFunc;
 
         public static void GenerateSelfSignedServiceCertificate(string filename, string hostname)
         {
-            if (null == m_SelfSignCertFunc)
+            if (m_SelfSignCertFunc == null)
             {
                 Assembly selfSignCert = Assembly.Load("SilverSim.SelfSignCert");
                 Type selfSignCertType = selfSignCert.GetType("SilverSim.SelfSignCert.SslSelfSignCertUtil");

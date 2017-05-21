@@ -31,37 +31,26 @@ namespace SilverSim.Scene.Npc
         public override bool IsInScene(SceneInterface scene)
         {
             SceneInterface currentScene = CurrentScene;
-            if(null == currentScene)
+            if(currentScene == null)
             {
                 return false;
             }
-            return (scene.ID == currentScene.ID);
+            return scene.ID == currentScene.ID;
         }
 
         protected override void SendAnimations(AvatarAnimation m)
         {
             SceneInterface scene = CurrentScene;
-            if(null != scene)
-            {
-                scene.SendAgentAnimToAllAgents(m);
-            }
+            scene?.SendAgentAnimToAllAgents(m);
         }
 
         internal SceneInterface CurrentScene { get; set; }
 
         public override UUID SceneID
         {
-            get
-            {
-                return CurrentScene.ID;
-            }
+            get { return CurrentScene.ID; }
 
-            set
-            {
-                throw new NotSupportedException();
-            }
+            set { throw new NotSupportedException(); }
         }
-
-
     }
 }

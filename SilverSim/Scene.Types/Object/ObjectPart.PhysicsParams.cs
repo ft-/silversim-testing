@@ -31,11 +31,11 @@ namespace SilverSim.Scene.Types.Object
     {
         #region Physics Properties
 
-        double m_Mass = 1;
-        double m_PhysicsDensity = 1000f;
-        double m_PhysicsFriction = 0.6f;
-        double m_PhysicsRestitution = 0.5f;
-        double m_PhysicsGravityMultiplier = 1f;
+        private double m_Mass = 1;
+        private double m_PhysicsDensity = 1000f;
+        private double m_PhysicsFriction = 0.6f;
+        private double m_PhysicsRestitution = 0.5f;
+        private double m_PhysicsGravityMultiplier = 1f;
 
         public double PhysicsDensity
         {
@@ -118,7 +118,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-
         public double PhysicsGravityMultiplier
         {
             get
@@ -140,7 +139,7 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
+        private readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
         public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors => m_PhysicsActors;
 
@@ -153,7 +152,7 @@ namespace SilverSim.Scene.Types.Object
                     IPhysicsObject obj;
                     ObjectGroup group = ObjectGroup;
                     SceneInterface scene = null;
-                    if (null != group)
+                    if (group != null)
                     {
                         scene = group.Scene;
                     }
@@ -166,19 +165,18 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-
-        readonly object m_PhysicsUpdateLock = new object();
+        private readonly object m_PhysicsUpdateLock = new object();
         public void PhysicsUpdate(PhysicsStateData value)
         {
             lock (m_PhysicsUpdateLock)
             {
                 var group = ObjectGroup;
-                if(null == group)
+                if(group == null)
                 {
                     return;
                 }
                 var scene = group.Scene;
-                if (null != scene && scene.ID == value.SceneID)
+                if (scene != null && scene.ID == value.SceneID)
                 {
                     Position = value.Position;
                     Rotation = value.Rotation;
@@ -191,13 +189,13 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Fields
-        bool m_IsPhantom;
-        bool m_IsPhysics;
-        bool m_IsVolumeDetect;
-        double m_Buoyancy;
-        bool m_IsRotateXEnabled = true;
-        bool m_IsRotateYEnabled = true;
-        bool m_IsRotateZEnabled = true;
+        private bool m_IsPhantom;
+        private bool m_IsPhysics;
+        private bool m_IsVolumeDetect;
+        private double m_Buoyancy;
+        private bool m_IsRotateXEnabled = true;
+        private bool m_IsRotateYEnabled = true;
+        private bool m_IsRotateZEnabled = true;
 
         public readonly VehicleParams VehicleParams = new VehicleParams();
 
@@ -205,10 +203,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsRotateXEnabled
         {
-            get
-            {
-                return m_IsRotateXEnabled;
-            }
+            get { return m_IsRotateXEnabled; }
+
             set
             {
                 m_IsRotateXEnabled = value;
@@ -220,10 +216,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsRotateYEnabled
         {
-            get
-            {
-                return m_IsRotateYEnabled;
-            }
+            get { return m_IsRotateYEnabled; }
+
             set
             {
                 m_IsRotateYEnabled = value;
@@ -235,10 +229,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsRotateZEnabled
         {
-            get
-            {
-                return m_IsRotateZEnabled;
-            }
+            get { return m_IsRotateZEnabled; }
+
             set
             {
                 m_IsRotateZEnabled = value;
@@ -250,10 +242,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsPhantom
         {
-            get
-            {
-                return m_IsPhantom;
-            }
+            get { return m_IsPhantom; }
+
             set
             {
                 m_IsPhantom = value;
@@ -265,10 +255,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsPhysics
         {
-            get
-            {
-                return m_IsPhysics;
-            }
+            get { return m_IsPhysics; }
+
             set
             {
                 m_IsPhysics = value;
@@ -280,10 +268,7 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsVolumeDetect
         {
-            get
-            {
-                return m_IsVolumeDetect;
-            }
+            get { return m_IsVolumeDetect; }
             set
             {
                 m_IsVolumeDetect = value;
@@ -295,10 +280,8 @@ namespace SilverSim.Scene.Types.Object
 
         public double Buoyancy
         {
-            get
-            {
-                return m_Buoyancy;
-            }
+            get { return m_Buoyancy; }
+
             set
             {
                 m_Buoyancy = value;
@@ -310,10 +293,8 @@ namespace SilverSim.Scene.Types.Object
 
         public VehicleType VehicleType
         {
-            get
-            {
-                return VehicleParams.VehicleType;
-            }
+            get { return VehicleParams.VehicleType; }
+
             set
             {
                 VehicleParams.VehicleType = value;
@@ -321,12 +302,11 @@ namespace SilverSim.Scene.Types.Object
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
+
         public VehicleFlags VehicleFlags
         {
-            get
-            {
-                return VehicleParams.Flags;
-            }
+            get { return VehicleParams.Flags; }
+
             set
             {
                 VehicleParams.Flags = value;
@@ -351,10 +331,8 @@ namespace SilverSim.Scene.Types.Object
 
         public Quaternion this[VehicleRotationParamId id]
         {
-            get
-            {
-                return VehicleParams[id];
-            }
+            get { return VehicleParams[id]; }
+
             set
             {
                 VehicleParams[id] = value;
@@ -365,10 +343,8 @@ namespace SilverSim.Scene.Types.Object
 
         public Vector3 this[VehicleVectorParamId id]
         {
-            get
-            {
-                return VehicleParams[id];
-            }
+            get { return VehicleParams[id]; }
+
             set
             {
                 VehicleParams[id] = value;
@@ -379,10 +355,8 @@ namespace SilverSim.Scene.Types.Object
 
         public double this[VehicleFloatParamId id]
         {
-            get
-            {
-                return VehicleParams[id];
-            }
+            get { return VehicleParams[id]; }
+
             set
             {
                 VehicleParams[id] = value;

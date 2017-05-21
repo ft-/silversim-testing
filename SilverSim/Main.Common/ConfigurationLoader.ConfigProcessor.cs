@@ -29,8 +29,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace SilverSim.Main.Common
@@ -46,125 +44,58 @@ namespace SilverSim.Main.Common
             string DirName { get; }
         }
 
-        sealed class CFG_IniFileSource : ICFG_Source
+        private sealed class CFG_IniFileSource : ICFG_Source
         {
-            readonly string m_FileName;
+            private readonly string m_FileName;
             public CFG_IniFileSource(string fileName)
             {
                 m_FileName = fileName;
             }
 
-            public string Message
-            {
-                get
-                {
-                    return "Could not load ini file {0}";
-                }
-            }
+            public string Message => "Could not load ini file {0}";
 
-            public string DirName
-            {
-                get
-                {
-                    return Path.GetDirectoryName(Name);
-                }
-            }
+            public string DirName => Path.GetDirectoryName(Name);
 
-            public string Name
-            {
-                get
-                {
-                    return Path.GetFullPath(m_FileName);
-                }
-            }
+            public string Name => Path.GetFullPath(m_FileName);
 
-            public IConfigSource ConfigSource
-            {
-                get
-                {
-                    return new IniConfigSource(m_FileName);
-                }
-            }
+            public IConfigSource ConfigSource => new IniConfigSource(m_FileName);
         }
 
-        sealed class CFG_NiniXmlFileSource : ICFG_Source
+        private sealed class CFG_NiniXmlFileSource : ICFG_Source
         {
-            readonly string m_Filename;
+            private readonly string m_Filename;
             public CFG_NiniXmlFileSource(string fileName)
             {
                 m_Filename = fileName;
             }
 
-            public string Message
-            {
-                get
-                {
-                    return "Could not load ini file {0}";
-                }
-            }
+            public string Message => "Could not load ini file {0}";
 
-            public string DirName
-            {
-                get
-                {
-                    return Path.GetDirectoryName(Name);
-                }
-            }
+            public string DirName => Path.GetDirectoryName(Name);
 
-            public string Name
-            {
-                get
-                {
-                    return Path.GetFullPath(m_Filename);
-                }
-            }
+            public string Name => Path.GetFullPath(m_Filename);
 
-            public IConfigSource ConfigSource
-            {
-                get
-                {
-                    return new XmlConfigSource(m_Filename);
-                }
-            }
+            public IConfigSource ConfigSource => new XmlConfigSource(m_Filename);
         }
 
-        sealed class CFG_NiniXmlUriSource : ICFG_Source
+        private sealed class CFG_NiniXmlUriSource : ICFG_Source
         {
-            readonly string m_Uri;
             public CFG_NiniXmlUriSource(string uri)
             {
-                m_Uri = uri;
+                Name = uri;
             }
 
-            public string Message
-            {
-                get
-                {
-                    return "Could not load xml file {0}";
-                }
-            }
+            public string Message => "Could not load xml file {0}";
 
-            public string DirName
-            {
-                get
-                {
-                    return ".";
-                }
-            }
+            public string DirName => ".";
 
-            public string Name
-            {
-                get
-                {
-                    return m_Uri;
-                }
-            }
+            public string Name { get; }
 
             public IConfigSource ConfigSource
             {
                 get
                 {
-                    using (XmlReader r = new XmlTextReader(HttpClient.DoStreamGetRequest(m_Uri, null, 20000)))
+                    using (XmlReader r = new XmlTextReader(HttpClient.DoStreamGetRequest(Name, null, 20000)))
                     {
                         return new XmlConfigSource(r);
                     }
@@ -172,46 +103,33 @@ namespace SilverSim.Main.Common
             }
         }
 
-        sealed class CFG_IniResourceSource : ICFG_Source
+        private sealed class CFG_IniResourceSource : ICFG_Source
         {
-            readonly string m_Name;
-            readonly string m_Info;
-            readonly string m_Assembly = string.Empty;
+            private readonly string m_Name;
+            private readonly string m_Assembly = string.Empty;
 
             public CFG_IniResourceSource(string name)
             {
                 m_Name = name;
-                m_Info = "Resource {0} not found";
+                Message = "Resource {0} not found";
             }
 
             public CFG_IniResourceSource(string name, string info)
             {
                 m_Name = name;
-                m_Info = info;
+                Message = info;
             }
 
             public CFG_IniResourceSource(string name, string info, string assembly)
             {
                 m_Name = name;
-                m_Info = info;
+                Message = info;
                 m_Assembly = assembly;
             }
 
-            public string DirName
-            {
-                get
-                {
-                    return ".";
-                }
-            }
+            public string DirName => ".";
 
-            public string Message
-            {
-                get
-                {
-                    return m_Info;
-                }
-            }
+            public string Message { get; }
 
             public string Name
             {
@@ -250,7 +168,7 @@ namespace SilverSim.Main.Common
 
                     string assemblyName = assembly.GetName().Name;
                     Stream resource = assembly.GetManifestResourceStream(assemblyName + ".Resources." + m_Name);
-                    if (null == resource)
+                    if (resource == null)
                     {
                         throw new FileNotFoundException(assemblyName + ".Resources." + m_Name);
                     }
@@ -259,46 +177,33 @@ namespace SilverSim.Main.Common
             }
         }
 
-        sealed class CFG_NiniXmlResourceSource : ICFG_Source
+        private sealed class CFG_NiniXmlResourceSource : ICFG_Source
         {
-            readonly string m_Name;
-            readonly string m_Info;
-            readonly string m_Assembly = string.Empty;
+            private readonly string m_Name;
+            private readonly string m_Assembly = string.Empty;
 
             public CFG_NiniXmlResourceSource(string name)
             {
                 m_Name = name;
-                m_Info = "Resource {0} not found";
+                Message = "Resource {0} not found";
             }
 
             public CFG_NiniXmlResourceSource(string name, string info)
             {
                 m_Name = name;
-                m_Info = info;
+                Message = info;
             }
 
             public CFG_NiniXmlResourceSource(string name, string info, string assembly)
             {
                 m_Name = name;
-                m_Info = info;
+                Message = info;
                 m_Assembly = assembly;
             }
 
-            public string DirName
-            {
-                get
-                {
-                    return ".";
-                }
-            }
+            public string DirName => ".";
 
-            public string Message
-            {
-                get
-                {
-                    return m_Info;
-                }
-            }
+            public string Message { get; }
 
             public string Name
             {
@@ -337,7 +242,7 @@ namespace SilverSim.Main.Common
 
                     string assemblyName = assembly.GetName().Name;
                     Stream resource = assembly.GetManifestResourceStream(assemblyName + ".Resources." + m_Name);
-                    if (null == resource)
+                    if (resource == null)
                     {
                         throw new FileNotFoundException(assemblyName + ".Resources." + m_Name);
                     }
@@ -349,7 +254,6 @@ namespace SilverSim.Main.Common
             }
         }
         #endregion
-
 
         #region Config Source Management
         private void AddSource(ICFG_Source cfgsource, string file)
@@ -427,8 +331,8 @@ namespace SilverSim.Main.Common
         #region Module Loading
         private Dictionary<string, T> GetServices<T>()
         {
-            Dictionary<string, T> result = new Dictionary<string, T>();
-            PluginInstances.ForEach(delegate (KeyValuePair<string, IPlugin> p)
+            var result = new Dictionary<string, T>();
+            PluginInstances.ForEach((KeyValuePair<string, IPlugin> p) =>
             {
                 if (typeof(T).IsAssignableFrom(p.Value.GetType()))
                 {
@@ -438,10 +342,10 @@ namespace SilverSim.Main.Common
             return result;
         }
 
-        static InterfaceVersionAttribute GetInterfaceVersion(Assembly assembly)
+        private static InterfaceVersionAttribute GetInterfaceVersion(Assembly assembly)
         {
-            InterfaceVersionAttribute attr = Attribute.GetCustomAttribute(assembly, typeof(InterfaceVersionAttribute)) as InterfaceVersionAttribute;
-            if (null != attr)
+            var attr = Attribute.GetCustomAttribute(assembly, typeof(InterfaceVersionAttribute)) as InterfaceVersionAttribute;
+            if (attr != null)
             {
                 return attr;
             }
@@ -463,9 +367,9 @@ namespace SilverSim.Main.Common
             throw new KeyNotFoundException();
         }
 
-        static Assembly ArchSpecificResolveEventHandler(object sender, ResolveEventArgs args)
+        private static Assembly ArchSpecificResolveEventHandler(object sender, ResolveEventArgs args)
         {
-            AssemblyName aName = new AssemblyName(args.Name);
+            var aName = new AssemblyName(args.Name);
             string assemblyFileName;
             Assembly assembly;
             if (PreloadPlatformAssemblies.TryGetValue(aName.Name, out assembly))
@@ -511,7 +415,7 @@ namespace SilverSim.Main.Common
             return assembly;
         }
 
-        readonly InterfaceVersionAttribute m_OwnInterfaceVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
+        private readonly InterfaceVersionAttribute m_OwnInterfaceVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -567,7 +471,7 @@ namespace SilverSim.Main.Common
                 throw new ConfigurationErrorException();
             }
 
-            IPluginFactory module = (IPluginFactory)assembly.CreateInstance(t.FullName);
+            var module = (IPluginFactory)assembly.CreateInstance(t.FullName);
             PluginInstances.Add(config.Name, module.Initialize(this, config));
         }
 
@@ -595,9 +499,9 @@ namespace SilverSim.Main.Common
 
         #region Preload Arch Specific Libraries
         [DllImport("kernel32.dll")]
-        static extern IntPtr LoadLibrary(string dllToLoad);
+        private static extern IntPtr LoadLibrary(string dllToLoad);
 
-        void LoadArchDlls()
+        private void LoadArchDlls()
         {
             string archModule = "UnmanagedModule-" + VersionInfo.ArchSpecificId;
             foreach (IConfig config in m_Config.Configs)
@@ -627,16 +531,12 @@ namespace SilverSim.Main.Common
         private void ProcessParameterMap()
         {
             IConfig parameterMap = m_Config.Configs["ParameterMap"];
-            if (null == parameterMap)
+            if (parameterMap == null)
             {
                 return;
             }
 
-            IConfig processedParameterMaps = m_Config.Configs["ProcessedParameterMaps"];
-            if (null == processedParameterMaps)
-            {
-                processedParameterMaps = m_Config.AddConfig("ProcessedParameterMaps");
-            }
+            IConfig processedParameterMaps = m_Config.Configs["ProcessedParameterMaps"] ?? m_Config.AddConfig("ProcessedParameterMaps");
 
             foreach (string key in parameterMap.GetKeys())
             {
@@ -659,18 +559,13 @@ namespace SilverSim.Main.Common
                     continue;
                 }
 
-                IConfig toconfig = m_Config.Configs[toparts[0]];
-                if (toconfig == null)
-                {
-                    toconfig = m_Config.AddConfig(toparts[0]);
-                }
+                IConfig toconfig = m_Config.Configs[toparts[0]] ?? m_Config.AddConfig(toparts[0]);
 
                 if (toconfig.Contains(toparts[1]))
                 {
                     /* do not overwrite existing keys */
                     continue;
                 }
-
 
                 processedParameterMaps.Set(key, val);
                 toconfig.Set(toparts[1], fromconfig.Get(fromparts[1]));
@@ -748,7 +643,7 @@ namespace SilverSim.Main.Common
                     continue;
                 }
                 IConfig sourceConfig = m_Config.Configs[useparam[0]];
-                if (null == sourceConfig || !sourceConfig.Contains(useparam[1]))
+                if (sourceConfig == null || !sourceConfig.Contains(useparam[1]))
                 {
                     continue;
                 }
@@ -780,8 +675,7 @@ namespace SilverSim.Main.Common
         {
             foreach (IConfig config in m_Config.Configs)
             {
-                string[] sections = config.GetString("Use", string.Empty).Split(new char[] { ',', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string section in sections)
+                foreach (string section in config.GetString("Use", string.Empty).Split(new char[] { ',', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (section == config.Name)
                     {
@@ -809,10 +703,10 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Load from grids xml
-        IConfigSource m_GridsXmlConfig;
+        private IConfigSource m_GridsXmlConfig;
         public void LoadGridsXml()
         {
-            if (null == m_GridsXmlConfig)
+            if (m_GridsXmlConfig == null)
             {
                 IConfig gridMap = m_Config.Configs["Grid"];
                 if (gridMap == null)
@@ -834,14 +728,9 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
-        void ProcessConfigurations(bool processParameterMap = true)
+        private void ProcessConfigurations(bool processParameterMap = true)
         {
-            IConfig importedInfo;
-            importedInfo = m_Config.Configs["ImportedConfigs"];
-            if (null == importedInfo)
-            {
-                importedInfo = m_Config.AddConfig("ImportedConfigs");
-            }
+            IConfig importedInfo = m_Config.Configs["ImportedConfigs"] ?? m_Config.AddConfig("ImportedConfigs");
             while (m_Sources.Count != 0)
             {
                 ICFG_Source source = m_Sources.Dequeue();
@@ -878,7 +767,7 @@ namespace SilverSim.Main.Common
             ProcessUseTemplates();
         }
 
-        void ShowModeHelp()
+        private void ShowModeHelp()
         {
             string searchstring = GetType().Assembly.GetName().Name + ".Resources.ModeConfig.";
             int searchstringlen = searchstring.Length;

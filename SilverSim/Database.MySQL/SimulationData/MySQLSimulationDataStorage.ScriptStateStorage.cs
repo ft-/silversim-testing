@@ -53,7 +53,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         /* setting value to null will delete the entry */
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        byte[] ISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID] 
+        byte[] ISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID]
         {
             get
             {

@@ -32,7 +32,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     partial class MySQLSimulationDataStorage : ISimulationDataPhysicsConvexStorageInterface, IPhysicsHacdCleanCache
     {
-        static readonly IMigrationElement[] Migrations_Physics = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations_Physics = new IMigrationElement[]
         {
             #region Table sculptmeshphysics
             new SqlTable("meshphysics") {IsDynamicRowFormat = true },
@@ -252,7 +252,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 });
             }
         }
-
 
         void IPhysicsHacdCleanCache.CleanCache()
         {

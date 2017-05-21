@@ -35,7 +35,7 @@ namespace SilverSim.Database.Memory.TravelingData
     [Description("Memory TravelingData backend")]
     public class MemoryTravelingDataService : TravelingDataServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly RwLockedDictionary<UUID, TravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, TravelingDataInfo>();
+        private readonly RwLockedDictionary<UUID, TravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, TravelingDataInfo>();
 
         public override TravelingDataInfo GetTravelingData(UUID sessionID) =>
             m_HGTravelingDatas[sessionID];

@@ -31,26 +31,20 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        readonly byte[] m_FullUpdateFixedBlock1 = new byte[(int)FullFixedBlock1Offset.BlockLength];
-        readonly byte[] m_FullUpdateFixedBlock2 = new byte[(int)FullFixedBlock2Offset.BlockLength];
-        readonly byte[] m_PropUpdateFixedBlock = new byte[(int)PropertiesFixedBlockOffset.BlockLength];
-        readonly byte[] m_CompressedUpdateFixedBlock = new byte[(int)CompressedUpdateOffset.BlockLength];
+        private readonly byte[] m_FullUpdateFixedBlock1 = new byte[(int)FullFixedBlock1Offset.BlockLength];
+        private readonly byte[] m_FullUpdateFixedBlock2 = new byte[(int)FullFixedBlock2Offset.BlockLength];
+        private readonly byte[] m_PropUpdateFixedBlock = new byte[(int)PropertiesFixedBlockOffset.BlockLength];
+        private readonly byte[] m_CompressedUpdateFixedBlock = new byte[(int)CompressedUpdateOffset.BlockLength];
 
-        byte[] m_FullUpdateData;
-        byte[] m_TerseUpdateData;
-        byte[] m_PropUpdateData;
-        byte[] m_CompressedUpdateData;
-        readonly object m_UpdateDataLock = new object();
+        private byte[] m_FullUpdateData;
+        private byte[] m_TerseUpdateData;
+        private byte[] m_PropUpdateData;
+        private byte[] m_CompressedUpdateData;
+        private readonly object m_UpdateDataLock = new object();
 
-        int m_ObjectSerial;
+        private int m_ObjectSerial;
 
-        public int SerialNumber
-        {
-            get
-            {
-                return m_ObjectSerial;
-            }
-        }
+        public int SerialNumber => m_ObjectSerial;
 
         public byte[] FullUpdateData
         {
@@ -211,6 +205,7 @@ namespace SilverSim.Scene.Types.Object
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum UpdateDataFlags : uint
         {
+            None = 0,
             Full = 1,
             Terse = 2,
             Properties = 4,
@@ -220,7 +215,7 @@ namespace SilverSim.Scene.Types.Object
 
         void PutInt32LEToBytes(byte[] b, int offset, Int32 vs)
         {
-            UInt32 v = (UInt32)vs;
+            var v = (UInt32)vs;
             b[offset + 0] = (byte)((v >> 0) & 0xFF);
             b[offset + 1] = (byte)((v >> 8) & 0xFF);
             b[offset + 2] = (byte)((v >> 16) & 0xFF);
@@ -233,7 +228,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void UpdateData(UpdateDataFlags flags, bool incSerial)
+        private void UpdateData(UpdateDataFlags flags, bool incSerial)
         {
             lock (m_UpdateDataLock)
             {

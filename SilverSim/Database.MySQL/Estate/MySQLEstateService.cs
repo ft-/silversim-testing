@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.Estate
     [Description("MySQL Estate Backend")]
     public sealed partial class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
 
         #region Constructor
@@ -148,7 +148,7 @@ namespace SilverSim.Database.MySQL.Estate
             new TableRevision(3),
             new AddColumn<bool>("UseGlobalTime") { IsNullAllowed = false, Default = true },
             new TableRevision(4),
-            new ChangeColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" } 
+            new ChangeColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" }
             /* ^^ this is for compatibility our list generator actually skips this field when not finding the revision 3 table */
             #endregion
         };
@@ -327,7 +327,7 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override List<EstateInfo> All
         {
-            get 
+            get
             {
                 var list = new List<EstateInfo>();
 

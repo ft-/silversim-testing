@@ -39,7 +39,7 @@ namespace SilverSim.Database.MySQL.Profile
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");
 
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
 
         public MySQLProfileService(string connectionString)
         {
@@ -119,7 +119,7 @@ namespace SilverSim.Database.MySQL.Profile
             }
         }
 
-        static IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("classifieds"),
             new AddColumn<UUID>("classifieduuid") { IsNullAllowed = false },

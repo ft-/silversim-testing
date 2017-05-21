@@ -36,7 +36,7 @@ namespace SilverSim.Database.Memory.Estate
     [Description("Memory Estate Backend")]
     public sealed partial class MemoryEstateService : EstateServiceInterface, IPlugin
     {
-        readonly RwLockedDictionary<uint, EstateInfo> m_Data = new RwLockedDictionary<uint, EstateInfo>();
+        private readonly RwLockedDictionary<uint, EstateInfo> m_Data = new RwLockedDictionary<uint, EstateInfo>();
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)

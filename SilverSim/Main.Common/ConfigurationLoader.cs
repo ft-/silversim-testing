@@ -74,13 +74,8 @@ namespace SilverSim.Main.Common
     {
         #region Resource Assets support
         [Description("Resource Asset Backend")]
-        sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
+        private sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
         {
-            public ResourceAssetPlugin()
-            {
-
-            }
-
             public void Startup(ConfigurationLoader loader)
             {
                 /* intentionally left empty */
@@ -94,25 +89,21 @@ namespace SilverSim.Main.Common
         {
             public TestingErrorException()
             {
-
             }
 
             public TestingErrorException(string message)
                 : base(message)
             {
-
             }
 
             protected TestingErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public TestingErrorException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -121,25 +112,21 @@ namespace SilverSim.Main.Common
         {
             public ConfigurationErrorException()
             {
-
             }
 
             public ConfigurationErrorException(string msg)
                 : base(msg)
             {
-
             }
 
             protected ConfigurationErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public ConfigurationErrorException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -148,25 +135,21 @@ namespace SilverSim.Main.Common
         {
             public ServiceNotFoundException()
             {
-
             }
 
             public ServiceNotFoundException(string msg)
                 : base(msg)
             {
-
             }
 
             protected ServiceNotFoundException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public ServiceNotFoundException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
         #endregion
@@ -184,50 +167,39 @@ namespace SilverSim.Main.Common
                     m_Log.Error(string.Format("Error removing PID file \"{0}\"", m_PIDFile), e);
                 }
             }
-            if(null != m_ShutdownEvent)
-            {
-                m_ShutdownEvent.Dispose();
-            }
+            m_ShutdownEvent?.Dispose();
         }
 
-        readonly ILog m_Log;
-        readonly ILog m_UpdaterLog;
-        readonly IConfigSource m_Config = new IniConfigSource();
-        readonly Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
-        readonly RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
-        readonly ManualResetEvent m_ShutdownEvent;
+        private readonly ILog m_Log;
+        private readonly ILog m_UpdaterLog;
+        private readonly IConfigSource m_Config = new IniConfigSource();
+        private readonly Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
+        private readonly RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
+        private readonly ManualResetEvent m_ShutdownEvent;
         static public readonly Dictionary<Type, string> FeaturesTable = new Dictionary<Type, string>();
-        readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
+        private readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
         public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
-        static readonly RwLockedDictionary<string, Assembly> PreloadPlatformAssemblies = new RwLockedDictionary<string, Assembly>();
+        private static readonly RwLockedDictionary<string, Assembly> PreloadPlatformAssemblies = new RwLockedDictionary<string, Assembly>();
         public readonly SceneList Scenes = new SceneList();
         public readonly IMRouter IMRouter = new IMRouter();
         public readonly CmdIO.CommandRegistry CommandRegistry = new CmdIO.CommandRegistry();
 
-        static string m_InstallationBinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static string InstallationBinPath
-        {
-            get
-            {
-                return m_InstallationBinPath;
-            }
-        }
+        private static readonly string m_InstallationBinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static string InstallationBinPath => m_InstallationBinPath;
 
         #region Simulator Shutdown Handler
-        readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
-        int m_ShutdownInSeconds = -1;
-        bool m_FirstShutdownNotice;
-        readonly object m_ShutdownTimerLock = new object();
+        private readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
+        private int m_ShutdownInSeconds = -1;
+        private bool m_FirstShutdownNotice;
+        private readonly object m_ShutdownTimerLock = new object();
 
-        int ShutdownInSeconds
+        private int ShutdownInSeconds
         {
-            get
-            {
-                return m_ShutdownInSeconds;
-            }
+            get { return m_ShutdownInSeconds; }
+
             set
             {
-                lock(m_ShutdownTimerLock)
+                lock (m_ShutdownTimerLock)
                 {
                     if (value > 0)
                     {
@@ -240,7 +212,7 @@ namespace SilverSim.Main.Common
         static public Action<int> SimulatorShutdownDelegate; /* used for Scene.Management registration */
         static public Action SimulatorShutdownAbortDelegate; /* used for Scene.Management registration */
 
-        void ShutdownTimerEventHandler(object o, ElapsedEventArgs evargs)
+        private void ShutdownTimerEventHandler(object o, ElapsedEventArgs evargs)
         {
             int timeLeft;
             lock(m_ShutdownTimerLock)
@@ -257,10 +229,7 @@ namespace SilverSim.Main.Common
             if(timeLeft % 15 == 0 || m_FirstShutdownNotice)
             {
                 m_FirstShutdownNotice = false;
-                if (null != SimulatorShutdownDelegate)
-                {
-                    SimulatorShutdownDelegate.Invoke(timeLeft);
-                }
+                SimulatorShutdownDelegate?.Invoke(timeLeft);
 
                 m_Log.InfoFormat("Simulator shutdown in {0} seconds", timeLeft);
             }
@@ -288,12 +257,12 @@ namespace SilverSim.Main.Common
             bool sendAbortNotice = false;
             lock(m_ShutdownTimerLock)
             {
-                sendAbortNotice = (m_ShutdownInSeconds > 0);
+                sendAbortNotice = m_ShutdownInSeconds > 0;
                 m_ShutdownInSeconds = -1;
                 m_ShutdownTimer.Stop();
             }
 
-            if(null != SimulatorShutdownAbortDelegate && sendAbortNotice && !quietAbort)
+            if(SimulatorShutdownAbortDelegate != null && sendAbortNotice && !quietAbort)
             {
                 m_Log.Info("Simulator shutdown is aborted.");
                 SimulatorShutdownAbortDelegate();
@@ -307,11 +276,11 @@ namespace SilverSim.Main.Common
             m_HeloResponseHeaders[key] = val;
         }
 
-        RwLockedDictionary<string, int> m_XProtocolsProvided = new RwLockedDictionary<string, int>();
+        private readonly RwLockedDictionary<string, int> m_XProtocolsProvided = new RwLockedDictionary<string, int>();
         public void AddHeloProtocolsProvided(string protocol, int priority)
         {
             m_XProtocolsProvided[protocol] = -priority;
-            List<string> list = new List<string>();
+            var list = new List<string>();
             foreach(KeyValuePair<string, int> item in m_XProtocolsProvided.OrderBy(key => key.Value))
             {
                 list.Add(item.Key);
@@ -342,11 +311,11 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
-        static Assembly m_MonoSecurity;
+        private static Assembly m_MonoSecurity;
 
-        static Assembly ResolveMonoSecurityEventHandler(object sender, ResolveEventArgs args)
+        private static Assembly ResolveMonoSecurityEventHandler(object sender, ResolveEventArgs args)
         {
-            AssemblyName aName = new AssemblyName(args.Name);
+            var aName = new AssemblyName(args.Name);
             if (aName.Name == "Mono.Security")
             {
                 return m_MonoSecurity;
@@ -407,16 +376,10 @@ namespace SilverSim.Main.Common
             AppDomain.CurrentDomain.AssemblyResolve += ArchSpecificResolveEventHandler;
         }
 
-        public IConfigSource Config
-        {
-            get
-            {
-                return m_Config;
-            }
-        }
+        public IConfigSource Config => m_Config;
 
         #region Plugin Registry
-        readonly bool m_ServerParamInitialLoadProcessed;
+        private readonly bool m_ServerParamInitialLoadProcessed;
 
         public void AddPlugin(string name, IPlugin plugin)
         {
@@ -427,18 +390,11 @@ namespace SilverSim.Main.Common
             }
         }
 
-        public ServerParamServiceInterface GetServerParamStorage()
-        {
-            return GetService<ServerParamServiceInterface>("ServerParamStorage");
-        }
+        public ServerParamServiceInterface GetServerParamStorage() =>
+            GetService<ServerParamServiceInterface>("ServerParamStorage");
 
-        public Dictionary<string, IPlugin> AllServices
-        {
-            get
-            {
-                return new Dictionary<string, IPlugin>(PluginInstances);
-            }
-        }
+        public Dictionary<string, IPlugin> AllServices =>
+            new Dictionary<string, IPlugin>(PluginInstances);
 
         public T GetService<T>(string serviceName)
         {
@@ -454,14 +410,12 @@ namespace SilverSim.Main.Common
             return (T)module;
         }
 
-        public T GetPluginService<T>(string serviceName)
-        {
-            return GetService<T>("$" + serviceName);
-        }
+        public T GetPluginService<T>(string serviceName) =>
+            GetService<T>("$" + serviceName);
 
         public List<T> GetServicesByValue<T>()
         {
-            List<T> list = new List<T>();
+            var list = new List<T>();
             foreach (IPlugin module in PluginInstances.Values)
             {
                 if (typeof(T).IsAssignableFrom(module.GetType()))
@@ -472,60 +426,27 @@ namespace SilverSim.Main.Common
             return list;
         }
 
-        public BaseHttpServer HttpServer
-        {
-            get
-            {
-                return GetService<BaseHttpServer>("HttpServer");
-            }
-        }
+        public BaseHttpServer HttpServer => GetService<BaseHttpServer>("HttpServer");
 
-        public BaseHttpServer HttpsServer
-        {
-            get
-            {
-                return GetService<BaseHttpServer>("HttpsServer");
-            }
-        }
+        public BaseHttpServer HttpsServer => GetService<BaseHttpServer>("HttpsServer");
 
-        public HttpXmlRpcHandler XmlRpcServer
-        {
-            get
-            {
-                return GetService<HttpXmlRpcHandler>("XmlRpcServer");
-            }
-        }
+        public HttpXmlRpcHandler XmlRpcServer => GetService<HttpXmlRpcHandler>("XmlRpcServer");
 
-        public HttpJson20RpcHandler Json20RpcServer
-        {
-            get
-            {
-                return GetService<HttpJson20RpcHandler>("JSON2.0RpcServer");
-            }
-        }
+        public HttpJson20RpcHandler Json20RpcServer => GetService<HttpJson20RpcHandler>("JSON2.0RpcServer");
 
-        public CapsHttpRedirector CapsRedirector
-        {
-            get
-            {
-                return GetService<CapsHttpRedirector>("CapsRedirector");
-            }
-        }
+        public CapsHttpRedirector CapsRedirector => GetService<CapsHttpRedirector>("CapsRedirector");
 
         #endregion
 
-        string m_GatekeeperURI = string.Empty;
+        private string m_GatekeeperURI = string.Empty;
 
         /** <summary>specifies the inter-grid region management server (not updated after any Startup has been called)</summary> */
         public string GatekeeperURI
         {
-            get
-            {
-                return m_GatekeeperURI;
-            }
+            get { return m_GatekeeperURI; }
             set
             {
-                if(!value.EndsWith("/"))
+                if (!value.EndsWith("/"))
                 {
                     value += "/";
                 }
@@ -533,18 +454,16 @@ namespace SilverSim.Main.Common
             }
         }
 
-        string m_HomeURI = string.Empty;
+        private string m_HomeURI = string.Empty;
 
         /** <summary>specifies the user server (not updated after any Startup has been called)</summary> */
         public string HomeURI
         {
-            get
-            {
-                return m_HomeURI;
-            }
+            get { return m_HomeURI; }
+
             set
             {
-                if(!value.EndsWith("/"))
+                if (!value.EndsWith("/"))
                 {
                     value += "/";
                 }
@@ -552,15 +471,9 @@ namespace SilverSim.Main.Common
             }
         }
 
-        public string GridNick
-        {
-            get; set;
-        }
+        public string GridNick { get; set; }
 
-        public string GridName
-        {
-            get; set;
-        }
+        public string GridName { get; set; }
 
         #region Constructor and Main
         public enum LocalConsole
@@ -569,8 +482,7 @@ namespace SilverSim.Main.Common
             Allowed
         }
 
-
-        void HandleRobotsTxt(HttpRequest req)
+        private void HandleRobotsTxt(HttpRequest req)
         {
             using (HttpResponse res = req.BeginResponse("text/plain"))
             {
@@ -582,15 +494,15 @@ namespace SilverSim.Main.Common
             }
         }
 
-        readonly string m_PIDFile = string.Empty;
+        private readonly string m_PIDFile = string.Empty;
 
-        void CtrlCHandler(object o, ConsoleCancelEventArgs e)
+        private void CtrlCHandler(object o, ConsoleCancelEventArgs e)
         {
             m_ShutdownEvent.Set();
             e.Cancel = true;
         }
 
-        void UpdaterLogEvent(CoreUpdater.LogType type, string msg)
+        private void UpdaterLogEvent(CoreUpdater.LogType type, string msg)
         {
             switch(type)
             {
@@ -622,8 +534,8 @@ namespace SilverSim.Main.Common
 
             m_ShutdownTimer.Elapsed += ShutdownTimerEventHandler;
             m_ShutdownEvent = shutdownEvent;
-            List<string> defineargs = new List<string>();
-            List<string> otherargs = new List<string>();
+            var defineargs = new List<string>();
+            var otherargs = new List<string>();
             foreach(string arg in args)
             {
                 if(arg.StartsWith("-D:"))
@@ -636,7 +548,7 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            ArgvConfigSource configSource = new ArgvConfigSource(otherargs.ToArray());
+            var configSource = new ArgvConfigSource(otherargs.ToArray());
             configSource.AddSwitch("Startup", "help", "h");
             configSource.AddSwitch("Startup", "mode", "m");
             configSource.AddSwitch("Startup", "config", "c");
@@ -666,7 +578,7 @@ namespace SilverSim.Main.Common
                 return;
             }
             {
-                List<string> loopCheck = new List<string>();
+                var loopCheck = new List<string>();
                 do
                 {
                     mode = newmode;
@@ -738,7 +650,7 @@ namespace SilverSim.Main.Common
             {
                 Assembly.LoadFile(Path.Combine(CoreUpdater.Instance.BinariesPath, preloadAssembly));
             }
-            
+
             /* pre-process defaults ini before adding the final configuration */
             ProcessConfigurations(false);
 
@@ -795,20 +707,12 @@ namespace SilverSim.Main.Common
                 switch (parts.Length)
                 {
                     case 1:
-                        cfg = m_Config.Configs["Startup"];
-                        if (null == cfg)
-                        {
-                            cfg = m_Config.AddConfig("Startup");
-                        }
+                        cfg = m_Config.Configs["Startup"] ?? m_Config.AddConfig("Startup");
                         cfg.Set(parts[0], varvalue);
                         break;
 
                     case 2:
-                        cfg = m_Config.Configs[parts[0]];
-                        if (null == cfg)
-                        {
-                            cfg = m_Config.AddConfig(parts[0]);
-                        }
+                        cfg = m_Config.Configs[parts[0]] ?? m_Config.AddConfig(parts[0]);
                         cfg.Set(parts[1], varvalue);
                         break;
 
@@ -834,7 +738,7 @@ namespace SilverSim.Main.Common
                     }
 
                     IConfig sourceConfig = m_Config.Configs[useparam[0]];
-                    if (null == sourceConfig || !sourceConfig.Contains(useparam[1]))
+                    if (sourceConfig == null || !sourceConfig.Contains(useparam[1]))
                     {
                         continue;
                     }
@@ -852,7 +756,7 @@ namespace SilverSim.Main.Common
 
             if (dumpResultingIniName.Length != 0)
             {
-                using (TextWriter writer = new StreamWriter(dumpResultingIniName))
+                using (var writer = new StreamWriter(dumpResultingIniName))
                 {
                     foreach (IConfig cfg in m_Config.Configs)
                     {
@@ -889,7 +793,6 @@ namespace SilverSim.Main.Common
                 /* intentionally ignored */
             }
 
-
             /* Initialize Log system */
             if (logConfigFile.Length != 0)
             {
@@ -918,7 +821,7 @@ namespace SilverSim.Main.Common
             CoreUpdater.Instance.OnUpdateLog += UpdaterLogEvent;
 
             IConfig heloConfig = m_Config.Configs["Helo.Headers"];
-            if(null != heloConfig)
+            if(heloConfig != null)
             {
                 foreach (string key in heloConfig.GetKeys())
                 {
@@ -927,7 +830,7 @@ namespace SilverSim.Main.Common
             }
 
             heloConfig = m_Config.Configs["Helo.X-Protocols-Provided"];
-            if(null != heloConfig)
+            if(heloConfig != null)
             {
                 foreach(string key in heloConfig.GetKeys())
                 {
@@ -937,17 +840,17 @@ namespace SilverSim.Main.Common
 
             IConfig consoleConfig = m_Config.Configs["Console"];
             string consoleTitle = string.Empty;
-            if(null != consoleConfig)
+            if(consoleConfig != null)
             {
                 consoleTitle = consoleConfig.GetString("ConsoleTitle", consoleTitle);
             }
 
             consoleTitle += ": " + VersionInfo.ProductName + " (" + VersionInfo.Version + ")";
-            if ((null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true)) && localConsoleControl == LocalConsole.Allowed)
+            if ((consoleConfig == null || consoleConfig.GetBoolean("EnableLocalConsole", true)) && localConsoleControl == LocalConsole.Allowed)
             {
                 PluginInstances.Add("LocalConsole", new Console.LocalConsole(consoleTitle, Scenes, CommandRegistry));
             }
-            else if ((null == consoleConfig || consoleConfig.GetBoolean("EnableLogConsole", false)) && localConsoleControl == LocalConsole.Allowed)
+            else if ((consoleConfig == null || consoleConfig.GetBoolean("EnableLogConsole", false)) && localConsoleControl == LocalConsole.Allowed)
             {
                 PluginInstances.Add("LogConsole", new Console.LogConsole(consoleTitle));
             }
@@ -1004,7 +907,7 @@ namespace SilverSim.Main.Common
             }
 
 #if DEBUG
-            string pleaseUseReleaseMsg = "Please use a release build for productive usage";
+            const string pleaseUseReleaseMsg = "Please use a release build for productive usage";
             KnownConfigurationIssues.Add(pleaseUseReleaseMsg);
             m_Log.Error(pleaseUseReleaseMsg);
 #endif
@@ -1044,7 +947,7 @@ namespace SilverSim.Main.Common
             }
 
             IConfig httpConfig = m_Config.Configs["HTTP"];
-            if(null == httpConfig)
+            if(httpConfig == null)
             {
                 m_Log.Fatal("Missing configuration section [HTTP]");
                 throw new ConfigurationErrorException();
@@ -1065,7 +968,7 @@ namespace SilverSim.Main.Common
             httpServer.UriHandlers.Add("/robots.txt", HandleRobotsTxt);
 
             IConfig httpsConfig = m_Config.Configs["HTTPS"];
-            if(null != httpsConfig)
+            if(httpsConfig != null)
             {
                 httpsServer = new BaseHttpServer(httpsConfig, this, true);
                 PluginInstances.Add("HttpsServer", httpsServer);
@@ -1096,7 +999,7 @@ namespace SilverSim.Main.Common
             {
                 if(instance.GetType().GetInterfaces().Contains(typeof(IPluginSubFactory)))
                 {
-                    IPluginSubFactory subfact = (IPluginSubFactory)instance;
+                    var subfact = (IPluginSubFactory)instance;
                     subfact.AddPlugins(this);
                 }
             }
@@ -1111,20 +1014,20 @@ namespace SilverSim.Main.Common
             }
 
             IConfig configLoader = Config.Configs["ConfigurationLoader"];
-            if(null != configLoader)
+            if(configLoader != null)
             {
-                m_RegionStorage = configLoader.Contains("RegionStorage") ? 
-                    GetService<GridServiceInterface>(configLoader.GetString("RegionStorage")) : 
+                m_RegionStorage = configLoader.Contains("RegionStorage") ?
+                    GetService<GridServiceInterface>(configLoader.GetString("RegionStorage")) :
                     null;
             }
 
             if(PluginInstances.ContainsKey("ServerParamStorage"))
             {
                 ServerParamServiceInterface serverParams = GetServerParamStorage();
-                Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
+                var cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
 
                 m_Log.Info("Distribute Server Params");
-                Dictionary<string, IPlugin> plugins = new Dictionary<string, IPlugin>(PluginInstances);
+                var plugins = new Dictionary<string, IPlugin>(PluginInstances);
 
                 m_ServerParamInitialLoadProcessed = true;
 
@@ -1146,7 +1049,7 @@ namespace SilverSim.Main.Common
                 MethodInfo m = t.GetMethod("HandleSimCircuitRequest");
                 m_SimCircuitRequest = (Action<HttpRequest, ConfigurationLoader>)Delegate.CreateDelegate(typeof(Action<HttpRequest, ConfigurationLoader>), m);
                 httpServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
-                if(null != httpsServer)
+                if(httpsServer != null)
                 {
                     httpsServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
                 }
@@ -1182,8 +1085,8 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Sim Establish
-        readonly Action<HttpRequest, ConfigurationLoader> m_SimCircuitRequest;
-        void SimCircuitRequest(HttpRequest req)
+        private readonly Action<HttpRequest, ConfigurationLoader> m_SimCircuitRequest;
+        private void SimCircuitRequest(HttpRequest req)
         {
             m_SimCircuitRequest(req, this);
         }
@@ -1195,7 +1098,7 @@ namespace SilverSim.Main.Common
             m_ShutdownEvent.Set();
         }
 
-        void ShutdownCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShutdownCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -1235,11 +1138,11 @@ namespace SilverSim.Main.Common
         {
             Scenes.OnRegionAdd -= LoadParamsOnAddedScene;
 
-            List<IPluginShutdown> shutdownLogoutBeforeAgentsList = new List<IPluginShutdown>();
-            List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
-            List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
-            List<IPluginShutdown> shutdownLogoutDatabaseList = new List<IPluginShutdown>();
-            List<IPluginShutdown> shutdownAnyList = new List<IPluginShutdown>();
+            var shutdownLogoutBeforeAgentsList = new List<IPluginShutdown>();
+            var shutdownLogoutAgentsList = new List<IPluginShutdown>();
+            var shutdownLogoutRegionsList = new List<IPluginShutdown>();
+            var shutdownLogoutDatabaseList = new List<IPluginShutdown>();
+            var shutdownAnyList = new List<IPluginShutdown>();
 
             foreach(IPluginShutdown s in GetServices<IPluginShutdown>().Values)
             {
@@ -1303,10 +1206,10 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                using (StreamReader reader = new StreamReader(args[1]))
+                using (var reader = new StreamReader(args[1]))
                 {
                     string line;
-                    while (null != (line = reader.ReadLine()))
+                    while ((line = reader.ReadLine()) != null)
                     {
                         CommandRegistry.ExecuteCommand(io.GetCmdLine(line), io, limitedToScene);
                     }

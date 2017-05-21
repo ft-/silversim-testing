@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
     public static partial class PrimMesh
     {
         #region extrude advanced
-        static List<Vector3> ExtrudeAdvanced(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
+        private static List<Vector3> ExtrudeAdvanced(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
         {
             var extrusionPath = new List<Vector3>();
             double twist;
@@ -81,7 +81,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return extrusionPath;
         }
 
-        static Vector3 CalcAdvancedCenterPrim(this ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
+        private static Vector3 CalcAdvancedCenterPrim(this ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
         {
             double twist;
             double angle = 0.0.Lerp(shape.Revolutions * 2 * Math.PI, cut);
@@ -129,7 +129,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         #endregion
 
         #region advanced mesh generator
-        static MeshLOD AdvancedToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static MeshLOD AdvancedToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             PathDetails path;
             switch (shape.ShapeType)
@@ -175,7 +175,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return mesh;
         }
 
-        static void BuildAdvancedTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
+        private static void BuildAdvancedTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
         {
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
@@ -184,7 +184,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             int verticeRowEndCount = verticeRowCount;
             if (!shape.IsOpen && shape.IsHollow)
             {
-                verticeRowEndCount -= 1;
+                --verticeRowEndCount;
             }
 
             /* generate z-triangles */

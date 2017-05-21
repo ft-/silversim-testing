@@ -35,7 +35,6 @@ namespace SilverSim.Scene.Types.Object
         #region Constructors
         public ObjectPartInventoryItem()
         {
-
         }
 
         public ObjectPartInventoryItem(AssetData asset)
@@ -63,7 +62,7 @@ namespace SilverSim.Scene.Types.Object
                 case AssetType.Gesture:
                     InventoryType = InventoryType.Gesture;
                     break;
-                case AssetType.ImageJPEG: 
+                case AssetType.ImageJPEG:
                 case AssetType.ImageTGA:
                     InventoryType = InventoryType.Snapshot;
                     break;
@@ -79,7 +78,7 @@ namespace SilverSim.Scene.Types.Object
                 case AssetType.Notecard:
                     InventoryType = InventoryType.Notecard;
                     break;
-                case AssetType.Sound: 
+                case AssetType.Sound:
                 case AssetType.SoundWAV:
                     InventoryType = InventoryType.Sound;
                     break;
@@ -130,7 +129,6 @@ namespace SilverSim.Scene.Types.Object
 
             public PermsGranterInfo()
             {
-
             }
 
             public PermsGranterInfo(PermsGranterInfo i)
@@ -143,15 +141,15 @@ namespace SilverSim.Scene.Types.Object
         public UUID NextOwnerAssetID = UUID.Zero;
 
         private PermsGranterInfo m_PermsGranter;
-        readonly object m_PermsGranterLock = new object();
-        public PermsGranterInfo PermsGranter 
-        { 
+        private readonly object m_PermsGranterLock = new object();
+        public PermsGranterInfo PermsGranter
+        {
             get
             {
                 lock(m_PermsGranterLock)
                 {
                     PermsGranterInfo permsGranter = m_PermsGranter;
-                    return (null != permsGranter) ?
+                    return (permsGranter != null) ?
                         new PermsGranterInfo(permsGranter) :
                         new PermsGranterInfo();
                 }
@@ -177,26 +175,24 @@ namespace SilverSim.Scene.Types.Object
 
         public ScriptInstance ScriptInstance
         {
-            get
-            {
-                return m_ScriptInstance;
-            }
+            get { return m_ScriptInstance; }
             set
             {
-                lock(m_PermsGranterLock)
+                lock (m_PermsGranterLock)
                 {
                     ScriptInstance instance = m_ScriptInstance;
-                    if (null != instance)
+                    if (instance != null)
                     {
                         instance.Abort();
                         instance.Remove();
                     }
 
-                    ScriptState = value != null ? value.ScriptState : null;
+                    ScriptState = value?.ScriptState;
                     m_ScriptInstance = value;
                 }
             }
         }
+
         public ScriptInstance RemoveScriptInstance
         {
             get

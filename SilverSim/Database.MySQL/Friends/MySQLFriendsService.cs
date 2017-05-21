@@ -53,10 +53,10 @@ namespace SilverSim.Database.MySQL.Friends
     [Description("MySQL Friends Backend")]
     public class MySQLFriendsService : FriendsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL FRIENDS SERVICE");
-        readonly string[] m_AvatarNameServiceNames;
-        AggregatingAvatarNameService m_AvatarNameService;
+        private readonly string[] m_AvatarNameServiceNames;
+        private AggregatingAvatarNameService m_AvatarNameService;
 
         public MySQLFriendsService(string connectionString, string avatarNameServices)
         {
@@ -64,7 +64,7 @@ namespace SilverSim.Database.MySQL.Friends
             m_AvatarNameServiceNames = avatarNameServices.Split(',');
         }
 
-        const string m_InnerJoinSelectFull = "SELECT A.*, B.RightsToFriend AS RightsToUser FROM friends AS A INNER JOIN friends as B ON A.FriendID LIKE B.UserID AND A.UserID LIKE B.FriendID ";
+        private const string m_InnerJoinSelectFull = "SELECT A.*, B.RightsToFriend AS RightsToUser FROM friends AS A INNER JOIN friends as B ON A.FriendID LIKE B.UserID AND A.UserID LIKE B.FriendID ";
 
         public void ResolveUUI(FriendInfo fi)
         {
@@ -257,7 +257,7 @@ namespace SilverSim.Database.MySQL.Friends
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("friends"),
             new AddColumn<UUID>("UserID") { IsNullAllowed = false },

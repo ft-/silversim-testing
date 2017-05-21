@@ -27,10 +27,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class ExtensionMethods
     {
-        public static MeshLOD ToMesh(this ObjectPart part, AssetServiceInterface assetService) => 
+        public static MeshLOD ToMesh(this ObjectPart part, AssetServiceInterface assetService) =>
             part.Shape.DecodedParams.ToMesh(assetService);
 
-        public static MeshLOD ToMesh(this ObjectPart.PrimitiveShape shape, AssetServiceInterface assetService) => 
+        public static MeshLOD ToMesh(this ObjectPart.PrimitiveShape shape, AssetServiceInterface assetService) =>
             shape.DecodedParams.ToMesh(assetService);
 
         public static MeshLOD ToMesh(this ObjectPart.PrimitiveShape.Decoded shape, AssetServiceInterface assetService)

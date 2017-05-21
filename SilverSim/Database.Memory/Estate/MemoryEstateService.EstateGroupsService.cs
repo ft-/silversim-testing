@@ -30,7 +30,7 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateGroupsServiceInterface, IEstateGroupsServiceListAccessInterface
     {
-        readonly RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UGI, bool>> m_EstateGroupsData = new RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UGI, bool>>(delegate () { return new RwLockedDictionary<UGI, bool>(); });
+        private readonly RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UGI, bool>> m_EstateGroupsData = new RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UGI, bool>>(() => new RwLockedDictionary<UGI, bool>());
 
         List<UGI> IEstateGroupsServiceListAccessInterface.this[uint estateID]
         {

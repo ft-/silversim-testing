@@ -37,18 +37,18 @@ namespace SilverSim.Main.Common.Console
     {
         private int m_CursorXPosition;
         private int m_CursorYPosition = -1;
-        readonly StringBuilder m_CommandLineBuffer = new StringBuilder();
+        private readonly StringBuilder m_CommandLineBuffer = new StringBuilder();
         private bool m_EchoInput = true;
-        readonly RwLockedList<string> m_CmdHistory = new RwLockedList<string>();
+        private readonly RwLockedList<string> m_CmdHistory = new RwLockedList<string>();
 
-        readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
-        readonly Thread m_LogThread;
-        readonly Thread m_InputThread;
-        readonly object m_InputThreadLock = new object();
+        private readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
+        private readonly Thread m_LogThread;
+        private readonly Thread m_InputThread;
+        private readonly object m_InputThreadLock = new object();
         private bool m_Shutdown;
-        readonly string m_ConsoleTitle;
-        readonly SceneList m_Scenes;
-        readonly CmdIO.CommandRegistry m_Commands;
+        private readonly string m_ConsoleTitle;
+        private readonly SceneList m_Scenes;
+        private readonly CmdIO.CommandRegistry m_Commands;
 
         public LocalConsole(string consoleTitle, SceneList scenes, CmdIO.CommandRegistry commands)
         {
@@ -321,7 +321,7 @@ namespace SilverSim.Main.Common.Console
             if (le.Level == Level.Error)
             {
                 WriteColorText(ConsoleColor.Red, outText);
-                if (null != le.ExceptionObject)
+                if (le.ExceptionObject != null)
                 {
                     System.Console.WriteLine();
                     WriteColorText(ConsoleColor.Red, le.ExceptionObject.ToString());
@@ -330,7 +330,7 @@ namespace SilverSim.Main.Common.Console
             else if (le.Level == Level.Warn)
             {
                 WriteColorText(ConsoleColor.Yellow, outText);
-                if (null != le.ExceptionObject)
+                if (le.ExceptionObject != null)
                 {
                     System.Console.WriteLine();
                     WriteColorText(ConsoleColor.Red, le.ExceptionObject.ToString());
@@ -340,11 +340,11 @@ namespace SilverSim.Main.Common.Console
             {
                 System.Console.Write("{0} - ", timeStr);
                 System.Console.Write("[");
-                ConsoleColor color = Colors[(Math.Abs(le.LoggerName.ToUpper().GetHashCode()) % Colors.Length)];
+                ConsoleColor color = Colors[Math.Abs(le.LoggerName.ToUpper().GetHashCode()) % Colors.Length];
                 WriteColorText(color, le.LoggerName);
                 System.Console.Write("]: ");
                 System.Console.Write(le.RenderedMessage.Trim());
-                if(null != le.ExceptionObject)
+                if(le.ExceptionObject != null)
                 {
                     System.Console.WriteLine();
                     WriteColorText(ConsoleColor.Red, le.ExceptionObject.ToString());

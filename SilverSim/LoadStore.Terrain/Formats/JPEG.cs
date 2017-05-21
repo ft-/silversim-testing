@@ -35,7 +35,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
     [Description("JPEG Terrain Storage Format Writer")]
     public class JPEG : ITerrainFileStorage, IPlugin
     {
-        static readonly Color[] m_GradientMap;
+        private static readonly Color[] m_GradientMap;
 
         static JPEG()
         {

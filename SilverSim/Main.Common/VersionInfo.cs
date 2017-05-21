@@ -29,37 +29,13 @@ namespace SilverSim.Main.Common
     public static class VersionInfo
     {
         [SuppressMessage("Gendarme.Rules.Portability", "DoNotHardcodePathsRule", Justification = "Gendarme misinterprets the string")]
-        public static string ProductName
-        { 
-            get
-            {
-                return "SilverSim/Arriba";
-            }
-        }
+        public static string ProductName => "SilverSim/Arriba";
 
-        public static string Shard
-        {
-            get
-            {
-                return "Development";
-            }
-        }
+        public static string Shard => "Development";
 
-        public static string Version
-        {
-            get
-            {
-                return "Test";
-            }
-        }
+        public static string Version => "Test";
 
-        public static bool IsPlatformMono
-        {
-            get 
-            { 
-                return Type.GetType("Mono.Runtime") != null;
-            }
-        }
+        public static bool IsPlatformMono => Type.GetType("Mono.Runtime") != null;
 
         [SuppressMessage("Gendarme.Rules.Portability", "DoNotHardcodePathsRule", Justification = "Gendarme misinterprets the string")]
         public static string RuntimeInformation
@@ -93,7 +69,6 @@ namespace SilverSim.Main.Common
                     {
                         ru += "/Mono";
                     }
-
                 }
                 else
                 {
@@ -108,12 +83,11 @@ namespace SilverSim.Main.Common
         {
             get
             {
-                StringBuilder ru = new StringBuilder();
+                var ru = new StringBuilder();
                 ru.Append(Environment.OSVersion.Platform.ToString());
                 ru.Append('-');
                 ru.Append(Environment.Is64BitProcess ? "64" : "32");
                 return ru.ToString();
-
             }
         }
 
@@ -121,7 +95,7 @@ namespace SilverSim.Main.Common
         {
             get
             {
-                StringBuilder ru = new StringBuilder("platform-libs/");
+                var ru = new StringBuilder("platform-libs/");
                 switch(Environment.OSVersion.Platform)
                 {
                     case PlatformID.Win32NT:
@@ -146,22 +120,10 @@ namespace SilverSim.Main.Common
             }
         }
 
-        public static string SimulatorVersion
-        {
-            get
-            {
-                return string.Format("{0} {1} {2} {3}", ProductName, Version, RuntimeInformation, MachineWidth);
-            }
-        }
+        public static string SimulatorVersion => string.Format("{0} {1} {2} {3}", ProductName, Version, RuntimeInformation, MachineWidth);
 
-        public static string MachineWidth
-        {
-            get
-            {
-                return Environment.Is64BitProcess ?
+        public static string MachineWidth => Environment.Is64BitProcess ?
                     "64-bit" :
                     "32-bit";
-            }
-        }
     }
 }

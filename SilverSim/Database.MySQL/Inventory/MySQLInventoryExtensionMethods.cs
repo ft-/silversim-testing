@@ -50,19 +50,24 @@ namespace SilverSim.Database.MySQL.Inventory
 
         public static InventoryItem ToItem(this MySqlDataReader reader)
         {
-            InventoryItem item = new InventoryItem(reader.GetUUID("ID"));
+            var item = new InventoryItem(reader.GetUUID("ID"))
+            {
+                ParentFolderID = reader.GetUUID("ParentFolderID"),
+                Name = reader.GetString("Name"),
+                Description = reader.GetString("Description"),
+                InventoryType = reader.GetEnum<InventoryType>("InventoryType"),
+                Flags = reader.GetEnum<InventoryFlags>("InventoryFlags"),
+                CreationDate = reader.GetDate("CreationDate"),
+                IsGroupOwned = reader.GetBool("IsGroupOwned"),
+                AssetID = reader.GetUUID("AssetID"),
+                AssetType = reader.GetEnum<AssetType>("AssetType"),
 
-            item.ParentFolderID = reader.GetUUID("ParentFolderID");
-            item.Name = reader.GetString("Name");
-            item.Description = reader.GetString("Description");
-            item.InventoryType = reader.GetEnum<InventoryType>("InventoryType");
-            item.Flags = reader.GetEnum<InventoryFlags>("InventoryFlags");
-            item.Owner.ID = reader.GetUUID("OwnerID");
-            item.LastOwner.ID = reader.GetUUID("LastOwnerID");
-            
-            item.Creator.ID = reader.GetUUID("CreatorID");
+                Owner = new UUI(reader.GetUUID("OwnerID")),
+                LastOwner = new UUI(reader.GetUUID("LastOwnerID")),
 
-            item.CreationDate = reader.GetDate("CreationDate");
+                Creator = new UUI(reader.GetUUID("CreatorID")),
+                Group = new UGI(reader.GetUUID("GroupID"))
+            };
             item.Permissions.Base = reader.GetEnum<InventoryPermissionsMask>("BasePermissionsMask");
             item.Permissions.Current = reader.GetEnum<InventoryPermissionsMask>("CurrentPermissionsMask");
             item.Permissions.EveryOne = reader.GetEnum<InventoryPermissionsMask>("EveryOnePermissionsMask");
@@ -71,10 +76,6 @@ namespace SilverSim.Database.MySQL.Inventory
             item.SaleInfo.Price = reader.GetInt32("SalePrice");
             item.SaleInfo.Type = reader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
             item.SaleInfo.PermMask = reader.GetEnum<InventoryPermissionsMask>("SalePermissionsMask");
-            item.Group.ID = reader.GetUUID("GroupID");
-            item.IsGroupOwned = reader.GetBool("IsGroupOwned");
-            item.AssetID = reader.GetUUID("AssetID");
-            item.AssetType = reader.GetEnum<AssetType>("AssetType");
 
             return item;
         }

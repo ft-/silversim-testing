@@ -28,19 +28,19 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 {
     public class VehicleMotor
     {
-        readonly VehicleParams m_Params;
-        double HeightExceededTime;
+        private readonly VehicleParams m_Params;
+        private double HeightExceededTime;
 
         internal VehicleMotor(VehicleParams param)
         {
             m_Params = param;
         }
 
-        bool IsMouselookSteerActive(VehicleFlags flags, PhysicsStateData currentState) =>
+        private bool IsMouselookSteerActive(VehicleFlags flags, PhysicsStateData currentState) =>
             ((flags & VehicleFlags.MouselookSteer) != 0 && currentState.IsAgentInMouselook) ||
                 (flags & VehicleFlags.MousePointSteer) != 0;
 
-        bool IsMouselookBankActive(VehicleFlags flags, PhysicsStateData currentState) =>
+        private bool IsMouselookBankActive(VehicleFlags flags, PhysicsStateData currentState) =>
             ((flags & VehicleFlags.MouselookBank) != 0 && currentState.IsAgentInMouselook) ||
                 (flags & VehicleFlags.MousePointBank) != 0;
 
@@ -110,7 +110,6 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 linearForce.Z = 0;
             }
             #endregion
-
 
             #region Hover Height Influence Calculation
             double hoverForce;
@@ -270,7 +269,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #region Angular Deflection
             /* Angular deflection reorients the vehicle to the velocity vector */
             Vector3 deflect = Quaternion.RotBetween(Vector3.UnitX, velocity).AsVector3;
-            angularTorque -= (deflect * m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt);
+            angularTorque -= deflect * m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt;
             #endregion
 
             #region Linear Deflection

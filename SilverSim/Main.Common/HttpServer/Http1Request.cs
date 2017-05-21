@@ -34,7 +34,7 @@ namespace SilverSim.Main.Common.HttpServer
     public sealed class Http1Request : HttpRequest
     {
         #region Private Fields
-        Stream m_HttpStream;
+        private Stream m_HttpStream;
         private HttpRequestBodyStream RawBody;
         #endregion
 
@@ -91,7 +91,7 @@ namespace SilverSim.Main.Common.HttpServer
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Http1Request(Stream httpStream, string callerIP, bool isBehindProxy, bool isSsl)
-            : base(callerIP, isBehindProxy, isSsl)
+            : base(isSsl)
         {
             m_HttpStream = httpStream;
             Body = null;
@@ -228,8 +228,7 @@ namespace SilverSim.Main.Common.HttpServer
 
                 if (m_Headers.ContainsKey("transfer-encoding"))
                 {
-                    string[] transferEncodings = m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string transferEncoding in transferEncodings)
+                    foreach (string transferEncoding in m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
                         {
@@ -254,8 +253,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 bool HaveChunkedInFront = false;
                 Body = m_HttpStream;
-                string[] transferEncodings = m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string transferEncoding in transferEncodings)
+                foreach (string transferEncoding in m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
                     {

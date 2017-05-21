@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Npc
     {
         #region NPC Appearance
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-        struct DetachEntry
+        private struct DetachEntry
         {
             public UUID ItemID;
             public UUID SceneID;
@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Npc
         public void DetachAllAttachments()
         {
             var detachList = new List<DetachEntry>();
-            m_AttachmentsList.ForEach((KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp) => 
+            m_AttachmentsList.ForEach((KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp) =>
                 detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value)));
             foreach (DetachEntry entry in detachList)
             {
@@ -63,7 +63,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        void DetachAttachment(DetachEntry entry)
+        private void DetachAttachment(DetachEntry entry)
         {
             ObjectGroup grp = CurrentScene.ObjectGroups[entry.ObjectID];
             try
@@ -242,7 +242,6 @@ namespace SilverSim.Scene.Npc
                 }
             }
 
-
             DetachAllAttachments();
 
             foreach (InventoryItem item in attachmentsToRez)
@@ -280,7 +279,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        void AttachFromInventory(AssetData data, UUID itemID)
+        private void AttachFromInventory(AssetData data, UUID itemID)
         {
             List<ObjectGroup> objgroups;
 #if DEBUG

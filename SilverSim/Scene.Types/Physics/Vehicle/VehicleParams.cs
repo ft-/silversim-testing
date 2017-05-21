@@ -29,11 +29,11 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public sealed class VehicleParams
     {
-        VehicleType m_VehicleType;
+        private VehicleType m_VehicleType;
 
-        Quaternion m_ReferenceFrame;
-        Vector3 m_AngularFrictionTimescale;
-        Vector3 m_OneByAngularFrictonTimescale = Vector3.One;
+        private Quaternion m_ReferenceFrame;
+        private Vector3 m_AngularFrictionTimescale;
+        private Vector3 m_OneByAngularFrictonTimescale = Vector3.One;
         public Vector3 OneByAngularFrictionTimescale
         {
             get
@@ -44,9 +44,10 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        Vector3 m_AngularMotorDirection;
-        Vector3 m_LinearFrictionTimescale;
-        Vector3 m_OneByLinearFrictionTimescale = Vector3.One;
+
+        private Vector3 m_AngularMotorDirection;
+        private Vector3 m_LinearFrictionTimescale;
+        private Vector3 m_OneByLinearFrictionTimescale = Vector3.One;
         public Vector3 OneByLinearFrictionTimescale
         {
             get
@@ -57,12 +58,13 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        Vector3 m_LinearMotorDirection;
-        Vector3 m_LinearMotorOffset;
 
-        double m_AngularDeflectionEfficiency;
-        double m_AngularDeflectionTimescale;
-        double m_OneByAngularDeflectionTimescale = 1;
+        private Vector3 m_LinearMotorDirection;
+        private Vector3 m_LinearMotorOffset;
+
+        private double m_AngularDeflectionEfficiency;
+        private double m_AngularDeflectionTimescale;
+        private double m_OneByAngularDeflectionTimescale = 1;
         public double OneByAngularDeflectionTimescale
         {
             get
@@ -73,8 +75,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        Vector3 m_AngularMotorDecayTimescale;
-        Vector3 m_OneByAngularMotorDecayTimescale = Vector3.One;
+
+        private Vector3 m_AngularMotorDecayTimescale;
+        private Vector3 m_OneByAngularMotorDecayTimescale = Vector3.One;
         public Vector3 OneByAngularMotorDecayTimescale
         {
             get
@@ -85,8 +88,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        Vector3 m_AngularMotorTimescale;
-        Vector3 m_OneByAngularMotorTimescale = Vector3.One;
+
+        private Vector3 m_AngularMotorTimescale;
+        private Vector3 m_OneByAngularMotorTimescale = Vector3.One;
         public Vector3 OneByAngularMotorTimescale
         {
             get
@@ -97,10 +101,11 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        double m_BankingEfficiency;
-        double m_BankingMix;
-        double m_BankingTimescale;
-        double m_OneByBankingTimescale = 1;
+
+        private double m_BankingEfficiency;
+        private double m_BankingMix;
+        private double m_BankingTimescale;
+        private double m_OneByBankingTimescale = 1;
         public double OneByBankingTimescale
         {
             get
@@ -111,11 +116,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        double m_Buoyancy;
-        double m_HoverHeight;
-        double m_HoverEfficiency;
-        double m_HoverTimescale;
-        double m_OneByHoverTimescale = 1;
+
+        private double m_Buoyancy;
+        private double m_HoverHeight;
+        private double m_HoverEfficiency;
+        private double m_HoverTimescale;
+        private double m_OneByHoverTimescale = 1;
         public double OneByHoverTimescale
         {
             get
@@ -126,9 +132,10 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        double m_LinearDeflectionEfficiency;
-        double m_LinearDeflectionTimescale;
-        double m_OneByLinearDeflectionTimescale = 1;
+
+        private double m_LinearDeflectionEfficiency;
+        private double m_LinearDeflectionTimescale;
+        private double m_OneByLinearDeflectionTimescale = 1;
         public double OneByLinearDeflectionTimescale
         {
             get
@@ -139,8 +146,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        Vector3 m_LinearMotorDecayTimescale;
-        Vector3 m_OneByLinearMotorDecayTimescale = Vector3.One;
+
+        private Vector3 m_LinearMotorDecayTimescale;
+        private Vector3 m_OneByLinearMotorDecayTimescale = Vector3.One;
         public Vector3 OneByLinearMotorDecayTimescale
         {
             get
@@ -151,8 +159,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        Vector3 m_LinearMotorTimescale;
-        Vector3 m_OneByLinearMotorTimescale = Vector3.One;
+
+        private Vector3 m_LinearMotorTimescale;
+        private Vector3 m_OneByLinearMotorTimescale = Vector3.One;
         public Vector3 OneByLinearMotorTimescale
         {
             get
@@ -163,9 +172,10 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        double m_VerticalAttractionEfficiency;
-        double m_VerticalAttractionTimescale;
-        double m_OneByVerticalAttractionTimescale = 1;
+
+        private double m_VerticalAttractionEfficiency;
+        private double m_VerticalAttractionTimescale;
+        private double m_OneByVerticalAttractionTimescale = 1;
         public double OneByVerticalAttractionTimescale
         {
             get
@@ -176,19 +186,20 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
-        VehicleFlags m_Flags;
 
-        Vector3 m_LinearWindEfficiency;
-        Vector3 m_AngularWindEfficiency;
+        private VehicleFlags m_Flags;
 
-        double m_MouselookAzimuth;
-        double m_MouselookAltitude;
-        double m_BankingAzimuth;
-        double m_DisableMotorsAbove;
-        double m_DisableMotorsAfter;
-        double m_InvertedBankingModifier;
+        private Vector3 m_LinearWindEfficiency;
+        private Vector3 m_AngularWindEfficiency;
 
-        readonly object m_VehicleParamLock = new object();
+        private double m_MouselookAzimuth;
+        private double m_MouselookAltitude;
+        private double m_BankingAzimuth;
+        private double m_DisableMotorsAbove;
+        private double m_DisableMotorsAfter;
+        private double m_InvertedBankingModifier;
+
+        private readonly object m_VehicleParamLock = new object();
 
         public void DecayDirections(double dt)
         {
@@ -201,10 +212,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
         public VehicleType VehicleType
         {
-            get
-            {
-                return m_VehicleType;
-            }
+            get { return m_VehicleType; }
+
             set
             {
                 lock (m_VehicleParamLock)
@@ -439,8 +448,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                             m_DisableMotorsAbove = 1.5f;
                             m_DisableMotorsAfter = 2.5f;
 
-                            m_Flags = (VehicleFlags.NoDeflectionUp | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp | VehicleFlags.LimitMotorDown |
-                                            VehicleFlags.LimitRollOnly | VehicleFlags.TorqueWorldZ);
+                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp | VehicleFlags.LimitMotorDown |
+                                            VehicleFlags.LimitRollOnly | VehicleFlags.TorqueWorldZ;
                             break;
 
                         case VehicleType.Sailboat:  // Halcyon-based vehicle type
@@ -478,9 +487,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
                             m_ReferenceFrame = Quaternion.Identity;
 
-                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverWaterOnly | 
+                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverWaterOnly |
                                 VehicleFlags.LimitMotorUp | VehicleFlags.LimitMotorDown |
-                                VehicleFlags.ReactToWind | VehicleFlags.ReactToCurrents | 
+                                VehicleFlags.ReactToWind | VehicleFlags.ReactToCurrents |
                                 VehicleFlags.TorqueWorldZ;
                             break;
 
@@ -488,7 +497,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                             throw new InvalidOperationException();
                     }
 
-                    if(value != VehicleType.None)
+                    if (value != VehicleType.None)
                     {
                         m_OneByAngularDeflectionTimescale = 1 / m_AngularDeflectionEfficiency;
                         m_OneByAngularFrictonTimescale = Vector3.One.ElementDivide(m_AngularFrictionTimescale);
@@ -506,12 +515,11 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
             }
         }
+
         public VehicleFlags Flags
         {
-            get
-            {
-                return m_Flags;
-            }
+            get { return m_Flags; }
+
             set
             {
                 lock (m_VehicleParamLock)
@@ -533,7 +541,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         {
             lock (m_VehicleParamLock)
             {
-                m_Flags &= (~value);
+                m_Flags &= ~value;
             }
         }
 

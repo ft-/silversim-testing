@@ -39,12 +39,11 @@ namespace SilverSim.Scene.Physics.Common
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT CONTROLLER");
 #endif
 
-        protected IAgent m_Agent { get; }
+        protected IAgent Agent { get; }
         protected readonly PhysicsStateData m_StateData;
-        readonly object m_Lock = new object();
-        readonly SceneInterface.LocationInfoProvider m_LocInfoProvider;
+        private readonly object m_Lock = new object();
 
-        protected override SceneInterface.LocationInfoProvider LocationInfoProvider => m_LocInfoProvider;
+        protected override SceneInterface.LocationInfoProvider LocationInfoProvider { get; }
 
         public abstract Vector3 Torque { get; }
         public abstract Vector3 Force { get; }
@@ -57,9 +56,9 @@ namespace SilverSim.Scene.Physics.Common
             RestitutionInputFactor = 3.2;
             FlySlowFastSpeedSwitchThreshold = 4;
             StandstillSpeedThreshold = 0.2;
-            m_Agent = agent;
+            Agent = agent;
             m_StateData = new PhysicsStateData(agent, sceneID);
-            m_LocInfoProvider = locInfoProvider;
+            LocationInfoProvider = locInfoProvider;
         }
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
@@ -198,7 +197,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public Vector3 this[VehicleVectorParamId id] 
+        public Vector3 this[VehicleVectorParamId id]
         {
             get
             {
@@ -210,7 +209,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public double this[VehicleFloatParamId id] 
+        public double this[VehicleFloatParamId id]
         {
             get
             {
@@ -263,84 +262,84 @@ namespace SilverSim.Scene.Physics.Common
         {
             var forces = new List<PositionalForce>();
             agentTorque = Vector3.Zero;
-            Vector3 linearVelocity = m_Agent.Velocity;
+            Vector3 linearVelocity = Agent.Velocity;
             double horizontalVelocity = linearVelocity.HorizontalLength;
             if (!IsPhysicsActive)
             {
                 /* No animation update on disabled physics */
                 return forces;
             }
-            else if(m_Agent.IsFlying)
+            else if(Agent.IsFlying)
             {
                 if (horizontalVelocity >= FlySlowFastSpeedSwitchThreshold * SpeedFactor)
                 {
-                    m_Agent.SetDefaultAnimation("flying");
+                    Agent.SetDefaultAnimation("flying");
                 }
                 else if (horizontalVelocity > 0.1)
                 {
-                    m_Agent.SetDefaultAnimation("flyingslow");
+                    Agent.SetDefaultAnimation("flyingslow");
                 }
-                else if(m_Agent.Velocity.Z > 0.001)
+                else if(Agent.Velocity.Z > 0.001)
                 {
-                    m_Agent.SetDefaultAnimation("hovering up");
+                    Agent.SetDefaultAnimation("hovering up");
                 }
-                else if(m_Agent.Velocity.Z < -0.001)
+                else if(Agent.Velocity.Z < -0.001)
                 {
-                    m_Agent.SetDefaultAnimation("hovering down");
+                    Agent.SetDefaultAnimation("hovering down");
                 }
                 else
                 {
-                    m_Agent.SetDefaultAnimation("hovering");
+                    Agent.SetDefaultAnimation("hovering");
                 }
                 /* TODO: implement taking off */
             }
             else
             {
-                Vector3 angularVelocity = m_Agent.AngularVelocity;
-                double groundHeightDiff = m_Agent.GlobalPositionOnGround.Z - m_LocInfoProvider.At(m_Agent.GlobalPosition).GroundHeight;
+                Vector3 angularVelocity = Agent.AngularVelocity;
+                double groundHeightDiff = Agent.GlobalPositionOnGround.Z - LocationInfoProvider.At(Agent.GlobalPosition).GroundHeight;
                 bool isfalling = groundHeightDiff > 0.1;
                 bool standing_still = horizontalVelocity < StandstillSpeedThreshold;
                 bool iscrouching = false; // groundHeightDiff < -0.1;
 
-                Vector3 bodyRotDiff = m_Agent.BodyRotation.GetEulerAngles() - m_LastKnownBodyRotation.GetEulerAngles();
+                Vector3 bodyRotDiff = Agent.BodyRotation.GetEulerAngles() - m_LastKnownBodyRotation.GetEulerAngles();
 
                 if(iscrouching)
                 {
-                    m_Agent.SetDefaultAnimation(standing_still ? "crouching" : "crouchwalking");
+                    Agent.SetDefaultAnimation(standing_still ? "crouching" : "crouchwalking");
                 }
                 else if (isfalling)
                 {
-                    m_Agent.SetDefaultAnimation("falling down");
+                    Agent.SetDefaultAnimation("falling down");
                 }
                 else if (!standing_still)
                 {
-                    m_Agent.SetDefaultAnimation(horizontalVelocity >= WalkRunSpeedSwitchThreshold * SpeedFactor ? "running" : "walking");
+                    Agent.SetDefaultAnimation(horizontalVelocity >= WalkRunSpeedSwitchThreshold * SpeedFactor ? "running" : "walking");
                 }
                 else if (m_ControlFlags.HasLeft())
                 {
-                    m_Agent.SetDefaultAnimation("turning left");
+                    Agent.SetDefaultAnimation("turning left");
                 }
                 else if (m_ControlFlags.HasRight())
                 {
-                    m_Agent.SetDefaultAnimation("turning right");
+                    Agent.SetDefaultAnimation("turning right");
                 }
                 else
                 {
-                    m_Agent.SetDefaultAnimation("standing");
+                    Agent.SetDefaultAnimation("standing");
                 }
                 /* TODO: implement striding, prejumping, jumping, soft landing */
             }
 
-            m_LastKnownBodyRotation = m_Agent.BodyRotation;
+            m_LastKnownBodyRotation = Agent.BodyRotation;
 
-            forces.Add(BuoyancyMotor(m_Agent, Vector3.Zero));
-            forces.Add(GravityMotor(m_Agent, Vector3.Zero));
-            forces.Add(HoverMotor(m_Agent, Vector3.Zero));
+            forces.Add(BuoyancyMotor(Agent, Vector3.Zero));
+            forces.Add(GravityMotor(Agent, Vector3.Zero));
+            forces.Add(HoverMotor(Agent, Vector3.Zero));
             forces.Add(new PositionalForce("ControlInput", ControlLinearInput * ControlLinearInputFactor * SpeedFactor, Vector3.Zero));
-            forces.Add(LinearRestitutionMotor(m_Agent, RestitutionInputFactor, Vector3.Zero));
+            forces.Add(LinearRestitutionMotor(Agent, RestitutionInputFactor, Vector3.Zero));
 
             /* let us allow advanced physics force input to be used on agents */
-            foreach (ObjectGroup grp in m_Agent.Attachments.All)
+            foreach (ObjectGroup grp in Agent.Attachments.All)
             {
                 foreach (KeyValuePair<UUID, Vector3> kvp in grp.AttachedForces)
                 {
@@ -359,7 +358,7 @@ namespace SilverSim.Scene.Physics.Common
                 forces.Add(new PositionalForce("AppliedForce", m_AppliedForce, Vector3.Zero));
             }
 
-            agentTorque += LookAtMotor(m_Agent);
+            agentTorque += LookAtMotor(Agent);
 
             return forces;
         }

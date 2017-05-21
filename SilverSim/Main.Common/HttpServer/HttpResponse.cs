@@ -88,14 +88,9 @@ namespace SilverSim.Main.Common.HttpServer
 
         public string ContentType
         {
-            get
-            {
-                return Headers["Content-Type"];
-            }
-            set
-            {
-                Headers["Content-Type"] = value;
-            }
+            get { return Headers["Content-Type"]; }
+
+            set { Headers["Content-Type"] = value; }
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "DisposableFieldsShouldBeDisposedRule")]

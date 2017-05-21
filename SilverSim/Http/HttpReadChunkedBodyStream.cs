@@ -66,36 +66,23 @@ namespace SilverSim.Http
 
         public override bool CanWrite => false;
 
-        public override long Length 
+        public override long Length
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public override long Position
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
+
+            set { throw new NotSupportedException(); }
         }
 
         public override int ReadTimeout
         {
-            get
-            {
-                return m_Input.ReadTimeout;
-            }
-            set
-            {
-                m_Input.ReadTimeout = value;
-            }
+            get { return m_Input.ReadTimeout; }
+
+            set { m_Input.ReadTimeout = value; }
         }
 
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
@@ -168,7 +155,6 @@ namespace SilverSim.Http
                     if (chunkFields[0].Length == 0)
                     {
                         m_EndOfChunked = true;
-
                     }
                     else
                     {
@@ -241,6 +227,7 @@ namespace SilverSim.Http
         {
             throw new NotSupportedException();
         }
+
         public override void WriteByte(byte value)
         {
             throw new NotSupportedException();

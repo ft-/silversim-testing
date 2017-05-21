@@ -31,10 +31,7 @@ namespace SilverSim.Main.Common.Log
 
         protected override void Append(LoggingEvent loggingEvent)
         {
-            Queues.ForEach(delegate(BlockingQueue<LoggingEvent> q)
-            {
-                q.Enqueue(loggingEvent);
-            });
+            Queues.ForEach((BlockingQueue<LoggingEvent> q) => q.Enqueue(loggingEvent));
         }
     }
 }

@@ -45,9 +45,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             while (dbReader.Read())
                             {
-                                var patch = new LayerPatch();
-                                patch.ExtendedPatchID = dbReader.GetUInt32("PatchID");
-                                patch.Serialization = dbReader.GetBytes("TerrainData");
+                                var patch = new LayerPatch()
+                                {
+                                    ExtendedPatchID = dbReader.GetUInt32("PatchID"),
+                                    Serialization = dbReader.GetBytes("TerrainData")
+                                };
                                 patches.Add(patch);
                             }
                         }

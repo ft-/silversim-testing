@@ -38,7 +38,7 @@ namespace SilverSim.Main.Common.HttpServer
         public RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>> XmlRpcMethods = new RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>>();
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void RequestHandler(HttpRequest httpreq)
+        private void RequestHandler(HttpRequest httpreq)
         {
             XmlRpc.XmlRpcRequest req;
             if(httpreq.Method != "POST")

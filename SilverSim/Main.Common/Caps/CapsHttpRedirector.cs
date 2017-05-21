@@ -36,10 +36,10 @@ namespace SilverSim.Main.Common.Caps
         private static readonly ILog m_Log = LogManager.GetLogger("CAPS HTTP REDIRECTOR");
         private BaseHttpServer m_HttpServer;
 
-        public readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>> Caps = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>>(delegate() { return new RwLockedDictionary<UUID, Action<HttpRequest>>();});
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>> Caps = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>>(() => new RwLockedDictionary<UUID, Action<HttpRequest>>());
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void RequestHandler(HttpRequest httpreq)
+        private void RequestHandler(HttpRequest httpreq)
         {
             Action<HttpRequest> del;
 

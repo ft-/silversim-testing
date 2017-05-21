@@ -28,7 +28,7 @@ namespace SilverSim.Main.Common
 {
     partial class ConfigurationLoader
     {
-        void ShowCachedDnsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowCachedDnsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -36,7 +36,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                StringBuilder output = new StringBuilder("Cached DNS entries:\n----------------------------------------------");
+                var output = new StringBuilder("Cached DNS entries:\n----------------------------------------------");
                 foreach (string dns in DnsNameCache.GetCachedDnsEntries())
                 {
                     output.Append("\n");
@@ -46,7 +46,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        void RemoveCachedDnsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void RemoveCachedDnsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help" || args.Count < 3)
             {

@@ -35,7 +35,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
     [Description("MySQL UserAccount AvatarName backend")]
     public class MySQLUserAccountNameService : AvatarNameServiceInterface, IPlugin, IDBServiceInterface
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
 
         public MySQLUserAccountNameService(string connectionString)
         {
@@ -60,10 +60,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             /* intentionally ignored */
         }
 
-        public override bool Remove(UUID key)
-        {
-            return false;
-        }
+        public override bool Remove(UUID key) => false;
 
         public override UUI this[string firstName, string lastName]
         {
@@ -85,14 +82,14 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public override List<UUI> Search(string[] names)
         {
-            List<UUI> list = new List<UUI>();
+            var list = new List<UUI>();
 
             if (names.Length == 1)
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?name AND LastName LIKE ?name", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?name AND LastName LIKE ?name", connection))
                     {
                         cmd.Parameters.AddParameter("?name", "%" + names[0] + "%");
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -107,10 +104,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
             else if(names.Length == 2)
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?name0 AND LastName LIKE ?name1", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?name0 AND LastName LIKE ?name1", connection))
                     {
                         cmd.Parameters.AddParameter("?name0", "%" + names[0] + "%");
                         cmd.Parameters.AddParameter("?name1", "%" + names[1] + "%");
@@ -127,15 +124,13 @@ namespace SilverSim.Database.MySQL.UserAccounts
             return list;
         }
 
-        static UUI GetUUIFromReader(MySqlDataReader reader)
+        private static UUI GetUUIFromReader(MySqlDataReader reader) => new UUI()
         {
-            UUI uui = new UUI();
-            uui.FirstName = reader.GetString("FirstName");
-            uui.LastName = reader.GetString("LastName");
-            uui.ID = reader.GetUUID("ID");
-            uui.IsAuthoritative = true;
-            return uui;
-        }
+            FirstName = reader.GetString("FirstName"),
+            LastName = reader.GetString("LastName"),
+            ID = reader.GetUUID("ID"),
+            IsAuthoritative = true
+        };
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -145,10 +140,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
         public override bool TryGetValue(UUID key, out UUI uui)
         {
             uui = null;
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE ID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE ID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddParameter("?id", key);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -167,10 +162,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
         public override bool TryGetValue(string firstName, string lastName, out UUI uui)
         {
             uui = null;
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE FirstName LIKE ?first AND LastName LIKE ?last", connection))
+                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE FirstName LIKE ?first AND LastName LIKE ?last", connection))
                 {
                     cmd.Parameters.AddParameter("?first", firstName);
                     cmd.Parameters.AddParameter("?last", lastName);
@@ -189,7 +184,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public void VerifyConnection()
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
             }
@@ -201,14 +196,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNTNAME SERVICE");
 
-        public MySQLUserAccountNameServiceFactory()
-        {
-            /* intentionally left empty */
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLUserAccountNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MySQLUserAccountNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
 }

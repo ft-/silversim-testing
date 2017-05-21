@@ -39,8 +39,8 @@ namespace SilverSim.Database.Memory.Asset
     [Description("Memory Asset Backend")]
     public class MemoryAssetService : AssetServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
-        readonly DefaultAssetReferencesService m_ReferencesService;
-        readonly RwLockedDictionary<UUID, AssetData> m_Assets = new RwLockedDictionary<UUID, AssetData>();
+        private readonly DefaultAssetReferencesService m_ReferencesService;
+        private readonly RwLockedDictionary<UUID, AssetData> m_Assets = new RwLockedDictionary<UUID, AssetData>();
 
         #region Constructor
         public MemoryAssetService()
@@ -81,17 +81,19 @@ namespace SilverSim.Database.Memory.Asset
             if(m_Assets.TryGetValue(key, out internalAsset))
             {
                 internalAsset.CreateTime = Date.Now;
-                asset = new AssetData();
-                asset.ID = internalAsset.ID;
-                asset.Data = new byte[internalAsset.Data.Length];
+                asset = new AssetData()
+                {
+                    ID = internalAsset.ID,
+                    Data = new byte[internalAsset.Data.Length],
+                    Type = internalAsset.Type,
+                    Name = internalAsset.Name,
+                    CreateTime = internalAsset.CreateTime,
+                    AccessTime = internalAsset.AccessTime,
+                    Creator = internalAsset.Creator,
+                    Flags = internalAsset.Flags,
+                    Temporary = internalAsset.Temporary
+                };
                 Buffer.BlockCopy(internalAsset.Data, 0, asset.Data, 0, internalAsset.Data.Length);
-                asset.Type = internalAsset.Type;
-                asset.Name = internalAsset.Name;
-                asset.CreateTime = internalAsset.CreateTime;
-                asset.AccessTime = internalAsset.AccessTime;
-                asset.Creator = internalAsset.Creator;
-                asset.Flags = internalAsset.Flags;
-                asset.Temporary = internalAsset.Temporary;
                 return true;
             }
             asset = null;
@@ -134,16 +136,17 @@ namespace SilverSim.Database.Memory.Asset
             AssetData data;
             if (m_Assets.TryGetValue(key, out data))
             {
-                metadata = new AssetMetadata();
-                metadata = new AssetData();
-                metadata.ID = data.ID;
-                metadata.Type = data.Type;
-                metadata.Name = data.Name;
-                metadata.CreateTime = data.CreateTime;
-                metadata.AccessTime = data.AccessTime;
-                metadata.Creator = data.Creator;
-                metadata.Flags = data.Flags;
-                metadata.Temporary = data.Temporary;
+                metadata = new AssetMetadata()
+                {
+                    ID = data.ID,
+                    Type = data.Type,
+                    Name = data.Name,
+                    CreateTime = data.CreateTime,
+                    AccessTime = data.AccessTime,
+                    Creator = data.Creator,
+                    Flags = data.Flags,
+                    Temporary = data.Temporary
+                };
                 return true;
             }
             else
@@ -201,34 +204,38 @@ namespace SilverSim.Database.Memory.Asset
             {
                 if(internalAsset.Flags != AssetFlags.Normal)
                 {
-                    internalAsset = new AssetData();
-                    internalAsset.ID = asset.ID;
-                    internalAsset.Data = new byte[asset.Data.Length];
+                    internalAsset = new AssetData()
+                    {
+                        ID = asset.ID,
+                        Data = new byte[asset.Data.Length],
+                        Type = asset.Type,
+                        Name = asset.Name,
+                        CreateTime = asset.CreateTime,
+                        AccessTime = asset.AccessTime,
+                        Creator = asset.Creator,
+                        Flags = asset.Flags,
+                        Temporary = asset.Temporary
+                    };
                     Buffer.BlockCopy(asset.Data, 0, internalAsset.Data, 0, asset.Data.Length);
-                    internalAsset.Type = asset.Type;
-                    internalAsset.Name = asset.Name;
-                    internalAsset.CreateTime = asset.CreateTime;
-                    internalAsset.AccessTime = asset.AccessTime;
-                    internalAsset.Creator = asset.Creator;
-                    internalAsset.Flags = asset.Flags;
-                    internalAsset.Temporary = asset.Temporary;
 
                     m_Assets[internalAsset.ID] = internalAsset;
                 }
             }
             else
             {
-                internalAsset = new AssetData();
-                internalAsset.ID = asset.ID;
-                internalAsset.Data = new byte[asset.Data.Length];
+                internalAsset = new AssetData()
+                {
+                    ID = asset.ID,
+                    Data = new byte[asset.Data.Length],
+                    Type = asset.Type,
+                    Name = asset.Name,
+                    CreateTime = asset.CreateTime,
+                    AccessTime = asset.AccessTime,
+                    Creator = asset.Creator,
+                    Flags = asset.Flags,
+                    Temporary = asset.Temporary
+                };
                 Buffer.BlockCopy(asset.Data, 0, internalAsset.Data, 0, asset.Data.Length);
-                internalAsset.Type = asset.Type;
-                internalAsset.Name = asset.Name;
-                internalAsset.CreateTime = asset.CreateTime;
-                internalAsset.AccessTime = asset.AccessTime;
-                internalAsset.Creator = asset.Creator;
-                internalAsset.Flags = asset.Flags;
-                internalAsset.Temporary = asset.Temporary;
 
                 m_Assets.Add(internalAsset.ID, internalAsset);
             }
@@ -238,7 +245,7 @@ namespace SilverSim.Database.Memory.Asset
         #region Delete asset method
         public override void Delete(UUID id)
         {
-            m_Assets.RemoveIf(id, delegate (AssetData d) { return d.Flags != AssetFlags.Normal; });
+            m_Assets.RemoveIf(id, (AssetData d) => d.Flags != AssetFlags.Normal);
         }
         #endregion
 

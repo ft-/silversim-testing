@@ -30,13 +30,13 @@ namespace SilverSim.Main.Common
 {
     public static class SimGridInfo
     {
-        const string GridsXml = "../data/SilverSim.gridinfo.xml";
+        private const string GridsXml = "../data/SilverSim.gridinfo.xml";
 
         public class SimGridInfoXmlException : Exception
         {
         }
 
-        static void LoadFromGridsXml_Grid(IConfigSource config, XmlTextReader reader, string tagname)
+        private static void LoadFromGridsXml_Grid(IConfigSource config, XmlTextReader reader, string tagname)
         {
             for (;;)
             {
@@ -88,7 +88,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static bool LoadFromGridsXml_Root(IConfigSource config, XmlTextReader reader, string gridId)
+        private static bool LoadFromGridsXml_Root(IConfigSource config, XmlTextReader reader, string gridId)
         {
             for(;;)
             {
@@ -128,7 +128,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static bool TryInstallingFromPackage(string gridId)
+        private static bool TryInstallingFromPackage(string gridId)
         {
             try
             {
@@ -173,9 +173,9 @@ retry:
                 }
             }
 
-            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            using (var fs = new FileStream(filename, FileMode.Open))
             {
-                using (XmlTextReader reader = new XmlTextReader(fs))
+                using (var reader = new XmlTextReader(fs))
                 {
                     for (;;)
                     {

@@ -23,16 +23,12 @@ using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.IO;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {
     public static class MapConverters
     {
-        static readonly Color[] m_GrayScaleMap;
+        private static readonly Color[] m_GrayScaleMap;
         static MapConverters()
         {
             m_GrayScaleMap = new Color[256];
@@ -40,7 +36,6 @@ namespace SilverSim.LoadStore.Terrain.Formats
             {
                 m_GrayScaleMap[i] = Color.FromArgb(i, i, i);
             }
-
         }
 
         #region Sort List by X and then Y
@@ -60,7 +55,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
         public static List<LayerPatch> ToPatchesFromGrayscale(this Bitmap bitmap)
         {
             var patches = new List<LayerPatch>();
-            if(bitmap.Width % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES != 0 ||
+            if((bitmap.Width % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) != 0 ||
                 (bitmap.Height % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) != 0)
             {
                 throw new ArgumentException("bitmap wxh is not dividable by LAYER_PATCH_NUM_XY_ENTRIES");
@@ -70,15 +65,17 @@ namespace SilverSim.LoadStore.Terrain.Formats
             {
                 for(uint x = 0; x < bitmap.Width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                 {
-                    LayerPatch patch = new LayerPatch();
-                    patch.X = x;
-                    patch.Y = (uint)bitmap.Height / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - 1 - y;
+                    var patch = new LayerPatch()
+                    {
+                        X = x,
+                        Y = (uint)bitmap.Height / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - 1 - y
+                    };
                     for (uint py = 0; py < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++py)
                     {
                         for (uint px = 0; px < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++px)
                         {
-                            long lx = (x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + px);
-                            long ly = (bitmap.Height - (long)y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - py - 1);
+                            long lx = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + px;
+                            long ly = bitmap.Height - (long)y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - py - 1;
                             patch[px, py] = bitmap.GetPixel((int)lx, (int)ly).GetBrightness() * 128f;
                         }
                     }

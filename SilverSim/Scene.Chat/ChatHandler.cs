@@ -30,8 +30,8 @@ namespace SilverSim.Scene.Chat
     #region Service Implementation
     public class ChatHandler : ChatServiceInterface
     {
-        readonly RwLockedDictionary<int, ChannelInfo> m_Channels = new RwLockedDictionary<int, ChannelInfo>();
-        readonly RwLockedList<Listener> m_ChatPass = new RwLockedList<Listener>();
+        private readonly RwLockedDictionary<int, ChannelInfo> m_Channels = new RwLockedDictionary<int, ChannelInfo>();
+        private readonly RwLockedList<Listener> m_ChatPass = new RwLockedList<Listener>();
 
         #region Constructor
         internal ChatHandler(double whisperDistance, double sayDistance, double shoutDistance)
@@ -172,7 +172,7 @@ namespace SilverSim.Scene.Chat
         }
 
         /* only to be used for SimCircuit */
-        UUID GetPassListenerUUID() => UUID.Zero;
+        private UUID GetPassListenerUUID() => UUID.Zero;
 
         public override Listener AddChatPassListener(Action<ListenEvent> send)
         {

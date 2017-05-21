@@ -71,7 +71,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void RequestHandler(HttpRequest httpreq)
+        private void RequestHandler(HttpRequest httpreq)
         {
             IValue req;
             if (httpreq.Method != "POST")
@@ -79,11 +79,11 @@ namespace SilverSim.Main.Common.HttpServer
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
-            
+
             IValue res;
             Map reqmap;
             AnArray reqarr;
-            
+
             try
             {
                 req = Json.Deserialize(httpreq.Body);
@@ -93,18 +93,17 @@ namespace SilverSim.Main.Common.HttpServer
                 req = null;
             }
 
-
-            if(null != (reqmap = (req as Map)))
+            if((reqmap = req as Map) != null)
             {
                 res = ProcessJsonRequest(reqmap);
             }
-            else if(null != (reqarr = (req as AnArray)))
+            else if((reqarr = req as AnArray) != null)
             {
                 var o = new AnArray();
                 foreach (IValue v in reqarr)
                 {
                     reqmap = v as Map;
-                    if (null != reqmap)
+                    if (reqmap != null)
                     {
                         o.Add(ProcessJsonRequest(reqmap));
                     }
@@ -126,7 +125,7 @@ namespace SilverSim.Main.Common.HttpServer
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        Map ProcessJsonRequest(Map req)
+        private Map ProcessJsonRequest(Map req)
         {
             Func<string, IValue, IValue> del;
             string method = req["method"].ToString();
@@ -134,8 +133,10 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 try
                 {
-                    var res = new Map();
-                    res.Add("jsonrpc", "2.0");
+                    var res = new Map
+                    {
+                        { "jsonrpc", "2.0" }
+                    };
                     try
                     {
                         res.Add("result", del(method, req["params"]));

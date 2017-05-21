@@ -30,17 +30,17 @@ namespace SilverSim.Scene.Chat
 {
     public sealed class RegexListenerInfo : ChatServiceInterface.Listener
     {
-        readonly Regex m_Name;
-        readonly string m_NamePlain = string.Empty;
-        readonly UUID m_ID;
-        readonly Regex m_Message;
-        readonly string m_MessagePlain = string.Empty;
-        readonly Int32 m_RegexBitfield;
-        readonly Action<ListenEvent> m_Send;
+        private readonly Regex m_Name;
+        private readonly string m_NamePlain = string.Empty;
+        private readonly UUID m_ID;
+        private readonly Regex m_Message;
+        private readonly string m_MessagePlain = string.Empty;
+        private readonly Int32 m_RegexBitfield;
+        private readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
         public override bool IsAgent => false;
 
-        readonly ChatHandler m_Handler;
+        private readonly ChatHandler m_Handler;
 
         public override bool IsMatching(string name, UUID id, string message, Int32 regexBitfield) => m_NamePlain == name &&
                 m_ID == id &&
@@ -49,13 +49,13 @@ namespace SilverSim.Scene.Chat
 
         internal RegexListenerInfo(
             ChatHandler handler,
-            int channel, 
+            int channel,
             string name,
-            UUID id, 
+            UUID id,
             string message,
             Int32 regexBitfield,
-            Func<UUID> getuuid, 
-            Func<Vector3> getpos, 
+            Func<UUID> getuuid,
+            Func<Vector3> getpos,
             Action<ListenEvent> send)
         {
             m_RegexBitfield = regexBitfield;
@@ -130,7 +130,7 @@ namespace SilverSim.Scene.Chat
                     return;
                 }
             }
-            if(m_ID != null)
+            if(m_ID != UUID.Zero)
             {
                 if(m_ID.Equals(UUID.Zero))
                 {

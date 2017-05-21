@@ -22,7 +22,6 @@
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 

@@ -45,9 +45,9 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
 
-        readonly string m_ConnectionString;
-        readonly DefaultAssetReferencesService m_ReferencesService;
-        readonly RwLockedList<string> m_ConfigurationIssues;
+        private readonly string m_ConnectionString;
+        private readonly DefaultAssetReferencesService m_ReferencesService;
+        private readonly RwLockedList<string> m_ConfigurationIssues;
 
         #region Constructor
         public MySQLDedupAssetService(string connectionString, RwLockedList<string> configurationIssues)
@@ -150,7 +150,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
             return res;
         }
-
         #endregion
 
         #region Accessors
@@ -179,17 +178,18 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     {
                         if (dbReader.Read())
                         {
-                            asset = new AssetData();
-                            asset.ID = dbReader.GetUUID("id");
-                            asset.Data = dbReader.GetBytes("data");
-                            asset.Type = dbReader.GetEnum<AssetType>("assetType");
-                            asset.Name = dbReader.GetString("name");
-                            asset.CreateTime = dbReader.GetDate("create_time");
-                            asset.AccessTime = dbReader.GetDate("access_time");
-                            asset.Creator = dbReader.GetUUI("CreatorID");
-                            asset.Flags = dbReader.GetEnum<AssetFlags>("asset_flags");
-                            asset.Temporary = dbReader.GetBool("temporary");
-
+                            asset = new AssetData()
+                            {
+                                ID = dbReader.GetUUID("id"),
+                                Data = dbReader.GetBytes("data"),
+                                Type = dbReader.GetEnum<AssetType>("assetType"),
+                                Name = dbReader.GetString("name"),
+                                CreateTime = dbReader.GetDate("create_time"),
+                                AccessTime = dbReader.GetDate("access_time"),
+                                Creator = dbReader.GetUUI("CreatorID"),
+                                Flags = dbReader.GetEnum<AssetFlags>("asset_flags"),
+                                Temporary = dbReader.GetBool("temporary")
+                            };
                             if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
@@ -243,15 +243,17 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     {
                         if (dbReader.Read())
                         {
-                            metadata = new AssetMetadata();
-                            metadata.ID = dbReader.GetUUID("id");
-                            metadata.Type = dbReader.GetEnum<AssetType>("assetType");
-                            metadata.Name = dbReader.GetString("name");
-                            metadata.Creator = dbReader.GetUUI("CreatorID");
-                            metadata.CreateTime = dbReader.GetDate("create_time");
-                            metadata.AccessTime = dbReader.GetDate("access_time");
-                            metadata.Flags = dbReader.GetEnum<AssetFlags>("asset_flags");
-                            metadata.Temporary = dbReader.GetBool("temporary");
+                            metadata = new AssetMetadata()
+                            {
+                                ID = dbReader.GetUUID("id"),
+                                Type = dbReader.GetEnum<AssetType>("assetType"),
+                                Name = dbReader.GetString("name"),
+                                Creator = dbReader.GetUUI("CreatorID"),
+                                CreateTime = dbReader.GetDate("create_time"),
+                                AccessTime = dbReader.GetDate("access_time"),
+                                Flags = dbReader.GetEnum<AssetFlags>("asset_flags"),
+                                Temporary = dbReader.GetBool("temporary")
+                            };
                             return true;
                         }
                     }
@@ -422,7 +424,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("assetdata") { IsDynamicRowFormat = true },
             new AddColumn<byte[]>("hash") { IsFixed = true, Cardinality = 20, IsNullAllowed = false },

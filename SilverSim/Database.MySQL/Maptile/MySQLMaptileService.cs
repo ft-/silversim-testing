@@ -36,15 +36,15 @@ namespace SilverSim.Database.MySQL.Maptile
     [Description("MySQL Maptile Backend")]
     public class MySQLMaptileService : MaptileServiceInterface, IPlugin, IDBServiceInterface
     {
-        readonly string m_ConnectionString;
-        static readonly ILog m_Log = LogManager.GetLogger("MYSQL MAPTILE SERVICE");
+        private readonly string m_ConnectionString;
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL MAPTILE SERVICE");
 
         public MySQLMaptileService(string connectionString)
         {
             m_ConnectionString = connectionString;
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("maptiles"),
             new AddColumn<uint>("LocX") { IsNullAllowed = false },
@@ -117,13 +117,13 @@ namespace SilverSim.Database.MySQL.Maptile
                 connection.Open();
                 var vals = new Dictionary<string, object>
                 {
-                    { "LocX", data.Location.X },
-                    { "LocY", data.Location.Y },
-                    { "ScopeID", data.ScopeID },
-                    { "LastUpdate", Date.Now },
-                    { "ContentType", data.ContentType },
-                    { "ZoomLevel", data.ZoomLevel },
-                    { "Data", data.Data }
+                    ["LocX"] = data.Location.X,
+                    ["LocY"] = data.Location.Y,
+                    ["ScopeID"] = data.ScopeID,
+                    ["LastUpdate"] = Date.Now,
+                    ["ContentType"] = data.ContentType,
+                    ["ZoomLevel"] = data.ZoomLevel,
+                    ["Data"] = data.Data
                 };
                 connection.ReplaceInto("maptiles", vals);
             }
@@ -182,7 +182,7 @@ namespace SilverSim.Database.MySQL.Maptile
     [PluginName("Maptile")]
     public class MySQLMaptileServiceFactory : IPluginFactory
     {
-        static readonly ILog m_Log = LogManager.GetLogger("MYSQL MAPTILE SERVICE");
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL MAPTILE SERVICE");
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
             new MySQLMaptileService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));

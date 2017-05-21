@@ -29,7 +29,7 @@ namespace SilverSim.Database.Memory.Profile
 {
     partial class MemoryProfileService : ProfileServiceInterface.IPicksInterface
     {
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>> m_Picks = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>>(delegate () { return new RwLockedDictionary<UUID, ProfilePick>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>> m_Picks = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>>(() => new RwLockedDictionary<UUID, ProfilePick>());
 
         ProfilePick IPicksInterface.this[UUI user, UUID id]
         {

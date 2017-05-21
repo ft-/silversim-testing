@@ -29,7 +29,7 @@ namespace SilverSim.Database.MySQL.Groups
 {
     partial class MySQLGroupsService : GroupsServiceInterface.IGroupMembershipsInterface
     {
-        GroupMembership MembershipFromReader(MySqlDataReader reader, UUI requestingAgent) => new GroupMembership()
+        private GroupMembership MembershipFromReader(MySqlDataReader reader, UUI requestingAgent) => new GroupMembership()
         {
             IsAcceptNotices = reader.GetBool("AcceptNotices"),
             Contribution = reader.GetInt32("Contribution"),
@@ -60,7 +60,7 @@ namespace SilverSim.Database.MySQL.Groups
                 {
                     conn.Open();
                     using (var cmd = new MySqlCommand(
-                            "SELECT g.*, m.AccessToken as AccessToken, m.SelectedRoleID AS ActiveRoleID, m.PrincipalID, m.SelectedRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " + 
+                            "SELECT g.*, m.AccessToken as AccessToken, m.SelectedRoleID AS ActiveRoleID, m.PrincipalID, m.SelectedRoleID, m.Contribution, m.ListInProfile, m.AcceptNotices, m.AccessToken, " +
                             "r.RoleID, r.Name AS RoleName, r.Description AS RoleDescription, r.Title as RoleTitle, r.Powers as RolePowers, " +
                             RCountQuery + "," + MCountQuery + " FROM (groupmemberships AS m INNER JOIN groups AS g ON m.GroupID = g.GroupID) " +
                             "INNER JOIN grouproles AS r ON m.SelectedRoleID = r.RoleID " +

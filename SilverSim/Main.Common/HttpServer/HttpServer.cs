@@ -24,9 +24,7 @@ using Nini.Config;
 using SilverSim.Http;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.PortControl;
-using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
-using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -52,22 +50,22 @@ namespace SilverSim.Main.Common.HttpServer
         public RwLockedDictionary<string, Action<HttpRequest>> RootUriContentTypeHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
 
         public uint Port { get; }
-        ExternalHostNameServiceInterface m_ExternalHostNameService;
+        private ExternalHostNameServiceInterface m_ExternalHostNameService;
         public string ExternalHostName => m_ExternalHostNameService.ExternalHostName;
 
         public string ServerURI => string.Format("{0}://{1}:{2}/", Scheme, ExternalHostName, Port);
         public string Scheme { get; }
 
-        readonly bool m_IsBehindProxy;
-        bool m_StoppingListeners;
+        private readonly bool m_IsBehindProxy;
+        private bool m_StoppingListeners;
 
-        X509Certificate2 m_ServerCertificate;
-        readonly SslProtocols m_SslProtocols = SslProtocols.Tls12;
-        readonly string m_CertificateFileName;
+        private X509Certificate2 m_ServerCertificate;
+        private readonly SslProtocols m_SslProtocols = SslProtocols.Tls12;
+        private readonly string m_CertificateFileName;
         readonly internal Type m_SslStreamPreload;
-        readonly Socket m_ListenerSocket;
-        readonly Thread m_ListenerThread;
-        readonly List<IPortControlServiceInterface> m_PortControlServices = new List<IPortControlServiceInterface>();
+        private readonly Socket m_ListenerSocket;
+        private readonly Thread m_ListenerThread;
+        private readonly List<IPortControlServiceInterface> m_PortControlServices = new List<IPortControlServiceInterface>();
 
         public BaseHttpServer(IConfig httpConfig, ConfigurationLoader loader, bool useSsl = false)
         {
@@ -217,9 +215,9 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        int m_ActiveThreadCount;
+        private int m_ActiveThreadCount;
 
-        readonly AutoResetEvent m_AsyncListenerEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent m_AsyncListenerEvent = new AutoResetEvent(false);
 
         private void AcceptThread()
         {
@@ -227,7 +225,7 @@ namespace SilverSim.Main.Common.HttpServer
             try
             {
                 Interlocked.Increment(ref m_ActiveThreadCount);
-                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+                var args = new SocketAsyncEventArgs();
                 args.Completed += AcceptHandler;
 
                 while (!m_StoppingListeners)
@@ -239,7 +237,6 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             if (m_StoppingListeners)
                             {
-
                                 break;
                             }
                         }
@@ -284,7 +281,7 @@ namespace SilverSim.Main.Common.HttpServer
             m_AsyncListenerEvent.Set();
         }
 
-        static string AddressToString(IPAddress ipAddr)
+        private static string AddressToString(IPAddress ipAddr)
         {
             if(ipAddr.AddressFamily == AddressFamily.InterNetworkV6)
             {
@@ -337,10 +334,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 finally
                 {
-                    if (null != socket)
-                    {
-                        socket.Close();
-                    }
+                    socket?.Close();
                     Interlocked.Decrement(ref m_ActiveThreadCount);
                 }
             }
@@ -376,7 +370,7 @@ namespace SilverSim.Main.Common.HttpServer
                         /* not correctly authenticated */
                         if (m_Log.IsDebugEnabled)
                         {
-                            m_Log.DebugFormat("SSL AuthenticateAsServer failed for client {0}", remoteAddr.ToString());
+                            m_Log.DebugFormat("SSL AuthenticateAsServer failed for client {0}", remoteAddr);
                         }
                         return;
                     }
@@ -409,10 +403,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 finally
                 {
-                    if (null != socket)
-                    {
-                        socket.Close();
-                    }
+                    socket?.Close();
                     Interlocked.Decrement(ref m_ActiveThreadCount);
                 }
             }

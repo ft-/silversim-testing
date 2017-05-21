@@ -99,12 +99,12 @@ namespace SilverSim.Database.MySQL.Groups
         {
             var vals = new Dictionary<string, object>
             {
-                { "GroupID", role.Group.ID },
-                { "RoleID", role.ID },
-                { "Name", role.Name },
-                { "Description", role.Description },
-                { "Title", role.Title },
-                { "Powers", role.Powers }
+                ["GroupID"] = role.Group.ID,
+                ["RoleID"] = role.ID,
+                ["Name"] = role.Name,
+                ["Description"] = role.Description,
+                ["Title"] = role.Title,
+                ["Powers"] = role.Powers
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {

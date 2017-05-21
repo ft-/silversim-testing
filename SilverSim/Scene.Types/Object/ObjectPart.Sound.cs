@@ -74,6 +74,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
         }
+
         private readonly SoundParam m_Sound = new SoundParam();
 
         public SoundParam Sound
@@ -171,6 +172,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
         }
+
         private readonly CollisionSoundParam m_CollisionSound = new CollisionSoundParam();
 
         private bool m_IsSoundQueueing;

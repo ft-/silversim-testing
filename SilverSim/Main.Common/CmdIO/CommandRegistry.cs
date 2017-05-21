@@ -28,43 +28,43 @@ using System.Text;
 
 namespace SilverSim.Main.Common.CmdIO
 {
-    public class CommandRegistry 
+    public class CommandRegistry
     {
         // for documentation:
         //public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
 
-        readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_CreateCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DeleteCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_LoadCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SaveCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ShowCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SetCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ResetCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_GetCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ChangeCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ClearCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RemoveCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_EmptyCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_StartCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RestartCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_StopCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SelectCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_EnableCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DisableCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_AlertCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_KickCommands;
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_UnregisterCommands;
+        private readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_CreateCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DeleteCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_LoadCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SaveCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ShowCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SetCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ResetCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_GetCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ChangeCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ClearCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RemoveCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_EmptyCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_StartCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RestartCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_StopCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_SelectCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_EnableCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DisableCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_AlertCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_KickCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_UnregisterCommands;
 
-        readonly object m_RegisterCmdGroupLock = new object();
+        private readonly object m_RegisterCmdGroupLock = new object();
 
         public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands => m_Commands;
 
-        RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CheckAddCommandType(string cmd, ref RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CheckAddCommandType(string cmd, ref RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
         {
             lock (m_RegisterCmdGroupLock)
             {
-                if(null == dict)
+                if(dict == null)
                 {
                     dict = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
                     Commands.Add(cmd, new CommandType(cmd, dict).Command_Handler);
@@ -178,10 +178,10 @@ namespace SilverSim.Main.Common.CmdIO
             CheckAddCommandType("kick", ref m_KickCommands).Add(cmd, handler);
         }
 
-        sealed class CommandType
+        private sealed class CommandType
         {
-            readonly string m_Command;
-            readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Dict;
+            private readonly string m_Command;
+            private readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Dict;
             public CommandType(string command, RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
             {
                 m_Command = command;
@@ -227,7 +227,6 @@ namespace SilverSim.Main.Common.CmdIO
                 {
                     io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
                 }
-
             }
         }
 

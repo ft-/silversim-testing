@@ -28,8 +28,8 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private Stream m_Output;
         private long m_RemainingLength;
-        readonly bool m_HasLimitedLength;
-        static readonly byte[] FillBytes = new byte[10240];
+        private readonly bool m_HasLimitedLength;
+        private static readonly byte[] FillBytes = new byte[10240];
 
         public HttpResponseBodyStream(Stream output, long contentLength)
         {
@@ -58,26 +58,16 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override long Position
         {
-            get
-            {
-                return Length - m_RemainingLength;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { return Length - m_RemainingLength; }
+
+            set { throw new NotSupportedException(); }
         }
 
-        public override int WriteTimeout 
+        public override int WriteTimeout
         {
-            get
-            {
-                return m_Output.WriteTimeout;
-            }
-            set
-            {
-                m_Output.WriteTimeout = value;
-            }
+            get { return m_Output.WriteTimeout; }
+
+            set { m_Output.WriteTimeout = value; }
         }
 
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)

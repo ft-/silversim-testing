@@ -60,8 +60,7 @@ namespace SilverSim.Database.Memory.Avatar
                 }
                 else
                 {
-                    var data = new RwLockedDictionary<string, string>(value);
-                    m_Data[avatarID] = data;
+                    m_Data[avatarID] = new RwLockedDictionary<string, string>(value);
                 }
             }
         }

@@ -28,10 +28,10 @@ namespace SilverSim.Http
 {
     public class HttpsStream : AbstractHttpStream
     {
-        readonly SslStream m_Stream;
-        readonly byte[] m_Buffer;
-        int m_BufferPos;
-        int m_BufferFill;
+        private readonly SslStream m_Stream;
+        private readonly byte[] m_Buffer;
+        private int m_BufferPos;
+        private int m_BufferFill;
 
         public HttpsStream(SslStream stream)
         {
@@ -138,14 +138,9 @@ namespace SilverSim.Http
 
         public override int WriteTimeout
         {
-            get
-            {
-                return m_Stream.WriteTimeout;
-            }
-            set
-            {
-                m_Stream.WriteTimeout = value;
-            }
+            get { return m_Stream.WriteTimeout; }
+
+            set { m_Stream.WriteTimeout = value; }
         }
 
         public override bool CanTimeout => m_Stream.CanTimeout;
@@ -163,22 +158,14 @@ namespace SilverSim.Http
 
         public override long Length
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public override long Position
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
+
+            set { throw new NotSupportedException(); }
         }
 
         public override long Seek(long offset, SeekOrigin origin)

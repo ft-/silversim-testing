@@ -75,7 +75,6 @@ namespace SilverSim.Database.MySQL.Estate
                         }
                     }
                 }
-
             }
         }
 

@@ -34,7 +34,7 @@ namespace SilverSim.Database.Memory.GridUser
     [Description("Memory GridUser Backend")]
     public sealed class MemoryGridUserService : GridUserServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly RwLockedDictionary<UUID, GridUserInfo> m_Data = new RwLockedDictionary<UUID, GridUserInfo>();
+        private readonly RwLockedDictionary<UUID, GridUserInfo> m_Data = new RwLockedDictionary<UUID, GridUserInfo>();
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)
@@ -72,7 +72,6 @@ namespace SilverSim.Database.Memory.GridUser
             }
         }
 
-
         public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo) =>
             TryGetValue(userID.ID, out gridUserInfo);
 
@@ -88,10 +87,12 @@ namespace SilverSim.Database.Memory.GridUser
             }
             else
             {
-                info = new GridUserInfo();
-                info.User = userID;
-                info.LastLogin = Date.Now;
-                info.IsOnline = true;
+                info = new GridUserInfo()
+                {
+                    User = userID,
+                    LastLogin = Date.Now,
+                    IsOnline = true
+                };
                 m_Data[userID.ID] = info;
             }
         }

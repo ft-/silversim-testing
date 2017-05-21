@@ -107,18 +107,18 @@ namespace SilverSim.Database.MySQL.Groups
         {
             var vals = new Dictionary<string, object>
             {
-                { "GroupID", group.ID.ID },
-                { "Location", group.ID.HomeURI != null ? group.ID.HomeURI.ToString() : string.Empty },
-                { "Name", group.ID.GroupName },
-                { "Charter", group.Charter },
-                { "InsigniaID", group.InsigniaID },
-                { "FounderID", group.Founder.ID },
-                { "MembershipFee", group.MembershipFee },
-                { "OpenEnrollment", group.IsOpenEnrollment },
-                { "ShowInList", group.IsShownInList },
-                { "AllowPublish", group.IsAllowPublish },
-                { "MaturePublish", group.IsMaturePublish },
-                { "OwnerRoleID", group.OwnerRoleID }
+                ["GroupID"] = group.ID.ID,
+                ["Location"] = group.ID.HomeURI != null ? group.ID.HomeURI.ToString() : string.Empty,
+                ["Name"] = group.ID.GroupName,
+                ["Charter"] = group.Charter,
+                ["InsigniaID"] = group.InsigniaID,
+                ["FounderID"] = group.Founder.ID,
+                ["MembershipFee"] = group.MembershipFee,
+                ["OpenEnrollment"] = group.IsOpenEnrollment,
+                ["ShowInList"] = group.IsShownInList,
+                ["AllowPublish"] = group.IsAllowPublish,
+                ["MaturePublish"] = group.IsMaturePublish,
+                ["OwnerRoleID"] = group.OwnerRoleID
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -242,8 +242,10 @@ namespace SilverSim.Database.MySQL.Groups
                     {
                         if (reader.Read())
                         {
-                            ugi = new UGI();
-                            ugi.ID = groupID;
+                            ugi = new UGI()
+                            {
+                                ID = groupID
+                            };
                             string uri = reader.GetString("Location");
                             if(!string.IsNullOrEmpty(uri))
                             {
@@ -262,15 +264,15 @@ namespace SilverSim.Database.MySQL.Groups
         {
             var vals = new Dictionary<string, object>
             {
-                { "Charter", group.Charter },
-                { "InsigniaID", group.InsigniaID },
-                { "FounderID", group.Founder.ID },
-                { "MembershipFee", group.MembershipFee },
-                { "OpenEnrollment", group.IsOpenEnrollment },
-                { "ShowInList", group.IsShownInList },
-                { "AllowPublish", group.IsAllowPublish },
-                { "MaturePublish", group.IsMaturePublish },
-                { "OwnerRoleID", group.OwnerRoleID }
+                ["Charter"] = group.Charter,
+                ["InsigniaID"] = group.InsigniaID,
+                ["FounderID"] = group.Founder.ID,
+                ["MembershipFee"] = group.MembershipFee,
+                ["OpenEnrollment"] = group.IsOpenEnrollment,
+                ["ShowInList"] = group.IsShownInList,
+                ["AllowPublish"] = group.IsAllowPublish,
+                ["MaturePublish"] = group.IsMaturePublish,
+                ["OwnerRoleID"] = group.OwnerRoleID
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {

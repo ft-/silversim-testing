@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Script;
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
@@ -206,7 +205,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                             if (hasHollow)
                             {
-                                ret += 1;
+                                ret++;
                             }
                             break;
                         case PrimitiveShapeType.Cylinder:
@@ -217,7 +216,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                             if (hasHollow)
                             {
-                                ret += 1;
+                                ret++;
                             }
                             break;
                         case PrimitiveShapeType.Prism:
@@ -228,7 +227,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                             if (hasHollow)
                             {
-                                ret += 1;
+                                ret++;
                             }
                             break;
                         case PrimitiveShapeType.Sphere:
@@ -243,7 +242,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                             if (hasHollow)
                             {
-                                ret += 1;
+                                ret++;
                             }
                             break;
                         case PrimitiveShapeType.Torus:
@@ -258,7 +257,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                             if (hasHollow)
                             {
-                                ret += 1;
+                                ret++;
                             }
                             break;
                         case PrimitiveShapeType.Tube:
@@ -273,7 +272,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                             if (hasHollow)
                             {
-                                ret += 1;
+                                ret++;
                             }
                             break;
                         case PrimitiveShapeType.Ring:
@@ -288,7 +287,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                             if (hasHollow)
                             {
-                                ret += 1;
+                                ret++;
                             }
                             break;
                         case PrimitiveShapeType.Sculpt:
@@ -386,38 +385,41 @@ namespace SilverSim.Scene.Types.Object
             }
 
             /** <summary>divides by 50000</summary> */
-            const double CutQuanta = 0.00002f;
+            private readonly double CutQuanta = 0.00002f;
             /** <summary>divides by 100</summary> */
-            const double ScaleQuanta = 0.01f;
+            private readonly double ScaleQuanta = 0.01f;
             /** <summary>divides by 100</summary> */
-            const double ShearQuanta = 0.01f;
+            private const double ShearQuanta = 0.01f;
             /** <summary>divides by 100</summary> */
-            const double TaperQuanta = 0.01f;
+            private const double TaperQuanta = 0.01f;
             /** <summary>0.015f</summary> */
-            const double RevQuanta = 0.015f;
+            private const double RevQuanta = 0.015f;
             /** <summary>divides by 50000</summary> */
-            const double HollowQuanta = 0.00002f;
-
+            private const double HollowQuanta = 0.00002f;
 
             public Decoded DecodedParams
             {
                 get
                 {
-                    var d = new Decoded();
+                    var d = new Decoded()
+                    {
+                        ShapeType = Type,
+                        SculptType = SculptType,
+                        SculptMap = SculptMap,
+                        IsSculptInverted = IsSculptInverted,
+                        IsSculptMirrored = IsSculptMirrored,
 
-                    d.ShapeType = Type;
-                    d.SculptType = SculptType;
-                    d.SculptMap = SculptMap;
-                    d.IsSculptInverted = IsSculptInverted;
-                    d.IsSculptMirrored = IsSculptMirrored;
+                        #region Profile Params
+                        ProfileBegin = (ProfileBegin * CutQuanta).Clamp(0f, 1f),
+                        ProfileEnd = (ProfileEnd * CutQuanta).Clamp(0f, 1f),
+                        IsOpen = ProfileBegin != 0 || ProfileEnd != 50000,
+                        ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask),
+                        HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask)
+                        #endregion
+                    };
 
                     #region Profile Params
-                    d.ProfileBegin = (ProfileBegin * CutQuanta).Clamp(0f, 1f);
-                    d.ProfileEnd = (ProfileEnd * CutQuanta).Clamp(0f, 1f);
-                    d.IsOpen = (ProfileBegin != 0 || ProfileEnd != 50000);
-                    d.ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask);
-                    d.HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask);
-                    d.ProfileHollow = ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) && 
+                    d.ProfileHollow = ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) &&
                         d.HoleShape == PrimitiveProfileHollowShape.Square) ?
                         (ProfileHollow * HollowQuanta).Clamp(0f, 0.7f) :
                         (ProfileHollow * HollowQuanta).Clamp(0f, 0.99f);
@@ -437,7 +439,7 @@ namespace SilverSim.Scene.Types.Object
                         0f);
                     d.TwistBegin = (PathTwistBegin * ScaleQuanta).Clamp(-1f, 1f);
                     d.TwistEnd = (PathTwist * ScaleQuanta).Clamp(-1f, 1f);
-                    d.RadiusOffset = (PathRadiusOffset * ScaleQuanta);
+                    d.RadiusOffset = PathRadiusOffset * ScaleQuanta;
                     d.Taper = new Vector3(
                         (PathTaperX * TaperQuanta).Clamp(-1f, 1f),
                         (PathTaperY * TaperQuanta).Clamp(-1f, 1f),
@@ -516,8 +518,10 @@ namespace SilverSim.Scene.Types.Object
 
             public static PrimitiveShape FromPrimitiveParams(AnArray.MarkEnumerator enumerator)
             {
-                var shape = new PrimitiveShape();
-                shape.Type = (PrimitiveShapeType)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
+                var shape = new PrimitiveShape()
+                {
+                    Type = (PrimitiveShapeType)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE")
+                };
                 if (shape.Type == PrimitiveShapeType.Sculpt)
                 {
                     shape.SculptMap = ParamsHelper.GetKey(enumerator, "PRIM_TYPE");
@@ -578,7 +582,7 @@ namespace SilverSim.Scene.Types.Object
                         case PrimitiveShapeType.Sculpt:
                             extrusion = PrimitiveExtrusion.Curve1;
                             break;
-                            
+
                         default:
                             break;
                     }
@@ -594,7 +598,7 @@ namespace SilverSim.Scene.Types.Object
                     cut.Y = cut.Y.Clamp(0, 1);
                     if (cut.Y - cut.X < 0.05f)
                     {
-                        cut.Y = cut.Y - 0.05f;
+                        cut.Y -= 0.05f;
                         if (cut.X < 0.0f)
                         {
                             cut.X = 0.0f;
@@ -618,9 +622,9 @@ namespace SilverSim.Scene.Types.Object
                     twist.X = twist.X.Clamp(-1f, 1f);
                     twist.Y = twist.Y.Clamp(-1f, 1f);
 
-                    double tempFloat = (100.0d * twist.X);
+                    double tempFloat = 100.0d * twist.X;
                     shape.PathTwistBegin = (sbyte)tempFloat;
-                    tempFloat = (100.0d * twist.Y);
+                    tempFloat = 100.0d * twist.Y;
                     shape.PathTwist = (sbyte)tempFloat;
 
                     Vector3 topSize;
@@ -750,7 +754,7 @@ namespace SilverSim.Scene.Types.Object
             public override bool Equals(object o)
             {
                 var s = o as PrimitiveShape;
-                if(null == s)
+                if(s == null)
                 {
                     return false;
                 }
@@ -1174,14 +1178,7 @@ namespace SilverSim.Scene.Types.Object
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int ALL_SIDES = -1;
 
-
-        public int NumberOfSides
-        {
-            get
-            {
-                return Shape.NumberOfSides;
-            }
-        }
+        public int NumberOfSides => Shape.NumberOfSides;
 
         public ICollection<TextureEntryFace> GetFaces(int face)
         {
@@ -1196,9 +1193,10 @@ namespace SilverSim.Scene.Types.Object
             }
             else
             {
-                var list = new List<TextureEntryFace>();
-                list.Add(m_TextureEntry[(uint)face]);
-                return list;
+                return new List<TextureEntryFace>
+                {
+                    m_TextureEntry[(uint)face]
+                };
             }
         }
 
@@ -1339,8 +1337,10 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Text:
                     {
-                        var p = new TextParam();
-                        p.Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT");
+                        var p = new TextParam()
+                        {
+                            Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT")
+                        };
                         Vector3 v = ParamsHelper.GetVector(enumerator, "PRIM_TEXT");
                         double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_TEXT");
                         p.TextColor = new ColorAlpha(v, alpha);
@@ -1412,13 +1412,14 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.PointLight:
                     {
-                        var p = new PointLightParam();
-                        p.IsLight = ParamsHelper.GetBoolean(enumerator, "PRIM_POINT_LIGHT");
-                        p.LightColor = new Color(ParamsHelper.GetVector(enumerator, "PRIM_POINT_LIGHT"));
-                        p.Intensity = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT");
-                        p.Radius = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT");
-                        p.Falloff = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT");
-                        PointLight = p;
+                        PointLight = new PointLightParam()
+                        {
+                            IsLight = ParamsHelper.GetBoolean(enumerator, "PRIM_POINT_LIGHT"),
+                            LightColor = new Color(ParamsHelper.GetVector(enumerator, "PRIM_POINT_LIGHT")),
+                            Intensity = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT"),
+                            Radius = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT"),
+                            Falloff = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT")
+                        };
                     }
                     break;
 
@@ -1444,14 +1445,15 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Flexible:
                     {
-                        var p = new FlexibleParam();
-                        p.IsFlexible = ParamsHelper.GetBoolean(enumerator, "PRIM_FLEXIBLE");
-                        p.Softness = ParamsHelper.GetInteger(enumerator, "PRIM_FLEXIBLE");
-                        p.Gravity = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE");
-                        p.Friction = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE");
-                        p.Wind = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE");
-                        p.Force = ParamsHelper.GetVector(enumerator, "PRIM_FLEXIBLE");
-                        Flexible = p;
+                        Flexible = new FlexibleParam()
+                        {
+                            IsFlexible = ParamsHelper.GetBoolean(enumerator, "PRIM_FLEXIBLE"),
+                            Softness = ParamsHelper.GetInteger(enumerator, "PRIM_FLEXIBLE"),
+                            Gravity = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
+                            Friction = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
+                            Wind = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
+                            Force = ParamsHelper.GetVector(enumerator, "PRIM_FLEXIBLE")
+                        };
                     }
                     break;
 
@@ -1499,11 +1501,12 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Omega:
                     {
-                        var p = new OmegaParam();
-                        p.Axis = ParamsHelper.GetVector(enumerator, "PRIM_OMEGA");
-                        p.Spinrate = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA");
-                        p.Gain = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA");
-                        Omega = p;
+                        Omega = new OmegaParam()
+                        {
+                            Axis = ParamsHelper.GetVector(enumerator, "PRIM_OMEGA"),
+                            Spinrate = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA"),
+                            Gain = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA")
+                        };
                     }
                     break;
 
@@ -1535,12 +1538,14 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Projector:
                     {
-                        var param = new ProjectionParam();
-                        param.IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR");
-                        param.ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR");
-                        param.ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR");
-                        param.ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR");
-                        param.ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR");
+                        var param = new ProjectionParam()
+                        {
+                            IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR")
+                        };
                     }
                     break;
 
@@ -1596,9 +1601,9 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region TextureEntryFace functions
-        const int PRIM_ALPHA_MODE_BLEND = 1;
+        private const int PRIM_ALPHA_MODE_BLEND = 1;
 
-        string GetTextureInventoryItem(UUID assetID)
+        private string GetTextureInventoryItem(UUID assetID)
         {
             if (assetID != UUID.Zero)
             {
@@ -1747,7 +1752,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        UUID GetTextureParam(IEnumerator<IValue> enumerator, string paraName)
+        private UUID GetTextureParam(IEnumerator<IValue> enumerator, string paraName)
         {
             var texture = ParamsHelper.GetString(enumerator, paraName);
             UUID uuid;
@@ -1772,8 +1777,7 @@ namespace SilverSim.Scene.Types.Object
                 case PrimitiveParamsType.Texture:
                     {
                         face.TextureID = GetTextureParam(enumerator, "PRIM_TEXTURE");
-                        Vector3 v;
-                        v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
+                        Vector3 v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
                         face.RepeatU = (float)v.X;
                         face.RepeatV = (float)v.Y;
                         v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
@@ -1849,7 +1853,7 @@ namespace SilverSim.Scene.Types.Object
                         repeats.Y *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
                         offsets.X *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
                         offsets.Y *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        rotation %= (Math.PI * 2);
+                        rotation %= Math.PI * 2;
                         rotation *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
 
                         Material mat;
@@ -1882,7 +1886,7 @@ namespace SilverSim.Scene.Types.Object
                         repeats *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
                         offsets *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
                         double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_SPECULAR");
-                        rotation %= (Math.PI * 2);
+                        rotation %= Math.PI * 2;
                         rotation *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
                         var color = new ColorAlpha(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"), 1);
                         int glossiness = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");

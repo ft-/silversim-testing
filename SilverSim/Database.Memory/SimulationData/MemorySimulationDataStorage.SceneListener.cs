@@ -34,7 +34,7 @@ namespace SilverSim.Database.Memory.SimulationData
     {
         public class MemorySceneListener : SceneListener
         {
-            readonly UUID m_RegionID;
+            private readonly UUID m_RegionID;
             internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Objects;
             internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Primitives;
             internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>> m_PrimItems;

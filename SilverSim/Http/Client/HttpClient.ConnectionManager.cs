@@ -41,7 +41,7 @@ namespace SilverSim.Http.Client
         public static readonly bool SupportsPipelining /*= false */;
 #endif
 
-        struct StreamInfo
+        private struct StreamInfo
         {
             public int ValidUntil;
             public AbstractHttpStream Stream;
@@ -59,11 +59,11 @@ namespace SilverSim.Http.Client
             }
         }
 
-        static readonly RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>> m_StreamList = new RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>>(delegate() { return new RwLockedList<StreamInfo>(); });
-        static Timer m_Timer;
+        private static readonly RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>> m_StreamList = new RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>>(() => new RwLockedList<StreamInfo>());
+        private static readonly Timer m_Timer;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        static void CleanUpTimer(object sender, ElapsedEventArgs e)
+        private static void CleanUpTimer(object sender, ElapsedEventArgs e)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace SilverSim.Http.Client
                 /* cleanup empty entries */
                 foreach(string key in m_StreamList.Keys)
                 {
-                    m_StreamList.RemoveIf(key, delegate(RwLockedList<StreamInfo> val) { return val.Count == 0; });
+                    m_StreamList.RemoveIf(key, (RwLockedList<StreamInfo> val) => val.Count == 0);
                 }
             }
             catch
@@ -97,7 +97,7 @@ namespace SilverSim.Http.Client
         #region Connect Handling
         /* yes, we need our own DNS cache. Mono bypasses anything that caches on Linux */
 
-        static Socket ConnectToTcp(string host, int port)
+        private static Socket ConnectToTcp(string host, int port)
         {
             IPAddress[] addresses = DnsNameCache.GetHostAddresses(host);
 
@@ -112,18 +112,16 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region Stream pipeling handling
-        static AbstractHttpStream OpenStream(string scheme, string host, int port)
-        {
-            return OpenStream(scheme, host, port,
+        private static AbstractHttpStream OpenStream(string scheme, string host, int port) =>
+            OpenStream(scheme, host, port,
                 null,
                 SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
                 false);
-        }
 
-        static AbstractHttpStream OpenStream(
+        private static AbstractHttpStream OpenStream(
             string scheme, string host, int port,
-            X509CertificateCollection clientCertificates, 
-            SslProtocols enabledSslProtocols, 
+            X509CertificateCollection clientCertificates,
+            SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation)
         {
 #if SUPPORT_PIPELINING
@@ -166,7 +164,7 @@ namespace SilverSim.Http.Client
             }
         }
 
-        static HttpsStream ConnectToSslServer(
+        private static HttpsStream ConnectToSslServer(
             string host,
             int port,
             X509CertificateCollection clientCertificates,
@@ -182,7 +180,7 @@ namespace SilverSim.Http.Client
             return new HttpsStream(sslstream);
         }
 
-        static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
+        private static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
         {
 #if SUPPORT_PIPELINING
             string key = scheme + "://" + host + ":" + port.ToString();

@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Agent
     {
         private readonly AgentWearables m_Wearables = new AgentWearables();
 
-        Vector3 m_AvatarSize = new Vector3(0.45, 0.6, 1.9);
+        private Vector3 m_AvatarSize = new Vector3(0.45, 0.6, 1.9);
         public Vector3 Size
         {
             get
@@ -67,18 +67,13 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        public AgentAttachments Attachments { get; } = new AgentAttachments();
+        public AgentAttachments Attachments { get; }
 
         public AgentWearables Wearables
         {
-            get
-            {
-                return m_Wearables;
-            }
-            set
-            {
-                m_Wearables.All = value;
-            }
+            get { return m_Wearables; }
+
+            set { m_Wearables.All = value; }
         }
 
         private readonly ReaderWriterLock m_VisualParamsLock = new ReaderWriterLock();
@@ -94,7 +89,7 @@ namespace SilverSim.Scene.Agent
         protected void InvokeOnAppearanceUpdate()
         {
             var ev = OnAppearanceUpdate; /* events are not exactly thread safe */
-            if(null != ev)
+            if(ev != null)
             {
                 foreach(Action<IAgent> del in ev.GetInvocationList().OfType<Action<IAgent>>())
                 {
@@ -146,26 +141,15 @@ namespace SilverSim.Scene.Agent
 
         public AppearanceInfo.AvatarTextureData Textures
         {
-            get
-            {
-                return m_Textures;
-            }
-            set
-            {
-                m_Textures.All = value.All;
-            }
+            get { return m_Textures; }
+
+            set { m_Textures.All = value.All; }
         }
 
         public AppearanceInfo.AvatarTextureData TextureHashes
         {
-            get
-            {
-                return m_TextureHashes;
-            }
-            set
-            {
-                m_TextureHashes.All = value.All;
-            }
+            get { return m_TextureHashes; }
+            set { m_TextureHashes.All = value.All; }
         }
 
         public byte[] VisualParams
@@ -221,7 +205,7 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        readonly object m_AppearanceUpdateLock = new object();
+        private readonly object m_AppearanceUpdateLock = new object();
         public AppearanceInfo Appearance
         {
             get
@@ -329,7 +313,7 @@ namespace SilverSim.Scene.Agent
                 Vector3 vel = Velocity;
                 Vector3 accel = Acceleration;
 
-                byte[] data = new byte[60];
+                var data = new byte[60];
                 int pos = 0;
                 {
                     byte[] b = BitConverter.GetBytes(LocalID);

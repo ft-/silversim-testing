@@ -35,7 +35,7 @@ using System.ComponentModel;
 namespace SilverSim.Database.MySQL.TravelingData
 {
     #region Service implementation
-    static class MySQLTravelingDataExtensionMethods
+    internal static class MySQLTravelingDataExtensionMethods
     {
         public static TravelingDataInfo ToTravelingData(this MySqlDataReader reader) => new TravelingDataInfo()
         {
@@ -52,7 +52,7 @@ namespace SilverSim.Database.MySQL.TravelingData
     public class MySQLTravelingDataService : TravelingDataServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL TRAVELINGDATA SERVICE");
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
 
         public MySQLTravelingDataService(string connectionString)
         {
@@ -190,12 +190,12 @@ namespace SilverSim.Database.MySQL.TravelingData
         {
             var insertVals = new Dictionary<string, object>
             {
-                { "SessionID", data.SessionID.ToString() },
-                { "UserID", data.UserID.ToString() },
-                { "GridExternalName", data.GridExternalName },
-                { "ServiceToken", data.ServiceToken },
-                { "ClientIPAddress", data.ClientIPAddress },
-                { "Timestamp", Date.Now }
+                ["SessionID"] = data.SessionID.ToString(),
+                ["UserID"] = data.UserID.ToString(),
+                ["GridExternalName"] = data.GridExternalName,
+                ["ServiceToken"] = data.ServiceToken,
+                ["ClientIPAddress"] = data.ClientIPAddress,
+                ["Timestamp"] = Date.Now
             };
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
@@ -204,7 +204,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("travelingdata"),
             new AddColumn<UUID>("SessionID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -216,7 +216,6 @@ namespace SilverSim.Database.MySQL.TravelingData
             new PrimaryKeyInfo(new string[] {"SessionID"}),
             new NamedKeyInfo("UserIDSessionID", new string[] { "UserID", "SessionID" }) { IsUnique = true }
         };
-
 
         public void VerifyConnection()
         {

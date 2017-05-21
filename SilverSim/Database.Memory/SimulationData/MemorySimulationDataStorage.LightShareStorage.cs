@@ -29,7 +29,7 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataLightShareStorageInterface
     {
-        readonly RwLockedDictionary<UUID, KeyValuePair<EnvController.WindlightSkyData, EnvController.WindlightWaterData>> m_LightShareData = new RwLockedDictionary<UUID, KeyValuePair<EnvController.WindlightSkyData, EnvController.WindlightWaterData>>();
+        private readonly RwLockedDictionary<UUID, KeyValuePair<EnvController.WindlightSkyData, EnvController.WindlightWaterData>> m_LightShareData = new RwLockedDictionary<UUID, KeyValuePair<EnvController.WindlightSkyData, EnvController.WindlightWaterData>>();
 
         bool ISimulationDataLightShareStorageInterface.TryGetValue(UUID regionID, out EnvController.WindlightSkyData skyData, out EnvController.WindlightWaterData waterData)
         {

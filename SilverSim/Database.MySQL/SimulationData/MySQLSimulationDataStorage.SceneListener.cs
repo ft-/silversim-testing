@@ -34,21 +34,20 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage
     {
-        readonly RwLockedList<MySQLSceneListener> m_SceneListenerThreads = new RwLockedList<MySQLSceneListener>();
+        private readonly RwLockedList<MySQLSceneListener> m_SceneListenerThreads = new RwLockedList<MySQLSceneListener>();
         public class MySQLSceneListener : SceneListener
         {
-            readonly string m_ConnectionString;
-            readonly UUID m_RegionID;
-            readonly RwLockedList<MySQLSceneListener> m_SceneListenerThreads;
+            private readonly string m_ConnectionString;
+            private readonly RwLockedList<MySQLSceneListener> m_SceneListenerThreads;
 
             public MySQLSceneListener(string connectionString, UUID regionID, RwLockedList<MySQLSceneListener> sceneListenerThreads)
             {
                 m_ConnectionString = connectionString;
-                m_RegionID = regionID;
+                RegionID = regionID;
                 m_SceneListenerThreads = sceneListenerThreads;
             }
 
-            public UUID RegionID => m_RegionID;
+            public UUID RegionID { get; }
 
             public QueueStat GetStats()
             {
@@ -56,14 +55,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return new QueueStat(count != 0 ? "PROCESSING" : "IDLE", count, (uint)m_ProcessedPrims);
             }
 
-            int m_ProcessedPrims;
+            private int m_ProcessedPrims;
 
             protected override void StorageMainThread()
             {
                 try
                 {
                     m_SceneListenerThreads.Add(this);
-                    Thread.CurrentThread.Name = "Storage Main Thread: " + m_RegionID.ToString();
+                    Thread.CurrentThread.Name = "Storage Main Thread: " + RegionID.ToString();
                     var primDeletionRequests = new List<string>();
                     var primItemDeletionRequests = new List<string>();
                     var objectDeletionRequests = new List<string>();
@@ -377,118 +376,118 @@ namespace SilverSim.Database.MySQL.SimulationData
                 ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
                 return new Dictionary<string, object>
                 {
-                    { "AssetId", item.AssetID },
-                    { "AssetType", item.AssetType },
-                    { "CreationDate", item.CreationDate },
-                    { "Creator", item.Creator },
-                    { "Description", item.Description },
-                    { "Flags", item.Flags },
-                    { "Group", item.Group },
-                    { "GroupOwned", item.IsGroupOwned },
-                    { "PrimID", primID },
-                    { "Name", item.Name },
-                    { "InventoryID", item.ID },
-                    { "InventoryType", item.InventoryType },
-                    { "LastOwner", item.LastOwner },
-                    { "Owner", item.Owner },
-                    { "ParentFolderID", item.ParentFolderID },
-                    { "BasePermissions", item.Permissions.Base },
-                    { "CurrentPermissions", item.Permissions.Current },
-                    { "EveryOnePermissions", item.Permissions.EveryOne },
-                    { "GroupPermissions", item.Permissions.Group },
-                    { "NextOwnerPermissions", item.Permissions.NextOwner },
-                    { "SaleType", item.SaleInfo.Type },
-                    { "SalePrice", item.SaleInfo.Price },
-                    { "SalePermMask", item.SaleInfo.PermMask },
-                    { "PermsGranter", grantinfo.PermsGranter.ToString() },
-                    { "PermsMask", grantinfo.PermsMask },
-                    { "NextOwnerAssetID", item.NextOwnerAssetID }
+                    ["AssetId"] = item.AssetID,
+                    ["AssetType"] = item.AssetType,
+                    ["CreationDate"] = item.CreationDate,
+                    ["Creator"] = item.Creator,
+                    ["Description"] = item.Description,
+                    ["Flags"] = item.Flags,
+                    ["Group"] = item.Group,
+                    ["GroupOwned"] = item.IsGroupOwned,
+                    ["PrimID"] = primID,
+                    ["Name"] = item.Name,
+                    ["InventoryID"] = item.ID,
+                    ["InventoryType"] = item.InventoryType,
+                    ["LastOwner"] = item.LastOwner,
+                    ["Owner"] = item.Owner,
+                    ["ParentFolderID"] = item.ParentFolderID,
+                    ["BasePermissions"] = item.Permissions.Base,
+                    ["CurrentPermissions"] = item.Permissions.Current,
+                    ["EveryOnePermissions"] = item.Permissions.EveryOne,
+                    ["GroupPermissions"] = item.Permissions.Group,
+                    ["NextOwnerPermissions"] = item.Permissions.NextOwner,
+                    ["SaleType"] = item.SaleInfo.Type,
+                    ["SalePrice"] = item.SaleInfo.Price,
+                    ["SalePermMask"] = item.SaleInfo.PermMask,
+                    ["PermsGranter"] = grantinfo.PermsGranter.ToString(),
+                    ["PermsMask"] = grantinfo.PermsMask,
+                    ["NextOwnerAssetID"] = item.NextOwnerAssetID
                 };
             }
 
             private Dictionary<string, object> GenerateUpdateObjectGroup(ObjectGroup objgroup) => new Dictionary<string, object>
             {
-                { "ID", objgroup.ID },
-                { "RegionID", objgroup.Scene.ID },
-                { "IsTempOnRez", objgroup.IsTempOnRez },
-                { "Owner", objgroup.Owner },
-                { "LastOwner", objgroup.LastOwner },
-                { "Group", objgroup.Group },
-                { "OriginalAssetID", objgroup.OriginalAssetID },
-                { "NextOwnerAssetID", objgroup.NextOwnerAssetID },
-                { "SaleType", objgroup.SaleType },
-                { "SalePrice", objgroup.SalePrice },
-                { "PayPrice0", objgroup.PayPrice0 },
-                { "PayPrice1", objgroup.PayPrice1 },
-                { "PayPrice2", objgroup.PayPrice2 },
-                { "PayPrice3", objgroup.PayPrice3 },
-                { "PayPrice4", objgroup.PayPrice4 },
-                { "AttachedPos", objgroup.AttachedPos },
-                { "AttachPoint", objgroup.AttachPoint },
-                { "IsIncludedInSearch", objgroup.IsIncludedInSearch },
-                { "RezzingObjectID", objgroup.RezzingObjectID }
+                ["ID"] = objgroup.ID,
+                ["RegionID"] = objgroup.Scene.ID,
+                ["IsTempOnRez"] = objgroup.IsTempOnRez,
+                ["Owner"] = objgroup.Owner,
+                ["LastOwner"] = objgroup.LastOwner,
+                ["Group"] = objgroup.Group,
+                ["OriginalAssetID"] = objgroup.OriginalAssetID,
+                ["NextOwnerAssetID"] = objgroup.NextOwnerAssetID,
+                ["SaleType"] = objgroup.SaleType,
+                ["SalePrice"] = objgroup.SalePrice,
+                ["PayPrice0"] = objgroup.PayPrice0,
+                ["PayPrice1"] = objgroup.PayPrice1,
+                ["PayPrice2"] = objgroup.PayPrice2,
+                ["PayPrice3"] = objgroup.PayPrice3,
+                ["PayPrice4"] = objgroup.PayPrice4,
+                ["AttachedPos"] = objgroup.AttachedPos,
+                ["AttachPoint"] = objgroup.AttachPoint,
+                ["IsIncludedInSearch"] = objgroup.IsIncludedInSearch,
+                ["RezzingObjectID"] = objgroup.RezzingObjectID
             };
 
             private Dictionary<string, object> GenerateUpdateObjectPart(ObjectPart objpart)
             {
                 var data = new Dictionary<string, object>
                 {
-                    { "ID", objpart.ID },
-                    { "LinkNumber", objpart.LinkNumber },
-                    { "RootPartID", objpart.ObjectGroup.RootPart.ID },
-                    { "Position", objpart.Position },
-                    { "Rotation", objpart.Rotation },
-                    { "SitText", objpart.SitText },
-                    { "TouchText", objpart.TouchText },
-                    { "Name", objpart.Name },
-                    { "Description", objpart.Description },
-                    { "SitTargetOffset", objpart.SitTargetOffset },
-                    { "SitTargetOrientation", objpart.SitTargetOrientation },
-                    { "PhysicsShapeType", objpart.PhysicsShapeType },
-                    { "PathfindingType", objpart.PathfindingType },
-                    { "Material", objpart.Material },
-                    { "Size", objpart.Size },
-                    { "Slice", objpart.Slice },
-                    { "MediaURL", objpart.MediaURL },
-                    { "Creator", objpart.Creator },
-                    { "CreationDate", objpart.CreationDate },
-                    { "Flags", objpart.Flags },
-                    { "AngularVelocity", objpart.AngularVelocity },
-                    { "LightData", objpart.PointLight.Serialization },
-                    { "HoverTextData", objpart.Text.Serialization },
-                    { "FlexibleData", objpart.Flexible.Serialization },
-                    { "LoopedSoundData", objpart.Sound.Serialization },
-                    { "ImpactSoundData", objpart.CollisionSound.Serialization },
-                    { "PrimitiveShapeData", objpart.Shape.Serialization },
-                    { "ParticleSystem", objpart.ParticleSystemBytes },
-                    { "TextureEntryBytes", objpart.TextureEntryBytes },
-                    { "TextureAnimationBytes", objpart.TextureAnimationBytes },
-                    { "ScriptAccessPin", objpart.ScriptAccessPin },
-                    { "CameraAtOffset", objpart.CameraAtOffset },
-                    { "CameraEyeOffset", objpart.CameraEyeOffset },
-                    { "ForceMouselook", objpart.ForceMouselook },
-                    { "BasePermissions", objpart.BaseMask },
-                    { "CurrentPermissions", objpart.OwnerMask },
-                    { "EveryOnePermissions", objpart.EveryoneMask },
-                    { "GroupPermissions", objpart.GroupMask },
-                    { "NextOwnerPermissions", objpart.NextOwnerMask },
-                    { "ClickAction", objpart.ClickAction },
-                    { "PassCollisionMode", objpart.PassCollisionMode },
-                    { "PassTouchMode", objpart.PassTouchMode },
-                    { "Velocity", objpart.Velocity },
-                    { "IsSoundQueueing", objpart.IsSoundQueueing },
-                    { "IsAllowedDrop", objpart.IsAllowedDrop },
-                    { "PhysicsDensity", objpart.PhysicsDensity },
-                    { "PhysicsFriction", objpart.PhysicsFriction },
-                    { "PhysicsRestitution", objpart.PhysicsRestitution },
-                    { "PhysicsGravityMultiplier", objpart.PhysicsGravityMultiplier },
+                    ["ID"] = objpart.ID,
+                    ["LinkNumber"] = objpart.LinkNumber,
+                    ["RootPartID"] = objpart.ObjectGroup.RootPart.ID,
+                    ["Position"] = objpart.Position,
+                    ["Rotation"] = objpart.Rotation,
+                    ["SitText"] = objpart.SitText,
+                    ["TouchText"] = objpart.TouchText,
+                    ["Name"] = objpart.Name,
+                    ["Description"] = objpart.Description,
+                    ["SitTargetOffset"] = objpart.SitTargetOffset,
+                    ["SitTargetOrientation"] = objpart.SitTargetOrientation,
+                    ["PhysicsShapeType"] = objpart.PhysicsShapeType,
+                    ["PathfindingType"] = objpart.PathfindingType,
+                    ["Material"] = objpart.Material,
+                    ["Size"] = objpart.Size,
+                    ["Slice"] = objpart.Slice,
+                    ["MediaURL"] = objpart.MediaURL,
+                    ["Creator"] = objpart.Creator,
+                    ["CreationDate"] = objpart.CreationDate,
+                    ["Flags"] = objpart.Flags,
+                    ["AngularVelocity"] = objpart.AngularVelocity,
+                    ["LightData"] = objpart.PointLight.Serialization,
+                    ["HoverTextData"] = objpart.Text.Serialization,
+                    ["FlexibleData"] = objpart.Flexible.Serialization,
+                    ["LoopedSoundData"] = objpart.Sound.Serialization,
+                    ["ImpactSoundData"] = objpart.CollisionSound.Serialization,
+                    ["PrimitiveShapeData"] = objpart.Shape.Serialization,
+                    ["ParticleSystem"] = objpart.ParticleSystemBytes,
+                    ["TextureEntryBytes"] = objpart.TextureEntryBytes,
+                    ["TextureAnimationBytes"] = objpart.TextureAnimationBytes,
+                    ["ScriptAccessPin"] = objpart.ScriptAccessPin,
+                    ["CameraAtOffset"] = objpart.CameraAtOffset,
+                    ["CameraEyeOffset"] = objpart.CameraEyeOffset,
+                    ["ForceMouselook"] = objpart.ForceMouselook,
+                    ["BasePermissions"] = objpart.BaseMask,
+                    ["CurrentPermissions"] = objpart.OwnerMask,
+                    ["EveryOnePermissions"] = objpart.EveryoneMask,
+                    ["GroupPermissions"] = objpart.GroupMask,
+                    ["NextOwnerPermissions"] = objpart.NextOwnerMask,
+                    ["ClickAction"] = objpart.ClickAction,
+                    ["PassCollisionMode"] = objpart.PassCollisionMode,
+                    ["PassTouchMode"] = objpart.PassTouchMode,
+                    ["Velocity"] = objpart.Velocity,
+                    ["IsSoundQueueing"] = objpart.IsSoundQueueing,
+                    ["IsAllowedDrop"] = objpart.IsAllowedDrop,
+                    ["PhysicsDensity"] = objpart.PhysicsDensity,
+                    ["PhysicsFriction"] = objpart.PhysicsFriction,
+                    ["PhysicsRestitution"] = objpart.PhysicsRestitution,
+                    ["PhysicsGravityMultiplier"] = objpart.PhysicsGravityMultiplier,
 
-                    { "IsRotateXEnabled", objpart.IsRotateXEnabled },
-                    { "IsRotateYEnabled", objpart.IsRotateYEnabled },
-                    { "IsRotateZEnabled", objpart.IsRotateZEnabled },
-                    { "IsVolumeDetect", objpart.IsVolumeDetect },
-                    { "IsPhantom", objpart.IsPhantom },
-                    { "IsPhysics", objpart.IsPhysics }
+                    ["IsRotateXEnabled"] = objpart.IsRotateXEnabled,
+                    ["IsRotateYEnabled"] = objpart.IsRotateYEnabled,
+                    ["IsRotateZEnabled"] = objpart.IsRotateZEnabled,
+                    ["IsVolumeDetect"] = objpart.IsVolumeDetect,
+                    ["IsPhantom"] = objpart.IsPhantom,
+                    ["IsPhysics"] = objpart.IsPhysics
                 };
                 using (var ms = new MemoryStream())
                 {

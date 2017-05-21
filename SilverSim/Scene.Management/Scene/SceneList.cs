@@ -39,7 +39,7 @@ namespace SilverSim.Scene.Management.Scene
         private static readonly ILog m_Log = LogManager.GetLogger("SCENE MANAGER");
         public event Action<SceneInterface> OnRegionAdd;
         public event Action<SceneInterface> OnRegionRemove;
-        readonly RwLockedBiDiMappingDictionary<UUID, string> m_RegionNames = new RwLockedBiDiMappingDictionary<UUID, string>();
+        private readonly RwLockedBiDiMappingDictionary<UUID, string> m_RegionNames = new RwLockedBiDiMappingDictionary<UUID, string>();
 
         public SceneList()
         {
@@ -54,7 +54,7 @@ namespace SilverSim.Scene.Management.Scene
             f.SetValue(null, act2);
         }
 
-        void HandleSimulatorShutdownInNotice(int timeLeft)
+        private void HandleSimulatorShutdownInNotice(int timeLeft)
         {
             foreach (SceneInterface scene in Values)
             {
@@ -68,7 +68,7 @@ namespace SilverSim.Scene.Management.Scene
             }
         }
 
-        void HandleSimulatorShutdownAbortNotice()
+        private void HandleSimulatorShutdownAbortNotice()
         {
             foreach (SceneInterface scene in Values)
             {
@@ -125,7 +125,7 @@ namespace SilverSim.Scene.Management.Scene
             if (OnRegionAdd != null)
             {
                 var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
-                if (null != ev)
+                if (ev != null)
                 {
                     foreach (var del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                     {
@@ -159,10 +159,7 @@ namespace SilverSim.Scene.Management.Scene
 
         public void Remove(SceneInterface scene)
         {
-            Remove(scene, (CultureInfo culture) =>
-            {
-                return this.GetLanguageString(culture, "RegionIsShuttingDown", "Region is shutting down");
-            });
+            Remove(scene, (CultureInfo culture) => this.GetLanguageString(culture, "RegionIsShuttingDown", "Region is shutting down"));
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -173,7 +170,7 @@ namespace SilverSim.Scene.Management.Scene
             if (OnRegionRemove != null)
             {
                 var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
-                if (null != ev)
+                if (ev != null)
                 {
                     foreach (var del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                     {

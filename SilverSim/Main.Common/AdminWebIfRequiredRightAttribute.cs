@@ -26,7 +26,7 @@ namespace SilverSim.Main.Common
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public sealed class AdminWebIfRequiredRightAttribute : Attribute
     {
-        public string Right { get; private set; }
+        public string Right { get; }
 
         public AdminWebIfRequiredRightAttribute(string right)
         {

@@ -45,8 +45,10 @@ namespace SilverSim.Main.Common
         {
             get
             {
-                Dictionary<int, string> tcpPorts = new Dictionary<int, string>();
-                tcpPorts.Add((int)HttpServer.Port, "HTTP Server");
+                var tcpPorts = new Dictionary<int, string>
+                {
+                    [(int)HttpServer.Port] = "HTTP Server"
+                };
                 try
                 {
                     tcpPorts.Add((int)HttpsServer.Port, "HTTPS Server");
@@ -60,10 +62,10 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
-        void ShowHttpHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowHttpHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             BaseHttpServer http = HttpServer;
-            StringBuilder sb = new StringBuilder("HTTP Handlers: (" + http.ServerURI + ")\n----------------------------------------------\n");
+            var sb = new StringBuilder("HTTP Handlers: (" + http.ServerURI + ")\n----------------------------------------------\n");
             ListHttpHandlers(sb, http);
             BaseHttpServer https;
             try
@@ -74,7 +76,7 @@ namespace SilverSim.Main.Common
             {
                 https = null;
             }
-            if (null != https)
+            if (https != null)
             {
                 sb.AppendFormat("\nHTTPS Handlers: ({0})\n----------------------------------------------\n", https.ServerURI);
                 ListHttpHandlers(sb, https);
@@ -82,7 +84,7 @@ namespace SilverSim.Main.Common
             io.Write(sb.ToString());
         }
 
-        void ListHttpHandlers(StringBuilder sb, BaseHttpServer server)
+        private void ListHttpHandlers(StringBuilder sb, BaseHttpServer server)
         {
             foreach (KeyValuePair<string, Action<HttpRequest>> kvp in server.UriHandlers)
             {
@@ -98,7 +100,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        void ShowThreadsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowThreadsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (UUID.Zero != limitedToScene)
             {
@@ -110,7 +112,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                StringBuilder sb = new StringBuilder("Threads:\n----------------------------------------------\n");
+                var sb = new StringBuilder("Threads:\n----------------------------------------------\n");
                 foreach (Thread t in ThreadManager.Threads)
                 {
                     sb.AppendFormat("Thread({0}): {1}\n", t.ManagedThreadId, t.Name);
@@ -120,9 +122,9 @@ namespace SilverSim.Main.Common
             }
         }
 
-        void ShowXmlRpcHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowXmlRpcHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            StringBuilder sb = new StringBuilder("XMLRPC Handlers:\n----------------------------------------------\n");
+            var sb = new StringBuilder("XMLRPC Handlers:\n----------------------------------------------\n");
             HttpXmlRpcHandler server = XmlRpcServer;
             foreach (KeyValuePair<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>> kvp in server.XmlRpcMethods)
             {
@@ -131,9 +133,9 @@ namespace SilverSim.Main.Common
             io.Write(sb.ToString());
         }
 
-        void ShowJson20RpcHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowJson20RpcHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            StringBuilder sb = new StringBuilder("JSON2.0RPC Handlers:\n----------------------------------------------\n");
+            var sb = new StringBuilder("JSON2.0RPC Handlers:\n----------------------------------------------\n");
             HttpJson20RpcHandler server = Json20RpcServer;
             foreach (KeyValuePair<string, Func<string, IValue, IValue>> kvp in server.Json20RpcMethods)
             {
@@ -142,9 +144,9 @@ namespace SilverSim.Main.Common
             io.Write(sb.ToString());
         }
 
-        void ShowCapsHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowCapsHandlersCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            StringBuilder sb = new StringBuilder("Caps Handlers:\n----------------------------------------------\n");
+            var sb = new StringBuilder("Caps Handlers:\n----------------------------------------------\n");
             CapsHttpRedirector redirector = CapsRedirector;
             foreach (KeyValuePair<string, RwLockedDictionary<UUID, Action<HttpRequest>>> kvp in redirector.Caps)
             {
@@ -159,22 +161,20 @@ namespace SilverSim.Main.Common
         }
 
         #region Show Port allocations
-        readonly GridServiceInterface m_RegionStorage;
-        void ShowPortAllocationsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private readonly GridServiceInterface m_RegionStorage;
+        private void ShowPortAllocationsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
-            StringBuilder sb = new StringBuilder("TCP Ports:\n----------------------------------------------\n");
+            var sb = new StringBuilder("TCP Ports:\n----------------------------------------------\n");
             foreach (KeyValuePair<int, string> kvp in KnownTcpPorts)
             {
                 sb.AppendFormat("{0}:\n- Port: {1}\n", kvp.Value, kvp.Key);
             }
-            if (null != m_RegionStorage)
+            if (m_RegionStorage != null)
             {
                 sb.Append("\nUDP Ports:\n----------------------------------------------\n");
-                IEnumerable<RegionInfo> regions = m_RegionStorage.GetAllRegions(UUID.Zero);
-                foreach (RegionInfo region in regions)
+                foreach (RegionInfo region in m_RegionStorage.GetAllRegions(UUID.Zero))
                 {
-                    string status;
-                    status = Scenes.ContainsKey(region.ID) ? "online" : "offline";
+                    string status = Scenes.ContainsKey(region.ID) ? "online" : "offline";
                     sb.AppendFormat("Region \"{0}\" ({1})\n- Port: {2}\n- Status: ({3})\n", region.Name, region.ID, region.ServerPort, status);
                 }
             }
@@ -199,7 +199,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        static void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -212,7 +212,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        void ShowModulesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowModulesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -226,14 +226,14 @@ namespace SilverSim.Main.Common
                     searchstring = args[2].ToLower();
                 }
 
-                StringBuilder output = new StringBuilder("Module List:\n----------------------------------------------");
+                var output = new StringBuilder("Module List:\n----------------------------------------------");
                 if (!string.IsNullOrEmpty(searchstring))
                 {
                     output.AppendFormat("\n<limited to modules containing \"{0}\">\n", searchstring);
                 }
                 foreach (KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
                 {
-                    DescriptionAttribute desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
+                    var desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
                     if (!string.IsNullOrEmpty(searchstring) &&
                         !moduledesc.Key.ToLower().Contains(searchstring))
                     {
@@ -241,7 +241,7 @@ namespace SilverSim.Main.Common
                     }
 
                     output.AppendFormat("\nModule {0}:", moduledesc.Key);
-                    if (null != desc)
+                    if (desc != null)
                     {
                         output.Append("\n   Description: ");
                         output.Append(desc.Description);
@@ -269,7 +269,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        static void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -282,7 +282,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        void ShowQueuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowQueuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -294,7 +294,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                StringBuilder sb = new StringBuilder("Queue List:\n----------------------------------------------");
+                var sb = new StringBuilder("Queue List:\n----------------------------------------------");
                 foreach (KeyValuePair<string, IQueueStatsAccess> kvp in GetServices<IQueueStatsAccess>())
                 {
                     foreach (QueueStatAccessor accessors in kvp.Value.QueueStats)

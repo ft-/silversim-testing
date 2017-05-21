@@ -207,9 +207,9 @@ namespace SilverSim.Database.MySQL.Groups
             }
             var vals = new Dictionary<string, object>
             {
-                { "GroupID", rolemember.Group.ID },
-                { "RoleID", rolemember.RoleID },
-                { "PrincipalID", rolemember.Principal.ID }
+                ["GroupID"] = rolemember.Group.ID,
+                ["RoleID"] = rolemember.RoleID,
+                ["PrincipalID"] = rolemember.Principal.ID
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -292,12 +292,13 @@ namespace SilverSim.Database.MySQL.Groups
                 if(Members.TryGetValue(requestingAgent, group, principal, out gmem) &&
                     Roles.TryGetValue(requestingAgent, group, UUID.Zero, out role))
                 {
-                    grolemem = new GroupRolemember();
-                    grolemem.Powers = role.Powers;
-                    grolemem.Principal = ResolveName(principal);
-                    grolemem.RoleID = UUID.Zero;
-                    grolemem.Group = gmem.Group;
-
+                    grolemem = new GroupRolemember()
+                    {
+                        Powers = role.Powers,
+                        Principal = ResolveName(principal),
+                        RoleID = UUID.Zero,
+                        Group = gmem.Group
+                    };
                     return true;
                 }
             }

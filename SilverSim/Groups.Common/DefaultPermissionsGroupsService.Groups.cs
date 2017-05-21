@@ -28,7 +28,7 @@ namespace SilverSim.Groups.Common
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupsInterface
     {
-        GroupInfo IGroupsInterface.this[UUI requestingAgent, string groupName] => 
+        GroupInfo IGroupsInterface.this[UUI requestingAgent, string groupName] =>
             m_InnerService.Groups[requestingAgent, groupName];
 
         GroupInfo IGroupsInterface.this[UUI requestingAgent, UGI group] =>
@@ -37,7 +37,7 @@ namespace SilverSim.Groups.Common
         UGI IGroupsInterface.this[UUI requestingAgent, UUID groupID] =>
             m_InnerService.Groups[requestingAgent, groupID];
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, string groupName) => 
+        bool IGroupsInterface.ContainsKey(UUI requestingAgent, string groupName) =>
             m_InnerService.Groups.ContainsKey(requestingAgent, groupName);
 
         bool IGroupsInterface.ContainsKey(UUI requestingAgent, UGI groupID) =>

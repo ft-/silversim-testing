@@ -38,7 +38,7 @@ namespace SilverSim.Database.MySQL.GridUser
     [Description("MySQL GridUser Backend")]
     public sealed class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
 
         #region Constructor
@@ -70,7 +70,7 @@ namespace SilverSim.Database.MySQL.GridUser
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("griduser"),
             new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -118,7 +118,7 @@ namespace SilverSim.Database.MySQL.GridUser
 
         public override GridUserInfo this[UUID userID]
         {
-            get 
+            get
             {
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
@@ -138,7 +138,6 @@ namespace SilverSim.Database.MySQL.GridUser
                 throw new GridUserNotFoundException();
             }
         }
-
 
         public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo) =>
             TryGetValue(userID.ID, out gridUserInfo);
@@ -168,7 +167,6 @@ namespace SilverSim.Database.MySQL.GridUser
                 };
                 conn.ReplaceInto("griduser", param);
             }
-
         }
 
         public override void LoggedIn(UUI userID)
@@ -195,15 +193,15 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 var data = new Dictionary<string, object>
                 {
-                    { "IsOnline", false },
-                    { "LastLogout", Date.Now },
-                    { "LastRegionID", lastRegionID },
-                    { "LastPosition", lastPosition },
-                    { "LastLookAt", lastLookAt }
+                    ["IsOnline"] = false,
+                    ["LastLogout"] = Date.Now,
+                    ["LastRegionID"] = lastRegionID,
+                    ["LastPosition"] = lastPosition,
+                    ["LastLookAt"] = lastLookAt
                 };
                 var where = new Dictionary<string, object>
                 {
-                    { "ID", userID.ID }
+                    ["ID"] = userID.ID
                 };
                 conn.UpdateSet("griduser", data, where);
             }
@@ -216,13 +214,13 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 var data = new Dictionary<string, object>
                 {
-                    { "HomeRegionID", homeRegionID },
-                    { "HomePosition", homePosition },
-                    { "HomeLookAt", homeLookAt }
+                    ["HomeRegionID"] = homeRegionID,
+                    ["HomePosition"] = homePosition,
+                    ["HomeLookAt"] = homeLookAt
                 };
                 var where = new Dictionary<string, object>
                 {
-                    { "ID", userID.ID }
+                    ["ID"] = userID.ID
                 };
                 conn.UpdateSet("griduser", data, where);
             }
@@ -235,13 +233,13 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 var data = new Dictionary<string, object>
                 {
-                    { "LastRegionID", lastRegionID },
-                    { "LastPosition", lastPosition },
-                    { "LastLookAt", lastLookAt }
+                    ["LastRegionID"] = lastRegionID,
+                    ["LastPosition"] = lastPosition,
+                    ["LastLookAt"] = lastLookAt
                 };
                 var where = new Dictionary<string, object>
                 {
-                    { "ID", userID.ID }
+                    ["ID"] = userID.ID
                 };
                 conn.UpdateSet("griduser", data, where);
             }

@@ -33,6 +33,6 @@ namespace SilverSim.Main.Common
             Name = name;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
     }
 }

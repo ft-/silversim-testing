@@ -37,15 +37,15 @@ namespace SilverSim.Main.Cmd.UserServer
     [Description("User Server Console Commands")]
     public class UserServerCommands : IPlugin
     {
-        readonly string m_UserAccountServiceName;
-        readonly string m_InventoryServiceName;
-        readonly string m_AuthInfoServiceName;
+        private readonly string m_UserAccountServiceName;
+        private readonly string m_InventoryServiceName;
+        private readonly string m_AuthInfoServiceName;
 
-        UserAccountServiceInterface m_UserAccountService;
-        AuthInfoServiceInterface m_AuthInfoService;
-        InventoryServiceInterface m_InventoryService;
-        List<IUserAccountDeleteServiceInterface> m_AccountDeleteServices;
-        List<IServiceURLsGetInterface> m_ServiceURLsGetters;
+        private UserAccountServiceInterface m_UserAccountService;
+        private AuthInfoServiceInterface m_AuthInfoService;
+        private InventoryServiceInterface m_InventoryService;
+        private List<IUserAccountDeleteServiceInterface> m_AccountDeleteServices;
+        private List<IServiceURLsGetInterface> m_ServiceURLsGetters;
 
         public UserServerCommands(IConfig ownSection)
         {
@@ -68,7 +68,7 @@ namespace SilverSim.Main.Cmd.UserServer
             loader.CommandRegistry.AddShowCommand("serviceurls", ShowServiceUrlsCommand);
         }
 
-        bool IsNameValid(string s)
+        private bool IsNameValid(string s)
         {
             foreach(char c in s)
             {
@@ -81,7 +81,7 @@ namespace SilverSim.Main.Cmd.UserServer
         }
 
         [Description("Show service URLs")]
-        void ShowServiceUrlsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowServiceUrlsCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -105,7 +105,7 @@ namespace SilverSim.Main.Cmd.UserServer
         }
 
         [Description("Show User")]
-        void ShowUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UserAccount account;
             if(args[0] == "help" || args.Count != 4)
@@ -135,14 +135,14 @@ namespace SilverSim.Main.Cmd.UserServer
         }
 
         [Description("Change user")]
-        void ChangeUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ChangeUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UserAccount account;
             if(args[0] == "help" || args.Count < 4 || args.Count % 2 != 0)
             {
                 io.Write("change user <firstname> <lastname> (<token> <parameter>)*\n" +
                         "Token parameters:\n" +
-                        "userlevel <level>\n" + 
+                        "userlevel <level>\n" +
                         "email <email>\n" +
                         "usertitle <usertitle>\n");
             }
@@ -188,7 +188,7 @@ namespace SilverSim.Main.Cmd.UserServer
         }
 
         [Description("Create user")]
-        void CreateUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void CreateUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help" || args.Count != 4)
             {
@@ -244,7 +244,7 @@ namespace SilverSim.Main.Cmd.UserServer
         }
 
         [Description("Delete user")]
-        void DeleteUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void DeleteUserCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UserAccount account;
             if (args[0] == "help" || args.Count < 3 || args.Count > 4)
@@ -270,7 +270,7 @@ namespace SilverSim.Main.Cmd.UserServer
                     return;
                 }
             }
-            else 
+            else
             {
                 if(m_UserAccountService.TryGetValue(UUID.Zero, args[2], args[3], out account))
                 {

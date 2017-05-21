@@ -27,14 +27,11 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataEnvControllerStorageInterface
     {
-        readonly RwLockedDictionary<UUID, byte[]> m_EnvControllerData = new RwLockedDictionary<UUID, byte[]>();
+        private readonly RwLockedDictionary<UUID, byte[]> m_EnvControllerData = new RwLockedDictionary<UUID, byte[]>();
 
         byte[] ISimulationDataEnvControllerStorageInterface.this[UUID regionID]
         {
-            get
-            {
-                return m_EnvControllerData[regionID];
-            }
+            get { return m_EnvControllerData[regionID]; }
 
             set
             {

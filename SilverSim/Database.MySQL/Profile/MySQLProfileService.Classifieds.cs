@@ -65,22 +65,24 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         if (reader.Read())
                         {
-                            classified = new ProfileClassified();
-                            classified.ClassifiedID = reader.GetUUID("classifieduuid");
-                            classified.Category = reader.GetInt32("category");
-                            classified.CreationDate = reader.GetDate("creationdate");
-                            classified.Creator.ID = reader.GetUUID("creatoruuid");
-                            classified.Description = reader.GetString("description");
-                            classified.ExpirationDate = reader.GetDate("expirationdate");
-                            classified.Flags = reader.GetByte("classifiedflags");
-                            classified.GlobalPos = reader.GetVector3("posglobal");
-                            classified.Name = reader.GetString("name");
-                            classified.ParcelID = reader.GetUUID("parceluuid");
-                            classified.ParcelName = reader.GetString("parcelname");
-                            classified.ParentEstate = reader.GetInt32("parentestate");
-                            classified.Price = reader.GetInt32("priceforlisting");
-                            classified.SimName = reader.GetString("simname");
-                            classified.SnapshotID = reader.GetUUID("snapshotuuid");
+                            classified = new ProfileClassified()
+                            {
+                                ClassifiedID = reader.GetUUID("classifieduuid"),
+                                Category = reader.GetInt32("category"),
+                                CreationDate = reader.GetDate("creationdate"),
+                                Creator = new UUI(reader.GetUUID("creatoruuid")),
+                                Description = reader.GetString("description"),
+                                ExpirationDate = reader.GetDate("expirationdate"),
+                                Flags = reader.GetByte("classifiedflags"),
+                                GlobalPos = reader.GetVector3("posglobal"),
+                                Name = reader.GetString("name"),
+                                ParcelID = reader.GetUUID("parceluuid"),
+                                ParcelName = reader.GetString("parcelname"),
+                                ParentEstate = reader.GetInt32("parentestate"),
+                                Price = reader.GetInt32("priceforlisting"),
+                                SimName = reader.GetString("simname"),
+                                SnapshotID = reader.GetUUID("snapshotuuid")
+                            };
                             return true;
                         }
                     }
@@ -112,7 +114,7 @@ namespace SilverSim.Database.MySQL.Profile
 
         ProfileClassified IClassifiedsInterface.this[UUI user, UUID id]
         {
-            get 
+            get
             {
                 ProfileClassified classified;
                 if (!Classifieds.TryGetValue(user, id, out classified))

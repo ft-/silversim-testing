@@ -30,11 +30,11 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateManagerServiceInterface, IEstateManagerServiceListAccessInterface
     {
-        readonly RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UUI, bool>> m_EstateManagerData = new RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UUI, bool>>(delegate () { return new RwLockedDictionary<UUI, bool>(); });
+        private readonly RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UUI, bool>> m_EstateManagerData = new RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UUI, bool>>(() => new RwLockedDictionary<UUI, bool>());
 
         List<UUI> IEstateManagerServiceListAccessInterface.this[uint estateID]
         {
-            get 
+            get
             {
                 RwLockedDictionary<UUI, bool> res;
                 return (m_EstateManagerData.TryGetValue(estateID, out res)) ?

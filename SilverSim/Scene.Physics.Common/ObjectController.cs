@@ -36,17 +36,10 @@ namespace SilverSim.Scene.Physics.Common
         protected ObjectPart m_Part;
         protected VehicleMotor m_Vehicle;
         protected readonly PhysicsStateData m_StateData;
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
         protected UUID SceneID { get; }
-        SceneInterface.LocationInfoProvider m_LocInfoProvider;
 
-        protected override SceneInterface.LocationInfoProvider LocationInfoProvider
-        {
-            get
-            {
-                return m_LocInfoProvider;
-            }
-        }
+        protected override SceneInterface.LocationInfoProvider LocationInfoProvider { get; }
 
         public abstract Vector3 Torque { get; }
         public abstract Vector3 Force { get; }
@@ -57,7 +50,7 @@ namespace SilverSim.Scene.Physics.Common
             m_StateData = new PhysicsStateData(part, sceneID);
             m_Part = part;
             m_Vehicle = part.VehicleParams.GetMotor();
-            m_LocInfoProvider = locInfoProvider;
+            LocationInfoProvider = locInfoProvider;
         }
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
@@ -92,12 +85,9 @@ namespace SilverSim.Scene.Physics.Common
         public abstract bool IsRotateYEnabled { get; set; }
         public abstract bool IsRotateZEnabled { get; set; }
 
-        public bool IsAgentCollisionActive 
+        public bool IsAgentCollisionActive
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
 
             set
             {
@@ -105,7 +95,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        double m_Mass = 1;
+        private double m_Mass = 1;
 
         public double Mass
         {
@@ -124,11 +114,11 @@ namespace SilverSim.Scene.Physics.Common
 
         #region Vehicle Calculation
 
-        Vector3 m_AppliedForce = Vector3.Zero;
-        Vector3 m_AppliedTorque = Vector3.Zero;
+        private Vector3 m_AppliedForce = Vector3.Zero;
+        private Vector3 m_AppliedTorque = Vector3.Zero;
 
         public void SetAppliedForce(Vector3 value)
-        { 
+        {
             lock (m_Lock)
             {
                 m_AppliedForce = value;
@@ -136,23 +126,23 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         public void SetAppliedTorque(Vector3 value)
-        { 
+        {
             lock (m_Lock)
             {
                 m_AppliedTorque = value;
             }
         }
 
-        Vector3 m_LinearImpulse = Vector3.Zero;
+        private Vector3 m_LinearImpulse = Vector3.Zero;
         public void SetLinearImpulse(Vector3 value)
-        { 
+        {
             lock(m_Lock)
             {
                 m_LinearImpulse = value;
             }
         }
 
-        Vector3 m_AngularImpulse = Vector3.Zero;
+        private Vector3 m_AngularImpulse = Vector3.Zero;
         public void SetAngularImpulse(Vector3 value)
         {
             lock(m_Lock)
@@ -161,7 +151,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        Vector3 m_AppliedInertia = Vector3.One;
+        private Vector3 m_AppliedInertia = Vector3.One;
         protected bool m_AppliedInertiaUpdate;
         public Vector3 AppliedInertia
         {
@@ -185,7 +175,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        Vector3 m_CenterOfGravityOffset = Vector3.Zero;
+        private Vector3 m_CenterOfGravityOffset = Vector3.Zero;
 
         public void UpdatePhysicsProperties()
         {
@@ -210,7 +200,7 @@ namespace SilverSim.Scene.Physics.Common
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 vehicleTorque)
         {
             ObjectGroup grp = m_Part.ObjectGroup;
-            List<PositionalForce> forces = new List<PositionalForce>();
+            var forces = new List<PositionalForce>();
             vehicleTorque = Vector3.Zero;
             if (grp == null || grp.RootPart != m_Part)
             {
@@ -237,7 +227,6 @@ namespace SilverSim.Scene.Physics.Common
             VehicleParams vehicleParams = m_Part.VehicleParams;
             if (vehicleParams.VehicleType != VehicleType.None)
             {
-
                 m_Vehicle.Process(dt, m_StateData, grp.Scene, Mass, m_Part.PhysicsGravityMultiplier * CombinedGravityAccelerationConstant);
                 forces.Add(new PositionalForce("LinearForce", m_Vehicle.LinearForce, Vector3.Zero));
                 vehicleTorque = m_Vehicle.AngularTorque;

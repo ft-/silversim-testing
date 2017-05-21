@@ -31,10 +31,10 @@ namespace SilverSim.Groups.Common
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupRolesInterface
     {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        GroupRole IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUID roleID] => 
+        GroupRole IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUID roleID] =>
             m_InnerService.Roles[requestingAgent, group, roleID];
 
-        bool IGroupRolesInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole) => 
+        bool IGroupRolesInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole) =>
             m_InnerService.Roles.TryGetValue(requestingAgent, group, roleID, out groupRole);
 
         bool IGroupRolesInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID) =>

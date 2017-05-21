@@ -37,11 +37,11 @@ namespace SilverSim.Database.MySQL.ServerParam
     [Description("MySQL ServerParam Backend")]
     public sealed class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin, IPluginShutdown
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");
 
         #region Cache
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Cache = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(delegate() { return new RwLockedDictionary<string, string>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Cache = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(() => new RwLockedDictionary<string, string>());
         #endregion
 
         #region Constructor
@@ -100,7 +100,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                     {
                         foreach(string k in regParams.Keys)
                         {
-                            if(!list.Exists(delegate(string p) { return p == k;}))
+                            if(!list.Exists((string p) => p == k))
                             {
                                 list.Add(k);
                             }
@@ -190,7 +190,6 @@ namespace SilverSim.Database.MySQL.ServerParam
             value = string.Empty;
             return false;
         }
-
 
         public override bool Contains(UUID regionID, string parameter)
         {
@@ -287,13 +286,13 @@ namespace SilverSim.Database.MySQL.ServerParam
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate()
+                connection.InsideTransaction(() =>
                 {
                     using (var cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                     {
                         cmd.Parameters.AddParameter("?regionid", regionID);
                         cmd.Parameters.AddParameter("?parametername", parameter);
-                        if(cmd.ExecuteNonQuery() >= 1)
+                        if (cmd.ExecuteNonQuery() >= 1)
                         {
                             result = true;
                         }
@@ -310,7 +309,7 @@ namespace SilverSim.Database.MySQL.ServerParam
             AnyServerParamListeners.Clear();
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("serverparams"),
             new AddColumn<UUID>("regionid") { IsNullAllowed = false, Default = UUID.Zero },

@@ -29,8 +29,8 @@ namespace SilverSim.Groups.Common
 {
     public sealed partial class DefaultPermissionsGroupsService : GroupsServiceInterface, IPlugin
     {
-        GroupsServiceInterface m_InnerService;
-        readonly string m_GroupsServiceName;
+        private GroupsServiceInterface m_InnerService;
+        private readonly string m_GroupsServiceName;
 
         public DefaultPermissionsGroupsService(IConfig ownSection)
         {
@@ -66,7 +66,7 @@ namespace SilverSim.Groups.Common
 
         public override GroupPowers GetAgentPowers(UGI group, UUI agent) => m_InnerService.GetAgentPowers(group, agent);
 
-        bool IsGroupOwner(UGI group, UUI agent)
+        private bool IsGroupOwner(UGI group, UUI agent)
         {
             GroupInfo groupInfo;
             try

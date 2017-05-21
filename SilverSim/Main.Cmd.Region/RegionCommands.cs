@@ -55,19 +55,19 @@ namespace SilverSim.Main.Cmd.Region
     [Description("Region Console Commands")]
     public class RegionCommands : IPlugin
     {
-        readonly string m_RegionStorageName;
-        readonly string m_EstateServiceName;
-        readonly string m_SimulationStorageName;
-        GridServiceInterface m_RegionStorage;
-        SceneFactoryInterface m_SceneFactory;
-        EstateServiceInterface m_EstateService;
-        SimulationDataStorageInterface m_SimulationData;
+        private readonly string m_RegionStorageName;
+        private readonly string m_EstateServiceName;
+        private readonly string m_SimulationStorageName;
+        private GridServiceInterface m_RegionStorage;
+        private SceneFactoryInterface m_SceneFactory;
+        private EstateServiceInterface m_EstateService;
+        private SimulationDataStorageInterface m_SimulationData;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION COMMANDS");
-        ExternalHostNameServiceInterface m_ExternalHostNameService;
-        ConfigurationLoader m_Loader;
-        BaseHttpServer m_HttpServer;
-        SceneList m_Scenes;
-        AvatarNameServiceInterface m_AvatarNameService;
+        private ExternalHostNameServiceInterface m_ExternalHostNameService;
+        private ConfigurationLoader m_Loader;
+        private BaseHttpServer m_HttpServer;
+        private SceneList m_Scenes;
+        private AvatarNameServiceInterface m_AvatarNameService;
 
         public RegionCommands(string regionStorageName, string estateServiceName, string simulationStorageName)
         {
@@ -138,7 +138,7 @@ namespace SilverSim.Main.Cmd.Region
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             var avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
-            if (null != sceneConfig)
+            if (sceneConfig != null)
             {
                 string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
                 if (!string.IsNullOrEmpty(avatarNameServices))
@@ -152,7 +152,7 @@ namespace SilverSim.Main.Cmd.Region
             m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServicesList);
         }
 
-        UUI ResolveName(UUI uui)
+        private UUI ResolveName(UUI uui)
         {
             UUI resultUui;
             if(m_AvatarNameService.TryGetValue(uui, out resultUui))
@@ -163,7 +163,7 @@ namespace SilverSim.Main.Cmd.Region
         }
 
         [Description("Clear HACD cache")]
-        void ClearHacdCacheCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ClearHacdCacheCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help")
             {
@@ -222,7 +222,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void ShowScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -285,7 +285,7 @@ namespace SilverSim.Main.Cmd.Region
                 foreach(ObjectPart part in scene.Primitives)
                 {
                     ObjectGroup group = part.ObjectGroup;
-                    if(null == group)
+                    if(group == null)
                     {
                         continue;
                     }
@@ -294,11 +294,11 @@ namespace SilverSim.Main.Cmd.Region
                         ScriptInstance instance = item.ScriptInstance;
                         if(item.InventoryType == Types.Inventory.InventoryType.LSLText)
                         {
-                            if(excludeNonFunctional && null == instance)
+                            if(excludeNonFunctional && instance == null)
                             {
                                 continue;
                             }
-                            if (null != instance)
+                            if (instance != null)
                             {
                                 if (excludeFunctional)
                                 {
@@ -318,14 +318,14 @@ namespace SilverSim.Main.Cmd.Region
                                 part.Name, part.ID,
                                 group.Name, group.ID,
                                 instance != null ? "yes" : "no",
-                                instance != null && instance.IsRunning ? "running" : "not running");
+                                instance?.IsRunning == true ? "running" : "not running");
                         }
                     }
                 }
             }
         }
 
-        void EnableScriptCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void EnableScriptCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             UUID selectedPart;
@@ -370,7 +370,7 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 ScriptInstance instance = item.ScriptInstance;
-                if (null == instance)
+                if (instance == null)
                 {
                     io.Write("item is not a valid script to be controlled");
                 }
@@ -382,7 +382,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void EnableScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void EnableScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -417,7 +417,7 @@ namespace SilverSim.Main.Cmd.Region
                     foreach(ObjectPartInventoryItem item in part.Inventory.Values)
                     {
                         ScriptInstance instance = item.ScriptInstance;
-                        if(instance != null && !instance.IsRunning)
+                        if(instance?.IsRunning == false)
                         {
                             instance.IsRunning = true;
                             ++count;
@@ -428,7 +428,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void DisableScriptCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void DisableScriptCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             UUID selectedPart;
@@ -473,7 +473,7 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 ScriptInstance instance = item.ScriptInstance;
-                if (null == instance)
+                if (instance == null)
                 {
                     io.Write("item is not a valid script to be controlled");
                 }
@@ -486,7 +486,7 @@ namespace SilverSim.Main.Cmd.Region
         }
 
         #region Region control commands
-        void ChangeRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ChangeRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -638,14 +638,14 @@ namespace SilverSim.Main.Cmd.Region
                         io.WriteFormatted("Could not change region parameters: {0}", e.Message);
                     }
                 }
-                if (null != selectedEstate)
+                if (selectedEstate != null)
                 {
                     m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
                 }
             }
         }
 
-        void CreateRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void CreateRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -775,7 +775,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void CreateRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void CreateRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -988,7 +988,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void DeleteRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void DeleteRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -1019,7 +1019,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void RestartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void RestartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
 
@@ -1060,7 +1060,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void EnableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void EnableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -1085,7 +1085,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void DisableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void DisableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -1110,7 +1110,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void StartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void StartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -1152,12 +1152,12 @@ namespace SilverSim.Main.Cmd.Region
                         return;
                     }
                     m_Scenes.Add(si);
-                    si.LoadSceneAsync();
+                    si.LoadScene();
                 }
             }
         }
 
-        void StopRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void StopRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -1188,7 +1188,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Region and Simulator notice
-        void AlertRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void AlertRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1227,7 +1227,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void AlertRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void AlertRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if(limitedToScene != UUID.Zero)
             {
@@ -1252,7 +1252,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Agent control (Login/Messages/Kick)
-        void AlertAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void AlertAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" && args.Count < 5)
@@ -1299,7 +1299,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void RebakeCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void RebakeCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" || args.Count < 3)
@@ -1345,7 +1345,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void KickAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void KickAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" || args.Count < 4)
@@ -1399,7 +1399,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void EnableDisableLoginsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void EnableDisableLoginsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1439,7 +1439,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Show commands
-        void ShowRegionStatsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowRegionStatsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1470,7 +1470,7 @@ namespace SilverSim.Main.Cmd.Region
                     formattedList.AddData(
                         scene.Name,
                         scene.Environment.EnvironmentFps.ToString("N2"),
-                        scene.PhysicsScene.PhysicsFPS.ToString("N2"), 
+                        scene.PhysicsScene.PhysicsFPS.ToString("N2"),
                         scene.PhysicsScene.PhysicsEngineName);
                 }
             }
@@ -1483,15 +1483,15 @@ namespace SilverSim.Main.Cmd.Region
                     return;
                 }
                 formattedList.AddData(
-                    scene.Name, 
-                    scene.Environment.EnvironmentFps.ToString("N2"), 
-                    scene.PhysicsScene.PhysicsFPS.ToString("N2"), 
+                    scene.Name,
+                    scene.Environment.EnvironmentFps.ToString("N2"),
+                    scene.PhysicsScene.PhysicsFPS.ToString("N2"),
                     scene.PhysicsScene.PhysicsEngineName);
             }
             io.Write(formattedList.ToString());
         }
 
-        void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             IEnumerable<RegionInfo> regions;
 
@@ -1556,7 +1556,7 @@ namespace SilverSim.Main.Cmd.Region
             io.Write(output.ToString());
         }
 
-        void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1597,10 +1597,9 @@ namespace SilverSim.Main.Cmd.Region
                     gridcoord.X_String + "," + gridcoord.Y_String);
             }
             io.Write(output.ToString());
-
         }
 
-        void SetWindPresetVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void SetWindPresetVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" || args.Count != 4)
@@ -1646,7 +1645,7 @@ namespace SilverSim.Main.Cmd.Region
             io.WriteFormatted("Set wind preset velocity at {0}: {1}", pos.ToString(), vel.ToString());
         }
 
-        void GetWindPresetVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void GetWindPresetVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" || args.Count != 3)
@@ -1685,7 +1684,7 @@ namespace SilverSim.Main.Cmd.Region
             io.WriteFormatted("Wind preset velocity at {0}: {1}", pos.ToString(), scene.Environment.Wind.PresetWind[pos].ToString());
         }
 
-        void SetWindVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void SetWindVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" || args.Count != 4)
@@ -1731,7 +1730,7 @@ namespace SilverSim.Main.Cmd.Region
             io.WriteFormatted("Set wind velocity at {0}: {1}", pos.ToString(), vel.ToString());
         }
 
-        void GetWindVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void GetWindVelocityCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" || args.Count > 3)
@@ -1777,7 +1776,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void ShowAgentsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowAgentsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1826,7 +1825,7 @@ namespace SilverSim.Main.Cmd.Region
             io.Write(output.ToString());
         }
 
-        void ShowParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ShowParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID sceneID = UUID.Zero != limitedToScene ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -1850,7 +1849,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Clear commands
-        void ClearObjectsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ClearObjectsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             SceneInterface scene;
             if (args[0] == "help")
@@ -1875,7 +1874,7 @@ namespace SilverSim.Main.Cmd.Region
             io.Write("All objects deleted.");
         }
 
-        void ClearParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ClearParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             SceneInterface scene;
             if (args[0] == "help")
@@ -1900,7 +1899,7 @@ namespace SilverSim.Main.Cmd.Region
             io.Write("Region parcels cleared");
         }
 
-        void ClearRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ClearRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             SceneInterface scene;
             if (args[0] == "help")
@@ -1928,7 +1927,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Select region command
-        void SelectRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void SelectRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -1970,7 +1969,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Sun Params
-        void ResetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ResetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -1988,7 +1987,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void SetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void SetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2089,8 +2088,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-
-        void GetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void GetSunParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2147,7 +2145,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Moon Params
-        void ResetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ResetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2165,7 +2163,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void SetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void SetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2212,8 +2210,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-
-        void GetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void GetMoonParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2247,7 +2244,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Tidal Params
-        void ResetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ResetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2265,8 +2262,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-
-        void EnableTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void EnableTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2284,7 +2280,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void DisableTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void DisableTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2302,16 +2298,16 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void SetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void SetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
             if (args[0] == "help" || args.Count < 3 ||
                 (args.Count < 4))
             {
-                io.Write("set tidalparam baseheight <baseheight>\n" + 
+                io.Write("set tidalparam baseheight <baseheight>\n" +
                     "set tidalparam moonamplitude <amplitude>\n" +
-                    "set tidalparam sunamplitude <amplitude>\n" + 
+                    "set tidalparam sunamplitude <amplitude>\n" +
                     "set tidalparam updateeverymsecs <millseconds>\n");
             }
             else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
@@ -2375,8 +2371,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-
-        void GetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void GetTidalParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2385,7 +2380,7 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("get tidalparam baseheight\n" +
                     "get tidalparam sunamplitude\n" +
                     "get tidalparam moonamplitude\n" +
-                    "get tidalparam enabled\n" + 
+                    "get tidalparam enabled\n" +
                     "get tidalparam updateeverymsecs");
             }
             else if (selectedScene == UUID.Zero || !m_Scenes.TryGetValue(selectedScene, out scene))
@@ -2425,7 +2420,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Wind Params
-        void ResetWindParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void ResetWindParamCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2446,7 +2441,7 @@ namespace SilverSim.Main.Cmd.Region
         #endregion
 
         #region Waterheight
-        void SetWaterheightCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void SetWaterheightCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;
@@ -2473,7 +2468,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        void GetWaterheightCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        private void GetWaterheightCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene = limitedToScene != UUID.Zero ? limitedToScene : io.SelectedScene;
             SceneInterface scene;

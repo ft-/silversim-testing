@@ -36,17 +36,17 @@ namespace SilverSim.Database.MySQL.Groups
     public sealed partial class MySQLGroupsService : GroupsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUPS SERVICE");
-        AggregatingAvatarNameService m_AvatarNameService;
+        private AggregatingAvatarNameService m_AvatarNameService;
 
-        const string GCountQuery = "(SELECT COUNT(m.PrincipalID) FROM groupmemberships AS m WHERE m.GroupID LIKE g.GroupID) AS MemberCount," +
+        private const string GCountQuery = "(SELECT COUNT(m.PrincipalID) FROM groupmemberships AS m WHERE m.GroupID LIKE g.GroupID) AS MemberCount," +
                                     "(SELECT COUNT(r.RoleID) FROM grouproles AS r WHERE r.GroupID LIKE g.GroupID) AS RoleCount";
 
-        const string MCountQuery = "(SELECT COUNT(xr.RoleID) FROM grouproles AS xr WHERE xr.GroupID LIKE g.GroupID) AS RoleCount";
+        private const string MCountQuery = "(SELECT COUNT(xr.RoleID) FROM grouproles AS xr WHERE xr.GroupID LIKE g.GroupID) AS RoleCount";
 
-        const string RCountQuery = "(SELECT COUNT(xrm.PrincipalID) FROM grouprolememberships AS xrm WHERE xrm.RoleID LIKE r.RoleID AND xrm.GroupID LIKE r.GroupID) AS RoleMembers," +
+        private const string RCountQuery = "(SELECT COUNT(xrm.PrincipalID) FROM grouprolememberships AS xrm WHERE xrm.RoleID LIKE r.RoleID AND xrm.GroupID LIKE r.GroupID) AS RoleMembers," +
                                     "(SELECT COUNT(xm.PrincipalID) FROM groupmemberships AS xm WHERE xm.GroupID LIKE r.GroupID) AS GroupMembers";
 
-        UUI ResolveName(UUI uui)
+        private UUI ResolveName(UUI uui)
         {
             UUI resultuui;
             if (m_AvatarNameService.TryGetValue(uui, out resultuui))
@@ -56,7 +56,7 @@ namespace SilverSim.Database.MySQL.Groups
             return uui;
         }
 
-        UGI ResolveName(UUI requestingAgent, UGI group)
+        private UGI ResolveName(UUI requestingAgent, UGI group)
         {
             UGI resolved;
             return Groups.TryGetValue(requestingAgent, group.ID, out resolved) ? resolved : group;
@@ -80,7 +80,7 @@ namespace SilverSim.Database.MySQL.Groups
 
         public override IGroupRolesInterface Roles => this;
 
-        bool TryGetGroupRoleRights(UUI requestingAgent, UGI group, UUID roleID, out GroupPowers powers)
+        private bool TryGetGroupRoleRights(UUI requestingAgent, UGI group, UUID roleID, out GroupPowers powers)
         {
             powers = GroupPowers.None;
             using (var conn = new MySqlConnection(m_ConnectionString))
@@ -173,8 +173,8 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        readonly string m_ConnectionString;
-        readonly string m_AvatarNameServiceNames;
+        private readonly string m_ConnectionString;
+        private readonly string m_AvatarNameServiceNames;
 
         public MySQLGroupsService(IConfig ownSection)
         {
@@ -186,7 +186,7 @@ namespace SilverSim.Database.MySQL.Groups
     [PluginName("Groups")]
     public class MySQLGroupsServiceFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => 
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
             new MySQLGroupsService(ownSection);
     }
 }

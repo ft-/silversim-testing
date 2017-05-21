@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Estate
     {
         List<UUID> IEstateRegionMapServiceInterface.this[uint estateID]
         {
-            get 
+            get
             {
                 var regionList = new List<UUID>();
                 using(var conn = new MySqlConnection(m_ConnectionString))
@@ -108,9 +108,11 @@ namespace SilverSim.Database.MySQL.Estate
             }
             set
             {
-                var vals = new Dictionary<string,object>();
-                vals["EstateID"] = value;
-                vals["RegionID"] = regionID;
+                var vals = new Dictionary<string, object>
+                {
+                    ["EstateID"] = value,
+                    ["RegionID"] = regionID
+                };
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();

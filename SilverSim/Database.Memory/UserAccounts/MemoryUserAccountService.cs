@@ -36,7 +36,7 @@ namespace SilverSim.Database.Memory.UserAccounts
     [Description("Memory UserAccount Backend")]
     public sealed class MemoryUserAccountService : UserAccountServiceInterface, IPlugin
     {
-        readonly RwLockedDictionary<UUID, UserAccount> m_Data = new RwLockedDictionary<UUID, UserAccount>();
+        private readonly RwLockedDictionary<UUID, UserAccount> m_Data = new RwLockedDictionary<UUID, UserAccount>();
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)
@@ -111,7 +111,7 @@ namespace SilverSim.Database.Memory.UserAccounts
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string email]
         {
-            get 
+            get
             {
                 UserAccount account;
                 if(!TryGetValue(scopeID, email, out account))
@@ -158,7 +158,7 @@ namespace SilverSim.Database.Memory.UserAccounts
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string firstName, string lastName]
         {
-            get 
+            get
             {
                 UserAccount account;
                 if(!TryGetValue(scopeID, firstName, lastName, out account))
@@ -207,7 +207,7 @@ namespace SilverSim.Database.Memory.UserAccounts
 
         public override void Remove(UUID scopeID, UUID accountID)
         {
-            m_Data.RemoveIf(accountID, delegate (UserAccount acc) { return acc.ScopeID == scopeID || scopeID == UUID.Zero; });
+            m_Data.RemoveIf(accountID, (UserAccount acc) => acc.ScopeID == scopeID || scopeID == UUID.Zero);
         }
 
         public override void SetEverLoggedIn(UUID scopeID, UUID accountID)

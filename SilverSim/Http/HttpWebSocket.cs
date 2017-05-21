@@ -52,10 +52,25 @@ namespace SilverSim.Http
         [Serializable]
         public class MessageTimeoutException : Exception
         {
+            public MessageTimeoutException()
+            {
+            }
+
+            public MessageTimeoutException(string message) : base(message)
+            {
+            }
+
+            public MessageTimeoutException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected MessageTimeoutException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+            {
+            }
         }
 
-        static readonly Random Random = new Random();
-        static byte[] MaskingKey
+        private static readonly Random Random = new Random();
+        private static byte[] MaskingKey
         {
             get
             {
@@ -69,10 +84,10 @@ namespace SilverSim.Http
         }
 
         protected readonly Stream m_WebSocketStream;
-        bool m_IsClosed;
-        readonly object m_SendLock = new object();
-        bool m_IsDisposed;
-        CloseReason m_CloseReason = CloseReason.NormalClosure;
+        private bool m_IsClosed;
+        private readonly object m_SendLock = new object();
+        private bool m_IsDisposed;
+        private CloseReason m_CloseReason = CloseReason.NormalClosure;
 
         public HttpWebSocket(Stream o)
         {
@@ -102,7 +117,7 @@ namespace SilverSim.Http
             m_IsDisposed = true;
         }
 
-        enum OpCode
+        private enum OpCode
         {
             Continuation = 0,
             Text = 1,
@@ -211,19 +226,21 @@ namespace SilverSim.Http
 
                 if (opcode == OpCode.Binary)
                 {
-                    var msg = new Message();
-                    msg.Data = payload;
-                    msg.Type = MessageType.Binary;
-                    msg.IsLastSegment = (hdr[0] & 128) != 0;
-                    return msg;
+                    return new Message()
+                    {
+                        Data = payload,
+                        Type = MessageType.Binary,
+                        IsLastSegment = (hdr[0] & 128) != 0
+                    };
                 }
                 else if (opcode == OpCode.Text)
                 {
-                    var msg = new Message();
-                    msg.Data = payload;
-                    msg.Type = MessageType.Text;
-                    msg.IsLastSegment = (hdr[0] & 128) != 0;
-                    return msg;
+                    return new Message()
+                    {
+                        Data = payload,
+                        Type = MessageType.Text,
+                        IsLastSegment = (hdr[0] & 128) != 0
+                    };
                 }
                 else if (opcode == OpCode.Ping)
                 {
@@ -243,7 +260,7 @@ namespace SilverSim.Http
             SendFrame(OpCode.Binary, fin, data, offset, length, masked);
         }
 
-        void SendClose(CloseReason reason)
+        private void SendClose(CloseReason reason)
         {
             byte[] res = BitConverter.GetBytes((ushort)reason);
             if(BitConverter.IsLittleEndian)
@@ -253,7 +270,7 @@ namespace SilverSim.Http
             SendFrame(OpCode.Close, true, res, 0, 2);
         }
 
-        void SendFrame(OpCode opcode, bool fin, byte[] payload, int offset, int length, bool masked = false)
+        private void SendFrame(OpCode opcode, bool fin, byte[] payload, int offset, int length, bool masked = false)
         {
             lock (m_SendLock)
             {

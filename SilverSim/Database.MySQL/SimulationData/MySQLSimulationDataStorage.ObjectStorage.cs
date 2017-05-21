@@ -86,7 +86,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region helpers
-        ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader) => new ObjectGroup()
+        private ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader) => new ObjectGroup()
         {
             IsTempOnRez = dbReader.GetBool("IsTempOnRez"),
             Owner = dbReader.GetUUI("Owner"),
@@ -105,7 +105,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             RezzingObjectID = dbReader.GetUUID("RezzingObjectID")
         };
 
-        ObjectPart ObjectPartFromDbReader(MySqlDataReader dbReader)
+        private ObjectPart ObjectPartFromDbReader(MySqlDataReader dbReader)
         {
             var objpart = new ObjectPart()
             {
@@ -134,48 +134,60 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 MediaURL = dbReader.GetString("MediaURL"),
 
-                AngularVelocity = dbReader.GetVector3("AngularVelocity")
+                AngularVelocity = dbReader.GetVector3("AngularVelocity"),
+                PointLight = new ObjectPart.PointLightParam()
+                {
+                    Serialization = dbReader.GetBytes("LightData")
+                },
+                Text = new ObjectPart.TextParam()
+                {
+                    Serialization = dbReader.GetBytes("HoverTextData")
+                },
+                Flexible = new ObjectPart.FlexibleParam()
+                {
+                    Serialization = dbReader.GetBytes("FlexibleData")
+                },
+                Sound = new ObjectPart.SoundParam()
+                {
+                    Serialization = dbReader.GetBytes("LoopedSoundData")
+                },
+                CollisionSound = new ObjectPart.CollisionSoundParam()
+                {
+                    Serialization = dbReader.GetBytes("ImpactSoundData")
+                },
+                Shape = new ObjectPart.PrimitiveShape()
+                {
+                    Serialization = dbReader.GetBytes("PrimitiveShapeData")
+                },
+                ParticleSystemBytes = dbReader.GetBytes("ParticleSystem"),
+                TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes"),
+                TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes"),
+
+                ScriptAccessPin = dbReader.GetInt32("ScriptAccessPin"),
+                ForceMouselook = dbReader.GetBoolean("ForceMouselook"),
+                BaseMask = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions"),
+                OwnerMask = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions"),
+                EveryoneMask = dbReader.GetEnum<InventoryPermissionsMask>("EveryOnePermissions"),
+                GroupMask = dbReader.GetEnum<InventoryPermissionsMask>("GroupPermissions"),
+                NextOwnerMask = dbReader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissions"),
+                ClickAction = dbReader.GetEnum<ClickActionType>("ClickAction"),
+                PassCollisionMode = dbReader.GetEnum<PassEventMode>("PassCollisionMode"),
+                PassTouchMode = dbReader.GetEnum<PassEventMode>("PassTouchMode"),
+                Velocity = dbReader.GetVector3("Velocity"),
+                IsSoundQueueing = dbReader.GetBool("IsSoundQueueing"),
+                IsAllowedDrop = dbReader.GetBool("IsAllowedDrop"),
+                PhysicsDensity = dbReader.GetDouble("PhysicsDensity"),
+                PhysicsFriction = dbReader.GetDouble("PhysicsFriction"),
+                PhysicsRestitution = dbReader.GetDouble("PhysicsRestitution"),
+                PhysicsGravityMultiplier = dbReader.GetDouble("PhysicsGravityMultiplier"),
+
+                IsVolumeDetect = dbReader.GetBool("IsVolumeDetect"),
+                IsPhantom = dbReader.GetBool("IsPhantom"),
+                IsPhysics = dbReader.GetBool("IsPhysics"),
+                IsRotateXEnabled = dbReader.GetBool("IsRotateXEnabled"),
+                IsRotateYEnabled = dbReader.GetBool("IsRotateYEnabled"),
+                IsRotateZEnabled = dbReader.GetBool("IsRotateZEnabled"),
             };
-            var lp = new ObjectPart.PointLightParam();
-            lp.Serialization = dbReader.GetBytes("LightData");
-            objpart.PointLight = lp;
-
-            var tp = new ObjectPart.TextParam();
-            tp.Serialization = dbReader.GetBytes("HoverTextData");
-            objpart.Text = tp;
-
-            var fp = new ObjectPart.FlexibleParam();
-            fp.Serialization = dbReader.GetBytes("FlexibleData");
-            objpart.Flexible = fp;
-
-            var sound = new ObjectPart.SoundParam();
-            sound.Serialization = dbReader.GetBytes("LoopedSoundData");
-            objpart.Sound = sound;
-
-            var collisionsound = new ObjectPart.CollisionSoundParam();
-            collisionsound.Serialization = dbReader.GetBytes("ImpactSoundData");
-            objpart.CollisionSound = collisionsound;
-
-            var ps = new ObjectPart.PrimitiveShape();
-            ps.Serialization = dbReader.GetBytes("PrimitiveShapeData");
-            objpart.Shape = ps;
-
-            objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
-            objpart.TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes");
-            objpart.TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes");
-
-            objpart.ScriptAccessPin = dbReader.GetInt32("ScriptAccessPin");
-            objpart.LoadedLinkNumber = dbReader.GetInt32("LinkNumber");
-
-            objpart.ForceMouselook = dbReader.GetBoolean("ForceMouselook");
-
-            objpart.BaseMask = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
-            objpart.OwnerMask = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
-            objpart.EveryoneMask = dbReader.GetEnum<InventoryPermissionsMask>("EveryOnePermissions");
-            objpart.GroupMask = dbReader.GetEnum<InventoryPermissionsMask>("GroupPermissions");
-            objpart.NextOwnerMask = dbReader.GetEnum<InventoryPermissionsMask>("NextOwnerPermissions");
-
-            objpart.ClickAction = dbReader.GetEnum<ClickActionType>("ClickAction");
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
             {
@@ -185,29 +197,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
 
-            objpart.PassCollisionMode = dbReader.GetEnum<PassEventMode>("PassCollisionMode");
-            objpart.PassTouchMode = dbReader.GetEnum<PassEventMode>("PassTouchMode");
-            objpart.Velocity = dbReader.GetVector3("Velocity");
-            objpart.AngularVelocity = dbReader.GetVector3("AngularVelocity");
-            objpart.IsSoundQueueing = dbReader.GetBool("IsSoundQueueing");
-            objpart.IsAllowedDrop = dbReader.GetBool("IsAllowedDrop");
-
-            objpart.PhysicsDensity = dbReader.GetDouble("PhysicsDensity");
-            objpart.PhysicsFriction = dbReader.GetDouble("PhysicsFriction");
-            objpart.PhysicsRestitution = dbReader.GetDouble("PhysicsRestitution");
-            objpart.PhysicsGravityMultiplier = dbReader.GetDouble("PhysicsGravityMultiplier");
-
-            objpart.IsVolumeDetect = dbReader.GetBool("IsVolumeDetect");
-            objpart.IsPhantom = dbReader.GetBool("IsPhantom");
-            objpart.IsPhysics = dbReader.GetBool("IsPhysics");
-            objpart.IsRotateXEnabled = dbReader.GetBool("IsRotateXEnabled");
-            objpart.IsRotateYEnabled = dbReader.GetBool("IsRotateYEnabled");
-            objpart.IsRotateZEnabled = dbReader.GetBool("IsRotateZEnabled");
-
             return objpart;
         }
 
-        ObjectPartInventoryItem ObjectPartInventoryItemFromDbReader(MySqlDataReader dbReader)
+        private ObjectPartInventoryItem ObjectPartInventoryItemFromDbReader(MySqlDataReader dbReader)
         {
             var item = new ObjectPartInventoryItem()
             {
@@ -224,7 +217,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 LastOwner = dbReader.GetUUI("LastOwner"),
                 Name = dbReader.GetString("Name"),
                 Owner = dbReader.GetUUI("Owner"),
-                ParentFolderID = dbReader.GetUUID("ParentFolderID")
+                ParentFolderID = dbReader.GetUUID("ParentFolderID"),
+                NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID")
             };
             item.Permissions.Base = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
             item.Permissions.Current = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
@@ -234,7 +228,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             item.SaleInfo.Type = dbReader.GetEnum<InventoryItem.SaleInfoData.SaleType>("SaleType");
             item.SaleInfo.Price = dbReader.GetInt32("SalePrice");
             item.SaleInfo.PermMask = dbReader.GetEnum<InventoryPermissionsMask>("SalePermMask");
-            item.NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID");
             var grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
             if (((string)dbReader["PermsGranter"]).Length != 0)
             {
@@ -283,7 +276,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                             {
                                 try
                                 {
-
                                     objgroupID = MySQLUtilities.GetUUID(dbReader, "id");
                                     originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
                                     nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
@@ -435,7 +427,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     int elemcnt = Math.Min(orphanedPrimInventories.Count - idx, 256);
                     string sqlcmd = "DELETE FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "' AND (" +
-                        string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt) select 
+                        string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt) select
                                             string.Format("PrimID LIKE '{0}' AND ID LIKE '{1}'", id.Key.ToString(), id.Value.ToString()));
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {

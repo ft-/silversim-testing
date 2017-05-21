@@ -37,7 +37,7 @@ namespace SilverSim.Database.MySQL.Presence
     [Description("MySQL NpcPresence Backend")]
     public class MySQLNpcPresenceService : NpcPresenceServiceInterface, IDBServiceInterface, IPlugin
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
 
         #region Constructor
@@ -103,7 +103,7 @@ namespace SilverSim.Database.MySQL.Presence
             throw new NotImplementedException();
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("npcpresence"),
             new AddColumn<UUID>("NpcID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -139,7 +139,7 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
 
-        NpcPresenceInfo ReaderToPresenceInfo(MySqlDataReader reader)
+        private NpcPresenceInfo ReaderToPresenceInfo(MySqlDataReader reader)
         {
             var presence = new NpcPresenceInfo();
             presence.Npc.ID = reader.GetUUID("NpcID");

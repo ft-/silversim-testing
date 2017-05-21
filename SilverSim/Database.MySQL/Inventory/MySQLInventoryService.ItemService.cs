@@ -93,9 +93,9 @@ namespace SilverSim.Database.MySQL.Inventory
         {
             get
             {
-                if(null == itemids || itemids.Count == 0)
+                if(itemids == null || itemids.Count == 0)
                 {
-                    throw new ArgumentOutOfRangeException("itemids");
+                    throw new ArgumentOutOfRangeException(nameof(itemids));
                 }
                 var items = new List<InventoryItem>();
                 using (var connection = new MySqlConnection(m_ConnectionString))
@@ -276,7 +276,7 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void IncrementVersion(UUID principalID, UUID folderID)
+        private void IncrementVersion(UUID principalID, UUID folderID)
         {
             try
             {
@@ -299,6 +299,5 @@ namespace SilverSim.Database.MySQL.Inventory
                 /* nothing to do here */
             }
         }
-
     }
 }

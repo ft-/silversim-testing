@@ -40,12 +40,12 @@ namespace SilverSim.Backend.Common.OfflineIM
 #if DEBUG
         private static readonly ILog m_Log = LogManager.GetLogger("OFFLINE IM");
 #endif
-        readonly string m_AvatarNameServiceName;
-        readonly string m_OfflineIMServiceName;
+        private readonly string m_AvatarNameServiceName;
+        private readonly string m_OfflineIMServiceName;
 
-        AvatarNameServiceInterface m_AvatarNameService;
-        OfflineIMServiceInterface m_OfflineIMService;
-        IMRouter m_IMRouter;
+        private AvatarNameServiceInterface m_AvatarNameService;
+        private OfflineIMServiceInterface m_OfflineIMService;
+        private IMRouter m_IMRouter;
 
         public OfflineIM(string avatarNameServiceName, string offlineIMServiceName)
         {
@@ -108,16 +108,18 @@ namespace SilverSim.Backend.Common.OfflineIM
             {
                 try
                 {
-                    var response_im = new GridInstantMessage();
-                    response_im.FromAgent = im.ToAgent;
-                    response_im.ToAgent = im.FromAgent;
-                    response_im.Dialog = GridInstantMessageDialog.BusyAutoResponse;
-                    response_im.IsFromGroup = false;
-                    response_im.Message = "User is not logged in. Message saved.";
-                    response_im.IMSessionID = im.IMSessionID;
-                    response_im.IsOffline = false;
-                    response_im.NoOfflineIMStore = true;
-                    response_im.IsSystemMessage = true;
+                    var response_im = new GridInstantMessage()
+                    {
+                        FromAgent = im.ToAgent,
+                        ToAgent = im.FromAgent,
+                        Dialog = GridInstantMessageDialog.BusyAutoResponse,
+                        IsFromGroup = false,
+                        Message = "User is not logged in. Message saved.",
+                        IMSessionID = im.IMSessionID,
+                        IsOffline = false,
+                        NoOfflineIMStore = true,
+                        IsSystemMessage = true
+                    };
                     m_IMRouter.SendWithResultDelegate(response_im);
                 }
                 catch

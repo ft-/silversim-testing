@@ -53,7 +53,7 @@ namespace SilverSim.Http
             return new WebSocketClient(s) { SelectedProtocol = selectedProtocol };
         }
 
-        static Stream ConnectStream(string url, string[] protocols, out string selectedProtocol)
+        private static Stream ConnectStream(string url, string[] protocols, out string selectedProtocol)
         {
             Stream stream;
             var uri = new Uri(url, UriKind.Absolute);
@@ -191,7 +191,7 @@ namespace SilverSim.Http
             return stream;
         }
 
-        static string ReadHeaderLine(Stream stream)
+        private static string ReadHeaderLine(Stream stream)
         {
             var s = new StringBuilder();
             for (;;)
@@ -221,14 +221,14 @@ namespace SilverSim.Http
             }
         }
 
-        static Stream OpenPlainStream(string host, int port)
+        private static Stream OpenPlainStream(string host, int port)
         {
             var s = new Socket(SocketType.Stream, ProtocolType.Tcp);
             s.Connect(host, port);
             return new NetworkStream(s);
         }
 
-        static Stream OpenSslStream(string host, int port)
+        private static Stream OpenSslStream(string host, int port)
         {
             var ssl = new SslStream(OpenPlainStream(host, port));
             ssl.AuthenticateAsClient(host, null, SslProtocols.Tls12, true);

@@ -52,15 +52,17 @@ namespace SilverSim.Main.Common
             public SimulationDataStorageInterface SimulationDataStorage;
         }
 
-        public static void LoadSceneAsync(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage)
+        public static void LoadScene(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage)
         {
             lock (scene.m_LoaderThreadLock)
             {
                 if (scene.m_LoaderThread == null && !scene.IsSceneEnabled)
                 {
-                    SceneLoadingParams loadparams = new SceneLoadingParams();
-                    loadparams.Scene = scene;
-                    loadparams.SimulationDataStorage = simulationDataStorage;
+                    var loadparams = new SceneLoadingParams()
+                    {
+                        Scene = scene,
+                        SimulationDataStorage = simulationDataStorage
+                    };
                     scene.m_LoaderThread = ThreadManager.CreateThread(LoadSceneThread);
                     scene.m_LoaderThread.Start(loadparams);
                 }
@@ -75,9 +77,11 @@ namespace SilverSim.Main.Common
             {
                 if (scene.m_LoaderThread == null && !scene.IsSceneEnabled)
                 {
-                    SceneLoadingParams loadparams = new SceneLoadingParams();
-                    loadparams.Scene = scene;
-                    loadparams.SimulationDataStorage = simulationDataStorage;
+                    var loadparams = new SceneLoadingParams()
+                    {
+                        Scene = scene,
+                        SimulationDataStorage = simulationDataStorage
+                    };
                     scene.m_LoaderThread = ThreadManager.CreateThread(LoadSceneThread);
                     /* we put a thread in there for ensuring correct sequence but we do not start it */
                     LoadSceneMain(loadparams);
@@ -85,16 +89,16 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void LoadSceneThread(object o)
+        private static void LoadSceneThread(object o)
         {
-            SceneLoadingParams loadparams = (SceneLoadingParams)o;
+            var loadparams = (SceneLoadingParams)o;
             Thread.CurrentThread.Name = "Scene Loading Thread for " + loadparams.Scene.Name + " (" + loadparams.Scene.ID.ToString() + ")";
             LoadSceneMain(loadparams);
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        static void LoadSceneMain(SceneLoadingParams loadparams)
+        private static void LoadSceneMain(SceneLoadingParams loadparams)
         {
             List<UUID> parcels;
             try
@@ -170,8 +174,7 @@ namespace SilverSim.Main.Common
 
                 lock(loadparams.Scene.m_LoaderThreadLock)
                 {
-                    List<Vector3> spawns = loadparams.SimulationDataStorage.Spawnpoints[loadparams.Scene.ID];
-                    loadparams.Scene.SpawnPoints = spawns;
+                    loadparams.Scene.SpawnPoints = loadparams.SimulationDataStorage.Spawnpoints[loadparams.Scene.ID];
                 }
 
                 lock(loadparams.Scene.m_LoaderThreadLock)
@@ -224,30 +227,31 @@ namespace SilverSim.Main.Common
                         {
                             m_Log.WarnFormat("Loading parcel {0} for {3} ({4}) failed: {2}: {1}\n{5}", parcelid, e.Message, e.GetType().FullName, loadparams.Scene.Name, loadparams.Scene.ID, e.StackTrace);
                         }
-
                     }
                 }
 
                 if (parcels.Count == 0)
                 {
-                    ParcelInfo pi = new ParcelInfo((int)loadparams.Scene.SizeX / 4, (int)loadparams.Scene.SizeY / 4);
-                    pi.AABBMin = new Vector3(0, 0, 0);
-                    pi.AABBMax = new Vector3(loadparams.Scene.SizeX - 1, loadparams.Scene.SizeY - 1, 0);
-                    pi.ActualArea = (int)(loadparams.Scene.SizeX * loadparams.Scene.SizeY);
-                    pi.Area = (int)(loadparams.Scene.SizeX * loadparams.Scene.SizeY);
-                    pi.AuctionID = 0;
-                    pi.LocalID = 1;
-                    pi.ID = UUID.Random;
-                    pi.Name = "Your Parcel";
-                    pi.Owner = loadparams.Scene.Owner;
-                    pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
-                    pi.BillableArea = (int)(loadparams.Scene.SizeX * loadparams.Scene.SizeY);
+                    var pi = new ParcelInfo((int)loadparams.Scene.SizeX / 4, (int)loadparams.Scene.SizeY / 4)
+                    {
+                        AABBMin = new Vector3(0, 0, 0),
+                        AABBMax = new Vector3(loadparams.Scene.SizeX - 1, loadparams.Scene.SizeY - 1, 0),
+                        ActualArea = (int)(loadparams.Scene.SizeX * loadparams.Scene.SizeY),
+                        Area = (int)(loadparams.Scene.SizeX * loadparams.Scene.SizeY),
+                        AuctionID = 0,
+                        LocalID = 1,
+                        ID = UUID.Random,
+                        Name = "Your Parcel",
+                        Owner = loadparams.Scene.Owner,
+                        Flags = ParcelFlags.None, /* we keep all flags disabled initially */
+                        BillableArea = (int)(loadparams.Scene.SizeX * loadparams.Scene.SizeY),
+                        LandingType = TeleportLandingType.Anywhere,
+                        LandingPosition = new Vector3(128, 128, 23),
+                        LandingLookAt = new Vector3(1, 0, 0),
+                        ClaimDate = new Date(),
+                        Status = ParcelStatus.Leased
+                    };
                     pi.LandBitmap.SetAllBits();
-                    pi.LandingType = TeleportLandingType.Anywhere;
-                    pi.LandingPosition = new Vector3(128, 128, 23);
-                    pi.LandingLookAt = new Vector3(1, 0, 0);
-                    pi.ClaimDate = new Date();
-                    pi.Status = ParcelStatus.Leased;
                     loadparams.SimulationDataStorage.Parcels.Store(loadparams.Scene.ID, pi);
                     loadparams.Scene.AddParcel(pi);
                     m_Log.InfoFormat("Auto-generated default parcel for {1} ({2})", parcels.Count, loadparams.Scene.Name, loadparams.Scene.ID);
@@ -309,7 +313,7 @@ namespace SilverSim.Main.Common
                     patches = loadparams.SimulationDataStorage.Terrains[loadparams.Scene.ID];
                 }
 
-                byte[,] valid = new byte[loadparams.Scene.SizeX / 16, loadparams.Scene.SizeY / 16];
+                var valid = new byte[loadparams.Scene.SizeX / 16, loadparams.Scene.SizeY / 16];
 
                 foreach (LayerPatch p in patches)
                 {

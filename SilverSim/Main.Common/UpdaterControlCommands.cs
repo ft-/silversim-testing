@@ -40,7 +40,7 @@ namespace SilverSim.Main.Common
             loader.CommandRegistry.AddShowCommand("package", ShowPackageDetails);
         }
 
-        static void ShowPackageDetails(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void ShowPackageDetails(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             PackageDescription desc;
             if (limitedToScene != UUID.Zero)
@@ -53,7 +53,7 @@ namespace SilverSim.Main.Common
             }
             else if(CoreUpdater.Instance.TryGetPackageDetails(args[2], out desc))
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.AppendFormat("Package {0}\n", desc.Name);
                 sb.Append("---------------------------------------------------------\n");
                 sb.AppendFormat("License: {0}\n", desc.License);
@@ -74,7 +74,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void ShowAvailablePackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void ShowAvailablePackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -97,9 +97,10 @@ namespace SilverSim.Main.Common
             }
         }
 
-        class UpdateLogRelay
+        private class UpdateLogRelay
         {
-            CmdIO.TTY m_IO;
+            private readonly CmdIO.TTY m_IO;
+
             public UpdateLogRelay(CmdIO.TTY io)
             {
                 m_IO = io;
@@ -111,7 +112,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void UpdateInstalledPackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void UpdateInstalledPackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -123,7 +124,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                UpdateLogRelay relay = new UpdateLogRelay(io);
+                var relay = new UpdateLogRelay(io);
                 CoreUpdater.Instance.OnUpdateLog += relay.LogEvent;
                 try
                 {
@@ -136,7 +137,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void ShowInstalledPackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void ShowInstalledPackages(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -148,7 +149,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.Append("Installed Packages\n");
                 sb.Append("---------------------------------------------------------\n");
                 foreach(KeyValuePair<string, string> kvp in CoreUpdater.Instance.InstalledPackages)
@@ -159,7 +160,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void UpdateFeed(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void UpdateFeed(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(limitedToScene != UUID.Zero)
             {
@@ -175,7 +176,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void CheckForUpdatesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void CheckForUpdatesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -199,7 +200,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void InstallPackageCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void InstallPackageCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -215,7 +216,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        static void UninstallPackageCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private static void UninstallPackageCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {

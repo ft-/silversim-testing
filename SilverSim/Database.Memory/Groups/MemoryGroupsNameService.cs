@@ -34,7 +34,7 @@ namespace SilverSim.Database.Memory.Groups
     [Description("Memory GroupsName Backend")]
     public sealed class MemoryGroupsNameService : GroupsNameServiceInterface, IPlugin
     {
-        readonly RwLockedDictionary<UUID, UGI> m_Data = new RwLockedDictionary<UUID, UGI>();
+        private readonly RwLockedDictionary<UUID, UGI> m_Data = new RwLockedDictionary<UUID, UGI>();
         #region Constructor
         public void Startup(ConfigurationLoader loader)
         {

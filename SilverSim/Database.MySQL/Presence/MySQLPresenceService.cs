@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.Presence
     [Description("MySQL Presence Backend")]
     public sealed class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
 
         #region Constructor
@@ -72,7 +72,7 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("presence"),
             new AddColumn<UUID>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -145,13 +145,11 @@ namespace SilverSim.Database.MySQL.Presence
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
+
             set /* setting null means logout, != null not allowed */
             {
-                if(value != null)
+                if (value != null)
                 {
                     throw new ArgumentException("setting value != null is not allowed without reportType");
                 }
@@ -163,9 +161,9 @@ namespace SilverSim.Database.MySQL.Presence
         [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID, PresenceServiceInterface.SetType reportType]
-        { 
+        {
             /* setting null means logout, != null login message */
-            set 
+            set
             {
                 if (value == null)
                 {

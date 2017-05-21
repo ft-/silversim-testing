@@ -28,7 +28,7 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataSpawnPointStorageInterface
     {
-        readonly RwLockedDictionary<UUID, RwLockedList<Vector3>> m_SpawnPointData = new RwLockedDictionary<UUID, RwLockedList<Vector3>>();
+        private readonly RwLockedDictionary<UUID, RwLockedList<Vector3>> m_SpawnPointData = new RwLockedDictionary<UUID, RwLockedList<Vector3>>();
 
         List<Vector3> ISimulationDataSpawnPointStorageInterface.this[UUID regionID]
         {
@@ -39,10 +39,8 @@ namespace SilverSim.Database.Memory.SimulationData
                     new List<Vector3>(data) :
                     new List<Vector3>();
             }
-            set
-            {
-                m_SpawnPointData[regionID] = new RwLockedList<Vector3>(value);
-            }
+
+            set { m_SpawnPointData[regionID] = new RwLockedList<Vector3>(value); }
         }
 
         bool ISimulationDataSpawnPointStorageInterface.Remove(UUID regionID) =>

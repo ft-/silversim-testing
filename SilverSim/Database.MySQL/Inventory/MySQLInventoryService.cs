@@ -40,13 +40,13 @@ namespace SilverSim.Database.MySQL.Inventory
     [Description("MySQL Inventory Backend")]
     public sealed partial class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly string m_ConnectionString;
-        static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
-        readonly DefaultInventoryFolderContentService m_ContentService;
-        readonly string m_InventoryItemTable;
-        readonly string m_InventoryFolderTable;
+        private readonly string m_ConnectionString;
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
+        private readonly DefaultInventoryFolderContentService m_ContentService;
+        private readonly string m_InventoryItemTable;
+        private readonly string m_InventoryFolderTable;
 
-        readonly IMigrationElement[] Migrations;
+        private readonly IMigrationElement[] Migrations;
 
         public MySQLInventoryService(string connectionString, string inventoryitemtable, string inventoryfoldertable)
         {
@@ -55,6 +55,7 @@ namespace SilverSim.Database.MySQL.Inventory
             m_ConnectionString = connectionString;
             m_ContentService = new DefaultInventoryFolderContentService(this);
 
+            /* renaming of tables for NPCs required so creating those on the fly */
             Migrations = new IMigrationElement[]
             {
                 new SqlTable(m_InventoryFolderTable),
@@ -100,7 +101,6 @@ namespace SilverSim.Database.MySQL.Inventory
                 /* necessary boolean correction */
                 new ChangeColumn<bool>("IsGroupOwned") { IsNullAllowed = false, Default = false },
             };
-
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]

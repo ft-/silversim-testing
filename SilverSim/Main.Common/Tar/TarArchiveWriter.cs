@@ -32,27 +32,27 @@ namespace SilverSim.Main.Common.Tar
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class TarArchiveWriter
     {
-        readonly Stream m_Stream;
-        int m_Position;
+        private readonly Stream m_Stream;
+        private int m_Position;
 
         public TarArchiveWriter(Stream s)
         {
             m_Stream = s;
         }
 
-        static readonly byte[] m_FileModeBytes = Encoding.ASCII.GetBytes("0000777");
-        static readonly byte[] m_OwnerIdBytes = Encoding.ASCII.GetBytes("0000764");
-        static readonly byte[] m_GroupIdBytes = Encoding.ASCII.GetBytes("0000764");
-        readonly List<string> m_Directories = new List<string>();
+        private static readonly byte[] m_FileModeBytes = Encoding.ASCII.GetBytes("0000777");
+        private static readonly byte[] m_OwnerIdBytes = Encoding.ASCII.GetBytes("0000764");
+        private static readonly byte[] m_GroupIdBytes = Encoding.ASCII.GetBytes("0000764");
+        private readonly List<string> m_Directories = new List<string>();
 
-        void WriteDirectory(string dirname)
+        private void WriteDirectory(string dirname)
         {
             if(dirname.IndexOf('/') < 0)
             {
                 return;
             }
             string[] dirparts = dirname.Split('/');
-            StringBuilder dirpath = new StringBuilder();
+            var dirpath = new StringBuilder();
 
             foreach(string dirpart in dirparts)
             {
@@ -70,17 +70,17 @@ namespace SilverSim.Main.Common.Tar
 
         public void WriteEndOfTar()
         {
-            byte[] header = new byte[512];
+            var header = new byte[512];
             if (m_Position % 512 != 0)
             {
                 m_Stream.Write(header, 0, 512 - (m_Position % 512));
-                m_Position += (512 - (m_Position % 512));
+                m_Position += 512 - (m_Position % 512);
             }
             m_Stream.Write(header, 0, 512);
             m_Stream.Flush();
         }
 
-        void WriteHeader(string filename, TarFileType fileType, int fileSize)
+        private void WriteHeader(string filename, TarFileType fileType, int fileSize)
         {
             Encoding ascii = Encoding.ASCII;
             byte[] bName = ascii.GetBytes(filename);
@@ -90,11 +90,11 @@ namespace SilverSim.Main.Common.Tar
                 WriteBytes(bName);
             }
 
-            byte[] header = new byte[512];
+            var header = new byte[512];
             if(m_Position % 512 != 0)
             {
                 m_Stream.Write(header, 0, 512 - (m_Position % 512));
-                m_Position += (512 - (m_Position % 512));
+                m_Position += 512 - (m_Position % 512);
             }
 
             Buffer.BlockCopy(bName, 0, header, 0, bName.Length > 100 ? 100 : bName.Length);
@@ -139,7 +139,7 @@ namespace SilverSim.Main.Common.Tar
             WriteBytes(header);
         }
 
-        void WriteBytes(byte[] b)
+        private void WriteBytes(byte[] b)
         {
             m_Stream.Write(b, 0, b.Length);
             m_Position += b.Length;

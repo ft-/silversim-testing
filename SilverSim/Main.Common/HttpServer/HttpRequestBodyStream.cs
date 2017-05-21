@@ -50,29 +50,19 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override long Position
         {
-            get
-            {
-                return Length - m_RemainingLength;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { return Length - m_RemainingLength; }
+
+            set { throw new NotSupportedException(); }
         }
 
-        public override int ReadTimeout 
-        { 
-            get
-            {
-                return m_Input.ReadTimeout;
-            }
-            set
-            {
-                m_Input.ReadTimeout = value;
-            }
+        public override int ReadTimeout
+        {
+            get { return m_Input.ReadTimeout; }
+
+            set { m_Input.ReadTimeout = value; }
         }
 
-        void CheckExpect100()
+        private void CheckExpect100()
         {
             if(m_Expect100Continue)
             {
@@ -81,6 +71,7 @@ namespace SilverSim.Main.Common.HttpServer
                 m_Expect100Continue = false;
             }
         }
+
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             throw new NotSupportedException();
@@ -184,6 +175,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
             throw new NotSupportedException();
         }
+
         public override void WriteByte(byte value)
         {
             throw new NotSupportedException();

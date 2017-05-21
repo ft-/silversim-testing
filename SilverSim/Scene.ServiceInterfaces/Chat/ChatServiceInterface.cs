@@ -33,20 +33,11 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
         {
             public abstract void Remove();
 
-            public abstract int Channel
-            {
-                get;
-            }
+            public abstract int Channel { get; }
 
-            public abstract Func<Vector3> GetPosition
-            {
-                get;
-            }
+            public abstract Func<Vector3> GetPosition { get; }
 
-            public abstract Func<UUID> GetUUID
-            {
-                get;
-            }
+            public abstract Func<UUID> GetUUID { get; }
 
             public virtual bool IsIgnorePosition => false;
 

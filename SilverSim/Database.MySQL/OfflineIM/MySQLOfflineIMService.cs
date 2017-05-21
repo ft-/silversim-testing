@@ -38,8 +38,8 @@ namespace SilverSim.Database.MySQL.OfflineIM
     [Description("MySQL OfflineIM Backend")]
     public class MySQLOfflineIMService : OfflineIMServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
-        static readonly ILog m_Log = LogManager.GetLogger("MYSQL OFFLINEIM SERVICE");
-        readonly string m_ConnectionString;
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL OFFLINEIM SERVICE");
+        private readonly string m_ConnectionString;
 
         public MySQLOfflineIMService(string connectionString)
         {
@@ -106,7 +106,7 @@ namespace SilverSim.Database.MySQL.OfflineIM
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("offlineim"),
             new AddColumn<ulong>("ID") { IsNullAllowed = false },
@@ -146,19 +146,19 @@ namespace SilverSim.Database.MySQL.OfflineIM
         {
             var vals = new Dictionary<string, object>
             {
-                { "ID", im.ID },
-                { "FromAgent", im.FromAgent },
-                { "FromGroup", im.FromGroup },
-                { "ToAgentID", im.ToAgent.ID },
-                { "Dialog", im.Dialog },
-                { "IsFromGroup", im.IsFromGroup },
-                { "Message", im.Message },
-                { "IMSessionID", im.IMSessionID },
-                { "Position", im.Position },
-                { "BinaryBucket", im.BinaryBucket },
-                { "ParentEstateID", im.ParentEstateID },
-                { "RegionID", im.RegionID },
-                { "Timestamp", im.Timestamp }
+                ["ID"] = im.ID,
+                ["FromAgent"] = im.FromAgent,
+                ["FromGroup"] = im.FromGroup,
+                ["ToAgentID"] = im.ToAgent.ID,
+                ["Dialog"] = im.Dialog,
+                ["IsFromGroup"] = im.IsFromGroup,
+                ["Message"] = im.Message,
+                ["IMSessionID"] = im.IMSessionID,
+                ["Position"] = im.Position,
+                ["BinaryBucket"] = im.BinaryBucket,
+                ["ParentEstateID"] = im.ParentEstateID,
+                ["RegionID"] = im.RegionID,
+                ["Timestamp"] = im.Timestamp
             };
             using (var connection = new MySqlConnection(m_ConnectionString))
             {

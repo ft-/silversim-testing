@@ -26,7 +26,6 @@ namespace SilverSim.Scene.Types.Object
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class ObjectUpdateInfo
     {
-
         private bool m_Killed;
         public uint LocalID;
         public ObjectPart Part { get; }

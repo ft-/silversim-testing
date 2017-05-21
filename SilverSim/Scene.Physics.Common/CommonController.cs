@@ -28,20 +28,11 @@ namespace SilverSim.Scene.Physics.Common
 {
     public abstract class CommonPhysicsController
     {
-        public double CombinedGravityAccelerationConstant
-        {
-            get
-            {
-                return BaseGravityAccelerationConstant + AdditionalGravityAccelerationConstant;
-            }
-        }
+        public double CombinedGravityAccelerationConstant => BaseGravityAccelerationConstant + AdditionalGravityAccelerationConstant;
         public double AdditionalGravityAccelerationConstant { get; set; }
         protected abstract double BaseGravityAccelerationConstant { get; }
 
-        protected abstract SceneInterface.LocationInfoProvider LocationInfoProvider
-        {
-            get;
-        }
+        protected abstract SceneInterface.LocationInfoProvider LocationInfoProvider { get; }
 
         public struct PositionalForce
         {
@@ -64,32 +55,25 @@ namespace SilverSim.Scene.Physics.Common
         protected PositionalForce GravityMotor(IPhysicalObject obj, Vector3 pos) =>
             new PositionalForce("GravityMotor", new Vector3(0, 0, -GravityConstant(obj)), pos);
 
-        double m_Buoyancy;
+        private double m_Buoyancy;
 
-        public double Buoyancy 
+        public double Buoyancy
         {
-            get
-            {
-                return m_Buoyancy;
-            }
+            get { return m_Buoyancy; }
 
-            set
-            {
-                m_Buoyancy = (value < 0) ? 0 : value;
-            }
+            set { m_Buoyancy = (value < 0) ? 0 : value; }
         }
-
 
         protected PositionalForce BuoyancyMotor(IPhysicalObject obj, Vector3 pos) =>
             new PositionalForce("BuoyancyMotor", new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj)), pos);
         #endregion
 
         #region Hover Motor
-        double m_HoverHeight;
-        bool m_HoverEnabled;
-        bool m_AboveWater;
-        double m_HoverTau;
-        object m_HoverParamsLock = new object();
+        private double m_HoverHeight;
+        private bool m_HoverEnabled;
+        private bool m_AboveWater;
+        private double m_HoverTau;
+        private readonly object m_HoverParamsLock = new object();
         protected PositionalForce HoverMotor(IPhysicalObject obj, Vector3 pos)
         {
             lock (m_HoverParamsLock)
@@ -136,11 +120,11 @@ namespace SilverSim.Scene.Physics.Common
         #endregion
 
         #region LookAt Motor
-        readonly object m_LookAtParamsLock = new object();
-        bool m_EnableLookAt;
-        Quaternion m_LookAtTarget;
-        double m_LookAtStrength;
-        double m_LookAtDamping;
+        private readonly object m_LookAtParamsLock = new object();
+        private bool m_EnableLookAt;
+        private Quaternion m_LookAtTarget;
+        private double m_LookAtStrength;
+        private double m_LookAtDamping;
 
         protected Vector3 LookAtMotor(IPhysicalObject obj)
         {

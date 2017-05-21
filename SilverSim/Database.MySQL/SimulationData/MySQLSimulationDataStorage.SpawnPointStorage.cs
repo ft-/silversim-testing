@@ -61,9 +61,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             cmd.ExecuteNonQuery();
                         }
 
-                        var data = new Dictionary<string, object>();
-                        data.Add("RegionID", regionID.ToString());
-
+                        var data = new Dictionary<string, object>
+                        {
+                            ["RegionID"] = regionID.ToString()
+                        };
                         foreach (Vector3 v in value)
                         {
                             data["Distance"] = v;

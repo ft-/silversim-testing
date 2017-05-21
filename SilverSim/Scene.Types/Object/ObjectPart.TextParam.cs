@@ -62,8 +62,8 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
         }
-        private readonly TextParam m_Text = new TextParam();
 
+        private readonly TextParam m_Text = new TextParam();
 
         public TextParam Text
         {

@@ -32,11 +32,11 @@ namespace SilverSim.Scene.Types.Physics
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class AgentUfoPhysics : IAgentPhysicsObject
     {
-        readonly Timer m_UfoTimer;
-        readonly IAgent m_Agent;
-        Vector3 m_ControlTargetVelocity = Vector3.Zero;
-        readonly PhysicsStateData m_StateData;
-        readonly object m_Lock = new object();
+        private readonly Timer m_UfoTimer;
+        private readonly IAgent m_Agent;
+        private Vector3 m_ControlTargetVelocity = Vector3.Zero;
+        private readonly PhysicsStateData m_StateData;
+        private readonly object m_Lock = new object();
 
         public AgentUfoPhysics(IAgent agent, UUID sceneID)
         {
@@ -54,12 +54,9 @@ namespace SilverSim.Scene.Types.Physics
             m_UfoTimer.Elapsed -= UfoTimerFunction;
         }
 
-        public bool IsAgentCollisionActive 
+        public bool IsAgentCollisionActive
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
 
             set
             {
@@ -92,7 +89,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
-        void UfoTimerFunction(object sender, ElapsedEventArgs e)
+        private void UfoTimerFunction(object sender, ElapsedEventArgs e)
         {
             Vector3 controlTarget;
             if (IsPhysicsActive)
@@ -149,18 +146,12 @@ namespace SilverSim.Scene.Types.Physics
 
         public Vector3 Force => Vector3.Zero;
 
-        public bool IsPhysicsActive
-        {
-            get;
-            set;
-        }
+        public bool IsPhysicsActive { get; set; }
 
         public bool IsPhantom
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
+
             set
             {
                 /* intentionally left empty */
@@ -169,10 +160,8 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsVolumeDetect
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
+
             set
             {
                 /* intentionally left empty */
@@ -181,30 +170,20 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool ContributesToCollisionSurfaceAsChild
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
+
             set
             {
                 /* intentionally left empty */
             }
         }
 
-        public double Mass
-        {
-            get
-            { 
-                return 2; 
-            }
-        }
+        public double Mass => 2;
 
         public double Buoyancy
         {
-            get
-            {
-                return 0f;
-            }
+            get { return 0f; }
+
             set
             {
                 /* intentionally left empty */
@@ -213,10 +192,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsRotateXEnabled
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
 
             set
             {
@@ -226,10 +202,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsRotateYEnabled
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
 
             set
             {
@@ -239,10 +212,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsRotateZEnabled
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
 
             set
             {
@@ -250,35 +220,26 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
-        public double SpeedFactor
-        {
-            get;
-            set;
-        }
+        public double SpeedFactor { get; set; }
 
         public void GroundRepel(double height, bool water, double tau)
         {
-
         }
 
         public void SetHoverHeight(double height, bool water, double tau)
         {
-
         }
 
         public void StopHover()
         {
-
         }
 
         public void SetLookAt(Quaternion q, double strength, double damping)
         {
-
         }
 
         public void StopLookAt()
         {
-
         }
     }
 }

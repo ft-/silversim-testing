@@ -28,12 +28,12 @@ namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static partial class PrimMesh
     {
-        static readonly Vector3 START_VECTOR_BOX;
+        private static readonly Vector3 START_VECTOR_BOX;
 
-        static readonly Vector3 TRAPEZOID_P0;
-        static readonly Vector3 TRAPEZOID_P1;
-        static readonly Vector3 TRAPEZOID_P2;
-        static readonly Vector3 TRAPEZOID_P3;
+        private static readonly Vector3 TRAPEZOID_P0;
+        private static readonly Vector3 TRAPEZOID_P1;
+        private static readonly Vector3 TRAPEZOID_P2;
+        private static readonly Vector3 TRAPEZOID_P3;
 
         static PrimMesh()
         {
@@ -72,6 +72,5 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             return mesh;
         }
-
     }
 }

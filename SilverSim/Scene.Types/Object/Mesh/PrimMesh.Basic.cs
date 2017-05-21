@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
     public static partial class PrimMesh
     {
         #region Box/Cylinder/Prism calculation
-        static void CalcTopSizeAndShear(ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut, out Vector3 topSize, out Vector3 shear, out double twist)
+        private static void CalcTopSizeAndShear(ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut, out Vector3 topSize, out Vector3 shear, out double twist)
         {
             twist = twistBegin.Lerp(twistEnd, cut);
             topSize = new Vector3();
@@ -57,7 +57,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             #endregion
         }
 
-        static Vector3 ApplyTortureParams(ObjectPart.PrimitiveShape.Decoded shape, Vector3 v, double twistBegin, double twistEnd, double cut)
+        private static Vector3 ApplyTortureParams(ObjectPart.PrimitiveShape.Decoded shape, Vector3 v, double twistBegin, double twistEnd, double cut)
         {
             double twist;
             Vector3 topSize;
@@ -86,7 +86,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return outvertex;
         }
 
-        static List<Vector3> ExtrudeBasic(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
+        private static List<Vector3> ExtrudeBasic(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
         {
             var extrusionPath = new List<Vector3>();
             double twist;
@@ -108,7 +108,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return extrusionPath;
         }
 
-        static MeshLOD BoxCylPrismToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static MeshLOD BoxCylPrismToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             PathDetails path;
             switch(shape.ShapeType)
@@ -156,7 +156,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return mesh;
         }
 
-        static void BuildBasicTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
+        private static void BuildBasicTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
         {
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
@@ -165,7 +165,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             int verticeRowEndCount = verticeRowCount;
             if (!shape.IsOpen && shape.IsHollow)
             {
-                verticeRowEndCount -= 1;
+                --verticeRowEndCount;
             }
 
             /* generate z-triangles */
@@ -280,7 +280,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         #endregion
 
         #region 2D Path calculation
-        static Vector3 Rotate2D_XY(this Vector3 vec, double angle)
+        private static Vector3 Rotate2D_XY(this Vector3 vec, double angle)
         {
             double sin = Math.Sin(angle);
             double cos = Math.Cos(angle);
@@ -290,7 +290,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 vec.Z);
         }
 
-        static Vector3 Rotate2D_YZ(this Vector3 vec, double angle)
+        private static Vector3 Rotate2D_YZ(this Vector3 vec, double angle)
         {
             double sin = Math.Sin(angle);
             double cos = Math.Cos(angle);
@@ -300,22 +300,22 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 vec.Y * sin + vec.Z * cos);
         }
 
-        static double CalcEquA(Vector3 v1, Vector3 v2)
+        private static double CalcEquA(Vector3 v1, Vector3 v2)
         {
             return v1.Y - v2.Y;
         }
 
-        static double CalcEquB(Vector3 v1, Vector3 v2)
+        private static double CalcEquB(Vector3 v1, Vector3 v2)
         {
             return v2.X - v1.X;
         }
-        
-        static double CalcEquD(Vector3 v1, Vector3 v2)
+
+        private static double CalcEquD(Vector3 v1, Vector3 v2)
         {
             return CalcEquA(v1, v2) * v1.X + CalcEquB(v1, v2) * v1.Y;
         }
 
-        static double CalcTriBaseAngle(Vector3 v)
+        private static double CalcTriBaseAngle(Vector3 v)
         {
             double ang = Math.Atan2(v.Y, v.X) - Math.Atan2(0.5, 0);
             while(ang < 0)
@@ -325,25 +325,25 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return ang;
         }
 
-        static readonly Vector3 TRIANGLE_P0 = Vector3.UnitX * 0.5;
-        static readonly Vector3 TRIANGLE_P1 = Vector3.UnitX.Rotate2D_XY(2.0943977032870302) * 0.5;
-        static readonly Vector3 TRIANGLE_P2 = Vector3.UnitX.Rotate2D_XY(-2.0943977032870302) * 0.5;
-        static readonly double[] TriEqu_A = new double[3] { CalcEquA(TRIANGLE_P0, TRIANGLE_P1), CalcEquA(TRIANGLE_P1, TRIANGLE_P2), CalcEquA(TRIANGLE_P2, TRIANGLE_P0) };
-        static readonly double[] TriEqu_B = new double[3] { CalcEquB(TRIANGLE_P0, TRIANGLE_P1), CalcEquB(TRIANGLE_P1, TRIANGLE_P2), CalcEquB(TRIANGLE_P2, TRIANGLE_P0) };
-        static readonly double[] TriEqu_D = new double[3] { CalcEquD(TRIANGLE_P0, TRIANGLE_P1), CalcEquD(TRIANGLE_P1, TRIANGLE_P2), CalcEquD(TRIANGLE_P2, TRIANGLE_P0) };
+        private static readonly Vector3 TRIANGLE_P0 = Vector3.UnitX * 0.5;
+        private static readonly Vector3 TRIANGLE_P1 = Vector3.UnitX.Rotate2D_XY(2.0943977032870302) * 0.5;
+        private static readonly Vector3 TRIANGLE_P2 = Vector3.UnitX.Rotate2D_XY(-2.0943977032870302) * 0.5;
+        private static readonly double[] TriEqu_A = new double[3] { CalcEquA(TRIANGLE_P0, TRIANGLE_P1), CalcEquA(TRIANGLE_P1, TRIANGLE_P2), CalcEquA(TRIANGLE_P2, TRIANGLE_P0) };
+        private static readonly double[] TriEqu_B = new double[3] { CalcEquB(TRIANGLE_P0, TRIANGLE_P1), CalcEquB(TRIANGLE_P1, TRIANGLE_P2), CalcEquB(TRIANGLE_P2, TRIANGLE_P0) };
+        private static readonly double[] TriEqu_D = new double[3] { CalcEquD(TRIANGLE_P0, TRIANGLE_P1), CalcEquD(TRIANGLE_P1, TRIANGLE_P2), CalcEquD(TRIANGLE_P2, TRIANGLE_P0) };
 
-        static readonly Vector3 TOPEDGE_SQUARE_P0 = Vector3.UnitX * 0.5 / 0.7;
-        static readonly Vector3 TOPEDGE_SQUARE_P1 = Vector3.UnitY * 0.5 / 0.7;
-        static readonly Vector3 TOPEDGE_SQUARE_P2 = -Vector3.UnitX * 0.5 / 0.7;
-        static readonly Vector3 TOPEDGE_SQUARE_P3 = -Vector3.UnitY * 0.5 / 0.7;
+        private static readonly Vector3 TOPEDGE_SQUARE_P0 = Vector3.UnitX * 0.5 / 0.7;
+        private static readonly Vector3 TOPEDGE_SQUARE_P1 = Vector3.UnitY * 0.5 / 0.7;
+        private static readonly Vector3 TOPEDGE_SQUARE_P2 = -Vector3.UnitX * 0.5 / 0.7;
+        private static readonly Vector3 TOPEDGE_SQUARE_P3 = -Vector3.UnitY * 0.5 / 0.7;
 
-        static readonly double[] TopEdgeEqu_A = new double[4] { CalcEquA(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquA(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquA(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquA(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
-        static readonly double[] TopEdgeEqu_B = new double[4] { CalcEquB(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquB(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquB(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquB(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
-        static readonly double[] TopEdgeEqu_D = new double[4] { CalcEquD(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquD(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquD(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquD(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
-        static readonly double TopEdgeAngSeg0 = Math.PI / 2;
-        static readonly double TopEdgeAngSeg2 = Math.PI * 3 / 2;
+        private static readonly double[] TopEdgeEqu_A = new double[4] { CalcEquA(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquA(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquA(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquA(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
+        private static readonly double[] TopEdgeEqu_B = new double[4] { CalcEquB(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquB(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquB(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquB(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
+        private static readonly double[] TopEdgeEqu_D = new double[4] { CalcEquD(TOPEDGE_SQUARE_P0, TOPEDGE_SQUARE_P1), CalcEquD(TOPEDGE_SQUARE_P1, TOPEDGE_SQUARE_P2), CalcEquD(TOPEDGE_SQUARE_P2, TOPEDGE_SQUARE_P3), CalcEquD(TOPEDGE_SQUARE_P3, TOPEDGE_SQUARE_P0) };
+        private static readonly double TopEdgeAngSeg0 = Math.PI / 2;
+        private static readonly double TopEdgeAngSeg2 = Math.PI * 3 / 2;
 
-        static Vector3 CalcTopEdgedSquare(double angle)
+        private static Vector3 CalcTopEdgedSquare(double angle)
         {
             Vector3 c_p3;
             double a1;
@@ -375,20 +375,19 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 d1 = TopEdgeEqu_D[3];
             }
 
-
             c_p3 = TOPEDGE_SQUARE_P0.Rotate2D_XY(angle);
             double a2 = c_p3.Y;
             double b2 = -c_p3.X;
             double d2 = a2 * c_p3.X + b2 * c_p3.Y;
 
             /* Cramer rule */
-            double div = (a1 * b2 - a2 * b1);
+            double div = a1 * b2 - a2 * b1;
             double x = (b2 * d1 - b1 * d2) / div;
             double y = (a1 * d2 - a2 * d1) / div;
             return new Vector3(x, y, 0);
         }
 
-        static Vector3 CalcTrianglePoint(double angle)
+        private static Vector3 CalcTrianglePoint(double angle)
         {
             /*                      p0 (0.5, 0.0)
              *                      /\
@@ -420,7 +419,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 d1 = TriEqu_D[2];
             }
 
-
             c_p3 = TRIANGLE_P0.Rotate2D_XY(angle);
             double a2 = c_p3.Y;
             double b2 = -c_p3.X;
@@ -433,13 +431,13 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return new Vector3(x, y, 0);
         }
 
-        sealed class PathDetails
+        private sealed class PathDetails
         {
             public List<Vector3> Vertices = new List<Vector3>();
             public bool IsOpenHollow;
         }
 
-        static Vector3 CalcPointToSquareBoundary(this Vector3 v, double scale)
+        private static Vector3 CalcPointToSquareBoundary(this Vector3 v, double scale)
         {
             double dirXabs = Math.Abs(v.X);
             double dirYabs = Math.Abs(v.Y);
@@ -448,7 +446,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 0.5 * scale / dirYabs);
         }
 
-        static void InsertAngle(List<double> angles, double angle)
+        private static void InsertAngle(List<double> angles, double angle)
         {
             int c = angles.Count;
             int i;
@@ -469,9 +467,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
         }
 
-        static readonly double[] CornerAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5 };
-        static readonly double[] PrismAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5, 2.0943977032870302, 2 * Math.PI - 2.0943977032870302 };
-        static List<double> CalcBaseAngles(this ObjectPart.PrimitiveShape.Decoded shape, double startangle, double endangle, double stepangle)
+        private static readonly double[] CornerAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5 };
+        private static readonly double[] PrismAngles = new double[] { Math.PI / 2, Math.PI, Math.PI * 1.5, 2.0943977032870302, 2 * Math.PI - 2.0943977032870302 };
+        private static List<double> CalcBaseAngles(this ObjectPart.PrimitiveShape.Decoded shape, double startangle, double endangle, double stepangle)
         {
             var angles = new List<double>();
             double genangle;
@@ -497,7 +495,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                         InsertAngle(angles, angle);
                     }
                 }
-
             }
             if (shape.ShapeType == PrimitiveShapeType.Prism)
             {
@@ -522,7 +519,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return angles;
         }
 
-        static PathDetails CalcBoxPath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static PathDetails CalcBoxPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Box has cut start at 0.5,-0.5 */
             var Path = new PathDetails();
@@ -568,7 +565,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
-                            innerDirectionalVec *= (shape.ProfileHollow);
+                            innerDirectionalVec *= shape.ProfileHollow;
                             break;
 
                         case PrimitiveProfileHollowShape.Same:
@@ -620,7 +617,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return Path;
         }
 
-        static PathDetails CalcCylinderPath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static PathDetails CalcCylinderPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Cylinder has cut start at 0,0.5 */
             var Path = new PathDetails();
@@ -664,7 +661,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                         case PrimitiveProfileHollowShape.Same:
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
-                            innerDirectionalVec *= (shape.ProfileHollow);
+                            innerDirectionalVec *= shape.ProfileHollow;
                             break;
 
                         case PrimitiveProfileHollowShape.Square:
@@ -686,7 +683,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     /* inner path is reversed */
                     Path.Vertices.Add(outerDirectionalVec);
                     Path.Vertices.Insert(0, innerDirectionalVec);
-
                 }
                 /* no center point here, even though we can have path cut */
                 Path.IsOpenHollow = shape.IsOpen;
@@ -714,7 +710,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return Path;
         }
 
-        static PathDetails CalcPrismPath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static PathDetails CalcPrismPath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Prism has cut start at 0,0.5 */
             var Path = new PathDetails();
@@ -780,7 +776,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     /* inner path is reversed */
                     Path.Vertices.Add(outerDirectionalVec);
                     Path.Vertices.Insert(0, innerDirectionalVec);
-
                 }
                 /* no center point here, even though we can have path cut */
                 Path.IsOpenHollow = shape.IsOpen;

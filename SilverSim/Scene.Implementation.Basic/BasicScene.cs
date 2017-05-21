@@ -70,16 +70,16 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal readonly RwLockedDoubleDictionary<UUID, UInt32, ObjectPart> m_Primitives = new RwLockedDoubleDictionary<UUID, UInt32, ObjectPart>();
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
-        UDPCircuitsManager m_UDPServer;
-        readonly IMServiceInterface m_IMService;
-        readonly SceneList m_Scenes;
-        readonly IMRouter m_IMRouter;
+        private UDPCircuitsManager m_UDPServer;
+        private readonly IMServiceInterface m_IMService;
+        private readonly SceneList m_Scenes;
+        private readonly IMRouter m_IMRouter;
         #endregion
 
         #region Interface wrappers
         public sealed class BasicSceneObjectsCollection : ISceneObjects
         {
-            readonly BasicScene m_Scene;
+            private readonly BasicScene m_Scene;
 
             internal BasicSceneObjectsCollection(BasicScene scene)
             {
@@ -113,7 +113,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneObjectPartsCollection : ISceneObjectParts
         {
-            readonly BasicScene m_Scene;
+            private readonly BasicScene m_Scene;
 
             internal BasicSceneObjectPartsCollection(BasicScene scene)
             {
@@ -139,8 +139,8 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneParcelsCollection : ISceneParcels
         {
-            readonly BasicScene m_Scene;
-            readonly object m_SceneUpdateLock = new object();
+            private readonly BasicScene m_Scene;
+            private readonly object m_SceneUpdateLock = new object();
 
             internal BasicSceneParcelsCollection(BasicScene scene)
             {
@@ -244,7 +244,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneAgentsCollection : ISceneAgents
         {
-            readonly BasicScene m_BasicScene;
+            private readonly BasicScene m_BasicScene;
 
             internal BasicSceneAgentsCollection(BasicScene scene)
             {
@@ -266,7 +266,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneRootAgentsCollection : ISceneAgents
         {
-            readonly BasicScene m_BasicScene;
+            private readonly BasicScene m_BasicScene;
 
             internal BasicSceneRootAgentsCollection(BasicScene scene)
             {
@@ -337,16 +337,16 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Services
-        readonly ChatServiceInterface m_ChatService;
-        readonly BasicSceneObjectsCollection m_SceneObjects;
-        readonly BasicSceneParcelsCollection m_SceneParcels;
-        readonly BasicSceneObjectPartsCollection m_SceneObjectParts;
-        readonly DefaultSceneObjectGroupInterface m_SceneObjectGroups;
-        readonly BasicSceneAgentsCollection m_SceneAgents;
-        readonly BasicSceneRootAgentsCollection m_SceneRootAgents;
-        readonly SimulationDataStorageInterface m_SimulationDataStorage;
-        readonly NeighborServiceInterface m_NeighborService;
-        readonly BaseHttpServer m_HttpServer;
+        private readonly ChatServiceInterface m_ChatService;
+        private readonly BasicSceneObjectsCollection m_SceneObjects;
+        private readonly BasicSceneParcelsCollection m_SceneParcels;
+        private readonly BasicSceneObjectPartsCollection m_SceneObjectParts;
+        private readonly DefaultSceneObjectGroupInterface m_SceneObjectGroups;
+        private readonly BasicSceneAgentsCollection m_SceneAgents;
+        private readonly BasicSceneRootAgentsCollection m_SceneRootAgents;
+        private readonly SimulationDataStorageInterface m_SimulationDataStorage;
+        private readonly NeighborServiceInterface m_NeighborService;
+        private readonly BaseHttpServer m_HttpServer;
 
         protected override object GetService(Type service)
         {
@@ -367,10 +367,7 @@ namespace SilverSim.Scene.Implementation.Basic
         protected override void SendChatPass(ListenEvent le)
         {
             ChatServiceInterface chatService = m_ChatService;
-            if (null != chatService)
-            {
-                chatService.Send(le);
-            }
+            chatService?.Send(le);
         }
 
         #endregion
@@ -385,29 +382,29 @@ namespace SilverSim.Scene.Implementation.Basic
             RegionInfo ri)
         : base(ri.Size.X, ri.Size.Y)
         {
-            m_Scenes = sceneParams.m_Scenes;
-            m_HttpServer = sceneParams.m_HttpServer;
-            if (sceneParams.m_AssetService == null)
+            m_Scenes = sceneParams.Scenes;
+            m_HttpServer = sceneParams.HttpServer;
+            if (sceneParams.AssetService == null)
             {
                 throw new ArgumentNullException("persistentAssetService");
             }
-            if (sceneParams.m_GridService == null)
+            if (sceneParams.GridService == null)
             {
                 throw new ArgumentNullException("gridService");
             }
             if (ri == null)
             {
-                throw new ArgumentNullException("ri");
+                throw new ArgumentNullException(nameof(ri));
             }
-            if (sceneParams.m_AvatarNameServices == null)
+            if (sceneParams.AvatarNameServices == null)
             {
                 throw new ArgumentNullException("avatarNameServices");
             }
-            if (sceneParams.m_SimulationDataStorage == null)
+            if (sceneParams.SimulationDataStorage == null)
             {
                 throw new ArgumentNullException("simulationDataStorage");
             }
-            if (sceneParams.m_EstateService == null)
+            if (sceneParams.EstateService == null)
             {
                 throw new ArgumentNullException("estateService");
             }
@@ -415,22 +412,22 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 throw new ArgumentNullException("capabilitiesConfig");
             }
-            if (sceneParams.m_RegionStorage == null)
+            if (sceneParams.RegionStorage == null)
             {
                 throw new ArgumentNullException("regionStorage");
             }
 
             #region Setup services
-            m_ChatService = sceneParams.m_ChatFactory.Instantiate();
-            RegionStorage = sceneParams.m_RegionStorage;
-            GroupsNameService = sceneParams.m_GroupsNameService;
-            GroupsService = sceneParams.m_GroupsService;
-            m_NeighborService = sceneParams.m_NeighborService;
-            m_SimulationDataStorage = sceneParams.m_SimulationDataStorage;
-            PersistentAssetService = sceneParams.m_AssetService;
-            TemporaryAssetService = sceneParams.m_AssetCacheService;
-            GridService = sceneParams.m_GridService;
-            EstateService = sceneParams.m_EstateService;
+            m_ChatService = sceneParams.ChatFactory.Instantiate();
+            RegionStorage = sceneParams.RegionStorage;
+            GroupsNameService = sceneParams.GroupsNameService;
+            GroupsService = sceneParams.GroupsService;
+            m_NeighborService = sceneParams.NeighborService;
+            m_SimulationDataStorage = sceneParams.SimulationDataStorage;
+            PersistentAssetService = sceneParams.AssetService;
+            TemporaryAssetService = sceneParams.AssetCacheService;
+            GridService = sceneParams.GridService;
+            EstateService = sceneParams.EstateService;
             /* next line is there to break the circular dependencies */
             TryGetScene = m_Scenes.TryGetValue;
 
@@ -451,7 +448,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ScopeID = ri.ScopeID;
             ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
-            m_ExternalHostNameService = sceneParams.m_ExternalHostNameService;
+            m_ExternalHostNameService = sceneParams.ExternalHostNameService;
             #endregion
 
             /* load estate flags cache */
@@ -467,9 +464,9 @@ namespace SilverSim.Scene.Implementation.Basic
                 throw new ArgumentException("Could not load estate data");
             }
 
-            m_RestartObject = new RestartObject(m_Scenes, this, sceneParams, sceneParams.m_RegionStorage);
-            m_IMService = sceneParams.m_IMService;
-            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, sceneParams.m_IMService, m_ChatService, this, sceneParams.m_PortControlServices);
+            m_RestartObject = new RestartObject(m_Scenes, this, sceneParams, sceneParams.RegionStorage);
+            m_IMService = sceneParams.IMService;
+            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, sceneParams.IMService, m_ChatService, this, sceneParams.PortControlServices);
             m_SceneObjects = new BasicSceneObjectsCollection(this);
             m_SceneObjectParts = new BasicSceneObjectPartsCollection(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
@@ -477,31 +474,31 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneRootAgents = new BasicSceneRootAgentsCollection(this);
             m_SceneParcels = new BasicSceneParcelsCollection(this);
             CapabilitiesConfig = sceneParams.m_CapabilitiesConfig;
-            foreach (AvatarNameServiceInterface avNameService in sceneParams.m_AvatarNameServices)
+            foreach (AvatarNameServiceInterface avNameService in sceneParams.AvatarNameServices)
             {
                 AvatarNameServices.Add(avNameService);
             }
 
             Terrain = new TerrainController(this);
-            Environment = new EnvironmentController(this, sceneParams.m_WindModelFactory);
+            Environment = new EnvironmentController(this, sceneParams.WindModelFactory);
 
-            if(null != sceneParams.m_PathfindingServiceFactory)
+            if(sceneParams.PathfindingServiceFactory != null)
             {
-                PathfindingService = sceneParams.m_PathfindingServiceFactory.Instantiate(this);
+                PathfindingService = sceneParams.PathfindingServiceFactory.Instantiate(this);
             }
 
-            m_IMRouter = sceneParams.m_IMRouter;
+            m_IMRouter = sceneParams.IMRouter;
             m_IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
 
             ScriptThreadPool = new ScriptWorkerThreadPool(50, 150, ID);
-            if(null != sceneParams.m_PhysicsFactory)
+            if(sceneParams.PhysicsFactory != null)
             {
                 try
                 {
-                    PhysicsScene = sceneParams.m_PhysicsFactory.InstantiatePhysicsScene(this);
+                    PhysicsScene = sceneParams.PhysicsFactory.InstantiatePhysicsScene(this);
                 }
                 catch
                 {
@@ -519,7 +516,7 @@ namespace SilverSim.Scene.Implementation.Basic
         }
         #endregion
 
-        void StoreEnvironmentControllerData(byte[] serializedData)
+        private void StoreEnvironmentControllerData(byte[] serializedData)
         {
             m_SimulationDataStorage.EnvironmentController[ID] = serializedData;
         }
@@ -541,8 +538,8 @@ namespace SilverSim.Scene.Implementation.Basic
             return agent.IMSend(im);
         }
 
-        SimulationDataStorageInterface.TerrainListener m_TerrainListener;
-        SimulationDataStorageInterface.SceneListener m_SceneListener;
+        private SimulationDataStorageInterface.TerrainListener m_TerrainListener;
+        private SimulationDataStorageInterface.SceneListener m_SceneListener;
 
         public override void StartStorage()
         {
@@ -555,22 +552,19 @@ namespace SilverSim.Scene.Implementation.Basic
             SceneListeners.Add(m_SceneListener);
         }
 
-        void RemoveScene(SceneInterface s)
+        private void RemoveScene(SceneInterface s)
         {
             ScriptThreadPool.Shutdown();
             Environment.OnEnvironmentControllerChangeParams -= StoreEnvironmentControllerData;
             Environment.Stop();
-            if(PathfindingService != null)
-            {
-                PathfindingService.Stop();
-            }
+            PathfindingService?.Stop();
             int serializedcount = 0;
             foreach(ObjectPart part in Primitives)
             {
                 foreach(ObjectPartInventoryItem item in part.Inventory.Values)
                 {
                     IScriptState state = item.ScriptState;
-                    if(null != state)
+                    if(state != null)
                     {
                         try
                         {
@@ -600,34 +594,31 @@ namespace SilverSim.Scene.Implementation.Basic
 
             m_RestartObject = null;
 
-            if (null != m_NeighborService)
+            if (m_NeighborService != null)
             {
                 RegionInfo rInfo = s.GetRegionInfo();
-                rInfo.Flags &= (~RegionFlags.RegionOnline);
+                rInfo.Flags &= ~RegionFlags.RegionOnline;
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
 
-            if (null != m_SceneListener)
+            if (m_SceneListener != null)
             {
                 m_SceneListener.StopStorageThread();
                 SceneListeners.Remove(m_SceneListener);
             }
 
-            if (null != m_TerrainListener)
+            if (m_TerrainListener != null)
             {
                 m_TerrainListener.StopStorageThread();
                 Terrain.TerrainListeners.Remove(m_TerrainListener);
             }
 
-            if (null != m_IMRouter)
+            if (m_IMRouter != null)
             {
                 m_IMRouter.SceneIM.Remove(IMSend);
             }
             UDPCircuitsManager udpServer = m_UDPServer;
-            if (udpServer != null)
-            {
-                udpServer.Shutdown();
-            }
+            udpServer?.Shutdown();
             m_UDPServer = null;
         }
         #endregion
@@ -635,14 +626,14 @@ namespace SilverSim.Scene.Implementation.Basic
         #region Properties
 
         public override List<ObjectUpdateInfo> UpdateInfos
-        { 
+        {
             get
             {
-                List<ObjectUpdateInfo> infos = new List<ObjectUpdateInfo>();
+                var infos = new List<ObjectUpdateInfo>();
                 foreach(IObject obj in m_Objects.Values)
                 {
-                    ObjectGroup objgrp = obj as ObjectGroup;
-                    if (null != objgrp)
+                    var objgrp = obj as ObjectGroup;
+                    if (objgrp != null)
                     {
                         foreach (ObjectPart part in objgrp.ValuesByKey1)
                         {
@@ -676,13 +667,9 @@ namespace SilverSim.Scene.Implementation.Basic
             ri.Location = location;
             GridService.RegisterRegion(ri);
             GridPosition = location;
-            
-            GridServiceInterface regionStorage = RegionStorage;
-            if (null != regionStorage)
-            {
-                regionStorage.RegisterRegion(ri);
-            }
 
+            GridServiceInterface regionStorage = RegionStorage;
+            regionStorage?.RegisterRegion(ri);
         }
 
         public override void ReregisterRegion()
@@ -690,14 +677,11 @@ namespace SilverSim.Scene.Implementation.Basic
             RegionInfo ri = GetRegionInfo();
             GridService.RegisterRegion(ri);
             GridServiceInterface regionStorage = RegionStorage;
-            if(null != regionStorage)
-            {
-                regionStorage.RegisterRegion(ri);
-            }
+            regionStorage?.RegisterRegion(ri);
             foreach (IAgent agent in Agents)
             {
-                ViewerAgent viewerAgent = agent as ViewerAgent;
-                if (null != viewerAgent)
+                var viewerAgent = agent as ViewerAgent;
+                if (viewerAgent != null)
                 {
                     SendRegionInfo(viewerAgent);
                 }
@@ -705,18 +689,18 @@ namespace SilverSim.Scene.Implementation.Basic
         }
 
         #region Restart Timer
-        RestartObject m_RestartObject;
+        private RestartObject m_RestartObject;
 
-        class RestartObject
+        private class RestartObject
         {
-            readonly WeakReference m_WeakScene;
-            readonly SceneFactory m_SceneFactory;
-            readonly GridServiceInterface m_RegionStorage;
+            private readonly WeakReference m_WeakScene;
+            private readonly SceneFactory m_SceneFactory;
+            private readonly GridServiceInterface m_RegionStorage;
             public readonly System.Timers.Timer RestartTimer = new System.Timers.Timer(1000);
-            int m_SecondsToRestart;
+            private int m_SecondsToRestart;
             public bool FirstTrigger;
-            readonly SceneList m_Scenes;
-            readonly object m_ActionLock = new object();
+            private readonly SceneList m_Scenes;
+            private readonly object m_ActionLock = new object();
             public bool Abort()
             {
                 lock(m_ActionLock)
@@ -790,7 +774,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     FirstTrigger = false;
                     foreach (IAgent agent in scene.RootAgents)
                     {
-                        agent.SendRegionNotice(scene.Owner, 
+                        agent.SendRegionNotice(scene.Owner,
                             string.Format(this.GetLanguageString(agent.CurrentCulture, "RegionIsRestartingInXSeconds", "Region is restarting in {0} seconds"), timeLeft),
                             scene.ID);
                     }
@@ -808,9 +792,7 @@ namespace SilverSim.Scene.Implementation.Basic
                         m_Log.InfoFormat("Restarting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
                         m_Scenes.Remove(scene,
                             (System.Globalization.CultureInfo culture) =>
-                            {
-                                return this.GetLanguageString(culture, "RegionIsNowRestarting", "Region is now restarting.");
-                            });
+                                this.GetLanguageString(culture, "RegionIsNowRestarting", "Region is now restarting."));
                         scene = null;
                         /* we are still alive despite having just stopped the region */
                         m_Log.InfoFormat("Starting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
@@ -824,7 +806,7 @@ namespace SilverSim.Scene.Implementation.Basic
                             return;
                         }
                         m_Scenes.Add(scene);
-                        scene.LoadSceneAsync();
+                        scene.LoadScene();
                     }
                     RestartTimer.Stop();
                 }
@@ -836,7 +818,7 @@ namespace SilverSim.Scene.Implementation.Basic
             AbortRegionRestart(false);
         }
 
-        void AbortRegionRestart(bool quietAbort)
+        private void AbortRegionRestart(bool quietAbort)
         {
             bool aborted = m_RestartObject.Abort();
             try
@@ -889,12 +871,12 @@ namespace SilverSim.Scene.Implementation.Basic
         public override void Add(IObject obj)
         {
             var objgroup = obj as ObjectGroup;
-            if (null != objgroup)
+            if (objgroup != null)
             {
                 var removeAgain = new List<ObjectPart>();
 
                 AddLegacyMaterials(objgroup);
-                
+
                 try
                 {
                     objgroup.Scene = this;
@@ -962,7 +944,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        void RemoveAllScripts(ScriptInstance instance, ObjectPart part)
+        private void RemoveAllScripts(ScriptInstance instance, ObjectPart part)
         {
             foreach (ObjectPartInventoryItem item in part.Inventory.Values)
             {
@@ -984,7 +966,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        readonly object m_ParcelUpdateLock = new object();
+        private readonly object m_ParcelUpdateLock = new object();
 
         public override bool RemoveParcel(ParcelInfo p, UUID mergeTo)
         {
@@ -992,7 +974,6 @@ namespace SilverSim.Scene.Implementation.Basic
             ParcelInfo mergeParcel;
             lock (m_ParcelUpdateLock)
             {
-
                 if (m_Parcels.TryGetValue(mergeTo, out mergeParcel))
                 {
                     removed = m_Parcels.Remove(p.ID);
@@ -1062,7 +1043,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        readonly object m_LightShareStoreLock = new object();
+        private readonly object m_LightShareStoreLock = new object();
         public override void TriggerLightShareSettingsChanged()
         {
             lock(m_LightShareStoreLock)
@@ -1106,7 +1087,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 return false;
             }
             var objgroup = obj as ObjectGroup;
-            if (null != objgroup)
+            if (objgroup != null)
             {
                 foreach (ObjectPart objpart in objgroup.Values)
                 {
@@ -1158,21 +1139,21 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Scene Loading
-        public override void LoadSceneAsync()
+        public override void LoadScene()
         {
-            if (null != m_NeighborService)
+            if (m_NeighborService != null)
             {
                 RegionInfo rInfo = GetRegionInfo();
                 rInfo.Flags |= RegionFlags.RegionOnline;
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
-            this.LoadSceneAsync(m_SimulationDataStorage);
+            this.LoadScene(m_SimulationDataStorage);
         }
 
         /** <summary>for testing purposes only</summary> */
         public override void LoadSceneSync()
         {
-            if (null != m_NeighborService)
+            if (m_NeighborService != null)
             {
                 RegionInfo rInfo = GetRegionInfo();
                 rInfo.Flags |= RegionFlags.RegionOnline;
@@ -1197,7 +1178,7 @@ namespace SilverSim.Scene.Implementation.Basic
             if(m_Agents.TryGetValue(req.AgentID, out agent))
             {
                 var viewerAgent = agent as ViewerAgent;
-                if (null != viewerAgent)
+                if (viewerAgent != null)
                 {
                     SendRegionInfo(viewerAgent);
                 }
@@ -1235,7 +1216,7 @@ namespace SilverSim.Scene.Implementation.Basic
             foreach (IAgent agent in Agents)
             {
                 var viewerAgent = agent as ViewerAgent;
-                if (null != viewerAgent)
+                if (viewerAgent != null)
                 {
                     SendRegionInfo(viewerAgent);
 
@@ -1254,7 +1235,7 @@ namespace SilverSim.Scene.Implementation.Basic
             foreach (IAgent agent in Agents)
             {
                 var viewerAgent = agent as ViewerAgent;
-                if (null != viewerAgent)
+                if (viewerAgent != null)
                 {
                     SendRegionInfo(viewerAgent);
                 }

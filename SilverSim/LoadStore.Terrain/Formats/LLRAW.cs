@@ -72,7 +72,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
         }
 
         /// <summary>Lookup table to speed up terrain exports</summary>
-        static readonly HeightmapLookupValue[] LookupHeightTable;
+        private static readonly HeightmapLookupValue[] LookupHeightTable;
 
         static LLRAW()
         {
@@ -98,7 +98,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
             }
         }
 
-        public List<LayerPatch> LoadStream(Stream input, int suggested_width, int suggested_height) => 
+        public List<LayerPatch> LoadStream(Stream input, int suggested_width, int suggested_height) =>
             input.LoadLLRawStream(suggested_width, suggested_height);
 
         public void SaveFile(string filename, List<LayerPatch> terrain)

@@ -93,14 +93,9 @@ namespace SilverSim.Main.Common.HttpServer
 
         public string this[string fieldName]
         {
-            get
-            {
-                return m_Headers[fieldName.ToLowerInvariant()];
-            }
-            set
-            {
-                m_Headers[fieldName.ToLowerInvariant()] = value;
-            }
+            get { return m_Headers[fieldName.ToLowerInvariant()]; }
+
+            set { m_Headers[fieldName.ToLowerInvariant()] = value; }
         }
 
         public bool TryGetHeader(string fieldName, out string value) => m_Headers.TryGetValue(fieldName.ToLowerInvariant(), out value);
@@ -119,10 +114,8 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 return string.Empty;
             }
-            set
-            {
-                m_Headers["content-type"] = value;
-            }
+
+            set { m_Headers["content-type"] = value; }
         }
         #endregion
 
@@ -132,7 +125,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        protected HttpRequest(string callerIP, bool isBehindProxy, bool isSsl)
+        protected HttpRequest(bool isSsl)
         {
             IsSsl = isSsl;
             Body = null;

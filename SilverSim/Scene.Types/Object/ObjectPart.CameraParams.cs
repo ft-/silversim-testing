@@ -25,9 +25,9 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        Vector3 m_CameraEyeOffset = Vector3.Zero;
-        Vector3 m_CameraAtOffset = Vector3.Zero;
-        bool m_ForceMouselook;
+        private Vector3 m_CameraEyeOffset = Vector3.Zero;
+        private Vector3 m_CameraAtOffset = Vector3.Zero;
+        private bool m_ForceMouselook;
 
         public Vector3 CameraEyeOffset
         {
@@ -69,10 +69,7 @@ namespace SilverSim.Scene.Types.Object
 
         public bool ForceMouselook
         {
-            get
-            {
-                return m_ForceMouselook;
-            }
+            get { return m_ForceMouselook; }
             set
             {
                 m_ForceMouselook = value;

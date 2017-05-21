@@ -28,9 +28,9 @@ namespace SilverSim.Http
     public class HttpWriteChunkedBodyStream : Stream
     {
         private Stream m_Output;
-        readonly byte[] StreamBuffer = new byte[10240];
+        private readonly byte[] StreamBuffer = new byte[10240];
         private int BufferFill;
-        readonly byte[] EOB = new byte[2] { (byte)'\r', (byte)'\n' };
+        private static readonly byte[] EOB = new byte[2] { (byte)'\r', (byte)'\n' };
 
         public HttpWriteChunkedBodyStream(Stream output)
         {
@@ -50,26 +50,16 @@ namespace SilverSim.Http
 
         public override long Position
         {
-            get
-            {
-                return Length;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { return Length; }
+
+            set { throw new NotSupportedException(); }
         }
 
-        public override int WriteTimeout 
+        public override int WriteTimeout
         {
-            get
-            {
-                return m_Output.WriteTimeout;
-            }
-            set
-            {
-                m_Output.WriteTimeout = value;
-            }
+            get { return m_Output.WriteTimeout; }
+
+            set { m_Output.WriteTimeout = value; }
         }
 
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
@@ -135,8 +125,8 @@ namespace SilverSim.Http
                 if(count + BufferFill >= StreamBuffer.Length)
                 {
                     Buffer.BlockCopy(buffer, offset, StreamBuffer, BufferFill, StreamBuffer.Length - BufferFill);
-                    count -= (StreamBuffer.Length - BufferFill);
-                    offset += (StreamBuffer.Length - BufferFill);
+                    count -= StreamBuffer.Length - BufferFill;
+                    offset += StreamBuffer.Length - BufferFill;
                     BufferFill = StreamBuffer.Length;
                     FlushBuffer();
                 }

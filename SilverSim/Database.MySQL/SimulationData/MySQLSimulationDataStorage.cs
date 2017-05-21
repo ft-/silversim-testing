@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IQueueStatsAccess
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
 
         #region Constructor
         public MySQLSimulationDataStorage(string connectionString)
@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
         #endregion
 
-        static readonly string[] Tables = new string[]
+        private static readonly string[] Tables = new string[]
         {
             "primitems",
             "prims",
@@ -104,7 +104,6 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public override void RemoveRegion(UUID regionID)
         {
-
             string regionIdStr = regionID.ToString();
             foreach (string table in Tables)
             {

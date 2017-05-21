@@ -31,9 +31,9 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public class MemorySimulationDataParcelAccessListStorage : ISimulationDataParcelAccessListStorageInterface
     {
-        readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>>(delegate() { return new RwLockedDictionary<UUI, ParcelAccessEntry>(); });
+        private readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>>(() => new RwLockedDictionary<UUI, ParcelAccessEntry>());
 
-        string GenParcelAccessListKey(UUID regionID, UUID parcelID) => regionID.ToString() + ":" + parcelID.ToString();
+        private string GenParcelAccessListKey(UUID regionID, UUID parcelID) => regionID.ToString() + ":" + parcelID.ToString();
 
         bool IParcelAccessList.this[UUID regionID, UUID parcelID, UUI accessor]
         {

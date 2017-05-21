@@ -30,59 +30,27 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataStorageInterface
     {
-        public abstract ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes
-        {
-            get;
-        }
+        public abstract ISimulationDataPhysicsConvexStorageInterface PhysicsConvexShapes { get; }
 
-        public abstract ISimulationDataEnvControllerStorageInterface EnvironmentController
-        {
-            get;
-        }
+        public abstract ISimulationDataEnvControllerStorageInterface EnvironmentController { get; }
 
-        public abstract ISimulationDataSpawnPointStorageInterface Spawnpoints
-        {
-            get;
-        }
+        public abstract ISimulationDataSpawnPointStorageInterface Spawnpoints { get; }
 
-        public abstract ISimulationDataLightShareStorageInterface LightShare
-        {
-            get;
-        }
+        public abstract ISimulationDataLightShareStorageInterface LightShare { get; }
 
-        public abstract ISimulationDataObjectStorageInterface Objects
-        {
-            get;
-        }
+        public abstract ISimulationDataObjectStorageInterface Objects { get; }
 
-        public abstract ISimulationDataParcelStorageInterface Parcels
-        {
-            get;
-        }
+        public abstract ISimulationDataParcelStorageInterface Parcels { get; }
 
-        public abstract ISimulationDataScriptStateStorageInterface ScriptStates
-        {
-            get;
-        }
+        public abstract ISimulationDataScriptStateStorageInterface ScriptStates { get; }
 
-        public abstract ISimulationDataTerrainStorageInterface Terrains
-        {
-            get;
-        }
+        public abstract ISimulationDataTerrainStorageInterface Terrains { get; }
 
-        public abstract ISimulationDataRegionSettingsStorageInterface RegionSettings
-        {
-            get;
-        }
+        public abstract ISimulationDataRegionSettingsStorageInterface RegionSettings { get; }
 
-        public abstract ISimulationDataEnvSettingsStorageInterface EnvironmentSettings
-        {
-            get;
-        }
-
+        public abstract ISimulationDataEnvSettingsStorageInterface EnvironmentSettings { get; }
 
         public abstract void RemoveRegion(UUID regionID);
-
 
         public abstract class SceneListener : ISceneListener
         {

@@ -31,8 +31,8 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage : ISimulationDataParcelStorageInterface
     {
-        readonly MySQLSimulationDataParcelAccessListStorage m_WhiteListStorage;
-        readonly MySQLSimulationDataParcelAccessListStorage m_BlackListStorage;
+        private readonly MySQLSimulationDataParcelAccessListStorage m_WhiteListStorage;
+        private readonly MySQLSimulationDataParcelAccessListStorage m_BlackListStorage;
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
@@ -130,11 +130,11 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         List<UUID> ISimulationDataParcelStorageInterface.ParcelsInRegion(UUID key)
         {
-            List<UUID> parcels = new List<UUID>();
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var parcels = new List<UUID>();
+            using(var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID LIKE '" + key.ToString() + "'", connection))
+                using(var cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID LIKE '" + key.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -150,76 +150,66 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         void ISimulationDataParcelStorageInterface.Store(UUID regionID, ParcelInfo parcel)
         {
-            Dictionary<string, object> p = new Dictionary<string, object>();
-            p["RegionID"] = regionID;
-            p["ParcelID"] = parcel.ID;
-            p["LocalID"] = parcel.LocalID;
-            p["Bitmap"] = parcel.LandBitmap.Data;
-            p["BitmapWidth"] = parcel.LandBitmap.BitmapWidth;
-            p["BitmapHeight"] = parcel.LandBitmap.BitmapHeight;
-            p["Name"] = parcel.Name;
-            p["Description"] = parcel.Description;
-            p["Owner"] = parcel.Owner;
-            p["IsGroupOwned"] = parcel.GroupOwned;
-            p["Area"] = parcel.Area;
-            p["AuctionID"] = parcel.AuctionID;
-            p["AuthBuyer"] = parcel.AuthBuyer;
-            p["Category"] = parcel.Category;
-            p["ClaimDate"] = parcel.ClaimDate.AsULong;
-            p["ClaimPrice"] = parcel.ClaimPrice;
-            p["Group"] = parcel.Group;
-            p["Flags"] = parcel.Flags;
-            p["LandingType"] = parcel.LandingType;
-            p["LandingPosition"] = parcel.LandingPosition;
-            p["LandingLookAt"] = parcel.LandingLookAt;
-            p["Status"] = parcel.Status;
-            p["MusicURI"] = parcel.MusicURI;
-            p["MediaURI"] = parcel.MediaURI;
-            p["MediaType"] = parcel.MediaType;
-            p["MediaWidth"] = parcel.MediaWidth;
-            p["MediaHeight"] = parcel.MediaHeight;
-            p["MediaID"] = parcel.MediaID;
-            p["SnapshotID"] = parcel.SnapshotID;
-            p["SalePrice"] = parcel.SalePrice;
-            p["OtherCleanTime"] = parcel.OtherCleanTime;
-            p["MediaAutoScale"] = parcel.MediaAutoScale;
-            p["MediaDescription"] = parcel.MediaDescription;
-            p["MediaLoop"] = parcel.MediaLoop;
-            p["ObscureMedia"] = parcel.ObscureMedia;
-            p["ObscureMusic"] = parcel.ObscureMusic;
-            p["RentPrice"] = parcel.RentPrice;
-            p["AABBMin"] = parcel.AABBMin;
-            p["AABBMax"] = parcel.AABBMax;
-            p["ParcelPrimBonus"] = parcel.ParcelPrimBonus;
-            p["PassPrice"] = parcel.PassPrice;
-            p["PassHours"] = parcel.PassHours;
-            p["ActualArea"] = parcel.ActualArea;
-            p["BillableArea"] = parcel.BillableArea;
-            p["SeeAvatars"] = parcel.SeeAvatars;
-            p["AnyAvatarSounds"] = parcel.AnyAvatarSounds;
-            p["GroupAvatarSounds"] = parcel.GroupAvatarSounds;
-            p["IsPrivate"] = parcel.IsPrivate;
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            var p = new Dictionary<string, object>
+            {
+                ["RegionID"] = regionID,
+                ["ParcelID"] = parcel.ID,
+                ["LocalID"] = parcel.LocalID,
+                ["Bitmap"] = parcel.LandBitmap.Data,
+                ["BitmapWidth"] = parcel.LandBitmap.BitmapWidth,
+                ["BitmapHeight"] = parcel.LandBitmap.BitmapHeight,
+                ["Name"] = parcel.Name,
+                ["Description"] = parcel.Description,
+                ["Owner"] = parcel.Owner,
+                ["IsGroupOwned"] = parcel.GroupOwned,
+                ["Area"] = parcel.Area,
+                ["AuctionID"] = parcel.AuctionID,
+                ["AuthBuyer"] = parcel.AuthBuyer,
+                ["Category"] = parcel.Category,
+                ["ClaimDate"] = parcel.ClaimDate.AsULong,
+                ["ClaimPrice"] = parcel.ClaimPrice,
+                ["Group"] = parcel.Group,
+                ["Flags"] = parcel.Flags,
+                ["LandingType"] = parcel.LandingType,
+                ["LandingPosition"] = parcel.LandingPosition,
+                ["LandingLookAt"] = parcel.LandingLookAt,
+                ["Status"] = parcel.Status,
+                ["MusicURI"] = parcel.MusicURI,
+                ["MediaURI"] = parcel.MediaURI,
+                ["MediaType"] = parcel.MediaType,
+                ["MediaWidth"] = parcel.MediaWidth,
+                ["MediaHeight"] = parcel.MediaHeight,
+                ["MediaID"] = parcel.MediaID,
+                ["SnapshotID"] = parcel.SnapshotID,
+                ["SalePrice"] = parcel.SalePrice,
+                ["OtherCleanTime"] = parcel.OtherCleanTime,
+                ["MediaAutoScale"] = parcel.MediaAutoScale,
+                ["MediaDescription"] = parcel.MediaDescription,
+                ["MediaLoop"] = parcel.MediaLoop,
+                ["ObscureMedia"] = parcel.ObscureMedia,
+                ["ObscureMusic"] = parcel.ObscureMusic,
+                ["RentPrice"] = parcel.RentPrice,
+                ["AABBMin"] = parcel.AABBMin,
+                ["AABBMax"] = parcel.AABBMax,
+                ["ParcelPrimBonus"] = parcel.ParcelPrimBonus,
+                ["PassPrice"] = parcel.PassPrice,
+                ["PassHours"] = parcel.PassHours,
+                ["ActualArea"] = parcel.ActualArea,
+                ["BillableArea"] = parcel.BillableArea,
+                ["SeeAvatars"] = parcel.SeeAvatars,
+                ["AnyAvatarSounds"] = parcel.AnyAvatarSounds,
+                ["GroupAvatarSounds"] = parcel.GroupAvatarSounds,
+                ["IsPrivate"] = parcel.IsPrivate
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 MySQLUtilities.ReplaceInto(connection, "parcels", p);
             }
         }
 
-        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList
-        {
-            get
-            {
-                return m_WhiteListStorage;
-            }
-        }
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList => m_WhiteListStorage;
 
-        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList
-        {
-            get
-            {
-                return m_BlackListStorage;
-            }
-        }
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList => m_BlackListStorage;
     }
 }

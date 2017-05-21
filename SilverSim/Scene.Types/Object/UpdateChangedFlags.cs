@@ -29,6 +29,7 @@ namespace SilverSim.Scene.Types.Object
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum UpdateChangedFlags : ulong
     {
+        None = 0,
         /* bits 0 - 31 are Viewer Protocol */
         Inventory = 0x001,
         Color = 0x002,

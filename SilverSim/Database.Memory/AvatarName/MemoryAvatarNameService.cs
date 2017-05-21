@@ -35,7 +35,7 @@ namespace SilverSim.Database.Memory.AvatarName
     [Description("Memory AvatarName Backend")]
     public sealed class MemoryAvatarNameService : AvatarNameServiceInterface, IPlugin
     {
-        readonly RwLockedDictionary<UUID, UUI> m_Data = new RwLockedDictionary<UUID, UUI>();
+        private readonly RwLockedDictionary<UUID, UUI> m_Data = new RwLockedDictionary<UUID, UUI>();
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)
@@ -95,7 +95,6 @@ namespace SilverSim.Database.Memory.AvatarName
         }
 
         public override bool Remove(UUID key) => m_Data.Remove(key);
-
 
         public override List<UUI> Search(string[] names)
         {

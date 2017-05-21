@@ -26,6 +26,7 @@ namespace SilverSim.Scene.Types.Object
     [Flags]
     public enum DetectedTypeFlags
     {
+        None = 0,
         Agent = 1 << 0,
         Active = 1 << 1,
         Passive = 1 << 2,

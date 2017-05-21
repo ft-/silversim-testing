@@ -68,7 +68,7 @@ namespace SilverSim.Http.Client
             DoRequest("GET", url, getValues, string.Empty, string.Empty, false, timeoutms);
 
         /*---------------------------------------------------------------------*/
-        public static string DoHeadRequest(string url, IDictionary<string, string> getvalues, int timeoutms) => 
+        public static string DoHeadRequest(string url, IDictionary<string, string> getvalues, int timeoutms) =>
             DoRequest("HEAD", url, getvalues, string.Empty, string.Empty, false, timeoutms);
 
         /*---------------------------------------------------------------------*/

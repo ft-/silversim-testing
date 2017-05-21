@@ -28,7 +28,7 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateRegionMapServiceInterface
     {
-        readonly RwLockedDictionaryAutoAdd<uint, RwLockedList<UUID>> m_RegionMapData = new RwLockedDictionaryAutoAdd<uint, RwLockedList<UUID>>(delegate () { return new RwLockedList<UUID>(); });
+        private readonly RwLockedDictionaryAutoAdd<uint, RwLockedList<UUID>> m_RegionMapData = new RwLockedDictionaryAutoAdd<uint, RwLockedList<UUID>>(() => new RwLockedList<UUID>());
 
         List<UUID> IEstateRegionMapServiceInterface.this[uint estateID]
         {

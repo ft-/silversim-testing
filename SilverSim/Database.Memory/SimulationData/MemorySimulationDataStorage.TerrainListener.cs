@@ -30,8 +30,8 @@ namespace SilverSim.Database.Memory.SimulationData
     {
         public class MemoryTerrainListener : TerrainListener
         {
-            readonly UUID m_RegionID;
-            readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>> m_Data;
+            private readonly UUID m_RegionID;
+            private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>> m_Data;
 
             public MemoryTerrainListener(RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>> data, UUID regionID)
             {

@@ -41,9 +41,9 @@ namespace SilverSim.Database.MySQL.Grid
     {
         private bool IsDeleteOnUnregister;
         private bool AllowDuplicateRegionNames;
-        readonly RwLockedDictionary<UUID, RegionInfo> m_Data = new RwLockedDictionary<UUID, RegionInfo>();
-        readonly bool m_UseRegionDefaultServices;
-        List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
+        private readonly RwLockedDictionary<UUID, RegionInfo> m_Data = new RwLockedDictionary<UUID, RegionInfo>();
+        private readonly bool m_UseRegionDefaultServices;
+        private List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
 
         public void TriggerParameterUpdated(UUID regionid, string parameter, string value)
         {
@@ -63,7 +63,6 @@ namespace SilverSim.Database.MySQL.Grid
                         break;
                 }
             }
-            
         }
 
         #region Constructor
@@ -275,7 +274,7 @@ namespace SilverSim.Database.MySQL.Grid
             {
                 /* we handoff most stuff to mysql here */
                 /* first line deletes only when region is not persistent */
-                m_Data.RemoveIf(regionID, delegate (RegionInfo regInfo) { return (scopeID == UUID.Zero || regInfo.ScopeID == scopeID) && (regInfo.Flags & RegionFlags.Persistent) == 0; });
+                m_Data.RemoveIf(regionID, (RegionInfo regInfo) => (scopeID == UUID.Zero || regInfo.ScopeID == scopeID) && (regInfo.Flags & RegionFlags.Persistent) == 0);
 
                 /* second step is to set it offline when it is persistent */
             }
@@ -289,13 +288,13 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override void DeleteRegion(UUID scopeID, UUID regionID)
         {
-            m_Data.RemoveIf(regionID, delegate (RegionInfo rInfo) { return scopeID == UUID.Zero || rInfo.ScopeID == scopeID; });
+            m_Data.RemoveIf(regionID, (RegionInfo rInfo) => scopeID == UUID.Zero || rInfo.ScopeID == scopeID);
         }
 
         #endregion
 
         #region List accessors
-        List<RegionInfo> GetRegionsByFlag(UUID scopeID, RegionFlags flags)
+        private List<RegionInfo> GetRegionsByFlag(UUID scopeID, RegionFlags flags)
         {
             var res = from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && (region.Flags & flags) != 0 select new RegionInfo(region);
             return new List<RegionInfo>(res);
@@ -316,7 +315,7 @@ namespace SilverSim.Database.MySQL.Grid
         public override List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max)
         {
             var res = from region in m_Data.Values
-                                          where 
+                                          where
                                           ((region.Location.X >= min.X && region.Location.Y >= min.Y && region.Location.X <= max.X && region.Location.Y <= max.Y) ||
                                           (region.Location.X + region.Size.X >= min.X && region.Location.Y + region.Size.Y >= min.Y && region.Location.X + region.Size.X <= max.X && region.Location.Y + region.Size.Y <= max.Y) ||
                                           (region.Location.X >= min.X && region.Location.Y >= min.Y && region.Location.X + region.Size.X > min.Y && region.Location.Y + region.Size.Y > min.Y) ||
@@ -325,7 +324,6 @@ namespace SilverSim.Database.MySQL.Grid
                                           &&
              (scopeID == UUID.Zero || scopeID == region.ScopeID)
                                           select new RegionInfo(region);
-
 
             return new List<RegionInfo>(res);
         }

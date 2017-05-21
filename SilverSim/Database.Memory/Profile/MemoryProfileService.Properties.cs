@@ -29,8 +29,8 @@ namespace SilverSim.Database.Memory.Profile
 {
     partial class MemoryProfileService : ProfileServiceInterface.IPropertiesInterface
     {
-        readonly Dictionary<UUID, ProfileProperties> m_Properties = new Dictionary<UUID, ProfileProperties>();
-        readonly ReaderWriterLock m_PropertiesLock = new ReaderWriterLock();
+        private readonly Dictionary<UUID, ProfileProperties> m_Properties = new Dictionary<UUID, ProfileProperties>();
+        private readonly ReaderWriterLock m_PropertiesLock = new ReaderWriterLock();
         public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
         {
             set

@@ -26,7 +26,7 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectGroup
     {
-        readonly object m_LinkUnlinkLock = new object();
+        private readonly object m_LinkUnlinkLock = new object();
         public bool TryUnlink(UUID primID, out ObjectPart part)
         {
             part = null;
@@ -41,7 +41,6 @@ namespace SilverSim.Scene.Types.Object
 
                     if (part.LinkNumber == LINK_ROOT)
                     {
-
                     }
                     else
                     {

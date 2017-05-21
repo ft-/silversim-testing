@@ -31,8 +31,8 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public class MySQLSimulationDataParcelAccessListStorage : ISimulationDataParcelAccessListStorageInterface
     {
-        readonly string m_ConnectionString;
-        readonly string m_TableName;
+        private readonly string m_ConnectionString;
+        private readonly string m_TableName;
 
         public MySQLSimulationDataParcelAccessListStorage(string connectionString, string tableName)
         {

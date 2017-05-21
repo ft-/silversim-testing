@@ -26,10 +26,10 @@ using SilverSim.Types;
 
 namespace SilverSim.Scene.Chat
 {
-    sealed class ChannelInfo
+    internal sealed class ChannelInfo
     {
         public readonly RwLockedList<ChatServiceInterface.Listener> Listeners = new RwLockedList<ChatServiceInterface.Listener>();
-        readonly ChatHandler m_Handler;
+        private readonly ChatHandler m_Handler;
 
         public ChannelInfo(ChatHandler handler)
         {
@@ -42,9 +42,9 @@ namespace SilverSim.Scene.Chat
             double shoutDistanceSquared = m_Handler.ShoutDistance * m_Handler.ShoutDistance;
             double whisperDistanceSquared = m_Handler.WhisperDistance * m_Handler.WhisperDistance;
 
-            Listeners.ForEach(delegate(ChatServiceInterface.Listener listener)
+            Listeners.ForEach((ChatServiceInterface.Listener listener) =>
             {
-                switch(ev.Type)
+                switch (ev.Type)
                 {
                     case ListenEvent.ChatType.Region:
                     case ListenEvent.ChatType.DebugChannel:
@@ -98,7 +98,7 @@ namespace SilverSim.Scene.Chat
                         break;
 
                     case ListenEvent.ChatType.OwnerSay:
-                        if(listener.GetUUID().Equals(ev.TargetID))
+                        if (listener.GetUUID().Equals(ev.TargetID))
                         {
                             listener.Send(ev);
                         }
@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Chat
 
                     case ListenEvent.ChatType.StartTyping:
                     case ListenEvent.ChatType.StopTyping:
-                        if(!listener.IsAgent)
+                        if (!listener.IsAgent)
                         {
                             /* listener is not an agent, so no typing messages */
                         }

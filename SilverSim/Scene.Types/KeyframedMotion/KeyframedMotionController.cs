@@ -30,12 +30,12 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 {
     public class KeyframedMotionController : IDisposable
     {
-        const double KEYFRAME_TIME_STEP = 1f / 45;
-        readonly Timer m_KeyframeTimer = new Timer(KEYFRAME_TIME_STEP);
-        readonly object m_KeyframeLock = new object();
-        KeyframedMotion m_Program = new KeyframedMotion();
+        private const double KEYFRAME_TIME_STEP = 1f / 45;
+        private readonly Timer m_KeyframeTimer = new Timer(KEYFRAME_TIME_STEP);
+        private readonly object m_KeyframeLock = new object();
+        private KeyframedMotion m_Program = new KeyframedMotion();
 
-        public ObjectGroup ObjectGroup { get; private set; }
+        public ObjectGroup ObjectGroup { get; }
 
         public KeyframedMotion Program
         {
@@ -72,7 +72,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             m_KeyframeTimer.Elapsed -= KeyframeTimer;
             m_KeyframeTimer.Dispose();
         }
-        
+
         #region Normal controls
         public void Play()
         {
@@ -126,7 +126,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         }
         #endregion
 
-        void KeyframeTimer(object o, ElapsedEventArgs args)
+        private void KeyframeTimer(object o, ElapsedEventArgs args)
         {
             var scene = ObjectGroup.Scene;
             if(!scene.IsKeyframedMotionEnabled)

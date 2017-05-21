@@ -36,7 +36,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("groups"),
             new AddColumn<UUID>("GroupID") { IsNullAllowed = false },

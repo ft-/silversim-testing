@@ -39,7 +39,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
     public class MySQLAuthInfoService : AuthInfoServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AUTHINFO SERVICE");
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
 
         public MySQLAuthInfoService(string connectionString)
         {
@@ -51,8 +51,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
             /* intentionally left empty */
         }
 
-
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("auth"),
             new AddColumn<UUID>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -93,7 +92,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate ()
+                connection.InsideTransaction(() =>
                 {
                     using (var cmd = new MySqlCommand("DELETE FROM auth WHERE UserID LIKE ?id", connection))
                     {
@@ -139,10 +138,12 @@ namespace SilverSim.Database.MySQL.AuthInfo
 
         public override void Store(UserAuthInfo info)
         {
-            var vals = new Dictionary<string, object>();
-            vals.Add("UserID", info.ID);
-            vals.Add("PasswordHash", info.PasswordHash);
-            vals.Add("PasswordSalt", info.PasswordSalt);
+            var vals = new Dictionary<string, object>
+            {
+                ["UserID"] = info.ID,
+                ["PasswordHash"] = info.PasswordHash,
+                ["PasswordSalt"] = info.PasswordSalt
+            };
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
@@ -159,8 +160,8 @@ namespace SilverSim.Database.MySQL.AuthInfo
             };
             var vals = new Dictionary<string, object>
             {
-                { "PasswordHash", ai.PasswordHash },
-                { "PasswordSalt", ai.PasswordSalt }
+                ["PasswordHash"] = ai.PasswordHash,
+                ["PasswordSalt"] = ai.PasswordSalt
             };
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
@@ -172,12 +173,14 @@ namespace SilverSim.Database.MySQL.AuthInfo
         public override UUID AddToken(UUID principalId, UUID sessionid, int lifetime_in_minutes)
         {
             UUID secureSessionID = UUID.Random;
-            var vals = new Dictionary<string, object>();
-            vals.Add("UserID", principalId);
-            vals.Add("SessionID", sessionid);
-            vals.Add("Token", secureSessionID);
             ulong d = Date.Now.AsULong + (ulong)lifetime_in_minutes * 30;
-            vals.Add("Validity", Date.UnixTimeToDateTime(d));
+            var vals = new Dictionary<string, object>
+            {
+                ["UserID"] = principalId,
+                ["SessionID"] = sessionid,
+                ["Token"] = secureSessionID,
+                ["Validity"] = Date.UnixTimeToDateTime(d)
+            };
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();

@@ -33,12 +33,12 @@ namespace SilverSim.Database.Memory.Maptile
     [Description("Memory Maptile Backend")]
     public class MemoryMaptileService : MaptileServiceInterface, IPlugin
     {
-        readonly RwLockedDictionary<string, MaptileData> m_Maptiles = new RwLockedDictionary<string, MaptileData>();
+        private readonly RwLockedDictionary<string, MaptileData> m_Maptiles = new RwLockedDictionary<string, MaptileData>();
 
-        static string GetKey(UUID scopeid, GridVector loc, int zoomlevel) =>
+        private static string GetKey(UUID scopeid, GridVector loc, int zoomlevel) =>
             string.Format("{0}-{1}-{2}-{3}", scopeid.ToString(), loc.X, loc.Y, zoomlevel);
 
-        static string GetKey(MaptileData data) =>
+        private static string GetKey(MaptileData data) =>
             GetKey(data.ScopeID, data.Location, data.ZoomLevel);
 
         public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
@@ -61,9 +61,10 @@ namespace SilverSim.Database.Memory.Maptile
 
         public override void Store(MaptileData data)
         {
-            var ndata = new MaptileData(data);
-            ndata.LastUpdate = Date.Now;
-            m_Maptiles[GetKey(data)] = ndata;
+            m_Maptiles[GetKey(data)] = new MaptileData(data)
+            {
+                LastUpdate = Date.Now
+            };
         }
 
         public override bool Remove(UUID scopeid, GridVector location, int zoomlevel) =>

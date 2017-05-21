@@ -34,14 +34,14 @@ namespace SilverSim.Main.Common
     partial class ConfigurationLoader
     {
         #region Load Server Params
-        void LoadServerParamsForPlugin(string name, IPlugin instance, Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults)
+        private void LoadServerParamsForPlugin(string name, IPlugin instance, Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults)
         {
             ServerParamServiceInterface serverParams = GetServerParamStorage();
             Type instanceType = instance.GetType();
-            ServerParamStartsWithAttribute[] startswithattrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamStartsWithAttribute)) as ServerParamStartsWithAttribute[];
+            var startswithattrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamStartsWithAttribute)) as ServerParamStartsWithAttribute[];
             if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)) && startswithattrs.Length != 0)
             {
-                IServerParamAnyListener listener = (IServerParamAnyListener)instance;
+                var listener = (IServerParamAnyListener)instance;
 #if DEBUG
                 m_Log.DebugFormat("Processing {0} for start with server params", name);
 #endif
@@ -70,7 +70,6 @@ namespace SilverSim.Main.Common
 #endif
                     serverParams.StartsWithServerParamListeners[attr.ParameterNameStartsWith].Add((IServerParamAnyListener)instance);
                 }
-
             }
 
             if (instanceType.GetInterfaces().Contains(typeof(IServerParamListener)))
@@ -165,7 +164,7 @@ namespace SilverSim.Main.Common
         #endregion
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void GetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void GetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help" || args.Count < 3 || args.Count > 4)
             {
@@ -211,7 +210,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void SetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void SetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help" || args.Count < 4 || args.Count > 5)
             {
@@ -256,10 +255,10 @@ namespace SilverSim.Main.Common
             }
         }
 
-        void ShowServerParamsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ShowServerParamsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            StringBuilder sb = new StringBuilder();
-            Dictionary<string, ServerParamAttribute> resList = new Dictionary<string, ServerParamAttribute>();
+            var sb = new StringBuilder();
+            var resList = new Dictionary<string, ServerParamAttribute>();
 
             foreach (KeyValuePair<string, ServerParamAttribute> kvp in ServerParams)
             {
@@ -282,8 +281,8 @@ namespace SilverSim.Main.Common
             io.Write(sb.ToString());
         }
 
-        Dictionary<string, ServerParamAttribute> m_KnownServerParams;
-        object m_KnownServerParamsLock = new object();
+        private Dictionary<string, ServerParamAttribute> m_KnownServerParams;
+        private readonly object m_KnownServerParamsLock = new object();
 
         public IReadOnlyDictionary<string, ServerParamAttribute> ServerParams
         {
@@ -299,8 +298,7 @@ namespace SilverSim.Main.Common
                             foreach (SceneInterface scene in Scenes.Values)
                             {
                                 Type instanceType = scene.GetType();
-                                ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
-                                foreach (ServerParamAttribute attr in attrs)
+                                foreach (ServerParamAttribute attr in (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)))
                                 {
                                     if (!m_KnownServerParams.ContainsKey(attr.ParameterName))
                                     {
@@ -312,8 +310,7 @@ namespace SilverSim.Main.Common
                             foreach (IServerParamListener listener in GetServicesByValue<IServerParamListener>())
                             {
                                 Type instanceType = listener.GetType();
-                                ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
-                                foreach (ServerParamAttribute attr in attrs)
+                                foreach (ServerParamAttribute attr in (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)))
                                 {
                                     ServerParamAttribute paraType;
                                     if (!m_KnownServerParams.TryGetValue(attr.ParameterName, out paraType) || paraType.Type == ServerParamType.GlobalOnly)
@@ -324,7 +321,7 @@ namespace SilverSim.Main.Common
 
                                 if (instanceType.GetInterfaces().Contains(typeof(IServerParamAnyListener)))
                                 {
-                                    IServerParamAnyListener anyListener = (IServerParamAnyListener)listener;
+                                    var anyListener = (IServerParamAnyListener)listener;
                                     foreach (KeyValuePair<string, ServerParamAttribute> kvp in anyListener.ServerParams)
                                     {
                                         ServerParamAttribute paraType;
@@ -351,18 +348,15 @@ namespace SilverSim.Main.Common
                 foreach (SceneInterface scene in Scenes.Values)
                 {
                     Type instanceType = scene.GetType();
-                    ServerParamAttribute[] attrs = (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute));
-                    foreach (ServerParamAttribute attr in attrs)
+                    foreach (ServerParamAttribute attr in (ServerParamAttribute[])Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)))
                     {
                         if (attr.ParameterName == parametername &&
                             !serverParams.Contains(regionID, parametername))
                         {
                             bool foundSpecific = false;
-                            MethodInfo[] mis = instanceType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                            foreach (MethodInfo mi in mis)
+                            foreach (MethodInfo mi in instanceType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
                             {
-                                ServerParamAttribute[] mi_attrs = Attribute.GetCustomAttributes(mi, typeof(ServerParamAttribute)) as ServerParamAttribute[];
-                                foreach (ServerParamAttribute mi_attr in mi_attrs)
+                                foreach (ServerParamAttribute mi_attr in Attribute.GetCustomAttributes(mi, typeof(ServerParamAttribute)) as ServerParamAttribute[])
                                 {
                                     if (mi_attr.ParameterName == parametername)
                                     {
@@ -475,14 +469,13 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Load region scene params
-        void LoadParamsOnAddedScene(SceneInterface scene)
+        private void LoadParamsOnAddedScene(SceneInterface scene)
         {
             ServerParamServiceInterface serverParams = GetServerParamStorage();
-            Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
+            var cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
             Type instanceType = scene.GetType();
 
-            ServerParamAttribute[] attrs = Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[];
-            foreach (ServerParamAttribute attr in attrs)
+            foreach (ServerParamAttribute attr in Attribute.GetCustomAttributes(instanceType, typeof(ServerParamAttribute)) as ServerParamAttribute[])
             {
                 string parameterName = attr.ParameterName;
                 List<KeyValuePair<UUID, string>> result;

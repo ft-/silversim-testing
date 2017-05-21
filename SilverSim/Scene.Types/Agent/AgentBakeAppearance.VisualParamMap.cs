@@ -42,7 +42,7 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        static readonly VisualParamMap[] m_VisualParamMapping = new VisualParamMap[]
+        private static readonly VisualParamMap[] m_VisualParamMapping = new VisualParamMap[]
         {
             new VisualParamMap(1, -0.3f, -0.3f, 2f),
             new VisualParamMap(2, -0.8f, -0.8f, 2.5f),

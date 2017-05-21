@@ -33,9 +33,9 @@ namespace SilverSim.Scene.Types.Agent
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class AgentAnimationController
     {
-        static ILog m_Log = LogManager.GetLogger("AGENT ANIMATION");
+        private static readonly ILog m_Log = LogManager.GetLogger("AGENT ANIMATION");
 
-        static readonly string[] m_AnimStates = new string[] {
+        private static readonly string[] m_AnimStates = new string[] {
             "crouching",
             "crouchwalking",
             "falling down",
@@ -60,14 +60,14 @@ namespace SilverSim.Scene.Types.Agent
             "walking"
         };
 
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
         public readonly Dictionary<string, UUID> m_AnimationOverride = new Dictionary<string, UUID>();
         public static readonly Dictionary<string, UUID> m_DefaultAnimationOverride = new Dictionary<string, UUID>();
 
-        string m_CurrentDefaultAnimation = "standing";
-        uint m_NextAnimSeqNumber;
+        private string m_CurrentDefaultAnimation = "standing";
+        private uint m_NextAnimSeqNumber;
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-        struct AnimationInfo
+        private struct AnimationInfo
         {
             public UUID AnimID;
             public UUID SourceID;
@@ -81,9 +81,9 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        readonly List<AnimationInfo> m_ActiveAnimations = new List<AnimationInfo>();
-        readonly UUID m_AgentID;
-        readonly Action<AvatarAnimation> m_SendAnimations;
+        private readonly List<AnimationInfo> m_ActiveAnimations = new List<AnimationInfo>();
+        private readonly UUID m_AgentID;
+        private readonly Action<AvatarAnimation> m_SendAnimations;
 
         public AgentAnimationController(UUID agentID, Action<AvatarAnimation> del)
         {
@@ -125,8 +125,10 @@ namespace SilverSim.Scene.Types.Agent
 
         public void SendAnimations()
         {
-            var m = new AvatarAnimation();
-            m.Sender = m_AgentID;
+            var m = new AvatarAnimation()
+            {
+                Sender = m_AgentID
+            };
             lock (m_Lock)
             {
                 foreach (var ai in m_ActiveAnimations)
@@ -181,7 +183,7 @@ namespace SilverSim.Scene.Types.Agent
                     }
                 }
             }
-            else if (m_AnimStates.Contains<string>(anim_state))
+            else if (m_AnimStates.Contains(anim_state))
             {
                 lock (m_Lock)
                 {
@@ -200,7 +202,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public void SetAnimationOverride(string anim_state, UUID anim_id)
         {
-            if (m_AnimStates.Contains<string>(anim_state))
+            if (m_AnimStates.Contains(anim_state))
             {
                 lock (m_Lock)
                 {

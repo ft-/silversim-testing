@@ -42,12 +42,12 @@ namespace SilverSim.Main.Cmd.Estate
     [Description("Estate Console Commands")]
     public class EstateCommands : IPlugin
     {
-        readonly string m_RegionStorageName;
-        readonly string m_EstateServiceName;
-        GridServiceInterface m_RegionStorage;
-        EstateServiceInterface m_EstateService;
-        AggregatingAvatarNameService m_AvatarNameService;
-        SceneList m_Scenes;
+        private readonly string m_RegionStorageName;
+        private readonly string m_EstateServiceName;
+        private GridServiceInterface m_RegionStorage;
+        private EstateServiceInterface m_EstateService;
+        private AggregatingAvatarNameService m_AvatarNameService;
+        private SceneList m_Scenes;
 
         public EstateCommands(string regionStorageName, string estateServiceName)
         {
@@ -68,7 +68,7 @@ namespace SilverSim.Main.Cmd.Estate
 
             var avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
-            if(null != sceneConfig)
+            if(sceneConfig != null)
             {
                 string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
                 if (!string.IsNullOrEmpty(avatarNameServices))
@@ -82,7 +82,7 @@ namespace SilverSim.Main.Cmd.Estate
             m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServicesList);
         }
 
-        UUI ResolveName(UUI uui)
+        private UUI ResolveName(UUI uui)
         {
             UUI resultUui;
             if (m_AvatarNameService.TryGetValue(uui, out resultUui))
@@ -103,7 +103,6 @@ namespace SilverSim.Main.Cmd.Estate
             }
 
             estates = m_EstateService.All;
-
 
             var output = new StringBuilder("Estate List:\n----------------------------------------------");
             foreach (EstateInfo estateInfo in estates)
@@ -252,12 +251,13 @@ namespace SilverSim.Main.Cmd.Estate
             }
             else
             {
-                estateInfo = new EstateInfo();
-                estateInfo.ID = estateID;
-                estateInfo.Name = args[2];
-                estateInfo.PricePerMeter = 1;
-                estateInfo.BillableFactor = 1;
-
+                estateInfo = new EstateInfo()
+                {
+                    ID = estateID,
+                    Name = args[2],
+                    PricePerMeter = 1,
+                    BillableFactor = 1
+                };
                 for (int argi = 4; argi + 1 < args.Count; argi += 2)
                 {
                     switch (args[argi].ToLower())

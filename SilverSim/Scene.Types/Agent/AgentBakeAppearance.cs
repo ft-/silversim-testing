@@ -44,7 +44,7 @@ namespace SilverSim.Scene.Types.Agent
     {
         private static readonly ILog m_BakeLog = LogManager.GetLogger("AVATAR BAKING");
 
-        enum BakeType
+        private enum BakeType
         {
             Head,
             UpperBody,
@@ -54,7 +54,7 @@ namespace SilverSim.Scene.Types.Agent
             Hair
         }
 
-        class OutfitItem
+        private class OutfitItem
         {
             public InventoryItem ActualItem;
             public Wearable WearableData;
@@ -65,7 +65,7 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        class BakeStatus : IDisposable
+        private class BakeStatus : IDisposable
         {
             public readonly Dictionary<UUID, OutfitItem> OutfitItems = new Dictionary<UUID, OutfitItem>();
             public readonly Dictionary<UUID, Image> Textures = new Dictionary<UUID, Image>();
@@ -149,7 +149,7 @@ namespace SilverSim.Scene.Types.Agent
         }
 
         #region Get Current Outfit
-        static int LinkDescriptionToInt(string desc)
+        private static int LinkDescriptionToInt(string desc)
         {
             int res = 0;
             if(desc.StartsWith("@") && int.TryParse(desc.Substring(1), out res))
@@ -159,7 +159,7 @@ namespace SilverSim.Scene.Types.Agent
             return 0;
         }
 
-        static byte DoubleToByte(double val, double min, double max)
+        private static byte DoubleToByte(double val, double min, double max)
         {
             if(val < min)
             {
@@ -178,27 +178,18 @@ namespace SilverSim.Scene.Types.Agent
             var inventoryService = agent.InventoryService;
             var assetService = agent.AssetService;
 
-            if (null != logOutput)
-            {
-                logOutput.Invoke(string.Format("Baking agent {0}", agent.Owner.FullName));
-            }
+            logOutput?.Invoke(string.Format("Baking agent {0}", agent.Owner.FullName));
             if (agent.CurrentOutfitFolder == UUID.Zero)
             {
                 var currentOutfitFolder = inventoryService.Folder[agentOwner.ID, AssetType.CurrentOutfitFolder];
                 agent.CurrentOutfitFolder = currentOutfitFolder.ID;
-                if (null != logOutput)
-                {
-                    logOutput.Invoke(string.Format("Retrieved current outfit folder for agent {0}", agent.Owner.FullName));
-                }
+                logOutput?.Invoke(string.Format("Retrieved current outfit folder for agent {0}", agent.Owner.FullName));
             }
 
             var currentOutfit = inventoryService.Folder.Content[agentOwner.ID, agent.CurrentOutfitFolder];
             if (currentOutfit.Version == agent.Appearance.Serial && !rebake)
             {
-                if (null != logOutput)
-                {
-                    logOutput.Invoke(string.Format("No baking required for agent {0}", agent.Owner.FullName));
-                }
+                logOutput?.Invoke(string.Format("No baking required for agent {0}", agent.Owner.FullName));
                 return;
             }
 
@@ -225,10 +216,7 @@ namespace SilverSim.Scene.Types.Agent
                 actualItemsInDict.Add(item.ID, item);
             }
 
-            if (null != logOutput)
-            {
-                logOutput.Invoke(string.Format("Processing assets for baking agent {0}", agent.Owner.FullName));
-            }
+            logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", agent.Owner.FullName));
 
             foreach (var linkItem in items)
             {
@@ -268,24 +256,16 @@ namespace SilverSim.Scene.Types.Agent
 
             agent.Wearables.All = wearables;
 
-            if (null != logOutput)
-            {
-                logOutput.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
-            }
+            logOutput?.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
 
             agent.BakeAppearanceFromWearablesInfo(sceneAssetService, logOutput);
 
-            if (null != logOutput)
-            {
-                logOutput.Invoke(string.Format("Baking agent {0} completed", agent.Owner.FullName));
-            }
-
-            
+            logOutput?.Invoke(string.Format("Baking agent {0} completed", agent.Owner.FullName));
         }
         #endregion
 
         #region Actual Baking Code
-        const int MAX_WEARABLES_PER_TYPE = 5;
+        private const int MAX_WEARABLES_PER_TYPE = 5;
 
         public static void BakeAppearanceFromWearablesInfo(this IAgent agent, AssetServiceInterface sceneAssetService, Action<string> logOutput = null)
         {
@@ -426,7 +406,7 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        static void AddAlpha(Bitmap bmp, Image inp)
+        private static void AddAlpha(Bitmap bmp, Image inp)
         {
             Bitmap bmpin = null;
             try
@@ -459,14 +439,11 @@ namespace SilverSim.Scene.Types.Agent
             }
             finally
             {
-                if (null != bmpin)
-                {
-                    bmpin.Dispose();
-                }
+                bmpin?.Dispose();
             }
         }
 
-        static void MultiplyLayerFromAlpha(Bitmap bmp, Image inp)
+        private static void MultiplyLayerFromAlpha(Bitmap bmp, Image inp)
         {
             Bitmap bmpin = null;
             try
@@ -499,14 +476,11 @@ namespace SilverSim.Scene.Types.Agent
             }
             finally
             {
-                if (null != bmpin)
-                {
-                    bmpin.Dispose();
-                }
+                bmpin?.Dispose();
             }
         }
 
-        static System.Drawing.Color GetTint(Wearable w, BakeType bType)
+        private static System.Drawing.Color GetTint(Wearable w, BakeType bType)
         {
             var wColor = new SilverSim.Types.Color(1, 1, 1);
             double val;
@@ -632,7 +606,7 @@ namespace SilverSim.Scene.Types.Agent
             return System.Drawing.Color.FromArgb(wColor.R_AsByte, wColor.G_AsByte, wColor.B_AsByte);
         }
 
-        static void ApplyTint(Bitmap bmp, SilverSim.Types.Color col)
+        private static void ApplyTint(Bitmap bmp, SilverSim.Types.Color col)
         {
             int x;
             int y;
@@ -650,7 +624,7 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        static AssetData BakeTexture(BakeStatus status, BakeType bake, AssetServiceInterface sceneAssetService)
+        private static AssetData BakeTexture(BakeStatus status, BakeType bake, AssetServiceInterface sceneAssetService)
         {
             int bakeDimensions = (bake == BakeType.Eyes) ? 128 : 512;
             Image srcimg;
@@ -695,7 +669,7 @@ namespace SilverSim.Scene.Types.Agent
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException("bake");
+                    throw new ArgumentOutOfRangeException(nameof(bake));
             }
 
             using (var bitmap = new Bitmap(bakeDimensions, bakeDimensions, PixelFormat.Format32bppArgb))
@@ -748,7 +722,7 @@ namespace SilverSim.Scene.Types.Agent
                         {
                             UUID texture;
                             Image img;
-                            if ((null != item.WearableData && item.WearableData.Textures.TryGetValue(texIndex, out texture)) &&
+                            if ((item.WearableData != null && item.WearableData.Textures.TryGetValue(texIndex, out texture)) &&
                                 status.TryGetTexture(bake, texture, out img))
                             {
                                 /* duplicate texture */
@@ -781,14 +755,14 @@ namespace SilverSim.Scene.Types.Agent
             return data;
         }
 
-        static readonly AvatarTextureIndex[] IndexesForBakeHead = new AvatarTextureIndex[]
+        private static readonly AvatarTextureIndex[] IndexesForBakeHead = new AvatarTextureIndex[]
         {
             AvatarTextureIndex.HeadAlpha,
             AvatarTextureIndex.HeadBodypaint,
             AvatarTextureIndex.HeadTattoo
         };
 
-        static readonly AvatarTextureIndex[] IndexesForBakeUpperBody = new AvatarTextureIndex[]
+        private static readonly AvatarTextureIndex[] IndexesForBakeUpperBody = new AvatarTextureIndex[]
         {
             AvatarTextureIndex.UpperBodypaint,
             AvatarTextureIndex.UpperGloves,
@@ -798,7 +772,7 @@ namespace SilverSim.Scene.Types.Agent
             AvatarTextureIndex.UpperAlpha
         };
 
-        static readonly AvatarTextureIndex[] IndexesForBakeLowerBody = new AvatarTextureIndex[]
+        private static readonly AvatarTextureIndex[] IndexesForBakeLowerBody = new AvatarTextureIndex[]
         {
             AvatarTextureIndex.LowerBodypaint,
             AvatarTextureIndex.LowerUnderpants,
@@ -809,26 +783,26 @@ namespace SilverSim.Scene.Types.Agent
             AvatarTextureIndex.LowerAlpha
         };
 
-        static readonly AvatarTextureIndex[] IndexesForBakeEyes = new AvatarTextureIndex[]
+        private static readonly AvatarTextureIndex[] IndexesForBakeEyes = new AvatarTextureIndex[]
         {
             AvatarTextureIndex.EyesIris,
             AvatarTextureIndex.EyesAlpha
         };
 
-        static readonly AvatarTextureIndex[] IndexesForBakeHair = new AvatarTextureIndex[]
+        private static readonly AvatarTextureIndex[] IndexesForBakeHair = new AvatarTextureIndex[]
         {
             AvatarTextureIndex.Hair,
             AvatarTextureIndex.HairAlpha
         };
 
-        static readonly AvatarTextureIndex[] IndexesForBakeSkirt = new AvatarTextureIndex[]
+        private static readonly AvatarTextureIndex[] IndexesForBakeSkirt = new AvatarTextureIndex[]
         {
             AvatarTextureIndex.Skirt
         };
 
-        public static object Owner { get; private set; }
+        public static object Owner { get; }
 
-        static void CoreBakeLogic(this IAgent agent, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
+        private static void CoreBakeLogic(this IAgent agent, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
         {
             var bakeHead = BakeTexture(bakeStatus, BakeType.Head, sceneAssetService);
             var bakeUpperBody = BakeTexture(bakeStatus, BakeType.UpperBody, sceneAssetService);
@@ -840,7 +814,7 @@ namespace SilverSim.Scene.Types.Agent
             var haveSkirt = false;
             foreach (var item in bakeStatus.OutfitItems.Values)
             {
-                if (item.WearableData != null && item.WearableData.Type == WearableType.Skirt)
+                if (item.WearableData?.Type == WearableType.Skirt)
                 {
                     haveSkirt = true;
                     break;
@@ -857,7 +831,7 @@ namespace SilverSim.Scene.Types.Agent
             sceneAssetService.Store(bakeUpperBody);
             sceneAssetService.Store(bakeLowerBody);
             sceneAssetService.Store(bakeHair);
-            if (null != bakeSkirt)
+            if (bakeSkirt != null)
             {
                 sceneAssetService.Store(bakeSkirt);
             }
@@ -873,7 +847,7 @@ namespace SilverSim.Scene.Types.Agent
         #endregion
 
         #region Base Bake textures
-        static class BaseBakes
+        private static class BaseBakes
         {
             public static readonly Image HeadAlpha;
             public static readonly Image HeadColor;
@@ -892,7 +866,7 @@ namespace SilverSim.Scene.Types.Agent
                 UpperBodyColor = LoadResourceImage("upperbody_color.tga.gz");
             }
 
-            static Image LoadResourceImage(string name)
+            private static Image LoadResourceImage(string name)
             {
                 var assembly = typeof(BaseBakes).Assembly;
                 using (var resource = assembly.GetManifestResourceStream(assembly.GetName().Name + ".Resources." + name))

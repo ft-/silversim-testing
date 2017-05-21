@@ -36,29 +36,21 @@ namespace SilverSim.Groups.Common
         bool IGroupInvitesInterface.TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite) =>
             m_InnerService.Invites.TryGetValue(requestingAgent, groupInviteID, out ginvite);
 
-        bool IGroupInvitesInterface.ContainsKey(UUI requestingAgent, UUID groupInviteID)
-        {
-            return m_InnerService.Invites.ContainsKey(requestingAgent, groupInviteID);
-        }
+        bool IGroupInvitesInterface.ContainsKey(UUI requestingAgent, UUID groupInviteID) =>
+            m_InnerService.Invites.ContainsKey(requestingAgent, groupInviteID);
 
         bool IGroupInvitesInterface.DoesSupportListGetters => false;
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UUI principal]
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         List<GroupInvite> IGroupInvitesInterface.GetByGroup(UUI requestingAgent, UGI group)

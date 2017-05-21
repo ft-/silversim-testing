@@ -36,8 +36,8 @@ namespace SilverSim.Scene.Registration
     [Description("Grid Registration Handler")]
     public class SceneRegistrar : IPlugin
     {
-        readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
-        SceneList m_Scenes;
+        private readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
+        private SceneList m_Scenes;
 
         public void Startup(ConfigurationLoader loader)
         {

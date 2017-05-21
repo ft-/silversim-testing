@@ -33,6 +33,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         [Flags]
         public enum DataFlags
         {
+            None = 0,
             Rotation = 1,
             Translation = 2,
         }
@@ -75,18 +76,19 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
         public void Serialize(Stream o)
         {
-            Map r = new Map();
             AnArray pos = null;
             AnArray rot = null;
-            AnArray durations = new AnArray();
-            r.Add("durations", durations);
-            r.Add("mode", (int)PlayMode);
-            r.Add("currentframe", CurrentFrame);
-            r.Add("currenttimeposition", CurrentTimePosition);
-            r.Add("running", IsRunning);
-            r.Add("runningreverse", IsRunningReverse);
-
-            if((DataFlags.Rotation & Flags) != 0)
+            var durations = new AnArray();
+            var r = new Map
+            {
+                { "durations", durations },
+                { "mode", (int)PlayMode },
+                { "currentframe", CurrentFrame },
+                { "currenttimeposition", CurrentTimePosition },
+                { "running", IsRunning },
+                { "runningreverse", IsRunningReverse }
+            };
+            if ((DataFlags.Rotation & Flags) != 0)
             {
                 rot = new AnArray();
                 r.Add("rotations", rot);
@@ -170,9 +172,11 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
             for(int i = 0; i < durations.Count; ++i)
             {
-                var frame = new Keyframe();
-                frame.Duration = durations[i].AsReal;
-                if(rot != null)
+                var frame = new Keyframe()
+                {
+                    Duration = durations[i].AsReal
+                };
+                if (rot != null)
                 {
                     frame.TargetRotation = rot[i].AsQuaternion;
                 }

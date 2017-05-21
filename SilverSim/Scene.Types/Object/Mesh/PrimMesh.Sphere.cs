@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
          */
 
         #region Calculate Sphere 2D Path
-        static Vector3 CalcTrapezoidInSpherePoint(double angle)
+        private static Vector3 CalcTrapezoidInSpherePoint(double angle)
         {
             Vector3 c_p1;
             Vector3 c_p2;
@@ -78,7 +78,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return new Vector3(x_above_div / below_div, y_above_div / below_div, 0);
         }
 
-        static Vector3 CalcSquareInSpherePoint(double angle)
+        private static Vector3 CalcSquareInSpherePoint(double angle)
         {
             /*                      p0 (0.5, 0.0)
              *                      /\
@@ -118,7 +118,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return new Vector3(x_above_div / below_div, y_above_div / below_div, 0);
         }
 
-        static PathDetails CalcSpherePath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static PathDetails CalcSpherePath(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* calculate a half-sphere here 
              * starting from UnitX to -UnitX

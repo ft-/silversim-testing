@@ -33,7 +33,7 @@ namespace SilverSim.Database.Memory.ServerParam
     [Description("Memory ServerParam Backend")]
     public sealed class MemoryServerParamService : ServerParamServiceInterface, IPlugin
     {
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Parameters = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(delegate() { return new RwLockedDictionary<string, string>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Parameters = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(() => new RwLockedDictionary<string, string>());
 
         public override List<KeyValuePair<UUID, string>> KnownParameters
         {
@@ -70,7 +70,7 @@ namespace SilverSim.Database.Memory.ServerParam
                     {
                         foreach(var k in regParams.Keys)
                         {
-                            if(!list.Exists(delegate(string p) { return p == k;}))
+                            if(!list.Exists((string p) => p == k))
                             {
                                 list.Add(k);
                             }

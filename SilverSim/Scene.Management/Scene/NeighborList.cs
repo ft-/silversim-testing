@@ -33,9 +33,9 @@ namespace SilverSim.Scene.Management.Scene
         public event Action<RegionInfo> OnNeighborAddOrUpdate;
         public Action<RegionInfo> OnNeighborRemove;
 
-        uint LowerPos(uint a, uint drawdist) => (a < drawdist) ? 0 : a - drawdist;
+        private uint LowerPos(uint a, uint drawdist) => (a < drawdist) ? 0 : a - drawdist;
 
-        bool IsPointInBox(GridVector pos, GridVector a, GridVector b, uint drawdist) =>
+        private bool IsPointInBox(GridVector pos, GridVector a, GridVector b, uint drawdist) =>
             pos.X >= LowerPos(a.X, drawdist) && pos.X < b.X + drawdist && pos.Y >= LowerPos(a.Y, drawdist) && pos.Y < b.Y + drawdist;
 
         public List<RegionInfo> GetNeighbors(RegionInfo thisRegion, uint drawdistance)

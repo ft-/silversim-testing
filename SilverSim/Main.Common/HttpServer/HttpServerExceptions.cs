@@ -46,12 +46,14 @@ namespace SilverSim.Main.Common.HttpServer
     [Serializable]
     public class HttpRedirectKeepVerbException : HttpServerException
     {
-        string Location { get; set; }
+        private string Location { get; }
+
         public HttpRedirectKeepVerbException(string url)
             : base(HttpStatusCode.RedirectKeepVerb, "Moved permanently")
         {
             Location = url;
         }
+
         public override void Serialize(HttpRequest req)
         {
             using (HttpResponse res = req.BeginResponse(HttpStatus, Message))
@@ -65,5 +67,20 @@ namespace SilverSim.Main.Common.HttpServer
     [Serializable]
     public class NotAWebSocketRequestException : Exception
     {
+        public NotAWebSocketRequestException()
+        {
+        }
+
+        public NotAWebSocketRequestException(string message) : base(message)
+        {
+        }
+
+        public NotAWebSocketRequestException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected NotAWebSocketRequestException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

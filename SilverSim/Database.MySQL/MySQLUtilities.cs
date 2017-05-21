@@ -89,7 +89,7 @@ namespace SilverSim.Database.MySQL
                 connectionString.AppendFormat("Server={0};", config.GetString("Server"));
             }
 
-            connectionString.AppendFormat("Uid={0};Pwd={1};Database={2};", 
+            connectionString.AppendFormat("Uid={0};Pwd={1};Database={2};",
                 config.GetString("Username"),
                 config.GetString("Password"),
                 config.GetString("Database"));
@@ -224,7 +224,7 @@ namespace SilverSim.Database.MySQL
         #region Push parameters
         public static void AddParameter(this MySqlParameterCollection mysqlparam, string key, object value)
         {
-            var t = value != null ? value.GetType() : null;
+            var t = value?.GetType();
             if (t == typeof(Vector3))
             {
                 var v = (Vector3)value;
@@ -305,7 +305,7 @@ namespace SilverSim.Database.MySQL
             }
         }
 
-        static void AddParameters(this MySqlParameterCollection mysqlparam, Dictionary<string, object> vals)
+        private static void AddParameters(this MySqlParameterCollection mysqlparam, Dictionary<string, object> vals)
         {
             foreach (KeyValuePair<string, object> kvp in vals)
             {
@@ -325,7 +325,7 @@ namespace SilverSim.Database.MySQL
             {
                 object value = kvp.Value;
 
-                var t = value != null ? value.GetType() : null;
+                var t = value?.GetType();
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
@@ -419,7 +419,7 @@ namespace SilverSim.Database.MySQL
             {
                 object value = kvp.Value;
 
-                var t = value != null ? value.GetType() : null;
+                var t = value?.GetType();
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
@@ -486,7 +486,7 @@ namespace SilverSim.Database.MySQL
 
             foreach (object value in vals.Values)
             {
-                var t = value != null ? value.GetType() : null;
+                var t = value?.GetType();
                 if (t == typeof(Vector3))
                 {
                     var v = (Vector3)value;
@@ -571,7 +571,7 @@ namespace SilverSim.Database.MySQL
                 {
                     resvals.Add(((double)value).ToString(CultureInfo.InvariantCulture));
                 }
-                else if (null == value)
+                else if (value == null)
                 {
                     resvals.Add("NULL");
                 }
@@ -603,19 +603,18 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region UPDATE SET helper
-        static List<string> UpdateSetFromVals(Dictionary<string, object> vals)
+        private static List<string> UpdateSetFromVals(Dictionary<string, object> vals)
         {
             var updates = new List<string>();
 
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 object value = kvp.Value;
-                var t = value != null ? value.GetType() : null;
+                var t = value?.GetType();
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
                 {
-
                     updates.Add("`" + key + "X` = ?v_" + key + "X");
                     updates.Add("`" + key + "Y` = ?v_" + key + "Y");
                     updates.Add("`" + key + "Z` = ?v_" + key + "Z");
@@ -667,7 +666,6 @@ namespace SilverSim.Database.MySQL
         public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, string where)
         {
             string q1 = "UPDATE " + tablename + " SET ";
-
 
             q1 += string.Join(",", UpdateSetFromVals(vals));
 
@@ -730,12 +728,12 @@ namespace SilverSim.Database.MySQL
         public static UUID GetUUID(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            var t = v != null ? v.GetType() : null;
+            var t = v?.GetType();
             if(t == typeof(Guid))
             {
                 return new UUID((Guid)v);
             }
-            
+
             if(t == typeof(string))
             {
                 return new UUID((string)v);
@@ -747,7 +745,7 @@ namespace SilverSim.Database.MySQL
         public static UUI GetUUI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            var t = v != null ? v.GetType() : null;
+            var t = v?.GetType();
             if (t == typeof(Guid))
             {
                 return new UUI((Guid)v);
@@ -764,7 +762,7 @@ namespace SilverSim.Database.MySQL
         public static UGI GetUGI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            var t = v != null ? v.GetType() : null;
+            var t = v?.GetType();
             if (t == typeof(Guid))
             {
                 return new UGI((Guid)v);
@@ -822,7 +820,7 @@ namespace SilverSim.Database.MySQL
         public static bool GetBool(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            var t = o != null ? o.GetType() : null;
+            var t = o?.GetType();
             if(t == typeof(uint))
             {
                 return (uint)o != 0;
@@ -848,7 +846,7 @@ namespace SilverSim.Database.MySQL
         public static byte[] GetBytes(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            var t = o != null ? o.GetType() : null;
+            var t = o?.GetType();
             if(t == typeof(DBNull))
             {
                 return new byte[0];
@@ -859,7 +857,7 @@ namespace SilverSim.Database.MySQL
         public static Uri GetUri(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            var t = o != null ? o.GetType() : null;
+            var t = o?.GetType();
             if(t == typeof(DBNull))
             {
                 return null;

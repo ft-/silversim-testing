@@ -29,7 +29,7 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataRegionSettingsStorageInterface
     {
-        readonly RwLockedDictionary<UUID, RegionSettings> m_RegionSettingsData = new RwLockedDictionary<UUID, RegionSettings>();
+        private readonly RwLockedDictionary<UUID, RegionSettings> m_RegionSettingsData = new RwLockedDictionary<UUID, RegionSettings>();
 
         RegionSettings ISimulationDataRegionSettingsStorageInterface.this[UUID regionID]
         {
@@ -42,10 +42,8 @@ namespace SilverSim.Database.Memory.SimulationData
                 }
                 return settings;
             }
-            set
-            {
-                m_RegionSettingsData[regionID] = new RegionSettings(value);
-            }
+
+            set { m_RegionSettingsData[regionID] = new RegionSettings(value); }
         }
 
         bool ISimulationDataRegionSettingsStorageInterface.TryGetValue(UUID regionID, out RegionSettings settings)

@@ -46,17 +46,17 @@ namespace SilverSim.Database.MySQL.Groups
         {
             var vals = new Dictionary<string, object>
             {
-                { "GroupID", notice.Group.ID },
-                { "NoticeID", notice.ID },
-                { "Timestamp", notice.Timestamp },
-                { "FromName", notice.Timestamp },
-                { "Subject", notice.Subject },
-                { "Message", notice.Message },
-                { "HasAttachment", notice.HasAttachment },
-                { "AttachmentType", notice.AttachmentType },
-                { "AttachmentName", notice.AttachmentName },
-                { "AttachmentItemID", notice.AttachmentItemID },
-                { "AttachmentOwnerID", notice.AttachmentOwner.ID }
+                ["GroupID"] = notice.Group.ID,
+                ["NoticeID"] = notice.ID,
+                ["Timestamp"] = notice.Timestamp,
+                ["FromName"] = notice.Timestamp,
+                ["Subject"] = notice.Subject,
+                ["Message"] = notice.Message,
+                ["HasAttachment"] = notice.HasAttachment,
+                ["AttachmentType"] = notice.AttachmentType,
+                ["AttachmentName"] = notice.AttachmentName,
+                ["AttachmentItemID"] = notice.AttachmentItemID,
+                ["AttachmentOwnerID"] = notice.AttachmentOwner.ID
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {

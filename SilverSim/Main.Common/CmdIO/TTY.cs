@@ -31,7 +31,7 @@ namespace SilverSim.Main.Common.CmdIO
         public UUID SelectedScene = UUID.Zero;
 
         public abstract void Write(string text);
-        
+
         public void WriteFormatted(string format, params object[] parms)
         {
             Write(String.Format(format, parms));

@@ -35,7 +35,7 @@ namespace SilverSim.Database.Memory.Friends
     [Description("Memory Friends Backend")]
     public class MemoryFriendsService : FriendsServiceInterface, IPlugin
     {
-        class FriendData
+        private class FriendData
         {
             public FriendRightFlags Rights;
             public string Secret;
@@ -47,14 +47,12 @@ namespace SilverSim.Database.Memory.Friends
             }
         }
 
-        readonly object m_TransactionLock = new object();
+        private readonly object m_TransactionLock = new object();
 
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, FriendData>> m_Friends = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, FriendData>>(delegate () {
-            return new RwLockedDictionary<UUID, FriendData>();
-        });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, FriendData>> m_Friends = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, FriendData>>(() => new RwLockedDictionary<UUID, FriendData>());
 
-        readonly string[] m_AvatarNameServiceNames;
-        AggregatingAvatarNameService m_AvatarNameService;
+        private readonly string[] m_AvatarNameServiceNames;
+        private AggregatingAvatarNameService m_AvatarNameService;
 
         public MemoryFriendsService(string avatarNameServices)
         {

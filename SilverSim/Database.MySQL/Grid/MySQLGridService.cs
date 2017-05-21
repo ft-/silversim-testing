@@ -41,13 +41,13 @@ namespace SilverSim.Database.MySQL.Grid
     [ServerParam("AllowDuplicateRegionNames", Type = ServerParamType.GlobalOnly, ParameterType = typeof(bool), DefaultValue = false)]
     public sealed class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin, IServerParamListener
     {
-        readonly string m_ConnectionString;
-        readonly string m_TableName;
+        private readonly string m_ConnectionString;
+        private readonly string m_TableName;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
         private bool m_IsDeleteOnUnregister;
         private bool m_AllowDuplicateRegionNames;
-        readonly bool m_UseRegionDefaultServices;
-        List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
+        private readonly bool m_UseRegionDefaultServices;
+        private List<RegionDefaultFlagsServiceInterface> m_RegionDefaultServices;
 
         [ServerParam("DeleteOnUnregister")]
         public void DeleteOnUnregisterUpdated(UUID regionid, string value)
@@ -56,7 +56,6 @@ namespace SilverSim.Database.MySQL.Grid
             {
                 m_IsDeleteOnUnregister = bool.Parse(value);
             }
-            
         }
 
         [ServerParam("AllowDuplicateRegionNames")]
@@ -66,7 +65,6 @@ namespace SilverSim.Database.MySQL.Grid
             {
                 m_AllowDuplicateRegionNames = bool.Parse(value);
             }
-
         }
 
         #region Constructor
@@ -96,8 +94,10 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                var migrations = new List<IMigrationElement>();
-                migrations.Add(new SqlTable(m_TableName));
+                var migrations = new List<IMigrationElement>
+                {
+                    new SqlTable(m_TableName)
+                };
                 migrations.AddRange(Migrations);
                 connection.MigrateTables(migrations.ToArray(), m_Log);
             }
@@ -396,7 +396,7 @@ namespace SilverSim.Database.MySQL.Grid
                         cmd.Parameters.AddParameter("?name", regionInfo.Name);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
-                            if (dbReader.Read() && 
+                            if (dbReader.Read() &&
                                 dbReader.GetUUID("uuid") != regionInfo.ID)
                             {
                                 throw new GridRegionUpdateFailedException("Duplicate region name");
@@ -413,12 +413,12 @@ namespace SilverSim.Database.MySQL.Grid
                             "ScopeID LIKE ?scopeid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("?min", regionInfo.Location);
-                    cmd.Parameters.AddParameter("?max", (regionInfo.Location + regionInfo.Size));
+                    cmd.Parameters.AddParameter("?max", regionInfo.Location + regionInfo.Size);
                     cmd.Parameters.AddParameter("?regionid", regionInfo.ID);
                     cmd.Parameters.AddParameter("?scopeid", regionInfo.ScopeID);
                     using(MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        if (dbReader.Read() && 
+                        if (dbReader.Read() &&
                             dbReader.GetUUID("uuid") != regionInfo.ID)
                         {
                             throw new GridRegionUpdateFailedException("Overlapping regions");
@@ -501,7 +501,7 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
         #region List accessors
-        List<RegionInfo> GetRegionsByFlag(UUID scopeID, RegionFlags flags)
+        private List<RegionInfo> GetRegionsByFlag(UUID scopeID, RegionFlags flags)
         {
             var result = new List<RegionInfo>();
 
@@ -600,8 +600,8 @@ namespace SilverSim.Database.MySQL.Grid
                     cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
                     cmd.Parameters.AddWithValue("?locX", ri.Location.X);
                     cmd.Parameters.AddWithValue("?locY", ri.Location.Y);
-                    cmd.Parameters.AddWithValue("?maxX", (ri.Size.X + ri.Location.X));
-                    cmd.Parameters.AddWithValue("?maxY", (ri.Size.Y + ri.Location.Y));
+                    cmd.Parameters.AddWithValue("?maxX", ri.Size.X + ri.Location.X);
+                    cmd.Parameters.AddWithValue("?maxY", ri.Size.Y + ri.Location.Y);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -613,7 +613,6 @@ namespace SilverSim.Database.MySQL.Grid
             }
 
             return result;
-
         }
 
         public override List<RegionInfo> GetAllRegions(UUID scopeID)
@@ -667,7 +666,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         #endregion
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             /* no SqlTable here since we are adding it when processing migrations */
             new AddColumn<UUID>("uuid") { IsNullAllowed = false, Default = UUID.Zero },

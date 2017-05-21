@@ -34,7 +34,7 @@ namespace SilverSim.Scene.Npc
 {
     public partial class NpcAgent
     {
-        readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
+        private readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
 
         public void DoSay(int channel, string text)
         {
@@ -170,7 +170,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedIMListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(delegate () { return new RwLockedDictionary<UUID, int>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedIMListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(() => new RwLockedDictionary<UUID, int>());
 
         public override bool IMSend(GridInstantMessage im)
         {
@@ -188,25 +188,23 @@ namespace SilverSim.Scene.Npc
                             if (part.Inventory.TryGetValue(kvpinner.Key, out item))
                             {
                                 ScriptInstance instance = item.ScriptInstance;
-                                if (null != instance)
+
+                                /* Translate IM event to mapped channel */
+                                instance?.PostEvent(new ListenEvent()
                                 {
-                                    /* Translate IM event to mapped channel */
-                                    instance.PostEvent(new ListenEvent()
-                                    {
-                                        ButtonIndex = -1,
-                                        Channel = kvpinner.Value,
-                                        Distance = 0,
-                                        GlobalPosition = Vector3.Zero,
-                                        ID = im.FromAgent.ID,
-                                        Message = im.Message,
-                                        Name = im.FromAgent.FullName,
-                                        OriginSceneID = UUID.Zero,
-                                        OwnerID = im.FromAgent.ID,
-                                        SourceType = im.Dialog == GridInstantMessageDialog.MessageFromObject ? ListenEvent.ChatSourceType.Object : ListenEvent.ChatSourceType.Agent,
-                                        TargetID = ID,
-                                        Type = ListenEvent.ChatType.Say
-                                    });
-                                }
+                                    ButtonIndex = -1,
+                                    Channel = kvpinner.Value,
+                                    Distance = 0,
+                                    GlobalPosition = Vector3.Zero,
+                                    ID = im.FromAgent.ID,
+                                    Message = im.Message,
+                                    Name = im.FromAgent.FullName,
+                                    OriginSceneID = UUID.Zero,
+                                    OwnerID = im.FromAgent.ID,
+                                    SourceType = im.Dialog == GridInstantMessageDialog.MessageFromObject ? ListenEvent.ChatSourceType.Object : ListenEvent.ChatSourceType.Agent,
+                                    TargetID = ID,
+                                    Type = ListenEvent.ChatType.Say
+                                });
                             }
                         }
                     }
@@ -234,9 +232,9 @@ namespace SilverSim.Scene.Npc
             m_ScriptedIMListeners.RemoveIf(objectid, (RwLockedDictionary<UUID, int> list) => list.Count == 0);
         }
 
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedChatListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(delegate() { return new RwLockedDictionary<UUID, int>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedChatListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(() => new RwLockedDictionary<UUID, int>());
 
-        void OnChatReceive(ListenEvent ev)
+        private void OnChatReceive(ListenEvent ev)
         {
             foreach(KeyValuePair<UUID, RwLockedDictionary<UUID, int>> kvp in m_ScriptedChatListeners)
             {
@@ -249,25 +247,23 @@ namespace SilverSim.Scene.Npc
                         if(part.Inventory.TryGetValue(kvpinner.Key, out item))
                         {
                             ScriptInstance instance = item.ScriptInstance;
-                            if(null != instance)
+
+                            /* Translate listen event to mapped channel */
+                            instance?.PostEvent(new ListenEvent()
                             {
-                                /* Translate listen event to mapped channel */
-                                instance.PostEvent(new ListenEvent()
-                                {
-                                    ButtonIndex = ev.ButtonIndex,
-                                    Channel = kvpinner.Value,
-                                    Distance = ev.Distance,
-                                    GlobalPosition = ev.GlobalPosition,
-                                    ID = ev.ID,
-                                    Message = ev.Message,
-                                    Name = ev.Name,
-                                    OriginSceneID = ev.OriginSceneID,
-                                    OwnerID = ev.OwnerID,
-                                    SourceType = ev.SourceType,
-                                    TargetID = ev.TargetID,
-                                    Type = ev.Type
-                                });
-                            }
+                                ButtonIndex = ev.ButtonIndex,
+                                Channel = kvpinner.Value,
+                                Distance = ev.Distance,
+                                GlobalPosition = ev.GlobalPosition,
+                                ID = ev.ID,
+                                Message = ev.Message,
+                                Name = ev.Name,
+                                OriginSceneID = ev.OriginSceneID,
+                                OwnerID = ev.OwnerID,
+                                SourceType = ev.SourceType,
+                                TargetID = ev.TargetID,
+                                Type = ev.Type
+                            });
                         }
                     }
                 }

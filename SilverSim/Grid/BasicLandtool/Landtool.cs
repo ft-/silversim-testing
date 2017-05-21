@@ -36,9 +36,9 @@ namespace SilverSim.Grid.BasicLandtool
     [Description("Basic Landtool")]
     public class Landtool : IPlugin
     {
-        readonly string m_PresenceServiceName;
-        PresenceServiceInterface m_PresenceService;
-        BaseHttpServer m_HttpServer;
+        private readonly string m_PresenceServiceName;
+        private PresenceServiceInterface m_PresenceService;
+        private BaseHttpServer m_HttpServer;
 
         public Landtool(IConfig ownSection)
         {
@@ -52,7 +52,7 @@ namespace SilverSim.Grid.BasicLandtool
             loader.XmlRpcServer.XmlRpcMethods.Add("preflightBuyLandPrep", HandlePreFlightBuyLandPrep);
         }
 
-        XmlRpc.XmlRpcResponse HandlePreFlightBuyLandPrep(XmlRpc.XmlRpcRequest req)
+        private XmlRpc.XmlRpcResponse HandlePreFlightBuyLandPrep(XmlRpc.XmlRpcRequest req)
         {
             Map structParam;
             UUID agentId;
@@ -90,7 +90,7 @@ namespace SilverSim.Grid.BasicLandtool
                 };
                 var membership_levels = new Map
                 {
-                    { "level", membership_level }
+                    ["level"] = membership_level
                 };
                 var landUse = new Map
                 {

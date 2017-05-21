@@ -73,6 +73,5 @@ namespace SilverSim.Scene.Npc
         {
             /* ignored */
         }
-
     }
 }

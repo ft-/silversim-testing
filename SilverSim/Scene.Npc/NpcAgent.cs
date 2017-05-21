@@ -54,33 +54,21 @@ namespace SilverSim.Scene.Npc
     {
         private static readonly ILog m_Log = LogManager.GetLogger("NPC AGENT");
 
-        readonly InventoryServiceInterface m_InventoryService;
-        readonly ProfileServiceInterface m_ProfileService;
-        readonly GridUserServiceInterface m_GridUserService;
-        readonly PresenceServiceInterface m_PresenceService;
+        private readonly InventoryServiceInterface m_InventoryService;
+        private readonly ProfileServiceInterface m_ProfileService;
+        private readonly GridUserServiceInterface m_GridUserService;
+        private readonly PresenceServiceInterface m_PresenceService;
 
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
 
-        public override bool IsRunning
-        {
-            get
-            {
-                return false; /* TODO: implement controls */
-            }
-        }
+        public override bool IsRunning => false;
 
-        public override bool IsFlying
-        {
-            get
-            {
-                return false; /* TODO: implement controls */
-            }
-        }
+        public override bool IsFlying => false; /* implement controls */
 
-        UUID GetMyUUID() => ID;
+        private UUID GetMyUUID() => ID;
 
-        Vector3 GetMyPosition() => GlobalPosition;
+        private Vector3 GetMyPosition() => GlobalPosition;
 
         internal void EnableListen()
         {
@@ -128,7 +116,7 @@ namespace SilverSim.Scene.Npc
             OnAppearanceUpdate -= HandleAppearanceUpdate;
         }
 
-        void HandleAppearanceUpdate(IAgent agent)
+        private void HandleAppearanceUpdate(IAgent agent)
         {
             SceneInterface scene = CurrentScene;
             if (null != scene)
@@ -158,36 +146,21 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
+        private readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
         public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds => m_ActiveChilds;
 
         public override IAgentTeleportServiceInterface ActiveTeleportService
         {
-            get
-            {
-                return null;
-            }
+            get { return null; }
 
-            set
-            {
-                throw new NotSupportedException();
-            }
+            set { throw new NotSupportedException(); }
         }
 
-        public override AssetServiceInterface AssetService
-        {
-            get
-            {
-                return CurrentScene.AssetService;
-            }
-        }
+        public override AssetServiceInterface AssetService => CurrentScene.AssetService;
 
         public override Vector3 CameraAtAxis
         {
-            get
-            {
-                return Vector3.UnitX;
-            }
+            get { return Vector3.UnitX; }
 
             set
             {
@@ -197,10 +170,7 @@ namespace SilverSim.Scene.Npc
 
         public override Vector3 CameraLeftAxis
         {
-            get
-            {
-                return Vector3.UnitX;
-            }
+            get { return Vector3.UnitX; }
 
             set
             {
@@ -210,10 +180,7 @@ namespace SilverSim.Scene.Npc
 
         public override Vector3 CameraPosition
         {
-            get
-            {
-                return Vector3.Zero;
-            }
+            get { return Vector3.Zero; }
 
             set
             {
@@ -223,28 +190,16 @@ namespace SilverSim.Scene.Npc
 
         public override Quaternion CameraRotation
         {
-            get
-            {
-                return Quaternion.Identity;
-            }
+            get { return Quaternion.Identity; }
 
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set { throw new NotImplementedException(); }
         }
 
         public override Vector3 CameraUpAxis
         {
-            get
-            {
-                return Vector3.UnitX;
-            }
+            get { return Vector3.UnitX; }
 
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set { throw new NotImplementedException(); }
         }
 
         public override ClientInfo Client => new ClientInfo()
@@ -262,18 +217,12 @@ namespace SilverSim.Scene.Npc
 
         public override EconomyServiceInterface EconomyService
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public override FriendsServiceInterface FriendsService
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public NpcPresenceServiceInterface NpcPresenceService { get; }
@@ -292,10 +241,7 @@ namespace SilverSim.Scene.Npc
 
         public override GroupsServiceInterface GroupsService
         {
-            get
-            {
-                return CurrentScene.GroupsService;
-            }
+            get { return CurrentScene.GroupsService; }
         }
 
         public override InventoryServiceInterface InventoryService
@@ -320,23 +266,14 @@ namespace SilverSim.Scene.Npc
 
         public override int LastMeasuredLatencyTickCount
         {
-            get
-            {
-                return 0;
-            }
+            get { return 0; }
 
-            set
-            {
-                throw new NotSupportedException("LastMeasuredLatencyTickCount");
-            }
+            set { throw new NotSupportedException("LastMeasuredLatencyTickCount"); }
         }
 
         public override OfflineIMServiceInterface OfflineIMService
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { throw new NotImplementedException(); }
         }
 
         #region Physics Linkage
@@ -366,7 +303,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                if(null == m_PresenceService)
+                if(m_PresenceService == null)
                 {
                     throw new NotSupportedException();
                 }
@@ -408,10 +345,7 @@ namespace SilverSim.Scene.Npc
 
         public override UserAgentServiceInterface UserAgentService
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { throw new NotImplementedException(); }
         }
 
         public override ulong AddNewFile(string filename, byte[] data)
@@ -512,7 +446,7 @@ namespace SilverSim.Scene.Npc
             base.InvokeOnPositionUpdate();
 
             SceneInterface currentScene = CurrentScene;
-            if(null != currentScene)
+            if(currentScene != null)
             {
                 currentScene.SendAgentObjectToAllAgents(this);
             }

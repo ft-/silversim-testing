@@ -96,7 +96,7 @@ namespace SilverSim.Database.Memory.Inventory
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, UUID key]
         {
-            get 
+            get
             {
                 InventoryFolder folder;
                 if(!Folder.TryGetValue(principalID, key, out folder))
@@ -176,7 +176,7 @@ namespace SilverSim.Database.Memory.Inventory
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, AssetType type]
         {
-            get 
+            get
             {
                 InventoryFolder folder;
                 if(Folder.TryGetValue(principalID, type, out folder))
@@ -280,7 +280,7 @@ namespace SilverSim.Database.Memory.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void PurgeOrDelete(UUID principalID, UUID folderID, bool deleteFolder)
+        private void PurgeOrDelete(UUID principalID, UUID folderID, bool deleteFolder)
         {
             List<UUID> folders;
             if(!Folder.ContainsKey(principalID, folderID))
@@ -290,8 +290,10 @@ namespace SilverSim.Database.Memory.Inventory
 
             if (deleteFolder)
             {
-                folders = new List<UUID>();
-                folders.Add(folderID);
+                folders = new List<UUID>
+                {
+                    folderID
+                };
             }
             else
             {
@@ -326,7 +328,7 @@ namespace SilverSim.Database.Memory.Inventory
             IncrementVersionNoExcept(principalID, folderID);
         }
 
-        List<UUID> GetFolderIDs(UUID principalID, UUID key)
+        private List<UUID> GetFolderIDs(UUID principalID, UUID key)
         {
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
             return m_Folders.TryGetValue(principalID, out folderSet) ?
@@ -351,7 +353,7 @@ namespace SilverSim.Database.Memory.Inventory
             }
         }
 
-        void IncrementVersionNoExcept(UUID principalID, UUID folderID)
+        private void IncrementVersionNoExcept(UUID principalID, UUID folderID)
         {
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
             InventoryFolder folder;

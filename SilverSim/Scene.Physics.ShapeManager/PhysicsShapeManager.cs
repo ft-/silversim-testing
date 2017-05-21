@@ -39,20 +39,20 @@ namespace SilverSim.Scene.Physics.ShapeManager
     [Description("Physics Shape Manager")]
     public sealed class PhysicsShapeManager : IPlugin, IPhysicsHacdCleanCache
     {
-        AssetServiceInterface m_AssetService;
-        SimulationDataStorageInterface m_SimulationStorage;
+        private AssetServiceInterface m_AssetService;
+        private SimulationDataStorageInterface m_SimulationStorage;
 
-        readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesBySculptMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
-        readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
+        private readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesBySculptMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
+        private readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
 
-        readonly string m_AssetServiceName;
-        readonly string m_SimulationDataStorageName;
-        readonly ReaderWriterLock m_Lock = new ReaderWriterLock();
+        private readonly string m_AssetServiceName;
+        private readonly string m_SimulationDataStorageName;
+        private readonly ReaderWriterLock m_Lock = new ReaderWriterLock();
 
         /** <summary>referencing class to provide usage counting for meshes</summary> */
         public sealed class PhysicsShapeMeshReference : PhysicsShapeReference
         {
-            readonly UUID m_ID;
+            private readonly UUID m_ID;
             internal PhysicsShapeMeshReference(UUID id, PhysicsShapeManager manager, PhysicsConvexShape shape)
                 : base(manager, shape)
             {
@@ -77,7 +77,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         /** <summary>referencing class to provide usage counting for sculpts and prims</summary> */
         public sealed class PhysicsShapePrimShapeReference : PhysicsShapeReference
         {
-            readonly ObjectPart.PrimitiveShape m_Shape;
+            private readonly ObjectPart.PrimitiveShape m_Shape;
 
             internal PhysicsShapePrimShapeReference(ObjectPart.PrimitiveShape primshape, PhysicsShapeManager manager, PhysicsConvexShape shape)
                 : base(manager, shape)
@@ -99,7 +99,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             m_SimulationDataStorageName = simulationStorageName;
         }
 
-        static PhysicsConvexShape GenerateDefaultAvatarShape()
+        private static PhysicsConvexShape GenerateDefaultAvatarShape()
         {
             var meshLod = new MeshLOD();
 
@@ -180,7 +180,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             DefaultAvatarConvexShape = new PhysicsShapeDefaultAvatarReference(this, GenerateDefaultAvatarShape());
         }
 
-        static PhysicsConvexShape DecomposeConvex(MeshLOD lod)
+        private static PhysicsConvexShape DecomposeConvex(MeshLOD lod)
         {
             using (var vhacd = new VHACD())
             {
@@ -195,10 +195,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 m_Lock.AcquireWriterLock(-1);
                 try
                 {
-                    m_ConvexShapesBySculptMesh.RemoveIf(id, delegate (PhysicsConvexShape s)
-                    {
-                        return s.UseCount == 0;
-                    });
+                    m_ConvexShapesBySculptMesh.RemoveIf(id, (PhysicsConvexShape s) => s.UseCount == 0);
                 }
                 finally
                 {
@@ -214,10 +211,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 m_Lock.AcquireWriterLock(-1);
                 try
                 {
-                    m_ConvexShapesByPrimShape.RemoveIf(primshape, delegate (PhysicsConvexShape s)
-                    {
-                        return s.UseCount == 0;
-                    });
+                    m_ConvexShapesByPrimShape.RemoveIf(primshape, (PhysicsConvexShape s) => s.UseCount == 0);
                 }
                 finally
                 {
@@ -247,7 +241,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
-        PhysicsConvexShape ConvertToMesh(ObjectPart.PrimitiveShape shape)
+        private PhysicsConvexShape ConvertToMesh(ObjectPart.PrimitiveShape shape)
         {
             PhysicsConvexShape convexShape = null;
             if (shape.Type == PrimitiveShapeType.Sculpt && shape.SculptType == PrimitiveSculptType.Mesh)
@@ -257,7 +251,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 {
                     convexShape = m.GetConvexPhysics();
                 }
-                if(null != convexShape && !convexShape.HasHullList && m.HasLOD(LLMesh.LodLevel.Physics))
+                if(convexShape?.HasHullList == false && m.HasLOD(LLMesh.LodLevel.Physics))
                 {
                     /* check for physics mesh before giving out the single hull */
                     MeshLOD lod = m.GetLOD(LLMesh.LodLevel.Physics);
@@ -265,7 +259,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                     convexShape = DecomposeConvex(lod);
                 }
 
-                if(null == convexShape)
+                if(convexShape == null)
                 {
                     /* go for visual LODs */
                     MeshLOD lod;
@@ -300,7 +294,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             return convexShape;
         }
 
-        bool TryGetConvexShapeFromMesh(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
+        private bool TryGetConvexShapeFromMesh(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
             PhysicsConvexShape physicshape;
             UUID meshId = shape.SculptMap;
@@ -346,7 +340,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             return true;
         }
 
-        bool TryGetConvexShapeFromPrim(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
+        private bool TryGetConvexShapeFromPrim(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
             PhysicsConvexShape physicshape;
             m_Lock.AcquireReaderLock(-1);
@@ -403,7 +397,6 @@ namespace SilverSim.Scene.Physics.ShapeManager
     [PluginName("PhysicsShapeManager")]
     public class PhysicsShapeManagerFactory : IPluginFactory
     {
-
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => new PhysicsShapeManager(
                 ownSection.GetString("AssetService"),
                 ownSection.GetString("SimulationDataStorage"));

@@ -30,13 +30,13 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataEnvSettingsStorageInterface
     {
-        readonly RwLockedDictionary<UUID, byte[]> m_EnvSettingsData = new RwLockedDictionary<UUID, byte[]>();
+        private readonly RwLockedDictionary<UUID, byte[]> m_EnvSettingsData = new RwLockedDictionary<UUID, byte[]>();
 
         bool ISimulationDataEnvSettingsStorageInterface.TryGetValue(UUID regionID, out WindLightSettings settings)
         {
             byte[] data;
             if(m_EnvSettingsData.TryGetValue(regionID, out data))
-            { 
+            {
                 using (var ms = new MemoryStream(data))
                 {
                     settings = WindLightSettings.Deserialize(ms);
@@ -65,7 +65,6 @@ namespace SilverSim.Database.Memory.SimulationData
                 {
                     m_EnvSettingsData.Remove(regionID);
                 }
-
                 else
                 {
                     using(var ms = new MemoryStream())

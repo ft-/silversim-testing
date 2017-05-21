@@ -29,7 +29,7 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateOwnerServiceInterface
     {
-        readonly RwLockedDictionary<uint, UUI> m_EstateOwnerData = new RwLockedDictionary<uint, UUI>();
+        private readonly RwLockedDictionary<uint, UUI> m_EstateOwnerData = new RwLockedDictionary<uint, UUI>();
 
         bool IEstateOwnerServiceInterface.TryGetValue(uint estateID, out UUI uui)
         {
@@ -50,16 +50,14 @@ namespace SilverSim.Database.Memory.Estate
             get
             {
                 UUI uui;
-                if(!EstateOwner.TryGetValue(estateID, out uui))
+                if (!EstateOwner.TryGetValue(estateID, out uui))
                 {
                     throw new KeyNotFoundException();
                 }
                 return uui;
             }
-            set
-            {
-                m_EstateOwnerData[estateID] = new UUI(value);
-            }
+
+            set { m_EstateOwnerData[estateID] = new UUI(value); }
         }
     }
 }

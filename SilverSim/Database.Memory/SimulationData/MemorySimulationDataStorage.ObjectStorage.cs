@@ -38,14 +38,14 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataObjectStorageInterface
     {
-        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Objects = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>>(delegate () { return new RwLockedDictionary<UUID, Map>(); });
-        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Primitives = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>>(delegate () { return new RwLockedDictionary<UUID, Map>(); });
-        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>> m_PrimItems = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>>(delegate () { return new RwLockedDictionary<string, Map>(); });
+        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Objects = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>>(() => new RwLockedDictionary<UUID, Map>());
+        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Primitives = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>>(() => new RwLockedDictionary<UUID, Map>());
+        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>> m_PrimItems = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>>(() => new RwLockedDictionary<string, Map>());
 
         internal static string GenItemKey(UUID primID, UUID itemID) =>
             primID.ToString() + ":" + itemID.ToString();
 
-        void RemoveAllObjectsInRegion(UUID key)
+        private void RemoveAllObjectsInRegion(UUID key)
         {
             m_PrimItems.Remove(key);
             m_Primitives.Remove(key);
@@ -75,7 +75,7 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region helpers
-        ObjectGroup ObjectGroupFromMap(Map map) => new ObjectGroup()
+        private ObjectGroup ObjectGroupFromMap(Map map) => new ObjectGroup()
         {
             IsTempOnRez = map["IsTempOnRez"].AsBoolean,
             Owner = new UUI(map["Owner"].ToString()),
@@ -94,7 +94,7 @@ namespace SilverSim.Database.Memory.SimulationData
             RezzingObjectID = map["RezzingObjectID"].AsUUID
         };
 
-        ObjectPart ObjectPartFromMap(Map map)
+        private ObjectPart ObjectPartFromMap(Map map)
         {
             var objpart = new ObjectPart()
             {
@@ -202,7 +202,7 @@ namespace SilverSim.Database.Memory.SimulationData
             return objpart;
         }
 
-        ObjectPartInventoryItem ObjectPartInventoryItemFromMap(Map map)
+        private ObjectPartInventoryItem ObjectPartInventoryItemFromMap(Map map)
         {
             var item = new ObjectPartInventoryItem()
             {
@@ -286,7 +286,6 @@ namespace SilverSim.Database.Memory.SimulationData
                             m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace);
                             objGroups.Remove(objgroupID);
                         }
-
                     }
 
                     m_Log.InfoFormat("Loading prims for region ID {0}", regionID);

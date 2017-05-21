@@ -51,26 +51,16 @@ namespace SilverSim.Http.Client
 
             public override long Position
             {
-                get
-                {
-                    return Length - m_RemainingLength;
-                }
-                set
-                {
-                    throw new NotSupportedException();
-                }
+                get { return Length - m_RemainingLength; }
+
+                set { throw new NotSupportedException(); }
             }
 
             public override int WriteTimeout
             {
-                get
-                {
-                    return m_Output.WriteTimeout;
-                }
-                set
-                {
-                    m_Output.WriteTimeout = value;
-                }
+                get { return m_Output.WriteTimeout; }
+
+                set { m_Output.WriteTimeout = value; }
             }
 
             public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
@@ -84,8 +74,8 @@ namespace SilverSim.Http.Client
                 {
                     while (m_RemainingLength > 0)
                     {
-                        Write(FillBytes, 0, 
-                            m_RemainingLength > FillBytes.Length ? 
+                        Write(FillBytes, 0,
+                            m_RemainingLength > FillBytes.Length ?
                             FillBytes.Length :
                             (int)m_RemainingLength);
                     }

@@ -35,13 +35,13 @@ namespace SilverSim.Scene.RegionLoader.Basic
     [Description("Region Loader")]
     public class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
-        readonly string m_RegionStorage = string.Empty;
-        ExternalHostNameServiceInterface m_ExternalHostNameService;
+        private readonly string m_RegionStorage = string.Empty;
+        private ExternalHostNameServiceInterface m_ExternalHostNameService;
         private GridServiceInterface m_RegionService;
         private SceneFactoryInterface m_SceneFactory;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
-        SceneList m_Scenes;
-        string m_GatekeeperUri;
+        private SceneList m_Scenes;
+        private string m_GatekeeperUri;
 
         #region Constructor
         internal RegionLoaderService(string regionStorage)
@@ -76,7 +76,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
                 }
                 SceneInterface si = m_SceneFactory.Instantiate(ri);
                 m_Scenes.Add(si);
-                si.LoadSceneAsync();
+                si.LoadScene();
             }
         }
     }

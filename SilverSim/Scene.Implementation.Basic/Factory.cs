@@ -50,43 +50,43 @@ namespace SilverSim.Scene.Implementation.Basic
     [Description("Basic Scene Factory")]
     public sealed class SceneFactory : SceneFactoryInterface, IPlugin
     {
-        internal ChatServiceFactoryInterface m_ChatFactory { get; private set; }
-        readonly string m_ChatFactoryName;
-        readonly string m_GroupsNameServiceName;
-        readonly string m_GroupsServiceName;
-        readonly string m_AssetServiceName;
-        readonly string m_AssetCacheServiceName;
-        readonly string m_GridServiceName;
-        readonly string m_RegionStorageName;
-        readonly string m_IMServiceName;
-        readonly string m_EstateServiceName;
-        readonly string m_SimulationDataStorageName;
-        readonly string m_PhysicsName;
-        readonly string m_NeighborServiceName;
-        readonly string m_WindModelFactoryName;
-        readonly string m_PathfindingServiceFactoryName;
-        readonly List<string> m_AvatarNameServiceNames = new List<string>();
+        internal ChatServiceFactoryInterface ChatFactory { get; private set; }
+        private readonly string m_ChatFactoryName;
+        private readonly string m_GroupsNameServiceName;
+        private readonly string m_GroupsServiceName;
+        private readonly string m_AssetServiceName;
+        private readonly string m_AssetCacheServiceName;
+        private readonly string m_GridServiceName;
+        private readonly string m_RegionStorageName;
+        private readonly string m_IMServiceName;
+        private readonly string m_EstateServiceName;
+        private readonly string m_SimulationDataStorageName;
+        private readonly string m_PhysicsName;
+        private readonly string m_NeighborServiceName;
+        private readonly string m_WindModelFactoryName;
+        private readonly string m_PathfindingServiceFactoryName;
+        private readonly List<string> m_AvatarNameServiceNames = new List<string>();
 
-        internal GroupsNameServiceInterface m_GroupsNameService { get; private set; }
-        internal AssetServiceInterface m_AssetService { get; private set; }
-        internal AssetServiceInterface m_AssetCacheService { get; private set; }
-        internal GridServiceInterface m_GridService { get; private set; }
-        internal GridServiceInterface m_RegionStorage { get; private set; }
-        internal GroupsServiceInterface m_GroupsService { get; private set; }
-        internal IMServiceInterface m_IMService { get; private set; }
-        internal EstateServiceInterface m_EstateService { get; private set; }
-        internal SimulationDataStorageInterface m_SimulationDataStorage { get; private set; }
+        internal GroupsNameServiceInterface GroupsNameService { get; private set; }
+        internal AssetServiceInterface AssetService { get; private set; }
+        internal AssetServiceInterface AssetCacheService { get; private set; }
+        internal GridServiceInterface GridService { get; private set; }
+        internal GridServiceInterface RegionStorage { get; private set; }
+        internal GroupsServiceInterface GroupsService { get; private set; }
+        internal IMServiceInterface IMService { get; private set; }
+        internal EstateServiceInterface EstateService { get; private set; }
+        internal SimulationDataStorageInterface SimulationDataStorage { get; private set; }
         internal readonly Dictionary<string, string> m_CapabilitiesConfig = new Dictionary<string, string>();
-        internal IPhysicsSceneFactory m_PhysicsFactory { get; private set; }
-        internal NeighborServiceInterface m_NeighborService { get; private set; }
-        internal ExternalHostNameServiceInterface m_ExternalHostNameService { get; private set; }
-        internal readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
-        internal SceneList m_Scenes { get; private set; }
-        internal IMRouter m_IMRouter { get; private set; }
-        internal BaseHttpServer m_HttpServer { get; private set; }
-        internal List<IPortControlServiceInterface> m_PortControlServices { get; private set; }
-        internal IWindModelFactory m_WindModelFactory { get; private set; }
-        internal IPathfindingServiceFactory m_PathfindingServiceFactory { get; private set; }
+        internal IPhysicsSceneFactory PhysicsFactory { get; private set; }
+        internal NeighborServiceInterface NeighborService { get; private set; }
+        internal ExternalHostNameServiceInterface ExternalHostNameService { get; private set; }
+        internal readonly List<AvatarNameServiceInterface> AvatarNameServices = new List<AvatarNameServiceInterface>();
+        internal SceneList Scenes { get; private set; }
+        internal IMRouter IMRouter { get; private set; }
+        internal BaseHttpServer HttpServer { get; private set; }
+        internal List<IPortControlServiceInterface> PortControlServices { get; private set; }
+        internal IWindModelFactory WindModelFactory { get; private set; }
+        internal IPathfindingServiceFactory PathfindingServiceFactory { get; private set; }
 
         internal List<IUserAgentServicePlugin> UserAgentServicePlugins { get; private set; }
         internal List<IAssetServicePlugin> AssetServicePlugins { get; private set; }
@@ -130,44 +130,44 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             if(!string.IsNullOrEmpty(m_WindModelFactoryName))
             {
-                m_WindModelFactory = loader.GetService<IWindModelFactory>(m_WindModelFactoryName);
+                WindModelFactory = loader.GetService<IWindModelFactory>(m_WindModelFactoryName);
             }
             if(!string.IsNullOrEmpty(m_PathfindingServiceFactoryName))
             {
-                m_PathfindingServiceFactory = loader.GetService<IPathfindingServiceFactory>(m_PathfindingServiceFactoryName);
+                PathfindingServiceFactory = loader.GetService<IPathfindingServiceFactory>(m_PathfindingServiceFactoryName);
             }
-            m_HttpServer = loader.HttpServer;
-            m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
-            m_ExternalHostNameService = loader.ExternalHostNameService;
-            m_Scenes = loader.Scenes;
-            m_IMRouter = loader.IMRouter;
-            m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
-            m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
+            HttpServer = loader.HttpServer;
+            PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
+            ExternalHostNameService = loader.ExternalHostNameService;
+            Scenes = loader.Scenes;
+            IMRouter = loader.IMRouter;
+            RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
+            ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
             if (m_GroupsNameServiceName.Length != 0)
             {
-                m_GroupsNameService = loader.GetService<GroupsNameServiceInterface>(m_GroupsNameServiceName);
+                GroupsNameService = loader.GetService<GroupsNameServiceInterface>(m_GroupsNameServiceName);
             }
             if (m_GroupsServiceName.Length != 0)
             {
-                m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
+                GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
             }
             if (m_PhysicsName.Length != 0)
             {
-                m_PhysicsFactory = loader.GetService<IPhysicsSceneFactory>(m_PhysicsName);
+                PhysicsFactory = loader.GetService<IPhysicsSceneFactory>(m_PhysicsName);
             }
             if (m_NeighborServiceName.Length != 0)
             {
-                m_NeighborService = loader.GetService<NeighborServiceInterface>(m_NeighborServiceName);
+                NeighborService = loader.GetService<NeighborServiceInterface>(m_NeighborServiceName);
             }
-            m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
-            m_AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
-            m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
-            m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
-            m_SimulationDataStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
-            m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
+            AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
+            AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
+            GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
+            IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
+            SimulationDataStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
+            EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             foreach(string servicename in m_AvatarNameServiceNames)
             {
-                m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(servicename));
+                AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(servicename));
             }
             UserAgentServicePlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
             AssetServicePlugins = loader.GetServicesByValue<IAssetServicePlugin>();

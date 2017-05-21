@@ -42,16 +42,14 @@ namespace SilverSim.Scene.Types.Object
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public partial class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
     {
-        static IScriptCompilerRegistry m_CompilerRegistry;
+        private static IScriptCompilerRegistry m_CompilerRegistry;
         public static IScriptCompilerRegistry CompilerRegistry
         {
-            get
-            {
-                return m_CompilerRegistry;
-            }
+            get { return m_CompilerRegistry; }
+
             set
             {
-                if(m_CompilerRegistry == null)
+                if (m_CompilerRegistry == null)
                 {
                     m_CompilerRegistry = value;
                 }
@@ -69,16 +67,10 @@ namespace SilverSim.Scene.Types.Object
         public event Action<IObject> OnPositionChange;
         #endregion
 
-        public UInt32 LocalID 
-        { 
-            get
-            {
-                return RootPart.LocalID;
-            }
-            set
-            {
-                RootPart.LocalID = value;
-            }
+        public UInt32 LocalID
+        {
+            get { return RootPart.LocalID; }
+            set { RootPart.LocalID = value; }
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
@@ -105,41 +97,38 @@ namespace SilverSim.Scene.Types.Object
         private UUID m_OriginalAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
         private UUID m_NextOwnerAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
         protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
-        public AgentSittingInterface AgentSitting { get; private set; }
+        public AgentSittingInterface AgentSitting { get; }
         public SceneInterface Scene { get; set; }
         public UUID FromItemID = UUID.Zero; /* used for attachments */
         public UUID RezzingObjectID = UUID.Zero; /* used alongside llRezObject and llRezAtRoot */
-        BoundingBox? m_BoundingBox;
+        private BoundingBox? m_BoundingBox;
 
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
 
-        AssetServiceInterface m_AssetService;
+        private AssetServiceInterface m_AssetService;
         public AssetServiceInterface AssetService /* specific for attachments usage */
-        { 
-            get
-            {
-                return m_AssetService ?? Scene.AssetService;
-            }
+        {
+            get { return m_AssetService ?? Scene.AssetService; }
+
             set
             {
                 /* set is specific for attachments to reduce immediate rezzing load */
                 m_AssetService = value;
             }
         }
+
         private Vector3 m_Acceleration = Vector3.Zero;
         private Vector3 m_AngularAcceleration = Vector3.Zero;
 
-        bool m_IsChangedEnabled;
+        private bool m_IsChangedEnabled;
         public bool IsChangedEnabled
         {
-            get
-            {
-                return m_IsChangedEnabled;
-            }
+            get { return m_IsChangedEnabled; }
+
             set
             {
                 m_IsChangedEnabled = m_IsChangedEnabled || value;
-                foreach(ObjectPart p in Values)
+                foreach (ObjectPart p in Values)
                 {
                     p.IsChangedEnabled = value;
                 }
@@ -156,15 +145,9 @@ namespace SilverSim.Scene.Types.Object
 
         public PathfindingType PathfindingType
         {
-            get
-            {
-                return RootPart.PathfindingType;
-            }
+            get { return RootPart.PathfindingType; }
 
-            set
-            {
-                RootPart.PathfindingType = value;
-            }
+            set { RootPart.PathfindingType = value; }
         }
 
         /* UUID references to PartID and Vector3 is the attaching force */
@@ -218,14 +201,9 @@ namespace SilverSim.Scene.Types.Object
 
         public double PhysicsGravityMultiplier
         {
-            get
-            {
-                return RootPart.PhysicsGravityMultiplier;
-            }
-            set
-            {
-                RootPart.PhysicsGravityMultiplier = value;
-            }
+            get { return RootPart.PhysicsGravityMultiplier; }
+
+            set { RootPart.PhysicsGravityMultiplier = value; }
         }
 
         internal void TriggerOnAssetIDChange()
@@ -283,8 +261,8 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region KeyframedMotion
-        KeyframedMotionController m_KeyframedMotion;
-        readonly object m_KeyframeMotionUpdateLock = new object();
+        private KeyframedMotionController m_KeyframedMotion;
+        private readonly object m_KeyframeMotionUpdateLock = new object();
 
         public KeyframedMotion.KeyframedMotion KeyframedMotion
         {
@@ -306,14 +284,16 @@ namespace SilverSim.Scene.Types.Object
                     m_KeyframedMotion.Dispose();
                     m_KeyframedMotion = null;
                 }
-                if (null != value)
+                if (value != null)
                 {
                     lock(m_KeyframeMotionUpdateLock)
                     {
                         if(m_KeyframedMotion == null)
                         {
-                            KeyframedMotionController controller = new KeyframedMotionController(this);
-                            controller.Program = value;
+                            var controller = new KeyframedMotionController(this)
+                            {
+                                Program = value
+                            };
                             m_KeyframedMotion = controller;
                         }
                         else
@@ -328,28 +308,19 @@ namespace SilverSim.Scene.Types.Object
         public void PlayKeyframedMotion()
         {
             KeyframedMotionController controller = m_KeyframedMotion;
-            if (controller != null)
-            {
-                controller.Play();
-            }
+            controller?.Play();
         }
 
         public void PauseKeyframedMotion()
         {
             KeyframedMotionController controller = m_KeyframedMotion;
-            if (controller != null)
-            {
-                controller.Pause();
-            }
+            controller?.Pause();
         }
 
         public void StopKeyframedMotion()
         {
             KeyframedMotionController controller = m_KeyframedMotion;
-            if (controller != null)
-            {
-                controller.Stop();
-            }
+            controller?.Stop();
         }
 
         #endregion
@@ -369,10 +340,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsIncludedInSearch
         {
-            get
-            {
-                return m_IsIncludedInSearch;
-            }
+            get { return m_IsIncludedInSearch; }
+
             set
             {
                 m_IsIncludedInSearch = value;
@@ -383,10 +352,8 @@ namespace SilverSim.Scene.Types.Object
 
         public int PayPrice0
         {
-            get
-            {
-                return m_PayPrice0;
-            }
+            get { return m_PayPrice0; }
+
             set
             {
                 m_PayPrice0 = value;
@@ -397,10 +364,8 @@ namespace SilverSim.Scene.Types.Object
 
         public int PayPrice1
         {
-            get
-            {
-                return m_PayPrice1;
-            }
+            get { return m_PayPrice1; }
+
             set
             {
                 m_PayPrice1 = value;
@@ -411,10 +376,8 @@ namespace SilverSim.Scene.Types.Object
 
         public int PayPrice2
         {
-            get
-            {
-                return m_PayPrice2;
-            }
+            get { return m_PayPrice2; }
+
             set
             {
                 m_PayPrice2 = value;
@@ -425,10 +388,8 @@ namespace SilverSim.Scene.Types.Object
 
         public int PayPrice3
         {
-            get
-            {
-                return m_PayPrice3;
-            }
+            get { return m_PayPrice3; }
+
             set
             {
                 m_PayPrice3 = value;
@@ -439,10 +400,8 @@ namespace SilverSim.Scene.Types.Object
 
         public int PayPrice4
         {
-            get
-            {
-                return m_PayPrice4;
-            }
+            get { return m_PayPrice4; }
+
             set
             {
                 m_PayPrice4 = value;
@@ -453,10 +412,8 @@ namespace SilverSim.Scene.Types.Object
 
         public InventoryItem.SaleInfoData.SaleType SaleType
         {
-            get
-            {
-                return m_SaleType;
-            }
+            get { return m_SaleType; }
+
             set
             {
                 m_SaleType = value;
@@ -467,10 +424,8 @@ namespace SilverSim.Scene.Types.Object
 
         public int SalePrice
         {
-            get
-            {
-                return m_SalePrice;
-            }
+            get { return m_SalePrice; }
+
             set
             {
                 m_SalePrice = value;
@@ -481,10 +436,7 @@ namespace SilverSim.Scene.Types.Object
 
         public int OwnershipCost
         {
-            get
-            {
-                return m_OwnershipCost;
-            }
+            get { return m_OwnershipCost; }
             set
             {
                 m_OwnershipCost = value;
@@ -495,10 +447,8 @@ namespace SilverSim.Scene.Types.Object
 
         public UInt32 Category
         {
-            get
-            {
-                return m_Category;
-            }
+            get { return m_Category; }
+
             set
             {
                 m_Category = value;
@@ -509,10 +459,8 @@ namespace SilverSim.Scene.Types.Object
 
         public AttachmentPoint AttachPoint
         {
-            get
-            {
-                return m_AttachPoint;
-            }
+            get { return m_AttachPoint; }
+
             set
             {
                 m_AttachPoint = value;
@@ -521,14 +469,12 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        bool m_IsAttached;
+        private bool m_IsAttached;
 
         public bool IsAttached
         {
-            get
-            {
-                return m_IsAttached;
-            }
+            get { return m_IsAttached; }
+
             set
             {
                 m_IsAttached = value;
@@ -564,18 +510,13 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsTempAttached
         {
-            get
-            {
-                return IsAttached && FromItemID == UUID.Zero;
-            }
+            get { return IsAttached && FromItemID == UUID.Zero; }
         }
 
         public Vector3 Acceleration
         {
-            get
-            {
-                return m_Acceleration;
-            }
+            get { return m_Acceleration; }
+
             set
             {
                 m_Acceleration = value;
@@ -586,10 +527,8 @@ namespace SilverSim.Scene.Types.Object
 
         public Vector3 AttachedPos
         {
-            get
-            {
-                return m_AttachedPos;
-            }
+            get { return m_AttachedPos; }
+
             set
             {
                 m_AttachedPos = value;
@@ -600,10 +539,8 @@ namespace SilverSim.Scene.Types.Object
 
         public Vector3 AngularAcceleration
         {
-            get
-            {
-                return m_AngularAcceleration;
-            }
+            get { return m_AngularAcceleration; }
+
             set
             {
                 m_AngularAcceleration = value;
@@ -614,13 +551,11 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsTemporary
         {
-            get
-            {
-                return m_IsTemporary;
-            }
+            get { return m_IsTemporary; }
+
             set
             {
-                lock(m_Lock) 
+                lock (m_Lock)
                 {
                     m_IsTemporary = value;
                 }
@@ -631,14 +566,12 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsTempOnRez
         {
-            get
-            {
-                return m_IsTempOnRez;
-            }
+            get { return m_IsTempOnRez; }
+
             set
             {
                 m_IsTempOnRez = value;
-                lock(m_Lock) 
+                lock (m_Lock)
                 {
                     m_IsTemporary = m_IsTemporary && m_IsTempOnRez;
                 }
@@ -649,14 +582,9 @@ namespace SilverSim.Scene.Types.Object
 
         public Vector3 Size
         {
-            get
-            {
-                return RootPart.Size;
-            }
-            set
-            {
-                RootPart.Size = value;
-            }
+            get { return RootPart.Size; }
+
+            set { RootPart.Size = value; }
         }
 
         public bool IsGroupOwned
@@ -768,14 +696,9 @@ namespace SilverSim.Scene.Types.Object
 
         public Vector3 AngularVelocity
         {
-            get
-            {
-                return RootPart.AngularVelocity;
-            }
-            set
-            {
-                RootPart.AngularVelocity = value;
-            }
+            get { return RootPart.AngularVelocity; }
+
+            set { RootPart.AngularVelocity = value; }
         }
 
         public Quaternion Rotation
@@ -836,7 +759,7 @@ namespace SilverSim.Scene.Types.Object
             int PrimCount = Count;
             if(PrimCount < linkTarget)
             {
-                linkTarget -= (PrimCount + 1);
+                linkTarget -= PrimCount + 1;
                 return m_SittingAgents.Keys1[linkTarget];
             }
             else
@@ -883,7 +806,7 @@ namespace SilverSim.Scene.Types.Object
             while (enumerator.MoveNext())
             {
                 switch(ParamsHelper.GetPrimParamType(enumerator))
-                { 
+                {
                     case PrimitiveParamsType.LinkTarget:
                         linkTarget = ParamsHelper.GetInteger(enumerator, "PRIM_LINK_TARGET");
                         if(0 == linkTarget)
@@ -1004,7 +927,7 @@ namespace SilverSim.Scene.Types.Object
                                     enumerator.GoToMarkPosition();
                                     obj.SetPrimitiveParams(enumerator);
                                 }
-                                m_SittingAgents.ForEach(delegate(IAgent agent)
+                                m_SittingAgents.ForEach((IAgent agent) =>
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
@@ -1021,7 +944,7 @@ namespace SilverSim.Scene.Types.Object
                                         kvp.Value.SetPrimitiveParams(enumerator);
                                     }
                                 });
-                                m_SittingAgents.ForEach(delegate(IAgent agent)
+                                m_SittingAgents.ForEach((IAgent agent) =>
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
@@ -1083,8 +1006,8 @@ namespace SilverSim.Scene.Types.Object
         #region Agent Sitting
         public class AgentSittingInterface
         {
-            readonly ObjectGroup m_Group;
-            readonly object m_SitLock = new object();
+            private readonly ObjectGroup m_Group;
+            private readonly object m_SitLock = new object();
 
             public AgentSittingInterface(ObjectGroup group)
             {
@@ -1111,7 +1034,7 @@ namespace SilverSim.Scene.Types.Object
                 return false;
             }
 
-            static readonly Vector3 SIT_TARGET_OFFSET = new Vector3(0, 0, 0.4);
+            private static readonly Vector3 SIT_TARGET_OFFSET = new Vector3(0, 0, 0.4);
 
             public void Sit(IAgent agent, int preferedLinkNumber = -1)
             {
@@ -1140,7 +1063,7 @@ namespace SilverSim.Scene.Types.Object
                 if(!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
                     !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
                 {
-                    agent.LocalPosition = (sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET);
+                    agent.LocalPosition = sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET;
                     agent.LocalRotation = sitOnTarget.SitTargetOrientation;
                 }
                 else
@@ -1153,7 +1076,7 @@ namespace SilverSim.Scene.Types.Object
                 agent.SetDefaultAnimation("sitting");
 
                 var scene = m_Group.Scene;
-                if (null != scene)
+                if (scene != null)
                 {
                     scene.SendAgentObjectToAllAgents(agent);
                     m_Group.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
@@ -1176,7 +1099,7 @@ namespace SilverSim.Scene.Types.Object
                         }
                     }
 
-                    if (null == sitOnTarget)
+                    if (sitOnTarget == null)
                     {
                         foreach (ObjectPart part in m_Group.ValuesByKey1)
                         {
@@ -1190,7 +1113,7 @@ namespace SilverSim.Scene.Types.Object
                         }
                     }
 
-                    if (null == sitOnTarget)
+                    if (sitOnTarget == null)
                     {
                         if(m_Group.RootPart.IsScriptedSitOnly)
                         {
@@ -1204,7 +1127,7 @@ namespace SilverSim.Scene.Types.Object
                 if (!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
                     !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
                 {
-                    sitPosition = (sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET);
+                    sitPosition = sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET;
                     sitRotation = sitOnTarget.SitTargetOrientation;
                 }
                 else
@@ -1231,18 +1154,12 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
 
-                if(null != satOn)
-                {
-                    satOn.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
-                }
+                satOn?.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
 
                 if (res)
                 {
                     SceneInterface scene = m_Group.Scene;
-                    if (null != scene)
-                    {
-                        scene.SendAgentObjectToAllAgents(agent);
-                    }
+                    scene?.SendAgentObjectToAllAgents(agent);
                     agent.SetDefaultAnimation("standing");
                 }
                 return res;
@@ -1253,10 +1170,7 @@ namespace SilverSim.Scene.Types.Object
         #region Script Events
         public void PostEvent(IScriptEvent ev)
         {
-            ForEach((ObjectPart item) =>
-            {
-                item.PostEvent(ev);
-            });
+            ForEach((ObjectPart item) => item.PostEvent(ev));
         }
         #endregion
 
@@ -1286,7 +1200,7 @@ namespace SilverSim.Scene.Types.Object
 
                 lock (m_Lock)
                 {
-                    if (null == m_BoundingBox)
+                    if (m_BoundingBox == null)
                     {
                         m_BoundingBox = box;
                     }
@@ -1296,10 +1210,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] TerseData
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { throw new NotImplementedException(); }
         }
 
         #region XML Serialization
@@ -1307,10 +1218,12 @@ namespace SilverSim.Scene.Types.Object
         {
             ToXml(writer, UUI.Unknown, Vector3.Zero, options, false);
         }
+
         public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             ToXml(writer, nextOwner, Vector3.Zero, options, false);
         }
+
         public void ToXml(XmlTextWriter writer, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
         {
             List<ObjectPart> parts = Values;
@@ -1348,7 +1261,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
             writer.WriteEndElement();
-            
+
 #warning KeyframeMotion Base64
 
             bool haveScriptState = false;
@@ -1383,7 +1296,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        static ObjectPart ParseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        private static ObjectPart ParseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart otherPart = null;
             if (reader.IsEmptyElement)
@@ -1437,7 +1350,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        private static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart part;
             var links = new SortedDictionary<int, ObjectPart>();
@@ -1510,7 +1423,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static ObjectPart ParseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        private static ObjectPart ParseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart rootPart = null;
             if(reader.IsEmptyElement)
@@ -1683,7 +1596,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static void FromXmlGroupScriptStates(XmlTextReader reader, ObjectGroup group)
+        private static void FromXmlGroupScriptStates(XmlTextReader reader, ObjectGroup group)
         {
             var itemID = UUID.Zero;
 
@@ -1751,7 +1664,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        static void FromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
+        private static void FromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             string tagname = reader.Name;
             var attrs = new Dictionary<string, string>();
@@ -1789,7 +1702,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
-            if (null == item)
+            if (item == null)
             {
                 reader.ReadToEndElement(tagname);
             }
@@ -1818,7 +1731,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static void FromXmlSavedScriptState(XmlTextReader reader, ObjectGroup group, UUID itemID)
+        private static void FromXmlSavedScriptState(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             for (; ; )
             {

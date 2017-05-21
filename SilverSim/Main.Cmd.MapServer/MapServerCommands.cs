@@ -34,10 +34,10 @@ namespace SilverSim.Main.Cmd.MapServer
     [Description("Map Server Console Commands")]
     public class MapServerCommands : IPlugin
     {
-        readonly string m_GridServiceName;
-        readonly string m_RegionDefaultFlagsServiceName;
-        GridServiceInterface m_GridService;
-        RegionDefaultFlagsServiceInterface m_RegionDefaultFlagsService;
+        private readonly string m_GridServiceName;
+        private readonly string m_RegionDefaultFlagsServiceName;
+        private GridServiceInterface m_GridService;
+        private RegionDefaultFlagsServiceInterface m_RegionDefaultFlagsService;
 
         public MapServerCommands(IConfig ownSection)
         {
@@ -56,7 +56,7 @@ namespace SilverSim.Main.Cmd.MapServer
             loader.CommandRegistry.AddShowCommand("gridregions", ShowRegionsCmd);
         }
 
-        void ShowRegionsCmd(List<string> args, TTY io, UUID limitedToScene)
+        private void ShowRegionsCmd(List<string> args, TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -77,7 +77,7 @@ namespace SilverSim.Main.Cmd.MapServer
             }
         }
 
-        void UnregisterRegionCmd(List<string> args, TTY io, UUID limitedToScene)
+        private void UnregisterRegionCmd(List<string> args, TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -126,7 +126,7 @@ namespace SilverSim.Main.Cmd.MapServer
             }
         }
 
-        void ShowRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
+        private void ShowRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -155,7 +155,7 @@ namespace SilverSim.Main.Cmd.MapServer
             }
         }
 
-        void ChangeRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
+        private void ChangeRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
         {
             if(limitedToScene != UUID.Zero)
             {
@@ -214,11 +214,11 @@ namespace SilverSim.Main.Cmd.MapServer
                             if(val)
                             {
                                 setFlags |= RegionFlags.FallbackRegion;
-                                removeFlags &= (~RegionFlags.FallbackRegion);
+                                removeFlags &= ~RegionFlags.FallbackRegion;
                             }
                             else
                             {
-                                setFlags &= (~RegionFlags.FallbackRegion);
+                                setFlags &= ~RegionFlags.FallbackRegion;
                                 removeFlags |= RegionFlags.FallbackRegion;
                             }
                             break;
@@ -231,11 +231,11 @@ namespace SilverSim.Main.Cmd.MapServer
                             if (val)
                             {
                                 setFlags |= RegionFlags.DefaultRegion;
-                                removeFlags &= (~RegionFlags.DefaultRegion);
+                                removeFlags &= ~RegionFlags.DefaultRegion;
                             }
                             else
                             {
-                                setFlags &= (~RegionFlags.DefaultRegion);
+                                setFlags &= ~RegionFlags.DefaultRegion;
                                 removeFlags |= RegionFlags.DefaultRegion;
                             }
                             break;
@@ -248,11 +248,11 @@ namespace SilverSim.Main.Cmd.MapServer
                             if (val)
                             {
                                 setFlags |= RegionFlags.DefaultHGRegion;
-                                removeFlags &= (~RegionFlags.DefaultHGRegion);
+                                removeFlags &= ~RegionFlags.DefaultHGRegion;
                             }
                             else
                             {
-                                setFlags &= (~RegionFlags.DefaultHGRegion);
+                                setFlags &= ~RegionFlags.DefaultHGRegion;
                                 removeFlags |= RegionFlags.DefaultHGRegion;
                             }
                             break;
@@ -265,11 +265,11 @@ namespace SilverSim.Main.Cmd.MapServer
                             if (val)
                             {
                                 setFlags |= RegionFlags.Persistent;
-                                removeFlags &= (~RegionFlags.Persistent);
+                                removeFlags &= ~RegionFlags.Persistent;
                             }
                             else
                             {
-                                setFlags &= (~RegionFlags.Persistent);
+                                setFlags &= ~RegionFlags.Persistent;
                                 removeFlags |= RegionFlags.Persistent;
                             }
                             break;
@@ -292,7 +292,7 @@ namespace SilverSim.Main.Cmd.MapServer
             }
         }
 
-        void ClearRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
+        private void ClearRegionFlagDefaultsCmd(List<string> args, TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {

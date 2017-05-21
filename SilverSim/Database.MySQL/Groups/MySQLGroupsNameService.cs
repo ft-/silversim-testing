@@ -37,7 +37,7 @@ namespace SilverSim.Database.MySQL.Groups
     [Description("MySQL GroupsName Backend")]
     public sealed class MySQLGroupsNameService : GroupsNameServiceInterface, IDBServiceInterface, IPlugin
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUP NAMES SERVICE");
 
         #region Constructor
@@ -88,7 +88,7 @@ namespace SilverSim.Database.MySQL.Groups
             return false;
         }
 
-        static UGI ToUGI(MySqlDataReader dbReader) =>
+        private static UGI ToUGI(MySqlDataReader dbReader) =>
             new UGI(dbReader.GetUUID("GroupID"), dbReader.GetString("GroupName"), dbReader.GetUri("HomeURI"));
 
         public override List<UGI> GetGroupsByName(string groupName, int limit)
@@ -148,7 +148,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("groupnames"),
             new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },

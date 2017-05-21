@@ -30,9 +30,9 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataParcelStorageInterface
     {
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ParcelInfo>> m_ParcelData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ParcelInfo>>(delegate () { return new RwLockedDictionary<UUID, ParcelInfo>(); });
-        readonly MemorySimulationDataParcelAccessListStorage m_WhiteListStorage = new MemorySimulationDataParcelAccessListStorage();
-        readonly MemorySimulationDataParcelAccessListStorage m_BlackListStorage = new MemorySimulationDataParcelAccessListStorage();
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ParcelInfo>> m_ParcelData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ParcelInfo>>(() => new RwLockedDictionary<UUID, ParcelInfo>());
+        private readonly MemorySimulationDataParcelAccessListStorage m_WhiteListStorage = new MemorySimulationDataParcelAccessListStorage();
+        private readonly MemorySimulationDataParcelAccessListStorage m_BlackListStorage = new MemorySimulationDataParcelAccessListStorage();
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
@@ -54,7 +54,7 @@ namespace SilverSim.Database.Memory.SimulationData
             return m_ParcelData.TryGetValue(regionID, out parcels) && parcels.Remove(parcelID);
         }
 
-        void RemoveAllParcelsInRegion(UUID regionID)
+        private void RemoveAllParcelsInRegion(UUID regionID)
         {
             m_ParcelData.Remove(regionID);
         }

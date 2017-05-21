@@ -38,7 +38,7 @@ namespace SilverSim.Database.Memory.Presence
     [Description("Memory Presence Backend")]
     public sealed class MemoryPresenceService : PresenceServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly RwLockedDictionary<UUID, PresenceInfo> m_Data = new RwLockedDictionary<UUID, PresenceInfo>();
+        private readonly RwLockedDictionary<UUID, PresenceInfo> m_Data = new RwLockedDictionary<UUID, PresenceInfo>();
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)
@@ -57,13 +57,11 @@ namespace SilverSim.Database.Memory.Presence
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
+
             set /* setting null means logout, != null not allowed */
             {
-                if(value != null)
+                if (value != null)
                 {
                     throw new ArgumentException("setting value != null is not allowed without reportType");
                 }
@@ -75,9 +73,9 @@ namespace SilverSim.Database.Memory.Presence
         [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID, PresenceServiceInterface.SetType reportType]
-        { 
+        {
             /* setting null means logout, != null login message */
-            set 
+            set
             {
                 if (value == null)
                 {
@@ -85,9 +83,10 @@ namespace SilverSim.Database.Memory.Presence
                 }
                 else if (reportType == SetType.Login)
                 {
-                    var pInfo = new PresenceInfo(value);
-                    pInfo.RegionID = UUID.Zero;
-                    m_Data[sessionID] = pInfo;
+                    m_Data[sessionID] = new PresenceInfo(value)
+                    {
+                        RegionID = UUID.Zero
+                    };
                 }
                 else if (reportType == SetType.Report)
                 {

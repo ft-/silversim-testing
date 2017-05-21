@@ -27,8 +27,8 @@ namespace SilverSim.Main.Common
 {
     public class Startup
     {
-        ConfigurationLoader m_ConfigLoader;
-        readonly ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
+        private ConfigurationLoader m_ConfigLoader;
+        private readonly ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
         public bool IsRunningAsService { get; set; }
 

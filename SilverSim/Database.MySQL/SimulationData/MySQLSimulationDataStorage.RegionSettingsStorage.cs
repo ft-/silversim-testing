@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Scene;
@@ -30,7 +29,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage : ISimulationDataRegionSettingsStorageInterface
     {
-        RegionSettings ToRegionSettings(MySqlDataReader reader) => new RegionSettings()
+        private RegionSettings ToRegionSettings(MySqlDataReader reader) => new RegionSettings()
         {
             BlockTerraform = reader.GetBool("BlockTerraform"),
             BlockFly = reader.GetBool("BlockFly"),
@@ -169,10 +168,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         bool ISimulationDataRegionSettingsStorageInterface.Remove(UUID regionID)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }

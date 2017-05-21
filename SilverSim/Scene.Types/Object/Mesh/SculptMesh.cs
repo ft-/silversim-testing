@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
         }
 
-        static Vector3 GetVertex(this Bitmap bm, int x, int y, bool mirror)
+        private static Vector3 GetVertex(this Bitmap bm, int x, int y, bool mirror)
         {
             var v = new Vector3();
             var c = bm.GetPixel(x, y);
@@ -159,7 +159,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* generate triangles */
             for (int row = 0; row < sculptSizeS - 1; ++row)
             {
-                int rowIndex = (row * sculptSizeT);
+                int rowIndex = row * sculptSizeT;
                 int row2Index = rowIndex + sculptSizeT;
                 for(int col = 0; col < sculptSizeT - 1; ++col)
                 {

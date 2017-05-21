@@ -29,10 +29,10 @@ namespace SilverSim.Scene.Types.Object
     {
         private TextureEntry m_TextureEntry = new TextureEntry();
         private byte[] m_TextureEntryBytes = new byte[0];
-        readonly ReaderWriterLock m_TextureEntryLock = new ReaderWriterLock();
+        private readonly ReaderWriterLock m_TextureEntryLock = new ReaderWriterLock();
 
         private byte[] m_TextureAnimationBytes = new byte[0];
-        readonly ReaderWriterLock m_TextureAnimationLock = new ReaderWriterLock();
+        private readonly ReaderWriterLock m_TextureAnimationLock = new ReaderWriterLock();
 
         private string m_MediaURL = string.Empty;
 
@@ -65,7 +65,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        UpdateChangedFlags ChangedTexParams(TextureEntryFace oldTexFace, TextureEntryFace newTexFace)
+        private UpdateChangedFlags ChangedTexParams(TextureEntryFace oldTexFace, TextureEntryFace newTexFace)
         {
             UpdateChangedFlags flags = 0;
             if(oldTexFace.Glow != newTexFace.Glow ||
@@ -99,7 +99,7 @@ namespace SilverSim.Scene.Types.Object
             return flags;
         }
 
-        UpdateChangedFlags ChangedTexParams(TextureEntry oldTex, TextureEntry newTex)
+        private UpdateChangedFlags ChangedTexParams(TextureEntry oldTex, TextureEntry newTex)
         {
             UpdateChangedFlags flags = ChangedTexParams(oldTex.DefaultTexture, newTex.DefaultTexture);
             uint index;

@@ -58,12 +58,12 @@ namespace SilverSim.Scene.Agent
 {
     public abstract partial class Agent : IAgent
     {
-        static ILog m_Log = LogManager.GetLogger("AGENT");
+        private static readonly ILog m_Log = LogManager.GetLogger("AGENT");
         protected readonly object m_DataLock = new object();
 
         #region Agent fields
-        readonly UUID m_AgentID;
-        double m_Health = 100f;
+        private readonly UUID m_AgentID;
+        private double m_Health = 100f;
         #endregion
 
         public string DisplayName { get; set; }
@@ -71,16 +71,14 @@ namespace SilverSim.Scene.Agent
         public string LastName { get; set; }
 
         #region Properties
-        public Uri HomeURI { get; private set; }
+        public Uri HomeURI { get; }
         public UInt32 LocalID { get; set; }
         #endregion
 
         public double PhysicsGravityMultiplier
         {
-            get
-            {
-                return 1;
-            }
+            get { return 1; }
+
             set
             {
                 /* nothing to do */
@@ -89,10 +87,8 @@ namespace SilverSim.Scene.Agent
 
         public PathfindingType PathfindingType
         {
-            get
-            {
-                return PathfindingType.Avatar;
-            }
+            get { return PathfindingType.Avatar; }
+
             set
             {
                 /* setting intentionally ignored */
@@ -101,6 +97,7 @@ namespace SilverSim.Scene.Agent
 
         protected Agent(UUID agentId, Uri homeURI)
         {
+            Attachments = new AgentAttachments();
             Group = UGI.Unknown;
             m_AgentID = agentId;
             HomeURI = homeURI;
@@ -131,7 +128,7 @@ namespace SilverSim.Scene.Agent
         public virtual void InvokeOnPositionUpdate()
         {
             var ev = OnPositionChange; /* events are not exactly thread-safe */
-            if (null != ev)
+            if (ev != null)
             {
                 foreach (Action<IObject> del in ev.GetInvocationList().OfType<Action<IObject>>())
                 {
@@ -172,7 +169,7 @@ namespace SilverSim.Scene.Agent
                     l.Z += Size.Z / 2;
                     Quaternion q = Quaternion.CreateFromEulers(0, 0, eulers.Z);
                     bool unsit = false;
-                    if (null != m_SittingOnObject && value == null)
+                    if (m_SittingOnObject != null && value == null)
                     {
                         unsit = true;
                     }
@@ -194,10 +191,8 @@ namespace SilverSim.Scene.Agent
 
         public string Name
         {
-            get
-            {
-                return string.Format("{0} {1}", FirstName, LastName);
-            }
+            get { return string.Format("{0} {1}", FirstName, LastName); }
+
             set
             {
                 string[] parts = value.Split(new char[] { ' ' }, 2);
@@ -214,10 +209,8 @@ namespace SilverSim.Scene.Agent
 
         public Vector3 LookAt
         {
-            get
-            {
-                return new Vector3(1, 0, 0) * Rotation;
-            }
+            get { return new Vector3(1, 0, 0) * Rotation; }
+
             set
             {
                 Vector3 delta = value.Normalize();
@@ -245,27 +238,17 @@ namespace SilverSim.Scene.Agent
 
         public string Description
         {
-            get
-            {
-                return string.Empty;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { return string.Empty; }
+
+            set { throw new NotSupportedException(); }
         }
 
         private double m_HoverHeight;
         public double HoverHeight
         {
-            get
-            {
-                return m_HoverHeight;
-            }
-            set
-            {
-                m_HoverHeight = value.Clamp(-2f, 2f);
-            }
+            get { return m_HoverHeight; }
+
+            set { m_HoverHeight = value.Clamp(-2f, 2f); }
         }
 
         public Vector3 GlobalPositionOnGround
@@ -881,7 +864,7 @@ namespace SilverSim.Scene.Agent
 
         public virtual string GetGroupTag()
         {
-            if (null != GroupsService)
+            if (GroupsService != null)
             {
                 GroupActiveMembership gam;
                 GroupRole role;
@@ -901,7 +884,7 @@ namespace SilverSim.Scene.Agent
         }
         #endregion
 
-        int m_NextParcelSequenceId;
+        private int m_NextParcelSequenceId;
 
         public int NextParcelSequenceId
         {
@@ -920,7 +903,7 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        UUID m_CurrentOutfitFolder = UUID.Zero;
+        private UUID m_CurrentOutfitFolder = UUID.Zero;
 
         public event Action<IObject> OnPositionChange;
 
@@ -1053,7 +1036,7 @@ namespace SilverSim.Scene.Agent
         public abstract void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
         #endregion
 
-        Vector4 m_CollisionPlane = new Vector4(0, 0, 1, -1);
+        private Vector4 m_CollisionPlane = new Vector4(0, 0, 1, -1);
 
         public Vector4 CollisionPlane
         {
@@ -1075,7 +1058,7 @@ namespace SilverSim.Scene.Agent
             bool updateProcessed = false;
             lock (m_DataLock)
             {
-                if (SceneID == value.SceneID && null == m_SittingOnObject)
+                if (SceneID == value.SceneID && m_SittingOnObject == null)
                 {
                     m_GlobalPosition = value.Position;
                     m_GlobalRotation = value.Rotation;
@@ -1093,8 +1076,8 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        Quaternion m_HeadRotation = Quaternion.Identity;
-        Quaternion m_BodyRotation = Quaternion.Identity;
+        private Quaternion m_HeadRotation = Quaternion.Identity;
+        private Quaternion m_BodyRotation = Quaternion.Identity;
 
         public Quaternion HeadRotation
         {

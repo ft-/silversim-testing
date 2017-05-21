@@ -57,18 +57,22 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         if (reader.Read())
                         {
-                            prefs = new ProfilePreferences();
-                            prefs.User = user;
-                            prefs.IMviaEmail = reader.GetBool("imviaemail");
-                            prefs.Visible = reader.GetBool("visible");
+                            prefs = new ProfilePreferences()
+                            {
+                                User = user,
+                                IMviaEmail = reader.GetBool("imviaemail"),
+                                Visible = reader.GetBool("visible")
+                            };
                             return true;
                         }
                         else
                         {
-                            prefs = new ProfilePreferences();
-                            prefs.User = user;
-                            prefs.IMviaEmail = false;
-                            prefs.Visible = false;
+                            prefs = new ProfilePreferences()
+                            {
+                                User = user,
+                                IMviaEmail = false,
+                                Visible = false
+                            };
                             return true;
                         }
                     }
@@ -112,11 +116,13 @@ namespace SilverSim.Database.MySQL.Profile
             }
             set
             {
-                Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                replaceVals["useruuid"] = user.ID;
-                replaceVals["imviaemail"] = value.IMviaEmail;
-                replaceVals["visible"] = value.Visible;
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                var replaceVals = new Dictionary<string, object>
+                {
+                    ["useruuid"] = user.ID,
+                    ["imviaemail"] = value.IMviaEmail,
+                    ["visible"] = value.Visible
+                };
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
                     conn.ReplaceInto("usersettings", replaceVals);

@@ -29,20 +29,20 @@ namespace SilverSim.Scene.Chat
 {
     public class ListenerInfo : ChatServiceInterface.Listener
     {
-        readonly string m_Name;
-        readonly UUID m_ID;
-        readonly string m_Message;
-        readonly Action<ListenEvent> m_Send;
+        private readonly string m_Name;
+        private readonly UUID m_ID;
+        private readonly string m_Message;
+        private readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
         public override bool IsAgent { get; }
 
-        readonly ChatHandler m_Handler;
+        private readonly ChatHandler m_Handler;
 
         internal ListenerInfo(
             ChatHandler handler,
             int channel,
             string name,
-            UUID id, 
+            UUID id,
             string message,
             Func<UUID> getuuid,
             Func<Vector3> getpos,
@@ -90,12 +90,12 @@ namespace SilverSim.Scene.Chat
 
         public override void Send(ListenEvent ev)
         {
-            if(!String.IsNullOrEmpty(m_Name) &&
+            if(!string.IsNullOrEmpty(m_Name) &&
                 ev.Name != m_Name)
             {
                 return;
             }
-            if(m_ID != null)
+            if(m_ID != UUID.Zero)
             {
                 if(m_ID.Equals(UUID.Zero))
                 {
@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Chat
                     return;
                 }
             }
-            if(!String.IsNullOrEmpty(m_Message) &&
+            if(!string.IsNullOrEmpty(m_Message) &&
                 ev.Message != m_Message)
             {
                 return;

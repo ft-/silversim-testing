@@ -44,8 +44,10 @@ namespace SilverSim.Database.MySQL.Estate
                         {
                             while (reader.Read())
                             {
-                                UGI ugi = new UGI();
-                                ugi.ID = reader.GetUUID("GroupID");
+                                var ugi = new UGI()
+                                {
+                                    ID = reader.GetUUID("GroupID")
+                                };
                                 estategroups.Add(ugi);
                             }
                         }
@@ -77,7 +79,7 @@ namespace SilverSim.Database.MySQL.Estate
             set
             {
                 string query = value ?
-                    "REPLACE INTO estate_groups (EstateID, GroupID) VALUES (?estateid, ?groupid)" : 
+                    "REPLACE INTO estate_groups (EstateID, GroupID) VALUES (?estateid, ?groupid)" :
                     "DELETE FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid";
 
                 using (var conn = new MySqlConnection(m_ConnectionString))

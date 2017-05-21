@@ -38,7 +38,7 @@ namespace SilverSim.Database.MySQL.AvatarName
     [Description("MySQL AvatarName Backend")]
     public sealed class MySQLAvatarNameService : AvatarNameServiceInterface, IDBServiceInterface, IPlugin
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR NAMES SERVICE");
 
         #region Constructor
@@ -201,7 +201,7 @@ namespace SilverSim.Database.MySQL.AvatarName
             }
         }
 
-        List<UUI> GetSearchResults(MySqlCommand cmd)
+        private List<UUI> GetSearchResults(MySqlCommand cmd)
         {
             var results = new List<UUI>();
             using(MySqlDataReader dbreader = cmd.ExecuteReader())
@@ -212,21 +212,16 @@ namespace SilverSim.Database.MySQL.AvatarName
                 }
                 return results;
             }
-
         }
 
-        static UUI ToUUI(MySqlDataReader dbreader)
+        private static UUI ToUUI(MySqlDataReader dbreader) => new UUI()
         {
-            var nd = new UUI()
-            {
-                ID = dbreader.GetUUID("AvatarID"),
-                HomeURI = dbreader.GetUri("HomeURI"),
-                FirstName = dbreader.GetString("FirstName"),
-                LastName = dbreader.GetString("LastName"),
-                IsAuthoritative = true
-            };
-            return nd;
-        }
+            ID = dbreader.GetUUID("AvatarID"),
+            HomeURI = dbreader.GetUri("HomeURI"),
+            FirstName = dbreader.GetString("FirstName"),
+            LastName = dbreader.GetString("LastName"),
+            IsAuthoritative = true
+        };
 
         public void VerifyConnection()
         {

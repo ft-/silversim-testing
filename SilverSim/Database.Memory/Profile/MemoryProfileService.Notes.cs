@@ -28,23 +28,20 @@ namespace SilverSim.Database.Memory.Profile
 {
     partial class MemoryProfileService : ProfileServiceInterface.INotesInterface
     {
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>> m_Notes = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>>(delegate () { return new RwLockedDictionary<UUID, string>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>> m_Notes = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>>(() => new RwLockedDictionary<UUID, string>());
         public string this[UUI user, UUI target]
         {
             get
             {
                 string note;
-                if(!TryGetValue(user, target, out note))
+                if (!TryGetValue(user, target, out note))
                 {
                     throw new KeyNotFoundException();
                 }
                 return note;
             }
 
-            set
-            {
-                m_Notes[user.ID][target.ID] = value;
-            }
+            set { m_Notes[user.ID][target.ID] = value; }
         }
 
         public bool ContainsKey(UUI user, UUI target)

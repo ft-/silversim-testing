@@ -31,31 +31,21 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     partial class MemorySimulationDataStorage : ISimulationDataPhysicsConvexStorageInterface, IPhysicsHacdCleanCache
     {
-        readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesByMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
-        readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
+        private readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesByMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
+        private readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
 
         PhysicsConvexShape ISimulationDataPhysicsConvexStorageInterface.this[UUID meshid]
         {
-            get
-            {
-                return m_ConvexShapesByMesh[meshid];
-            }
-            set
-            {
-                m_ConvexShapesByMesh[meshid] = value;
-            }
+            get { return m_ConvexShapesByMesh[meshid]; }
+
+            set { m_ConvexShapesByMesh[meshid] = value; }
         }
 
         PhysicsConvexShape ISimulationDataPhysicsConvexStorageInterface.this[ObjectPart.PrimitiveShape primShape]
         {
-            get
-            {
-                return m_ConvexShapesByPrimShape[primShape];
-            }
-            set
-            {
-                m_ConvexShapesByPrimShape[primShape] = value;
-            }
+            get { return m_ConvexShapesByPrimShape[primShape]; }
+
+            set { m_ConvexShapesByPrimShape[primShape] = value; }
         }
 
         bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, out PhysicsConvexShape shape) =>

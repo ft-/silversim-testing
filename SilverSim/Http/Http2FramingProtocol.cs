@@ -26,12 +26,27 @@ namespace SilverSim.Http
 {
     public abstract class Http2FramingProtocol : IDisposable
     {
-        readonly Stream m_OriginalStream;
-        readonly bool m_DisposeFlag;
+        private readonly Stream m_OriginalStream;
+        private readonly bool m_DisposeFlag;
 
         [Serializable]
         public class ProtocolErrorException : Exception
         {
+            public ProtocolErrorException()
+            {
+            }
+
+            public ProtocolErrorException(string message) : base(message)
+            {
+            }
+
+            public ProtocolErrorException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected ProtocolErrorException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+            {
+            }
         }
 
         protected Http2FramingProtocol(Stream originalStream, bool dispose = true)
@@ -84,6 +99,7 @@ namespace SilverSim.Http
         [Flags]
         protected enum DataFrameFlags : byte
         {
+            None = 0,
             EndStream = 0x1,
             Padded = 0x8
         }
@@ -91,6 +107,7 @@ namespace SilverSim.Http
         [Flags]
         protected enum HeadersFrameFlags : byte
         {
+            None = 0,
             EndStream = 0x1,
             EndHeaders = 0x4,
             Padded = 0x8,
@@ -100,12 +117,14 @@ namespace SilverSim.Http
         [Flags]
         protected enum SettingsFrameFlags : byte
         {
+            None = 0,
             Ack = 0x01
         }
 
         [Flags]
         protected enum PushPromiseFrameFlags : byte
         {
+            None = 0,
             EndHeaders = 0x4,
             Padded = 0x8
         }
@@ -113,14 +132,17 @@ namespace SilverSim.Http
         [Flags]
         protected enum PingFrameFlags : byte
         {
+            None = 0,
             Ack = 0x1
         }
 
         [Flags]
         protected enum ContinuationFrameFlags : byte
         {
+            None = 0,
             EndHeaders = 0x4
         }
+
         protected sealed class Http2Frame
         {
             public int Length;
@@ -130,8 +152,8 @@ namespace SilverSim.Http
             public byte[] Data;
         }
 
-        readonly object m_SendLock = new object();
-        int m_LastReceivedStreamId;
+        private readonly object m_SendLock = new object();
+        private int m_LastReceivedStreamId;
 
         protected void SendGoAway(GoAwayReasonCode reason)
         {
@@ -151,7 +173,7 @@ namespace SilverSim.Http
         protected void SendFrame(Http2FrameType type, byte flags, int streamid, byte[] data, int offset, int length)
         {
             if(offset < 0 || length < 0 ||
-                offset > data.Length || length > data.Length || 
+                offset > data.Length || length > data.Length ||
                 offset + length > data.Length ||
                 length > 0xFFFFFF)
             {

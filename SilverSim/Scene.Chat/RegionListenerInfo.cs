@@ -33,11 +33,11 @@ namespace SilverSim.Scene.Chat
 
         internal RegionListenerInfo(
             ChatHandler handler,
-            int channel, 
+            int channel,
             string name,
-            UUID id, 
+            UUID id,
             string message,
-            Func<UUID> getuuid, 
+            Func<UUID> getuuid,
             Action<ListenEvent> send)
             : base(handler, channel, name, id, message, getuuid, GetPositionFunc, send, false)
         {

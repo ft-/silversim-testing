@@ -24,10 +24,6 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Groups;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.Database.MySQL.Groups
 {
@@ -117,16 +113,13 @@ namespace SilverSim.Database.MySQL.Groups
             GroupTitle = reader.GetString("Title")
         };
 
-        public static GroupRolemembership ToGroupRolemembershipEveryone(this MySqlDataReader reader, GroupPowers powers)
+        public static GroupRolemembership ToGroupRolemembershipEveryone(this MySqlDataReader reader, GroupPowers powers) => new GroupRolemembership()
         {
-            GroupRolemembership grouprolemem = new GroupRolemembership();
-            grouprolemem.Group = new UGI(reader.GetUUID("GroupID"));
-            grouprolemem.RoleID = UUID.Zero;
-            grouprolemem.Principal = new UUI(reader.GetUUID("PrincipalID"));
-            grouprolemem.Powers = powers;
-
-            return grouprolemem;
-        }
+            Group = new UGI(reader.GetUUID("GroupID")),
+            RoleID = UUID.Zero,
+            Principal = new UUI(reader.GetUUID("PrincipalID")),
+            Powers = powers
+        };
 
         public static GroupInvite ToGroupInvite(this MySqlDataReader reader) => new GroupInvite()
         {

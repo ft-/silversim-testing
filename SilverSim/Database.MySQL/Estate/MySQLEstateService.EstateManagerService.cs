@@ -31,7 +31,7 @@ namespace SilverSim.Database.MySQL.Estate
     {
         List<UUI> IEstateManagerServiceListAccessInterface.this[uint estateID]
         {
-            get 
+            get
             {
                 var estatemanagers = new List<UUI>();
                 using(var conn = new MySqlConnection(m_ConnectionString))
@@ -81,7 +81,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
             set
             {
-                string query = value ? 
+                string query = value ?
                     "REPLACE INTO estate_managers (EstateID, UserID) VALUES (?estateid, ?userid)" :
                     "DELETE FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"";
 
@@ -104,12 +104,6 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        IEstateManagerServiceListAccessInterface IEstateManagerServiceInterface.All
-        {
-            get
-            {
-                return this;
-            }
-        }
+        IEstateManagerServiceListAccessInterface IEstateManagerServiceInterface.All => this;
     }
 }

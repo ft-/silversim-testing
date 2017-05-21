@@ -100,10 +100,10 @@ namespace SilverSim.Database.MySQL.Groups
         {
             var vals = new Dictionary<string, object>
             {
-                { "GroupID", group.ID },
-                { "PrincipalID", principal.ID },
-                { "SelectedRoleID", roleID },
-                { "AccessToken", accessToken }
+                ["GroupID"] = group.ID,
+                ["PrincipalID"] = principal.ID,
+                ["SelectedRoleID"] = roleID,
+                ["AccessToken"] = accessToken
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {

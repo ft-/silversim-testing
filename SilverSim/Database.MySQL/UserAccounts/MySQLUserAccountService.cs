@@ -36,9 +36,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
 {
     #region Service Implementation
     [Description("MySQL UserAccount Backend")]
-    public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
-        readonly string m_ConnectionString;
+        private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
 
         #region Constructor
@@ -70,7 +70,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
         }
 
-        static IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("useraccounts"),
             new AddColumn<UUID>("ID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -237,7 +237,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string email]
         {
-            get 
+            get
             {
                 UserAccount account;
                 if(!TryGetValue(scopeID, email, out account))
@@ -336,7 +336,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string firstName, string lastName]
         {
-            get 
+            get
             {
                 UserAccount account;
                 if(!TryGetValue(scopeID, firstName, lastName, out account))
@@ -350,7 +350,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
         public override List<UserAccount> GetAccounts(UUID scopeID, string query)
         {
             string[] words = query.Split(new char[] {' '}, 2);
-            List<UserAccount> accounts = new List<UserAccount>();
+            var accounts = new List<UserAccount>();
             if(query.Trim().Length == 0)
             {
                 using (var connection = new MySqlConnection(m_ConnectionString))

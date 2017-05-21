@@ -58,7 +58,7 @@ namespace SilverSim.Http.Client
         }
 
         #region HTTP Utility Functions
-        static void ReadHeaderLines(AbstractHttpStream s, IDictionary<string, string> headers)
+        private static void ReadHeaderLines(AbstractHttpStream s, IDictionary<string, string> headers)
         {
             headers.Clear();
             string lastHeader = string.Empty;
@@ -127,9 +127,7 @@ namespace SilverSim.Http.Client
             }
 
             return DoStreamRequest(method, url, getValues, content_type, content_length, (Stream s) =>
-            {
-                s.Write(buffer, 0, buffer.Length);
-            }, compressed, timeoutms, headers);
+                s.Write(buffer, 0, buffer.Length), compressed, timeoutms, headers);
         }
 
         /*---------------------------------------------------------------------*/
@@ -143,7 +141,7 @@ namespace SilverSim.Http.Client
             int timeoutms,
             IDictionary<string, string> headers = null)
         {
-            if(null == headers)
+            if(headers == null)
             {
                 headers = new Dictionary<string, string>();
             }

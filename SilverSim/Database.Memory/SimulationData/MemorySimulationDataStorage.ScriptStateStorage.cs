@@ -29,7 +29,7 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataScriptStateStorageInterface
     {
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, byte[]>> m_ScriptStateData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, byte[]>>(delegate () { return new RwLockedDictionary<string, byte[]>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, byte[]>> m_ScriptStateData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, byte[]>>(() => new RwLockedDictionary<string, byte[]>());
 
         string GenScriptStateKey(UUID primID, UUID itemID) =>
             primID.ToString() + ":" + itemID.ToString();
@@ -43,22 +43,19 @@ namespace SilverSim.Database.Memory.SimulationData
 
         /* setting value to null will delete the entry */
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        byte[] ISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID] 
+        byte[] ISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID]
         {
             get
             {
                 byte[] state;
-                if(!ScriptStates.TryGetValue(regionID, primID, itemID, out state))
+                if (!ScriptStates.TryGetValue(regionID, primID, itemID, out state))
                 {
                     throw new KeyNotFoundException();
                 }
 
                 return state;
             }
-            set
-            {
-                m_ScriptStateData[regionID][GenScriptStateKey(primID, itemID)] = value;
-            }
+            set { m_ScriptStateData[regionID][GenScriptStateKey(primID, itemID)] = value; }
         }
 
         bool ISimulationDataScriptStateStorageInterface.Remove(UUID regionID, UUID primID, UUID itemID)
@@ -67,7 +64,7 @@ namespace SilverSim.Database.Memory.SimulationData
             return m_ScriptStateData.TryGetValue(regionID, out states) && states.Remove(GenScriptStateKey(primID, itemID));
         }
 
-        void RemoveAllScriptStatesInRegion(UUID regionID)
+        private void RemoveAllScriptStatesInRegion(UUID regionID)
         {
             m_ScriptStateData.Remove(regionID);
         }

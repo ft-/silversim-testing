@@ -29,15 +29,10 @@ namespace SilverSim.Main.Common
 {
     partial class ConfigurationLoader
     {
-        sealed class SystemIPv4Service : ExternalHostNameServiceInterface
+        private sealed class SystemIPv4Service : ExternalHostNameServiceInterface
         {
-            string m_IPv4Cached = string.Empty;
-            int m_IPv4LastCached;
-
-            public SystemIPv4Service()
-            {
-
-            }
+            private string m_IPv4Cached = string.Empty;
+            private int m_IPv4LastCached;
 
             public override string ExternalHostName
             {
@@ -68,30 +63,22 @@ namespace SilverSim.Main.Common
             }
         }
 
-        sealed class DomainNameResolveService : ExternalHostNameServiceInterface
+        private sealed class DomainNameResolveService : ExternalHostNameServiceInterface
         {
-            readonly string m_HostName;
             public DomainNameResolveService(string hostname)
             {
-                m_HostName = hostname;
+                ExternalHostName = hostname;
             }
 
             public DomainNameResolveService()
             {
-
             }
 
-            public override string ExternalHostName
-            {
-                get
-                {
-                    return m_HostName;
-                }
-            }
+            public override string ExternalHostName { get; }
         }
 
-        static readonly SystemIPv4Service m_SystemIPv4 = new SystemIPv4Service();
-        DomainNameResolveService m_DomainResolver;
+        private static readonly SystemIPv4Service m_SystemIPv4 = new SystemIPv4Service();
+        private DomainNameResolveService m_DomainResolver;
 
         public ExternalHostNameServiceInterface ExternalHostNameService
         {
@@ -114,7 +101,7 @@ namespace SilverSim.Main.Common
                 }
                 else
                 {
-                    if (null == m_DomainResolver)
+                    if (m_DomainResolver == null)
                     {
                         m_DomainResolver = new DomainNameResolveService(result);
                     }

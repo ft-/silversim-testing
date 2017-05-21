@@ -41,7 +41,7 @@ namespace SilverSim.Scene.Agent
             m_AnimationController.SendAnimations();
         }
 
-        AgentAnimationController m_AnimationController;
+        private readonly AgentAnimationController m_AnimationController;
 
         protected void RevokeAnimPermissions(UUID sourceID, ScriptPermissions permissions)
         {

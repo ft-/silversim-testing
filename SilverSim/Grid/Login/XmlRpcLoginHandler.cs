@@ -52,9 +52,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.IO;
 using System.Net;
-using System.Xml;
 
 namespace SilverSim.Grid.Login
 {
@@ -76,47 +74,47 @@ namespace SilverSim.Grid.Login
     {
         private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC LOGIN");
 
-        BaseHttpServer m_HttpServer;
-        BaseHttpServer m_HttpsServer;
-        HttpXmlRpcHandler m_XmlRpcServer;
-        RwLockedList<string> m_ConfigurationIssues;
-        bool m_AllowLoginViaHttpWhenHttpsIsConfigured;
+        private BaseHttpServer m_HttpServer;
+        private BaseHttpServer m_HttpsServer;
+        private HttpXmlRpcHandler m_XmlRpcServer;
+        private RwLockedList<string> m_ConfigurationIssues;
+        private bool m_AllowLoginViaHttpWhenHttpsIsConfigured;
 
-        UserAccountServiceInterface m_UserAccountService;
-        GridUserServiceInterface m_GridUserService;
-        GridServiceInterface m_GridService;
-        InventoryServiceInterface m_InventoryService;
-        PresenceServiceInterface m_PresenceService;
-        FriendsServiceInterface m_FriendsService;
-        AuthInfoServiceInterface m_AuthInfoService;
-        AvatarServiceInterface m_AvatarService;
-        TravelingDataServiceInterface m_TravelingDataService;
-        ILoginConnectorServiceInterface m_LoginConnectorService;
+        private UserAccountServiceInterface m_UserAccountService;
+        private GridUserServiceInterface m_GridUserService;
+        private GridServiceInterface m_GridService;
+        private InventoryServiceInterface m_InventoryService;
+        private PresenceServiceInterface m_PresenceService;
+        private FriendsServiceInterface m_FriendsService;
+        private AuthInfoServiceInterface m_AuthInfoService;
+        private AvatarServiceInterface m_AvatarService;
+        private TravelingDataServiceInterface m_TravelingDataService;
+        private ILoginConnectorServiceInterface m_LoginConnectorService;
 
-        readonly string m_UserAccountServiceName;
-        readonly string m_GridUserServiceName;
-        readonly string m_GridServiceName;
-        readonly string m_InventoryServiceName;
-        readonly string m_PresenceServiceName;
-        readonly string m_FriendsServiceName;
-        readonly string m_AuthInfoServiceName;
-        readonly string m_AvatarServiceName;
-        readonly string m_TravelingDataServiceName;
-        readonly string m_LoginConnectorServiceName;
-        UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
-        UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
-        string m_WelcomeMessage = "Welcome to your new world!";
-        Uri m_AboutPage;
-        Uri m_WelcomePage;
-        Uri m_RegisterPage;
-        bool m_GridLibraryEnabled;
-        string m_GridNick = string.Empty;
-        string m_GridName = string.Empty;
-        bool m_AllowMultiplePresences;
-        int m_MaxAgentGroups = 42;
-        string m_HomeUri;
-        string m_GatekeeperUri;
-        List<IServiceURLsGetInterface> m_ServiceURLsGetters = new List<IServiceURLsGetInterface>();
+        private readonly string m_UserAccountServiceName;
+        private readonly string m_GridUserServiceName;
+        private readonly string m_GridServiceName;
+        private readonly string m_InventoryServiceName;
+        private readonly string m_PresenceServiceName;
+        private readonly string m_FriendsServiceName;
+        private readonly string m_AuthInfoServiceName;
+        private readonly string m_AvatarServiceName;
+        private readonly string m_TravelingDataServiceName;
+        private readonly string m_LoginConnectorServiceName;
+        private UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
+        private UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
+        private string m_WelcomeMessage = "Welcome to your new world!";
+        private Uri m_AboutPage;
+        private Uri m_WelcomePage;
+        private Uri m_RegisterPage;
+        private bool m_GridLibraryEnabled;
+        private string m_GridNick = string.Empty;
+        private string m_GridName = string.Empty;
+        private bool m_AllowMultiplePresences;
+        private int m_MaxAgentGroups = 42;
+        private string m_HomeUri;
+        private string m_GatekeeperUri;
+        private List<IServiceURLsGetInterface> m_ServiceURLsGetters = new List<IServiceURLsGetInterface>();
 
         public XmlRpcLoginHandler(IConfig ownSection)
         {
@@ -164,7 +162,7 @@ namespace SilverSim.Grid.Login
             m_HttpServer.UriHandlers.Add("/login", HandleLogin);
             m_HttpServer.UriHandlers.Add("/get_grid_info", HandleGetGridInfo);
             m_HttpServer.UriHandlers.Add("/json_grid_info", HandleJsonGridInfo);
-            if (null != m_HttpsServer)
+            if (m_HttpsServer != null)
             {
                 m_HttpsServer.UriHandlers.Add("/login", HandleLogin);
                 m_HttpsServer.UriHandlers.Add("/get_grid_info", HandleGetGridInfo);
@@ -173,10 +171,12 @@ namespace SilverSim.Grid.Login
             m_XmlRpcServer.XmlRpcMethods.Add("login_to_simulator", HandleLogin);
         }
 
-        Dictionary<string, string> CollectGridInfo()
+        private Dictionary<string, string> CollectGridInfo()
         {
-            var list = new Dictionary<string, string>();
-            list.Add("platform", "SilverSim");
+            var list = new Dictionary<string, string>
+            {
+                ["platform"] = "SilverSim"
+            };
             if (m_HttpsServer != null && !m_AllowLoginViaHttpWhenHttpsIsConfigured)
             {
                 list.Add("login", m_HttpsServer.ServerURI);
@@ -202,7 +202,7 @@ namespace SilverSim.Grid.Login
             return list;
         }
 
-        void HandleJsonGridInfo(HttpRequest httpreq)
+        private void HandleJsonGridInfo(HttpRequest httpreq)
         {
             var jsonres = new Map();
             foreach (KeyValuePair<string, string> kvp in CollectGridInfo())
@@ -219,7 +219,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        void HandleGetGridInfo(HttpRequest httpreq)
+        private void HandleGetGridInfo(HttpRequest httpreq)
         {
             using (var res = httpreq.BeginResponse("text/xml"))
             {
@@ -235,10 +235,10 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        class LoginData
+        private class LoginData
         {
-            static readonly Random m_RandomNumber = new Random();
-            static readonly object m_RandomNumberLock = new object();
+            private static readonly Random m_RandomNumber = new Random();
+            private static readonly object m_RandomNumberLock = new object();
 
             private static uint NewCircuitCode
             {
@@ -276,7 +276,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        UUID Authenticate(UUID avatarid, UUID sessionid, string passwd)
+        private UUID Authenticate(UUID avatarid, UUID sessionid, string passwd)
         {
             try
             {
@@ -288,7 +288,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        void HandleLogin(HttpRequest httpreq)
+        private void HandleLogin(HttpRequest httpreq)
         {
             if (!m_AllowLoginViaHttpWhenHttpsIsConfigured && m_HttpsServer != null && !httpreq.IsSsl)
             {
@@ -339,7 +339,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        XmlRpc.XmlRpcResponse HandleLogin(XmlRpc.XmlRpcRequest req)
+        private XmlRpc.XmlRpcResponse HandleLogin(XmlRpc.XmlRpcRequest req)
         {
             if (!m_AllowLoginViaHttpWhenHttpsIsConfigured && m_HttpsServer != null && !req.IsSsl)
             {
@@ -348,13 +348,12 @@ namespace SilverSim.Grid.Login
 
             if (req.Params.Count != 1)
             {
-                
                 m_Log.ErrorFormat("Request from {0} does not contain a single struct parameter", req.CallerIP);
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing struct parameter");
             }
 
             var structParam = req.Params[0] as Map;
-            if(null == structParam)
+            if(structParam == null)
             {
                 m_Log.ErrorFormat("Request from {0} does not contain struct parameter", req.CallerIP);
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing struct parameter");
@@ -455,7 +454,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        XmlRpc.XmlRpcResponse LoginAuthenticated(XmlRpc.XmlRpcRequest req, LoginData loginData)
+        private XmlRpc.XmlRpcResponse LoginAuthenticated(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             try
             {
@@ -600,7 +599,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
+        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             m_GridUserService.LoggedInAdd(loginData.Account.Principal);
             try
@@ -615,7 +614,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
+        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             var hgdata = new TravelingDataInfo()
             {
@@ -648,7 +647,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
+        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             var flags = TeleportFlags.None;
             if(loginData.Account.UserLevel >= 200)
@@ -692,7 +691,7 @@ namespace SilverSim.Grid.Login
             {
                 var data = new Map
                 {
-                    { "folder_id", loginData.InventoryRoot.ID }
+                    ["folder_id"] = loginData.InventoryRoot.ID
                 };
                 var ardata = new AnArray
                 {
@@ -719,7 +718,7 @@ namespace SilverSim.Grid.Login
             {
                 var data = new Map
                 {
-                    { "folder_id", loginData.InventoryLibRoot.ID }
+                    ["folder_id"] = loginData.InventoryLibRoot.ID
                 };
                 var ardata = new AnArray
                 {
@@ -872,8 +871,8 @@ namespace SilverSim.Grid.Login
                 {
                     var gestureData = new Map
                     {
-                        { "asset_id", item.AssetID },
-                        { "item_id", item.ID }
+                        ["asset_id"] = item.AssetID,
+                        ["item_id"] = item.ID
                     };
                     gestureArray.Add(gestureData);
                 }
@@ -888,7 +887,7 @@ namespace SilverSim.Grid.Login
             {
                 var data = new Map
                 {
-                    { "agent_id", m_GridLibraryOwner }
+                    ["agent_id"] = m_GridLibraryOwner
                 };
                 var ar = new AnArray
                 {
@@ -962,25 +961,25 @@ namespace SilverSim.Grid.Login
             return res;
         }
 
-        const string Option_InventoryRoot = "inventory-root";
-        const string Option_InventorySkeleton = "inventory-skeleton";
-        const string Option_InventoryLibRoot = "inventory-lib-root";
-        const string Option_InventoryLibOwner = "inventory-lib-owner";
-        const string Option_inventoryLibSkeleton = "inventory-skel-lib";
-        const string Option_Gestures = "gestures";
-        const string Option_EventCategories = "event_categories";
-        const string Option_EventNotifications = "event_notifications";
-        const string Option_ClassifiedCategories = "classified_categories";
-        const string Option_BuddyList = "buddy-list";
-        const string Option_UiConfig = "ui-config";
-        const string Option_LoginFlags = "login-flags";
-        const string Option_GlobalTextures = "global-textures";
-        const string Option_AdultCompliant = "adult_compliant";
+        private const string Option_InventoryRoot = "inventory-root";
+        private const string Option_InventorySkeleton = "inventory-skeleton";
+        private const string Option_InventoryLibRoot = "inventory-lib-root";
+        private const string Option_InventoryLibOwner = "inventory-lib-owner";
+        private const string Option_inventoryLibSkeleton = "inventory-skel-lib";
+        private const string Option_Gestures = "gestures";
+        private const string Option_EventCategories = "event_categories";
+        private const string Option_EventNotifications = "event_notifications";
+        private const string Option_ClassifiedCategories = "classified_categories";
+        private const string Option_BuddyList = "buddy-list";
+        private const string Option_UiConfig = "ui-config";
+        private const string Option_LoginFlags = "login-flags";
+        private const string Option_GlobalTextures = "global-textures";
+        private const string Option_AdultCompliant = "adult_compliant";
 
-        readonly string[] RequiredParameters = new string[] { "first", "last", "start", "passwd", "channel", "version", "mac", "id0" };
+        private readonly string[] RequiredParameters = new string[] { "first", "last", "start", "passwd", "channel", "version", "mac", "id0" };
 
         [Serializable]
-        class LoginFailResponseException : Exception
+        private class LoginFailResponseException : Exception
         {
             public string Reason { get; }
 
@@ -991,7 +990,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        XmlRpc.XmlRpcResponse LoginFailResponse(string reason, string message)
+        private XmlRpc.XmlRpcResponse LoginFailResponse(string reason, string message)
         {
             var m = new Map
             {
@@ -1014,9 +1013,9 @@ namespace SilverSim.Grid.Login
         }
 
         #region Server Parameters
-        readonly object m_ConfigUpdateLock = new object();
+        private readonly object m_ConfigUpdateLock = new object();
 
-        const string ConfigIssueText = "Server parameter \"AllowLoginViaHttpWhenHttpsIsConfigured\" is set to true. Please disable it.";
+        private const string ConfigIssueText = "Server parameter \"AllowLoginViaHttpWhenHttpsIsConfigured\" is set to true. Please disable it.";
         [ServerParam("AllowLoginViaHttpWhenHttpsIsConfigured")]
         public void HandleAllowLoginViaHttpWhenHttpsIsConfigured(UUID regionid, string value)
         {
@@ -1060,6 +1059,7 @@ namespace SilverSim.Grid.Login
             }
             m_WelcomeMessage = value;
         }
+
         [ServerParam("GridLibraryOwner")]
         public void HandleGridLibraryOwner(UUID regionid, string value)
         {
@@ -1200,7 +1200,7 @@ namespace SilverSim.Grid.Login
     [PluginName("XmlRpcLoginHandler")]
     public class XmlRpcLoginHandlerFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => 
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
             new XmlRpcLoginHandler(ownSection);
     }
     #endregion

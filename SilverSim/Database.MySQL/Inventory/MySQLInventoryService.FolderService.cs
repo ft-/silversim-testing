@@ -138,7 +138,7 @@ namespace SilverSim.Database.MySQL.Inventory
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, UUID key]
         {
-            get 
+            get
             {
                 InventoryFolder folder;
                 if(!Folder.TryGetValue(principalID, key, out folder))
@@ -235,7 +235,7 @@ namespace SilverSim.Database.MySQL.Inventory
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, AssetType type]
         {
-            get 
+            get
             {
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
@@ -426,7 +426,7 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void PurgeOrDelete(UUID principalID, UUID folderID, MySqlConnection connection, bool deleteFolder)
+        private void PurgeOrDelete(UUID principalID, UUID folderID, MySqlConnection connection, bool deleteFolder)
         {
             List<UUID> folders;
             InventoryFolder thisfolder = Folder[principalID, folderID];
@@ -440,8 +440,10 @@ namespace SilverSim.Database.MySQL.Inventory
             {
                 if (deleteFolder)
                 {
-                    folders = new List<UUID>();
-                    folders.Add(folderID);
+                    folders = new List<UUID>
+                    {
+                        folderID
+                    };
                 }
                 else
                 {
@@ -517,7 +519,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        List<UUID> GetFolderIDs(UUID principalID, UUID key, MySqlConnection connection)
+        private List<UUID> GetFolderIDs(UUID principalID, UUID key, MySqlConnection connection)
         {
             var folders = new List<UUID>();
             using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE ?ownerid AND ParentFolderID LIKE ?folderid", connection))
@@ -556,7 +558,7 @@ namespace SilverSim.Database.MySQL.Inventory
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void IncrementVersionNoExcept(UUID principalID, UUID folderID)
+        private void IncrementVersionNoExcept(UUID principalID, UUID folderID)
         {
             try
             {

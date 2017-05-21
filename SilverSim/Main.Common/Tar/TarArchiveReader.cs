@@ -32,7 +32,7 @@ namespace SilverSim.Main.Common.Tar
     public class TarArchiveReader : Stream
     {
 #if DEBUG
-        static ILog m_Log = LogManager.GetLogger("TAR ARCHIVE READER");
+        private static readonly ILog m_Log = LogManager.GetLogger("TAR ARCHIVE READER");
 #endif
         /* TarArchiveReader has Stream support, so that we can directly apply XmlTextReader and so on */
         [Serializable]
@@ -40,25 +40,21 @@ namespace SilverSim.Main.Common.Tar
         {
             public EndOfTarException()
             {
-
             }
 
             public EndOfTarException(string message)
                 : base(message)
             {
-
             }
 
             protected EndOfTarException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public EndOfTarException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -69,21 +65,21 @@ namespace SilverSim.Main.Common.Tar
             public int Length;
         }
 
-        int m_Position;
-        readonly Stream m_Stream;
-        int m_LengthOfData;
+        private int m_Position;
+        private readonly Stream m_Stream;
+        private int m_LengthOfData;
 
         public TarArchiveReader(Stream s)
         {
             m_Stream = s;
         }
 
-        byte[] ReadHeaderBytes()
+        private byte[] ReadHeaderBytes()
         {
-            byte[] buf = new byte[512];
+            var buf = new byte[512];
             if (m_LengthOfData != 0)
             {
-                byte[] exbuf = new byte[8192];
+                var exbuf = new byte[8192];
                 while (m_LengthOfData > 0)
                 {
                     int readBytes = m_Stream.Read(exbuf, 0, m_LengthOfData > exbuf.Length ? exbuf.Length : m_LengthOfData);
@@ -110,7 +106,7 @@ namespace SilverSim.Main.Common.Tar
             Encoding ascii = Encoding.ASCII;
             bool haveLongLink = false;
             byte[] buf;
-            Header hdr = new Header();
+            var hdr = new Header();
             do
             {
                 buf = ReadHeaderBytes();
@@ -120,11 +116,11 @@ namespace SilverSim.Main.Common.Tar
                 }
                 hdr.FileType = (TarFileType)buf[156];
                 hdr.Length = Convert.ToInt32(ascii.GetString(buf, 124, 11), 8);
-                
+
                 if(buf[156] == (byte)TarFileType.LongLink)
                 {
                     haveLongLink = true;
-                    byte[] fnameBytes = new byte[hdr.Length];
+                    var fnameBytes = new byte[hdr.Length];
                     m_LengthOfData = hdr.Length;
                     if(Read(fnameBytes, 0, hdr.Length) != hdr.Length)
                     {
@@ -150,29 +146,11 @@ namespace SilverSim.Main.Common.Tar
             return hdr;
         }
 
-        public override bool CanRead
-        {
-            get 
-            {
-                return true;
-            }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanWrite
-        {
-            get 
-            {
-                return false;
-            }
-        }
+        public override bool CanWrite => false;
 
         public override void Flush()
         {
@@ -181,22 +159,14 @@ namespace SilverSim.Main.Common.Tar
 
         public override long Length
         {
-            get 
-            { 
-                throw new NotSupportedException(); 
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public override long Position
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
+
+            set { throw new NotSupportedException(); }
         }
 
         public override int Read(byte[] buffer, int offset, int count)

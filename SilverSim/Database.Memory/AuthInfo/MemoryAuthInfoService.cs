@@ -35,7 +35,7 @@ namespace SilverSim.Database.Memory.AuthInfo
     [Description("Memory AuthInfo backend")]
     public class MemoryAuthInfoService : AuthInfoServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        class AuthToken
+        private class AuthToken
         {
             public readonly UUID UserID;
             public readonly UUID SessionID;
@@ -49,8 +49,8 @@ namespace SilverSim.Database.Memory.AuthInfo
             }
         }
 
-        readonly RwLockedDictionary<UUID, UserAuthInfo> m_AuthInfos = new RwLockedDictionary<UUID, UserAuthInfo>();
-        readonly RwLockedDictionary<UUID, AuthToken> m_Tokens = new RwLockedDictionary<UUID, AuthToken>();
+        private readonly RwLockedDictionary<UUID, UserAuthInfo> m_AuthInfos = new RwLockedDictionary<UUID, UserAuthInfo>();
+        private readonly RwLockedDictionary<UUID, AuthToken> m_Tokens = new RwLockedDictionary<UUID, AuthToken>();
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -111,7 +111,7 @@ namespace SilverSim.Database.Memory.AuthInfo
 
         public override void ReleaseToken(UUID accountId, UUID secureSessionId)
         {
-            m_Tokens.RemoveIf(secureSessionId, delegate (AuthToken tok) { return accountId == tok.UserID; });
+            m_Tokens.RemoveIf(secureSessionId, (AuthToken tok) => accountId == tok.UserID);
         }
 
         public override void ReleaseTokenBySession(UUID accountId, UUID sessionId)

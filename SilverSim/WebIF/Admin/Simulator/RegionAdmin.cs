@@ -1082,7 +1082,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     return;
                 }
                 m_Scenes.Add(si);
-                si.LoadSceneAsync();
+                si.LoadScene();
                 m_WebIF.SuccessResponse(req, new Map());
             }
         }

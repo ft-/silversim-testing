@@ -39,8 +39,8 @@ namespace SilverSim.Database.MySQL.Avatar
     [Description("MySQL Avatar Backend")]
     public sealed class MySQLAvatarService : AvatarServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        readonly string m_ConnectionString;
-        static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");
+        private readonly string m_ConnectionString;
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");
 
         public MySQLAvatarService(string connectionString)
         {
@@ -80,7 +80,7 @@ namespace SilverSim.Database.MySQL.Avatar
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    if (null == value)
+                    if (value == null)
                     {
                         using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE ?principalid", connection))
                         {
@@ -90,7 +90,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     }
                     else
                     {
-                        connection.InsideTransaction(delegate()
+                        connection.InsideTransaction(() =>
                         {
                             using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE ?principalid", connection))
                             {
@@ -98,8 +98,10 @@ namespace SilverSim.Database.MySQL.Avatar
                                 cmd.ExecuteNonQuery();
                             }
 
-                            var vals = new Dictionary<string, object>();
-                            vals["PrincipalID"] = avatarID;
+                            var vals = new Dictionary<string, object>
+                            {
+                                ["PrincipalID"] = avatarID
+                            };
                             foreach (KeyValuePair<string, string> kvp in value)
                             {
                                 vals["Name"] = kvp.Key;
@@ -122,7 +124,7 @@ namespace SilverSim.Database.MySQL.Avatar
                 {
                     connection.Open();
 
-                    connection.InsideTransaction(delegate()
+                    connection.InsideTransaction(() =>
                     {
                         foreach (string key in itemKeys)
                         {
@@ -145,11 +147,11 @@ namespace SilverSim.Database.MySQL.Avatar
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 else if (itemKeys == null)
                 {
-                    throw new ArgumentNullException("itemKeys");
+                    throw new ArgumentNullException(nameof(itemKeys));
                 }
                 if (itemKeys.Count != value.Count)
                 {
@@ -160,10 +162,11 @@ namespace SilverSim.Database.MySQL.Avatar
                 {
                     connection.Open();
 
-                    var vals = new Dictionary<string, object>();
-                    vals["PrincipalID"] = avatarID;
-
-                    connection.InsideTransaction(delegate()
+                    var vals = new Dictionary<string, object>
+                    {
+                        ["PrincipalID"] = avatarID
+                    };
+                    connection.InsideTransaction(() =>
                     {
                         for (int i = 0; i < itemKeys.Count; ++i)
                         {
@@ -217,10 +220,12 @@ namespace SilverSim.Database.MySQL.Avatar
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    var vals = new Dictionary<string, object>();
-                    vals["PrincipalID"] = avatarID;
-                    vals["Name"] = itemKey;
-                    vals["Value"] = value;
+                    var vals = new Dictionary<string, object>
+                    {
+                        ["PrincipalID"] = avatarID,
+                        ["Name"] = itemKey,
+                        ["Value"] = value
+                    };
                     connection.ReplaceInto("avatars", vals);
                 }
             }
@@ -231,7 +236,7 @@ namespace SilverSim.Database.MySQL.Avatar
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate()
+                connection.InsideTransaction(() =>
                 {
                     foreach (string name in nameList)
                     {
@@ -277,7 +282,7 @@ namespace SilverSim.Database.MySQL.Avatar
             }
         }
 
-        static readonly IMigrationElement[] Migrations = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
             new SqlTable("avatars"),
             new AddColumn<UUID>("PrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -300,7 +305,7 @@ namespace SilverSim.Database.MySQL.Avatar
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");
 
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => 
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
             new MySQLAvatarService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion

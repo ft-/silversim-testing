@@ -31,7 +31,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 {
     public class VHACD : IDisposable
     {
-        static ILog m_Log = LogManager.GetLogger("VHACD");
+        private static readonly ILog m_Log = LogManager.GetLogger("VHACD");
 
         public struct ConvexHull
         {
@@ -80,34 +80,35 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 OclAcceleration = true;
             }
         }
-        [DllImport("kernel32.dll")]
-        static extern IntPtr LoadLibrary(string dllToLoad);
 
-        static readonly object m_InitLock = new object();
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr LoadLibrary(string dllToLoad);
+
+        private static readonly object m_InitLock = new object();
         static bool m_Inited;
 
-        IntPtr m_VHacd;
+        private IntPtr m_VHacd;
 
         [DllImport("vhacd", EntryPoint = "_ZN5VHACD11CreateVHACDEv")]
-        static extern IntPtr VHacd_Create();
+        private static extern IntPtr VHacd_Create();
 
         [DllImport("vhacd", EntryPoint = "vhacd_Cancel")]
-        static extern void VHacd_Cancel(IntPtr vhacd);
+        private static extern void VHacd_Cancel(IntPtr vhacd);
 
         [DllImport("vhacd", EntryPoint = "vhacd_Release")]
-        static extern void VHacd_Release(IntPtr vhacd);
+        private static extern void VHacd_Release(IntPtr vhacd);
 
         [DllImport("vhacd", EntryPoint = "vhacd_Clean")]
-        static extern void VHacd_Clean(IntPtr vhacd);
+        private static extern void VHacd_Clean(IntPtr vhacd);
 
         [DllImport("vhacd", EntryPoint = "vhacd_GetNConvexHulls")]
-        static extern int VHacd_GetNConvexHulls(IntPtr vhacd);
+        private static extern int VHacd_GetNConvexHulls(IntPtr vhacd);
 
         [DllImport("vhacd", EntryPoint = "vhacd_Compute")]
-        static extern bool VHacd_Compute(IntPtr vhacd, double[] points, uint stridePoints, uint countPoints, int[] triangles, uint strideTriangles, uint countTriangles, ref Parameters param);
+        private static extern bool VHacd_Compute(IntPtr vhacd, double[] points, uint stridePoints, uint countPoints, int[] triangles, uint strideTriangles, uint countTriangles, ref Parameters param);
 
         [DllImport("vhacd", EntryPoint = "vhacd_GetConvexHull")]
-        static extern void VHacd_GetConvexHull(IntPtr vhacd, uint index, ref ConvexHull ch);
+        private static extern void VHacd_GetConvexHull(IntPtr vhacd, uint index, ref ConvexHull ch);
 
         public void Dispose()
         {
@@ -117,7 +118,6 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 m_VHacd = IntPtr.Zero;
             }
         }
-
 
         public VHACD()
         {
@@ -158,7 +158,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 throw new InvalidDataException();
             }
 
-            PhysicsConvexShape shape = new PhysicsConvexShape();
+            var shape = new PhysicsConvexShape();
             int numhulls = VHacd_GetNConvexHulls(m_VHacd);
             for (uint hullidx = 0; hullidx < numhulls; ++hullidx)
             {

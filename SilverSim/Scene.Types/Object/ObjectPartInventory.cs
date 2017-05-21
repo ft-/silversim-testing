@@ -50,10 +50,9 @@ namespace SilverSim.Scene.Types.Object
         public int InventorySerial = 1;
 
         public UUID PartID { get; internal set; }
-        readonly object m_DataLock = new object();
+        private readonly object m_DataLock = new object();
 
-
-        int m_SuspendCount;
+        private int m_SuspendCount;
         public void SuspendScripts()
         {
             Interlocked.Increment(ref m_SuspendCount);
@@ -153,8 +152,7 @@ namespace SilverSim.Scene.Types.Object
                     if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
                     {
                         var script = item.ScriptInstance;
-                        if(script != null &&
-                            script.IsRunning)
+                        if(script?.IsRunning == true)
                         {
                             ++n;
                         }
@@ -194,7 +192,7 @@ namespace SilverSim.Scene.Types.Object
         {
             base.Add(key1, key2, item);
             Interlocked.Increment(ref InventorySerial);
-            
+
             var addDelegate = OnChange;
             if(addDelegate != null)
             {
@@ -310,10 +308,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 Add(newItem, false);
             }
-            if (null != script)
-            {
-                script.Remove();
-            }
+            script?.Remove();
             Interlocked.Increment(ref InventorySerial);
             var updateDelegate = OnChange;
             if (updateDelegate != null)
@@ -331,10 +326,7 @@ namespace SilverSim.Scene.Types.Object
             if (base.Remove(key1, out item))
             {
                 ScriptInstance script = item.RemoveScriptInstance;
-                if (null != script)
-                {
-                    script.Remove();
-                }
+                script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -355,10 +347,7 @@ namespace SilverSim.Scene.Types.Object
             if (base.Remove(key2, out item))
             {
                 ScriptInstance script = item.RemoveScriptInstance;
-                if (null != script)
-                {
-                    script.Remove();
-                }
+                script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -378,10 +367,7 @@ namespace SilverSim.Scene.Types.Object
             if (base.Remove(key1, out item))
             {
                 ScriptInstance script = item.RemoveScriptInstance;
-                if (null != script)
-                {
-                    script.Remove();
-                }
+                script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -401,10 +387,7 @@ namespace SilverSim.Scene.Types.Object
             if (base.Remove(key2, out item))
             {
                 ScriptInstance script = item.RemoveScriptInstance;
-                if (null != script)
-                {
-                    script.Remove();
-                }
+                script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -440,10 +423,12 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner)
+        private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner)
         {
-            var item = new ObjectPartInventoryItem();
-            item.Owner = currentOwner;
+            var item = new ObjectPartInventoryItem()
+            {
+                Owner = currentOwner
+            };
             var grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
             bool ownerChanged = false;
 
@@ -461,7 +446,7 @@ namespace SilverSim.Scene.Types.Object
                         {
                             break;
                         }
-                        
+
                         switch (reader.Name)
                         {
                             case "AssetID":
@@ -570,9 +555,11 @@ namespace SilverSim.Scene.Types.Object
 
         public void FillFromXml(XmlTextReader reader, UUI currentOwner)
         {
-            var part = new ObjectPart();
-            part.Owner = currentOwner;
-            if(reader.IsEmptyElement)
+            var part = new ObjectPart()
+            {
+                Owner = currentOwner
+            };
+            if (reader.IsEmptyElement)
             {
                 throw new InvalidObjectXmlException();
             }

@@ -40,10 +40,12 @@ namespace SilverSim.Groups.Common
             m_InnerService.Members.ContainsKey(requestingAgent, group, principal);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UGI group] => m_InnerService.Members[requestingAgent, group];
+        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UGI group] =>
+            m_InnerService.Members[requestingAgent, group];
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UUI principal] => m_InnerService.Members[requestingAgent, principal];
+        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UUI principal] =>
+            m_InnerService.Members[requestingAgent, principal];
 
         GroupMember IGroupMembersInterface.Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken)
         {

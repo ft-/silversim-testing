@@ -46,24 +46,15 @@ namespace SilverSim.Main.Common
         IsRunning = 16,
         InvalidParameter = 17,
         NoEstates = 18
-    };
+    }
 
     public interface IAdminWebIF
     {
-        RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights
-        {
-            get;
-        }
+        RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights { get; }
 
-        RwLockedDictionary<string, Action<HttpRequest, Map>> JsonMethods
-        {
-            get;
-        }
+        RwLockedDictionary<string, Action<HttpRequest, Map>> JsonMethods { get; }
 
-        RwLockedList<string> ModuleNames
-        {
-            get;
-        }
+        RwLockedList<string> ModuleNames { get; }
 
         void SuccessResponse(HttpRequest req, Map m);
         void ErrorResponse(HttpRequest req, AdminWebIfErrorResult reason);

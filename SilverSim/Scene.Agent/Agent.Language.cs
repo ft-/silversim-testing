@@ -26,9 +26,9 @@ namespace SilverSim.Scene.Agent
     partial class Agent
     {
         #region AgentLanguage
-        string m_AgentLanguage = string.Empty;
-        CultureInfo m_AgentCultureInfo;
-        readonly object m_AgentLanguageLock = new object();
+        private string m_AgentLanguage = string.Empty;
+        private CultureInfo m_AgentCultureInfo;
+        private readonly object m_AgentLanguageLock = new object();
 
         public string AgentLanguage
         {
@@ -57,7 +57,7 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
+        private static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
         public CultureInfo CurrentCulture
         {
             get

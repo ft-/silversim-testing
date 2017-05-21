@@ -27,7 +27,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
     [PluginName("Basic")]
     public sealed class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig) => 
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig) =>
             new RegionLoaderService(ownConfig.GetString("RegionStorage"));
     }
 }

@@ -30,10 +30,10 @@ namespace SilverSim.Http.Client
         {
             private AbstractHttpStream m_Input;
             private long m_RemainingLength;
-            readonly bool m_KeepAlive;
-            readonly string m_Scheme;
-            readonly string m_Host;
-            readonly int m_Port;
+            private readonly bool m_KeepAlive;
+            private readonly string m_Scheme;
+            private readonly string m_Host;
+            private readonly int m_Port;
 
             internal ResponseBodyStream(AbstractHttpStream input, long contentLength, bool keepAlive, string scheme, string host, int port)
             {
@@ -58,26 +58,16 @@ namespace SilverSim.Http.Client
 
             public override long Position
             {
-                get
-                {
-                    return Length - m_RemainingLength;
-                }
-                set
-                {
-                    throw new NotSupportedException();
-                }
+                get { return Length - m_RemainingLength; }
+
+                set { throw new NotSupportedException(); }
             }
 
-            public override int ReadTimeout 
-            { 
-                get
-                {
-                    return m_Input.ReadTimeout;
-                }
-                set
-                {
-                    m_Input.ReadTimeout = value;
-                }
+            public override int ReadTimeout
+            {
+                get { return m_Input.ReadTimeout; }
+
+                set { m_Input.ReadTimeout = value; }
             }
 
             public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
@@ -89,7 +79,7 @@ namespace SilverSim.Http.Client
             {
                 if(m_Input != null)
                 {
-                    byte[] b = new byte[10240];
+                    var b = new byte[10240];
                     while(m_RemainingLength > 0)
                     {
                         Read(b, 0, m_RemainingLength > b.Length ?

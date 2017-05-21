@@ -39,10 +39,8 @@ namespace SilverSim.Scene.Types.Object
 
         public double FacelightLimitIntensity
         {
-            get
-            {
-                return m_FacelightLimitIntensity;
-            }
+            get { return m_FacelightLimitIntensity; }
+
             set
             {
                 lock (m_DataLock)
@@ -67,19 +65,17 @@ namespace SilverSim.Scene.Types.Object
 
         public double AttachmentLightLimitIntensity
         {
-            get
-            {
-                return m_AttachmentLightLimitIntensity;
-            }
+            get { return m_AttachmentLightLimitIntensity; }
+
             set
             {
-                lock(m_DataLock)
+                lock (m_DataLock)
                 {
                     if (value > 1)
                     {
                         value = 1;
                     }
-                    else if(value < 0)
+                    else if (value < 0)
                     {
                         value = 0;
                     }
@@ -95,10 +91,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsFacelightDisabled
         {
-            get
-            {
-                return m_IsFacelightDisabled;
-            }
+            get { return m_IsFacelightDisabled; }
+
             set
             {
                 lock (m_DataLock)
@@ -115,10 +109,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsAttachmentLightsDisabled
         {
-            get
-            {
-                return m_IsAttachmentLightsDisabled;
-            }
+            get { return m_IsAttachmentLightsDisabled; }
+
             set
             {
                 lock (m_DataLock)

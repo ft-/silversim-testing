@@ -32,10 +32,10 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public sealed class Http1Response : HttpResponse
     {
-        readonly Stream m_Output;
+        private readonly Stream m_Output;
         private bool m_IsHeaderSent;
         private Stream ResponseBody;
-        readonly bool IsChunkedAccepted;
+        private readonly bool IsChunkedAccepted;
 
         [SuppressMessage("Gendarme.Rules.Correctness", "DisposableFieldsShouldBeDisposedRule")]
         public Http1Response(Stream output, HttpRequest request, HttpStatusCode statusCode, string statusDescription)
@@ -164,15 +164,9 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override void Dispose()
         {
-            if (null != ResponseBody)
-            {
-                ResponseBody.Dispose();
-            }
+            ResponseBody?.Dispose();
             Close();
-            if (null != m_Output)
-            {
-                m_Output.Dispose();
-            }
+            m_Output?.Dispose();
         }
     }
 }

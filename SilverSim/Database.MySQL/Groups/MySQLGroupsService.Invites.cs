@@ -104,11 +104,11 @@ namespace SilverSim.Database.MySQL.Groups
         {
             var vals = new Dictionary<string, object>
             {
-                { "InviteID", invite.ID },
-                { "GroupID", invite.Group.ID },
-                { "RoleID", invite.RoleID },
-                { "PrincipalID", invite.Principal.ID },
-                { "Timestamp", invite.Timestamp }
+                ["InviteID"] = invite.ID,
+                ["GroupID"] = invite.Group.ID,
+                ["RoleID"] = invite.RoleID,
+                ["PrincipalID"] = invite.Principal.ID,
+                ["Timestamp"] = invite.Timestamp
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {

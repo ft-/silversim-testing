@@ -112,7 +112,7 @@ namespace SilverSim.Database.MySQL.Profile
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         ProfilePick IPicksInterface.this[UUI user, UUID id]
         {
-            get 
+            get
             {
                 ProfilePick pick;
                 if(!Picks.TryGetValue(user, id, out pick))

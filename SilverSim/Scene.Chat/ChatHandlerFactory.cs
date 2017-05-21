@@ -30,9 +30,9 @@ namespace SilverSim.Scene.Chat
     [Description("Region Chat Handler")]
     public sealed class ChatHandlerFactory : ChatServiceFactoryInterface, IPlugin
     {
-        readonly double m_WhisperDistance;
-        readonly double m_SayDistance;
-        readonly double m_ShoutDistance;
+        private readonly double m_WhisperDistance;
+        private readonly double m_SayDistance;
+        private readonly double m_ShoutDistance;
 
         public ChatHandlerFactory(double whisperDistance, double sayDistance, double shoutDistance)
         {

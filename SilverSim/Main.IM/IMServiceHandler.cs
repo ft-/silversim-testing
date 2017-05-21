@@ -38,12 +38,12 @@ namespace SilverSim.Main.IM
     {
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();
         protected internal RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
-        readonly uint m_MaxThreads;
-        readonly object m_Lock = new object();
-        IMRouter m_IMRouter;
+        private readonly uint m_MaxThreads;
+        private readonly object m_Lock = new object();
+        private IMRouter m_IMRouter;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void IMSendThread(object s)
+        private void IMSendThread(object s)
         {
             var service = (IMServiceHandler)s;
             Thread thread = Thread.CurrentThread;
@@ -69,7 +69,7 @@ namespace SilverSim.Main.IM
                 service.m_Threads.Remove(thread);
             }
         }
-        
+
         #region Constructor
         public IMServiceHandler(uint maxThreads)
         {

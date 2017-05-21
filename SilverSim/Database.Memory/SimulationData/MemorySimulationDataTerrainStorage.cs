@@ -29,7 +29,7 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public partial class MemorySimulationDataStorage : ISimulationDataTerrainStorageInterface
     {
-        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>> m_TerrainData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>>(delegate() { return new RwLockedDictionary<uint, byte[]>(); } );
+        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>> m_TerrainData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>>(() => new RwLockedDictionary<uint, byte[]>());
 
         List<LayerPatch> ISimulationDataTerrainStorageInterface.this[UUID regionID]
         {
@@ -41,9 +41,11 @@ namespace SilverSim.Database.Memory.SimulationData
                 {
                     foreach(var kvp in patchesData)
                     {
-                        var patch = new LayerPatch();
-                        patch.ExtendedPatchID = kvp.Key;
-                        patch.Serialization = kvp.Value;
+                        var patch = new LayerPatch()
+                        {
+                            ExtendedPatchID = kvp.Key,
+                            Serialization = kvp.Value
+                        };
                         patches.Add(patch);
                     }
                 }
@@ -51,7 +53,7 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        void RemoveTerrain(UUID regionID)
+        private void RemoveTerrain(UUID regionID)
         {
             m_TerrainData.Remove(regionID);
         }

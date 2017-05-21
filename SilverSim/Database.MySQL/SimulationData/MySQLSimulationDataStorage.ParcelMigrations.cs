@@ -27,7 +27,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage
     {
-        static readonly IMigrationElement[] Migrations_Parcels = new IMigrationElement[]
+        private static readonly IMigrationElement[] Migrations_Parcels = new IMigrationElement[]
         {
             #region Table parcels
             new SqlTable("parcels"),
