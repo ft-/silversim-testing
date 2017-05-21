@@ -45,16 +45,19 @@ namespace SilverSim.Viewer.Core
             ve.SessionID = UUID.Zero;
 
             SceneInterface scene = Scene;
-            if (scene != null)
+            ViewerAgent thisAgent = Agent;
+            if(thisAgent == null || scene == null)
             {
-                foreach (var agent in scene.Agents)
+                return;
+            }
+            UUI agentOwner = thisAgent.Owner;
+            foreach (var agent in scene.Agents)
+            {
+                if (agent.Owner.Equals(agentOwner))
                 {
-                    if (agent.Owner.Equals(Agent.Owner))
-                    {
-                        continue;
-                    }
-                    agent.SendMessageAlways(m, scene.ID);
+                    continue;
                 }
+                agent.SendMessageAlways(m, scene.ID);
             }
         }
     }
