@@ -39,25 +39,25 @@ namespace SilverSim.Scene.Types.Scene
     [ServerParam("SpawnpointRouting")]
     public partial class SceneInterface
     {
-        bool m_EnableLandingOverrideLocal;
-        bool m_EnableLandingOverrideGlobal;
-        bool m_EnableLandingOverrideSetToLocal;
+        private bool m_EnableLandingOverrideLocal;
+        private bool m_EnableLandingOverrideGlobal;
+        private bool m_EnableLandingOverrideSetToLocal;
 
-        string m_SpawnPointRoutingLocal;
-        string m_SpawnPointRoutingGlobal;
-        bool m_SpawnPointRoutingSetToLocal;
+        private string m_SpawnPointRoutingLocal;
+        private string m_SpawnPointRoutingGlobal;
+        private bool m_SpawnPointRoutingSetToLocal;
 
-        bool EnableLandingOverride => m_EnableLandingOverrideSetToLocal ? m_EnableLandingOverrideLocal : m_EnableLandingOverrideGlobal;
+        private bool EnableLandingOverride => m_EnableLandingOverrideSetToLocal ? m_EnableLandingOverrideLocal : m_EnableLandingOverrideGlobal;
 
-        string SpawnPointRouting => m_SpawnPointRoutingSetToLocal ? m_SpawnPointRoutingLocal : m_SpawnPointRoutingGlobal;
+        private string SpawnPointRouting => m_SpawnPointRoutingSetToLocal ? m_SpawnPointRoutingLocal : m_SpawnPointRoutingGlobal;
 
         [ServerParam("EnableLandingOverride", ParameterType = typeof(bool))]
         public void EnableLandingOverrideUpdated(UUID regionID, string value)
         {
             ParameterUpdatedHandler(
-                ref m_EnableLandingOverrideLocal, 
-                ref m_EnableLandingOverrideGlobal, 
-                ref m_EnableLandingOverrideSetToLocal, 
+                ref m_EnableLandingOverrideLocal,
+                ref m_EnableLandingOverrideGlobal,
+                ref m_EnableLandingOverrideSetToLocal,
                 regionID, value);
         }
 
@@ -89,7 +89,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-
         [Serializable]
         public class ParcelAccessDeniedException : Exception
         {
@@ -113,24 +112,22 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel)
+        private bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel)
         {
             string nop;
             return CheckParcelAccessRights(agent, parcel, out nop);
         }
 
-        readonly RwLockedList<Vector3> m_Spawnpoints = new RwLockedList<Vector3>();
+        private readonly RwLockedList<Vector3> m_Spawnpoints = new RwLockedList<Vector3>();
 
         public List<Vector3> SpawnPoints
         {
-            get
-            {
-                return new List<Vector3>(m_Spawnpoints);
-            }
+            get { return new List<Vector3>(m_Spawnpoints); }
+
             set
             {
                 m_Spawnpoints.Clear();
-                foreach(Vector3 v in value)
+                foreach (Vector3 v in value)
                 {
                     m_Spawnpoints.Add(v);
                 }
@@ -165,7 +162,7 @@ namespace SilverSim.Scene.Types.Scene
         protected abstract void TriggerSpawnpointUpdate();
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
+        private bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
         {
             reason = string.Empty;
             /* EO,EM,RO,PO must be able to enter parcel */
@@ -191,7 +188,7 @@ namespace SilverSim.Scene.Types.Scene
 
             if ((parcel.Flags & ParcelFlags.UseAccessGroup) != 0)
             {
-                if(null == GroupsService)
+                if(GroupsService == null)
                 {
                     reason = this.GetLanguageString(agent.CurrentCulture, "ParcelIsGroupRestricted", "Parcel is group restricted");
                     return false;
@@ -227,19 +224,19 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        ParcelInfo FindNonBlockedParcel(IAgent agent, Vector3 destinationLocation)
+        private ParcelInfo FindNonBlockedParcel(IAgent agent, Vector3 destinationLocation)
         {
             ParcelInfo selectedParcel = null;
             foreach(ParcelInfo parcel in Parcels)
             {
-                if(TeleportLandingType.Blocked == parcel.LandingType || 
+                if(TeleportLandingType.Blocked == parcel.LandingType ||
                     parcel.PassPrice != 0 /* skip parcels with pass price here */ ||
                     !CheckParcelAccessRights(agent, parcel))
                 {
                     continue;
                 }
 
-                if (null != selectedParcel)
+                if (selectedParcel != null)
                 {
                     Vector3 a;
                     Vector3 b;
@@ -289,7 +286,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* only block teleport destination when not EM, EO or RO */
-            if(null == selectedParcel &&
+            if(selectedParcel == null &&
                 (
                     (!IsEstateManager(agent.Owner) && !agent.Owner.EqualsGrid(Owner)) || !Parcels.TryGetValue(destinationLocation, out selectedParcel)
                 ))
@@ -299,7 +296,7 @@ namespace SilverSim.Scene.Types.Scene
             return selectedParcel;
         }
 
-        EstateInfo CheckEstateRights(IAgent agent)
+        private EstateInfo CheckEstateRights(IAgent agent)
         {
             UUI agentOwner = agent.Owner;
             uint estateID = EstateService.RegionMap[ID];
@@ -425,10 +422,17 @@ namespace SilverSim.Scene.Types.Scene
                                 }
                                 break;
 
-                            default:
-                            case "closest":
+                            case "sequence":
+                                foreach(Vector3 v in relativeSpawns)
                                 {
-                                    while(relativeSpawns.Count > 0)
+                                    absoluteSpawns.Add(v * obj.GlobalRotation + obj.GlobalPosition);
+                                }
+                                break;
+
+                            case "closest":
+                            default:
+                                {
+                                    while (relativeSpawns.Count > 0)
                                     {
                                         int closestindex = -1;
                                         double distance = 0;
@@ -449,13 +453,6 @@ namespace SilverSim.Scene.Types.Scene
                                     }
                                 }
                                 break;
-
-                            case "sequence":
-                                foreach(Vector3 v in relativeSpawns)
-                                {
-                                    absoluteSpawns.Add(v * obj.GlobalRotation + obj.GlobalPosition);
-                                }
-                                break;
                         }
 
                         foreach (var spawn in absoluteSpawns)
@@ -464,7 +461,7 @@ namespace SilverSim.Scene.Types.Scene
                             if (Parcels.TryGetValue(spawn, out spawnParcel) &&
                                (spawnParcel.PassPrice != 0 /* skip parcels with pass price here */ ||
                                     CheckParcelAccessRights(agent, spawnParcel)))
-                            { 
+                            {
                                 /* found a viable spawn here */
                                 p = spawnParcel;
                                 destinationLocation = spawn;
@@ -497,8 +494,8 @@ namespace SilverSim.Scene.Types.Scene
                             destinationLookAt = p.LandingLookAt;
                             break;
 
-                        default:
                         case TeleportLandingType.Anywhere:
+                        default:
                             break;
                     }
                 }

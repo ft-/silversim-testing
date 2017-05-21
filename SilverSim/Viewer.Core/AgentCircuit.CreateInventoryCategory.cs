@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.Core
             }
 
             var reqmap = o as Map;
-            if(null == reqmap)
+            if(reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;

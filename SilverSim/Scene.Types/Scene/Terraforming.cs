@@ -42,15 +42,15 @@ namespace SilverSim.Scene.Types.Scene
             Noise = 4,
             Revert = 5,
 
-            Erode = 255,
+            Olsen = 253,
             Weather = 254,
-            Olsen = 253
+            Erode = 255
         }
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        sealed class PaintEffectAttribute : Attribute
+        private sealed class PaintEffectAttribute : Attribute
         {
-            public StandardTerrainEffect Effect { get; private set; }
+            public StandardTerrainEffect Effect { get; }
 
             public PaintEffectAttribute(StandardTerrainEffect effect)
             {
@@ -59,9 +59,9 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        sealed class FloodEffectAttribute : Attribute
+        private sealed class FloodEffectAttribute : Attribute
         {
-            public StandardTerrainEffect Effect { get; private set; }
+            public StandardTerrainEffect Effect { get; }
 
             public FloodEffectAttribute(StandardTerrainEffect effect)
             {
@@ -308,14 +308,13 @@ namespace SilverSim.Scene.Types.Scene
             {
                 for (int y = yFrom; y <= yTo; y++)
                 {
-                    Vector3 pos = new Vector3(x, y, 0);
+                    var pos = new Vector3(x, y, 0);
                     if (!scene.CanTerraform(agentOwner, pos))
                     {
                         continue;
                     }
 
-                    double z;
-                    z = (modify.Seconds < 4.0) ?
+                    double z = (modify.Seconds < 4.0) ?
                         SphericalFactor(x, y, data.West, data.South, strength) * modify.Seconds * 0.25f :
                         1;
 
@@ -474,9 +473,9 @@ namespace SilverSim.Scene.Types.Scene
                         double z = SphericalFactor(x, y, data.West, data.South, strength) / (strength);
                         if (z > 0) // add in non-zero amount
                         {
-                            double a = (scene.Terrain[(uint)x, (uint)y] - (average / avgsteps));
+                            double a = scene.Terrain[(uint)x, (uint)y] - (average / avgsteps);
 
-                            LayerPatch lp = scene.Terrain.AdjustTerrain((uint)x, (uint)y, (a * duration));
+                            LayerPatch lp = scene.Terrain.AdjustTerrain((uint)x, (uint)y, a * duration);
                             if (lp != null && !changed.Contains(lp))
                             {
                                 changed.Add(lp);
@@ -562,22 +561,21 @@ namespace SilverSim.Scene.Types.Scene
         [FloodEffect(StandardTerrainEffect.Flatten)]
         public static void FlattenArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
-
+            var changed = new List<LayerPatch>();
 
             double sum = 0;
             double steps = 0;
 
-            for (int x = (int)data.West; x < (int)data.East; x++)
+            for (var x = (int)data.West; x < (int)data.East; x++)
             {
-                for (int y = (int)data.South; y < (int)data.North; y++)
+                for (var y = (int)data.South; y < (int)data.North; y++)
                 {
                     if (!scene.CanTerraform(agentOwner, new Vector3(x, y, 0)))
                     {
                         continue;
                     }
                     sum += scene.Terrain[(uint)x, (uint)y];
-                    steps += 1;
+                    steps++;
                 }
             }
 
@@ -585,9 +583,9 @@ namespace SilverSim.Scene.Types.Scene
 
             double str = 0.1f * modify.Size; // == 0.2 in the default client
 
-            for (int x = (int)data.West; x < (int)data.East; x++)
+            for (var x = (int)data.West; x < (int)data.East; x++)
             {
-                for (int y = (int)data.South; y < (int)data.North; y++)
+                for (var y = (int)data.South; y < (int)data.North; y++)
                 {
                     if (scene.CanTerraform(agentOwner, new Vector3(x, y, 0)))
                     {
@@ -697,17 +695,17 @@ namespace SilverSim.Scene.Types.Scene
         #endregion
 
         #region Util Functions
-        static double MetersToSphericalStrength(double size)
+        private static double MetersToSphericalStrength(double size)
         {
             return (size + 1) * 1.35f;
         }
 
-        static double SphericalFactor(double x, double y, double rx, double ry, double size)
+        private static double SphericalFactor(double x, double y, double rx, double ry, double size)
         {
             return size * size - ((x - rx) * (x - rx) + (y - ry) * (y - ry));
         }
 
-        static double GetBilinearInterpolate(double x, double y, SceneInterface scene)
+        private static double GetBilinearInterpolate(double x, double y, SceneInterface scene)
         {
             int w = (int)scene.SizeX;
             int h = (int)scene.SizeY;
@@ -739,18 +737,17 @@ namespace SilverSim.Scene.Types.Scene
             double a11 = h1 - h2 - h3 + h4;
             double partialx = x - (uint)x;
             double partialz = y - (uint)y;
-            double hi = a00 + (a10 * partialx) + (a01 * partialz) + (a11 * partialx * partialz);
-            return hi;
+            return a00 + (a10 * partialx) + (a01 * partialz) + (a11 * partialx * partialz);
         }
 
-        static double Noise(double x, double y)
+        private static double Noise(double x, double y)
         {
             int n = (int)x + (int)(y * 749);
             n = (n << 13) ^ n;
-            return (1 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
+            return 1 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824;
         }
 
-        static double SmoothedNoise1(double x, double y)
+        private static double SmoothedNoise1(double x, double y)
         {
             double corners = (Noise(x - 1, y - 1) + Noise(x + 1, y - 1) + Noise(x - 1, y + 1) + Noise(x + 1, y + 1)) / 16;
             double sides = (Noise(x - 1, y) + Noise(x + 1, y) + Noise(x, y - 1) + Noise(x, y + 1)) / 8;
@@ -758,17 +755,17 @@ namespace SilverSim.Scene.Types.Scene
             return corners + sides + center;
         }
 
-        static double Interpolate(double x, double y, double z)
+        private static double Interpolate(double x, double y, double z)
         {
             return (x * (1 - z)) + (y * z);
         }
 
-        static double InterpolatedNoise(double x, double y)
+        private static double InterpolatedNoise(double x, double y)
         {
-            int integer_X = (int)(x);
+            var integer_X = (int)(x);
             double fractional_X = x - integer_X;
 
-            int integer_Y = (int)y;
+            var integer_Y = (int)y;
             double fractional_Y = y - integer_Y;
 
             double v1 = SmoothedNoise1(integer_X, integer_Y);
@@ -782,7 +779,7 @@ namespace SilverSim.Scene.Types.Scene
             return Interpolate(i1, i2, fractional_Y);
         }
 
-        static double PerlinNoise2D(double x, double y, int octaves, double persistence)
+        private static double PerlinNoise2D(double x, double y, int octaves, double persistence)
         {
             double total = 0;
 

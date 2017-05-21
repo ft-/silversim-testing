@@ -31,7 +31,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        void AddDetectAgentData(IAgent agent, DetectInfo detectdata)
+        private void AddDetectAgentData(IAgent agent, DetectInfo detectdata)
         {
             detectdata.Key = agent.ID;
             detectdata.Group = agent.Group;

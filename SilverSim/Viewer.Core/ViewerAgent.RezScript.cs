@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.RezScript)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        void HandleRezScript(Message m)
+        public void HandleRezScript(Message m)
         {
             var req = (RezScript)m;
             if(req.CircuitSessionID != req.SessionID ||
@@ -71,7 +71,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        void RezScriptFromAgentInventory(AgentCircuit circuit, ObjectPart part, RezScript req)
+        private void RezScriptFromAgentInventory(AgentCircuit circuit, ObjectPart part, RezScript req)
         {
             var itemID = req.InventoryBlock.ItemID;
             InventoryItem item;
@@ -179,7 +179,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        void RezNewScript(AgentCircuit circuit, ObjectPart part, RezScript req)
+        private void RezNewScript(AgentCircuit circuit, ObjectPart part, RezScript req)
         {
             AssetData data;
             try
@@ -201,7 +201,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        void RezActualScript(AgentCircuit circuit, ObjectPart part, RezScript req, AssetData data)
+        private void RezActualScript(AgentCircuit circuit, ObjectPart part, RezScript req, AssetData data)
         {
             if(!part.CheckPermissions(Owner, Group, InventoryPermissionsMask.Modify))
             {

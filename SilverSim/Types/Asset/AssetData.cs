@@ -32,10 +32,7 @@ namespace SilverSim.Types.Asset
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         public Stream InputStream
         {
-            get
-            {
-                return new MemoryStream(Data);
-            }
+            get { return new MemoryStream(Data); }
         }
 
         #region References accessor

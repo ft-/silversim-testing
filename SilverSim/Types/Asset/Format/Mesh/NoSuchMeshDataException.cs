@@ -29,25 +29,21 @@ namespace SilverSim.Types.Asset.Format.Mesh
     {
         public NoSuchMeshDataException()
         {
-
         }
 
         public NoSuchMeshDataException(string message)
             : base(message)
         {
-
         }
 
         protected NoSuchMeshDataException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-
         }
 
         public NoSuchMeshDataException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 }

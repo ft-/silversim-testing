@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable RCS1123
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -104,7 +106,7 @@ namespace SilverSim.Types
             return v;
         }
 
-        const double GimbalThreshold = 0.000436;
+        private const double GimbalThreshold = 0.000436;
 
         public void GetEulerAngles(out double roll, out double pitch, out double yaw)
         {
@@ -232,10 +234,10 @@ namespace SilverSim.Types
             double atLeftCos = atCos * leftCos;
             double atLeftSin = atSin * leftSin;
             return new Quaternion(
-                (atSin * leftCos * upCos + atCos * leftSin * upSin),
-                (atCos * leftSin * upCos - atSin * leftCos * upSin),
-                (atLeftCos * upSin + atLeftSin * upCos),
-                (atLeftCos * upCos - atLeftSin * upSin)
+                atSin * leftCos * upCos + atCos * leftSin * upSin,
+                atCos * leftSin * upCos - atSin * leftCos * upSin,
+                atLeftCos * upSin + atLeftSin * upCos,
+                atLeftCos * upCos - atLeftSin * upSin
             );
         }
 
@@ -421,7 +423,7 @@ namespace SilverSim.Types
                 {
                     // First assume X axis is orthogonal to the vectors.
                     Vector3 orthoVector = new Vector3(1.0f, 0.0f, 0.0f);
-                    orthoVector = orthoVector - a * (a.X / a.Dot(a));
+                    orthoVector -= a * (a.X / a.Dot(a));
                     // Check for near zero vector. A very small non-zero number here will create
                     // a rotation in an undesired direction.
                     rotBetween = (orthoVector.Length > 0.0001) ?
@@ -464,7 +466,6 @@ namespace SilverSim.Types
                 }
             }
             return rotBetween;
-
         }
 
         public static Quaternion Parse(string val)
@@ -700,8 +701,10 @@ namespace SilverSim.Types
 
         public static AnArray operator+(Quaternion q, AnArray a)
         {
-            var b = new AnArray();
-            b.Add(q);
+            var b = new AnArray
+            {
+                q
+            };
             b.AddRange(a);
             return b;
         }
@@ -721,16 +724,15 @@ namespace SilverSim.Types
                 a.W * b.W - a.X * b.X - a.Y * b.Y - a.Z * b.Z
             );
 
-        public static Quaternion operator *(Quaternion quaternion, double scaleFactor) => 
+        public static Quaternion operator *(Quaternion quaternion, double scaleFactor) =>
             new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
 
-        public static Quaternion operator *(double scaleFactor, Quaternion quaternion) => 
+        public static Quaternion operator *(double scaleFactor, Quaternion quaternion) =>
             new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
 
         public Quaternion Conjugate() => new Quaternion(-X, -Y, -Z, W);
 
         public static Quaternion operator /(Quaternion a, Quaternion b) => a * b.Conjugate();
-
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Quaternion(string val) => Parse(val);
@@ -751,10 +753,8 @@ namespace SilverSim.Types
                 ToBytes(bytes, 0);
                 return bytes;
             }
-            set
-            {
-                FromBytes(value, 0, true);
-            }
+
+            set { FromBytes(value, 0, true); }
         }
 
         public void FromBytes(byte[] byteArray, int pos, bool normalized)
@@ -816,6 +816,7 @@ namespace SilverSim.Types
                 W = (xyzsum > 0f) ? Math.Sqrt(xyzsum) : 0f;
             }
         }
+
         public void ToBytes(byte[] dest, int pos)
         {
             double norm = Math.Sqrt(X * X + Y * Y + Z * Z + W * W);

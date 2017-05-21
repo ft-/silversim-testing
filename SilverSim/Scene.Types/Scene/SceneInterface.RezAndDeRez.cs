@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Scene
             public InventoryPermissionsMask NextOwnerMask;
         }
 
-        Vector3 CalculateTargetedRezLocation(
+        private Vector3 CalculateTargetedRezLocation(
             RayResult ray,
             Vector3 scale,
             Vector3 projectedWaterLocation)
@@ -89,8 +89,8 @@ namespace SilverSim.Scene.Types.Scene
                 double ratio = (waterHeight - rezparams.RayStart.Z) / dir.Z;
 
                 projectedWaterLocation = rezparams.RayStart;
-                projectedWaterLocation.X += (ratio * dir.X);
-                projectedWaterLocation.Y += (ratio * dir.Y);
+                projectedWaterLocation.X += ratio * dir.X;
+                projectedWaterLocation.Y += ratio * dir.Y;
                 projectedWaterLocation.Z = waterHeight;
             }
             else
@@ -397,11 +397,11 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     new ObjectTransferItem(agent,
                         this,
-                        assetIDs, 
-                        kvp.Value, 
+                        assetIDs,
+                        kvp.Value,
                         req.Destination == DeRezAction.DeleteToTrash ? AssetType.TrashFolder : AssetType.Object).QueueWorkItem();
                 }
-                else 
+                else
                 {
                     InventoryServiceInterface agentInventoryService;
                     AssetServiceInterface agentAssetService;

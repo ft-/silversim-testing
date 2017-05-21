@@ -25,7 +25,6 @@ namespace SilverSim.Types.GridUser
     {
         public GridUserInfo()
         {
-
         }
 
         public UUI User = UUI.Unknown;

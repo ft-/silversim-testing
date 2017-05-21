@@ -23,9 +23,7 @@ using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Threading;
-using SilverSim.Types.Economy;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Economy;
@@ -44,9 +42,9 @@ namespace SilverSim.Viewer.Economy
 
         [PacketHandler(MessageType.MoneyBalanceRequest)]
         [PacketHandler(MessageType.EconomyDataRequest)]
-        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        bool m_ShutdownEconomy;
+        private bool m_ShutdownEconomy;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -96,7 +94,7 @@ namespace SilverSim.Viewer.Economy
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleEconomyDataRequest(AgentCircuit circuit, Message m)
+        private void HandleEconomyDataRequest(AgentCircuit circuit, Message m)
         {
             SceneInterface scene;
             ViewerAgent agent;
@@ -138,7 +136,7 @@ namespace SilverSim.Viewer.Economy
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleMoneyBalanceRequest(AgentCircuit circuit, Message m)
+        private void HandleMoneyBalanceRequest(AgentCircuit circuit, Message m)
         {
             var mbr = (MoneyBalanceRequest)m;
             if (mbr.AgentID == mbr.CircuitAgentID && mbr.SessionID == mbr.CircuitSessionID)
@@ -180,13 +178,7 @@ namespace SilverSim.Viewer.Economy
             }
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public void Shutdown()
         {
@@ -197,9 +189,7 @@ namespace SilverSim.Viewer.Economy
     [PluginName("ViewerEconomy")]
     public class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerEconomy();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerEconomy();
     }
 }

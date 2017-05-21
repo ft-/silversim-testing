@@ -225,7 +225,6 @@ namespace SilverSim.Types.Primitive
 
         public ParticleSystem()
         {
-
         }
 
         /// <summary>
@@ -276,7 +275,6 @@ namespace SilverSim.Types.Primitive
                 /*int dataSize = */pack.UnpackSignedBits(32);
                 UnpackLegacyData(pack);
 
-
                 if ((PartDataFlags & ParticleDataFlags.DataGlow) == ParticleDataFlags.DataGlow)
                 {
                     if (pack.Data.Length - pack.BytePos < 2)
@@ -298,11 +296,10 @@ namespace SilverSim.Types.Primitive
                     BlendFuncSource = (BlendFunc)pack.UnpackUnsignedBits(8);
                     BlendFuncDest = (BlendFunc)pack.UnpackUnsignedBits(8);
                 }
-
             }
         }
 
-        void UnpackSystem(BitPacker pack)
+        private void UnpackSystem(BitPacker pack)
         {
             CRC = pack.UnpackUnsignedBits(32);
             PartFlags = pack.UnpackUnsignedBits(32);
@@ -328,7 +325,7 @@ namespace SilverSim.Types.Primitive
             Target = pack.UuidValue;
         }
 
-        void UnpackLegacyData(BitPacker pack)
+        private void UnpackLegacyData(BitPacker pack)
         {
             PartDataFlags = (ParticleDataFlags)pack.UnpackUnsignedBits(32);
             PartMaxAge = pack.UnpackFixed(false, 8, 8);
@@ -409,7 +406,7 @@ namespace SilverSim.Types.Primitive
             return bytes;
         }
 
-        void PackSystemBytes(BitPacker pack)
+        private void PackSystemBytes(BitPacker pack)
         {
             pack.PackBits(CRC, 32);
             pack.PackBits(PartFlags, 32);
@@ -433,7 +430,7 @@ namespace SilverSim.Types.Primitive
             pack.UuidValue = Target;
         }
 
-        void PackLegacyData(BitPacker pack)
+        private void PackLegacyData(BitPacker pack)
         {
             pack.PackBits((uint)PartDataFlags, 32);
             pack.PackFixed(PartMaxAge, false, 8, 8);

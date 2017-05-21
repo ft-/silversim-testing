@@ -70,6 +70,7 @@ namespace SilverSim.ServiceInterfaces.Profile
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum PropertiesUpdateFlags
         {
+            None = 0,
             Properties = 1,
             Interests = 2
         }

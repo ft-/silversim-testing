@@ -27,9 +27,9 @@ namespace SilverSim.Types.Asset.Format.Mesh
 {
     public class LLMesh
     {
-        readonly Map m_MeshData;
-        readonly int m_EndOfHeader;
-        readonly byte[] m_AssetData;
+        private readonly Map m_MeshData;
+        private readonly int m_EndOfHeader;
+        private readonly byte[] m_AssetData;
 
         public LLMesh(AssetData asset)
         {
@@ -72,7 +72,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
 
             var lodMap = iv as Map;
-            if (null == lodMap)
+            if (lodMap == null)
             {
                 throw new NoSuchMeshDataException();
             }
@@ -148,7 +148,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
 
             var lodMap = iv as Map;
-            if(null == lodMap)
+            if(lodMap == null)
             {
                 throw new NoSuchMeshDataException();
             }

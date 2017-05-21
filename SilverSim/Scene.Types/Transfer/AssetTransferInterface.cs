@@ -30,10 +30,10 @@ namespace SilverSim.Scene.Types.Transfer
 {
     public abstract class AssetTransferWorkItem
     {
-        readonly AssetServiceInterface m_DestinationAssetService;
-        readonly AssetServiceInterface m_SourceAssetService;
-        protected UUID m_AssetID { get; }
-        readonly List<UUID> m_AssetIDList;
+        private readonly AssetServiceInterface m_DestinationAssetService;
+        private readonly AssetServiceInterface m_SourceAssetService;
+        protected UUID AssetID { get; }
+        private readonly List<UUID> m_AssetIDList;
 
         public enum ReferenceSource
         {
@@ -41,23 +41,25 @@ namespace SilverSim.Scene.Types.Transfer
             Destination
         }
 
-        readonly ReferenceSource m_RefSource;
+        private readonly ReferenceSource m_RefSource;
 
         protected AssetTransferWorkItem(AssetServiceInterface dest, AssetServiceInterface source, UUID assetid, ReferenceSource refsource)
         {
             m_DestinationAssetService = dest;
             m_SourceAssetService = source;
-            m_AssetID = assetid;
+            AssetID = assetid;
             m_RefSource = refsource;
-            m_AssetIDList = new List<UUID>();
-            m_AssetIDList.Add(assetid);
+            m_AssetIDList = new List<UUID>
+            {
+                assetid
+            };
         }
 
         protected AssetTransferWorkItem(AssetServiceInterface dest, AssetServiceInterface source, List<UUID> assetids, ReferenceSource refsource)
         {
             m_DestinationAssetService = dest;
             m_SourceAssetService = source;
-            m_AssetID = UUID.Zero;
+            AssetID = UUID.Zero;
             m_RefSource = refsource;
             m_AssetIDList = new List<UUID>(assetids);
         }
@@ -118,7 +120,7 @@ namespace SilverSim.Scene.Types.Transfer
         public abstract void AssetTransferComplete();
         public abstract void AssetTransferFailed(Exception e);
 
-        static void HandleWorkItem(object o)
+        private static void HandleWorkItem(object o)
         {
             var wi = (AssetTransferWorkItem)o;
             wi.ProcessAssetTransfer();

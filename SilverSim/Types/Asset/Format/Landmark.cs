@@ -37,7 +37,6 @@ namespace SilverSim.Types.Asset.Format
         #region Constructors
         public Landmark()
         {
-
         }
 
         public Landmark(AssetData asset)

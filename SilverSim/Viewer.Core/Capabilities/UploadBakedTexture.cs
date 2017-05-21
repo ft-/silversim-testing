@@ -30,25 +30,13 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UploadBakedTexture : UploadAssetAbstractCapability
     {
-        static readonly ILog m_Log = LogManager.GetLogger("UPLOAD BAKED TEXTURE");
-        readonly AssetServiceInterface m_AssetService;
-        readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
+        private static readonly ILog m_Log = LogManager.GetLogger("UPLOAD BAKED TEXTURE");
+        private readonly AssetServiceInterface m_AssetService;
+        private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
 
-        public override string CapabilityName
-        {
-            get
-            {
-                return "UploadBakedTexture";
-            }
-        }
+        public override string CapabilityName => "UploadBakedTexture";
 
-        public override int ActiveUploads
-        {
-            get
-            {
-                return m_Transactions.Count;
-            }
-        }
+        public override int ActiveUploads => m_Transactions.Count;
 
         public UploadBakedTexture(
             UUI creator,
@@ -70,7 +58,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
             KeyValuePair<UUID, UUID> kvp;
-            if (m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
+            if (m_Transactions.RemoveIf(transactionID, (UUID v) => true, out kvp))
             {
                 var m = new Map();
 
@@ -79,11 +67,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                     throw new UrlNotFoundException();
                 }
 
-                data.Name = "Baked Texture for Agent " + m_Creator.ID.ToString();
+                data.Name = "Baked Texture for Agent " + Creator.ID.ToString();
                 try
                 {
                     m_AssetService.Store(data);
-                    m_Log.InfoFormat("Uploaded baked texture {1} for {0}", m_Creator.FullName, data.ID);
+                    m_Log.InfoFormat("Uploaded baked texture {1} for {0}", Creator.FullName, data.ID);
                 }
                 catch
                 {
@@ -98,36 +86,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        protected override UUID NewAssetID
-        {
-            get
-            {
-                return UUID.RandomFixedFirst(0xFFFFFFFF);
-            }
-        }
+        protected override UUID NewAssetID => UUID.RandomFixedFirst(0xFFFFFFFF);
 
-        protected override bool AssetIsLocal
-        {
-            get
-            {
-                return true;
-            }
-        }
+        protected override bool AssetIsLocal => true;
 
-        protected override bool AssetIsTemporary
-        {
-            get
-            {
-                return true;
-            }
-        }
+        protected override bool AssetIsTemporary => true;
 
-        protected override AssetType NewAssetType
-        {
-            get
-            {
-                return AssetType.Texture;
-            }
-        }
+        protected override AssetType NewAssetType => AssetType.Texture;
     }
 }

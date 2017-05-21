@@ -63,8 +63,8 @@ namespace SilverSim.Types.Asset.Format
         public UUI LastOwner = new UUI();
         public UUI Owner = new UUI();
         public UGI Group = new UGI();
-        InventoryPermissionsData Permissions;
-        InventoryItem.SaleInfoData SaleInfo;
+        private InventoryPermissionsData Permissions;
+        private InventoryItem.SaleInfoData SaleInfo;
 
         #region Constructors
         public Wearable()
@@ -396,7 +396,7 @@ namespace SilverSim.Types.Asset.Format
         #endregion
 
         #region Support functions
-        static readonly Color[] EyeColors =
+        private static readonly Color[] EyeColors =
         {
             Color.FromRgb(50, 25, 5),
             Color.FromRgb(109, 55, 15),
@@ -415,7 +415,7 @@ namespace SilverSim.Types.Asset.Format
             Color.FromRgb(255, 0, 0)
         };
 
-        static readonly Color[] SkinColors =
+        private static readonly Color[] SkinColors =
         {
             Color.FromRgb(0, 0, 0),
             Color.FromRgb(255, 0, 255),
@@ -427,7 +427,7 @@ namespace SilverSim.Types.Asset.Format
             Color.FromRgb(255, 0, 255)
         };
 
-        static readonly Color[] PigmentColors =
+        private static readonly Color[] PigmentColors =
         {
             Color.FromRgb(252, 215, 200),
             Color.FromRgb(240, 177, 112),
@@ -435,7 +435,7 @@ namespace SilverSim.Types.Asset.Format
             Color.FromRgb(29, 9, 6)
         };
 
-        static readonly Color[] RainbowHairColors =
+        private static readonly Color[] RainbowHairColors =
         {
             Color.FromRgb(0, 0, 0),
             Color.FromRgb(255, 0, 255),
@@ -447,13 +447,13 @@ namespace SilverSim.Types.Asset.Format
             Color.FromRgb(255, 0, 255)
         };
 
-        static readonly Color[] RedHairColors =
+        private static readonly Color[] RedHairColors =
         {
             Color.FromRgb(0, 0, 0),
             Color.FromRgb(118, 47, 19)
         };
 
-        static readonly Color[] BlondeHairColors =
+        private static readonly Color[] BlondeHairColors =
         {
             Color.FromRgb(0, 0, 0),
             Color.FromRgb(22, 6, 6),
@@ -468,7 +468,7 @@ namespace SilverSim.Types.Asset.Format
             Color.FromRgb(238, 205, 136)
         };
 
-        static Color CalcColor(double val, Color[] table)
+        private static Color CalcColor(double val, Color[] table)
         {
             var paramColor = new Color(0, 0, 0);
 

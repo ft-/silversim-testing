@@ -31,11 +31,11 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        void SendAgentDataUpdate(AgentCircuit circuit)
+        private void SendAgentDataUpdate(AgentCircuit circuit)
         {
             var adu = new AgentDataUpdate();
             var groupsService = circuit.Scene.GroupsService;
-            if (null != groupsService)
+            if (groupsService != null)
             {
                 try
                 {
@@ -72,7 +72,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.AgentDataUpdateRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAgentDataUpdateRequest(Message m)
+        public void HandleAgentDataUpdateRequest(Message m)
         {
             var adur = (AgentDataUpdateRequest)m;
             if (adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)

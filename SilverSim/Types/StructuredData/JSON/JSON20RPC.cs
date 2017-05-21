@@ -44,25 +44,21 @@ namespace SilverSim.Types.StructuredData.Json
         {
             public InvalidJson20RpcResponseException()
             {
-
             }
 
             public InvalidJson20RpcResponseException(string message)
                 : base(message)
             {
-
             }
 
             protected InvalidJson20RpcResponseException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InvalidJson20RpcResponseException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -73,7 +69,6 @@ namespace SilverSim.Types.StructuredData.Json
 
             public Json20RpcException()
             {
-
             }
 
             public Json20RpcException(int faultCode, string message)
@@ -85,7 +80,6 @@ namespace SilverSim.Types.StructuredData.Json
             public Json20RpcException(string message)
                 : base(message)
             {
-
             }
 
             protected Json20RpcException(SerializationInfo info, StreamingContext context)
@@ -97,14 +91,13 @@ namespace SilverSim.Types.StructuredData.Json
             public Json20RpcException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
         public static IValue DeserializeResponse(Stream stream)
         {
             var m = Json.Deserialize(stream) as Map;
-            if(null == m)
+            if(m == null)
             {
                 throw new InvalidJson20RpcResponseException();
             }

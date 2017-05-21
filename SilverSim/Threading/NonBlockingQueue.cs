@@ -26,7 +26,8 @@ namespace SilverSim.Threading
 {
     public class NonblockingQueue<T> : Queue<T>
     {
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
+
         public NonblockingQueue(IEnumerable<T> col)
             : base(col)
         {
@@ -45,7 +46,7 @@ namespace SilverSim.Threading
         {
             lock (m_Lock)
             {
-                base.Clear();
+                Clear();
             }
         }
 

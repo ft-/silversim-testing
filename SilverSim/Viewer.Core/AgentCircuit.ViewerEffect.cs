@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Core
     {
         [PacketHandler(MessageType.ViewerEffect)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleViewerEffect(Message m)
+        public void HandleViewerEffect(Message m)
         {
             var ve = (ViewerEffect)m;
             if(ve.AgentID != ve.CircuitAgentID ||

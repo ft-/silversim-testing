@@ -40,7 +40,7 @@ namespace SilverSim.Scene.Types.Scene
     [ServerParam("god_agents", ParameterType = typeof(string), DefaultValue = "")]
     public abstract partial class SceneInterface
     {
-        void ParameterUpdatedHandler(ref bool localval, ref bool globalval, ref bool settolocalval, UUID regionId, string value)
+        private void ParameterUpdatedHandler(ref bool localval, ref bool globalval, ref bool settolocalval, UUID regionId, string value)
         {
             if (regionId == UUID.Zero)
             {
@@ -71,7 +71,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        GroupPowers GetGroupPowers(UUI agentOwner, UGI group)
+        private GroupPowers GetGroupPowers(UUI agentOwner, UGI group)
         {
             if(!IsGroupMember(agentOwner, group))
             {
@@ -91,9 +91,9 @@ namespace SilverSim.Scene.Types.Scene
         public bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power) => (GetGroupPowers(agentOwner, group) & power) != 0;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        bool IsGroupMember(UUI agentOwner, UGI group)
+        private bool IsGroupMember(UUI agentOwner, UGI group)
         {
-            if (null == GroupsService || group.ID == UUID.Zero)
+            if (GroupsService == null || group.ID == UUID.Zero)
             {
                 return false;
             }
@@ -124,10 +124,10 @@ namespace SilverSim.Scene.Types.Scene
             uint estateID;
             UUI estateOwner;
 
-            return (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+            return EstateService.RegionMap.TryGetValue(ID, out estateID) &&
                 EstateService.EstateOwner.TryGetValue(estateID, out estateOwner) &&
                 (agent.EqualsGrid(estateOwner) ||
-                    EstateService.EstateManager[estateID, agent]));
+                    EstateService.EstateManager[estateID, agent]);
         }
 
         public bool IsEstateOwner(UUI agent)
@@ -135,16 +135,16 @@ namespace SilverSim.Scene.Types.Scene
             uint estateID;
             UUI estateOwner;
 
-            return (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+            return EstateService.RegionMap.TryGetValue(ID, out estateID) &&
                 EstateService.EstateOwner.TryGetValue(estateID, out estateOwner) &&
-                agent.EqualsGrid(estateOwner));
+                agent.EqualsGrid(estateOwner);
         }
 
-        bool m_EstateManagerIsGodLocal;
-        bool m_EstateManagerIsGodGlobal;
-        bool m_EstateManagerIsGodSetToLocal;
+        private bool m_EstateManagerIsGodLocal;
+        private bool m_EstateManagerIsGodGlobal;
+        private bool m_EstateManagerIsGodSetToLocal;
 
-        bool EstateManagerIsGod => m_EstateManagerIsGodSetToLocal ? m_EstateManagerIsGodLocal : m_EstateManagerIsGodGlobal;
+        private bool EstateManagerIsGod => m_EstateManagerIsGodSetToLocal ? m_EstateManagerIsGodLocal : m_EstateManagerIsGodGlobal;
 
         [ServerParam("estate_manager_is_god", ParameterType = typeof(bool))]
         public void EstateManagerIsGodUpdated(UUID regionID, string value)
@@ -156,11 +156,11 @@ namespace SilverSim.Scene.Types.Scene
                 regionID, value);
         }
 
-        readonly RwLockedList<UUI> m_GodAgentsLocal = new RwLockedList<UUI>();
-        readonly RwLockedList<UUI> m_GodAgentsGlobal = new RwLockedList<UUI>();
-        bool m_GodAgentsSetToLocal;
+        private readonly RwLockedList<UUI> m_GodAgentsLocal = new RwLockedList<UUI>();
+        private readonly RwLockedList<UUI> m_GodAgentsGlobal = new RwLockedList<UUI>();
+        private bool m_GodAgentsSetToLocal;
 
-        void UpdateGodAgentsList(RwLockedList<UUI> list, UUID regionId, string value)
+        private void UpdateGodAgentsList(RwLockedList<UUI> list, UUID regionId, string value)
         {
             if(string.IsNullOrEmpty(value))
             {
@@ -202,6 +202,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
         }
+
         [ServerParam("god_agents")]
         public void GodAgentsUpdated(UUID regionID, string value)
         {
@@ -220,7 +221,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        bool IsInGodAgents(UUI agent)
+        private bool IsInGodAgents(UUI agent)
         {
             RwLockedList<UUI> activeList = m_GodAgentsSetToLocal ? m_GodAgentsLocal : m_GodAgentsGlobal;
             return activeList.Contains(agent);
@@ -231,11 +232,11 @@ namespace SilverSim.Scene.Types.Scene
                 (EstateManagerIsGod && IsEstateManager(agent)) ||
                 IsInGodAgents(agent);
 
-        bool m_RegionOwnerIsSimConsoleUserLocal;
-        bool m_RegionOwnerIsSimConsoleUserGlobal;
-        bool m_RegionOwnerIsSimConsoleUserSetToLocal;
+        private bool m_RegionOwnerIsSimConsoleUserLocal;
+        private bool m_RegionOwnerIsSimConsoleUserGlobal;
+        private bool m_RegionOwnerIsSimConsoleUserSetToLocal;
 
-        bool RegionOwnerIsSimConsoleUser => m_RegionOwnerIsSimConsoleUserSetToLocal ? m_RegionOwnerIsSimConsoleUserLocal : m_RegionOwnerIsSimConsoleUserGlobal;
+        private bool RegionOwnerIsSimConsoleUser => m_RegionOwnerIsSimConsoleUserSetToLocal ? m_RegionOwnerIsSimConsoleUserLocal : m_RegionOwnerIsSimConsoleUserGlobal;
 
         [ServerParam("region_owner_is_simconsole_user", ParameterType = typeof(bool))]
         public void RegionOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
@@ -248,11 +249,11 @@ namespace SilverSim.Scene.Types.Scene
                 value);
         }
 
-        bool m_EstateOwnerIsSimConsoleUserLocal;
-        bool m_EstateOwnerIsSimConsoleUserGlobal;
-        bool m_EstateOwnerIsSimConsoleUserSetToLocal;
+        private bool m_EstateOwnerIsSimConsoleUserLocal;
+        private bool m_EstateOwnerIsSimConsoleUserGlobal;
+        private bool m_EstateOwnerIsSimConsoleUserSetToLocal;
 
-        bool EstateOwnerIsSimConsoleUser => m_EstateOwnerIsSimConsoleUserSetToLocal ? m_EstateOwnerIsSimConsoleUserLocal : m_EstateOwnerIsSimConsoleUserGlobal;
+        private bool EstateOwnerIsSimConsoleUser => m_EstateOwnerIsSimConsoleUserSetToLocal ? m_EstateOwnerIsSimConsoleUserLocal : m_EstateOwnerIsSimConsoleUserGlobal;
 
         [ServerParam("estate_owner_is_simconsole_user", ParameterType = typeof(bool))]
         public void EstateOwnerIsSimConsoleUserUpdated(UUID regionId, string value)
@@ -265,11 +266,11 @@ namespace SilverSim.Scene.Types.Scene
                 value);
         }
 
-        bool m_EstateManagerIsSimConsoleUserLocal;
-        bool m_EstateManagerIsSimConsoleUserGlobal;
-        bool m_EstateManagerIsSimConsoleUserSetToLocal;
+        private bool m_EstateManagerIsSimConsoleUserLocal;
+        private bool m_EstateManagerIsSimConsoleUserGlobal;
+        private bool m_EstateManagerIsSimConsoleUserSetToLocal;
 
-        bool EstateManagerIsSimConsoleUser => m_EstateManagerIsSimConsoleUserSetToLocal ? m_EstateManagerIsSimConsoleUserLocal : m_EstateManagerIsSimConsoleUserGlobal;
+        private bool EstateManagerIsSimConsoleUser => m_EstateManagerIsSimConsoleUserSetToLocal ? m_EstateManagerIsSimConsoleUserLocal : m_EstateManagerIsSimConsoleUserGlobal;
 
         [ServerParam("estate_manager_is_simconsole_user", ParameterType = typeof(bool))]
         public void EstateManagerIsSimConsoleUserUpdated(UUID regionId, string value)
@@ -284,7 +285,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool IsSimConsoleAllowed(UUI agent)
         {
-            if (RegionOwnerIsSimConsoleUser && 
+            if (RegionOwnerIsSimConsoleUser &&
                 agent.EqualsGrid(Owner))
             {
                 return true;
@@ -296,7 +297,7 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
-            if (EstateManagerIsSimConsoleUser && 
+            if (EstateManagerIsSimConsoleUser &&
                 IsEstateManager(agent))
             {
                 return true;
@@ -654,12 +655,11 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
+        private bool m_ParcelOwnerIsAdminLocal;
+        private bool m_ParcelOwnerIsAdminGlobal;
+        private bool m_ParcelOwnerIsAdminSetToLocal;
 
-        bool m_ParcelOwnerIsAdminLocal;
-        bool m_ParcelOwnerIsAdminGlobal;
-        bool m_ParcelOwnerIsAdminSetToLocal;
-
-        bool ParcelOwnerIsAdmin => m_ParcelOwnerIsAdminSetToLocal ? m_ParcelOwnerIsAdminLocal : m_ParcelOwnerIsAdminGlobal;
+        private bool ParcelOwnerIsAdmin => m_ParcelOwnerIsAdminSetToLocal ? m_ParcelOwnerIsAdminLocal : m_ParcelOwnerIsAdminGlobal;
 
         [ServerParam("parcel_owner_is_admin", ParameterType = typeof(bool))]
         public void ParcelOwnerIsAdminUpdated(UUID regionId, string value)

@@ -37,6 +37,7 @@ namespace SilverSim.ServiceInterfaces.Statistics
             Processed = processed;
         }
     }
+
     public sealed class QueueStatAccessor
     {
         public readonly string Name;

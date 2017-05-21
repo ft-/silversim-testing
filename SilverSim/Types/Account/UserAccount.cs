@@ -38,7 +38,6 @@ namespace SilverSim.Types.Account
 
         public UserAccount()
         {
-
         }
 
         public UserAccount(UserAccount src)

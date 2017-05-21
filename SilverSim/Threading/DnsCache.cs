@@ -31,10 +31,10 @@ namespace SilverSim.Threading
 {
     public static class DnsNameCache
     {
-        static RwLockedDictionary<string, KeyValuePair<IPAddress[], int>> m_DnsCache = new RwLockedDictionary<string, KeyValuePair<IPAddress[], int>>();
-        const int MAX_DNS_CACHE_TIME_IN_MILLISECONDS = 60 * 1000;
+        private static readonly RwLockedDictionary<string, KeyValuePair<IPAddress[], int>> m_DnsCache = new RwLockedDictionary<string, KeyValuePair<IPAddress[], int>>();
+        private const int MAX_DNS_CACHE_TIME_IN_MILLISECONDS = 60 * 1000;
 
-        static Timer m_Timer;
+        private static readonly Timer m_Timer;
 
         static DnsNameCache()
         {
@@ -44,11 +44,11 @@ namespace SilverSim.Threading
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        static void CleanUpTimer(object sender, ElapsedEventArgs e)
+        private static void CleanUpTimer(object sender, ElapsedEventArgs e)
         {
             try
             {
-                List<string> removeList = new List<string>();
+                var removeList = new List<string>();
                 foreach (KeyValuePair<string, KeyValuePair<IPAddress[], int>> kvp in m_DnsCache)
                 {
                     int diffTime = kvp.Value.Value - Environment.TickCount;

@@ -26,17 +26,16 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
-using System.Globalization;
 
 namespace SilverSim.Scripting.Common
 {
     public abstract class ScriptEventInstance : ScriptInstance
     {
-        readonly object m_Lock = new object();
-        readonly NonblockingQueue<IScriptEvent> m_Events = new NonblockingQueue<IScriptEvent>();
-        double m_ExecutionTime;
+        private readonly object m_Lock = new object();
+        private readonly NonblockingQueue<IScriptEvent> m_Events = new NonblockingQueue<IScriptEvent>();
+        private double m_ExecutionTime;
 
-        protected ScriptEventInstance(ObjectPart part, ObjectPartInventoryItem item, byte[] state)
+        protected ScriptEventInstance(ObjectPart part, ObjectPartInventoryItem item)
         {
             Part = part;
             Item = item;

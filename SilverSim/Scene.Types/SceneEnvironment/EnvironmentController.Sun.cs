@@ -45,11 +45,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 SecPerDay = 4 * 60 * 60;
                 SecPerYear = 11 * SecPerDay;
-
             }
         }
 
-        readonly SunData m_SunData = new SunData();
+        private readonly SunData m_SunData = new SunData();
 
         public Vector3 SunDirection
         {
@@ -81,12 +80,11 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-
         #region Update of sun direction
         /* source of algorithm is secondlifescripters mailing list */
-        double m_AverageSunTilt = -0.25 * Math.PI;
-        double m_SeasonalSunTilt = 0.03 * Math.PI;
-        double m_SunNormalizedOffset = 0.45;
+        private double m_AverageSunTilt = -0.25 * Math.PI;
+        private double m_SeasonalSunTilt = 0.03 * Math.PI;
+        private double m_SunNormalizedOffset = 0.45;
 
         public double AverageSunTilt
         {
@@ -207,13 +205,11 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        bool m_ImmediateSunUpdate;
+        private bool m_ImmediateSunUpdate;
         public bool IsSunFixed
         {
-            get
-            {
-                return m_SunData.IsSunFixed;
-            }
+            get { return m_SunData.IsSunFixed; }
+
             set
             {
 #if DEBUG
@@ -274,7 +270,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             sunDirection.Z += m_SunNormalizedOffset;
             double radius = sunDirection.Length;
             sunDirection = sunDirection.Normalize();
-            sunVelocity *= (1 / radius);
+            sunVelocity *= 1 / radius;
             lock (m_EnvironmentLock)
             {
                 m_SunData.SunPhase = sun_phase;
@@ -286,7 +282,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #endregion
 
         #region Viewer time message update
-        SimulatorViewerTimeMessage BuildTimeMessage() => new SimulatorViewerTimeMessage()
+        private SimulatorViewerTimeMessage BuildTimeMessage() => new SimulatorViewerTimeMessage()
         {
             SunPhase = m_SunData.SunPhase,
             UsecSinceStart = Date.GetUnixTime() * 1000000,

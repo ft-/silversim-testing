@@ -30,10 +30,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         public Vector3 this[Vector3 pos]
         {
-            get
-            {
-                return new Vector3();
-            }
+            get { return new Vector3(); }
 
             set
             {

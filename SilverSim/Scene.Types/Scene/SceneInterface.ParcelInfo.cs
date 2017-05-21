@@ -36,9 +36,9 @@ namespace SilverSim.Scene.Types.Scene
     {
         private Int32[,] m_ParcelLayer; /* initialized in constructor */
         private bool[] m_ParcelLayerDirty; /* RegionWidth / PARCEL_BLOCK_SIZE * RegionHeight / PARCEL_BLOCK_SIZE / 1024 */
-        readonly ReaderWriterLock m_ParcelLayerRwLock = new ReaderWriterLock();
+        private readonly ReaderWriterLock m_ParcelLayerRwLock = new ReaderWriterLock();
         protected readonly RwLockedDoubleDictionary<UUID, Int32, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
-        readonly object m_ParcelOverlayUpdateLock = new object();
+        private readonly object m_ParcelOverlayUpdateLock = new object();
 
         private void InitializeParcelLayer()
         {
@@ -135,11 +135,13 @@ namespace SilverSim.Scene.Types.Scene
 
             for(offset = 0; offset < c.Length; offset += 1024, ++sequenceID)
             {
-                m = new ParcelOverlay();
-                m.SequenceID = sequenceID;
-                m.Data = (c.Length - offset >= 1024) ? 
-                    new byte[1024] : 
-                    new byte[c.Length - offset];
+                m = new ParcelOverlay()
+                {
+                    SequenceID = sequenceID,
+                    Data = (c.Length - offset >= 1024) ?
+                    new byte[1024] :
+                    new byte[c.Length - offset]
+                };
                 Buffer.BlockCopy(c, offset, m.Data, 0, m.Data.Length);
                 agent.SendMessageAlways(m, ID);
             }
@@ -161,12 +163,14 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             foreach (IAgent a in Agents)
                             {
-                                ParcelOverlay m = new ParcelOverlay();
-                                m.Data = (totalLen - offset >= 1024) ?
+                                ParcelOverlay m = new ParcelOverlay()
+                                {
+                                    Data = (totalLen - offset >= 1024) ?
                                     new byte[1024] :
-                                    new byte[totalLen - offset];
+                                    new byte[totalLen - offset],
 
-                                m.SequenceID = sequenceID;
+                                    SequenceID = sequenceID
+                                };
                                 UUI agentID = a.Owner;
                                 for (int pos = 0; pos < m.Data.Length; ++pos)
                                 {
@@ -200,24 +204,26 @@ namespace SilverSim.Scene.Types.Scene
             ParcelInfo pinfo;
             if(Parcels.TryGetValue(req.ParcelID, out pinfo))
             {
-                var reply = new ParcelInfoReply();
-                reply.AgentID = req.AgentID;
-                reply.OwnerID = pinfo.Owner.ID;
-                reply.Name = pinfo.Name;
-                reply.Description = pinfo.Description;
-                reply.ActualArea = pinfo.ActualArea;
-                reply.BillableArea = pinfo.BillableArea;
-                reply.Flags = (byte)pinfo.Flags;
-                reply.SimName = Name;
-                reply.SnapshotID = UUID.Zero;
-                reply.Dwell = pinfo.Dwell;
-                reply.SalePrice = pinfo.SalePrice;
-                reply.AuctionID = pinfo.AuctionID;
+                var reply = new ParcelInfoReply()
+                {
+                    AgentID = req.AgentID,
+                    OwnerID = pinfo.Owner.ID,
+                    Name = pinfo.Name,
+                    Description = pinfo.Description,
+                    ActualArea = pinfo.ActualArea,
+                    BillableArea = pinfo.BillableArea,
+                    Flags = (byte)pinfo.Flags,
+                    SimName = Name,
+                    SnapshotID = UUID.Zero,
+                    Dwell = pinfo.Dwell,
+                    SalePrice = pinfo.SalePrice,
+                    AuctionID = pinfo.AuctionID
+                };
                 Agents[req.AgentID].SendMessageAlways(reply, ID);
             }
         }
 
-        public ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, ParcelProperties.RequestResultType requestResult) => 
+        public ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, ParcelProperties.RequestResultType requestResult) =>
             new ParcelProperties()
         {
             RequestResult = requestResult,
@@ -320,7 +326,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 end_y = (int)SizeY - 1;
             }
-            
+
             for(int x = start_x; x <= end_x; ++x)
             {
                 for(int y = start_y; y <= end_y; ++y)

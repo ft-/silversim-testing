@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
@@ -129,11 +132,11 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        const int P_AL_ACCESS = 1;
-        const int P_AL_BAN = 2;
-        const int P_MAX_ENTRIES = 48;
+        private const int P_AL_ACCESS = 1;
+        private const int P_AL_BAN = 2;
+        private const int P_MAX_ENTRIES = 48;
 
-        void SendParcelAccessList(int localID, ParcelAccessList listType, List<ParcelAccessEntry> list)
+        private void SendParcelAccessList(int localID, ParcelAccessList listType, List<ParcelAccessEntry> list)
         {
             var rep = new ParcelAccessListReply();
             int sequenceno = 1;
@@ -153,7 +156,7 @@ namespace SilverSim.Viewer.Core
                 rep.LocalID = localID;
                 rep.Flags = listType;
                 rep.SequenceID = sequenceno++;
-                
+
                 foreach (var pae in list)
                 {
                     if(rep.AccessList.Count == P_MAX_ENTRIES)
@@ -202,15 +205,15 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        readonly object m_ParcelAccessListLock = new object();
-        UUID m_ParcelAccessListTransaction = UUID.Zero;
-        readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelAccessListSegments = new Dictionary<int, ParcelAccessListUpdate>();
+        private readonly object m_ParcelAccessListLock = new object();
+        private UUID m_ParcelAccessListTransaction = UUID.Zero;
+        private readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelAccessListSegments = new Dictionary<int, ParcelAccessListUpdate>();
 
-        readonly object m_ParcelBanListLock = new object();
-        UUID m_ParcelBanListTransaction = UUID.Zero;
-        readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelBanListSegments = new Dictionary<int, ParcelAccessListUpdate>();
+        private readonly object m_ParcelBanListLock = new object();
+        private UUID m_ParcelBanListTransaction = UUID.Zero;
+        private readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelBanListSegments = new Dictionary<int, ParcelAccessListUpdate>();
 
-        void ParcelAccessListUpdateManage(UUID parcelID, Dictionary<UUID, ParcelAccessListUpdate.Data> entries, IParcelAccessList accessList)
+        private void ParcelAccessListUpdateManage(UUID parcelID, Dictionary<UUID, ParcelAccessListUpdate.Data> entries, IParcelAccessList accessList)
         {
             foreach (var listed in accessList[Scene.ID, parcelID])
             {
@@ -304,7 +307,7 @@ namespace SilverSim.Viewer.Core
             if ((pInfo.Owner.EqualsGrid(Agent.Owner) ||
                 Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageBanned)) &&
                 req.Flags == ParcelAccessList.Ban)
-            { 
+            {
                 lock (m_ParcelBanListLock)
                 {
                     if (m_ParcelBanListTransaction != req.TransactionID)

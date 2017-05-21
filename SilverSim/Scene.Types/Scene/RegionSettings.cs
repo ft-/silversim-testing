@@ -95,10 +95,8 @@ namespace SilverSim.Scene.Types.Scene
         private UUID m_TerrainTexture1 = TextureConstant.DefaultTerrainTexture1;
         public UUID TerrainTexture1
         {
-            get
-            {
-                return m_TerrainTexture1;
-            }
+            get { return m_TerrainTexture1; }
+
             set
             {
                 m_TerrainTexture1 = (value == UUID.Zero) ?
@@ -110,10 +108,8 @@ namespace SilverSim.Scene.Types.Scene
         private UUID m_TerrainTexture2 = TextureConstant.DefaultTerrainTexture2;
         public UUID TerrainTexture2
         {
-            get
-            {
-                return m_TerrainTexture2;
-            }
+            get { return m_TerrainTexture2; }
+
             set
             {
                 m_TerrainTexture2 = (value == UUID.Zero) ?
@@ -125,10 +121,8 @@ namespace SilverSim.Scene.Types.Scene
         private UUID m_TerrainTexture3 = TextureConstant.DefaultTerrainTexture3;
         public UUID TerrainTexture3
         {
-            get
-            {
-                return m_TerrainTexture3;
-            }
+            get { return m_TerrainTexture3; }
+
             set
             {
                 m_TerrainTexture3 = (value == UUID.Zero) ?
@@ -140,10 +134,8 @@ namespace SilverSim.Scene.Types.Scene
         private UUID m_TerrainTexture4 = TextureConstant.DefaultTerrainTexture4;
         public UUID TerrainTexture4
         {
-            get
-            {
-                return m_TerrainTexture4;
-            }
+            get { return m_TerrainTexture4; }
+
             set
             {
                 m_TerrainTexture4 = (value == UUID.Zero) ?

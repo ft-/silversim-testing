@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void Cap_RenderMaterials(HttpRequest httpreq)
+        private void Cap_RenderMaterials(HttpRequest httpreq)
         {
             if (httpreq.CallerIP != RemoteIP)
             {
@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void Cap_RenderMaterials_GET(HttpRequest httpreq)
+        private void Cap_RenderMaterials_GET(HttpRequest httpreq)
         {
             using (var httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void Cap_RenderMaterials_POST(HttpRequest httpreq)
+        private void Cap_RenderMaterials_POST(HttpRequest httpreq)
         {
             Map reqmap;
             try
@@ -82,7 +82,7 @@ namespace SilverSim.Viewer.Core
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -113,13 +113,13 @@ namespace SilverSim.Viewer.Core
                     httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                     return;
                 }
-                if (null == zippedDataArray && null == zippedDataMap)
+                if (zippedDataArray == null && zippedDataMap == null)
                 {
                     httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted Zipped LLSD-XML");
                     return;
                 }
 
-                if(null != zippedDataArray)
+                if(zippedDataArray != null)
                 {
                     foreach (var v in zippedDataArray)
                     {
@@ -133,16 +133,15 @@ namespace SilverSim.Viewer.Core
                         }
                     }
                 }
-                else if(null != zippedDataMap &&
-                    zippedDataMap.ContainsKey("FullMaterialsPerFace"))
+                else if(zippedDataMap?.ContainsKey("FullMaterialsPerFace") == true)
                 {
                     var faceData = zippedDataMap["FullMaterialsPerFace"] as AnArray;
-                    if (null != faceData)
+                    if (faceData != null)
                     {
                         foreach (var face_iv in faceData)
                         {
                             var faceDataMap = face_iv as Map;
-                            if(null == faceDataMap)
+                            if(faceDataMap == null)
                             {
                                 continue;
                             }

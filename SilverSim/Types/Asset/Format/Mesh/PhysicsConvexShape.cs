@@ -48,7 +48,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             Load(data, physOffset, physSize);
         }
 
-        static int LEBytesToInt32(byte[] b, int offset)
+        private static int LEBytesToInt32(byte[] b, int offset)
         {
             var data = b;
             int ofs = offset;
@@ -62,7 +62,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return BitConverter.ToInt32(b, ofs);
         }
 
-        static void Int32ToLEBytes(int val, byte[] b, int offset)
+        private static void Int32ToLEBytes(int val, byte[] b, int offset)
         {
             var d = BitConverter.GetBytes(val);
             if(!BitConverter.IsLittleEndian)
@@ -118,7 +118,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
             set
             {
-                if(null == value)
+                if(value == null)
                 {
                     throw new ArgumentNullException("value");
                 }
@@ -234,7 +234,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
         }
 
-        static string VertexToString(Vector3 v) => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
+        private static string VertexToString(Vector3 v) => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
 
         public void DumpToBlenderRaw(string filename)
         {

@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable RCS1154
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -174,6 +176,7 @@ namespace SilverSim.Types.Primitive
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum PrimitiveSculptType : byte
     {
+        None = 0,
         Sphere = 1,
         Torus = 2,
         Plane = 3,
@@ -234,7 +237,7 @@ namespace SilverSim.Types.Primitive
     [Flags]
     [SuppressMessage("Gendarme.Rules.Design", "FlagsShouldNotDefineAZeroValueRule")]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public enum PrimitiveMediaPermission 
+    public enum PrimitiveMediaPermission
     {
         None = 0,
         Owner = 1,

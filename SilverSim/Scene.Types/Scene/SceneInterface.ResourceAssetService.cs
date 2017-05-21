@@ -35,13 +35,13 @@ namespace SilverSim.Scene.Types.Scene
     {
         public class ResourceAssetAccessor : RwLockedDictionary<UUID, AssetData>
         {
-            readonly List<string> m_Resources;
+            private readonly List<string> m_Resources;
             internal ResourceAssetAccessor()
             {
                 m_Resources = new List<string>(GetType().Assembly.GetManifestResourceNames());
             }
 
-            string GetAssetResourceName(UUID key) => "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
+            private string GetAssetResourceName(UUID key) => "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
 
             public bool ContainsAsset(UUID key) => m_Resources.Contains(GetAssetResourceName(key));
 
@@ -69,8 +69,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public class ResourceAssetService : AssetServiceInterface, IAssetDataServiceInterface, IAssetMetadataServiceInterface
         {
-            readonly ResourceAssetAccessor m_ResourceAssets;
-            readonly ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
+            private readonly ResourceAssetAccessor m_ResourceAssets;
+            private readonly ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
 
             public ResourceAssetService()
             {
@@ -110,6 +110,7 @@ namespace SilverSim.Scene.Types.Scene
                 metadata = this[key];
                 return true;
             }
+
             public override AssetReferencesServiceInterface References => m_ReferencesService;
 
             public override IAssetDataServiceInterface Data => this;
@@ -167,6 +168,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private static ResourceAssetService ResourceAssets = new ResourceAssetService();
+        private static readonly ResourceAssetService ResourceAssets = new ResourceAssetService();
     }
 }

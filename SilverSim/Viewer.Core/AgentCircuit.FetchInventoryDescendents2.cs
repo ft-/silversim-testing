@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void WriteInventoryFolderContent(XmlTextWriter writer, InventoryFolderContent folder, 
+        private void WriteInventoryFolderContent(XmlTextWriter writer, InventoryFolderContent folder,
             bool fetch_folders,
             bool fetch_items, List<InventoryItem> linkeditems)
         {
@@ -95,7 +95,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        void Cap_FetchInventoryDescendents2(HttpRequest httpreq)
+        private void Cap_FetchInventoryDescendents2(HttpRequest httpreq)
         {
             IValue o;
             if (httpreq.CallerIP != RemoteIP)
@@ -121,7 +121,7 @@ namespace SilverSim.Viewer.Core
             }
 
             var reqmap = o as Map;
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -142,7 +142,7 @@ namespace SilverSim.Viewer.Core
                     foreach (var iv1 in foldersreqarray)
                     {
                         var itemmap = iv1 as Map;
-                        if (null == itemmap)
+                        if (itemmap == null)
                         {
                             continue;
                         }
@@ -193,7 +193,7 @@ namespace SilverSim.Viewer.Core
                     foreach (var iv in foldersreqarray)
                     {
                         var itemmap = iv as Map;
-                        if (null == iv)
+                        if (iv == null)
                         {
                             continue;
                         }
@@ -209,7 +209,6 @@ namespace SilverSim.Viewer.Core
                         var ownerid = itemmap["owner_id"].AsUUID;
                         bool fetch_folders = itemmap["fetch_folders"].AsBoolean;
                         bool fetch_items = itemmap["fetch_items"].AsBoolean;
-
 
                         if (folderContents.ContainsKey(ownerid))
                         {

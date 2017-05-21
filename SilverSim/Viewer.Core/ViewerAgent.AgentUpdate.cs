@@ -35,10 +35,11 @@ namespace SilverSim.Viewer.Core
     public partial class ViewerAgent
     {
         #region Agent Controls Field
-        ControlFlags m_TakenControls;
-        ControlFlags m_IgnoredControls;
-        ControlFlags m_ActiveAgentControlFlags;
-        bool m_IsRunning;
+        private ControlFlags m_TakenControls;
+        private ControlFlags m_IgnoredControls;
+        private ControlFlags m_ActiveAgentControlFlags;
+        private bool m_IsRunning;
+
         public class ScriptControlData
         {
             public ControlFlags Taken;
@@ -46,7 +47,6 @@ namespace SilverSim.Viewer.Core
 
             public ScriptControlData()
             {
-
             }
 
             public ScriptControlData(ScriptControlData data)
@@ -56,17 +56,16 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        readonly Dictionary<ScriptInstance, ScriptControlData> m_ScriptControls = new Dictionary<ScriptInstance, ScriptControlData>();
+        private readonly Dictionary<ScriptInstance, ScriptControlData> m_ScriptControls = new Dictionary<ScriptInstance, ScriptControlData>();
         #endregion
 
         public override void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {
-            var data = new ScriptControlData()
+            this[instance] = new ScriptControlData()
             {
                 Taken = accept != 0 ? (ControlFlags)controls : ControlFlags.None,
                 Ignored = pass_on != 0 ? (ControlFlags)controls : ControlFlags.None
             };
-            this[instance] = data;
         }
 
         public override void ReleaseControls(ScriptInstance instance)
@@ -92,7 +91,7 @@ namespace SilverSim.Viewer.Core
             {
                 lock(m_ScriptControls)
                 {
-                    if (null != value)
+                    if (value != null)
                     {
                         m_ScriptControls[instance] = new ScriptControlData(value);
                     }
@@ -112,24 +111,12 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Script Controls
-        public ControlFlags TakenControls
-        {
-            get
-            {
-                return m_TakenControls;
-            }
-        }
+        public ControlFlags TakenControls => m_TakenControls;
 
-        public ControlFlags IgnoredControls
-        {
-            get
-            {
-                return m_IgnoredControls;
-            }
-        }
+        public ControlFlags IgnoredControls => m_IgnoredControls;
         #endregion
 
-        void ProcessAgentControls()
+        private void ProcessAgentControls()
         {
             var agentControlFlags = m_ActiveAgentControlFlags & (~IgnoredControls);
             var agentMovementDirection = Vector3.Zero;
@@ -210,9 +197,9 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.SetAlwaysRun)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleSetAlwaysRun(Message m)
+        public void HandleSetAlwaysRun(Message m)
         {
-            var sar = (Messages.Agent.SetAlwaysRun)m;
+            var sar = (SetAlwaysRun)m;
 
             if (sar.AgentID != sar.CircuitAgentID ||
                 sar.SessionID != sar.CircuitSessionID)
@@ -230,26 +217,14 @@ namespace SilverSim.Viewer.Core
             ProcessAgentControls();
         }
 
-        public override bool IsRunning
-        {
-            get
-            {
-                return m_IsRunning;
-            }
-        }
+        public override bool IsRunning => m_IsRunning;
 
-        bool m_IsFlying;
-        public override bool IsFlying
-        {
-            get
-            {
-                return m_IsFlying;
-            }
-        }
+        private bool m_IsFlying;
+        public override bool IsFlying => m_IsFlying;
 
         [PacketHandler(MessageType.AgentUpdate)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAgentUpdateMessage(Message m)
+        public void HandleAgentUpdateMessage(Message m)
         {
             /* only AgentUpdate is passed here */
             var au = (AgentUpdate)m;

@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Threading;
@@ -28,34 +30,21 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class NewFileAgentInventory : UploadAssetAbstractCapability
     {
-        readonly InventoryServiceInterface m_InventoryService;
-        readonly AssetServiceInterface m_AssetService;
-        readonly ViewerAgent m_Agent;
+        private readonly InventoryServiceInterface m_InventoryService;
+        private readonly AssetServiceInterface m_AssetService;
+        private readonly ViewerAgent m_Agent;
 
-        readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
+        private readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
 
-        public override string CapabilityName
-        {
-            get
-            {
-                return "NewFileAgentInventory";
-            }
-        }
+        public override string CapabilityName => "NewFileAgentInventory";
 
-        public override int ActiveUploads
-        {
-            get
-            {
-                return m_Transactions.Count;
-            }
-        }
+        public override int ActiveUploads => m_Transactions.Count;
 
         public NewFileAgentInventory(ViewerAgent agent, string serverURI, string remoteip)
             : base(agent.Owner, serverURI, remoteip)
@@ -76,9 +65,9 @@ namespace SilverSim.Viewer.Core.Capabilities
                 ParentFolderID = reqmap["folder_id"].AsUUID,
                 AssetTypeName = reqmap["asset_type"].ToString(),
                 InventoryTypeName = reqmap["inventory_type"].ToString(),
-                LastOwner = m_Creator,
-                Owner = m_Creator,
-                Creator = m_Creator
+                LastOwner = Creator,
+                Owner = Creator,
+                Creator = Creator
             };
             item.Permissions.Base = InventoryPermissionsMask.All;
             item.Permissions.Current = InventoryPermissionsMask.Every;
@@ -92,10 +81,12 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
             KeyValuePair<UUID, InventoryItem> kvp;
-            if (m_Transactions.RemoveIf(transactionID, delegate(InventoryItem v) { return true; }, out kvp))
+            if (m_Transactions.RemoveIf(transactionID, (InventoryItem v) => true, out kvp))
             {
-                Map m = new Map();
-                m.Add("new_inventory_item", kvp.Value.ID.ToString());
+                var m = new Map
+                {
+                    { "new_inventory_item", kvp.Value.ID.ToString() }
+                };
                 kvp.Value.AssetID = data.ID;
                 data.Type = kvp.Value.AssetType;
                 data.Name = kvp.Value.Name;
@@ -128,36 +119,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        protected override UUID NewAssetID
-        {
-            get
-            {
-                return UUID.Random;
-            }
-        }
+        protected override UUID NewAssetID => UUID.Random;
 
-        protected override bool AssetIsLocal
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsLocal => false;
 
-        protected override bool AssetIsTemporary
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsTemporary => false;
 
-        protected override AssetType NewAssetType
-        {
-            get
-            {
-                return AssetType.Unknown;
-            }
-        }
+        protected override AssetType NewAssetType => AssetType.Unknown;
     }
 }

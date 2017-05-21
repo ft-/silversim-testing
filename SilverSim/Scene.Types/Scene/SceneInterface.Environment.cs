@@ -39,8 +39,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public class LocationInfoProvider
         {
-            TerrainController m_TerrainController;
-            RegionSettings m_RegionSettings;
+            private readonly TerrainController m_TerrainController;
+            private readonly RegionSettings m_RegionSettings;
 
             internal LocationInfoProvider(TerrainController terrain, RegionSettings regionSettings)
             {
@@ -50,11 +50,11 @@ namespace SilverSim.Scene.Types.Scene
 
             public LocationInfo At(Vector3 pos)
             {
-                var locInfo = new LocationInfo();
-                locInfo.WaterHeight = m_RegionSettings.WaterHeight;
-                locInfo.GroundHeight = m_TerrainController[pos];
-
-                return locInfo;
+                return new LocationInfo()
+                {
+                    WaterHeight = m_RegionSettings.WaterHeight,
+                    GroundHeight = m_TerrainController[pos]
+                };
             }
         }
 
@@ -84,7 +84,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void TriggerStoreOfEnvironmentSettings();
 
-        EnvironmentSettings m_EnvironmentSettings;
+        private EnvironmentSettings m_EnvironmentSettings;
 
         public EnvironmentSettings EnvironmentSettings
         {
@@ -99,11 +99,10 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                m_EnvironmentSettings = (null != value) ?
+                m_EnvironmentSettings = (value != null) ?
                     new EnvironmentSettings(value) :
                     null;
             }
         }
-
     }
 }

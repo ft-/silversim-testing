@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
@@ -67,25 +70,19 @@ namespace SilverSim.Viewer.Core
     public partial class ViewerAgent : SilverSim.Scene.Agent.Agent
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
-        readonly SceneList m_Scenes;
+        private readonly SceneList m_Scenes;
 
         #region Agent fields
         private UUID m_CurrentSceneID;
         #endregion
 
-        readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
+        private readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
 
         /** <summary>Key is region ID</summary> */
-        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds
-        {
-            get
-            {
-                return m_ActiveChilds;
-            }
-        }
+        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds => m_ActiveChilds;
         public override ClientInfo Client { get; }
 
-        readonly UserAccount m_UntrustedAccountInfo;
+        private readonly UserAccount m_UntrustedAccountInfo;
         public override UserAccount UntrustedAccountInfo => new UserAccount(m_UntrustedAccountInfo);
 
         public override SessionInfo Session => new SessionInfo()
@@ -95,7 +92,7 @@ namespace SilverSim.Viewer.Core
             ServiceSessionID = m_ServiceSessionID
         };
 
-        public override List<GridType> SupportedGridTypes 
+        public override List<GridType> SupportedGridTypes
         {
             get
             {
@@ -108,18 +105,16 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        IAgentTeleportServiceInterface m_ActiveTeleportService;
+        private IAgentTeleportServiceInterface m_ActiveTeleportService;
         public override IAgentTeleportServiceInterface ActiveTeleportService
         {
-            get
-            {
-                return m_ActiveTeleportService;
-            }
+            get { return m_ActiveTeleportService; }
+
             set
             {
-                lock(m_DataLock)
+                lock (m_DataLock)
                 {
-                    if(m_ActiveTeleportService != null && value != null)
+                    if (m_ActiveTeleportService != null && value != null)
                     {
                         throw new InvalidOperationException();
                     }
@@ -148,7 +143,7 @@ namespace SilverSim.Viewer.Core
         public readonly RwLockedDictionary<UUID, AgentCircuit> Circuits = new RwLockedDictionary<UUID, AgentCircuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
 
-        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate() { return new RwLockedDictionary<uint, uint>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(() => new RwLockedDictionary<uint, uint>());
 
         public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials => m_TransmittedTerrainSerials;
 
@@ -239,24 +234,17 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region IAgent Properties
-        public override bool IsNpc
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool IsNpc => false;
 
-        bool m_IsInMouselook;
+        private bool m_IsInMouselook;
 
         public override bool IsInMouselook => m_IsInMouselook;
 
+        private readonly RwLockedDictionary<UUID, FriendStatus> m_KnownFriends = new RwLockedDictionary<UUID, FriendStatus>();
+        private bool m_KnownFriendsCached;
+        private readonly object m_KnownFriendsCacheLock = new object();
 
-        readonly RwLockedDictionary<UUID, FriendStatus> m_KnownFriends = new RwLockedDictionary<UUID, FriendStatus>();
-        bool m_KnownFriendsCached;
-        readonly object m_KnownFriendsCacheLock = new object();
-
-        void CacheFriends()
+        private void CacheFriends()
         {
             lock (m_KnownFriendsCacheLock)
             {
@@ -326,13 +314,7 @@ namespace SilverSim.Viewer.Core
 
         private bool m_IsActiveGod;
 
-        public override bool IsActiveGod
-        {
-            get
-            {
-                return m_IsActiveGod;
-            }
-        }
+        public override bool IsActiveGod => m_IsActiveGod;
 
         public override int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {
@@ -388,7 +370,7 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                return (SittingOnObject != null) ? 
+                return (SittingOnObject != null) ?
                     (DetectedTypeFlags.Agent | DetectedTypeFlags.Passive) :
                     (DetectedTypeFlags.Agent | DetectedTypeFlags.Active);
             }
@@ -407,11 +389,11 @@ namespace SilverSim.Viewer.Core
 
         #endregion
 
-        readonly UUID m_SecureSessionID;
-        readonly string m_ServiceSessionID;
-        readonly List<IAgentTeleportServiceInterface> m_TeleportServices;
+        private readonly UUID m_SecureSessionID;
+        private readonly string m_ServiceSessionID;
+        private readonly List<IAgentTeleportServiceInterface> m_TeleportServices;
 
-        void CloseAllCircuits(bool result)
+        private void CloseAllCircuits(bool result)
         {
             foreach(var info in ActiveChilds.Values)
             {
@@ -574,10 +556,7 @@ namespace SilverSim.Viewer.Core
             OfflineIMService = serviceList.Get<OfflineIMServiceInterface>();
             FirstName = firstName;
             LastName = lastName;
-            if (EconomyService != null)
-            {
-                EconomyService.Login(Owner, SessionID, m_SecureSessionID);
-            }
+            EconomyService?.Login(Owner, SessionID, m_SecureSessionID);
             OnPositionChange += ChildUpdateOnPositionChange;
             OnAppearanceUpdate += HandleAppearanceUpdate;
         }
@@ -588,10 +567,7 @@ namespace SilverSim.Viewer.Core
             lock (m_DataLock)
             {
                 DetachAllAttachments();
-                if (EconomyService != null)
-                {
-                    EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
-                }
+                EconomyService?.Logout(Owner, SessionID, m_SecureSessionID);
                 m_AssetService = null;
                 m_InventoryService = null;
                 m_GroupsService = null;
@@ -604,7 +580,7 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Physics Linkage
-        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
+        private readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
         public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors => m_PhysicsActors;
 
@@ -677,7 +653,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.RegionHandshakeReply)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleRegionHandshakeReply(Message m)
+        public void HandleRegionHandshakeReply(Message m)
         {
             var rhr = (Messages.Region.RegionHandshakeReply)m;
             AgentCircuit circuit;
@@ -686,7 +662,7 @@ namespace SilverSim.Viewer.Core
                 var scene = circuit.Scene;
                 /* Add our agent to scene */
                 scene.SendAllParcelOverlaysTo(this);
-                scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
+                scene.Terrain.UpdateTerrainDataToSingleClient(this);
                 scene.Environment.UpdateWindDataToSingleClient(this);
                 scene.SendAgentObjectToAllAgents(this);
                 scene.SendRegionInfo(this);
@@ -711,8 +687,8 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        UUID m_AgentSitTarget = UUID.Zero;
-        Vector3 m_AgentRequestedSitOffset = Vector3.Zero;
+        private UUID m_AgentSitTarget = UUID.Zero;
+        private Vector3 m_AgentRequestedSitOffset = Vector3.Zero;
 
         [PacketHandler(MessageType.AgentRequestSit)]
         public void HandleAgentRequestSit(Message m)
@@ -728,7 +704,7 @@ namespace SilverSim.Viewer.Core
             if(Circuits.TryGetValue(sitreq.CircuitSceneID, out circuit))
             {
                 var scene = circuit.Scene;
-                if(null == scene || scene.ID != SceneID)
+                if(scene == null || scene.ID != SceneID)
                 {
                     return;
                 }
@@ -742,7 +718,7 @@ namespace SilverSim.Viewer.Core
                 if(scene.Primitives.TryGetValue(sitreq.TargetID, out part))
                 {
                     var grp = part.ObjectGroup;
-                    if(null != grp)
+                    if(grp != null)
                     {
                         ObjectPart sitOnLink;
                         Vector3 sitOffset;
@@ -787,7 +763,7 @@ namespace SilverSim.Viewer.Core
             if (Circuits.TryGetValue(sitreq.CircuitSceneID, out circuit))
             {
                 var scene = circuit.Scene;
-                if (null == scene || scene.ID != SceneID)
+                if (scene == null || scene.ID != SceneID)
                 {
                     return;
                 }
@@ -795,7 +771,7 @@ namespace SilverSim.Viewer.Core
                 if (scene.Primitives.TryGetValue(m_AgentSitTarget, out part))
                 {
                     var grp = part.ObjectGroup;
-                    if (null != grp)
+                    if (grp != null)
                     {
                         grp.AgentSitting.Sit(this, m_AgentRequestedSitOffset, grp.RootPart != part ? part.LinkNumber : -1);
                     }
@@ -805,7 +781,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.CompleteAgentMovement)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleCompleteAgentMovement(Message m)
+        public void HandleCompleteAgentMovement(Message m)
         {
             var cam = (CompleteAgentMovement)m;
             AgentCircuit circuit;
@@ -817,7 +793,7 @@ namespace SilverSim.Viewer.Core
             else if (Circuits.TryGetValue(cam.CircuitSceneID, out circuit))
             {
                 var scene = circuit.Scene;
-                if(null == scene)
+                if(scene == null)
                 {
                     return;
                 }
@@ -850,7 +826,6 @@ namespace SilverSim.Viewer.Core
                         /* TODO: how to do this? */
                         return;
                     }
-
                 }
 
                 var amc = new AgentMovementComplete()
@@ -901,7 +876,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.LogoutRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleLogoutRequest(Message m)
+        public void HandleLogoutRequest(Message m)
         {
             var lr = (LogoutRequest)m;
             /* agent wants to logout */
@@ -934,7 +909,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.MuteListRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleMuteListRequest(Message m)
+        public void HandleMuteListRequest(Message m)
         {
             var req = (MuteListRequest)m;
             if (req.AgentID != ID || req.SessionID != m.CircuitSessionID)
@@ -977,7 +952,6 @@ namespace SilverSim.Viewer.Core
 
         public override void HandleMessage(ChildAgentPositionUpdate m)
         {
-
         }
 
         public override void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)

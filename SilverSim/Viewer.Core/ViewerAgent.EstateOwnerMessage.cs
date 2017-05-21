@@ -19,10 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
@@ -38,14 +40,11 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        byte[] StringToBytes(string s)
-        {
-            return (s + "\0").ToUTF8Bytes();
-        }
+        private byte[] StringToBytes(string s) => (s + "\0").ToUTF8Bytes();
 
         [PacketHandler(MessageType.EstateOwnerMessage)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleEstateOwnerMessage(Message m)
+        public void HandleEstateOwnerMessage(Message m)
         {
             var req = (EstateOwnerMessage)m;
             if(req.SessionID != SessionID ||
@@ -175,14 +174,14 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        static readonly EstateAccessFlags[] m_OrderedAccessFlags = new EstateAccessFlags[4] {
+        private static readonly EstateAccessFlags[] m_OrderedAccessFlags = new EstateAccessFlags[4] {
             EstateAccessFlags.AllowedAgents,
             EstateAccessFlags.AllowedGroups,
             EstateAccessFlags.BannedAgents,
             EstateAccessFlags.Managers
         };
 
-        void SendEstateList(UUID transactionID, UUID invoice, EstateAccessFlags code, List<UUI> data, uint estateID, UUID fromSceneID)
+        private void SendEstateList(UUID transactionID, UUID invoice, EstateAccessFlags code, List<UUI> data, uint estateID, UUID fromSceneID)
         {
             int i = 0;
             while(i < data.Count)
@@ -223,7 +222,7 @@ namespace SilverSim.Viewer.Core
         }
 
         /* this is groups only, so no code check inside */
-        void SendEstateList(UUID transactionID, UUID invoice, List<UGI> data, uint estateID, UUID fromSceneID)
+        private void SendEstateList(UUID transactionID, UUID invoice, List<UGI> data, uint estateID, UUID fromSceneID)
         {
             int i = 0;
             while(i < data.Count)
@@ -256,7 +255,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_GetInfo(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_GetInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             var scene = circuit.Scene;
             uint estateID;
@@ -271,28 +270,28 @@ namespace SilverSim.Viewer.Core
                 req.TransactionID,
                 req.Invoice,
                 EstateAccessFlags.Managers,
-                scene.EstateService.EstateManager.All[estateID], 
-                estateID, 
+                scene.EstateService.EstateManager.All[estateID],
+                estateID,
                 req.CircuitSceneID);
             SendEstateList(
                 req.TransactionID,
                 req.Invoice,
-                EstateAccessFlags.AllowedAgents, 
-                scene.EstateService.EstateAccess.All[estateID], 
-                estateID, 
+                EstateAccessFlags.AllowedAgents,
+                scene.EstateService.EstateAccess.All[estateID],
+                estateID,
                 req.CircuitSceneID);
             SendEstateList(
                 req.TransactionID,
                 req.Invoice,
                 scene.EstateService.EstateGroup.All[estateID],
-                estateID, 
+                estateID,
                 req.CircuitSceneID);
             SendEstateList(
-                req.TransactionID, 
+                req.TransactionID,
                 req.Invoice,
-                EstateAccessFlags.BannedAgents, 
-                scene.EstateService.EstateBans.All[estateID], 
-                estateID, 
+                EstateAccessFlags.BannedAgents,
+                scene.EstateService.EstateBans.All[estateID],
+                estateID,
                 req.CircuitSceneID);
 
             SendEstateUpdateInfo(req.Invoice, req.TransactionID, estateInfo, req.CircuitSceneID);
@@ -330,7 +329,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_SetRegionInfo(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_SetRegionInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 9)
             {
@@ -360,10 +359,10 @@ namespace SilverSim.Viewer.Core
             scene.TriggerRegionSettingsChanged();
         }
 
-        void EstateOwner_TextureDetail(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_TextureDetail(AgentCircuit circuit, EstateOwnerMessage req)
         {
             bool settingsChanged = false;
-            
+
             var scene = circuit.Scene;
             try
             {
@@ -414,7 +413,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_TextureHeights(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_TextureHeights(AgentCircuit circuit, EstateOwnerMessage req)
         {
             var scene = circuit.Scene;
 
@@ -461,18 +460,18 @@ namespace SilverSim.Viewer.Core
             scene.TriggerRegionSettingsChanged();
         }
 
-        void EstateOwner_TextureCommit(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_TextureCommit(AgentCircuit circuit, EstateOwnerMessage req)
         {
         }
 
-        static bool ParamStringToBool(byte[] b)
+        private static bool ParamStringToBool(byte[] b)
         {
             string s = b.FromUTF8Bytes().ToLower();
             return s == "1" || s == "y" || s == "yes" || s == "t" || s == "true";
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_SetRegionTerrain(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_SetRegionTerrain(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count != 9)
             {
@@ -495,7 +494,7 @@ namespace SilverSim.Viewer.Core
             scene.TriggerRegionSettingsChanged();
         }
 
-        void EstateOwner_Restart(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_Restart(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {
@@ -511,7 +510,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_EstateChangeCovenantId(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_EstateChangeCovenantId(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {
@@ -539,7 +538,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_EstateAccessDelta(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_EstateAccessDelta(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)
             {
@@ -551,7 +550,7 @@ namespace SilverSim.Viewer.Core
             var prey = UUID.Parse(req.ParamList[2].FromUTF8Bytes());
             var uui = UUI.Unknown;
             var ugi = UGI.Unknown;
-            if((null == scene.GroupsNameService || !scene.GroupsNameService.TryGetValue(prey, out ugi)) &&
+            if((scene.GroupsNameService == null || !scene.GroupsNameService.TryGetValue(prey, out ugi)) &&
                 (flags & (EstateAccessDeltaFlags.AddGroup | EstateAccessDeltaFlags.RemoveGroup)) != 0)
             {
                 circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateAccessNotPossibleSinceGroupNotKnown", "Changing estate access not possible since group not known"), scene.ID);
@@ -681,7 +680,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_SimulatorMessage(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_SimulatorMessage(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 5)
             {
@@ -696,7 +695,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_InstantMessage(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_InstantMessage(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if (req.ParamList.Count < 2)
             {
@@ -726,7 +725,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_SetRegionDebug(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_SetRegionDebug(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)
             {
@@ -740,7 +739,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_TeleportHomeUser(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_TeleportHomeUser(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if (req.ParamList.Count < 2)
             {
@@ -758,7 +757,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_TeleportHomeAllUsers(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_TeleportHomeAllUsers(AgentCircuit circuit, EstateOwnerMessage req)
         {
             var scene = circuit.Scene;
 
@@ -775,17 +774,17 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_Colliders(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_Colliders(AgentCircuit circuit, EstateOwnerMessage req)
         {
 
         }
 
-        void EstateOwner_Scripts(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_Scripts(AgentCircuit circuit, EstateOwnerMessage req)
         {
 
         }
 
-        void EstateOwner_Terrain(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_Terrain(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {
@@ -816,7 +815,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_EstateChangeInfo(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_EstateChangeInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)
             {
@@ -866,7 +865,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_Telehub(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_Telehub(AgentCircuit circuit, EstateOwnerMessage req)
         {
             UInt32 param = 0;
             if(req.ParamList.Count < 1)
@@ -930,7 +929,7 @@ namespace SilverSim.Viewer.Core
             SendMessageAlways(res, scene.ID);
         }
 
-        void EstateOwner_KickEstate(AgentCircuit circuit, EstateOwnerMessage req)
+        private void EstateOwner_KickEstate(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {

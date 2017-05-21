@@ -30,7 +30,6 @@ namespace SilverSim.Types.StructuredData.AssetXml
 {
     public static class AssetXml
     {
-
         #region Asset Deserialization
         [Serializable]
         public class InvalidAssetSerializationException : Exception
@@ -42,19 +41,16 @@ namespace SilverSim.Types.StructuredData.AssetXml
             public InvalidAssetSerializationException(string message)
                 : base(message)
             {
-
             }
 
             protected InvalidAssetSerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InvalidAssetSerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -72,7 +68,6 @@ namespace SilverSim.Types.StructuredData.AssetXml
                     case XmlNodeType.Element:
                         switch (reader.Name)
                         {
-
                             case "Guid":
                                 reader.ReadElementValueAsString();
                                 break;
@@ -116,7 +111,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
                         switch (nodeName)
                         {
                             case "Data":
-                                asset.Data = isEmptyElement ? 
+                                asset.Data = isEmptyElement ?
                                     new byte[0] :
                                     reader.ReadContentAsBase64();
                                 break;
@@ -255,19 +250,16 @@ namespace SilverSim.Types.StructuredData.AssetXml
             public InvalidAssetMetadataSerializationException(string message)
                 : base(message)
             {
-
             }
 
             protected InvalidAssetMetadataSerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InvalidAssetMetadataSerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 

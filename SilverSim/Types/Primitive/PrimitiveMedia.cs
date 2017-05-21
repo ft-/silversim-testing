@@ -32,7 +32,6 @@ namespace SilverSim.Types.Primitive
         {
             public Entry()
             {
-
             }
 
             public bool IsAutoLoop;
@@ -82,22 +81,24 @@ namespace SilverSim.Types.Primitive
             [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
             public static explicit operator Map(Entry e)
             {
-                Map m = new Map();
-                m.Add("alt_image_enable", e.IsAlternativeImageEnabled);
-                m.Add("auto_loop", e.IsAutoLoop);
-                m.Add("auto_play", e.IsAutoPlay);
-                m.Add("auto_scale", e.IsAutoScale);
-                m.Add("auto_zoom", e.IsAutoZoom);
-                m.Add("controls", (int)e.Controls);
-                m.Add("current_url", e.CurrentURL);
-                m.Add("first_click_interact", e.IsInteractOnFirstClick);
-                m.Add("width_pixels", e.Width);
-                m.Add("height_pixels", e.Height);
-                m.Add("home_url", e.HomeURL);
-                m.Add("perms_control", (int)e.ControlPermissions);
-                m.Add("perms_interact", (int)e.InteractPermissions);
-                AnArray whiteList = new AnArray();
-                if (e.WhiteList != null && e.WhiteList.Length > 0)
+                var m = new Map
+                {
+                    { "alt_image_enable", e.IsAlternativeImageEnabled },
+                    { "auto_loop", e.IsAutoLoop },
+                    { "auto_play", e.IsAutoPlay },
+                    { "auto_scale", e.IsAutoScale },
+                    { "auto_zoom", e.IsAutoZoom },
+                    { "controls", (int)e.Controls },
+                    { "current_url", e.CurrentURL },
+                    { "first_click_interact", e.IsInteractOnFirstClick },
+                    { "width_pixels", e.Width },
+                    { "height_pixels", e.Height },
+                    { "home_url", e.HomeURL },
+                    { "perms_control", (int)e.ControlPermissions },
+                    { "perms_interact", (int)e.InteractPermissions }
+                };
+                var whiteList = new AnArray();
+                if (e.WhiteList?.Length > 0)
                 {
                     foreach (string v in e.WhiteList)
                     {
@@ -112,24 +113,25 @@ namespace SilverSim.Types.Primitive
             [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
             public static explicit operator Entry(Map m)
             {
-                Entry e = new Entry();
-                e.IsAlternativeImageEnabled = m["alt_image_enable"].AsBoolean;
-                e.IsAutoLoop = m["auto_loop"].AsBoolean;
-                e.IsAutoPlay = m["auto_play"].AsBoolean;
-                e.IsAutoScale = m["auto_scale"].AsBoolean;
-                e.IsAutoZoom = m["auto_zoom"].AsBoolean;
-                e.Controls = (PrimitiveMediaControls)m["controls"].AsInt;
-                e.CurrentURL = m["current_url"].ToString();
-                e.IsInteractOnFirstClick = m["first_click_interfact"].AsBoolean;
-                e.Width = m["width_pixels"].AsInt;
-                e.Height = m["height_pixels"].AsInt;
-                e.HomeURL = m["home_url"].ToString();
-                e.ControlPermissions = (PrimitiveMediaPermission)m["perms_control"].AsInt;
-                e.InteractPermissions = (PrimitiveMediaPermission)m["perms_interact"].AsInt;
-
+                var e = new Entry()
+                {
+                    IsAlternativeImageEnabled = m["alt_image_enable"].AsBoolean,
+                    IsAutoLoop = m["auto_loop"].AsBoolean,
+                    IsAutoPlay = m["auto_play"].AsBoolean,
+                    IsAutoScale = m["auto_scale"].AsBoolean,
+                    IsAutoZoom = m["auto_zoom"].AsBoolean,
+                    Controls = (PrimitiveMediaControls)m["controls"].AsInt,
+                    CurrentURL = m["current_url"].ToString(),
+                    IsInteractOnFirstClick = m["first_click_interfact"].AsBoolean,
+                    Width = m["width_pixels"].AsInt,
+                    Height = m["height_pixels"].AsInt,
+                    HomeURL = m["home_url"].ToString(),
+                    ControlPermissions = (PrimitiveMediaPermission)m["perms_control"].AsInt,
+                    InteractPermissions = (PrimitiveMediaPermission)m["perms_interact"].AsInt
+                };
                 if (m.ContainsKey("whitelist") && m["whitelist"] is AnArray)
                 {
-                    List<string> whiteList = new List<string>();
+                    var whiteList = new List<string>();
                     foreach (IValue iv in (AnArray)m["whitelist"])
                     {
                         whiteList.Add(iv.ToString());
@@ -157,7 +159,7 @@ namespace SilverSim.Types.Primitive
                 writer.WriteKeyValuePair("home_url", HomeURL);
                 writer.WriteKeyValuePair("perms_control", (int)ControlPermissions);
                 writer.WriteKeyValuePair("perms_interact", (int)InteractPermissions);
-                if (WhiteList != null && WhiteList.Length > 0)
+                if (WhiteList?.Length > 0)
                 {
                     bool haveWhitelistEntry = false;
                     foreach (string v in WhiteList)
@@ -180,7 +182,7 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        static void FromXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
+        private static void FromXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
         {
             for (; ; )
             {
@@ -259,6 +261,7 @@ namespace SilverSim.Types.Primitive
                 }
             }
         }
+
         public void ToXml(XmlTextWriter writer)
         {
             writer.WriteStartElement("OSMedia");

@@ -35,6 +35,7 @@ namespace SilverSim.ServiceInterfaces
             Close,
             Establish
         }
+
         public class ChildConnection
         {
             public ChildConnectionState State;

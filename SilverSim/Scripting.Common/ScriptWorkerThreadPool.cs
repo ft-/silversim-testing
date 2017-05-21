@@ -33,12 +33,13 @@ namespace SilverSim.Scripting.Common
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SCRIPT WORKER THREAD POOL");
 
-        readonly BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
-        readonly ManualResetEvent m_WaitShutdownEvent = new ManualResetEvent(false);
+        private readonly BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
+        private readonly ManualResetEvent m_WaitShutdownEvent = new ManualResetEvent(false);
         private int m_MinimumThreads = 2;
         private int m_MaximumThreads = 150;
-        readonly UUID m_SceneID;
-        bool m_ShutdownThreads;
+        private readonly UUID m_SceneID;
+        private bool m_ShutdownThreads;
+
         public class ScriptThreadContext
         {
             public ScriptInstance CurrentScriptInstance;
@@ -46,21 +47,18 @@ namespace SilverSim.Scripting.Common
             public ScriptWorkerThreadPool ThreadPool;
         }
 
-        readonly RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
+        private readonly RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
 
         public int MinimumThreads
         {
-            get
-            {
-                return m_MinimumThreads;
-            }
+            get { return m_MinimumThreads; }
             set
             {
-                if(value < 2)
+                if (value < 2)
                 {
                     throw new ArgumentException("value");
                 }
-                if(value > m_MaximumThreads)
+                if (value > m_MaximumThreads)
                 {
                     m_MaximumThreads = value;
                 }
@@ -70,14 +68,8 @@ namespace SilverSim.Scripting.Common
 
         public int MaximumThreads
         {
-            get
-            {
-                return m_MaximumThreads;
-            }
-            set
-            {
-                m_MaximumThreads = value < m_MinimumThreads ? m_MinimumThreads : value;
-            }
+            get { return m_MaximumThreads; }
+            set { m_MaximumThreads = value < m_MinimumThreads ? m_MinimumThreads : value; }
         }
 
         public ScriptWorkerThreadPool(int minimumThreads, int maximumThreads, UUID sceneID)
@@ -187,7 +179,7 @@ namespace SilverSim.Scripting.Common
                         lock(tc)
                         {
                             var instance = tc.CurrentScriptInstance;
-                            if (null != instance)
+                            if (instance != null)
                             {
                                 lock (instance)
                                 {

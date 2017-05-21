@@ -31,10 +31,7 @@ namespace SilverSim.Types
 {
     public static class TypeExtensionMethods
     {
-        public static int PosIfNotNeg(this double a)
-        {
-            return a < 0 ? -1 : 1;
-        }
+        public static int PosIfNotNeg(this double a) => a < 0 ? -1 : 1;
 
         public static double Mix(this double a, double b, double m) => a * (1 - m) + b * m;
 
@@ -107,7 +104,7 @@ namespace SilverSim.Types
             return Quaternion.CreateFromEulers(0, 0, yaw);
         }
 
-        static readonly UTF8Encoding m_UTF8NoBOM = new UTF8Encoding(false);
+        private static readonly UTF8Encoding m_UTF8NoBOM = new UTF8Encoding(false);
 
         public static byte[] ToUTF8Bytes(this string s) => m_UTF8NoBOM.GetBytes(s);
 

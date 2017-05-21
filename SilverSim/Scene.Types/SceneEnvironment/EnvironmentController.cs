@@ -31,30 +31,25 @@ namespace SilverSim.Scene.Types.SceneEnvironment
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ENVIRONMENT CONTROLLER");
 
-        readonly object m_EnvironmentLock = new object();
+        private readonly object m_EnvironmentLock = new object();
 
-        public IWindModel Wind
-        {
-            get;
-        }
+        public IWindModel Wind { get; }
 
-        readonly SceneInterface m_Scene;
-        readonly System.Timers.Timer m_Timer = new System.Timers.Timer(1000 / 60f);
+        private readonly SceneInterface m_Scene;
+        private readonly System.Timers.Timer m_Timer = new System.Timers.Timer(1000 / 60f);
 
-        int m_SunUpdateEveryMsecs = 10000;
-        uint m_SendSimTimeAfterNSunUpdates = 10 - 1;
-        int m_UpdateWindModelEveryMsecs = 10000;
-        int m_UpdateTidalModelEveryMsecs = 60000;
+        private int m_SunUpdateEveryMsecs = 10000;
+        private uint m_SendSimTimeAfterNSunUpdates = 10 - 1;
+        private int m_UpdateWindModelEveryMsecs = 10000;
+        private int m_UpdateTidalModelEveryMsecs = 60000;
 
-        uint m_SunUpdatesUntilSendSimTime;
+        private uint m_SunUpdatesUntilSendSimTime;
 
         #region Update Rate Control
         public int UpdateTidalModelEveryMsecs
         {
-            get
-            {
-                return m_UpdateTidalModelEveryMsecs;
-            }
+            get { return m_UpdateTidalModelEveryMsecs; }
+
             set
             {
                 m_UpdateTidalModelEveryMsecs = value;
@@ -64,10 +59,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public int SunUpdateEveryMsecs
         {
-            get
-            {
-                return m_SunUpdateEveryMsecs;
-            }
+            get { return m_SunUpdateEveryMsecs; }
+
             set
             {
                 m_SunUpdateEveryMsecs = value;
@@ -77,10 +70,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public uint SendSimTimeEveryNthSunUpdate
         {
-            get
-            {
-                return m_SendSimTimeAfterNSunUpdates + 1;
-            }
+            get { return m_SendSimTimeAfterNSunUpdates + 1; }
+
             set
             {
                 if (value >= 1)
@@ -93,10 +84,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public int UpdateWindModelEveryMsecs
         {
-            get
-            {
-                return m_UpdateWindModelEveryMsecs;
-            }
+            get { return m_UpdateWindModelEveryMsecs; }
+
             set
             {
                 if (value >= 1)
@@ -155,12 +144,12 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         }
         #endregion
 
-        int m_LastFpsTickCount;
-        int m_LastWindModelUpdateTickCount;
-        int m_LastSunUpdateTickCount;
-        int m_LastTidalModelUpdateTickCount;
-        int m_CountedTicks;
-        double m_EnvironmentFps;
+        private int m_LastFpsTickCount;
+        private int m_LastWindModelUpdateTickCount;
+        private int m_LastSunUpdateTickCount;
+        private int m_LastTidalModelUpdateTickCount;
+        private int m_CountedTicks;
+        private double m_EnvironmentFps;
 
         public double EnvironmentFps
         {
@@ -206,10 +195,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
 
             int lastwinddt = newTickCount - m_LastWindModelUpdateTickCount;
-            if (null != Wind && lastwinddt >= m_UpdateWindModelEveryMsecs)
+            if (lastwinddt >= m_UpdateWindModelEveryMsecs)
             {
                 m_LastWindModelUpdateTickCount = newTickCount;
-                Wind.UpdateModel(m_SunData, lastwinddt / 1000.0);
+                Wind?.UpdateModel(m_SunData, lastwinddt / 1000.0);
             }
 
             UpdateMoonPhase();

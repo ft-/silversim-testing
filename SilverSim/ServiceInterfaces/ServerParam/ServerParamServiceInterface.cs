@@ -31,13 +31,13 @@ namespace SilverSim.ServiceInterfaces.ServerParam
 {
     public abstract class ServerParamServiceInterface
     {
-        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> GenericServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(delegate() { return new RwLockedList<IServerParamAnyListener>(); });
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> GenericServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(() => new RwLockedList<IServerParamAnyListener>());
         public readonly RwLockedList<IServerParamAnyListener> AnyServerParamListeners = new RwLockedList<IServerParamAnyListener>();
-        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>> SpecificParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>>(delegate () { return new RwLockedList<Action<UUID, string>>(); });
-        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> StartsWithServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(delegate() { return new RwLockedList<IServerParamAnyListener>(); });
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>> SpecificParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<Action<UUID, string>>>(() => new RwLockedList<Action<UUID, string>>());
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>> StartsWithServerParamListeners = new RwLockedDictionaryAutoAdd<string, RwLockedList<IServerParamAnyListener>>(() => new RwLockedList<IServerParamAnyListener>());
 
         private static readonly ILog m_ServerParamUpdateLog = LogManager.GetLogger("SERVER PARAM UPDATE");
-        
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public string this[UUID regionID, string parameter, string defvalue]
         {
@@ -50,7 +50,7 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             }
         }
 
-        readonly object m_UpdateSequenceLock = new object();
+        private readonly object m_UpdateSequenceLock = new object();
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public string this[UUID regionID, string parameter]
@@ -150,21 +150,12 @@ namespace SilverSim.ServiceInterfaces.ServerParam
         public abstract bool Contains(UUID regionID, string parameter);
         public abstract bool TryGetExplicitValue(UUID regionID, string parameter, out string value);
 
-        public abstract List<string> this[UUID regionID]
-        {
-            get;
-        }
+        public abstract List<string> this[UUID regionID] { get; }
 
         /* specific for use by configuration loader */
-        public abstract List<KeyValuePair<UUID, string>> this[string parametername]
-        {
-            get;
-        }
+        public abstract List<KeyValuePair<UUID, string>> this[string parametername] { get; }
 
-        public abstract List<KeyValuePair<UUID, string>> KnownParameters
-        {
-            get;
-        }
+        public abstract List<KeyValuePair<UUID, string>> KnownParameters { get; }
 
         public abstract bool Remove(UUID regionID, string parameter);
 

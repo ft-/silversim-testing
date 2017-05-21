@@ -41,5 +41,4 @@ namespace SilverSim.Scene.Types.Script
             NlsParams = param;
         }
     }
-
 }

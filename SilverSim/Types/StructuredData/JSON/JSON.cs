@@ -31,29 +31,25 @@ namespace SilverSim.Types.StructuredData.Json
     public static class Json
     {
         [Serializable]
-        public class InvalidJsonSerializationException : Exception 
+        public class InvalidJsonSerializationException : Exception
         {
             public InvalidJsonSerializationException()
             {
-
             }
 
             public InvalidJsonSerializationException(string message)
                 : base(message)
             {
-
             }
 
             protected InvalidJsonSerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InvalidJsonSerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -124,7 +120,7 @@ namespace SilverSim.Types.StructuredData.Json
                     for (; ;)
                     {
                         c = (char) io.Peek();
-                        if(c == ']' || c == ',' | c == '}')
+                        if(c == ']' || c == ',' || c == '}')
                         {
                             break;
                         }
@@ -327,6 +323,7 @@ namespace SilverSim.Types.StructuredData.Json
             }
             io.Write('}');
         }
+
         private static void SerializeArray(TextWriter io, AnArray arr)
         {
             io.Write('[');

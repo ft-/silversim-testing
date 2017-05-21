@@ -36,7 +36,6 @@ namespace SilverSim.Scene.Types.Script
     {
         public Dictionary<int, string> Messages = new Dictionary<int,string>();
 
-
         public CompilerException()
         {
         }

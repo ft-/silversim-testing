@@ -34,7 +34,7 @@ namespace SilverSim.Types.Asset.Format
             Chat = 2,
             Wait = 3,
             EndOfGesture = 4
-        };
+        }
 
         #region Steps
         public interface IStep
@@ -84,7 +84,6 @@ namespace SilverSim.Types.Asset.Format
             public bool WaitForTime;
             public float WaitTime;
 
-
             public string Serialize()
             {
                 int waitFlags = 0;
@@ -121,7 +120,6 @@ namespace SilverSim.Types.Asset.Format
         #region Constructors
         public Gesture()
         {
-
         }
 
         public Gesture(AssetData asset)
@@ -160,7 +158,7 @@ namespace SilverSim.Types.Asset.Format
                 {
                     throw new NotAGestureFormatException();
                 }
-                
+
                 if (!uint.TryParse(e.Current, out TriggerKeyMask))
                 {
                     throw new NotAGestureFormatException();
@@ -218,12 +216,12 @@ namespace SilverSim.Types.Asset.Format
                                 {
                                     step.Name = e.Current;
                                 }
-                                if (e.MoveNext() && 
+                                if (e.MoveNext() &&
                                     !UUID.TryParse(e.Current, out step.AssetID))
                                 {
                                     throw new NotAGestureFormatException();
                                 }
-                                if (e.MoveNext() && 
+                                if (e.MoveNext() &&
                                     !int.TryParse(e.Current, out intval))
                                 {
                                     throw new NotAGestureFormatException();
@@ -302,7 +300,7 @@ namespace SilverSim.Types.Asset.Format
                     StepSound stepsound;
                     StepAnimation stepanim;
                     stepsound = step as StepSound;
-                    if(null != stepsound)
+                    if(stepsound != null)
                     {
                         if (!refs.Contains(stepsound.AssetID))
                         {
@@ -310,9 +308,9 @@ namespace SilverSim.Types.Asset.Format
                         }
                         continue;
                     }
-                    
+
                     stepanim = step as StepAnimation;
-                    if(null != (stepanim))
+                    if(stepanim != null)
                     {
                         if (!refs.Contains(stepanim.AssetID))
                         {

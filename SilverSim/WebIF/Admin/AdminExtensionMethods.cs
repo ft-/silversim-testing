@@ -37,15 +37,12 @@ namespace SilverSim.WebIF.Admin
             return webIF[0];
         }
 
-        public static Map ToMap(this UUI uui)
+        public static Map ToMap(this UUI uui) => new Map
         {
-            return new Map
-            {
-                { "fullname", uui.FullName },
-                { "uui", uui.ToString() },
-                { "firstname", uui.FirstName },
-                { "lastname", uui.LastName }
-            };
-        }
+            { "fullname", uui.FullName },
+            { "uui", uui.ToString() },
+            { "firstname", uui.FirstName },
+            { "lastname", uui.LastName }
+        };
     }
 }

@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
@@ -46,10 +49,10 @@ namespace SilverSim.Viewer.Core
         /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
         public Vector3 RemoteOffset { get; protected set; }
 
-        readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
-        readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
-        readonly Dictionary<string, Action<Message>> m_GodlikeMessageRouting = new Dictionary<string, Action<Message>>();
-        readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
+        private readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
+        private readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
+        private readonly Dictionary<string, Action<Message>> m_GodlikeMessageRouting = new Dictionary<string, Action<Message>>();
+        private readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
         public SimCircuit(
             UDPCircuitsManager server,
@@ -230,8 +233,8 @@ namespace SilverSim.Viewer.Core
 
         public class ChildAgentUpdater : IAgentChildUpdateServiceInterface
         {
-            readonly SimCircuit m_Circuit;
-            readonly uint m_ViewerCircuitCode;
+            private readonly SimCircuit m_Circuit;
+            private readonly uint m_ViewerCircuitCode;
 
             public ChildAgentUpdater(SimCircuit circuit, uint viewercircuitcode)
             {

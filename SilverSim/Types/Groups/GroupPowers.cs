@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable RCS1154
+#pragma warning disable RCS1029
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -72,7 +75,6 @@ namespace SilverSim.Types.Groups
         /// <summary>Can subdivide and join parcels</summary>
         LandDivideJoin = 1UL << 15,
 
-
         // Chat
         /// <summary>Can join group chat sessions</summary>
         JoinChat = 1UL << 16,
@@ -108,7 +110,6 @@ namespace SilverSim.Types.Groups
         AllowLandmark = 1UL << 26,
         /// <summary>Can set home location on any group owned parcel</summary>
         AllowSetHome = 1UL << 28,
-
 
         // Parcel access
         /// <summary>Can modify public access settings for group owned parcels</summary>
@@ -158,7 +159,7 @@ namespace SilverSim.Types.Groups
         /// <summary>Default powers for Everyone</summary>
         DefaultEveryonePowers = AllowSetHome | Accountable | JoinChat | AllowVoiceChat | ReceiveNotices | StartProposal | VoteOnProposal,
         /// <summary>Default powers for Owner</summary>
-        OwnerPowers = 
+        OwnerPowers =
                     Accountable |
                     AllowEditLand |
                     AllowFly |
@@ -168,7 +169,7 @@ namespace SilverSim.Types.Groups
                     AllowVoiceChat |
                     AssignMember |
                     AssignMemberLimited |
-                    ChangeActions | 
+                    ChangeActions |
                     ChangeIdentity |
                     ChangeMedia |
                     ChangeOptions |

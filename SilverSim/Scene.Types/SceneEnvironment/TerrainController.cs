@@ -39,15 +39,15 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         private const int BASE_REGION_SIZE = 256;
         private const double DEFAULT_TERRAIN_HEIGHT = 21;
 
-        readonly SceneInterface m_Scene;
-        readonly ReaderWriterLock m_TerrainRwLock = new ReaderWriterLock();
+        private readonly SceneInterface m_Scene;
+        private readonly ReaderWriterLock m_TerrainRwLock = new ReaderWriterLock();
 
-        readonly LayerPatch[,] m_TerrainPatches;
+        private readonly LayerPatch[,] m_TerrainPatches;
 
         public readonly RwLockedList<ITerrainListener> TerrainListeners = new RwLockedList<ITerrainListener>();
 
-        float m_LowerLimit;
-        float m_RaiseLimit;
+        private float m_LowerLimit;
+        private float m_RaiseLimit;
 
         public float LowerLimit
         {
@@ -123,9 +123,11 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             {
                 for (x = 0; x < xPatches; ++x)
                 {
-                    m_TerrainPatches[y, x] = new LayerPatch(22);
-                    m_TerrainPatches[y, x].X = x;
-                    m_TerrainPatches[y, x].Y = y;
+                    m_TerrainPatches[y, x] = new LayerPatch(22)
+                    {
+                        X = x,
+                        Y = y
+                    };
                 }
             }
             Patch = new PatchesAccessor(m_TerrainPatches, xPatches, yPatches);
@@ -179,7 +181,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             return sorted.Values;
         }
 */
-        private List<LayerData> CompileTerrainData(IAgent agent, bool force)
+        private List<LayerData> CompileTerrainData(IAgent agent)
         {
             m_TerrainRwLock.AcquireReaderLock(-1);
             try
@@ -232,9 +234,9 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        public void UpdateTerrainDataToSingleClient(IAgent agent, bool forceUpdate)
+        public void UpdateTerrainDataToSingleClient(IAgent agent)
         {
-            foreach (LayerData m in CompileTerrainData(agent, forceUpdate))
+            foreach (LayerData m in CompileTerrainData(agent))
             {
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
@@ -244,12 +246,13 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             foreach (IAgent agent in m_Scene.Agents)
             {
-                foreach (LayerData m in CompileTerrainData(agent, false))
+                foreach (LayerData m in CompileTerrainData(agent))
                 {
                     agent.SendMessageAlways(m, m_Scene.ID);
                 }
             }
         }
+
         public void UpdateTerrainListeners(LayerPatch layerpatch)
         {
             layerpatch = new LayerPatch(layerpatch);
@@ -501,9 +504,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         public class PatchesAccessor
         {
-            readonly LayerPatch[,] m_TerrainPatches;
-            readonly uint m_NumXPatches;
-            readonly uint m_NumYPatches;
+            private readonly LayerPatch[,] m_TerrainPatches;
+            private readonly uint m_NumXPatches;
+            private readonly uint m_NumYPatches;
+
             public PatchesAccessor(LayerPatch[,] terrainPatches, uint xPatches, uint yPatches)
             {
                 m_TerrainPatches = terrainPatches;

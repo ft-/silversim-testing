@@ -32,9 +32,9 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectMedia : ICapabilityInterface
     {
-        readonly UUI m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly string m_RemoteIP;
+        private readonly UUI m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly string m_RemoteIP;
 
         public ObjectMedia(UUI agent, SceneInterface scene, string remoteip)
         {
@@ -43,13 +43,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "ObjectMedia";
-            }
-        }
+        public string CapabilityName => "ObjectMedia";
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
@@ -74,7 +68,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -101,7 +95,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        void HandleObjectMediaRequest(HttpRequest httpreq, Map reqmap)
+        private void HandleObjectMediaRequest(HttpRequest httpreq, Map reqmap)
         {
             UUID objectID = reqmap["object_id"].AsUUID;
             ObjectPart part;
@@ -118,10 +112,12 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            var res = new Map();
-            res.Add("object_id", objectID);
+            var res = new Map
+            {
+                ["object_id"] = objectID
+            };
             var mediaList = part.Media;
-            if(null == mediaList)
+            if(mediaList == null)
             {
                 using (var resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
                 {
@@ -132,7 +128,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             var mediaData = new AnArray();
             foreach (var entry in part.Media)
             {
-                if(null != entry)
+                if(entry != null)
                 {
                     mediaData.Add((Map)entry);
                 }
@@ -153,7 +149,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        void HandleObjectMediaUpdate(HttpRequest httpreq, Map reqmap)
+        private void HandleObjectMediaUpdate(HttpRequest httpreq, Map reqmap)
         {
             UUID objectID = reqmap["object_id"].AsUUID;
             ObjectPart part;
@@ -174,7 +170,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             foreach (var v in (AnArray)reqmap["object_media_data"])
             {
                 var vm = v as Map;
-                if (null != vm)
+                if (vm != null)
                 {
                     media.Add((PrimitiveMedia.Entry)vm);
                 }

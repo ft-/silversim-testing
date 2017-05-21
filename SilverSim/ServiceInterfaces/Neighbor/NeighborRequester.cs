@@ -28,8 +28,8 @@ namespace SilverSim.ServiceInterfaces.Neighbor
 {
     public static class NeighborRequester
     {
-        const int MAXIMUM_VIEW_RANGE = 1024;
-        const int MAXIMUM_REGION_SIZE = 8192;
+        private const int MAXIMUM_VIEW_RANGE = 1024;
+        private const int MAXIMUM_REGION_SIZE = 8192;
 
         public static bool IsNeighbor(this RegionInfo ownRegion, RegionInfo neighborRegion)
         {

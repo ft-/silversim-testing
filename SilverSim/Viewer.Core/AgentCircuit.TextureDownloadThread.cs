@@ -193,7 +193,7 @@ namespace SilverSim.Viewer.Core
 
                             Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);
                             SendMessage(res);
-                        } 
+                        }
 
                         int offset = IMAGE_FIRST_PACKET_SIZE;
                         ushort packetno = 0;

@@ -26,6 +26,7 @@ namespace SilverSim.Types.Estate
     [Flags]
     public enum EstateAccessFlags
     {
+        None = 0,
         AllowedAgents = 1 << 0,
         AllowedGroups = 1 << 1,
         BannedAgents = 1 << 2,

@@ -25,9 +25,6 @@ namespace SilverSim.Types.Asset.Format
 {
     public interface IReferencesAccessor
     {
-        List<UUID> References
-        {
-            get;
-        }
+        List<UUID> References { get; }
     }
 }

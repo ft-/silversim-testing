@@ -29,26 +29,23 @@ namespace SilverSim.WebIF.Admin.Simulator
 {
     public static class ExtensionMethods
     {
-        public static Map ToJsonMap(this EstateInfo estate)
+        public static Map ToJsonMap(this EstateInfo estate) => new Map
         {
-            return new Map
-            {
-                { "ID", (int)estate.ID },
-                { "ParentEstateID", (int)estate.ParentEstateID },
-                { "Name", estate.Name },
-                { "Flags", ((uint)estate.Flags).ToString() },
-                { "Owner", estate.Owner.ToMap() },
-                { "PricePerMeter", estate.PricePerMeter },
-                { "BillableFactor", estate.BillableFactor },
-                { "SunPosition", estate.SunPosition },
-                { "AbuseEmail", estate.AbuseEmail },
-                { "UseGlobalTime", estate.UseGlobalTime }
-            };
-        }
+            { "ID", (int)estate.ID },
+            { "ParentEstateID", (int)estate.ParentEstateID },
+            { "Name", estate.Name },
+            { "Flags", ((uint)estate.Flags).ToString() },
+            { "Owner", estate.Owner.ToMap() },
+            { "PricePerMeter", estate.PricePerMeter },
+            { "BillableFactor", estate.BillableFactor },
+            { "SunPosition", estate.SunPosition },
+            { "AbuseEmail", estate.AbuseEmail },
+            { "UseGlobalTime", estate.UseGlobalTime }
+        };
 
         public static Map ToJsonMap(this RegionInfo region)
         {
-            Map m = new Map
+            var m = new Map
             {
                 { "ID", region.ID },
                 { "Location", region.Location.GridLocation },
@@ -85,20 +82,17 @@ namespace SilverSim.WebIF.Admin.Simulator
             return m;
         }
 
-        public static Map ToJsonMap(this IAgent agent, SceneInterface scene)
+        public static Map ToJsonMap(this IAgent agent, SceneInterface scene) => new Map
         {
-            return new Map
-            {
-                { "ID", agent.Owner.ID },
-                { "FullName", agent.Owner.FullName },
-                { "FirstName", agent.Owner.FirstName },
-                { "LastName", agent.Owner.LastName },
-                { "HomeURI", agent.Owner.HomeURI != null ? agent.Owner.HomeURI.ToString() : string.Empty },
-                { "Type", agent.IsNpc ? "Npc" : "User" },
-                { "IsRoot", agent.IsInScene(scene) },
-                { "Position", agent.GlobalPosition.ToString() },
-                { "Health", agent.Health }
-            };
-        }
+            { "ID", agent.Owner.ID },
+            { "FullName", agent.Owner.FullName },
+            { "FirstName", agent.Owner.FirstName },
+            { "LastName", agent.Owner.LastName },
+            { "HomeURI", agent.Owner.HomeURI != null ? agent.Owner.HomeURI.ToString() : string.Empty },
+            { "Type", agent.IsNpc ? "Npc" : "User" },
+            { "IsRoot", agent.IsInScene(scene) },
+            { "Position", agent.GlobalPosition.ToString() },
+            { "Health", agent.Health }
+        };
     }
 }

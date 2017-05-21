@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -35,8 +38,8 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        UInt64 m_NextXferID;
-        UInt64 NextXferID
+        private UInt64 m_NextXferID;
+        private UInt64 NextXferID
         {
             get
             {
@@ -59,13 +62,12 @@ namespace SilverSim.Viewer.Core
 
             internal UploadTransaction()
             {
-
             }
         }
 
         public class TerrainUploadTransaction : UploadTransaction
         {
-            readonly SceneInterface m_Scene;
+            private readonly SceneInterface m_Scene;
 
             internal TerrainUploadTransaction(SceneInterface scene)
             {
@@ -85,7 +87,6 @@ namespace SilverSim.Viewer.Core
 
             public virtual void OnAbort()
             {
-
             }
         }
 
@@ -107,7 +108,6 @@ namespace SilverSim.Viewer.Core
 
             public virtual void OnAbort()
             {
-
             }
         }
 
@@ -150,7 +150,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Asset Uploads
-        UUID AddAssetUploadTransaction(UUID transactionID, AssetUploadTransaction t, UUID fromSceneID)
+        private UUID AddAssetUploadTransaction(UUID transactionID, AssetUploadTransaction t, UUID fromSceneID)
         {
             UInt64 XferID = NextXferID;
             m_AssetTransactions.Add(transactionID, XferID, t);
@@ -168,22 +168,18 @@ namespace SilverSim.Viewer.Core
             return transactionID;
         }
 
-        AssetData BuildUploadedAsset(AssetUploadTransaction t)
+        private AssetData BuildUploadedAsset(AssetUploadTransaction t) => new AssetData()
         {
-            var asset = new AssetData()
-            {
-                Data = BuildUploadedData(t),
-                ID = t.AssetID,
-                Type = t.AssetType,
-                Temporary = t.IsTemporary,
-                Local = t.IsLocal
-            };
-            return asset;
-        }
+            Data = BuildUploadedData(t),
+            ID = t.AssetID,
+            Type = t.AssetType,
+            Temporary = t.IsTemporary,
+            Local = t.IsLocal
+        };
 
         [PacketHandler(MessageType.AssetUploadRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAssetUploadRequest(Message m)
+        public void HandleAssetUploadRequest(Message m)
         {
             var req = (AssetUploadRequest)m;
             AssetUploadTransaction transaction;
@@ -222,7 +218,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.AbortXfer)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAbortXfer(Message m)
+        public void HandleAbortXfer(Message m)
         {
             var req = (AbortXfer)m;
             AssetUploadTransaction assettransaction;
@@ -239,7 +235,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void AssetUploadCompleted(AssetUploadTransaction transaction, UUID fromSceneID)
+        private void AssetUploadCompleted(AssetUploadTransaction transaction, UUID fromSceneID)
         {
             var data = BuildUploadedAsset(transaction);
             bool success = true;
@@ -275,7 +271,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Terrain Uploads
-        void AddTerrainUploadTransaction(TerrainUploadTransaction t, UUID fromSceneID)
+        private void AddTerrainUploadTransaction(TerrainUploadTransaction t, UUID fromSceneID)
         {
             var id = UUID.Random;
             t.XferID = NextXferID;
@@ -294,7 +290,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.SendXferPacket)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleSendXferPacket(Message m)
+        public void HandleSendXferPacket(Message m)
         {
             var req = (SendXferPacket)m;
             var fromSceneID = m.CircuitSceneID;

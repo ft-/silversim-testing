@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable RCS1154
+#pragma warning disable RCS1029
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -186,21 +189,19 @@ namespace SilverSim.Types.Parcel
 
         public class ParcelDataLandBitmap
         {
-            readonly byte[,] m_LandBitmap;
-            readonly int m_BitmapWidth;
-            readonly int m_BitmapHeight;
-            readonly ReaderWriterLock m_LandBitmapRwLock;
-            readonly ParcelInfo m_ParcelInfo;
+            private readonly byte[,] m_LandBitmap;
+            private readonly ReaderWriterLock m_LandBitmapRwLock;
+            private readonly ParcelInfo m_ParcelInfo;
 
-            public int BitmapWidth => m_BitmapWidth;
+            public int BitmapWidth { get; }
 
-            public int BitmapHeight => m_BitmapHeight;
+            public int BitmapHeight { get; }
 
             public ParcelDataLandBitmap(byte[,] landBitmap, int bitmapWidth, int bitmapHeight, ReaderWriterLock landBitmapRwLock, ParcelInfo parcelInfo)
             {
                 m_LandBitmap = landBitmap;
-                m_BitmapWidth = bitmapWidth;
-                m_BitmapHeight = bitmapHeight;
+                BitmapWidth = bitmapWidth;
+                BitmapHeight = bitmapHeight;
                 m_LandBitmapRwLock = landBitmapRwLock;
                 m_ParcelInfo = parcelInfo;
             }
@@ -214,9 +215,9 @@ namespace SilverSim.Types.Parcel
                     m_LandBitmapRwLock.AcquireWriterLock(-1);
                     if (bitmap.m_LandBitmap.Length == m_LandBitmap.Length)
                     {
-                        for (int y = 0; y < m_BitmapHeight; ++y)
+                        for (int y = 0; y < BitmapHeight; ++y)
                         {
-                            for (int x = 0; x < m_BitmapWidth; ++x)
+                            for (int x = 0; x < BitmapWidth; ++x)
                             {
                                 m_LandBitmap[y, x] |= bitmap.m_LandBitmap[y, x];
                             }
@@ -276,10 +277,8 @@ namespace SilverSim.Types.Parcel
 
             public byte[] DataNoAABBUpdate
             {
-                get
-                {
-                    return Data;
-                }
+                get { return Data; }
+
                 set
                 {
                     try
@@ -303,9 +302,9 @@ namespace SilverSim.Types.Parcel
 
             public void SetAllBits()
             {
-                for(int x = 0; x < m_BitmapWidth / 8; ++x)
+                for(int x = 0; x < BitmapWidth / 8; ++x)
                 {
-                    for(int y = 0; y < m_BitmapHeight; ++y)
+                    for(int y = 0; y < BitmapHeight; ++y)
                     {
                         m_LandBitmap[y, x] = 0xFF;
                     }
@@ -316,7 +315,7 @@ namespace SilverSim.Types.Parcel
             {
                 int x = ((int)v.X) / 4;
                 int y = ((int)v.Y) / 4;
-                if (v.X < 0 || v.Y < 0 || x < 0 || y < 0 || x >= m_BitmapWidth || y >= m_BitmapHeight)
+                if (v.X < 0 || v.Y < 0 || x < 0 || y < 0 || x >= BitmapWidth || y >= BitmapHeight)
                 {
                     return false;
                 }
@@ -326,14 +325,9 @@ namespace SilverSim.Types.Parcel
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public bool this[int x, int y]
             {
-                get
-                {
-                    return this[x, y, true];
-                }
-                set
-                {
-                    this[x, y, true] = value;
-                }
+                get { return this[x, y, true]; }
+
+                set { this[x, y, true] = value; }
             }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -341,9 +335,9 @@ namespace SilverSim.Types.Parcel
             {
                 get
                 {
-                    if (x < m_BitmapWidth && y < m_BitmapHeight)
+                    if (x < BitmapWidth && y < BitmapHeight)
                     {
-                        return 0 != (m_LandBitmap[y, x / m_BitmapWidth] & (1 << (x % 8)));
+                        return 0 != (m_LandBitmap[y, x / BitmapWidth] & (1 << (x % 8)));
                     }
                     else
                     {
@@ -352,12 +346,12 @@ namespace SilverSim.Types.Parcel
                 }
                 set
                 {
-                    if (x < m_BitmapWidth && y < m_BitmapHeight)
+                    if (x < BitmapWidth && y < BitmapHeight)
                     {
                         m_LandBitmapRwLock.AcquireWriterLock(-1);
                         try
                         {
-                            byte b = m_LandBitmap[y, x / m_BitmapWidth];
+                            byte b = m_LandBitmap[y, x / BitmapWidth];
                             if (value)
                             {
                                 b |= (byte)(1 << (x % 8));
@@ -366,7 +360,7 @@ namespace SilverSim.Types.Parcel
                             {
                                 b &= (byte)(~(1 << (x % 8)));
                             }
-                            m_LandBitmap[y, x / m_BitmapWidth] = b;
+                            m_LandBitmap[y, x / BitmapWidth] = b;
                             if (runaabb)
                             {
                                 DetermineAABB();
@@ -384,7 +378,7 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
-            static readonly int[] ParcelAreaFromByte = new int[256] 
+            private static readonly int[] ParcelAreaFromByte = new int[256]
             {
                 /*        x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF */
                 /* 0x */   0,   1,   1,   2,   1,   2,   2,   3,   1,   2,   2,   3,   2,   3,   3,   4,
@@ -405,17 +399,17 @@ namespace SilverSim.Types.Parcel
                 /* Fx */   4,   5,   5,   6,   5,   6,   6,   7,   5,   6,   6,   7,   6,   7,   7,   8
             };
 
-            void DetermineAABB()
+            private void DetermineAABB()
             {
-                int aabbminy = m_BitmapHeight - 1;
-                int aabbminx = m_BitmapWidth * 8 - 1;
+                int aabbminy = BitmapHeight - 1;
+                int aabbminx = BitmapWidth * 8 - 1;
                 int aabbmaxy = 0;
                 int aabbmaxx = 0;
                 int parcelarea = 0;
 
-                for (int y = 0; y < m_BitmapHeight; ++y)
+                for (int y = 0; y < BitmapHeight; ++y)
                 {
-                    for (int x = 0; x < m_BitmapWidth / 8; ++x)
+                    for (int x = 0; x < BitmapWidth / 8; ++x)
                     {
                         if (m_LandBitmap[y, x] != 0)
                         {

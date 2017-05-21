@@ -101,10 +101,7 @@ namespace SilverSim.ServiceInterfaces.Grid
     {
         #region Accessors
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract RegionInfo this[UUID scopeID, UUID regionID]
-        {
-            get;
-        }
+        public abstract RegionInfo this[UUID scopeID, UUID regionID] { get; }
 
         public abstract bool TryGetValue(UUID scopeID, UUID regionID, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, UUID regionID);
@@ -117,27 +114,18 @@ namespace SilverSim.ServiceInterfaces.Grid
         public bool ContainsKey(UUID scopeID, GridVector position) => ContainsKey(scopeID, position.X, position.Y);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract RegionInfo this[UUID scopeID, uint gridX, uint gridY]
-        {
-            get;
-        }
+        public abstract RegionInfo this[UUID scopeID, uint gridX, uint gridY] { get; }
 
         public abstract bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, uint gridX, uint gridY);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract RegionInfo this[UUID scopeID, string regionName]
-        {
-            get;
-        }
+        public abstract RegionInfo this[UUID scopeID, string regionName] { get; }
 
         public abstract bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, string regionName);
 
-        public abstract RegionInfo this[UUID regionID]
-        {
-            get;
-        }
+        public abstract RegionInfo this[UUID regionID] { get; }
 
         public abstract bool TryGetValue(UUID regionID, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID regionID);
@@ -152,6 +140,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         {
             throw new NotSupportedException();
         }
+
         public virtual void RemoveRegionFlags(UUID regionID, RegionFlags removeflags)
         {
             throw new NotSupportedException();

@@ -38,13 +38,8 @@ namespace SilverSim.Types.Agent
         {
             [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
             public readonly static int TextureCount = 21;
-            readonly UUID[] m_AvatarTextures = new UUID[TextureCount];
-            readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
-
-            public AvatarTextureData()
-            {
-
-            }
+            private readonly UUID[] m_AvatarTextures = new UUID[TextureCount];
+            private readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 
             [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
             public UUID[] All
@@ -125,22 +120,17 @@ namespace SilverSim.Types.Agent
             }
         }
 
-        readonly AgentWearables m_Wearables = new AgentWearables();
+        private readonly AgentWearables m_Wearables = new AgentWearables();
         public AgentWearables Wearables
         {
-            get
-            {
-                return m_Wearables;
-            }
-            set
-            {
-                m_Wearables.All = value;
-            }
+            get { return m_Wearables; }
+
+            set { m_Wearables.All = value; }
         }
 
         public readonly RwLockedDictionaryAutoAdd<AttachmentPoint, RwLockedDictionary<UUID, UUID>> Attachments =
-            new RwLockedDictionaryAutoAdd<AttachmentPoint, RwLockedDictionary<UUID, UUID>>(delegate() { return new RwLockedDictionary<UUID, UUID>(); });
-        readonly ReaderWriterLock m_VisualParamsLock = new ReaderWriterLock();
+            new RwLockedDictionaryAutoAdd<AttachmentPoint, RwLockedDictionary<UUID, UUID>>(() => new RwLockedDictionary<UUID, UUID>());
+        private readonly ReaderWriterLock m_VisualParamsLock = new ReaderWriterLock();
         private byte[] m_VisualParams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
         public double AvatarHeight;
         public UInt32 Serial = 1;
@@ -191,25 +181,21 @@ namespace SilverSim.Types.Agent
         {
             public InvalidAppearanceInfoSerializationException()
             {
-
             }
 
             public InvalidAppearanceInfoSerializationException(string msg)
                 : base(msg)
             {
-
             }
 
             protected InvalidAppearanceInfoSerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InvalidAppearanceInfoSerializationException(string msg, Exception innerException)
                 : base(msg, innerException)
             {
-
             }
         }
 
@@ -241,11 +227,11 @@ namespace SilverSim.Types.Agent
 
                     appearanceInfo.Attachments[ap][im["item"].AsUUID] = im["asset"].AsUUID;
                 }
-                
+
                 for(int i = 0; i < wearables.Count; ++i)
                 {
                     var wearablesAt = wearables[i] as AnArray;
-                    if(null == wearablesAt)
+                    if(wearablesAt == null)
                     {
                         throw new InvalidAppearanceInfoSerializationException();
                     }

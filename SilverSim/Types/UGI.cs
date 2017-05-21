@@ -36,14 +36,12 @@ namespace SilverSim.Types
 
         public string GroupData
         {
-            get
-            {
-                return string.Format("{0};{1}", HomeURI.ToString(), GroupName);
-            }
+            get { return string.Format("{0};{1}", HomeURI.ToString(), GroupName); }
+
             set
             {
                 string[] parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
-                if(parts.Length < 2)
+                if (parts.Length < 2)
                 {
                     throw new ArgumentException("\"" + value + "\" is not a GroupData string");
                 }
@@ -114,7 +112,7 @@ namespace SilverSim.Types
                 return true;
             }
 
-            return ugi.ID == ID && 
+            return ugi.ID == ID &&
                 ((ugi.HomeURI == null && HomeURI == null) ||
                 (ugi.HomeURI != null && HomeURI != null && ugi.HomeURI.Equals(HomeURI)));
         }
@@ -126,7 +124,6 @@ namespace SilverSim.Types
                 ID.GetHashCode() ^ GroupName.GetHashCode() ^ h.GetHashCode() :
                 ID.GetHashCode() ^ GroupName.GetHashCode();
         }
-
 
         public UGI(UUID ID, string GroupName, Uri HomeURI)
         {

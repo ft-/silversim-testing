@@ -34,9 +34,9 @@ namespace SilverSim.Viewer.Core.Capabilities
     public class ParcelPropertiesUpdate : ICapabilityInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("PARCEL PROPERTIES UPDATE");
-        readonly ViewerAgent m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly string m_RemoteIP;
+        private readonly ViewerAgent m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly string m_RemoteIP;
 
         public ParcelPropertiesUpdate(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
@@ -45,13 +45,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "ParcelPropertiesUpdate";
-            }
-        }
+        public string CapabilityName => "ParcelPropertiesUpdate";
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
@@ -77,7 +71,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;

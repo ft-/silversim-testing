@@ -75,7 +75,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             Load(data, physOffset, physSize);
         }
 
-        static Vector3 U16LEBytesToVertex(byte[] data, int offset, Vector3 posMin, Vector3 posMax)
+        private static Vector3 U16LEBytesToVertex(byte[] data, int offset, Vector3 posMin, Vector3 posMax)
         {
             int offs = offset;
             var buf = data;
@@ -98,7 +98,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return new Vector3(x, y, z);
         }
 
-        static UVCoord U16LEBytesToUV(byte[] data, int offset, UVCoord posMin, UVCoord posMax)
+        private static UVCoord U16LEBytesToUV(byte[] data, int offset, UVCoord posMin, UVCoord posMax)
         {
             int offs = offset;
             var buf = data;
@@ -119,7 +119,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return new UVCoord(u, v);
         }
 
-        static float BytesLEToFloat(byte[] data, int offset)
+        private static float BytesLEToFloat(byte[] data, int offset)
         {
             var buf = data;
             int offs = offset;
@@ -134,7 +134,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return BitConverter.ToSingle(data, offs);
         }
 
-        static ushort BytesLEToU16(byte[] data, int offset)
+        private static ushort BytesLEToU16(byte[] data, int offset)
         {
             var buf = data;
             int offs = offset;
@@ -295,10 +295,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
         }
 
-        static string VertexToString(Vector3 v)
-        {
-            return string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
-        }
+        private static string VertexToString(Vector3 v) => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
 
         public void DumpToBlenderRaw(string filename)
         {

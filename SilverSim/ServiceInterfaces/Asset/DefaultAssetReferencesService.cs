@@ -21,7 +21,6 @@
 
 using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -30,8 +29,8 @@ namespace SilverSim.ServiceInterfaces.Asset
     public sealed class DefaultAssetReferencesService : AssetReferencesServiceInterface
     {
         #region Fields
-        readonly AssetServiceInterface m_Service;
-        readonly RwLockedDictionary<UUID, List<UUID>> m_ReferencesCache = new RwLockedDictionary<UUID, List<UUID>>();
+        private readonly AssetServiceInterface m_Service;
+        private readonly RwLockedDictionary<UUID, List<UUID>> m_ReferencesCache = new RwLockedDictionary<UUID, List<UUID>>();
         #endregion
 
         #region Constructor

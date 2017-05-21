@@ -33,10 +33,10 @@ namespace SilverSim.Scene.Types.Script
 {
     public class LocalizedScriptMessage : IListenEventLocalization
     {
-        readonly object m_NlsRefObject;
-        readonly string m_NlsId;
-        readonly object[] m_Param;
-        readonly string m_NlsDefMessage;
+        private readonly object m_NlsRefObject;
+        private readonly string m_NlsId;
+        private readonly object[] m_Param;
+        private readonly string m_NlsDefMessage;
 
         public LocalizedScriptMessage(object nlsRefObject, string nlsId, string nlsDefMessage, params object[] param)
         {
@@ -69,8 +69,8 @@ namespace SilverSim.Scene.Types.Script
         public event Action<ScriptInstance> OnStateChange;
         public event Action<ScriptInstance> OnScriptReset;
         public abstract IScriptState ScriptState { get; }
-        public virtual bool HasTouchEvent { get { return false; } }
-        public virtual bool HasMoneyEvent { get { return false; } }
+        public virtual bool HasTouchEvent => false;
+        public virtual bool HasMoneyEvent => false;
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectPartInventoryItem Item { get; }
@@ -80,7 +80,7 @@ namespace SilverSim.Scene.Types.Script
 
         public abstract double ExecutionTime { get; set; }
 
-        public ScriptInstance()
+        protected ScriptInstance()
         {
             IsAborting = false;
         }
@@ -96,10 +96,7 @@ namespace SilverSim.Scene.Types.Script
             IsRunning = false;
             IsAborting = true;
             IScriptWorkerThreadPool pool = ThreadPool;
-            if (null != pool)
-            {
-                pool.AbortScript(this);
-            }
+            pool?.AbortScript(this);
         }
 
         public abstract bool IsLinkMessageReceiver { get; }

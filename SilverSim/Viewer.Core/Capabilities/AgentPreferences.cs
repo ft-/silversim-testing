@@ -29,8 +29,8 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class AgentPreferences : ICapabilityInterface
     {
-        readonly ViewerAgent m_Agent;
-        readonly string m_RemoteIP;
+        private readonly ViewerAgent m_Agent;
+        private readonly string m_RemoteIP;
 
         public AgentPreferences(ViewerAgent agent, string remoteip)
         {
@@ -38,13 +38,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "AgentPreferences";
-            }
-        }
+        public string CapabilityName => "AgentPreferences";
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
@@ -69,7 +63,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;

@@ -19,18 +19,19 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SilverSim.WebIF.Admin.Simulator
@@ -39,12 +40,12 @@ namespace SilverSim.WebIF.Admin.Simulator
     [Description("WebIF Estate Admin Support")]
     public class EstateAdmin : IPlugin
     {
-        readonly string m_EstateServiceName;
-        readonly string m_RegionStorageName;
-        EstateServiceInterface m_EstateService;
-        GridServiceInterface m_RegionStorageService;
-        IAdminWebIF m_WebIF;
-        SceneList m_Scenes;
+        private readonly string m_EstateServiceName;
+        private readonly string m_RegionStorageName;
+        private EstateServiceInterface m_EstateService;
+        private GridServiceInterface m_RegionStorageService;
+        private IAdminWebIF m_WebIF;
+        private SceneList m_Scenes;
 
         public EstateAdmin(string estateServiceName, string regionStorageName)
         {
@@ -72,7 +73,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIfRequiredRight("estates.view")]
-        void HandleList(HttpRequest req, Map jsondata)
+        private void HandleList(HttpRequest req, Map jsondata)
         {
             var estates = m_EstateService.All;
 
@@ -88,12 +89,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIfRequiredRight("estates.view")]
-        void HandleGet(HttpRequest req, Map jsondata)
+        private void HandleGet(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
-            if ((jsondata.ContainsKey("name") && 
+            if ((jsondata.ContainsKey("name") &&
                     m_EstateService.TryGetValue(jsondata["name"].ToString(), out estateInfo)) ||
-                (jsondata.ContainsKey("id") && 
+                (jsondata.ContainsKey("id") &&
                     m_EstateService.TryGetValue(jsondata["id"].AsUInt, out estateInfo)))
             {
                 /* found estate via name or via id */
@@ -112,9 +113,10 @@ namespace SilverSim.WebIF.Admin.Simulator
             foreach(UUID regionid in regionMap)
             {
                 RegionInfo rInfo;
-                var regiondata = new Map();
-
-                regiondata.Add("ID", regionid);
+                var regiondata = new Map
+                {
+                    ["ID"] = regionid
+                };
                 if (m_RegionStorageService.TryGetValue(regionid, out rInfo))
                 {
                     regiondata.Add("Name", rInfo.Name);
@@ -127,7 +129,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIfRequiredRight("estates.manage")]
-        void HandleUpdate(HttpRequest req, Map jsondata)
+        private void HandleUpdate(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
             if (jsondata.ContainsKey("id") && m_EstateService.TryGetValue(jsondata["id"].AsUInt, out estateInfo))
@@ -178,7 +180,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     estateInfo.ParentEstateID = jsondata["parentestateid"].AsUInt;
                 }
-
             }
             catch
             {
@@ -208,7 +209,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIfRequiredRight("estates.manage")]
-        void HandleCreate(HttpRequest req, Map jsondata)
+        private void HandleCreate(HttpRequest req, Map jsondata)
         {
             var estateInfo = new EstateInfo();
             if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
@@ -261,7 +262,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIfRequiredRight("estates.manage")]
-        void HandleDelete(HttpRequest req, Map jsondata)
+        private void HandleDelete(HttpRequest req, Map jsondata)
         {
             uint estateID;
             try
@@ -293,7 +294,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIfRequiredRight("estate.notice")]
-        void HandleNotice(HttpRequest req, Map jsondata)
+        private void HandleNotice(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("id") || !jsondata.ContainsKey("message"))
             {
@@ -308,8 +309,10 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     if (m_EstateService.ContainsKey(estateID))
                     {
-                        var m = new Map();
-                        m.Add("noticed_regions", new AnArray());
+                        var m = new Map
+                        {
+                            ["noticed_regions"] = new AnArray()
+                        };
                         m_WebIF.SuccessResponse(req, m);
                     }
                     else
@@ -335,8 +338,10 @@ namespace SilverSim.WebIF.Admin.Simulator
                             }
                         }
                     }
-                    var m = new Map();
-                    m.Add("noticed_regions", regions);
+                    var m = new Map
+                    {
+                        ["noticed_regions"] = regions
+                    };
                     m_WebIF.SuccessResponse(req, m);
                 }
             }
@@ -348,12 +353,10 @@ namespace SilverSim.WebIF.Admin.Simulator
     [PluginName("EstateAdmin")]
     public class EstateAdminFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new EstateAdmin(
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new EstateAdmin(
                 ownSection.GetString("EstateService", "EstateService"),
                 ownSection.GetString("RegionStorage", "RegionStorage"));
-        }
     }
     #endregion
 }

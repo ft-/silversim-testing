@@ -31,11 +31,11 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 {
     public partial class EnvironmentController
     {
-        readonly ReaderWriterLock m_LightShareLock = new ReaderWriterLock();
-        WindlightSkyData m_SkyWindlight = WindlightSkyData.Defaults;
-        WindlightWaterData m_WaterWindlight = WindlightWaterData.Defaults;
-        readonly RwLockedDictionary<UUID, bool> m_OverrideLightSharePerAgent = new RwLockedDictionary<UUID, bool>();
-        bool m_WindlightValid;
+        private readonly ReaderWriterLock m_LightShareLock = new ReaderWriterLock();
+        private WindlightSkyData m_SkyWindlight = WindlightSkyData.Defaults;
+        private WindlightWaterData m_WaterWindlight = WindlightWaterData.Defaults;
+        private readonly RwLockedDictionary<UUID, bool> m_OverrideLightSharePerAgent = new RwLockedDictionary<UUID, bool>();
+        private bool m_WindlightValid;
 
         public struct WLVector2
         {
@@ -180,7 +180,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             IAgent agent;
             if (m_Scene.RootAgents.TryGetValue(agentID, out agent))
             {
-                agent.SendMessageIfRootAgent(CompileWindlightSettings(SkyData, waterData), m_Scene.ID);
+                agent.SendMessageIfRootAgent(CompileWindlightSettings(skyData, waterData), m_Scene.ID);
             }
         }
 
@@ -356,16 +356,20 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #region Windlight message compiler
         private GenericMessage CompileResetWindlightSettings()
         {
-            var m = new GenericMessage();
-            m.Method = "WindlightReset";
+            var m = new GenericMessage()
+            {
+                Method = "WindlightReset"
+            };
             m.ParamList.Add(new byte[0]);
             return m;
         }
 
         private GenericMessage CompileWindlightSettings(WindlightSkyData skyWindlight, WindlightWaterData waterWindlight)
         {
-            var m = new GenericMessage();
-            m.Method = "Windlight";
+            var m = new GenericMessage()
+            {
+                Method = "Windlight"
+            };
             var mBlock = new byte[249];
             int pos = 0;
             AddToCompiledWL(waterWindlight.Color, ref mBlock, ref pos);

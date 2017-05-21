@@ -34,12 +34,12 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        class ObjectPropertiesSendHandler : IDisposable
+        private class ObjectPropertiesSendHandler : IDisposable
         {
-            ObjectProperties m_Props;
-            int m_Bytelen;
-            readonly IAgent m_Agent;
-            readonly UUID m_SceneID;
+            private ObjectProperties m_Props;
+            private int m_Bytelen;
+            private readonly IAgent m_Agent;
+            private readonly UUID m_SceneID;
 
             public ObjectPropertiesSendHandler(IAgent agent, UUID sceneID)
             {
@@ -50,7 +50,7 @@ namespace SilverSim.Scene.Types.Scene
             public void Send(ObjectPart part)
             {
                 var propUpdate = part.PropertiesUpdateData;
-                if (null == propUpdate)
+                if (propUpdate == null)
                 {
                     return;
                 }
@@ -62,7 +62,7 @@ namespace SilverSim.Scene.Types.Scene
                     m_Props = null;
                 }
 
-                if (null == m_Props)
+                if (m_Props == null)
                 {
                     m_Props = new ObjectProperties();
                 }
@@ -73,7 +73,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Dispose()
             {
-                if(null != m_Props)
+                if(m_Props != null)
                 {
                     m_Agent.SendMessageAlways(m_Props, m_SceneID);
                     m_Bytelen = 0;
@@ -100,8 +100,10 @@ namespace SilverSim.Scene.Types.Scene
             ObjectPart part;
             if(Primitives.TryGetValue(req.ObjectID, out part))
             {
-                PayPriceReply rep = new PayPriceReply();
-                rep.ObjectID = req.ObjectID;
+                var rep = new PayPriceReply()
+                {
+                    ObjectID = req.ObjectID
+                };
                 Object.ObjectGroup grp = part.ObjectGroup;
                 rep.ButtonData.Add(grp.PayPrice0);
                 rep.ButtonData.Add(grp.PayPrice1);
@@ -501,7 +503,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        void ApplyPermissions(ObjectPart prim, ObjectPermissions.Data d, InventoryPermissionsMask setmask, InventoryPermissionsMask clrmask,
+        private void ApplyPermissions(ObjectPart prim, ObjectPermissions.Data d, InventoryPermissionsMask setmask, InventoryPermissionsMask clrmask,
             ObjectPropertiesSendHandler propHandler)
         {
             if ((d.Field & ObjectPermissions.ChangeFieldMask.Base) != 0)
@@ -774,7 +776,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             Object.ObjectGroup grp = part.ObjectGroup;
-            if(null == grp)
+            if(grp == null)
             {
                 return;
             }
@@ -871,8 +873,6 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     continue;
                 }
-
-
             }
         }
 
@@ -911,6 +911,7 @@ namespace SilverSim.Scene.Types.Scene
                 part.MediaURL = data.MediaURL;
             }
         }
+
         [PacketHandler(MessageType.ObjectExportSelected)]
         public void HandleObjectExportSelected(Message m)
         {

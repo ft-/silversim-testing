@@ -41,8 +41,8 @@ namespace SilverSim.Types.Agent
             }
         }
 
-        readonly ReaderWriterLock m_WearablesUpdateLock = new ReaderWriterLock();
-        readonly Dictionary<WearableType, List<WearableInfo>> m_Wearables = new Dictionary<WearableType, List<WearableInfo>>();
+        private readonly ReaderWriterLock m_WearablesUpdateLock = new ReaderWriterLock();
+        private readonly Dictionary<WearableType, List<WearableInfo>> m_Wearables = new Dictionary<WearableType, List<WearableInfo>>();
 
         public AgentWearables()
         {

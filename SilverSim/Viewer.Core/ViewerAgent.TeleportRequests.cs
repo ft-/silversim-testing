@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
@@ -32,11 +35,11 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        static RwLockedDictionary<ulong, KeyValuePair<ulong, RegionInfo>> m_HypergridDestinations = new RwLockedDictionary<ulong, KeyValuePair<ulong, RegionInfo>>();
-        private static Random m_RandomNumber = new Random();
-        private static object m_RandomNumberLock = new object();
+        private static readonly RwLockedDictionary<ulong, KeyValuePair<ulong, RegionInfo>> m_InterGridDestinations = new RwLockedDictionary<ulong, KeyValuePair<ulong, RegionInfo>>();
+        private static readonly Random m_RandomNumber = new Random();
+        private static readonly object m_RandomNumberLock = new object();
 
-        private ushort NewHgRegionLocY
+        private ushort NewInterGridRegionLocY
         {
             get
             {
@@ -49,10 +52,10 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void CleanDestinationCache()
+        private void CleanDestinationCache()
         {
             var regionHandles = new List<ulong>();
-            foreach (var kvp in m_HypergridDestinations)
+            foreach (var kvp in m_InterGridDestinations)
             {
                 if (Date.GetUnixTime() - kvp.Value.Key > 240)
                 {
@@ -61,27 +64,27 @@ namespace SilverSim.Viewer.Core
             }
             foreach (ulong r in regionHandles)
             {
-                m_HypergridDestinations.Remove(r);
+                m_InterGridDestinations.Remove(r);
             }
         }
 
-        public GridVector CacheHgDestination(RegionInfo di)
+        public GridVector CacheInterGridDestination(RegionInfo di)
         {
             CleanDestinationCache();
             var hgRegionHandle = new GridVector()
             {
                 GridX = 0,
-                GridY = NewHgRegionLocY
+                GridY = NewInterGridRegionLocY
             };
-            m_HypergridDestinations.Add(di.Location.RegionHandle, new KeyValuePair<ulong, RegionInfo>(Date.GetUnixTime(), di));
+            m_InterGridDestinations.Add(di.Location.RegionHandle, new KeyValuePair<ulong, RegionInfo>(Date.GetUnixTime(), di));
             return hgRegionHandle;
         }
 
-        bool TryGetDestination(GridVector gv, out RegionInfo di)
+        private bool TryGetDestination(GridVector gv, out RegionInfo di)
         {
             KeyValuePair<ulong, RegionInfo> dest;
             di = default(RegionInfo);
-            if (m_HypergridDestinations.TryGetValue(gv.RegionHandle, out dest) &&
+            if (m_InterGridDestinations.TryGetValue(gv.RegionHandle, out dest) &&
                 Date.GetUnixTime() - dest.Key <= 240)
             {
                 di = dest.Value;
@@ -93,12 +96,11 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-
         [PacketHandler(MessageType.TeleportCancel)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportCancel(Message m)
         {
-            TeleportCancel req = (TeleportCancel)m;
+            var req = (TeleportCancel)m;
             if(req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -112,7 +114,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportLandmarkRequest(Message m)
         {
-            TeleportLandmarkRequest req = (TeleportLandmarkRequest)m;
+            var req = (TeleportLandmarkRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -126,7 +128,7 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportLocationRequest(Message m)
         {
-            TeleportLocationRequest req = (TeleportLocationRequest)m;
+            var req = (TeleportLocationRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {

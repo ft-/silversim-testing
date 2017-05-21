@@ -68,7 +68,7 @@ namespace SilverSim.Viewer.Core
 
             var regionFlags = req.RegionFlags;
 
-            if ((req.RedirectGridX != 0 || req.RedirectGridY != 0))
+            if (req.RedirectGridX != 0 || req.RedirectGridY != 0)
             {
                 if (Scene.IsEstateManager(Agent.Owner))
                 {

@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.AgentSetAppearance)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleSetAgentAppearance(Message p)
+        public void HandleSetAgentAppearance(Message p)
         {
             var m = (AgentSetAppearance)p;
             if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
@@ -66,10 +66,10 @@ namespace SilverSim.Viewer.Core
             }
 
             m_TextureEntry = m.ObjectData;
-            
+
             VisualParams = m.VisualParams;
             Size = m.Size;
-            AvatarAppearance res = new AvatarAppearance()
+            var res = new AvatarAppearance()
             {
                 Sender = ID,
                 IsTrial = false,
@@ -88,15 +88,15 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.AgentWearablesRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAgentWearablesRequest(Message p)
+        public void HandleAgentWearablesRequest(Message p)
         {
-            AgentWearablesRequest m = (AgentWearablesRequest)p;
+            var m = (AgentWearablesRequest)p;
             if(m.AgentID != ID || m.SessionID != m.CircuitSessionID)
             {
                 return;
             }
 
-            AgentWearablesUpdate awu = new AgentWearablesUpdate()
+            var awu = new AgentWearablesUpdate()
             {
                 AgentID = m.AgentID,
                 SessionID = m.SessionID,
@@ -118,9 +118,9 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.AgentIsNowWearing)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAgentIsNowWearing(Message p)
+        public void HandleAgentIsNowWearing(Message p)
         {
-            AgentIsNowWearing m = (AgentIsNowWearing)p;
+            var m = (AgentIsNowWearing)p;
             if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
             {
                 return;
@@ -149,9 +149,9 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.AgentCachedTexture)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAgentCachedTexture(Message p)
+        public void HandleAgentCachedTexture(Message p)
         {
-            AgentCachedTexture m = (AgentCachedTexture)p;
+            var m = (AgentCachedTexture)p;
             if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
             {
                 return;
@@ -175,7 +175,7 @@ namespace SilverSim.Viewer.Core
             SendMessageAlways(res, m.CircuitSceneID);
         }
 
-        void HandleAppearanceUpdate(IAgent agent)
+        private void HandleAppearanceUpdate(IAgent agent)
         {
             AgentCircuit circuit;
             if (Circuits.TryGetValue(m_CurrentSceneID, out circuit))

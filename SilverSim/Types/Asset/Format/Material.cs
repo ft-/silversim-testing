@@ -93,7 +93,7 @@ namespace SilverSim.Types.Asset.Format
         public Material(AssetData asset)
         {
             var m = LlsdXml.Deserialize(asset.InputStream) as Map;
-            if(null == m)
+            if(m == null)
             {
                 throw new NotAMaterialFormatException();
             }
@@ -207,21 +207,25 @@ namespace SilverSim.Types.Asset.Format
 
         public Map WriteMap()
         {
-            var w = new Map();
-            w.Add("AlphaMaskCutoff", AlphaMaskCutoff);
-            w.Add("DiffuseAlphaMode", DiffuseAlphaMode);
-            w.Add("EnvIntensity", EnvIntensity);
-            w.Add("NormMap", NormMap);
-            w.Add("NormOffsetX", NormOffsetX);
-            w.Add("NormOffsetY", NormOffsetY);
-            w.Add("NormRepeatX", NormRepeatX);
-            w.Add("NormRepeatY", NormRepeatY);
-            w.Add("NormRotation", NormRotation);
-            var spec = new AnArray();
-            spec.Add(SpecColor.R_AsByte);
-            spec.Add(SpecColor.G_AsByte);
-            spec.Add(SpecColor.B_AsByte);
-            spec.Add(SpecColor.A_AsByte);
+            var w = new Map
+            {
+                { "AlphaMaskCutoff", AlphaMaskCutoff },
+                { "DiffuseAlphaMode", DiffuseAlphaMode },
+                { "EnvIntensity", EnvIntensity },
+                { "NormMap", NormMap },
+                { "NormOffsetX", NormOffsetX },
+                { "NormOffsetY", NormOffsetY },
+                { "NormRepeatX", NormRepeatX },
+                { "NormRepeatY", NormRepeatY },
+                { "NormRotation", NormRotation }
+            };
+            var spec = new AnArray
+            {
+                SpecColor.R_AsByte,
+                SpecColor.G_AsByte,
+                SpecColor.B_AsByte,
+                SpecColor.A_AsByte
+            };
             w.Add("SpecColor", spec);
             w.Add("SpecExp", SpecExp);
             w.Add("SpecMap", SpecMap);
@@ -235,11 +239,12 @@ namespace SilverSim.Types.Asset.Format
 
         public static implicit operator AssetData(Material v)
         {
-            var asset = new AssetData();
-            asset.ID = v.MaterialID;
+            var asset = new AssetData()
+            {
+                ID = v.MaterialID
+            };
             using (var ms = new MemoryStream())
             {
-
                 using (var w = ms.UTF8XmlTextWriter())
                 {
                     w.WriteStartElement("llsd");

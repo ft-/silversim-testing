@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
@@ -38,10 +41,10 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID,UInt32,KeyValuePair<UUID, UUID>>();
+        private readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID,UInt32,KeyValuePair<UUID, UUID>>();
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-        struct DetachEntry
+        private struct DetachEntry
         {
             public UUID ItemID;
             public UUID SceneID;
@@ -58,7 +61,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.RezMultipleAttachmentsFromInv)]
         [PacketHandler(MessageType.RezSingleAttachmentFromInv)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleRezAttachment(Message m)
+        public void HandleRezAttachment(Message m)
         {
             switch(m.Number)
             {
@@ -90,7 +93,6 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.RezSingleAttachmentFromInv:
                     {
-
                         var req = (Messages.Object.RezSingleAttachmentFromInv)m;
                         if (req.SessionID != SessionID || req.AgentID != ID)
                         {
@@ -111,7 +113,7 @@ namespace SilverSim.Viewer.Core
         [PacketHandler(MessageType.DetachAttachmentIntoInv)]
         [PacketHandler(MessageType.ObjectDetach)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleDetachAttachment(Message m)
+        public void HandleDetachAttachment(Message m)
         {
             var detachList = new List<DetachEntry>();
             if(m.Number == MessageType.ObjectDetach)
@@ -163,13 +165,11 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Actual attachment handling
-        void DetachAllAttachments()
+        private void DetachAllAttachments()
         {
             var detachList = new List<DetachEntry>();
-            m_AttachmentsList.ForEach(delegate(KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp)
-            {
-                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value));
-            });
+            m_AttachmentsList.ForEach((KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp) =>
+                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value)));
             foreach (var entry in detachList)
             {
                 DetachAttachment(entry);
@@ -178,19 +178,19 @@ namespace SilverSim.Viewer.Core
 
         public class RezAttachmentHandler : AssetTransferWorkItem
         {
-            readonly SceneInterface m_Scene;
-            readonly UUID m_ItemID;
-            readonly UUI m_RezzingAgent;
-            readonly AttachmentPoint m_AttachPoint;
-            readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
+            private readonly SceneInterface m_Scene;
+            private readonly UUID m_ItemID;
+            private readonly UUI m_RezzingAgent;
+            private readonly AttachmentPoint m_AttachPoint;
+            private readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
 
             internal RezAttachmentHandler(
-                SceneInterface scene, 
-                UUID itemid, 
-                UUID assetid, 
-                AssetServiceInterface source, 
-                UUI rezzingagent, AttachmentPoint 
-                attachPoint,
+                SceneInterface scene,
+                UUID itemid,
+                UUID assetid,
+                AssetServiceInterface source,
+                UUI rezzingagent,
+                AttachmentPoint attachPoint,
                 RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> attachmentsList)
                 : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
             {
@@ -201,7 +201,7 @@ namespace SilverSim.Viewer.Core
                 m_AttachmentsList = attachmentsList;
             }
 
-            void SendAlertMessage(string msg)
+            private void SendAlertMessage(string msg)
             {
                 IAgent agent;
                 if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
@@ -216,7 +216,7 @@ namespace SilverSim.Viewer.Core
                 List<ObjectGroup> objgroups;
                 try
                 {
-                    data = m_Scene.AssetService[m_AssetID];
+                    data = m_Scene.AssetService[AssetID];
                 }
                 catch
                 {
@@ -233,7 +233,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch(Exception e)
                 {
-                    m_Log.WarnFormat("Deserialization error for object asset {0} for agent {1} {2} ({3}): {4}: {5}", 
+                    m_Log.WarnFormat("Deserialization error for object asset {0} for agent {1} {2} ({3}): {4}: {5}",
                         data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID, e.GetType().FullName, e.ToString());
                     SendAlertMessage("ALERT: InvalidObjectParams");
                     return;
@@ -277,7 +277,7 @@ namespace SilverSim.Viewer.Core
                         grp.AttachedPos = Vector3.Zero;
                     }
                 }
-                
+
                 grp.FromItemID = m_ItemID;
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
@@ -308,7 +308,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void RezAttachment(UUID itemID, AttachmentPoint attachpointFlagged)
+        private void RezAttachment(UUID itemID, AttachmentPoint attachpointFlagged)
         {
             InventoryItem item;
             try
@@ -342,23 +342,23 @@ namespace SilverSim.Viewer.Core
             }
 
             if (accessFailed)
-            { 
+            {
                 m_Log.WarnFormat("Attaching item {0} / asset {1} not possible since it is missing", item.ID, item.AssetID);
                 SendAlertMessage("ALERT: CantFindInvItem", SceneID);
                 return;
             }
 
             new RezAttachmentHandler(
-                Circuits[SceneID].Scene, 
-                itemID, 
-                item.AssetID, 
-                AssetService, 
-                Owner, 
+                Circuits[SceneID].Scene,
+                itemID,
+                item.AssetID,
+                AssetService,
+                Owner,
                 attachpointFlagged,
                 m_AttachmentsList).QueueWorkItem();
         }
 
-        void DetachAttachment(DetachEntry entry)
+        private void DetachAttachment(DetachEntry entry)
         {
             var grp = Circuits[entry.SceneID].Scene.ObjectGroups[entry.ObjectID];
             try

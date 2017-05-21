@@ -22,21 +22,19 @@
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core
 {
     public static class SimCircuitEstablishService
     {
-        static Random m_RandomNumber = new Random();
-        static object m_RandomNumberLock = new object();
+        private static readonly Random m_RandomNumber = new Random();
+        private static readonly object m_RandomNumberLock = new object();
 
         private static uint NewCircuitCode
         {
@@ -76,7 +74,7 @@ namespace SilverSim.Viewer.Core
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
-            if(null == reqmap)
+            if(reqmap == null)
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
@@ -98,7 +96,7 @@ namespace SilverSim.Viewer.Core
             }
 
             var gridService = scene.GridService;
-            if(null == gridService)
+            if(gridService == null)
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;

@@ -34,21 +34,15 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         #region Accessors
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract IInventoryFolderServiceInterface Folder
-        {
-            get;
-        }
+        public abstract IInventoryFolderServiceInterface Folder { get; }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract IInventoryItemServiceInterface Item
-        {
-            get;
-        }
+        public abstract IInventoryItemServiceInterface Item { get; }
 
         public abstract List<InventoryItem> GetActiveGestures(UUID principalID);
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void VerifyInventoryFolder(UUID principalID, UUID parentFolderID, string name, AssetType type)
+        private void VerifyInventoryFolder(UUID principalID, UUID parentFolderID, string name, AssetType type)
         {
             InventoryFolder folder;
             try

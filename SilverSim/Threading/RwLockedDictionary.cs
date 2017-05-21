@@ -38,23 +38,20 @@ namespace SilverSim.Threading
             public KeyAlreadyExistsException(string message)
                 : base(message)
             {
-
             }
+
             public KeyAlreadyExistsException()
             {
-
             }
 
             public KeyAlreadyExistsException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected KeyAlreadyExistsException(SerializationInfo info, StreamingContext context)
             : base(info, context)
             {
-
             }
         }
 
@@ -89,7 +86,7 @@ namespace SilverSim.Threading
         }
 
         public bool IsReadOnly => false;
-        public int Count 
+        public int Count
         {
             get
             {
@@ -266,7 +263,7 @@ namespace SilverSim.Threading
             try
             {
                 foreach(KeyValuePair<TKey, TValue> kvp in m_Dictionary)
-                { 
+                {
                     if(kvp.Value.Equals(value))
                     {
                         return true;
@@ -378,7 +375,7 @@ namespace SilverSim.Threading
                 foreach(KeyValuePair<TKey, TValue> kvp in m_Dictionary)
                 {
                     array[arrayIndex++] = kvp;
-                } 
+                }
             }
             finally
             {
@@ -549,7 +546,6 @@ namespace SilverSim.Threading
             }
         }
 
-
         public void Remove(IEnumerable<TKey> keys)
         {
             m_RwLock.AcquireWriterLock(-1);
@@ -587,7 +583,7 @@ namespace SilverSim.Threading
             try
             {
                 TValue checkval;
-                if(m_Dictionary.TryGetValue(key, out checkval) && 
+                if(m_Dictionary.TryGetValue(key, out checkval) &&
                     !del(checkval))
                 {
                     return false;
@@ -620,7 +616,7 @@ namespace SilverSim.Threading
 
     public class RwLockedDictionaryAutoAdd<TKey, TValue> : RwLockedDictionary<TKey, TValue>
     {
-        readonly CreateValueDelegate m_AutoAddDelegate;
+        private readonly CreateValueDelegate m_AutoAddDelegate;
         public RwLockedDictionaryAutoAdd(CreateValueDelegate autoAddDelegate)
         {
             m_AutoAddDelegate = autoAddDelegate;

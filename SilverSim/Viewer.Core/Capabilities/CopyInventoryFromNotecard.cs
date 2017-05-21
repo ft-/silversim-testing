@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
@@ -45,7 +48,6 @@ namespace SilverSim.Viewer.Core.Capabilities
             public NotecardAssetTransfer(AssetServiceInterface dest, AssetServiceInterface src, List<UUID> assetids)
                 : base(dest, src, assetids, ReferenceSource.Source)
             {
-
             }
 
             public override void AssetTransferComplete()
@@ -59,9 +61,9 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        readonly ViewerAgent m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly string m_RemoteIP;
+        private readonly ViewerAgent m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly string m_RemoteIP;
         private static readonly ILog m_Log = LogManager.GetLogger("COPY INVENTORY FROM NOTECARD");
 
         public CopyInventoryFromNotecard(ViewerAgent agent, SceneInterface scene, string remoteip)
@@ -71,13 +73,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "CopyInventoryFromNotecard";
-            }
-        }
+        public string CapabilityName => "CopyInventoryFromNotecard";
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
@@ -102,7 +98,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -136,7 +132,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             var transferItems = new List<UUID>();
             var destFolder = new Dictionary<AssetType, InventoryFolder>();
-            if(null != nc)
+            if(nc != null)
             {
                 foreach (var ncitem in nc.Inventory.Values)
                 {
@@ -182,13 +178,13 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        void HandleAssetTransferWorkItem(object o)
+        private void HandleAssetTransferWorkItem(object o)
         {
             AssetTransferWorkItem wi = (AssetTransferWorkItem)o;
             wi.ProcessAssetTransfer();
         }
 
-        UUID CreateInventoryItemFromNotecard(InventoryFolder destinationFolder, NotecardInventoryItem ncitem, uint callbackID)
+        private UUID CreateInventoryItemFromNotecard(InventoryFolder destinationFolder, NotecardInventoryItem ncitem, uint callbackID)
         {
             var item = new InventoryItem()
             {
@@ -210,7 +206,6 @@ namespace SilverSim.Viewer.Core.Capabilities
             item.Permissions.Group = InventoryPermissionsMask.None;
             item.Permissions.EveryOne = InventoryPermissionsMask.None;
             item.Permissions.NextOwner = ncitem.Permissions.NextOwner;
-
 
             m_Agent.InventoryService.Item.Add(item);
             m_Agent.SendMessageAlways(new Messages.Inventory.UpdateCreateInventoryItem(m_Agent.ID, true, UUID.Zero, item, callbackID), m_Scene.ID);

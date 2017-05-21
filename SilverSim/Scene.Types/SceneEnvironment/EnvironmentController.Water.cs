@@ -25,7 +25,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 {
     public partial class EnvironmentController
     {
-        class WaterConfig
+        private class WaterConfig
         {
             public bool EnableTideControl;
             public double TidalBaseHeight = 20;
@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public double TidalSunAmplitude = 0.1;
         }
 
-        readonly WaterConfig m_WaterConfig = new WaterConfig();
+        private readonly WaterConfig m_WaterConfig = new WaterConfig();
 
         public enum BooleanWaterParams
         {
@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             TidalSunAmplitude,
         }
 
-        readonly object m_TidalLock = new object();
+        private readonly object m_TidalLock = new object();
 
         public bool this[BooleanWaterParams type]
         {
@@ -142,7 +142,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        void TidalTimer()
+        private void TidalTimer()
         {
             double waterHeight;
             double sun_phase = SunPhase;

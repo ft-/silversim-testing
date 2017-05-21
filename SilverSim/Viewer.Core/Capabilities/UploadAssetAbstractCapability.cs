@@ -20,15 +20,14 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using log4net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -36,13 +35,13 @@ namespace SilverSim.Viewer.Core.Capabilities
     public abstract class UploadAssetAbstractCapability : ICapabilityInterface
     {
         public abstract string CapabilityName { get; }
-        protected UUI m_Creator { get; private set; }
+        protected UUI Creator { get; }
         protected string m_ServerURI;
         protected readonly string m_RemoteIP;
 
-        public UploadAssetAbstractCapability(UUI creator, string serverURI, string remoteip)
+        protected UploadAssetAbstractCapability(UUI creator, string serverURI, string remoteip)
         {
-            m_Creator = creator;
+            Creator = creator;
             m_ServerURI = serverURI;
             m_RemoteIP = remoteip;
         }
@@ -60,25 +59,21 @@ namespace SilverSim.Viewer.Core.Capabilities
         {
             public UrlNotFoundException()
             {
-
             }
 
             public UrlNotFoundException(string message)
                 : base(message)
             {
-
             }
 
             protected UrlNotFoundException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public UrlNotFoundException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -87,25 +82,21 @@ namespace SilverSim.Viewer.Core.Capabilities
         {
             public InsufficientFundsException()
             {
-
             }
 
             public InsufficientFundsException(string message)
                 : base(message)
             {
-
             }
 
             protected InsufficientFundsException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InsufficientFundsException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -114,25 +105,21 @@ namespace SilverSim.Viewer.Core.Capabilities
         {
             public UploadErrorException()
             {
-
             }
 
             public UploadErrorException(string message)
                 : base(message)
             {
-
             }
 
             protected UploadErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public UploadErrorException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -171,7 +158,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     return;
                 }
-                if (null == reqmap)
+                if (reqmap == null)
                 {
                     httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                     return;
@@ -199,9 +186,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch(InsufficientFundsException)
                 {
-                    Map llsderrorreply = new Map();
-                    llsderrorreply.Add("state", "insufficient funds");
-
+                    var llsderrorreply = new Map
+                    {
+                        { "state", "insufficient funds" }
+                    };
                     using (HttpResponse httperrorres = httpreq.BeginResponse())
                     {
                         using (Stream outErrorStream = httperrorres.GetOutputStream())
@@ -252,7 +240,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 asset.Local = AssetIsLocal;
                 asset.Temporary = AssetIsTemporary;
                 asset.Name = string.Empty;
-                asset.Creator = m_Creator;
+                asset.Creator = Creator;
 
                 Map llsdreply;
                 try
@@ -283,9 +271,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch (InsufficientFundsException)
                 {
-                    var llsderrorreply = new Map();
-                    llsderrorreply.Add("state", "insufficient funds");
-
+                    var llsderrorreply = new Map
+                    {
+                        { "state", "insufficient funds" }
+                    };
                     using (var httperrorres = httpreq.BeginResponse())
                     {
                         httperrorres.ContentType = "application/llsd+xml";

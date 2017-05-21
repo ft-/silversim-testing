@@ -38,9 +38,9 @@ namespace SilverSim.Viewer.OfflineIM
     public class ViewerOfflineIMServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         [PacketHandler(MessageType.RetrieveInstantMessages)]
-        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        bool m_ShutdownOfflineIM;
+        private bool m_ShutdownOfflineIM;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -76,7 +76,7 @@ namespace SilverSim.Viewer.OfflineIM
                 ViewerAgent agent = req.Key.Agent;
 
                 OfflineIMServiceInterface offlineIMService = agent.OfflineIMService;
-                if(null != offlineIMService)
+                if(offlineIMService != null)
                 {
                     try
                     {
@@ -100,13 +100,7 @@ namespace SilverSim.Viewer.OfflineIM
             }
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get 
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public void Shutdown()
         {
@@ -117,9 +111,7 @@ namespace SilverSim.Viewer.OfflineIM
     [PluginName("ViewerOfflineIMServer")]
     public class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerOfflineIMServer();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerOfflineIMServer();
     }
 }

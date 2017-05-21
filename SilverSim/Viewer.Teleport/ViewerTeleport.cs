@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using Nini.Config;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
@@ -50,10 +53,7 @@ namespace SilverSim.Viewer.Teleport
     [PluginName("ViewerTeleport")]
     public class Factory : IPluginFactory
     {
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerTeleport();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerTeleport();
     }
 }

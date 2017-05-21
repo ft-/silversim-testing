@@ -19,10 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
@@ -34,12 +36,12 @@ namespace SilverSim.WebIF.Admin.MapServer
     [Description("WebIF MapServer Admin Support")]
     public class MapServerAdmin : IPlugin
     {
-        readonly string m_GridServiceName;
-        readonly string m_RegionDefaultFlagsServiceName;
-        GridServiceInterface m_GridService;
-        RegionDefaultFlagsServiceInterface m_RegionDefaultFlagsService;
-        IAdminWebIF m_WebIF;
-        readonly UUID m_ScopeID;
+        private readonly string m_GridServiceName;
+        private readonly string m_RegionDefaultFlagsServiceName;
+        private GridServiceInterface m_GridService;
+        private RegionDefaultFlagsServiceInterface m_RegionDefaultFlagsService;
+        private IAdminWebIF m_WebIF;
+        private readonly UUID m_ScopeID;
 
         public MapServerAdmin(IConfig ownSection)
         {
@@ -65,20 +67,22 @@ namespace SilverSim.WebIF.Admin.MapServer
             m_WebIF.JsonMethods.Add("mapserver.defaultregionflags.change", HandleMapServerChangeDefaultRegionFlags);
         }
 
-        void ReturnRegionsResult(HttpRequest req, List<RegionInfo> regions)
+        private void ReturnRegionsResult(HttpRequest req, List<RegionInfo> regions)
         {
             var resdata = new Map();
             foreach (var ri in regions)
             {
-                var regiondata = new Map();
-                regiondata.Add("name", ri.Name);
-                regiondata.Add("location_x", ri.Location.GridX);
-                regiondata.Add("location_y", ri.Location.GridY);
-                regiondata.Add("size_x", ri.Size.GridX);
-                regiondata.Add("size_y", ri.Size.GridY);
                 var owner = m_WebIF.ResolveName(ri.Owner);
-                regiondata.Add("owner", owner.ToString());
-                regiondata.Add("flags", (int)ri.Flags);
+                var regiondata = new Map
+                {
+                    { "name", ri.Name },
+                    { "location_x", ri.Location.GridX },
+                    { "location_y", ri.Location.GridY },
+                    { "size_x", ri.Size.GridX },
+                    { "size_y", ri.Size.GridY },
+                    { "owner", owner.ToString() },
+                    { "flags", (int)ri.Flags }
+                };
                 resdata.Add(ri.ID.ToString(), regiondata);
             }
 
@@ -86,7 +90,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         }
 
         [AdminWebIfRequiredRight("mapserver.unregister")]
-        void HandleMapServerUnregisterRegion(HttpRequest req, Map jsondata)
+        private void HandleMapServerUnregisterRegion(HttpRequest req, Map jsondata)
         {
             UUID regionId;
             if(!jsondata.TryGetValue("id", out regionId))
@@ -105,7 +109,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         }
 
         [AdminWebIfRequiredRight("mapserver.manage")]
-        void HandleMapServerChangeDefaultRegionFlags(HttpRequest req, Map jsondata)
+        private void HandleMapServerChangeDefaultRegionFlags(HttpRequest req, Map jsondata)
         {
             UUID id;
             if (!jsondata.TryGetValue("id", out id))
@@ -179,7 +183,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         }
 
         [AdminWebIfRequiredRight("mapserver.manage")]
-        void HandleMapServerGetDefaultRegionFlags(HttpRequest req, Map jsondata)
+        private void HandleMapServerGetDefaultRegionFlags(HttpRequest req, Map jsondata)
         {
             var resdata = new Map();
             foreach (var kvp in m_RegionDefaultFlagsService.GetAllRegionDefaultFlags())
@@ -190,7 +194,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         }
 
         [AdminWebIfRequiredRight("mapserver.view")]
-        void HandleMapServerGetDefaultHGRegions(HttpRequest req, Map jsondata)
+        private void HandleMapServerGetDefaultHGRegions(HttpRequest req, Map jsondata)
         {
             List<RegionInfo> regions;
             try
@@ -206,7 +210,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         }
 
         [AdminWebIfRequiredRight("mapserver.view")]
-        void HandleMapServerGetDefaultRegions(HttpRequest req, Map jsondata)
+        private void HandleMapServerGetDefaultRegions(HttpRequest req, Map jsondata)
         {
             List<RegionInfo> regions;
             try
@@ -222,7 +226,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         }
 
         [AdminWebIfRequiredRight("mapserver.view")]
-        void HandleMapServerGetFallbackRegions(HttpRequest req, Map jsondata)
+        private void HandleMapServerGetFallbackRegions(HttpRequest req, Map jsondata)
         {
             List<RegionInfo> regions;
             try
@@ -238,7 +242,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         }
 
         [AdminWebIfRequiredRight("mapserver.view")]
-        void HandleMapServerSearch(HttpRequest req, Map jsondata)
+        private void HandleMapServerSearch(HttpRequest req, Map jsondata)
         {
             IValue searchkey;
             if(!jsondata.TryGetValue("query", out searchkey))
@@ -264,9 +268,7 @@ namespace SilverSim.WebIF.Admin.MapServer
     [PluginName("MapServerAdmin")]
     public class MapServerAdminFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MapServerAdmin(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new MapServerAdmin(ownSection);
     }
 }

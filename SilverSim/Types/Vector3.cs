@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable RCS1123
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -171,7 +173,6 @@ namespace SilverSim.Types
             return this;
         }
 
-
         /// <summary>
         /// Parse a vector from a string
         /// </summary>
@@ -266,40 +267,25 @@ namespace SilverSim.Types
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string X_String
         {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "{0}", X);
-            }
-            set
-            {
-                X = double.Parse(value, CultureInfo.InvariantCulture);
-            }
+            get { return string.Format(CultureInfo.InvariantCulture, "{0}", X); }
+
+            set { X = double.Parse(value, CultureInfo.InvariantCulture); }
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string Y_String
         {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "{0}", Y);
-            }
-            set
-            {
-                Y = double.Parse(value, CultureInfo.InvariantCulture);
-            }
+            get { return string.Format(CultureInfo.InvariantCulture, "{0}", Y); }
+
+            set { Y = double.Parse(value, CultureInfo.InvariantCulture); }
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string Z_String
         {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture, "{0}", Z);
-            }
-            set
-            {
-                Z = double.Parse(value, CultureInfo.InvariantCulture);
-            }
+            get { return string.Format(CultureInfo.InvariantCulture, "{0}", Z); }
+
+            set { Z = double.Parse(value, CultureInfo.InvariantCulture); }
         }
 
         public static Vector3 Lerp(Vector3 lhs, Vector3 rhs, double c) => lhs + (rhs - lhs) * c;

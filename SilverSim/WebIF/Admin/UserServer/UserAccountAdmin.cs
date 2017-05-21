@@ -19,7 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
@@ -36,12 +38,12 @@ namespace SilverSim.WebIF.Admin.UserServer
     [Description("WebIF User Account Admin Support")]
     public class UserAccountAdmin : IPlugin
     {
-        readonly string m_UserAccountServiceName;
-        readonly string m_AuthInfoServiceName;
-        UserAccountServiceInterface m_UserAccountService;
-        AuthInfoServiceInterface m_AuthInfoService;
-        IAdminWebIF m_WebIF;
-        List<IUserAccountDeleteServiceInterface> m_AccountDeleteServices;
+        private readonly string m_UserAccountServiceName;
+        private readonly string m_AuthInfoServiceName;
+        private UserAccountServiceInterface m_UserAccountService;
+        private AuthInfoServiceInterface m_AuthInfoService;
+        private IAdminWebIF m_WebIF;
+        private List<IUserAccountDeleteServiceInterface> m_AccountDeleteServices;
 
         public UserAccountAdmin(IConfig ownSection)
         {
@@ -71,7 +73,7 @@ namespace SilverSim.WebIF.Admin.UserServer
         }
 
         [AdminWebIfRequiredRight("useraccounts.create")]
-        void HandleUserAccountCreate(HttpRequest req, Map jsondata)
+        private void HandleUserAccountCreate(HttpRequest req, Map jsondata)
         {
             var account = new UserAccount();
             account.Principal.ID = UUID.Random;
@@ -141,13 +143,13 @@ namespace SilverSim.WebIF.Admin.UserServer
             };
             var resdata = new Map
             {
-                { "account", res }
+                ["account"] = res
             };
             m_WebIF.SuccessResponse(req, resdata);
         }
 
         [AdminWebIfRequiredRight("useraccounts.manage")]
-        void HandleUserAccountChange(HttpRequest req, Map jsondata)
+        private void HandleUserAccountChange(HttpRequest req, Map jsondata)
         {
             UserAccount account;
             if (!jsondata.ContainsKey("id"))
@@ -195,7 +197,7 @@ namespace SilverSim.WebIF.Admin.UserServer
         }
 
         [AdminWebIfRequiredRight("useraccounts.delete")]
-        void HandleUserAccountDelete(HttpRequest req, Map jsondata)
+        private void HandleUserAccountDelete(HttpRequest req, Map jsondata)
         {
             IValue id;
             IValue scopeid;
@@ -231,7 +233,7 @@ namespace SilverSim.WebIF.Admin.UserServer
         }
 
         [AdminWebIfRequiredRight("useraccounts.changepassword")]
-        void HandleUserAccountChangePassword(HttpRequest req, Map jsondata)
+        private void HandleUserAccountChangePassword(HttpRequest req, Map jsondata)
         {
             UUID id;
             UserAuthInfo uai;
@@ -271,7 +273,7 @@ namespace SilverSim.WebIF.Admin.UserServer
         }
 
         [AdminWebIfRequiredRight("useraccount.get")]
-        void HandleUserAccountGet(HttpRequest req, Map jsondata)
+        private void HandleUserAccountGet(HttpRequest req, Map jsondata)
         {
             IValue id;
             if (!jsondata.TryGetValue("id", out id))
@@ -305,7 +307,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 };
                 var resdata = new Map
                 {
-                    { "account", result }
+                    ["account"] = result
                 };
                 m_WebIF.SuccessResponse(req, resdata);
             }
@@ -316,7 +318,7 @@ namespace SilverSim.WebIF.Admin.UserServer
         }
 
         [AdminWebIfRequiredRight("useraccounts.view")]
-        void HandleUserAccountSearch(HttpRequest req, Map jsondata)
+        private void HandleUserAccountSearch(HttpRequest req, Map jsondata)
         {
             var res = new Map();
             var accountsRes = new AnArray();
@@ -375,9 +377,7 @@ namespace SilverSim.WebIF.Admin.UserServer
     [PluginName("UserAccountAdmin")]
     public class UserAccountAdminFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new UserAccountAdmin(ownSection);
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new UserAccountAdmin(ownSection);
     }
 }

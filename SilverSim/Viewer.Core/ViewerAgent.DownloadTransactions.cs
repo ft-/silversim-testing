@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.RequestXfer)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleRequestXfer(Message m)
+        public void HandleRequestXfer(Message m)
         {
             var req = (RequestXfer)m;
             DownloadTransferData tdata;
@@ -89,7 +89,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.ConfirmXferPacket)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleConfirmXferPacket(Message m)
+        public void HandleConfirmXferPacket(Message m)
         {
             var req = (ConfirmXferPacket)m;
             DownloadTransferData tdata;

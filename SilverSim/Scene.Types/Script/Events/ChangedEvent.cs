@@ -31,6 +31,7 @@ namespace SilverSim.Scene.Types.Script.Events
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum ChangedFlags
         {
+            None = 0,
             Inventory = 0x001,
             Color = 0x002,
             Shape = 0x004,

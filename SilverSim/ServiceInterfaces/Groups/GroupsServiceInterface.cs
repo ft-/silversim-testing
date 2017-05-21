@@ -37,28 +37,19 @@ namespace SilverSim.ServiceInterfaces.Groups
             void Delete(UUI requestingAgent, UGI group);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            UGI this[UUI requestingAgent, UUID groupID]
-            {
-                get;
-            }
+            UGI this[UUI requestingAgent, UUID groupID] { get; }
 
             bool TryGetValue(UUI requestingAgent, UUID groupID, out UGI ugi);
             bool ContainsKey(UUI requestingAgent, UUID groupID);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupInfo this[UUI requestingAgent, UGI group]
-            {
-                get;
-            }
+            GroupInfo this[UUI requestingAgent, UGI group] { get; }
 
             bool TryGetValue(UUI requestingAgent, UGI groupID, out GroupInfo groupInfo);
             bool ContainsKey(UUI requestingAgent, UGI groupID);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupInfo this[UUI requestingAgent, string groupName]
-            {
-                get;
-            }
+            GroupInfo this[UUI requestingAgent, string groupName] { get; }
 
             bool TryGetValue(UUI requestingAgent, string groupName, out GroupInfo groupInfo);
             bool ContainsKey(UUI requestingAgent, string groupName);
@@ -69,28 +60,19 @@ namespace SilverSim.ServiceInterfaces.Groups
         public interface IGroupMembershipsInterface
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupMembership this[UUI requestingAgent, UGI group, UUI principal]
-            {
-                get;
-            }
+            GroupMembership this[UUI requestingAgent, UGI group, UUI principal] { get; }
 
             bool TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMembership gmem);
             bool ContainsKey(UUI requestingAgent, UGI group, UUI principal);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupMembership> this[UUI requestingAgent, UUI principal]
-            {
-                get;
-            }
+            List<GroupMembership> this[UUI requestingAgent, UUI principal] { get; }
         }
 
         public interface IActiveGroupMembershipInterface
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupActiveMembership this[UUI requestingAgent, UUI principal]
-            {
-                get;
-            }
+            GroupActiveMembership this[UUI requestingAgent, UUI principal] { get; }
 
             bool TryGetValue(UUI requestingAgent, UUI principal, out GroupActiveMembership gam);
             bool ContainsKey(UUI requestingAgent, UUI principal);
@@ -99,25 +81,16 @@ namespace SilverSim.ServiceInterfaces.Groups
         public interface IGroupMembersInterface
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupMember this[UUI requestingAgent, UGI group, UUI principal]
-            {
-                get;
-            }
+            GroupMember this[UUI requestingAgent, UGI group, UUI principal] { get; }
 
             bool TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMember gmem);
             bool ContainsKey(UUI requestingAgent, UGI group, UUI principal);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupMember> this[UUI requestingAgent, UGI group]
-            {
-                get;
-            }
+            List<GroupMember> this[UUI requestingAgent, UGI group] { get; }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupMember> this[UUI requestingAgent, UUI principal]
-            {
-                get;
-            }
+            List<GroupMember> this[UUI requestingAgent, UUI principal] { get; }
 
             GroupMember Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken);
             void SetContribution(UUI requestingagent, UGI group, UUI principal, int contribution);
@@ -128,24 +101,15 @@ namespace SilverSim.ServiceInterfaces.Groups
         public interface IGroupRolesInterface
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupRole this[UUI requestingAgent, UGI group, UUID roleID]
-            {
-                get;
-            }
+            GroupRole this[UUI requestingAgent, UGI group, UUID roleID] { get; }
 
             bool TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole);
             bool ContainsKey(UUI requestingAgent, UGI group, UUID roleID);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupRole> this[UUI requestingAgent, UGI group]
-            {
-                get;
-            }
+            List<GroupRole> this[UUI requestingAgent, UGI group] { get; }
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupRole> this[UUI requestingAgent, UGI group, UUI principal]
-            {
-                get;
-            }
+            List<GroupRole> this[UUI requestingAgent, UGI group, UUI principal] { get; }
 
             void Add(UUI requestingAgent, GroupRole role);
             void Update(UUI requestingAgent, GroupRole role);
@@ -155,31 +119,19 @@ namespace SilverSim.ServiceInterfaces.Groups
         public interface IGroupRolemembersInterface
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
-            {
-                get;
-            }
+            GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal] { get; }
 
             bool TryGetValue(UUI requestingAgent, UGI group, UUID roleID, UUI principal, out GroupRolemember grolemem);
             bool ContainsKey(UUI requestingAgent, UGI group, UUID roleID, UUI principal);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
-            {
-                get;
-            }
+            List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID] { get; }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupRolemembership> this[UUI requestingAgent, UUI principal]
-            {
-                get;
-            }
+            List<GroupRolemembership> this[UUI requestingAgent, UUI principal] { get; }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            List<GroupRolemember> this[UUI requestingAgent, UGI group]
-            {
-                get;
-            }
+            List<GroupRolemember> this[UUI requestingAgent, UGI group] { get; }
 
             void Add(UUI requestingAgent, GroupRolemember rolemember);
             void Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal);
@@ -188,21 +140,13 @@ namespace SilverSim.ServiceInterfaces.Groups
         public interface IGroupSelectInterface
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            UGI this[UUI requestingAgent, UUI princialID]
-            {
-                get;
-                set;
-            }
+            UGI this[UUI requestingAgent, UUI princialID] { get; set; }
 
             bool TryGetValue(UUI requestingAgent, UUI principalID, out UGI ugi);
 
             /* get/set active role id */
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            UUID this[UUI requestingAgent, UGI group, UUI principal]
-            {
-                get;
-                set;
-            }
+            UUID this[UUI requestingAgent, UGI group, UUI principal] { get; set; }
 
             bool TryGetValue(UUI requestingAgent, UGI group, UUI principal, out UUID id);
         }
@@ -210,10 +154,7 @@ namespace SilverSim.ServiceInterfaces.Groups
         public interface IGroupInvitesInterface
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupInvite this[UUI requestingAgent, UUID groupInviteID]
-            {
-                get;
-            }
+            GroupInvite this[UUI requestingAgent, UUID groupInviteID] { get; }
 
             bool TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite);
             bool ContainsKey(UUI requestingAgent, UUID groupInviteID);
@@ -222,24 +163,17 @@ namespace SilverSim.ServiceInterfaces.Groups
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
-            {
-                get;
-            }
+            List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal] { get; }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> this[UUI requestingAgent, UUI principal]
-            {
-                get;
-            }
+            List<GroupInvite> this[UUI requestingAgent, UUI principal] { get; }
 
             /** <summary>Only for use of Permission modules</summary> */
             List<GroupInvite> GetByGroup(UUI requestingAgent, UGI group);
 
             void Add(UUI requestingAgent, GroupInvite invite);
             void Delete(UUI requestingAgent, UUID inviteID);
-
         }
 
         public interface IGroupNoticesInterface
@@ -247,10 +181,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             List<GroupNotice> GetNotices(UUI requestingAgent, UGI group);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            GroupNotice this[UUI requestingAgent, UUID groupNoticeID]
-            {
-                get;
-            }
+            GroupNotice this[UUI requestingAgent, UUID groupNoticeID] { get; }
 
             bool TryGetValue(UUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice);
             bool ContainsKey(UUI requestingAgent, UUID groupNoticeID);
@@ -260,50 +191,23 @@ namespace SilverSim.ServiceInterfaces.Groups
             void Delete(UUI requestingAgent, UUID groupNoticeID);
         }
 
-        public abstract IGroupsInterface Groups
-        {
-            get;
-        }
+        public abstract IGroupsInterface Groups { get; }
 
-        public abstract IGroupRolesInterface Roles
-        {
-            get;
-        }
+        public abstract IGroupRolesInterface Roles { get; }
 
-        public abstract IGroupMembersInterface Members
-        {
-            get;
-        }
+        public abstract IGroupMembersInterface Members { get; }
 
-        public abstract IGroupMembershipsInterface Memberships
-        {
-            get;
-        }
+        public abstract IGroupMembershipsInterface Memberships { get; }
 
-        public abstract IGroupRolemembersInterface Rolemembers
-        {
-            get;
-        }
+        public abstract IGroupRolemembersInterface Rolemembers { get; }
 
-        public abstract IGroupSelectInterface ActiveGroup
-        {
-            get;
-        }
+        public abstract IGroupSelectInterface ActiveGroup { get; }
 
-        public abstract IActiveGroupMembershipInterface ActiveMembership
-        {
-            get;
-        }
+        public abstract IActiveGroupMembershipInterface ActiveMembership { get; }
 
-        public abstract IGroupInvitesInterface Invites
-        {
-            get;
-        }
+        public abstract IGroupInvitesInterface Invites { get; }
 
-        public abstract IGroupNoticesInterface Notices
-        {
-            get;
-        }
+        public abstract IGroupNoticesInterface Notices { get; }
 
         [Serializable]
         public class AccessFailedException : Exception
@@ -467,7 +371,7 @@ namespace SilverSim.ServiceInterfaces.Groups
 
             foreach(var power in powers)
             {
-                if(!agentPowers.HasFlag(power))
+                if((agentPowers & power) == 0)
                 {
                     throw new GroupInsufficientPowersException(power);
                 }

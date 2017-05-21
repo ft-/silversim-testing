@@ -27,8 +27,8 @@ namespace SilverSim.Types
 {
     public class FormattedListBuilder
     {
-        readonly Dictionary<string, int> Fields;
-        StringBuilder m_StringBuilder = new StringBuilder();
+        private readonly Dictionary<string, int> Fields;
+        private readonly StringBuilder m_StringBuilder = new StringBuilder();
 
         public FormattedListBuilder()
         {
@@ -46,7 +46,7 @@ namespace SilverSim.Types
         {
             if(columnSize == 0)
             {
-                throw new ArgumentOutOfRangeException("columnSize");
+                throw new ArgumentOutOfRangeException(nameof(columnSize));
             }
             Fields.Add(column, columnSize);
             return this;

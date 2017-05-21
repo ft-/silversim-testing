@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Types.Scene
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class DefaultSceneObjectGroupInterface : ISceneObjectGroups
     {
-        readonly SceneInterface m_Scene;
+        private readonly SceneInterface m_Scene;
 
         public DefaultSceneObjectGroupInterface(SceneInterface scene)
         {
@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Scene
             get
             {
                 var obj = m_Scene.Objects[id] as ObjectGroup;
-                if(null != obj)
+                if(obj != null)
                 {
                     return obj;
                 }
@@ -83,7 +83,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public sealed class ObjectGroupEnumerator : IEnumerator<ObjectGroup>
         {
-            readonly IEnumerator m_Enum;
+            private readonly IEnumerator m_Enum;
 
             internal ObjectGroupEnumerator(IEnumerator enumerator)
             {

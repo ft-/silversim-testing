@@ -47,10 +47,7 @@ namespace SilverSim.ServiceInterfaces.Presence
 
     public abstract class NpcPresenceServiceInterface
     {
-        public abstract List<NpcPresenceInfo> this[UUID regionID]
-        {
-            get;
-        }
+        public abstract List<NpcPresenceInfo> this[UUID regionID] { get; }
 
         public abstract bool TryGetValue(UUID regionID, string firstname, string lastname, out NpcPresenceInfo info);
 

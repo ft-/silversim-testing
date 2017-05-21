@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Types.Script.Events
     }
 
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-    public struct DetectInfo 
+    public struct DetectInfo
     {
         public UUID Key;
         public UGI Group;

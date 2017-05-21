@@ -30,29 +30,25 @@ namespace SilverSim.Types.StructuredData.Llsd
     public static class LlsdBinary
     {
         [Serializable]
-        public class InvalidLlsdBinarySerializationException : Exception 
+        public class InvalidLlsdBinarySerializationException : Exception
         {
             public InvalidLlsdBinarySerializationException()
             {
-
             }
 
             public InvalidLlsdBinarySerializationException(string message)
                 : base(message)
             {
-
             }
 
             protected InvalidLlsdBinarySerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InvalidLlsdBinarySerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -109,7 +105,7 @@ namespace SilverSim.Types.StructuredData.Llsd
 
                 case 'i':
                     return new Integer(ReadInt32(input));
-                   
+
                 case 'r':
                     data = new byte[8];
                     if (8 != input.Read(data, 0, 8))
@@ -218,7 +214,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                         key = Encoding.UTF8.GetString(data);
 
                         newMap[key] = DeserializeInternal(input, false);
-
                     }
                     if('}' != input.ReadByte())
                     {

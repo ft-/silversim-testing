@@ -518,7 +518,6 @@ namespace SilverSim.Threading
             }
         }
 
-
         public void Remove(IEnumerable<TKey> keys)
         {
             m_RwLock.AcquireWriterLock(-1);
@@ -589,7 +588,8 @@ namespace SilverSim.Threading
 
     public class RwLockedSortedDictionaryAutoAdd<TKey, TValue> : RwLockedSortedDictionary<TKey, TValue>
     {
-        readonly CreateValueDelegate m_AutoAddDelegate;
+        private readonly CreateValueDelegate m_AutoAddDelegate;
+
         public RwLockedSortedDictionaryAutoAdd(CreateValueDelegate autoAddDelegate)
         {
             m_AutoAddDelegate = autoAddDelegate;

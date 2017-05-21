@@ -20,22 +20,20 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages.Parcel;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ParcelNavigateMedia : ICapabilityInterface
     {
-        readonly UUI m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly string m_RemoteIP;
+        private readonly UUI m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly string m_RemoteIP;
 
         public ParcelNavigateMedia(UUI agent, SceneInterface scene, string remoteip)
         {
@@ -44,13 +42,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "ParcelNavigateMedia";
-            }
-        }
+        public string CapabilityName => "ParcelNavigateMedia";
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
@@ -75,7 +67,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;

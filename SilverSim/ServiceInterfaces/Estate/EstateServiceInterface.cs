@@ -20,20 +20,13 @@
 // exception statement from your version.
 
 using SilverSim.Types.Estate;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.ServiceInterfaces.Estate
 {
     public abstract class EstateServiceInterface
     {
-        public abstract EstateInfo this[uint estateID]
-        {
-            get;
-            set;
-        }
+        public abstract EstateInfo this[uint estateID] { get; set; }
 
         public abstract void Add(EstateInfo estateInfo);
 

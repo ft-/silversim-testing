@@ -42,9 +42,9 @@ namespace SilverSim.Scene.Types.Scene
     [ServerParam("DoNotAddScriptsToTrashFolder", ParameterType = typeof(bool), DefaultValue = false)]
     public partial class SceneInterface
     {
-        bool m_DoNotAddScriptsToTrashFolderUpdatedLocal;
-        bool m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
-        bool m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal;
+        private bool m_DoNotAddScriptsToTrashFolderUpdatedLocal;
+        private bool m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
+        private bool m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal;
 
         [ServerParam("DoNotAddScriptsToTrashFolder", ParameterType = typeof(bool))]
         public void DoNotAddScriptsToTrashFolderUpdated(UUID regionID, string value)
@@ -56,9 +56,9 @@ namespace SilverSim.Scene.Types.Scene
                 regionID, value);
         }
 
-        bool DoNotAddScriptsToTrashFolder => m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal ? m_DoNotAddScriptsToTrashFolderUpdatedLocal : m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
+        private bool DoNotAddScriptsToTrashFolder => m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal ? m_DoNotAddScriptsToTrashFolderUpdatedLocal : m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
 
-        bool TryGetServices(UUI targetAgentId, out InventoryServiceInterface inventoryService, out AssetServiceInterface assetService)
+        private bool TryGetServices(UUI targetAgentId, out InventoryServiceInterface inventoryService, out AssetServiceInterface assetService)
         {
             UserAgentServiceInterface userAgentService = null;
             inventoryService = null;
@@ -77,7 +77,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            if (null == userAgentService)
+            if (userAgentService == null)
             {
                 return false;
             }
@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            return null != inventoryService && null != assetService;
+            return inventoryService != null && assetService != null;
         }
 
         [PacketHandler(MessageType.UpdateTaskInventory)]
@@ -156,8 +156,8 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        void AddTaskInventoryItem(UpdateTaskInventory req, IAgent agent, ObjectPart part)
-        { 
+        private void AddTaskInventoryItem(UpdateTaskInventory req, IAgent agent, ObjectPart part)
+        {
             switch(req.InvType)
             {
                 case InventoryType.Animation:
@@ -209,8 +209,10 @@ namespace SilverSim.Scene.Types.Scene
                 agentItem.AssetType == req.AssetType &&
                 agentItem.InventoryType == req.InvType)
             {
-                var item = new ObjectPartInventoryItem(agentItem);
-                item.ID = UUID.Random;
+                var item = new ObjectPartInventoryItem(agentItem)
+                {
+                    ID = UUID.Random
+                };
                 AdjustPermissionsAccordingly(agent, part.Owner, item);
                 item.LastOwner = item.Owner;
                 item.Owner = part.Owner;
@@ -237,7 +239,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        void AdjustPermissionsAccordingly(IAgent agent, UUI newOwner, ObjectPartInventoryItem item)
+        private void AdjustPermissionsAccordingly(IAgent agent, UUI newOwner, ObjectPartInventoryItem item)
         {
             if(agent.Owner != newOwner && !agent.IsActiveGod)
             {
@@ -245,7 +247,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        void UpdateTaskInventoryItem(UpdateTaskInventory req, IAgent agent, ObjectPart part)
+        private void UpdateTaskInventoryItem(UpdateTaskInventory req, IAgent agent, ObjectPart part)
         {
             ObjectPartInventoryItem item;
 
@@ -537,8 +539,8 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        const string InvFile_Header = "\tinv_object\t0\n\t{\n";
-        const string InvFile_SectionEnd = "\t}\n";
-        const string InvFile_NameValueLine = "\t\t{0}\t{1}\n";
+        private const string InvFile_Header = "\tinv_object\t0\n\t{\n";
+        private const string InvFile_SectionEnd = "\t}\n";
+        private const string InvFile_NameValueLine = "\t\t{0}\t{1}\n";
     }
 }

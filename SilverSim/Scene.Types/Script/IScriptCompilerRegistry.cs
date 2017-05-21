@@ -25,15 +25,8 @@ namespace SilverSim.Scene.Types.Script
 {
     public interface IScriptCompilerRegistry
     {
-        IScriptCompiler this[string name]
-        {
-            get;
-            set;
-        }
+        IScriptCompiler this[string name] { get; set; }
 
-        IList<string> Names
-        {
-            get;
-        }
+        IList<string> Names { get; }
     }
 }

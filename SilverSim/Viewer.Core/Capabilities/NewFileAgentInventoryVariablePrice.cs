@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Threading;
@@ -38,27 +40,15 @@ namespace SilverSim.Viewer.Core.Capabilities
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class NewFileAgentInventoryVariablePrice : UploadAssetAbstractCapability
     {
-        readonly InventoryServiceInterface m_InventoryService;
-        readonly AssetServiceInterface m_AssetService;
-        readonly ViewerAgent m_Agent;
+        private readonly InventoryServiceInterface m_InventoryService;
+        private readonly AssetServiceInterface m_AssetService;
+        private readonly ViewerAgent m_Agent;
 
-        readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
+        private readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
 
-        public override string CapabilityName
-        {
-            get
-            {
-                return "NewFileAgentInventoryVariablePrice";
-            }
-        }
+        public override string CapabilityName => "NewFileAgentInventoryVariablePrice";
 
-        public override int ActiveUploads
-        {
-            get
-            {
-                return m_Transactions.Count;
-            }
-        }
+        public override int ActiveUploads => m_Transactions.Count;
 
         public NewFileAgentInventoryVariablePrice(ViewerAgent agent, string serverURI, string remoteip)
             : base(agent.Owner, serverURI, remoteip)
@@ -79,9 +69,9 @@ namespace SilverSim.Viewer.Core.Capabilities
                 ParentFolderID = reqmap["folder_id"].AsUUID,
                 AssetTypeName = reqmap["asset_type"].ToString(),
                 InventoryTypeName = reqmap["inventory_type"].ToString(),
-                LastOwner = m_Creator,
-                Owner = m_Creator,
-                Creator = m_Creator
+                LastOwner = Creator,
+                Owner = Creator,
+                Creator = Creator
             };
             item.Permissions.Base = InventoryPermissionsMask.All;
             item.Permissions.Current = InventoryPermissionsMask.Every;
@@ -95,7 +85,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
             KeyValuePair<UUID, InventoryItem> kvp;
-            if (m_Transactions.RemoveIf(transactionID, delegate(InventoryItem v) { return true; }, out kvp))
+            if (m_Transactions.RemoveIf(transactionID, (InventoryItem v) => true, out kvp))
             {
                 var m = new Map
                 {
@@ -140,7 +130,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        void UploadObject(UUID transactionID, AssetData data)
+        private void UploadObject(UUID transactionID, AssetData data)
         {
             var m = (Map)LlsdXml.Deserialize(data.InputStream);
             var instance_list = (AnArray)m["instance_list"];
@@ -160,13 +150,15 @@ namespace SilverSim.Viewer.Core.Capabilities
                     /* we serialize the assets straight away, no allocating SOG in between here. Allocating a SOG would just take senselessly a lot of time and memory. */
                     if (texture_list.Count > 0)
                     {
-                        var textureFolder = m_InventoryService.Folder[m_Creator.ID, AssetType.Texture].ID;
-                        var folder = new InventoryFolder();
-                        folder.Name = data.Name + " - Textures";
-                        folder.Owner = m_Creator;
-                        folder.InventoryType = InventoryType.Unknown;
-                        folder.ParentFolderID = textureFolder;
-                        folder.Version = 1;
+                        var textureFolder = m_InventoryService.Folder[Creator.ID, AssetType.Texture].ID;
+                        var folder = new InventoryFolder()
+                        {
+                            Name = data.Name + " - Textures",
+                            Owner = Creator,
+                            InventoryType = InventoryType.Unknown,
+                            ParentFolderID = textureFolder,
+                            Version = 1
+                        };
                         m_InventoryService.Folder.Add(folder);
 
                         int idx = 0;
@@ -178,7 +170,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                             {
                                 ID = UUID.Random,
                                 Type = AssetType.Texture,
-                                Creator = m_Creator,
+                                Creator = Creator,
                                 Data = (BinaryData)iv,
                                 Name = data.Name + " - Texture " + idx.ToString()
                             };
@@ -189,11 +181,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                             {
                                 AssetID = newasset.ID,
                                 AssetType = AssetType.Texture,
-                                Creator = m_Creator,
+                                Creator = Creator,
                                 InventoryType = InventoryType.Texture,
-                                LastOwner = m_Creator,
+                                LastOwner = Creator,
                                 Name = data.Name + " - Texture " + idx.ToString(),
-                                Owner = m_Creator,
+                                Owner = Creator,
                                 ParentFolderID = folder.ID
                             };
                             item.Permissions.Base = InventoryPermissionsMask.All;
@@ -221,7 +213,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                         var rootRotConjugated = Quaternion.Inverse(primrots[0]);
                         for(idx = 1; idx < primscales.Length; ++idx)
                         {
-                            primpositions[idx] = primpositions[idx] - primpositions[0];
+                            primpositions[idx] -= primpositions[0];
                             primrots[idx] = (rootRotConjugated * primrots[idx]) * rootRotConjugated;
                         }
                     }
@@ -263,7 +255,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                                     {
                                         ID = UUID.Random,
                                         Type = AssetType.Mesh,
-                                        Creator = m_Creator,
+                                        Creator = Creator,
                                         Data = meshstream.ToArray(),
                                         Name = data.Name + " - Mesh " + (idx + 1).ToString()
                                     };
@@ -330,18 +322,18 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        void WritePart(
-            XmlTextWriter writer, 
-            string assetName, 
-            Vector3 position, Vector3 scale, Quaternion rotation, 
+        private void WritePart(
+            XmlTextWriter writer,
+            string assetName,
+            Vector3 position, Vector3 scale, Quaternion rotation,
             UUID meshID, TextureEntry te, int linknumber,
             Date creationDate)
         {
             writer.WriteStartElement("SceneObjectPart");
             {
                 writer.WriteNamedValue("AllowedDrop", "false");
-                writer.WriteUUID("CreatorID", m_Creator.ID);
-                writer.WriteNamedValue("CreatorData", m_Creator.CreatorData);
+                writer.WriteUUID("CreatorID", Creator.ID);
+                writer.WriteNamedValue("CreatorData", Creator.CreatorData);
                 writer.WriteNamedValue("InventorySerial", 1);
                 writer.WriteUUID("UUID", UUID.Random);
                 writer.WriteNamedValue("LocalId", linknumber);
@@ -430,8 +422,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 writer.WriteNamedValue("ObjectSaleType", 0);
                 writer.WriteNamedValue("OwnershipCost", 0);
                 writer.WriteUUID("GroupID", UUID.Zero);
-                writer.WriteUUID("OwnerID", m_Creator.ID);
-                writer.WriteUUID("LastOwnerID", m_Creator.ID);
+                writer.WriteUUID("OwnerID", Creator.ID);
+                writer.WriteUUID("LastOwnerID", Creator.ID);
                 writer.WriteNamedValue("BaseMask", (uint)InventoryPermissionsMask.All);
                 writer.WriteNamedValue("OwnerMask", (uint)InventoryPermissionsMask.Every);
                 writer.WriteNamedValue("EveryoneMask", 0);
@@ -452,36 +444,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             writer.WriteEndElement(); /* SceneObjectPart */
         }
 
-        protected override UUID NewAssetID
-        {
-            get
-            {
-                return UUID.Random;
-            }
-        }
+        protected override UUID NewAssetID => UUID.Random;
 
-        protected override bool AssetIsLocal
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsLocal => false;
 
-        protected override bool AssetIsTemporary
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsTemporary => false;
 
-        protected override AssetType NewAssetType
-        {
-            get
-            {
-                return AssetType.Unknown;
-            }
-        }
+        protected override AssetType NewAssetType => AssetType.Unknown;
     }
 }

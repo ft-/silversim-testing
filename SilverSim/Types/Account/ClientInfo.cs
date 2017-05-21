@@ -21,7 +21,7 @@
 
 namespace SilverSim.Types.Account
 {
-    public struct ClientInfo 
+    public struct ClientInfo
     {
         public string ClientVersion;
         public string Channel;

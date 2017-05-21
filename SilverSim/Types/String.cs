@@ -28,7 +28,7 @@ namespace SilverSim.Types
     [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public sealed class AString : IEquatable<AString>, IEquatable<string>, IValue
     {
-        readonly string m_Value;
+        private readonly string m_Value;
 
         #region Properties
         public ValueType Type => ValueType.String;
@@ -50,9 +50,9 @@ namespace SilverSim.Types
 
         public bool Equals(AString v) => m_Value.Equals(v.m_Value);
 
-        public int CompareTo(string v) => m_Value.CompareTo(m_Value);
+        public int CompareTo(string v) => m_Value.CompareTo(v);
 
-        public bool Equals(string v) => m_Value.Equals(m_Value);
+        public bool Equals(string v) => m_Value.Equals(v);
 
         public override string ToString() => m_Value;
 
@@ -60,13 +60,13 @@ namespace SilverSim.Types
         {
             AString a;
             var s = obj as string;
-            if(null != s)
+            if(s != null)
             {
                 return m_Value == s;
             }
 
             a = obj as AString;
-            if(null != a)
+            if(a != null)
             {
                 return m_Value == a.m_Value;
             }

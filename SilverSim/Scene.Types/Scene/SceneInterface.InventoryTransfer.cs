@@ -37,10 +37,10 @@ namespace SilverSim.Scene.Types.Scene
     {
         public class AddToObjectTransferItem : AssetTransferWorkItem
         {
-            readonly ObjectPart m_Part;
+            private readonly ObjectPart m_Part;
             protected readonly UUI m_SourceAgent;
             protected readonly UUID m_SceneID;
-            ObjectPartInventoryItem m_Item;
+            private readonly ObjectPartInventoryItem m_Item;
             protected readonly TryGetSceneDelegate TryGetScene;
 
             public AddToObjectTransferItem(
@@ -76,18 +76,18 @@ namespace SilverSim.Scene.Types.Scene
 
         public class ObjectTransferItem : AssetTransferWorkItem
         {
-            readonly InventoryServiceInterface m_InventoryService;
+            private readonly InventoryServiceInterface m_InventoryService;
             protected readonly UUI m_DestinationAgent;
             protected readonly UUID m_SceneID;
-            readonly List<InventoryItem> m_Items;
-            readonly string m_DestinationFolder = string.Empty;
-            readonly UUID m_DestinationFolderID = UUID.Zero;
+            private readonly List<InventoryItem> m_Items;
+            private readonly string m_DestinationFolder = string.Empty;
+            private readonly UUID m_DestinationFolderID = UUID.Zero;
             protected readonly TryGetSceneDelegate TryGetScene;
-            readonly AssetType m_DestinationFolderType = AssetType.Object;
+            private readonly AssetType m_DestinationFolderType = AssetType.Object;
 
             public ObjectTransferItem(
-                IAgent agent, 
-                SceneInterface scene, 
+                IAgent agent,
+                SceneInterface scene,
                 UUID assetid,
                 List<InventoryItem> items,
                 string destinationFolder = "")
@@ -120,10 +120,10 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             public ObjectTransferItem(
-                IAgent agent, 
-                SceneInterface scene, 
-                List<UUID> assetids, 
-                List<InventoryItem> items, 
+                IAgent agent,
+                SceneInterface scene,
+                List<UUID> assetids,
+                List<InventoryItem> items,
                 string destinationFolder = "")
                 : base(agent.AssetService, scene.AssetService, assetids, ReferenceSource.Source)
             {
@@ -244,14 +244,14 @@ namespace SilverSim.Scene.Types.Scene
                     item.ParentFolderID = folder.ID;
                     item.IsGroupOwned = false;
                     m_InventoryService.Item.Add(item);
-                    if (null != agent)
+                    if (agent != null)
                     {
                         var msg = new UpdateCreateInventoryItem()
                         {
-                            AgentID = m_DestinationAgent.ID
+                            AgentID = m_DestinationAgent.ID,
+                            SimApproved = true
                         };
                         msg.AddItem(item, 0);
-                        msg.SimApproved = true;
                         agent.SendMessageAlways(msg, m_SceneID);
                     }
                 }

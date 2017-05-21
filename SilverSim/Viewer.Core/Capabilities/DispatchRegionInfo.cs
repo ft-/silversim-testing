@@ -32,9 +32,9 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class DispatchRegionInfo : ICapabilityInterface
     {
-        readonly ViewerAgent m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly string m_RemoteIP;
+        private readonly ViewerAgent m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly string m_RemoteIP;
 
 #if DEBUG
         private static readonly ILog m_Log = LogManager.GetLogger("DISPATCH REGION INFO");
@@ -46,13 +46,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "DispatchRegionInfo";
-            }
-        }
+        public string CapabilityName => "DispatchRegionInfo";
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
@@ -77,7 +71,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -106,8 +100,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_Scene.RegionSettings.AllowLandJoinDivide = reqmap["allow_parcel_changes"].AsBoolean;
             m_Scene.RegionSettings.BlockShowInSearch = reqmap["block_parcel_search"].AsBoolean;
 #if DEBUG
-            m_Log.DebugFormat("RegionFlags={0} Access={1} AgentLimit={2} ObjectBonus={3}", 
-                m_Scene.RegionSettings.AsFlags.ToString(), 
+            m_Log.DebugFormat("RegionFlags={0} Access={1} AgentLimit={2} ObjectBonus={3}",
+                m_Scene.RegionSettings.AsFlags.ToString(),
                 m_Scene.Access,
                 m_Scene.RegionSettings.AgentLimit,
                 m_Scene.RegionSettings.ObjectBonus);

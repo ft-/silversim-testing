@@ -29,10 +29,10 @@ namespace SilverSim.Types
 {
     public static class MultiLanguageSupport
     {
-        static readonly RwLockedDictionary<string, ResourceSet> m_LoadedAssemblyResources = new RwLockedDictionary<string, ResourceSet>();
-        static readonly object m_LoadAssemblyLock = new object();
-        static readonly string InstallBinPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-        static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
+        private static readonly RwLockedDictionary<string, ResourceSet> m_LoadedAssemblyResources = new RwLockedDictionary<string, ResourceSet>();
+        private static readonly object m_LoadAssemblyLock = new object();
+        private static readonly string InstallBinPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        private static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
 
         public static ResourceSet GetLanguageResourceSet(
             this object o,
@@ -42,7 +42,7 @@ namespace SilverSim.Types
             var assembly = type.Assembly;
             var assemblyName = assembly.GetName().Name;
             ResourceSet res = null;
-            var culture = selectedCulture ?? EnUsCulture; 
+            var culture = selectedCulture ?? EnUsCulture;
             var cultureName = culture.Name;
             var cultureGroup = cultureName.Split('-')[0];
 

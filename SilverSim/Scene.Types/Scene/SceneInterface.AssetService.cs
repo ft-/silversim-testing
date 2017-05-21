@@ -32,7 +32,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         public class DefaultAssetReferencesService : AssetReferencesServiceInterface
         {
-            readonly SceneInterface m_Scene;
+            private readonly SceneInterface m_Scene;
 
             internal DefaultAssetReferencesService(SceneInterface scene)
             {
@@ -40,8 +40,8 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            public override List<UUID> this[UUID key] 
-            { 
+            public override List<UUID> this[UUID key]
+            {
                 get
                 {
                     try
@@ -65,8 +65,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public class DefaultAssetService : AssetServiceInterface, IAssetMetadataServiceInterface, IAssetDataServiceInterface
         {
-            readonly SceneInterface m_Scene;
-            readonly DefaultAssetReferencesService m_ReferencesService;
+            private readonly SceneInterface m_Scene;
+            private readonly DefaultAssetReferencesService m_ReferencesService;
 
             internal DefaultAssetService(SceneInterface si)
             {
@@ -119,6 +119,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 return false;
             }
+
             public override AssetReferencesServiceInterface References => m_ReferencesService;
 
             public override IAssetDataServiceInterface Data => this;
@@ -159,6 +160,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 return false;
             }
+
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override AssetData this[UUID key]
             {

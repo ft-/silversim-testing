@@ -34,30 +34,26 @@ namespace SilverSim.Threading
             public ChangeKeyFailedException(string message)
                 : base(message)
             {
-
             }
 
             public ChangeKeyFailedException()
             {
-
             }
 
             public ChangeKeyFailedException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected ChangeKeyFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
             {
-
             }
         }
 
-        readonly Dictionary<TKey1, KeyValuePair<TKey2, TValue>> m_Dictionary_K1;
-        readonly Dictionary<TKey2, KeyValuePair<TKey1, TValue>> m_Dictionary_K2;
-        readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        private readonly Dictionary<TKey1, KeyValuePair<TKey2, TValue>> m_Dictionary_K1;
+        private readonly Dictionary<TKey2, KeyValuePair<TKey1, TValue>> m_Dictionary_K2;
+        private readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 
         public RwLockedDoubleDictionary()
         {
@@ -545,10 +541,7 @@ namespace SilverSim.Threading
 
         public List<TValue> ValuesByKey1
         {
-            get
-            {
-                return Values;
-            }
+            get { return Values; }
         }
 
         public List<TValue> ValuesByKey2

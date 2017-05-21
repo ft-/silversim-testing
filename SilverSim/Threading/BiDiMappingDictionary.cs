@@ -34,30 +34,26 @@ namespace SilverSim.Threading
             public ChangeKeyFailedException(string message)
                 : base(message)
             {
-
             }
 
             public ChangeKeyFailedException()
             {
-
             }
 
             public ChangeKeyFailedException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
 
             protected ChangeKeyFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
             {
-
             }
         }
 
-        readonly Dictionary<TKey1, TKey2> m_Dictionary_K1;
-        readonly Dictionary<TKey2, TKey1> m_Dictionary_K2;
-        readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        private readonly Dictionary<TKey1, TKey2> m_Dictionary_K1;
+        private readonly Dictionary<TKey2, TKey1> m_Dictionary_K2;
+        private readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 
         public RwLockedBiDiMappingDictionary()
         {

@@ -30,7 +30,6 @@ namespace SilverSim.Types.Presence
 
         public PresenceInfo()
         {
-
         }
 
         public PresenceInfo(PresenceInfo src)

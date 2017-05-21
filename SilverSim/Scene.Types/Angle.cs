@@ -40,14 +40,9 @@ namespace SilverSim.Scene.Types
         #region Properties
         public double Degrees
         {
-            get
-            {
-                return Radians * 180f / Math.PI;
-            }
-            set
-            {
-                Radians = value * Math.PI / 180f;
-            }
+            get { return Radians * 180f / Math.PI; }
+
+            set { Radians = value * Math.PI / 180f; }
         }
 
         public double Radians;

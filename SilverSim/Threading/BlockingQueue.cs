@@ -27,7 +27,7 @@ namespace SilverSim.Threading
 {
     public class BlockingQueue<T> : Queue<T>
     {
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
 
         public BlockingQueue(IEnumerable<T> col)
             : base(col)

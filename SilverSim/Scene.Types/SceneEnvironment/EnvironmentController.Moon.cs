@@ -26,9 +26,9 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 {
     public partial class EnvironmentController
     {
-        double m_MoonPhase;
-        double m_MoonPhaseOffset;
-        double m_MoonPeriodLengthInSecs = 2.1 * 3600; /* a little difference for having it move through day time */
+        private double m_MoonPhase;
+        private double m_MoonPhaseOffset;
+        private double m_MoonPeriodLengthInSecs = 2.1 * 3600; /* a little difference for having it move through day time */
 
         public double MoonPhase
         {
@@ -82,6 +82,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 TriggerOnEnvironmentControllerChange();
             }
         }
+
         public void UpdateMoonPhase()
         {
             lock(m_EnvironmentLock)

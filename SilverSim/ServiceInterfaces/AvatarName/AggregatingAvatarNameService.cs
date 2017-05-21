@@ -28,7 +28,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 {
     public class AggregatingAvatarNameService : AvatarNameServiceInterface
     {
-        readonly RwLockedList<AvatarNameServiceInterface> m_ServiceList;
+        private readonly RwLockedList<AvatarNameServiceInterface> m_ServiceList;
 
         public AggregatingAvatarNameService(RwLockedList<AvatarNameServiceInterface> serviceList)
         {
@@ -64,7 +64,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                     notFoundFirst = true;
                 }
             }
-            if (null == uui)
+            if (uui == null)
             {
                 return false;
             }
@@ -154,7 +154,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                     notFoundFirst = true;
                 }
             }
-            if (null == uui)
+            if (uui == null)
             {
                 return false;
             }

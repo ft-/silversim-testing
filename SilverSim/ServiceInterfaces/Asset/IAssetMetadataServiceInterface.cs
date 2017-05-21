@@ -27,10 +27,7 @@ namespace SilverSim.ServiceInterfaces.Asset
     public interface IAssetMetadataServiceInterface
     {
         #region Metadata accessors
-        AssetMetadata this[UUID key]
-        {
-            get;
-        }
+        AssetMetadata this[UUID key] { get; }
 
         bool TryGetValue(UUID key, out AssetMetadata metadata);
         #endregion

@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
@@ -59,15 +62,15 @@ namespace SilverSim.Viewer.Friends
         [PacketHandler(MessageType.TerminateFriendship)]
         [PacketHandler(MessageType.GrantUserRights)]
         [IMMessageHandler(GridInstantMessageDialog.FriendshipOffered)]
-        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        IMServiceInterface m_IMService;
-        readonly string m_IMServiceName;
-        List<IFriendsServicePlugin> m_FriendsPlugins;
-        List<IUserAgentServicePlugin> m_UserAgentPlugins;
-        SceneList m_Scenes;
+        private IMServiceInterface m_IMService;
+        private readonly string m_IMServiceName;
+        private List<IFriendsServicePlugin> m_FriendsPlugins;
+        private List<IUserAgentServicePlugin> m_UserAgentPlugins;
+        private SceneList m_Scenes;
 
-        bool m_ShutdownFriends;
+        private bool m_ShutdownFriends;
 
         public ViewerFriendsServer(string imService)
         {
@@ -75,7 +78,7 @@ namespace SilverSim.Viewer.Friends
         }
 
         public void Startup(ConfigurationLoader loader)
-        { 
+        {
             m_Scenes = loader.Scenes;
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_FriendsPlugins = loader.GetServicesByValue<IFriendsServicePlugin>();
@@ -148,7 +151,7 @@ namespace SilverSim.Viewer.Friends
             }
         }
 
-        void HandleFriendshipOffered(ImprovedInstantMessage m)
+        private void HandleFriendshipOffered(ImprovedInstantMessage m)
         {
             if(m.CircuitAgentID != m.AgentID ||
                 m.CircuitSessionID != m.SessionID)
@@ -227,7 +230,7 @@ namespace SilverSim.Viewer.Friends
             m_IMService.Send(gim);
         }
 
-        void HandleAcceptFriendship(Message m)
+        private void HandleAcceptFriendship(Message m)
         {
             var req = (AcceptFriendship)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -306,7 +309,7 @@ namespace SilverSim.Viewer.Friends
             m_IMService.Send(gim);
         }
 
-        void HandleDeclineFriendship(Message m)
+        private void HandleDeclineFriendship(Message m)
         {
             var req = (DeclineFriendship)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -385,7 +388,7 @@ namespace SilverSim.Viewer.Friends
             m_IMService.Send(gim);
         }
 
-        void HandleTerminateFriendship(Message m)
+        private void HandleTerminateFriendship(Message m)
         {
             var req = (TerminateFriendship)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -454,7 +457,7 @@ namespace SilverSim.Viewer.Friends
 #warning Implement Terminate remote message
         }
 
-        void HandleGrantUserRights(Message m)
+        private void HandleGrantUserRights(Message m)
         {
             var req = (GrantUserRights)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -462,7 +465,6 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-
 
             SceneInterface scene;
             if (!m_Scenes.TryGetValue(m.CircuitSceneID, out scene))
@@ -532,13 +534,7 @@ namespace SilverSim.Viewer.Friends
 #warning TODO: send GrantUserRights to friend
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get 
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public void Shutdown()
         {
@@ -548,7 +544,7 @@ namespace SilverSim.Viewer.Friends
         public bool TryGetFriendsService(UUI agent, out FriendsServiceInterface friendsService)
         {
             friendsService = null;
-            if(null == agent.HomeURI)
+            if(agent.HomeURI == null)
             {
                 return false;
             }
@@ -575,7 +571,7 @@ namespace SilverSim.Viewer.Friends
                 }
             }
 
-            if(null == userAgentService)
+            if(userAgentService == null)
             {
                 return false;
             }
@@ -621,9 +617,7 @@ namespace SilverSim.Viewer.Friends
     [PluginName("ViewerFriendsServer")]
     public class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerFriendsServer(ownSection.GetString("IMService", "IMService"));
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerFriendsServer(ownSection.GetString("IMService", "IMService"));
     }
 }

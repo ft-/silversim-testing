@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.CmdIO;
@@ -54,33 +57,33 @@ namespace SilverSim.Viewer.Core
         public UUID AgentID = UUID.Zero;
         public ViewerAgent Agent;
         private SceneInterface m_Scene;
-        readonly RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
-        readonly CapsHttpRedirector m_CapsRedirector;
-        readonly object m_SceneSetLock = new object();
+        private readonly RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
+        private readonly CapsHttpRedirector m_CapsRedirector;
+        private readonly object m_SceneSetLock = new object();
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
         private ChatServiceInterface.Listener m_DebugChannelListener;
 
-        readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
-        readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
-        readonly Dictionary<string, Action<Message>> m_GodlikeMessageRouting = new Dictionary<string, Action<Message>>();
-        readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
+        private readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
+        private readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
+        private readonly Dictionary<string, Action<Message>> m_GodlikeMessageRouting = new Dictionary<string, Action<Message>>();
+        private readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
         private Thread m_TextureDownloadThread;
         private bool m_TextureDownloadThreadRunning;
-        readonly BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
+        private readonly BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
         internal List<ITriggerOnRootAgentActions> m_TriggerOnRootAgentActions = new List<ITriggerOnRootAgentActions>();
 
         private Thread m_InventoryThread;
         private bool m_InventoryThreadRunning;
-        readonly BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
+        private readonly BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
         public string GatekeeperURI { get; protected set; }
 
         private Thread m_ObjectUpdateThread;
         private bool m_ObjectUpdateThreadRunning;
-        readonly CommandRegistry m_Commands;
+        private readonly CommandRegistry m_Commands;
 
-        int m_AgentUpdatesReceived;
+        private int m_AgentUpdatesReceived;
 
         /* storage for last teleport flags */
         public TeleportFlags LastTeleportFlags { get; set; }
@@ -92,30 +95,27 @@ namespace SilverSim.Viewer.Core
         #region Scene Changing Property
         public SceneInterface Scene
         {
-            get
-            {
-                return m_Scene;
-            }
+            get { return m_Scene; }
 
             set
             {
                 lock (m_SceneSetLock) /* scene change serialization */
                 {
                     var oldScene = m_Scene;
-                    if (null != m_Scene)
+                    if (m_Scene != null)
                     {
-                        if(m_ChatListener != null)
+                        if (m_ChatListener != null)
                         {
                             m_ChatListener.Remove();
                             m_ChatListener = null;
                         }
-                        if(m_DebugChannelListener != null)
+                        if (m_DebugChannelListener != null)
                         {
                             m_DebugChannelListener.Remove();
                             m_DebugChannelListener = null;
                         }
                         m_ChatService = null;
-                        
+
                         foreach (var kvp in m_Scene.SceneCapabilities)
                         {
                             if (kvp.Value is ICapabilityInterface)
@@ -126,24 +126,21 @@ namespace SilverSim.Viewer.Core
                         }
                     }
                     m_Scene = value;
-                    if(null != oldScene)
-                    {
-                        oldScene.TriggerAgentChangedScene(Agent);
-                    }
-                    if (null != m_Scene)
+                    oldScene?.TriggerAgentChangedScene(Agent);
+                    if (m_Scene != null)
                     {
                         var sceneCapID = UUID.Random;
                         foreach (var kvp in m_Scene.SceneCapabilities)
                         {
                             if (kvp.Value is ICapabilityInterface)
                             {
-                                var iface = (ICapabilityInterface)(kvp.Value);
+                                var iface = (ICapabilityInterface)kvp.Value;
                                 AddCapability(iface.CapabilityName, sceneCapID, iface.HttpRequestHandler);
                             }
                         }
 
                         m_ChatService = m_Scene.GetService<ChatServiceInterface>();
-                        if(null != m_ChatService)
+                        if (m_ChatService != null)
                         {
                             try
                             {
@@ -182,24 +179,21 @@ namespace SilverSim.Viewer.Core
             return agentPos;
         }
 
-        private UUID ChatGetAgentUUID()
-        {
-            return AgentID;
-        }
+        private UUID ChatGetAgentUUID() => AgentID;
 
-        const int PUBLIC_CHANNEL = 0;
-        const int DEBUG_CHANNEL = 0x7FFFFFFF;
+        private const int PUBLIC_CHANNEL = 0;
+        private const int DEBUG_CHANNEL = 0x7FFFFFFF;
 
         private void ChatListenerAction(ListenEvent le)
         {
             var cfs = new ChatFromSimulator()
             {
-                Audible = Messages.Chat.ChatAudibleLevel.Fully,
-                ChatType = (Messages.Chat.ChatType)(byte)le.Type,
+                Audible = ChatAudibleLevel.Fully,
+                ChatType = (ChatType)(byte)le.Type,
                 FromName = le.Name,
                 Position = le.GlobalPosition,
                 SourceID = le.ID,
-                SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType,
+                SourceType = (ChatSourceType)(byte)le.SourceType,
                 OwnerID = le.OwnerID
             };
             if (le.Localization != null)
@@ -227,10 +221,10 @@ namespace SilverSim.Viewer.Core
 
         #region Message Handler Definitions
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-        sealed class MessageHandlerExtenderKeyValuePairCircuitQueue
+        private sealed class MessageHandlerExtenderKeyValuePairCircuitQueue
         {
-            readonly WeakReference m_Circuit;
-            readonly Queue<KeyValuePair<AgentCircuit, Message>> m_Queue;
+            private readonly WeakReference m_Circuit;
+            private readonly Queue<KeyValuePair<AgentCircuit, Message>> m_Queue;
 
             public MessageHandlerExtenderKeyValuePairCircuitQueue(AgentCircuit circuit, Queue<KeyValuePair<AgentCircuit, Message>> q)
             {
@@ -248,11 +242,11 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        sealed class MessageHandlerExtenderViewerAgent
+        private sealed class MessageHandlerExtenderViewerAgent
         {
-            readonly WeakReference m_Agent;
-            readonly WeakReference m_Circuit;
-            readonly Action<ViewerAgent, AgentCircuit, Message> m_Delegate;
+            private readonly WeakReference m_Agent;
+            private readonly WeakReference m_Circuit;
+            private readonly Action<ViewerAgent, AgentCircuit, Message> m_Delegate;
 
             // for documentation
             //public delegate void HandlerDelegate(ViewerAgent agent, AgentCircuit circuit, Message m);
@@ -275,10 +269,10 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        sealed class MessageHandlerExtenderIAgent
+        private sealed class MessageHandlerExtenderIAgent
         {
-            readonly WeakReference m_Agent;
-            readonly Action<IAgent, Message> m_Delegate;
+            private readonly WeakReference m_Agent;
+            private readonly Action<IAgent, Message> m_Delegate;
 
             //for documentation
             //public delegate void HandlerDelegate(IAgent agent, Message m);
@@ -303,14 +297,14 @@ namespace SilverSim.Viewer.Core
 
         #region Message Handler Initialization
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        Action<Message> DeriveActionDelegateFromFieldInfo(FieldInfo fi, Type t, object o, string info)
+        private Action<Message> DeriveActionDelegateFromFieldInfo(FieldInfo fi, Type t, object o, string info)
         {
             if (typeof(Queue<Message>).IsAssignableFrom(fi.FieldType))
             {
                 var mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(Message) });
-                if (null == mi)
+                if (mi == null)
                 {
-                    m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
+                    m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use for {2}", fi.Name, t.GetType(), info);
                 }
                 else
                 {
@@ -318,15 +312,14 @@ namespace SilverSim.Viewer.Core
                     m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, info);
 #endif
                     return (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), fi.GetValue(o), mi);
-
                 }
             }
             else if (typeof(Queue<KeyValuePair<AgentCircuit, Message>>).IsAssignableFrom(fi.FieldType))
             {
                 var mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(KeyValuePair<AgentCircuit, Message>) });
-                if (null == mi)
+                if (mi == null)
                 {
-                    m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
+                    m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use for {2}", fi.Name, t.GetType(), info);
                 }
                 else
                 {
@@ -334,23 +327,22 @@ namespace SilverSim.Viewer.Core
                     m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, info);
 #endif
                     return new MessageHandlerExtenderKeyValuePairCircuitQueue(this, (Queue<KeyValuePair<AgentCircuit, Message>>)fi.GetValue(o)).Handler;
-
                 }
             }
             else
             {
-                m_Log.FatalFormat("Field {0} of {1} is not derived from Queue<Message> or Queue<KeyValuePair<Circuit, Message>>", fi.Name, t.GetType());
+                m_Log.FatalFormat("Field {0} of {1} is not derived from Queue<Message> or Queue<KeyValuePair<Circuit, Message>> for {2}", fi.Name, t.GetType(), info);
             }
 
             throw new ArgumentException("Handler resolver error");
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        Action<Message> DeriveActionDelegateFromMethodInfo(MethodInfo mi, Type t, object o, string info)
+        private Action<Message> DeriveActionDelegateFromMethodInfo(MethodInfo mi, Type t, object o, string info)
         {
             if (mi.ReturnType != typeof(void))
             {
-                m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
+                m_Log.FatalFormat("Method {0} return type is not void for {1}", mi.Name, info);
             }
             else if (mi.GetParameters().Length == 3)
             {
@@ -358,7 +350,7 @@ namespace SilverSim.Viewer.Core
                     mi.GetParameters()[1].ParameterType != typeof(AgentCircuit) ||
                     mi.GetParameters()[2].ParameterType != typeof(Message))
                 {
-                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                    m_Log.FatalFormat("Method {0} parameter types do not match for {1}", mi.Name, info);
                 }
                 else
                 {
@@ -374,7 +366,7 @@ namespace SilverSim.Viewer.Core
                 if (mi.GetParameters()[0].ParameterType != typeof(IAgent) ||
                     mi.GetParameters()[1].ParameterType != typeof(Message))
                 {
-                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                    m_Log.FatalFormat("Method {0} parameter types do not match for {1}", mi.Name, info);
                 }
                 else
                 {
@@ -387,11 +379,11 @@ namespace SilverSim.Viewer.Core
             }
             else if (mi.GetParameters().Length != 1)
             {
-                m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
+                m_Log.FatalFormat("Method {0} parameter count does not match for {1}", mi.Name, info);
             }
             else if (mi.GetParameters()[0].ParameterType != typeof(Message))
             {
-                m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                m_Log.FatalFormat("Method {0} parameter types do not match for {1}", mi.Name, info);
             }
             else
             {
@@ -405,7 +397,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        void AddMessageRouting(object o)
+        private void AddMessageRouting(object o)
         {
             var types = new List<Type>();
             var tt = o.GetType();
@@ -527,7 +519,7 @@ namespace SilverSim.Viewer.Core
 
                 foreach (var mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    if (null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethodAttribute)))
+                    if (Attribute.GetCustomAttribute(mi, typeof(IgnoreMethodAttribute)) != null)
                     {
                         continue;
                     }
@@ -581,7 +573,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-                                m_Log.WarnFormat("Tried duplicate registration of generic message {0}", gm.Method.ToString());
+                                m_Log.WarnFormat("Tried duplicate registration of generic message {0}", gm.Method);
                             }
                         }
                     }
@@ -604,7 +596,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-                                m_Log.WarnFormat("Tried duplicate registration of godlike message {0}", gm.Method.ToString());
+                                m_Log.WarnFormat("Tried duplicate registration of godlike message {0}", gm.Method);
                             }
                         }
                     }
@@ -672,7 +664,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        void AddCapabilityExtensions(object o, UUID regionSeedID)
+        private void AddCapabilityExtensions(object o, UUID regionSeedID)
         {
             var types = new List<Type>();
             var tt = o.GetType();
@@ -687,7 +679,7 @@ namespace SilverSim.Viewer.Core
                 foreach (var mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
                     var ca = (CapabilityHandlerAttribute)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandlerAttribute));
-                    if (null == ca)
+                    if (ca == null)
                     {
                         /* not a capability handler */
                     }
@@ -704,7 +696,7 @@ namespace SilverSim.Viewer.Core
                         m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
                     }
                     else if (mi.GetParameters()[0].ParameterType != typeof(ViewerAgent) ||
-                        mi.GetParameters()[1].ParameterType != typeof(AgentCircuit) ||  
+                        mi.GetParameters()[1].ParameterType != typeof(AgentCircuit) ||
                         mi.GetParameters()[2].ParameterType != typeof(HttpRequest))
                     {
                         m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
@@ -723,7 +715,6 @@ namespace SilverSim.Viewer.Core
                             m_Log.Warn(string.Format("Method {0} of {1} failed to instantiate capability {2}", mi.Name, t.Name, ca.Name), e);
                         }
                     }
-
                 }
             }
         }
@@ -731,11 +722,11 @@ namespace SilverSim.Viewer.Core
 
         public AgentCircuit(
             CommandRegistry commands,
-            ViewerAgent agent, 
+            ViewerAgent agent,
             UDPCircuitsManager server,
             UInt32 circuitcode,
-            CapsHttpRedirector capsredirector, 
-            UUID regionSeedID, 
+            CapsHttpRedirector capsredirector,
+            UUID regionSeedID,
             Dictionary<string, string> serviceURLs,
             string gatekeeperURI,
             List<IProtocolExtender> extenders,
@@ -749,7 +740,7 @@ namespace SilverSim.Viewer.Core
             Agent = agent;
             m_CapsRedirector = capsredirector;
             GatekeeperURI = gatekeeperURI;
-            
+
             /* the following two capabilities are mandatory */
             AddCapability("SEED", regionSeedID, RegionSeedHandler);
             AddCapability("EventQueueGet", regionSeedID, Cap_EventQueueGet);
@@ -790,7 +781,7 @@ namespace SilverSim.Viewer.Core
                     {
                         AddMessageRouting(o);
                     }
-                    
+
                     if(interfaces.Contains(typeof(ICapabilityExtender)))
                     {
                         AddCapabilityExtensions(o, regionSeedID);
@@ -810,7 +801,7 @@ namespace SilverSim.Viewer.Core
             {
                 m_CapsRedirector.Caps[kvp.Key].Remove(kvp.Value);
             }
-            if (null != Agent && null != Scene)
+            if (Agent != null && Scene != null)
             {
 #if DEBUG
                 m_Log.DebugFormat("Removing agent {0} from scene {1}", Agent.Owner.FullName, Scene.Name);
@@ -849,7 +840,7 @@ namespace SilverSim.Viewer.Core
         {
             /* we know the message type now, so we have to decode it when possible */
             switch(mType)
-            { 
+            {
                 case MessageType.ScriptDialogReply:
                     /* script dialog uses a different internal format, so we decode it specifically */
                     if(!p.ReadUUID().Equals(AgentID) ||
@@ -1059,7 +1050,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Thread control logic
-        bool m_EventQueueEnabled;
+        private bool m_EventQueueEnabled;
 
         protected override void StartSpecificThreads()
         {
@@ -1086,17 +1077,17 @@ namespace SilverSim.Viewer.Core
 
         protected override void StopSpecificThreads()
         {
-            if(null != m_TextureDownloadThread)
+            if(m_TextureDownloadThread != null)
             {
                 m_TextureDownloadThreadRunning = false;
                 m_TextureDownloadThread = null;
             }
-            if(null != m_InventoryThread)
+            if(m_InventoryThread != null)
             {
                 m_InventoryThreadRunning = false;
                 m_InventoryThread = null;
             }
-            if (null != m_ObjectUpdateThread)
+            if (m_ObjectUpdateThread != null)
             {
                 m_ObjectUpdateThreadRunning = false;
                 m_ObjectUpdateThread = null;

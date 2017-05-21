@@ -37,7 +37,7 @@ namespace SilverSim.ServiceInterfaces.Avatar
     public class AvatarUpdateFailedException : Exception
     {
         public AvatarUpdateFailedException()
-        { 
+        {
         }
 
         public AvatarUpdateFailedException(string message)
@@ -65,31 +65,25 @@ namespace SilverSim.ServiceInterfaces.Avatar
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract string this[UUID avatarID, string itemKey]
-        {
-            get;
-            set;
-        }
+        public abstract string this[UUID avatarID, string itemKey] { get; set; }
 
         public abstract bool TryGetValue(UUID avatarID, string itemKey, out string value);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract List<string> this[UUID avatarID, IList<string> itemKeys]
-        {
-            get;
-            set;
-        }
+        public abstract List<string> this[UUID avatarID, IList<string> itemKeys] { get; set; }
 
         public abstract void Remove(UUID avatarID, IList<string> nameList);
         public abstract void Remove(UUID avatarID, string name);
 
         public void StoreAppeanceInfo(UUID avatarID, AppearanceInfo aInfo)
         {
-            Dictionary<string, string> vals = new Dictionary<string, string>();
-            vals.Add("Serial", aInfo.Serial.ToString());
-            vals.Add("AvatarHeight", aInfo.AvatarHeight.ToString(CultureInfo.InvariantCulture));
+            var vals = new Dictionary<string, string>
+            {
+                ["Serial"] = aInfo.Serial.ToString(),
+                ["AvatarHeight"] = aInfo.AvatarHeight.ToString(CultureInfo.InvariantCulture)
+            };
             bool firstVp = true;
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             foreach(byte b in aInfo.VisualParams)
             {
                 if(!firstVp)
@@ -183,9 +177,11 @@ namespace SilverSim.ServiceInterfaces.Avatar
                     int pos = int.Parse(m.Groups[1].Value);
                     int no = int.Parse(m.Groups[2].Value);
                     var va = kvp.Value.Split(':');
-                    var wi = new AgentWearables.WearableInfo();
-                    wi.ItemID = UUID.Parse(va[0]);
-                    if(va.Length > 1)
+                    var wi = new AgentWearables.WearableInfo()
+                    {
+                        ItemID = UUID.Parse(va[0])
+                    };
+                    if (va.Length > 1)
                     {
                         wi.AssetID = UUID.Parse(va[1]);
                     }

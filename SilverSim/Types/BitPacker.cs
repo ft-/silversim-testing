@@ -123,62 +123,37 @@ namespace SilverSim.Types
 
         public uint UintValue
         {
-            get
-            {
-                return UnpackUnsignedBits(32);
-            }
-            set
-            {
-                PackBits(value, 32);
-            }
+            get { return UnpackUnsignedBits(32); }
+
+            set { PackBits(value, 32); }
         }
 
         public int IntValue
         {
-            get
-            {
-                return UnpackSignedBits(32);
-            }
-            set
-            {
-                PackBits(value, 32);
-            }
+            get { return UnpackSignedBits(32); }
+
+            set { PackBits(value, 32); }
         }
 
         public short ShortValue
         {
-            get
-            {
-                return (short)UnpackSignedBits(16);
-            }
-            set
-            {
-                PackBits(value, 16);
-            }
+            get { return (short)UnpackSignedBits(16); }
+
+            set { PackBits(value, 16); }
         }
 
         public ushort UshortValue
         {
-            get
-            {
-                return (ushort)UnpackUnsignedBits(16);
-            }
-            set
-            {
-                PackBits((uint)value, 16);
-            }
+            get { return (ushort)UnpackUnsignedBits(16); }
+
+            set { PackBits((uint)value, 16); }
         }
 
         public byte ByteValue
         {
-            get
-            {
-                return UnpackBitsFromArray(8)[0];
-            }
-            set
-            {
-                PackBits(value, 8);
-            }
+            get { return UnpackBitsFromArray(8)[0]; }
+
+            set { PackBits(value, 8); }
         }
 
         public UUID UuidValue
@@ -191,7 +166,7 @@ namespace SilverSim.Types
                 }
 
                 var val = new UUID(Data, m_BitPos / 8);
-                m_BitPos += (16 * 8);
+                m_BitPos += 16 * 8;
                 return val;
             }
             set
@@ -201,7 +176,7 @@ namespace SilverSim.Types
                     throw new InvalidOperationException();
                 }
                 value.ToBytes(Data, m_BitPos / 8);
-                m_BitPos += (16 * 8);
+                m_BitPos += 16 * 8;
             }
         }
 
@@ -210,26 +185,16 @@ namespace SilverSim.Types
 
         public bool BoolValue
         {
-            get
-            {
-                return UnpackBitsFromArray(1)[0] != 0;
-            }
-            set
-            {
-                PackBitsToArray(value ? BIT_ON : BIT_OFF, 1);
-            }
+            get { return UnpackBitsFromArray(1)[0] != 0; }
+
+            set { PackBitsToArray(value ? BIT_ON : BIT_OFF, 1); }
         }
 
         public ColorAlpha ColorValue
         {
-            get
-            {
-                return new ColorAlpha(UnpackBitsFromArray(32));
-            }
-            set
-            {
-                PackBitsToArray(value.AsByte, 32);
-            }
+            get { return new ColorAlpha(UnpackBitsFromArray(32)); }
+
+            set { PackBitsToArray(value.AsByte, 32); }
         }
         #endregion
 
@@ -357,7 +322,7 @@ namespace SilverSim.Types
         {
             int count = 0;
             int curBytePos = 0;
-            
+
             while(bitCount > 0)
             {
                 count = bitCount;

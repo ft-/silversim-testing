@@ -70,86 +70,84 @@ namespace SilverSim.Types.Asset
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string FileName
         {
-            get
-            {
-                return "assets/" + ID.ToString() + FileExtension;
-            }
+            get { return "assets/" + ID.ToString() + FileExtension; }
+
             set
             {
                 AssetType type;
-                if(value.EndsWith("_texture.jp2"))
+                if (value.EndsWith("_texture.jp2"))
                 {
                     type = AssetType.Texture;
                 }
-                else if(value.EndsWith("_texture.tga"))
+                else if (value.EndsWith("_texture.tga"))
                 {
                     type = AssetType.TextureTGA;
                 }
-                else if(value.EndsWith("_image.tga"))
+                else if (value.EndsWith("_image.tga"))
                 {
                     type = AssetType.ImageTGA;
                 }
-                else if(value.EndsWith("_image.jpg"))
+                else if (value.EndsWith("_image.jpg"))
                 {
                     type = AssetType.ImageJPEG;
                 }
-                else if(value.EndsWith("_sound.ogg"))
+                else if (value.EndsWith("_sound.ogg"))
                 {
                     type = AssetType.Sound;
                 }
-                else if(value.EndsWith("_sound.wav"))
+                else if (value.EndsWith("_sound.wav"))
                 {
                     type = AssetType.SoundWAV;
                 }
-                else if(value.EndsWith("_callingcard.txt"))
+                else if (value.EndsWith("_callingcard.txt"))
                 {
                     type = AssetType.CallingCard;
                 }
-                else if(value.EndsWith("_landmark.txt"))
+                else if (value.EndsWith("_landmark.txt"))
                 {
                     type = AssetType.Landmark;
                 }
-                else if(value.EndsWith("_clothing.txt"))
+                else if (value.EndsWith("_clothing.txt"))
                 {
                     type = AssetType.Clothing;
                 }
-                else if(value.EndsWith("_object.xml"))
+                else if (value.EndsWith("_object.xml"))
                 {
                     type = AssetType.Object;
                 }
-                else if(value.EndsWith("_notecard.txt"))
+                else if (value.EndsWith("_notecard.txt"))
                 {
                     type = AssetType.Notecard;
                 }
-                else if(value.EndsWith("_script.lsl"))
+                else if (value.EndsWith("_script.lsl"))
                 {
                     type = AssetType.LSLText;
                 }
-                else if(value.EndsWith("_bytecode.lso"))
+                else if (value.EndsWith("_bytecode.lso"))
                 {
                     type = AssetType.LSLBytecode;
                 }
-                else if(value.EndsWith("_bodypart.txt"))
+                else if (value.EndsWith("_bodypart.txt"))
                 {
                     type = AssetType.Bodypart;
                 }
-                else if(value.EndsWith("_animation.bvh"))
+                else if (value.EndsWith("_animation.bvh"))
                 {
                     type = AssetType.Animation;
                 }
-                else if(value.EndsWith("_gesture.txt"))
+                else if (value.EndsWith("_gesture.txt"))
                 {
                     type = AssetType.Gesture;
                 }
-                else if(value.EndsWith("_simstate.bin"))
+                else if (value.EndsWith("_simstate.bin"))
                 {
                     type = AssetType.Simstate;
                 }
-                else if(value.EndsWith("_mesh.llmesh"))
+                else if (value.EndsWith("_mesh.llmesh"))
                 {
                     type = AssetType.Mesh;
                 }
-                else if(value.EndsWith("_material.xml"))
+                else if (value.EndsWith("_material.xml"))
                 {
                     type = AssetType.Material;
                 }
@@ -176,7 +174,7 @@ namespace SilverSim.Types.Asset
                 switch(Type)
                 {
                     case AssetType.Texture: return "image/x-j2c";
-                    case AssetType.TextureTGA: 
+                    case AssetType.TextureTGA:
                     case AssetType.ImageTGA: return "image/tga";
                     case AssetType.ImageJPEG: return "image/jpeg";
                     case AssetType.Sound: return "audio/ogg";

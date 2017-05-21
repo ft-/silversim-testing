@@ -40,10 +40,7 @@ namespace SilverSim.Viewer.Core
             im.OnResult = circuit.OnIMResult;
 
             var server = circuit.Server;
-            if (server != null)
-            {
-                server.RouteIM(im);
-            }
+            server?.RouteIM(im);
         }
     }
 }

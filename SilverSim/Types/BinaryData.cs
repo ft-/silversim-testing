@@ -27,7 +27,7 @@ namespace SilverSim.Types
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class BinaryData : IValue, IEquatable<BinaryData>
     {
-        readonly byte[] m_Data;
+        private readonly byte[] m_Data;
 
         public BinaryData()
         {
@@ -54,14 +54,9 @@ namespace SilverSim.Types
         #region Properties
         public byte this[ulong pos]
         {
-            get
-            {
-                return m_Data[pos];
-            }
-            set
-            {
-                m_Data[pos] = value;
-            }
+            get { return m_Data[pos]; }
+
+            set { m_Data[pos] = value; }
         }
 
         public int Length => m_Data.Length;

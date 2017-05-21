@@ -35,25 +35,21 @@ namespace SilverSim.Types.StructuredData.Llsd
         {
             public InvalidLlsdXmlSerializationException()
             {
-
             }
 
             public InvalidLlsdXmlSerializationException(string message)
                 : base(message)
             {
-
             }
 
             protected InvalidLlsdXmlSerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public InvalidLlsdXmlSerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -160,7 +156,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                         break;
                 }
             }
-
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
@@ -305,7 +300,6 @@ namespace SilverSim.Types.StructuredData.Llsd
                         }
                         return r_val;
                     }
-
                 case "string":
                     if(input.IsEmptyElement)
                     {
@@ -330,7 +324,7 @@ namespace SilverSim.Types.StructuredData.Llsd
                         return UUID.Zero;
                     }
                     return new UUID(GetTextNode(input));
-                    
+
                 default:
                     throw new InvalidLlsdXmlSerializationException();
             }

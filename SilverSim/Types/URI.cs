@@ -25,7 +25,7 @@ namespace SilverSim.Types
 {
     public sealed class URI : IEquatable<URI>, IEquatable<string>, IValue
     {
-        readonly Uri m_Value;
+        private readonly Uri m_Value;
 
         #region Properties
         public ValueType Type => ValueType.URI;
@@ -113,7 +113,7 @@ namespace SilverSim.Types
         public ABoolean AsBoolean => new ABoolean(true);
         public Integer AsInteger => new Integer(1);
         public Quaternion AsQuaternion => new Quaternion(0, 0, 0, 1);
-        public Real AsReal { get { return new Real(1); } }
+        public Real AsReal => new Real(1);
         public AString AsString => new AString(ToString());
         public UUID AsUUID => new UUID();
         public Vector3 AsVector3 => new Vector3(1);

@@ -86,7 +86,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
         }
 
         #region Deserialization Common
-        static void DeserializeStructMember(XmlTextReader reader, Map map)
+        private static void DeserializeStructMember(XmlTextReader reader, Map map)
         {
             var fieldname = string.Empty;
             for (; ; )
@@ -141,7 +141,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static Map DeserializeStruct(XmlTextReader reader)
+        private static Map DeserializeStruct(XmlTextReader reader)
         {
             var iv = new Map();
             for (; ; )
@@ -181,7 +181,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static void DeserializeArrayData(XmlTextReader reader, AnArray ar)
+        private static void DeserializeArrayData(XmlTextReader reader, AnArray ar)
         {
             for (; ; )
             {
@@ -220,7 +220,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static AnArray DeserializeArray(XmlTextReader reader)
+        private static AnArray DeserializeArray(XmlTextReader reader)
         {
             var iv = new AnArray();
             for (; ; )
@@ -260,7 +260,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static readonly string[] Iso8601DateFormats = new string[]
+        private static readonly string[] Iso8601DateFormats = new string[]
         {
             "yyyyMMdd'T'HHmmss",
             "yyyyMMdd'T'HHmmss'Z'",
@@ -268,13 +268,13 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             "yyyyMMdd'T'HHmmsszz"
         };
 
-        static readonly Regex Iso8601DateRegex = new Regex(
+        private static readonly Regex Iso8601DateRegex = new Regex(
             @"(((?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}))|((?<year>\d{4})(?<month>\d{2})(?<day>\d{2})))" +
             "T" +
             @"(((?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2}))|((?<hour>\d{2})(?<minute>\d{2})(?<second>\d{2})))" +
             @"(?<tz>$|Z|([+-]\d{2}:?(\d{2})?))");
 
-        static IValue DeserializeValue(XmlTextReader reader)
+        private static IValue DeserializeValue(XmlTextReader reader)
         {
             IValue iv = null;
             for(;;)
@@ -383,7 +383,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
         #endregion
 
         #region Deserialization (Request)
-        static AnArray DeserializeRequestParams(XmlTextReader reader)
+        private static AnArray DeserializeRequestParams(XmlTextReader reader)
         {
             var array = new AnArray();
             for (; ; )
@@ -419,7 +419,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static XmlRpcRequest DeserializeRequestInner(XmlTextReader reader)
+        private static XmlRpcRequest DeserializeRequestInner(XmlTextReader reader)
         {
             var req = new XmlRpcRequest();
             for (; ; )
@@ -473,7 +473,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
 
         public static XmlRpcRequest DeserializeRequest(XmlTextReader reader)
         {
-            if(null == reader)
+            if(reader == null)
             {
                 throw new ArgumentNullException(nameof(reader));
             }
@@ -508,7 +508,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
         #region Deserialization (Response)
         public static XmlRpcResponse DeserializeResponse(Stream o)
         {
-            if (null == o)
+            if (o == null)
             {
                 throw new ArgumentNullException(nameof(o));
             }
@@ -520,7 +520,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
 
         public static XmlRpcResponse DeserializeResponse(XmlTextReader reader)
         {
-            if(null == reader)
+            if(reader == null)
             {
                 throw new ArgumentNullException(nameof(reader));
             }
@@ -551,7 +551,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static IValue DeserializeResponseParam(XmlTextReader reader)
+        private static IValue DeserializeResponseParam(XmlTextReader reader)
         {
             IValue iv = null;
             for(;;)
@@ -591,7 +591,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static IValue DeserializeFault(XmlTextReader reader)
+        private static IValue DeserializeFault(XmlTextReader reader)
         {
             IValue iv = null;
             for (; ; )
@@ -631,7 +631,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static IValue DeserializeResponseParams(XmlTextReader reader)
+        private static IValue DeserializeResponseParams(XmlTextReader reader)
         {
             IValue iv = null;
             for (; ; )
@@ -671,7 +671,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
-        static XmlRpcResponse DeserializeResponseInner(XmlTextReader reader)
+        private static XmlRpcResponse DeserializeResponseInner(XmlTextReader reader)
         {
             var res = new XmlRpcResponse();
             for (; ; )
@@ -701,7 +701,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                                 else
                                 {
                                     var f = DeserializeFault(reader) as Map;
-                                    if(null != f)
+                                    if(f != null)
                                     {
                                         if(f.ContainsKey("faultCode") && f.ContainsKey("faultString"))
                                         {
@@ -739,7 +739,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
         #endregion
 
         #region Serialization
-        static void Serialize(IValue iv, XmlTextWriter w)
+        private static void Serialize(IValue iv, XmlTextWriter w)
         {
             var t = iv.GetType();
 

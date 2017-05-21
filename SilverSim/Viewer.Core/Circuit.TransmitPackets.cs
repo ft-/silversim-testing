@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
@@ -99,14 +102,13 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-
         #region LLUDP Packet transmitter
 
         /* we limit by amount of acks here (concept from TCP, more or less as window approach) */
         protected int[] m_AckThrottlingCount = new int[(int)Message.QueueOutType.NumQueues];
 
         private static readonly Dictionary<MessageType, Message.QueueOutType> m_QueueOutTable = new Dictionary<MessageType, Message.QueueOutType>();
-        static void InitializeTransmitQueueRouting()
+        private static void InitializeTransmitQueueRouting()
         {
             /* viewers do not wait long for this, so we give them higher priority */
             m_QueueOutTable.Add(MessageType.ImageData, Message.QueueOutType.TextureStart);
@@ -117,7 +119,7 @@ namespace SilverSim.Viewer.Core
             m_QueueOutTable.Add(MessageType.TransferInfo, Message.QueueOutType.Asset);
         }
 
-        void InitializeTransmitQueueing()
+        private void InitializeTransmitQueueing()
         {
             int i;
             for (i = 0; i < m_AckThrottlingCount.Length; ++i)
@@ -141,7 +143,7 @@ namespace SilverSim.Viewer.Core
 
             /* events are not exactly thread-safe, so we have to take the value first */
             var ev = OnTerminateCircuit;
-            if (null != ev)
+            if (ev != null)
             {
                 foreach (var d in ev.GetInvocationList().OfType<Action>())
                 {
@@ -167,11 +169,8 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            var server = m_Server;
-            if (null != server)
-            {
-                server.RemoveCircuit(this);
-            }
+            var server = Server;
+            server?.RemoveCircuit(this);
 
             Stop();
             return;
@@ -230,7 +229,7 @@ namespace SilverSim.Viewer.Core
                     timeout = 0;
                     --qcount;
                     cancelmsg = m as CancelTxThread;
-                    if (null != cancelmsg)
+                    if (cancelmsg != null)
                     {
                         break;
                     }
@@ -283,11 +282,10 @@ namespace SilverSim.Viewer.Core
                         LowPriorityQueue.Enqueue(m);
                     }
                 }
-                if (null != cancelmsg)
+                if (cancelmsg != null)
                 {
                     break;
                 }
-
 
                 for (uint qidx = 0; qidx < (uint)Message.QueueOutType.NumQueues; ++qidx)
                 {
@@ -335,9 +333,7 @@ namespace SilverSim.Viewer.Core
                                 m.Serialize(p);
                                 p.Flush();
                                 p.IsReliable = m.IsReliable;
-                                p.AckMessage = p.IsReliable ?
-                                    m : 
-                                    null;
+                                p.AckMessage = p.IsReliable ? m : null;
                                 p.SequenceNumber = NextSequenceNumber;
                                 p.FinishZLE();
                                 int savedDataLength = p.DataLength;
@@ -362,7 +358,7 @@ namespace SilverSim.Viewer.Core
 
                                     Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
                                 }
-                                m_Server.SendPacketTo(p, RemoteEndPoint);
+                                Server.SendPacketTo(p, RemoteEndPoint);
 
                                 Interlocked.Increment(ref m_PacketsSent);
                                 p.EnqueuedAtTime = Environment.TickCount;
@@ -441,7 +437,7 @@ namespace SilverSim.Viewer.Core
                     p.WriteUInt32(0);
                     try
                     {
-                        m_Server.SendPacketTo(p, RemoteEndPoint);
+                        Server.SendPacketTo(p, RemoteEndPoint);
                         Interlocked.Increment(ref m_PacketsSent);
                     }
                     catch(ObjectDisposedException)
@@ -478,7 +474,7 @@ namespace SilverSim.Viewer.Core
                             c = 0;
                         }
                         p.SequenceNumber = NextSequenceNumber;
-                        m_Server.SendPacketTo(p, RemoteEndPoint);
+                        Server.SendPacketTo(p, RemoteEndPoint);
                         Interlocked.Increment(ref m_PacketsSent);
                     }
                 }

@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateGestureTaskInventory : UploadAssetAbstractCapability
     {
-        sealed class TransactionInfo
+        private sealed class TransactionInfo
         {
             public UUID TaskID;
             public UUID ItemID;
@@ -43,25 +43,13 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        readonly ViewerAgent m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
+        private readonly ViewerAgent m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
 
-        public override string CapabilityName
-        {
-            get
-            {
-                return "UpdateGestureTaskInventory";
-            }
-        }
+        public override string CapabilityName => "UpdateGestureTaskInventory";
 
-        public override int ActiveUploads
-        {
-            get
-            {
-                return m_Transactions.Count;
-            }
-        }
+        public override int ActiveUploads => m_Transactions.Count;
 
         public UpdateGestureTaskInventory(ViewerAgent agent, SceneInterface scene, string serverURI, string remoteip)
             : base(agent.Owner, serverURI, remoteip)
@@ -80,7 +68,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
             KeyValuePair<UUID, TransactionInfo> kvp;
-            if (m_Transactions.RemoveIf(transactionID, delegate(TransactionInfo v) { return true; }, out kvp))
+            if (m_Transactions.RemoveIf(transactionID, (TransactionInfo v) => true, out kvp))
             {
                 var m = new Map();
                 ObjectPartInventoryItem item;
@@ -136,36 +124,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        protected override UUID NewAssetID
-        {
-            get
-            {
-                return UUID.Random;
-            }
-        }
+        protected override UUID NewAssetID => UUID.Random;
 
-        protected override bool AssetIsLocal
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsLocal => false;
 
-        protected override bool AssetIsTemporary
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsTemporary => false;
 
-        protected override AssetType NewAssetType
-        {
-            get
-            {
-                return AssetType.Gesture;
-            }
-        }
+        protected override AssetType NewAssetType => AssetType.Gesture;
     }
 }

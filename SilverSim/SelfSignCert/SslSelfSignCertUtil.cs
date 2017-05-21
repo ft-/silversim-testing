@@ -54,14 +54,18 @@ namespace SilverSim.SelfSignCert
 
             var rawCert = builder.Sign(rsaKey);
 
-            var p12 = new PKCS12();
-            p12.Password = string.Empty;
-            var list = new ArrayList();
-
-            list.Add(new byte[4] { 1, 0, 0, 0 });
-            var attributes = new Hashtable(1);
-            attributes.Add(PKCS9.localKeyId, list);
-
+            var p12 = new PKCS12()
+            {
+                Password = string.Empty
+            };
+            var list = new ArrayList
+            {
+                new byte[4] { 1, 0, 0, 0 }
+            };
+            var attributes = new Hashtable(1)
+            {
+                [PKCS9.localKeyId] = list
+            };
             p12.AddCertificate(new X509Certificate(rawCert), attributes);
             p12.AddPkcs8ShroudedKeyBag(rsaKey, attributes);
             p12.SaveToFile(filename);

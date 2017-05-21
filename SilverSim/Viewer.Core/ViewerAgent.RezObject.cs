@@ -34,12 +34,11 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        sealed class AgentRezObjectHandler  : RezObjectHandler
+        private sealed class AgentRezObjectHandler  : RezObjectHandler
         {
             public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
                 : base(scene, targetpos, assetid, source, rezzingagent, rezparams, itemOwnerPermissions)
             {
-
             }
 
             public override void PostProcessObjectGroups(List<ObjectGroup> grps)
@@ -59,7 +58,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.RezObject)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleRezObject(Message m)
+        public void HandleRezObject(Message m)
         {
             var req = (Messages.Object.RezObject)m;
             if(req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)
@@ -110,17 +109,17 @@ namespace SilverSim.Viewer.Core
                 NextOwnerMask = req.RezData.NextOwnerMask
             };
             var rezHandler = new AgentRezObjectHandler(
-                Circuits[m.CircuitSceneID].Scene, 
-                rezparams.RayEnd, 
-                item.AssetID, 
-                AssetService, 
-                Owner, 
+                Circuits[m.CircuitSceneID].Scene,
+                rezparams.RayEnd,
+                item.AssetID,
+                AssetService,
+                Owner,
                 rezparams);
 
             ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
         }
 
-        void HandleAssetTransferWorkItem(object o)
+        private void HandleAssetTransferWorkItem(object o)
         {
             var wi = (AssetTransferWorkItem)o;
             wi.ProcessAssetTransfer();
@@ -128,7 +127,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.RezObjectFromNotecard)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleRezObjectFromNotecard(Message m)
+        public void HandleRezObjectFromNotecard(Message m)
         {
             var req = (Messages.Object.RezObjectFromNotecard)m;
             if (req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)

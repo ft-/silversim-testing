@@ -29,7 +29,7 @@ namespace SilverSim.Viewer.Core
     /* used on methods compatible with FactoryDelegate */
     public sealed class CapabilityHandlerAttribute : Attribute
     {
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public CapabilityHandlerAttribute(string name)
         {

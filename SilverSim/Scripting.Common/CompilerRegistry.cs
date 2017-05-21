@@ -39,8 +39,9 @@ namespace SilverSim.Scripting.Common
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public class RegistryImpl : IScriptCompilerRegistry
         {
-            readonly RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();
+            private readonly RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();
             public string DefaultCompilerName { get; set; }
+
             public RegistryImpl()
             {
                 DefaultCompilerName = "lsl";
@@ -108,7 +109,7 @@ namespace SilverSim.Scripting.Common
                 return compiler;
             }
 
-            static Assembly ResolveAssembly(object sender, ResolveEventArgs args)
+            private static Assembly ResolveAssembly(object sender, ResolveEventArgs args)
             {
                 var aName = new AssemblyName(args.Name);
 
@@ -136,7 +137,7 @@ namespace SilverSim.Scripting.Common
                 else
                 {
                     var appDom = AppDomain.CreateDomain(
-                        "Script Domain " + assetID.ToString(), 
+                        "Script Domain " + assetID.ToString(),
                         AppDomain.CurrentDomain.Evidence);
                     appDom.AssemblyResolve += ResolveAssembly;
                     appDom.Load("SilverSim.Types");
@@ -173,13 +174,14 @@ namespace SilverSim.Scripting.Common
 
             public class StreamReaderAddHead : TextReader
             {
-                readonly TextReader m_InnerReader;
-                string m_Header;
+                private readonly TextReader m_InnerReader;
+                private string m_Header;
                 public StreamReaderAddHead(string header, TextReader reader)
                 {
                     m_Header = header;
                     m_InnerReader = reader;
                 }
+
                 public override void Close()
                 {
                     m_InnerReader.Close();
@@ -192,9 +194,11 @@ namespace SilverSim.Scripting.Common
                         m_InnerReader.Dispose();
                     }
                 }
+
                 public override int Peek() => m_Header.Length != 0 ?
                         m_Header[0] :
                         m_InnerReader.Peek();
+
                 public override int Read()
                 {
                     if (m_Header.Length != 0)
@@ -208,6 +212,7 @@ namespace SilverSim.Scripting.Common
                         return m_InnerReader.Read();
                     }
                 }
+
                 public override int Read(char[] buffer, int index, int count)
                 {
                     int n = 0;

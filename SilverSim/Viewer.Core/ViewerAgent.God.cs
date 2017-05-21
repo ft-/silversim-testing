@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Core
     {
         [PacketHandler(MessageType.RequestGodlikePowers)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleRequestGodlikePowers(Message p)
+        public void HandleRequestGodlikePowers(Message p)
         {
             var m = (RequestGodlikePowers)p;
             if(m.AgentID != ID || m.SessionID != m.CircuitSessionID)

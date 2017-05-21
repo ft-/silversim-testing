@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable RCS1123
+#pragma warning disable RCS1029
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -41,10 +44,8 @@ namespace SilverSim.Types
 
         public Vector3 AtAxis
         {
-            get
-            {
-                return new Vector3(M11, M21, M31);
-            }
+            get { return new Vector3(M11, M21, M31); }
+
             set
             {
                 M11 = value.X;
@@ -55,10 +56,8 @@ namespace SilverSim.Types
 
         public Vector3 LeftAxis
         {
-            get
-            {
-                return new Vector3(M12, M22, M32);
-            }
+            get { return new Vector3(M12, M22, M32); }
+
             set
             {
                 M12 = value.X;
@@ -69,10 +68,8 @@ namespace SilverSim.Types
 
         public Vector3 UpAxis
         {
-            get
-            {
-                return new Vector3(M13, M23, M33);
-            }
+            get { return new Vector3(M13, M23, M33); }
+
             set
             {
                 M13 = value.X;
@@ -83,10 +80,8 @@ namespace SilverSim.Types
 
         public Vector3 Translate
         {
-            get
-            {
-                return new Vector3(M41, M42, M43);
-            }
+            get { return new Vector3(M41, M42, M43); }
+
             set
             {
                 M41 = value.X;
@@ -225,7 +220,7 @@ namespace SilverSim.Types
 
             // sines
             double sx;
-            double sz; 
+            double sz;
 
             double M13_a = M13;
             if (M13_a < -1f)
@@ -344,30 +339,28 @@ namespace SilverSim.Types
 
         #region Static Methods
 
-        public static Matrix4 operator+(Matrix4 matrix1, Matrix4 matrix2)
+        public static Matrix4 operator +(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4()
         {
-            var matrix = new Matrix4();
-            matrix.M11 = matrix1.M11 + matrix2.M11;
-            matrix.M12 = matrix1.M12 + matrix2.M12;
-            matrix.M13 = matrix1.M13 + matrix2.M13;
-            matrix.M14 = matrix1.M14 + matrix2.M14;
+            M11 = matrix1.M11 + matrix2.M11,
+            M12 = matrix1.M12 + matrix2.M12,
+            M13 = matrix1.M13 + matrix2.M13,
+            M14 = matrix1.M14 + matrix2.M14,
 
-            matrix.M21 = matrix1.M21 + matrix2.M21;
-            matrix.M22 = matrix1.M22 + matrix2.M22;
-            matrix.M23 = matrix1.M23 + matrix2.M23;
-            matrix.M24 = matrix1.M24 + matrix2.M24;
+            M21 = matrix1.M21 + matrix2.M21,
+            M22 = matrix1.M22 + matrix2.M22,
+            M23 = matrix1.M23 + matrix2.M23,
+            M24 = matrix1.M24 + matrix2.M24,
 
-            matrix.M31 = matrix1.M31 + matrix2.M31;
-            matrix.M32 = matrix1.M32 + matrix2.M32;
-            matrix.M33 = matrix1.M33 + matrix2.M33;
-            matrix.M34 = matrix1.M34 + matrix2.M34;
+            M31 = matrix1.M31 + matrix2.M31,
+            M32 = matrix1.M32 + matrix2.M32,
+            M33 = matrix1.M33 + matrix2.M33,
+            M34 = matrix1.M34 + matrix2.M34,
 
-            matrix.M41 = matrix1.M41 + matrix2.M41;
-            matrix.M42 = matrix1.M42 + matrix2.M42;
-            matrix.M43 = matrix1.M43 + matrix2.M43;
-            matrix.M44 = matrix1.M44 + matrix2.M44;
-            return matrix;
-        }
+            M41 = matrix1.M41 + matrix2.M41,
+            M42 = matrix1.M42 + matrix2.M42,
+            M43 = matrix1.M43 + matrix2.M43,
+            M44 = matrix1.M44 + matrix2.M44
+        };
 
         public static Matrix4 CreateFromAxisAngle(Vector3 axis, double angle)
         {
@@ -829,30 +822,28 @@ namespace SilverSim.Types
             M44 = matrix1.M44 * scaleFactor
         };
 
-        public static Matrix4 operator-(Matrix4 matrix)
+        public static Matrix4 operator -(Matrix4 matrix) => new Matrix4()
         {
-            Matrix4 result = new Matrix4();
-            result.M11 = -matrix.M11;
-            result.M12 = -matrix.M12;
-            result.M13 = -matrix.M13;
-            result.M14 = -matrix.M14;
+            M11 = -matrix.M11,
+            M12 = -matrix.M12,
+            M13 = -matrix.M13,
+            M14 = -matrix.M14,
 
-            result.M21 = -matrix.M21;
-            result.M22 = -matrix.M22;
-            result.M23 = -matrix.M23;
-            result.M24 = -matrix.M24;
+            M21 = -matrix.M21,
+            M22 = -matrix.M22,
+            M23 = -matrix.M23,
+            M24 = -matrix.M24,
 
-            result.M31 = -matrix.M31;
-            result.M32 = -matrix.M32;
-            result.M33 = -matrix.M33;
-            result.M34 = -matrix.M34;
+            M31 = -matrix.M31,
+            M32 = -matrix.M32,
+            M33 = -matrix.M33,
+            M34 = -matrix.M34,
 
-            result.M41 = -matrix.M41;
-            result.M42 = -matrix.M42;
-            result.M43 = -matrix.M43;
-            result.M44 = -matrix.M44;
-            return result;
-        }
+            M41 = -matrix.M41,
+            M42 = -matrix.M42,
+            M43 = -matrix.M43,
+            M44 = -matrix.M44
+        };
 
         public static Matrix4 operator -(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4()
         {
@@ -948,7 +939,7 @@ namespace SilverSim.Types
                 throw new ArgumentException("Singular matrix inverse not possible");
             }
 
-            return (Adjoint3x3(matrix) / matrix.Determinant3x3);
+            return Adjoint3x3(matrix) / matrix.Determinant3x3;
         }
 
         public static Matrix4 Adjoint3x3(Matrix4 matrix)
@@ -958,7 +949,7 @@ namespace SilverSim.Types
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    adjointMatrix[i, j] = (Math.Pow(-1, i + j) * (Minor(matrix, i, j).Determinant3x3));
+                    adjointMatrix[i, j] = Math.Pow(-1, i + j) * (Minor(matrix, i, j).Determinant3x3);
                 }
             }
 
@@ -983,7 +974,7 @@ namespace SilverSim.Types
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    adjointMatrix[i, j] = (Math.Pow(-1, i + j) * ((Minor(matrix, i, j)).Determinant));
+                    adjointMatrix[i, j] = Math.Pow(-1, i + j) * ((Minor(matrix, i, j)).Determinant);
                 }
             }
 
@@ -1163,10 +1154,10 @@ namespace SilverSim.Types
                         switch (column)
                         {
                             case 0:
-                                M31 = value; 
+                                M31 = value;
                                 break;
                             case 1:
-                                M32 = value; 
+                                M32 = value;
                                 break;
                             case 2:
                                 M33 = value;
@@ -1185,10 +1176,10 @@ namespace SilverSim.Types
                                 M41 = value;
                                 break;
                             case 1:
-                                M42 = value; 
+                                M42 = value;
                                 break;
                             case 2:
-                                M43 = value; 
+                                M43 = value;
                                 break;
                             case 3:
                                 M44 = value;

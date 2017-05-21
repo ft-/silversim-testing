@@ -52,10 +52,7 @@ namespace SilverSim.Scene.Types.Scene
                 !part.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify) ||
                 !item.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify))
             {
-                if(null != agent)
-                {
-                    agent.SendAlertMessage("NOTIFY: CannotResetSelectObjectsNoPermission", ID);
-                }
+                agent?.SendAlertMessage("NOTIFY: CannotResetSelectObjectsNoPermission", ID);
                 return;
             }
             instance = item.ScriptInstance;
@@ -91,7 +88,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 ItemID = req.ItemID,
                 ObjectID = req.ObjectID,
-                IsRunning = instance != null && instance.IsRunning ? instance.IsRunning : false
+                IsRunning = instance?.IsRunning == true
             };
             agent.SendMessageAlways(reply, ID);
         }
@@ -144,20 +141,14 @@ namespace SilverSim.Scene.Types.Scene
             if(Objects.TryGetValue(req.ObjectID, out iobj))
             {
                 var o = iobj as ObjectGroup;
-                if (o != null)
+                o?.ForEach((ObjectPart p) =>
                 {
-                    o.ForEach((ObjectPart p) =>
+                    p.Inventory.ForEach((ObjectPartInventoryItem i) =>
                     {
-                        p.Inventory.ForEach((ObjectPartInventoryItem i) =>
-                        {
-                            Script.ScriptInstance instance = i.ScriptInstance;
-                            if (instance != null)
-                            {
-                                instance.RevokePermissions(req.AgentID, req.ObjectPermissions);
-                            }
-                        });
+                        Script.ScriptInstance instance = i.ScriptInstance;
+                        instance?.RevokePermissions(req.AgentID, req.ObjectPermissions);
                     });
-                }
+                });
             }
         }
     }

@@ -63,24 +63,12 @@ namespace SilverSim.Types.Grid
 
     public static class TeleportFlagsExtensionMethods
     {
-        public static bool NeedsInitialPosition(this TeleportFlags flags)
-        {
-            return (flags & (TeleportFlags.ViaLogin | TeleportFlags.ViaHGLogin | TeleportFlags.ViaLocation | TeleportFlags.ViaLandmark)) != 0;
-        }
+        public static bool NeedsInitialPosition(this TeleportFlags flags) => (flags & (TeleportFlags.ViaLogin | TeleportFlags.ViaHGLogin | TeleportFlags.ViaLocation | TeleportFlags.ViaLandmark)) != 0;
 
-        public static bool IsLogin(this TeleportFlags flags)
-        {
-            return (flags & (TeleportFlags.ViaLogin | TeleportFlags.ViaHGLogin)) != 0;
-        }
+        public static bool IsLogin(this TeleportFlags flags) => (flags & (TeleportFlags.ViaLogin | TeleportFlags.ViaHGLogin)) != 0;
 
-        public static bool IsGodlike(this TeleportFlags flags)
-        {
-            return (flags & TeleportFlags.Godlike) != 0;
-        }
+        public static bool IsGodlike(this TeleportFlags flags) => (flags & TeleportFlags.Godlike) != 0;
 
-        public static bool IsLure(this TeleportFlags flags)
-        {
-            return (flags & TeleportFlags.ViaLure) != 0;
-        }
+        public static bool IsLure(this TeleportFlags flags) => (flags & TeleportFlags.ViaLure) != 0;
     }
 }

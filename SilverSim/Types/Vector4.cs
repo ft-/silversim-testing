@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable RCS1123
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -92,7 +94,7 @@ namespace SilverSim.Types
         public bool ApproxEquals(Vector4 vec, double tolerance)
         {
             Vector4 diff = this - vec;
-            return (diff.LengthSquared <= tolerance * tolerance);
+            return diff.LengthSquared <= tolerance * tolerance;
         }
 
         public int CompareTo(Vector4 vector)

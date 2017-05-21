@@ -30,7 +30,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void WriteAvatarNameData(XmlTextWriter writer, UUI nd)
+        private void WriteAvatarNameData(XmlTextWriter writer, UUI nd)
         {
             writer.WriteStartElement("map");
 #warning verify expected username handling with viewer source code (GetDisplayNames capability)
@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Core
             writer.WriteEndElement();
         }
 
-        void Cap_GetDisplayNames(HttpRequest httpreq)
+        private void Cap_GetDisplayNames(HttpRequest httpreq)
         {
             if (httpreq.CallerIP != RemoteIP)
             {

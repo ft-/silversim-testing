@@ -98,7 +98,6 @@ namespace SilverSim.Types
         }
         #endregion Serialization
 
-
         #region Operators
         public static Real operator -(Real v) => new Real(-v.m_Value);
 

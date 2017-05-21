@@ -59,9 +59,9 @@ namespace SilverSim.Viewer.Core
             NumStatIndex
         }
 
-        readonly SimStats.Data[] m_SimStatsData = new SimStats.Data[(int)SimStatIndex.NumStatIndex];
+        private readonly SimStats.Data[] m_SimStatsData = new SimStats.Data[(int)SimStatIndex.NumStatIndex];
 
-        void InitSimStats()
+        private void InitSimStats()
         {
             m_SimStatsData[(int)SimStatIndex.TimeDilation] = new SimStats.Data(SimStats.Data.StatType.TimeDilation, 1);
             m_SimStatsData[(int)SimStatIndex.SimFPS] = new SimStats.Data(SimStats.Data.StatType.SimFPS, 0);
@@ -87,9 +87,9 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.SimSpareTimeMs] = new SimStats.Data(SimStats.Data.StatType.SimSpareTimeMs, 0);
         }
 
-        int m_LastPacketsReceived;
-        int m_LastPacketsSent;
-        int m_LastAgentUpdatesReceived;
+        private int m_LastPacketsReceived;
+        private int m_LastPacketsSent;
+        private int m_LastAgentUpdatesReceived;
 
         protected override void SendSimStats(int dt)
         {
@@ -121,7 +121,7 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;
             m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = (double)agentUpdatesReceived * 1000f / dt;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
-            if (null != scene)
+            if (scene != null)
             {
                 m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = scene.Primitives.Count;
                 m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;

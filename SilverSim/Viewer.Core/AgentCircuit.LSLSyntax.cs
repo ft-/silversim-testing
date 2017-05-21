@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void Cap_LSLSyntax(HttpRequest httpreq)
+        private void Cap_LSLSyntax(HttpRequest httpreq)
         {
             if (httpreq.Method != "POST")
             {
@@ -52,7 +52,7 @@ namespace SilverSim.Viewer.Core
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;

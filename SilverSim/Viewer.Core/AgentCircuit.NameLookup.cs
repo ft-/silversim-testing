@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Core
     {
         [PacketHandler(MessageType.UUIDGroupNameRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void GroupNameLookup(Message m)
+        public void GroupNameLookup(Message m)
         {
             var req = (UUIDGroupNameRequest)m;
             var rep = new UUIDGroupNameReply();
@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Core
                 {
                     try
                     {
-                        if (null != groupsService)
+                        if (groupsService != null)
                         {
                             rep.UUIDNameBlock.Add(new UUIDGroupNameReply.Data(groupsService.Groups[Agent.Owner, id]));
                         }
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.UUIDNameRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void UserNameLookup(Message m)
+        public void UserNameLookup(Message m)
         {
             var req = (UUIDNameRequest)m;
             var rep = new UUIDNameReply();

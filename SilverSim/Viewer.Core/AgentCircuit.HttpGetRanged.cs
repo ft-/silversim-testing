@@ -23,14 +23,13 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core
 {
     partial class AgentCircuit
     {
-        void ReturnRangeProcessedAsset(HttpRequest httpreq, AssetData asset, string contentType, string capName)
+        private void ReturnRangeProcessedAsset(HttpRequest httpreq, AssetData asset, string contentType, string capName)
         {
             if (httpreq.ContainsHeader("Range"))
             {

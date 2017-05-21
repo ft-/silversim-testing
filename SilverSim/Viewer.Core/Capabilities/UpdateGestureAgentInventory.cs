@@ -31,32 +31,20 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateGestureAgentInventory : UploadAssetAbstractCapability
     {
-        readonly ViewerAgent m_Agent;
-        readonly InventoryServiceInterface m_InventoryService;
-        readonly AssetServiceInterface m_AssetService;
-        readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
+        private readonly ViewerAgent m_Agent;
+        private readonly InventoryServiceInterface m_InventoryService;
+        private readonly AssetServiceInterface m_AssetService;
+        private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
 
-        public override string CapabilityName
-        {
-            get
-            {
-                return "UpdateGestureAgentInventory";
-            }
-        }
+        public override string CapabilityName => "UpdateGestureAgentInventory";
 
-        public override int ActiveUploads
-        {
-            get
-            {
-                return m_Transactions.Count;
-            }
-        }
+        public override int ActiveUploads => m_Transactions.Count;
 
         public UpdateGestureAgentInventory(
-            ViewerAgent agent, 
-            InventoryServiceInterface inventoryService, 
-            AssetServiceInterface assetService, 
-            string serverURI, 
+            ViewerAgent agent,
+            InventoryServiceInterface inventoryService,
+            AssetServiceInterface assetService,
+            string serverURI,
             string remoteip)
             : base(agent.Owner, serverURI, remoteip)
         {
@@ -75,13 +63,13 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
             KeyValuePair<UUID, UUID> kvp;
-            if (m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
+            if (m_Transactions.RemoveIf(transactionID, (UUID v) => true, out kvp))
             {
                 var m = new Map();
                 InventoryItem item;
                 try
                 {
-                    item = m_InventoryService.Item[m_Creator.ID, kvp.Value];
+                    item = m_InventoryService.Item[Creator.ID, kvp.Value];
                 }
                 catch
                 {
@@ -126,36 +114,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        protected override UUID NewAssetID
-        {
-            get
-            {
-                return UUID.Random;
-            }
-        }
+        protected override UUID NewAssetID => UUID.Random;
 
-        protected override bool AssetIsLocal
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsLocal => false;
 
-        protected override bool AssetIsTemporary
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsTemporary => false;
 
-        protected override AssetType NewAssetType
-        {
-            get
-            {
-                return AssetType.Gesture;
-            }
-        }
+        protected override AssetType NewAssetType => AssetType.Gesture;
     }
 }

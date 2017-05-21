@@ -36,8 +36,8 @@ namespace SilverSim.Scene.Types.WindLight
     {
         public readonly RwLockedList<KeyValuePair<double, string>> DayCycle = new RwLockedList<KeyValuePair<double, string>>();
         public readonly RwLockedDictionary<string, SkyEntry> SkySettings = new RwLockedDictionary<string, SkyEntry>();
-        WaterEntry m_WaterSettings = new WaterEntry();
-        readonly object m_WaterSettingsLock = new object();
+        private WaterEntry m_WaterSettings = new WaterEntry();
+        private readonly object m_WaterSettingsLock = new object();
 
         public WaterEntry WaterSettings
         {
@@ -119,25 +119,21 @@ namespace SilverSim.Scene.Types.WindLight
         {
             public EnvironmentSettingsSerializationException()
             {
-
             }
 
             public EnvironmentSettingsSerializationException(string message)
                 : base(message)
             {
-
             }
 
             protected EnvironmentSettingsSerializationException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
-
             }
 
             public EnvironmentSettingsSerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
-
             }
         }
 
@@ -145,7 +141,7 @@ namespace SilverSim.Scene.Types.WindLight
         {
             var env = new EnvironmentSettings();
             var a = LlsdXml.Deserialize(input) as AnArray;
-            if(null == a)
+            if(a == null)
             {
                 throw new EnvironmentSettingsSerializationException();
             }

@@ -95,7 +95,7 @@ namespace SilverSim.Scene.Types.Scene
         ParcelInfo this[UUID id] { get; }
         ParcelInfo this[Vector3 position] { get; }
         ParcelInfo this[int localID] { get; }
-        
+
         bool TryGetValue(UUID id, out ParcelInfo pinfo);
         bool TryGetValue(Vector3 position, out ParcelInfo pinfo);
         bool TryGetValue(int localID, out ParcelInfo pinfo);
@@ -124,14 +124,14 @@ namespace SilverSim.Scene.Types.Scene
 
         public UUID ID { get; protected set; }
         public UUID ScopeID { get; protected set; }
-        public UUID RegionSecret { get; private set; }
+        public UUID RegionSecret { get; }
         public uint RegionPort { get; protected set; }
         public abstract uint ServerHttpPort { get; }
         public UUID RegionMapTexture { get; protected set; }
         public UUID ParcelMapTexture { get; protected set; }
         public abstract string ServerURI { get; }
-        public uint SizeX { get; private set; }
-        public uint SizeY { get; private set; }
+        public uint SizeX { get; }
+        public uint SizeY { get; }
         public string Name { get; set; }
         public GridVector GridPosition { get; protected set; }
         public abstract ISceneObjects Objects { get; }
@@ -144,10 +144,10 @@ namespace SilverSim.Scene.Types.Scene
         public event Action<SceneInterface> OnRemove;
         public AssetServiceInterface TemporaryAssetService { get; protected set; }
         public AssetServiceInterface PersistentAssetService { get; protected set; }
-        public AssetServiceInterface AssetService { get; private set; }
+        public AssetServiceInterface AssetService { get; }
         public GroupsServiceInterface GroupsService { get; protected set; }
         public GroupsNameServiceInterface GroupsNameService { get; protected set; }
-        public AvatarNameServiceInterface AvatarNameService { get; private set; }
+        public AvatarNameServiceInterface AvatarNameService { get; }
         public IPathfindingService PathfindingService { get; protected set; }
         public readonly RwLockedList<AvatarNameServiceInterface> AvatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
         public readonly RwLockedList<ISceneListener> SceneListeners = new RwLockedList<ISceneListener>();
@@ -156,7 +156,7 @@ namespace SilverSim.Scene.Types.Scene
         public EconomyServiceInterface EconomyService { get; protected set; }
         public EstateServiceInterface EstateService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
-        readonly NotecardCache m_NotecardCache;
+        private readonly NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
         public IScriptWorkerThreadPool ScriptThreadPool { get; protected set; }
@@ -181,10 +181,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool IsSceneEnabled
         {
-            get
-            {
-                return LoginControl.IsLoginEnabled;
-            }
+            get { return LoginControl.IsLoginEnabled; }
+
             set
             {
                 if (value)
@@ -202,8 +200,8 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void LoadSceneSync();
 
         #region Physics
-        IPhysicsScene m_PhysicsScene;
-        readonly object m_PhysicsSceneChangeLock = new object();
+        private IPhysicsScene m_PhysicsScene;
+        private readonly object m_PhysicsSceneChangeLock = new object();
 
         public IPhysicsScene PhysicsScene
         {
@@ -222,10 +220,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 lock (m_PhysicsSceneChangeLock)
                 {
-                    if (null != m_PhysicsScene)
-                    {
-                        m_PhysicsScene.RemoveAll();
-                    }
+                    m_PhysicsScene?.RemoveAll();
                     m_PhysicsScene = value;
                     foreach (ObjectPart p in Primitives)
                     {
@@ -276,17 +271,9 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public RegionAccess Access
-        {
-            get;
-            set;
-        }
+        public RegionAccess Access { get; set; }
 
-        public UUI Owner
-        {
-            get;
-            set;
-        }
+        public UUI Owner { get; set; }
 
         protected virtual object GetService(Type service)
         {
@@ -345,7 +332,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private const uint PARCEL_BLOCK_SIZE = 4;
 
-        void LoginsEnabledHandler(UUID sceneid, bool state)
+        private void LoginsEnabledHandler(UUID sceneid, bool state)
         {
             if (state)
             {
@@ -361,7 +348,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void RelocateRegion(GridVector location);
         public GridServiceInterface RegionStorage { get; set; }
 
-        public SceneInterface(UInt32 sizeX, UInt32 sizeY)
+        protected SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {
             LoginControl = new LoginController(this);
             RegionMapTexture = TextureConstant.DefaultTerrainTexture2; /* set Default terrain Texture 2 as initial RegionMapTexture */
@@ -385,7 +372,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             LoginControl.OnLoginsEnabled -= LoginsEnabledHandler;
             var ev = OnRemove;
-            if (null != ev)
+            if (ev != null)
             {
                 foreach (Action<SceneInterface> del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
                 {
@@ -446,7 +433,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private readonly RwLockedDictionary<UInt32, IObject> m_LocalIDs = new RwLockedDictionary<uint, IObject>();
         private UInt32 m_LastLocalID;
-        readonly object m_LastLocalIDLock = new object();
+        private readonly object m_LastLocalIDLock = new object();
 
         private UInt32 NextLocalID
         {
@@ -469,7 +456,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void AddNewLocalID(IObject v)
         {
-            do
+            while (true)
             {
                 try
                 {
@@ -482,7 +469,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     /* no action required */
                 }
-            } while (true);
+            }
         }
 
         protected void RemoveLocalID(IObject v)

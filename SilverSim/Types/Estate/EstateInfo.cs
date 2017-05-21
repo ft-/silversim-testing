@@ -26,9 +26,9 @@ namespace SilverSim.Types.Estate
         public uint ID;
         public uint ParentEstateID = 1;
         public string Name = "My Estate";
-        public RegionOptionFlags Flags = RegionOptionFlags.AllowDirectTeleport | 
+        public RegionOptionFlags Flags = RegionOptionFlags.AllowDirectTeleport |
             RegionOptionFlags.AllowLandmark |
-            RegionOptionFlags.AllowSetHome | 
+            RegionOptionFlags.AllowSetHome |
             RegionOptionFlags.AllowVoice |
             RegionOptionFlags.ExternallyVisible;
         public UUI Owner = UUI.Unknown;
@@ -42,7 +42,6 @@ namespace SilverSim.Types.Estate
 
         public EstateInfo()
         {
-
         }
 
         public EstateInfo(EstateInfo src)

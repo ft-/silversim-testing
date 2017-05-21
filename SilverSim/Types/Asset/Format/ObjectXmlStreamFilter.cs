@@ -28,39 +28,21 @@ namespace SilverSim.Types.Asset.Format
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class ObjectXmlStreamFilter : Stream
     {
-        readonly byte[] m_Buffer = new byte[10240];
-        int m_BufFill;
-        int m_BufUsed;
-        readonly Stream m_BufInput;
+        private readonly byte[] m_Buffer = new byte[10240];
+        private int m_BufFill;
+        private int m_BufUsed;
+        private readonly Stream m_BufInput;
 
         public ObjectXmlStreamFilter(Stream input)
         {
             m_BufInput = input;
         }
 
-        public override bool CanRead
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanSeek
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
-        public override bool CanWrite
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanWrite => false;
 
         public override void Flush()
         {
@@ -69,22 +51,14 @@ namespace SilverSim.Types.Asset.Format
 
         public override long Length
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
         }
 
         public override long Position
         {
-            get
-            {
-                throw new NotSupportedException();
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get { throw new NotSupportedException(); }
+
+            set { throw new NotSupportedException(); }
         }
 
         public override int Read(byte[] buffer, int offset, int count)

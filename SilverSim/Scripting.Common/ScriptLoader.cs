@@ -33,17 +33,17 @@ namespace SilverSim.Scripting.Common
 {
     public static class ScriptLoader
     {
-        static readonly ReaderWriterLock m_CompilerLock = new ReaderWriterLock();
-        static readonly RwLockedDictionary<UUID, AppDomain> m_LoadedDomains = new RwLockedDictionary<UUID, AppDomain>();
-        static readonly RwLockedDictionary<UUID, IScriptAssembly> m_LoadedAssemblies = new RwLockedDictionary<UUID, IScriptAssembly>();
-        static readonly RwLockedDictionary<UUID, RwLockedList<ScriptInstance>> m_LoadedInstances = new RwLockedDictionary<UUID, RwLockedList<ScriptInstance>>();
+        private static readonly ReaderWriterLock m_CompilerLock = new ReaderWriterLock();
+        private static readonly RwLockedDictionary<UUID, AppDomain> m_LoadedDomains = new RwLockedDictionary<UUID, AppDomain>();
+        private static readonly RwLockedDictionary<UUID, IScriptAssembly> m_LoadedAssemblies = new RwLockedDictionary<UUID, IScriptAssembly>();
+        private static readonly RwLockedDictionary<UUID, RwLockedList<ScriptInstance>> m_LoadedInstances = new RwLockedDictionary<UUID, RwLockedList<ScriptInstance>>();
 
         public static void Remove(UUID assetID, ScriptInstance instance)
         {
             m_CompilerLock.AcquireWriterLock(-1);
             try
             {
-                if(m_LoadedInstances.RemoveIf(assetID, delegate(RwLockedList<ScriptInstance> list)
+                if(m_LoadedInstances.RemoveIf(assetID, (RwLockedList<ScriptInstance> list) =>
                 {
                     list.Remove(instance);
                     return list.Count == 0;
@@ -74,7 +74,7 @@ namespace SilverSim.Scripting.Common
             m_CompilerLock.AcquireReaderLock(-1);
             try
             {
-                var assembly = m_LoadedAssemblies.GetOrAddIfNotExists(data.ID, delegate()
+                var assembly = m_LoadedAssemblies.GetOrAddIfNotExists(data.ID, () =>
                 {
                     using (var reader = new StreamReader(data.InputStream))
                     {

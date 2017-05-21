@@ -27,7 +27,6 @@ namespace SilverSim.Types.Grid
         #region Constructor
         public RegionInfo()
         {
-
         }
 
         public RegionInfo(RegionInfo src)

@@ -19,6 +19,10 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+#pragma warning disable RCS1163
+
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
@@ -28,7 +32,6 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.Groups;
 using SilverSim.Types.Profile;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
@@ -69,13 +72,13 @@ namespace SilverSim.Viewer.Profile
         [GenericMessageHandler("avatarpicksrequest")]
         [GenericMessageHandler("pickinforequest")]
         [GenericMessageHandler("avatarnotesrequest")]
-        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
-        bool m_ShutdownProfile;
-        List<IUserAgentServicePlugin> m_UserAgentServices;
-        List<IProfileServicePlugin> m_ProfileServices;
-        readonly System.Timers.Timer m_CleanupTimer = new System.Timers.Timer(10000);
+        private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        private bool m_ShutdownProfile;
+        private List<IUserAgentServicePlugin> m_UserAgentServices;
+        private List<IProfileServicePlugin> m_ProfileServices;
+        private readonly System.Timers.Timer m_CleanupTimer = new System.Timers.Timer(10000);
 
-        sealed class ProfileServiceData
+        private sealed class ProfileServiceData
         {
             public ProfileServiceInterface ProfileService;
             public UserAgentServiceInterface UserAgentService;
@@ -89,8 +92,8 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        readonly RwLockedDictionary<string, ProfileServiceData> m_LastKnownProfileServices = new RwLockedDictionary<string, ProfileServiceData>();
-        readonly RwLockedDictionary<UUID, KeyValuePair<UUI, int>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UUI, int>>();
+        private readonly RwLockedDictionary<string, ProfileServiceData> m_LastKnownProfileServices = new RwLockedDictionary<string, ProfileServiceData>();
+        private readonly RwLockedDictionary<UUID, KeyValuePair<UUI, int>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UUI, int>>();
 
         public void CleanupTimer(object sender, ElapsedEventArgs e)
         {
@@ -248,14 +251,14 @@ namespace SilverSim.Viewer.Profile
 
         #region Lookup actual service for profile
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        ProfileServiceData LookupProfileService(SceneInterface scene, UUID agentID, out UUI agentUUI)
+        private ProfileServiceData LookupProfileService(SceneInterface scene, UUID agentID, out UUI agentUUI)
         {
             ProfileServiceData serviceData = null;
             ProfileServiceInterface profileService = null;
             UserAgentServiceInterface userAgentService = null;
             agentUUI = UUI.Unknown;
 
-            if(null == profileService)
+            if(profileService == null)
             {
                 try
                 {
@@ -263,11 +266,11 @@ namespace SilverSim.Viewer.Profile
                     agentUUI = agent.Owner;
                     profileService = agent.ProfileService;
                     userAgentService = agent.UserAgentService;
-                    if(null == profileService)
+                    if(profileService == null)
                     {
                         profileService = new DummyProfileService();
                     }
-                    if(null == userAgentService)
+                    if(userAgentService == null)
                     {
                         userAgentService = new DummyUserAgentService();
                     }
@@ -279,7 +282,7 @@ namespace SilverSim.Viewer.Profile
                 }
             }
 
-            if(null == profileService && null == userAgentService)
+            if(profileService == null && userAgentService == null)
             {
                 UUI uui;
                 try
@@ -313,7 +316,7 @@ namespace SilverSim.Viewer.Profile
 
                         if (userAgentService != null)
                         {
-                            if (null == profileService)
+                            if (profileService == null)
                             {
                                 profileService = new DummyProfileService();
                             }
@@ -335,7 +338,7 @@ namespace SilverSim.Viewer.Profile
 
         #region Classifieds
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleDirClassifiedQuery(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleDirClassifiedQuery(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (DirClassifiedQuery)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -347,7 +350,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleAvatarClassifiedsRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
+        private void HandleAvatarClassifiedsRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if(m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -387,9 +390,11 @@ namespace SilverSim.Viewer.Profile
             }
             catch
             {
-                reply = new AvatarClassifiedReply();
-                reply.AgentID = m.AgentID;
-                reply.TargetID = targetuuid;
+                reply = new AvatarClassifiedReply()
+                {
+                    AgentID = m.AgentID,
+                    TargetID = targetuuid
+                };
                 agent.SendMessageAlways(reply, scene.ID);
                 return;
             }
@@ -401,30 +406,34 @@ namespace SilverSim.Viewer.Profile
                     agent.SendMessageAlways(reply, scene.ID);
                     reply = null;
                 }
-                if (null == reply)
+                if (reply == null)
                 {
-                    reply = new AvatarClassifiedReply();
-                    reply.AgentID = m.AgentID;
-                    reply.TargetID = targetuuid;
+                    reply = new AvatarClassifiedReply()
+                    {
+                        AgentID = m.AgentID,
+                        TargetID = targetuuid
+                    };
                     messageFill = 0;
                 }
 
-                AvatarClassifiedReply.ClassifiedData d = new AvatarClassifiedReply.ClassifiedData();
-                d.ClassifiedID = classified.Key;
-                d.Name = classified.Value;
+                var d = new AvatarClassifiedReply.ClassifiedData()
+                {
+                    ClassifiedID = classified.Key,
+                    Name = classified.Value
+                };
                 reply.Data.Add(d);
                 m_ClassifiedQueryCache[classified.Key] = new KeyValuePair<UUI, int>(uui, Environment.TickCount);
                 messageFill += entryLen;
             }
 
-            if (null != reply)
+            if (reply != null)
             {
                 agent.SendMessageAlways(reply, scene.ID);
             }
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleClassifiedInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleClassifiedInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (ClassifiedInfoRequest)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -450,28 +459,29 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-
             try
             {
                 ProfileClassified cls = serviceData.ProfileService.Classifieds[kvp.Key, req.ClassifiedID];
-                var reply = new ClassifiedInfoReply();
-                reply.AgentID = req.AgentID;
+                var reply = new ClassifiedInfoReply()
+                {
+                    AgentID = req.AgentID,
 
-                reply.ClassifiedID = cls.ClassifiedID;
-                reply.CreatorID = cls.Creator.ID;
-                reply.CreationDate = cls.CreationDate;
-                reply.ExpirationDate = cls.ExpirationDate;
-                reply.Category = cls.Category;
-                reply.Name = cls.Name;
-                reply.Description = cls.Description;
-                reply.ParcelID = cls.ParcelID;
-                reply.ParentEstate = cls.ParentEstate;
-                reply.SnapshotID = cls.SnapshotID;
-                reply.SimName = cls.SimName;
-                reply.PosGlobal = cls.GlobalPos;
-                reply.ParcelName = cls.ParcelName;
-                reply.ClassifiedFlags = cls.Flags;
-                reply.PriceForListing = cls.Price;
+                    ClassifiedID = cls.ClassifiedID,
+                    CreatorID = cls.Creator.ID,
+                    CreationDate = cls.CreationDate,
+                    ExpirationDate = cls.ExpirationDate,
+                    Category = cls.Category,
+                    Name = cls.Name,
+                    Description = cls.Description,
+                    ParcelID = cls.ParcelID,
+                    ParentEstate = cls.ParentEstate,
+                    SnapshotID = cls.SnapshotID,
+                    SimName = cls.SimName,
+                    PosGlobal = cls.GlobalPos,
+                    ParcelName = cls.ParcelName,
+                    ClassifiedFlags = cls.Flags,
+                    PriceForListing = cls.Price
+                };
                 agent.SendMessageAlways(reply, scene.ID);
             }
             catch
@@ -481,7 +491,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleClassifiedInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleClassifiedInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (ClassifiedInfoUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -490,7 +500,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            if(null == agent.ProfileService)
+            if(agent.ProfileService == null)
             {
                 return;
             }
@@ -517,7 +527,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleClassifiedDelete(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleClassifiedDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (ClassifiedDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -526,7 +536,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            if(null == agent.ProfileService)
+            if(agent.ProfileService == null)
             {
                 return;
             }
@@ -541,7 +551,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandleClassifiedGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleClassifiedGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (ClassifiedGodDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -555,7 +565,7 @@ namespace SilverSim.Viewer.Profile
 
         #region Notes
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleAvatarNotesRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
+        private void HandleAvatarNotesRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if (m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -584,10 +594,11 @@ namespace SilverSim.Viewer.Profile
                 targetuui = new UUI(targetuuid);
             }
 
-
-            var reply = new AvatarNotesReply();
-            reply.AgentID = m.AgentID;
-            reply.TargetID = targetuui.ID;
+            var reply = new AvatarNotesReply()
+            {
+                AgentID = m.AgentID,
+                TargetID = targetuui.ID
+            };
             try
             {
                 reply.Notes = agent.ProfileService.Notes[agent.Owner, targetuui];
@@ -600,7 +611,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleAvatarNotesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleAvatarNotesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarNotesUpdate)m;
             if(req.AgentID != req.CircuitAgentID ||
@@ -609,7 +620,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            if (null == agent.ProfileService)
+            if (agent.ProfileService == null)
             {
                 return;
             }
@@ -627,7 +638,7 @@ namespace SilverSim.Viewer.Profile
 
         #region Picks
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleAvatarPicksRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
+        private void HandleAvatarPicksRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if(m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -667,9 +678,11 @@ namespace SilverSim.Viewer.Profile
             }
             catch
             {
-                reply = new AvatarPicksReply();
-                reply.AgentID = m.AgentID;
-                reply.TargetID = targetuuid;
+                reply = new AvatarPicksReply()
+                {
+                    AgentID = m.AgentID,
+                    TargetID = targetuuid
+                };
                 agent.SendMessageAlways(reply, scene.ID);
                 return;
             }
@@ -681,29 +694,33 @@ namespace SilverSim.Viewer.Profile
                     agent.SendMessageAlways(reply, scene.ID);
                     reply = null;
                 }
-                if(null == reply)
+                if(reply == null)
                 {
-                    reply = new AvatarPicksReply();
-                    reply.AgentID = m.AgentID;
-                    reply.TargetID = targetuuid;
+                    reply = new AvatarPicksReply()
+                    {
+                        AgentID = m.AgentID,
+                        TargetID = targetuuid
+                    };
                     messageFill = 0;
                 }
 
-                AvatarPicksReply.PickData d = new AvatarPicksReply.PickData();
-                d.PickID = pick.Key;
-                d.Name = pick.Value;
+                var d = new AvatarPicksReply.PickData()
+                {
+                    PickID = pick.Key,
+                    Name = pick.Value
+                };
                 reply.Data.Add(d);
                 messageFill += entryLen;
             }
 
-            if(null != reply)
+            if(reply != null)
             {
                 agent.SendMessageAlways(reply, scene.ID);
             }
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandlePickInfoRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
+        private void HandlePickInfoRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if (m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -743,20 +760,22 @@ namespace SilverSim.Viewer.Profile
             try
             {
                 var pick = serviceData.ProfileService.Picks[uui, pickid];
-                var reply = new PickInfoReply();
-                reply.AgentID = m.AgentID;
-                reply.CreatorID = pick.Creator.ID;
-                reply.Description = pick.Description;
-                reply.IsEnabled = pick.Enabled;
-                reply.Name = pick.Name;
-                reply.OriginalName = pick.OriginalName;
-                reply.ParcelID = pick.ParcelID;
-                reply.PickID = pick.PickID;
-                reply.PosGlobal = pick.GlobalPosition;
-                reply.SnapshotID = pick.SnapshotID;
-                reply.SortOrder = pick.SortOrder;
-                reply.TopPick = pick.TopPick;
-                reply.User = string.Empty;
+                var reply = new PickInfoReply()
+                {
+                    AgentID = m.AgentID,
+                    CreatorID = pick.Creator.ID,
+                    Description = pick.Description,
+                    IsEnabled = pick.Enabled,
+                    Name = pick.Name,
+                    OriginalName = pick.OriginalName,
+                    ParcelID = pick.ParcelID,
+                    PickID = pick.PickID,
+                    PosGlobal = pick.GlobalPosition,
+                    SnapshotID = pick.SnapshotID,
+                    SortOrder = pick.SortOrder,
+                    TopPick = pick.TopPick,
+                    User = string.Empty
+                };
                 agent.SendMessageAlways(reply, scene.ID);
             }
             catch
@@ -766,7 +785,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandlePickInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandlePickInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (PickInfoUpdate)m;
             if(req.AgentID != req.CircuitAgentID ||
@@ -800,7 +819,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandlePickDelete(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandlePickDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (PickDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -825,7 +844,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandlePickGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandlePickGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (PickGodDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -839,7 +858,7 @@ namespace SilverSim.Viewer.Profile
 
         #region User Info
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleUserInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleUserInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (UserInfoRequest)m;
             if (req.CircuitSessionID != req.SessionID ||
@@ -855,10 +874,12 @@ namespace SilverSim.Viewer.Profile
             }
             catch /* yes, we are catching a NullReferenceException here too */
             {
-                prefs = new ProfilePreferences();
-                prefs.IMviaEmail = false;
-                prefs.Visible = false;
-                prefs.User = agent.Owner;
+                prefs = new ProfilePreferences()
+                {
+                    IMviaEmail = false,
+                    Visible = false,
+                    User = agent.Owner
+                };
             }
 
             var reply = new UserInfoReply()
@@ -874,7 +895,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleUpdateUserInfo(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleUpdateUserInfo(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (UpdateUserInfo)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -883,7 +904,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            if(null == agent.ProfileService)
+            if(agent.ProfileService == null)
             {
                 return;
             }
@@ -907,7 +928,7 @@ namespace SilverSim.Viewer.Profile
 
         #region Avatar Properties
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleAvatarPropertiesRequest(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleAvatarPropertiesRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarPropertiesRequest)m;
             if(req.CircuitSessionID != req.SessionID ||
@@ -942,12 +963,14 @@ namespace SilverSim.Viewer.Profile
 #if DEBUG
                 m_Log.Debug("Exception at userinfo request", e);
 #endif
-                userInfo = new UserAgentServiceInterface.UserInfo();
-                userInfo.FirstName = uui.FirstName;
-                userInfo.LastName = uui.LastName;
-                userInfo.UserFlags = 0;
-                userInfo.UserCreated = new Date();
-                userInfo.UserTitle = string.Empty;
+                userInfo = new UserAgentServiceInterface.UserInfo()
+                {
+                    FirstName = uui.FirstName,
+                    LastName = uui.LastName,
+                    UserFlags = 0,
+                    UserCreated = new Date(),
+                    UserTitle = string.Empty
+                };
             }
 
             try
@@ -1001,14 +1024,13 @@ namespace SilverSim.Viewer.Profile
             };
             agent.SendMessageAlways(res2, scene.ID);
 
-
             var res3 = new AvatarGroupsReply()
             {
                 AgentID = req.AgentID,
                 AvatarID = req.AvatarID
             };
             /* when the scene has a groups service, we check which groups the avatar has */
-            if (null != scene.GroupsService)
+            if (scene.GroupsService != null)
             {
                 try
                 {
@@ -1024,7 +1046,6 @@ namespace SilverSim.Viewer.Profile
                             ListInProfile = gmem.IsListInProfile
                         });
                     }
-
                 }
                 catch
 #if DEBUG
@@ -1041,7 +1062,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleAvatarPropertiesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleAvatarPropertiesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarPropertiesUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -1084,7 +1105,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleAvatarInterestsUpdate(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleAvatarInterestsUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarInterestsUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -1123,13 +1144,7 @@ namespace SilverSim.Viewer.Profile
         }
         #endregion
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get 
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public void Shutdown()
         {
@@ -1142,9 +1157,7 @@ namespace SilverSim.Viewer.Profile
     [PluginName("ViewerProfileServer")]
     public class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerProfileServer();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerProfileServer();
     }
 }

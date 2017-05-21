@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void Cap_SimConsoleAsync(HttpRequest httpreq)
+        private void Cap_SimConsoleAsyncCap(HttpRequest httpreq)
         {
             IValue iv;
             if (httpreq.CallerIP != RemoteIP)
@@ -88,9 +88,9 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        sealed class SimConsoleAsyncTTY : TTY
+        private sealed class SimConsoleAsyncTTY : TTY
         {
-            readonly AgentCircuit m_Circuit;
+            private readonly AgentCircuit m_Circuit;
             public bool HaveOutputSent { get; private set; }
             public SimConsoleAsyncTTY(AgentCircuit c)
             {

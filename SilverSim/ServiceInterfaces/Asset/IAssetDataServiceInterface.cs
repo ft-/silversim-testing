@@ -28,10 +28,7 @@ namespace SilverSim.ServiceInterfaces.Asset
     public interface IAssetDataServiceInterface
     {
         #region Data accessors
-        Stream this[UUID key]
-        {
-            get;
-        }
+        Stream this[UUID key] { get; }
 
         bool TryGetValue(UUID key, out Stream s);
         #endregion

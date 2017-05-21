@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void WriteInventoryItem(InventoryItem item, XmlTextWriter writer)
+        private void WriteInventoryItem(InventoryItem item, XmlTextWriter writer)
         {
             writer.WriteKeyValuePair("agent_id", item.Owner.ID);
             writer.WriteKeyValuePair("asset_id", item.AssetID);
@@ -80,7 +80,7 @@ namespace SilverSim.Viewer.Core
             writer.WriteEndElement();
         }
 
-        void Cap_FetchInventory2(HttpRequest httpreq)
+        private void Cap_FetchInventory2(HttpRequest httpreq)
         {
             IValue o;
             if (httpreq.CallerIP != RemoteIP)
@@ -105,13 +105,12 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            Map reqmap = o as Map;
-            if (null == reqmap)
+            var reqmap = o as Map;
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
-
 
             using (var res = httpreq.BeginResponse())
             {
@@ -126,7 +125,7 @@ namespace SilverSim.Viewer.Core
                     foreach (var iv in (AnArray)reqmap["items"])
                     {
                         var itemmap = iv as Map;
-                        if (null == itemmap)
+                        if (itemmap == null)
                         {
                             continue;
                         }

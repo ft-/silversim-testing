@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
@@ -37,19 +40,18 @@ namespace SilverSim.Viewer.Core
     {
         public bool ForceUseCircuitCode;
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
-        public UInt32 CircuitCode { get; private set; }
+        public UInt32 CircuitCode { get; }
         protected BlockingQueue<Message> m_TxQueue = new BlockingQueue<Message>();
         private bool m_TxRunning;
         private Thread m_TxThread;
         private int __SequenceNumber;
-        readonly NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
-        readonly UDPCircuitsManager m_Server;
+        private readonly NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
         public EndPoint RemoteEndPoint;
-        readonly RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
+        private readonly RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
         public int LastMeasuredLatencyTickCount { get; private set; }
         private uint m_LogoutReplySeqNo;
         private bool m_LogoutReplySent;
-        readonly object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
+        private readonly object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
         private int m_LogoutReplySentAtTime;
         private int m_LastReceivedPacketAtTime;
 
@@ -90,22 +92,9 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        internal UDPCircuitsManager Server { get; }
 
-        internal UDPCircuitsManager Server
-        {
-            get
-            {
-                return m_Server;
-            }
-        }
-
-        protected uint NextSequenceNumber
-        {
-            get
-            {
-                return (uint)Interlocked.Increment(ref __SequenceNumber);
-            }
-        }
+        protected uint NextSequenceNumber => (uint)Interlocked.Increment(ref __SequenceNumber);
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
@@ -119,7 +108,7 @@ namespace SilverSim.Viewer.Core
             UDPCircuitsManager server,
             UInt32 circuitcode)
         {
-            m_Server = server;
+            Server = server;
             CircuitCode = circuitcode;
 
             m_LastReceivedPacketAtTime = Environment.TickCount;
@@ -153,7 +142,7 @@ namespace SilverSim.Viewer.Core
             Interlocked.Increment(ref m_PacketsReceived);
 
             /* do we have some acks from the packet's end? */
-            if (null != acknumbers)
+            if (acknumbers != null)
             {
                 int unackedReleasedCount = 0;
                 bool ackedObjects = false;
@@ -170,7 +159,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    if (null != p_acked)
+                    if (p_acked != null)
                     {
                         unackedReleasedCount += p_acked.DataLength;
                         Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
@@ -183,7 +172,7 @@ namespace SilverSim.Viewer.Core
                         {
                             ackedSomethingElse = true;
                         }
-                        if (null != p_acked.AckMessage)
+                        if (p_acked.AckMessage != null)
                         {
                             try
                             {
@@ -228,7 +217,7 @@ namespace SilverSim.Viewer.Core
                 {
                     case MessageType.CompleteAgentMovement:
                         /* Immediate ack */
-                        m_Server.SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), RemoteEndPoint);
+                        Server.SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), RemoteEndPoint);
                         break;
 
                     default:
@@ -258,7 +247,7 @@ namespace SilverSim.Viewer.Core
                                 m_UnackedPacketsHash.Remove(ackno);
                             }
                         }
-                        if (null != p_acked)
+                        if (p_acked != null)
                         {
                             unackedReleasedCount += p_acked.DataLength;
                             Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
@@ -272,7 +261,7 @@ namespace SilverSim.Viewer.Core
                                 ackedSomethingElse = true;
                             }
 
-                            if (null != p_acked.AckMessage)
+                            if (p_acked.AckMessage != null)
                             {
                                 try
                                 {
@@ -319,7 +308,7 @@ namespace SilverSim.Viewer.Core
                     newpck.WriteMessageNumber(MessageType.CompletePingCheck);
                     newpck.WriteUInt8(pingID);
                     newpck.SequenceNumber = NextSequenceNumber;
-                    m_Server.SendPacketTo(newpck, ep);
+                    Server.SendPacketTo(newpck, ep);
                     /* check for unacks */
                     try
                     {
@@ -339,7 +328,7 @@ namespace SilverSim.Viewer.Core
                                 if (Value.ResentCount < 5)
                                 {
                                     Value.TransferredAtTime = Environment.TickCount;
-                                    m_Server.SendPacketTo(Value, RemoteEndPoint);
+                                    Server.SendPacketTo(Value, RemoteEndPoint);
                                 }
                                 ++Value.ResentCount;
                             }
@@ -368,9 +357,10 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Thread control logic
-        readonly object m_ThreadControlLock = new object();
+        private readonly object m_ThreadControlLock = new object();
 
         protected abstract void StartSpecificThreads();
+
         public void Start()
         {
             lock (m_ThreadControlLock)
@@ -386,6 +376,7 @@ namespace SilverSim.Viewer.Core
         }
 
         protected abstract void StopSpecificThreads();
+
         public void Stop()
         {
             lock (m_ThreadControlLock)

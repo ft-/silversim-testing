@@ -34,33 +34,21 @@ namespace SilverSim.ServiceInterfaces.Inventory
         /* DO NOT USE this[UUID key] anywhere else than in a Robust Inventory handler 
          * Not all connectors / services support this access.
          */
-        InventoryFolder this[UUID key]
-        {
-            get;
-        }
+        InventoryFolder this[UUID key] { get; }
         bool TryGetValue(UUID key, out InventoryFolder folder);
         bool ContainsKey(UUID key);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        InventoryFolder this[UUID principalID, UUID key]
-        {
-            get;
-        }
+        InventoryFolder this[UUID principalID, UUID key] { get; }
         bool TryGetValue(UUID principalID, UUID key, out InventoryFolder folder);
         bool ContainsKey(UUID principalID, UUID key);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        InventoryFolder this[UUID principalID, AssetType type]
-        {
-            get;
-        }
+        InventoryFolder this[UUID principalID, AssetType type] { get; }
         bool TryGetValue(UUID principalID, AssetType type, out InventoryFolder folder);
         bool ContainsKey(UUID principalID, AssetType type);
 
-        IInventoryFolderContentServiceInterface Content
-        {
-            get;
-        }
+        IInventoryFolderContentServiceInterface Content { get; }
 
         List<InventoryFolder> GetFolders(UUID principalID, UUID key);
         List<InventoryItem> GetItems(UUID principalID, UUID key);

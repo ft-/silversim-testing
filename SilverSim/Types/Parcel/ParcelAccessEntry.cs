@@ -30,7 +30,6 @@ namespace SilverSim.Types.Parcel
 
         public ParcelAccessEntry()
         {
-
         }
 
         public ParcelAccessEntry(ParcelAccessEntry src)

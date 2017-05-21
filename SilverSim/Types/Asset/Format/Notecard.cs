@@ -81,8 +81,7 @@ namespace SilverSim.Types.Asset.Format
                     {
                         im = LlsdXml.Deserialize(i) as Map;
                     }
-                    if (null != im &&
-                        im.ContainsKey("serial") &&
+                    if (im?.ContainsKey("serial") == true &&
                         im.ContainsKey("height") &&
                         im.ContainsKey("wearables") &&
                         im.ContainsKey("textures") &&
@@ -101,7 +100,7 @@ namespace SilverSim.Types.Asset.Format
                                         foreach (var wi in aw)
                                         {
                                             var awm = wi as Map;
-                                            if (null != awm)
+                                            if (awm != null)
                                             {
                                                 try
                                                 {
@@ -126,7 +125,7 @@ namespace SilverSim.Types.Asset.Format
                                 foreach (var a in attarray)
                                 {
                                     var am = a as Map;
-                                    if (null != am)
+                                    if (am != null)
                                     {
                                         try
                                         {
@@ -157,7 +156,7 @@ namespace SilverSim.Types.Asset.Format
 
         #region Notecard Parser
 
-        string ReadLine(Stream stream)
+        private string ReadLine(Stream stream)
         {
             int c;
             var data = new StringBuilder();
@@ -250,7 +249,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        void ReadInventorySaleInfo(Stream assetdata, ref NotecardInventoryItem item)
+        private void ReadInventorySaleInfo(Stream assetdata, ref NotecardInventoryItem item)
         {
             if(ReadLine(assetdata) != "{")
             {
@@ -295,7 +294,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        NotecardInventoryItem ReadInventoryItem(Stream assetdata)
+        private NotecardInventoryItem ReadInventoryItem(Stream assetdata)
         {
             var item = new NotecardInventoryItem();
             if(ReadLine(assetdata) != "{")
@@ -372,7 +371,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        NotecardInventoryItem ReadInventoryItems(Stream assetdata)
+        private NotecardInventoryItem ReadInventoryItems(Stream assetdata)
         {
             NotecardInventoryItem item = null;
             uint extcharindex = 0;
@@ -412,7 +411,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        void ReadInventory(Stream assetdata)
+        private void ReadInventory(Stream assetdata)
         {
             Inventory = new NotecardInventory();
             if(ReadLine(assetdata) != "{")
@@ -448,7 +447,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        void ReadNotecard(Stream assetdata)
+        private void ReadNotecard(Stream assetdata)
         {
             if(ReadLine(assetdata) != "{")
             {
@@ -526,7 +525,7 @@ namespace SilverSim.Types.Asset.Format
                 "}}\n";
 
         [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
-        static string ItemToString(NotecardInventoryItem item) => string.Format(ItemFormatString,
+        private static string ItemToString(NotecardInventoryItem item) => string.Format(ItemFormatString,
                 item.ExtCharIndex,
                 item.ID, item.ParentFolderID,
                 (uint)item.Permissions.Base,

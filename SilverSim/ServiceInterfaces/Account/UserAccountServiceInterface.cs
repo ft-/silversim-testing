@@ -33,47 +33,34 @@ namespace SilverSim.ServiceInterfaces.Account
     {
         public UserAccountNotFoundException()
         {
-
         }
 
         public UserAccountNotFoundException(string message)
             : base(message)
         {
-
         }
 
         protected UserAccountNotFoundException(SerializationInfo info, StreamingContext context):
             base(info, context)
         {
-
         }
 
         public UserAccountNotFoundException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
     public abstract class UserAccountServiceInterface : IUserAccountDeleteServiceInterface
     {
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract UserAccount this[UUID scopeID, UUID accountID]
-        {
-            get;
-        }
+        public abstract UserAccount this[UUID scopeID, UUID accountID] { get; }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract UserAccount this[UUID scopeID, string email]
-        {
-            get;
-        }
+        public abstract UserAccount this[UUID scopeID, string email] { get; }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract UserAccount this[UUID scopeID, string firstName, string lastName]
-        {
-            get;
-        }
+        public abstract UserAccount this[UUID scopeID, string firstName, string lastName] { get; }
 
         public abstract bool ContainsKey(UUID scopeID, UUID accountID);
         public abstract bool ContainsKey(UUID scopeID, string email);

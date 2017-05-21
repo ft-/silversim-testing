@@ -30,6 +30,13 @@ namespace SilverSim.Scene.Types.Scene
     {
         void SendMessageToAgent(UUID agentID, Message m);
         void ScheduleUpdate(ObjectUpdateInfo info);
-        ICircuit UseSimCircuit(IPEndPoint ep, UUID sessionID, SceneInterface thisScene, UUID remoteSceneID, uint circuitcode, GridVector remoteLocation, Vector3 remoteOffset);
+        ICircuit UseSimCircuit(
+            IPEndPoint ep,
+            UUID sessionID,
+            SceneInterface thisScene,
+            UUID remoteSceneID,
+            uint circuitcode,
+            GridVector remoteLocation,
+            Vector3 remoteOffset);
     }
 }

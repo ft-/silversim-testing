@@ -29,7 +29,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void Cap_GetTexture(HttpRequest httpreq)
+        private void Cap_GetTexture(HttpRequest httpreq)
         {
             var parts = httpreq.RawUrl.Substring(1).Split('/');
 

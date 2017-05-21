@@ -35,9 +35,9 @@ namespace SilverSim.Viewer.Core
     public partial class AgentCircuit
     {
         #region ObjectProperties handler
-        sealed class ObjectPropertiesTriggerMessage : Message
+        private sealed class ObjectPropertiesTriggerMessage : Message
         {
-            readonly AgentCircuit m_Circuit;
+            private readonly AgentCircuit m_Circuit;
 
             public ObjectPropertiesTriggerMessage(AgentCircuit circuit)
             {
@@ -47,10 +47,10 @@ namespace SilverSim.Viewer.Core
 
             public List<ObjectPart> ObjectParts = new List<ObjectPart>();
 
-            void HandleCompletion(bool f)
+            private void HandleCompletion(bool f)
             {
                 ViewerAgent agent = m_Circuit.Agent;
-                if(null == agent)
+                if(agent == null)
                 {
                     return;
                 }
@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Core
                 foreach (var part in ObjectParts)
                 {
                     byte[] propUpdate = part.PropertiesUpdateData;
-                    if (null == propUpdate)
+                    if (propUpdate == null)
                     {
                         return;
                     }
@@ -72,7 +72,7 @@ namespace SilverSim.Viewer.Core
                         props = null;
                     }
 
-                    if (null == props)
+                    if (props == null)
                     {
                         props = new ObjectProperties();
                     }
@@ -81,7 +81,7 @@ namespace SilverSim.Viewer.Core
                     bytelen += propUpdate.Length;
                 }
 
-                if (null != props)
+                if (props != null)
                 {
                     m_Circuit.SendMessage(props);
                 }
@@ -89,7 +89,7 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
-        readonly BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
+        private readonly BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
         private bool m_TriggerFirstUpdate;
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
@@ -103,7 +103,6 @@ namespace SilverSim.Viewer.Core
             m_EnableObjectUpdates = true;
             m_TxObjectQueue.Enqueue(null);
         }
-
 
         private void SendObjectUpdateMsg(UDPPacket p)
         {
@@ -279,7 +278,6 @@ namespace SilverSim.Viewer.Core
 
             while (m_ObjectUpdateThreadRunning)
             {
-
                 if (!((physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100))
                 {
                     try
@@ -309,7 +307,6 @@ namespace SilverSim.Viewer.Core
                         {
                             nonPhysicalOutQueue.Enqueue(objinfo);
                         }
-
                     }
                     catch
                     {
@@ -434,7 +431,7 @@ namespace SilverSim.Viewer.Core
                             else if(isSelected && !wasSelected)
                             {
                                 SendSelectedObjects.Add(ui.Part.ID);
-                                if(null == full_packet_objprop)
+                                if(full_packet_objprop == null)
                                 {
                                     full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
                                 }
@@ -445,7 +442,7 @@ namespace SilverSim.Viewer.Core
                             {
                                 byte[] fullUpdate = ui.FullUpdate;
 
-                                if (null != fullUpdate)
+                                if (fullUpdate != null)
                                 {
                                     if (ui.IsPhysics)
                                     {
@@ -463,12 +460,11 @@ namespace SilverSim.Viewer.Core
                                             phys_full_packet_data = null;
                                         }
 
-                                        if (null == phys_full_packet_data)
+                                        if (phys_full_packet_data == null)
                                         {
                                             phys_full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
                                             phys_full_packet_data_length = 0;
                                         }
-
 
                                         phys_full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
                                         phys_full_packet_data_length += fullUpdate.Length;
@@ -489,12 +485,11 @@ namespace SilverSim.Viewer.Core
                                             nonphys_full_packet_data = null;
                                         }
 
-                                        if (null == nonphys_full_packet_data)
+                                        if (nonphys_full_packet_data == null)
                                         {
                                             nonphys_full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
                                             nonphys_full_packet_data_length = 0;
                                         }
-
 
                                         nonphys_full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
                                         nonphys_full_packet_data_length += fullUpdate.Length;
@@ -505,7 +500,7 @@ namespace SilverSim.Viewer.Core
                             {
                                 byte[] terseUpdate = ui.TerseUpdate;
 
-                                if (null != terseUpdate)
+                                if (terseUpdate != null)
                                 {
                                     if (ui.IsPhysics)
                                     {
@@ -517,7 +512,7 @@ namespace SilverSim.Viewer.Core
                                             phys_terse_packet_count = 0;
                                         }
 
-                                        if (null == phys_terse_packet)
+                                        if (phys_terse_packet == null)
                                         {
                                             phys_terse_packet = GetTxObjectPoolPacket();
                                             if (phys_terse_packet == null)
@@ -543,7 +538,7 @@ namespace SilverSim.Viewer.Core
                                             nonphys_terse_packet_count = 0;
                                         }
 
-                                        if (null == nonphys_terse_packet)
+                                        if (nonphys_terse_packet == null)
                                         {
                                             nonphys_terse_packet = GetTxObjectPoolPacket();
                                             if (nonphys_terse_packet == null)

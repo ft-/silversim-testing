@@ -19,15 +19,16 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.Groups;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Search;
@@ -52,9 +53,9 @@ namespace SilverSim.Viewer.Search
         [PacketHandler(MessageType.DirLandQuery)]
         [PacketHandler(MessageType.DirPopularQuery)]
         [PacketHandler(MessageType.DirFindQuery)]
-        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        bool m_ShutdownSearch;
+        private bool m_ShutdownSearch;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -101,11 +102,11 @@ namespace SilverSim.Viewer.Search
         }
 
         [AgentCircuit.IgnoreMethod]
-        void ProcessDirFindQuery(ViewerAgent agent, AgentCircuit circuit, Message m)
+        private void ProcessDirFindQuery(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
             var req = (DirFindQuery)m;
             SceneInterface scene = circuit.Scene;
-            if(null == scene)
+            if(scene == null)
             {
                 return;
             }
@@ -132,19 +133,20 @@ namespace SilverSim.Viewer.Search
             }
         }
 
-        void ProcessDirFindQuery_People(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
+        private void ProcessDirFindQuery_People(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
         {
             DirPeopleReply res = null;
             var t = new UDPPacket();
 
-            List<UUI> uuis = scene.AvatarNameService.Search(req.QueryText.Split(new char[] {' '}, 2));
-            foreach(UUI uui in uuis)
+            foreach(UUI uui in scene.AvatarNameService.Search(req.QueryText.Split(new char[] {' '}, 2)))
             {
-                if(null == res)
+                if(res == null)
                 {
-                    res = new DirPeopleReply();
-                    res.AgentID = req.AgentID;
-                    res.QueryID = req.QueryID;
+                    res = new DirPeopleReply()
+                    {
+                        AgentID = req.AgentID,
+                        QueryID = req.QueryID
+                    };
                 }
 
                 var d = new DirPeopleReply.QueryReplyData()
@@ -176,12 +178,12 @@ namespace SilverSim.Viewer.Search
             }
         }
 
-        void ProcessDirFindQuery_Groups(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
+        private void ProcessDirFindQuery_Groups(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
         {
             DirGroupsReply res = null;
 
             var groupsService = scene.GroupsService;
-            if(null == groupsService)
+            if(groupsService == null)
             {
                 res = new DirGroupsReply()
                 {
@@ -206,7 +208,7 @@ namespace SilverSim.Viewer.Search
             var t = new UDPPacket();
             foreach (var gi in gis)
             {
-                if (null == res)
+                if (res == null)
                 {
                     res = new DirGroupsReply()
                     {
@@ -238,13 +240,13 @@ namespace SilverSim.Viewer.Search
             }
         }
 
-        void ProcessDirFindQuery_Events(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
+        private void ProcessDirFindQuery_Events(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
         {
 
         }
 
         [AgentCircuit.IgnoreMethod]
-        void ProcessAvatarPickerRequest(ViewerAgent agent, AgentCircuit circuit, Message m)
+        private void ProcessAvatarPickerRequest(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
             var req = (AvatarPickerRequest)m;
             var res = new AvatarPickerReply();
@@ -279,13 +281,15 @@ namespace SilverSim.Viewer.Search
             var results = scene.AvatarNameService.Search(names);
             for(int offset = 0; offset < results.Count && offset < 100; ++offset)
             {
-                var d = new AvatarPickerReply.DataEntry();
-                d.AvatarID = results[offset].ID;
                 string[] sp = results[offset].FullName.Split(new char[] {' '}, 2);
-                d.FirstName = sp[0];
-                d.LastName = (sp.Length > 1) ?
+                var d = new AvatarPickerReply.DataEntry()
+                {
+                    AvatarID = results[offset].ID,
+                    FirstName = sp[0],
+                    LastName = (sp.Length > 1) ?
                     sp[1] :
-                    string.Empty;
+                    string.Empty
+                };
                 res.Data.Add(d);
             }
             agent.SendMessageAlways(res, scene.ID);
@@ -341,8 +345,8 @@ namespace SilverSim.Viewer.Search
                 return;
             }
 
-            int page_size = (string.IsNullOrEmpty(psize) ? 500 : int.Parse(psize));
-            int page_number = (string.IsNullOrEmpty(pnumber) ? 1 : int.Parse(pnumber));
+            int page_size = string.IsNullOrEmpty(psize) ? 500 : int.Parse(psize);
+            int page_number = string.IsNullOrEmpty(pnumber) ? 1 : int.Parse(pnumber);
             SceneInterface scene = circuit.Scene;
             if(scene == null)
             {
@@ -397,13 +401,7 @@ namespace SilverSim.Viewer.Search
             }
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get 
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public void Shutdown()
         {
@@ -414,9 +412,7 @@ namespace SilverSim.Viewer.Search
     [PluginName("ViewerSearch")]
     public class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerSearch();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerSearch();
     }
 }

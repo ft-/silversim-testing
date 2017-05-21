@@ -19,25 +19,24 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Scene.Types.Neighbor;
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.Agent;
-using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        void ChildUpdateOnPositionChange(IObject own)
+        private void ChildUpdateOnPositionChange(IObject own)
         {
             AgentCircuit c;
             if(Circuits.TryGetValue(SceneID, out c))
             {
                 var scene = c.Scene;
-                if(null != scene)
+                if(scene != null)
                 {
                     foreach (var kvp in ActiveChilds)
                     {
@@ -56,22 +55,19 @@ namespace SilverSim.Viewer.Core
                             UpAxis = CameraUpAxis
                         };
                         var childUpdater = kvp.Value.ChildAgentUpdateService;
-                        if (childUpdater != null)
-                        {
-                            childUpdater.SendMessage(m);
-                        }
+                        childUpdater?.SendMessage(m);
                     }
                 }
             }
         }
 
-        void ChildUpdateOnParamChange()
+        private void ChildUpdateOnParamChange()
         {
             AgentCircuit c;
             if (Circuits.TryGetValue(SceneID, out c))
             {
                 var scene = c.Scene;
-                if (null != scene)
+                if (scene != null)
                 {
                     foreach (var kvp in ActiveChilds)
                     {
@@ -112,10 +108,7 @@ namespace SilverSim.Viewer.Core
                         //m.AgentAccessList;
                         //m.AgentInfo;
                         var childUpdater = kvp.Value.ChildAgentUpdateService;
-                        if (childUpdater != null)
-                        {
-                            childUpdater.SendMessage(m);
-                        }
+                        childUpdater?.SendMessage(m);
                     }
                 }
             }

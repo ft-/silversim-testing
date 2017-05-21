@@ -40,7 +40,7 @@ namespace SilverSim.Viewer.Core.Capabilities
     {
         private static readonly ILog m_Log = LogManager.GetLogger("UPDATE SCRIPT TASK");
 
-        sealed class TransactionInfo
+        private sealed class TransactionInfo
         {
             public UUID TaskID;
             public UUID ItemID;
@@ -56,25 +56,13 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        readonly ViewerAgent m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
+        private readonly ViewerAgent m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
 
-        public override string CapabilityName
-        {
-            get
-            {
-                return "UpdateScriptTask";
-            }
-        }
+        public override string CapabilityName => "UpdateScriptTask";
 
-        public override int ActiveUploads
-        {
-            get
-            {
-                return m_Transactions.Count;
-            }
-        }
+        public override int ActiveUploads => m_Transactions.Count;
 
         public UpdateScriptTask(ViewerAgent agent, SceneInterface scene, string serverURI, string remoteip)
             : base(agent.Owner, serverURI, remoteip)
@@ -98,7 +86,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
             KeyValuePair<UUID, TransactionInfo> kvp;
-            if (m_Transactions.RemoveIf(transactionID, delegate(TransactionInfo v) { return true; }, out kvp))
+            if (m_Transactions.RemoveIf(transactionID, (TransactionInfo v) => true, out kvp))
             {
                 var m = new Map();
                 ObjectPartInventoryItem item;
@@ -142,10 +130,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 try
                 {
                     instance = item.RemoveScriptInstance;
-                    if (null != instance)
-                    {
-                        instance.Abort();
-                    }
+                    instance?.Abort();
                 }
                 catch
 #if DEBUG
@@ -185,8 +170,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 catch (Exception e)
                 {
                     m_Log.ErrorFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
-                    var errors = new AnArray();
-                    errors.Add("0:Unexpected compiler error " + e.GetType().Name);
+                    var errors = new AnArray
+                    {
+                        "0:Unexpected compiler error " + e.GetType().Name
+                    };
                     m.Add("errors", errors);
                     m.Add("compiled", false);
                 }
@@ -202,36 +189,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        protected override UUID NewAssetID
-        {
-            get
-            {
-                return UUID.Random;
-            }
-        }
+        protected override UUID NewAssetID => UUID.Random;
 
-        protected override bool AssetIsLocal
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsLocal => false;
 
-        protected override bool AssetIsTemporary
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool AssetIsTemporary => false;
 
-        protected override AssetType NewAssetType
-        {
-            get
-            {
-                return AssetType.LSLText;
-            }
-        }
+        protected override AssetType NewAssetType => AssetType.LSLText;
     }
 }

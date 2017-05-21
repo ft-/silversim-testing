@@ -47,9 +47,9 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
         public class LoginController
         {
-            ReadyFlags m_CurrentFlags = ReadyFlags.ExpectedFlags;
-            readonly object m_Lock = new object();
-            readonly SceneInterface m_Scene;
+            private ReadyFlags m_CurrentFlags = ReadyFlags.ExpectedFlags;
+            private readonly object m_Lock = new object();
+            private readonly SceneInterface m_Scene;
 
             public LoginController(SceneInterface scene)
             {
@@ -61,7 +61,7 @@ namespace SilverSim.Scene.Types.Scene
                 lock(m_Lock)
                 {
                     ReadyFlags oldFlags = m_CurrentFlags;
-                    m_CurrentFlags &= (~lf);
+                    m_CurrentFlags &= ~lf;
                     if (oldFlags != ReadyFlags.None && m_CurrentFlags == ReadyFlags.None)
                     {
                         TriggerLoginsEnabled(true);
@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Types.Scene
             public bool IsLoginEnabled => m_CurrentFlags == ReadyFlags.None;
 
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            void TriggerLoginsEnabled(bool state)
+            private void TriggerLoginsEnabled(bool state)
             {
                 var ev = OnLoginsEnabled;
                 if(ev != null)

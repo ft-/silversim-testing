@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
@@ -31,17 +33,11 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class EstateChangeInfo : ICapabilityInterface
     {
-        readonly SceneInterface m_Scene;
-        readonly ViewerAgent m_Agent;
-        readonly string m_RemoteIP;
+        private readonly SceneInterface m_Scene;
+        private readonly ViewerAgent m_Agent;
+        private readonly string m_RemoteIP;
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "EstateChangeInfo";
-            }
-        }
+        public string CapabilityName => "EstateChangeInfo";
 
         public EstateChangeInfo(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
@@ -73,7 +69,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -102,7 +98,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             {
                 estate.Name = estateName;
                 estate.SunPosition = sun_hour - 6;
-                estate.UseGlobalTime = (sun_hour < 6);
+                estate.UseGlobalTime = sun_hour < 6;
                 if (isSunFixed)
                 {
                     estate.Flags |= RegionOptionFlags.SunFixed;

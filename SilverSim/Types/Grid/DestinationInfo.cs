@@ -30,7 +30,6 @@ namespace SilverSim.Types.Grid
         #region Constructor
         public DestinationInfo()
         {
-
         }
 
         public DestinationInfo(RegionInfo ri)
@@ -85,10 +84,10 @@ namespace SilverSim.Types.Grid
         {
             get
             {
-                if(null == m_SimIP)
+                if (m_SimIP == null)
                 {
                     var addresses = DnsNameCache.GetHostAddresses(ServerIP, true);
-                    if(addresses.Length == 0)
+                    if (addresses.Length == 0)
                     {
                         throw new InvalidOperationException();
                     }
@@ -96,12 +95,10 @@ namespace SilverSim.Types.Grid
                 }
                 return m_SimIP;
             }
-            set
-            {
-                m_SimIP = value;
-            }
+
+            set { m_SimIP = value; }
         }
 
-        EndPoint m_SimIP;
+        private EndPoint m_SimIP;
     }
 }

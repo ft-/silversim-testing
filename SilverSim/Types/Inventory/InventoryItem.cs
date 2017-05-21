@@ -30,13 +30,12 @@ namespace SilverSim.Types.Inventory
         #region Inventory Data
         public UUID ID = UUID.Zero;
         public UUID ParentFolderID = UUID.Zero;
-        string m_Name = string.Empty;
+
+        private string m_Name = string.Empty;
         public string Name
         {
-            get
-            {
-                return m_Name;
-            }
+            get { return m_Name; }
+
             set
             {
                 /* ensure that no non-printable characters manage it into our inventory */
@@ -44,17 +43,12 @@ namespace SilverSim.Types.Inventory
             }
         }
 
-        string m_Description = string.Empty;
+        private string m_Description = string.Empty;
         public string Description
         {
-            get
-            {
-                return m_Description;
-            }
-            set
-            {
-                m_Description = value.FilterToNonControlChars().TrimToMaxLength(127);
-            }
+            get { return m_Description; }
+
+            set { m_Description = value.FilterToNonControlChars().TrimToMaxLength(127); }
         }
 
         public InventoryType InventoryType = InventoryType.Unknown;
@@ -99,8 +93,8 @@ namespace SilverSim.Types.Inventory
                 {
                     switch(Type)
                     {
-                        default:
-                        case SaleType.NoSale: return "not";
+                        case SaleType.NoSale:
+                        default: return "not";
                         case SaleType.Original: return "orig";
                         case SaleType.Copy: return "copy";
                         case SaleType.Content: return "cntn";
@@ -198,26 +192,16 @@ namespace SilverSim.Types.Inventory
         #region Properties
         public string AssetTypeName
         {
-            get
-            {
-                return AssetType.AssetTypeToString();
-            }
-            set
-            {
-                AssetType = value.StringToAssetType();
-            }
+            get { return AssetType.AssetTypeToString(); }
+
+            set { AssetType = value.StringToAssetType(); }
         }
 
         public string InventoryTypeName
         {
-            get
-            {
-                return InventoryType.InventoryTypeToString();
-            }
-            set
-            {
-                InventoryType = value.StringToInventoryType();
-            }
+            get { return InventoryType.InventoryTypeToString(); }
+
+            set { InventoryType = value.StringToInventoryType(); }
         }
         #endregion
     }

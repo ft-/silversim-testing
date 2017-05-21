@@ -77,7 +77,6 @@ namespace SilverSim.Types.Primitive
             return bytes;
         }
 
-
         public TextureAnimationEntry(byte[] data, int pos)
         {
             if (data.Length - pos >= 16)

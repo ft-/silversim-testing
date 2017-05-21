@@ -32,15 +32,15 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        readonly BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
-        int m_EventQueueEventId = 1;
+        private readonly BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
+        private int m_EventQueueEventId = 1;
 
         protected override void SendViaEventQueueGet(Message m)
         {
             m_EventQueue.Enqueue(m);
         }
 
-        void Cap_EventQueueGet(HttpRequest httpreq)
+        private void Cap_EventQueueGet(HttpRequest httpreq)
         {
             if (httpreq.Method != "POST")
             {
@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            if(null == m)
+            if(m == null)
             {
                 using (var res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
                 {

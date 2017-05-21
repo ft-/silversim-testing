@@ -44,7 +44,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private Viewer.Messages.Message AgentToObjectUpdate(IAgent agent)
+        private Message AgentToObjectUpdate(IAgent agent)
         {
             Viewer.Messages.Object.UnreliableObjectUpdate m;
             var sittingOn = agent.SittingOnObject;
@@ -56,15 +56,31 @@ namespace SilverSim.Scene.Types.Scene
             {
                 m = new Viewer.Messages.Object.UnreliableObjectUpdate();
             }
-            var d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData();
-            d.Data = new byte[0];
-            d.ExtraParams = new byte[1];
-            d.FullID = agent.ID;
-            d.LocalID = agent.LocalID;
-            d.Material = PrimitiveMaterial.Flesh;
-            d.MediaURL = string.Empty;
-            d.NameValue = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}", agent.FirstName, agent.LastName, string.Empty);
-            d.ObjectData = new byte[76];
+            var d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData()
+            {
+                Data = new byte[0],
+                ExtraParams = new byte[1],
+                FullID = agent.ID,
+                LocalID = agent.LocalID,
+                Material = PrimitiveMaterial.Flesh,
+                MediaURL = string.Empty,
+                NameValue = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}", agent.FirstName, agent.LastName, string.Empty),
+                ObjectData = new byte[76],
+                PathCurve = 16,
+                PathScaleX = 100,
+                PathScaleY = 100,
+                PCode = PrimitiveCode.Avatar,
+                ProfileCurve = 1,
+                PSBlock = new byte[0],
+                Scale = new Vector3(0.45f, 0.6f, 1.9f),
+                Text = string.Empty,
+                TextColor = new ColorAlpha(0, 0, 0, 0),
+                TextureAnim = new byte[0],
+                TextureEntry = new byte[0],
+                UpdateFlags = PrimitiveFlags.Physics | PrimitiveFlags.ObjectModify | PrimitiveFlags.ObjectCopy | PrimitiveFlags.ObjectAnyOwner |
+                            PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectMove | PrimitiveFlags.InventoryEmpty | PrimitiveFlags.ObjectTransfer |
+                            PrimitiveFlags.ObjectOwnerModify
+            };
             agent.CollisionPlane.ToBytes(d.ObjectData, 0);
             agent.Position.ToBytes(d.ObjectData, 16);
             agent.Velocity.ToBytes(d.ObjectData, 28);
@@ -84,22 +100,7 @@ namespace SilverSim.Scene.Types.Scene
                 d.ParentID = sittingobj.LocalID;
             }
             rot.ToBytes(d.ObjectData, 52);
-            
-            d.PathCurve = 16;
-            d.PathScaleX = 100;
-            d.PathScaleY = 100;
-            d.PCode = PrimitiveCode.Avatar;
-            d.ProfileCurve = 1;
-            d.Material = PrimitiveMaterial.Flesh;
-            d.PSBlock = new byte[0];
-            d.Scale = new Vector3(0.45f, 0.6f, 1.9f);
-            d.Text = string.Empty;
-            d.TextColor = new ColorAlpha(0, 0, 0, 0);
-            d.TextureAnim = new byte[0];
-            d.TextureEntry = new byte[0];
-            d.UpdateFlags = PrimitiveFlags.Physics | PrimitiveFlags.ObjectModify | PrimitiveFlags.ObjectCopy | PrimitiveFlags.ObjectAnyOwner |
-                            PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectMove | PrimitiveFlags.InventoryEmpty | PrimitiveFlags.ObjectTransfer |
-                            PrimitiveFlags.ObjectOwnerModify;
+
             m.ObjectData.Add(d);
             m.GridPosition = GridPosition;
             return m;
@@ -149,7 +150,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             var m = new Viewer.Messages.Object.KillObject();
             m.LocalIDs.AddRange(localids);
-            
+
             foreach(IAgent a in Agents)
             {
                 a.SendMessageAlways(m, ID);

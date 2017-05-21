@@ -107,10 +107,8 @@ namespace SilverSim.Types
 
         public ulong RegionHandle
         {
-            get
-            {
-                return (((ulong)X) << 32) | (ulong)Y;
-            }
+            get { return (((ulong)X) << 32) | (ulong)Y; }
+
             set
             {
                 Y = (uint)(value & 0xFFFFFFFF);
@@ -123,10 +121,11 @@ namespace SilverSim.Types
         public GridVector AlignToZoomlevel(int zoomlevel)
         {
             var zoomborder = (uint)(256 << (zoomlevel - 1));
-            var res = new GridVector();
-            res.X = X - (X % zoomborder);
-            res.Y = Y - (Y % zoomborder);
-            return res;
+            return new GridVector()
+            {
+                X = X - (X % zoomborder),
+                Y = Y - (Y % zoomborder)
+            };
         }
 
         public static GridVector Zero => new GridVector();
@@ -137,26 +136,14 @@ namespace SilverSim.Types
 
         public ushort GridX
         {
-            get
-            {
-                return (ushort)(X / 256);
-            }
-            set
-            {
-                X = (uint)value * 256;
-            }
+            get { return (ushort)(X / 256); }
+            set { X = (uint)value * 256; }
         }
 
         public ushort GridY
         {
-            get
-            {
-                return (ushort)(Y / 256);
-            }
-            set
-            {
-                Y = (uint)value * 256;
-            }
+            get { return (ushort)(Y / 256); }
+            set { Y = (uint)value * 256; }
         }
         #endregion
     }

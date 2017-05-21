@@ -25,11 +25,6 @@ namespace SilverSim.Scene.Types.Physics
 {
     public class DummyPhysicsObject : IPhysicsObject
     {
-        public DummyPhysicsObject()
-        {
-
-        }
-
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
         {
             /* intentionally left empty */
@@ -55,6 +50,7 @@ namespace SilverSim.Scene.Types.Physics
         {
             /* intentionally left empty */
         }
+
         public void SetAppliedTorque(Vector3 value)
         {
             /* intentionally left empty */
@@ -84,34 +80,28 @@ namespace SilverSim.Scene.Types.Physics
 
         public double Buoyancy
         {
-            get
-            {
-                return 0f;
-            }
+            get { return 0f; }
+
             set
             {
                 /* intentionally left empty */
             }
         }
 
-        public bool IsPhysicsActive 
+        public bool IsPhysicsActive
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
+
             set
             {
                 /* intentionally left empty */
             }
         }
 
-        public bool IsPhantom 
+        public bool IsPhantom
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
+
             set
             {
                 /* intentionally left empty */
@@ -120,10 +110,8 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsVolumeDetect
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
+
             set
             {
                 /* intentionally left empty */
@@ -132,10 +120,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsRotateXEnabled
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
 
             set
             {
@@ -145,10 +130,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsRotateYEnabled
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
 
             set
             {
@@ -158,10 +140,7 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsRotateZEnabled
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
 
             set
             {
@@ -171,22 +150,18 @@ namespace SilverSim.Scene.Types.Physics
 
         public void SetHoverHeight(double height, bool water, double tau)
         {
-
         }
 
         public void StopHover()
         {
-
         }
 
         public void SetLookAt(Quaternion q, double strength, double damping)
         {
-
         }
 
         public void StopLookAt()
         {
-
         }
 
         public static readonly DummyPhysicsObject SharedInstance = new DummyPhysicsObject();

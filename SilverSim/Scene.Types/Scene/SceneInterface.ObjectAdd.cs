@@ -35,9 +35,9 @@ namespace SilverSim.Scene.Types.Scene
     {
         [PacketHandler(MessageType.ObjectAdd)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleObjectAdd(Message m)
+        public void HandleObjectAdd(Message m)
         {
-            ObjectAdd p = (ObjectAdd)m;
+            var p = (ObjectAdd)m;
             if(p.CircuitAgentID != p.AgentID ||
                 p.CircuitSessionID != p.SessionID)
             {
@@ -51,8 +51,10 @@ namespace SilverSim.Scene.Types.Scene
         {
             var rezparams = new RezObjectParams();
             var group = new Object.ObjectGroup();
-            var part = new ObjectPart();
-            part.ID = UUID.Random;
+            var part = new ObjectPart()
+            {
+                ID = UUID.Random
+            };
             group.Add(1, part.ID, part);
             group.Name = "Primitive";
             IAgent agent = Agents[p.AgentID];

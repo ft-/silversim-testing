@@ -20,23 +20,20 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectMediaNavigate : ICapabilityInterface
     {
-        readonly UUI m_Agent;
-        readonly SceneInterface m_Scene;
-        readonly string m_RemoteIP;
+        private readonly UUI m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly string m_RemoteIP;
 
         public ObjectMediaNavigate(UUI agent, SceneInterface scene, string remoteip)
         {
@@ -45,15 +42,9 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "ObjectMediaNavigate";
-            }
-        }
+        public string CapabilityName => "ObjectMediaNavigate";
 
-        bool CheckUrlAgainstWhiteList(string rawUrl, PrimitiveMedia.Entry entry)
+        private bool CheckUrlAgainstWhiteList(string rawUrl, PrimitiveMedia.Entry entry)
         {
             var url = new Uri(rawUrl);
 
@@ -114,7 +105,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (null == reqmap)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -129,7 +120,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             try
             {
                 entry = part.Media[textureIndex];
-                if(null == entry)
+                if(entry == null)
                 {
                     /* nothing to do */
                 }
@@ -137,8 +128,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 {
                     /* permission is okay when anyone is enabled */
                 }
-                else if(0 != (entry.InteractPermissions & PrimitiveMediaPermission.Owner) && 
-                    part.ObjectGroup.Owner.EqualsGrid(m_Agent) && 
+                else if(0 != (entry.InteractPermissions & PrimitiveMediaPermission.Owner) &&
+                    part.ObjectGroup.Owner.EqualsGrid(m_Agent) &&
                     !part.ObjectGroup.IsGroupOwned)
                 {
                     /* permission is okay when group is allowed and agent is group member */
@@ -150,7 +141,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 else
                 {
                     var groupsService = part.ObjectGroup.Scene.GroupsService;
-                    if(null != groupsService)
+                    if(groupsService != null)
                     {
                         UGI groupID = part.ObjectGroup.Group;
                         if(!groupsService.Memberships.ContainsKey(m_Agent, groupID, m_Agent))

@@ -31,13 +31,7 @@ namespace SilverSim.Viewer.Core.Capabilities
     {
         public readonly Map Features = new Map();
 
-        public string CapabilityName 
-        { 
-            get
-            {
-                return "SimulatorFeatures";
-            }
-        }
+        public string CapabilityName => "SimulatorFeatures";
 
         public SimulatorFeatures(string searchUrl, string gridName, string gridURL, bool exportSupported)
         {

@@ -29,28 +29,23 @@ namespace SilverSim.Types.AuthInfo
     {
         public PasswordAuthenticationFailedException()
         {
-
         }
 
         public PasswordAuthenticationFailedException(string message)
              : base(message)
         {
-
         }
 
         protected PasswordAuthenticationFailedException(SerializationInfo info, StreamingContext context)
         : base(info, context)
         {
-
         }
 
         public PasswordAuthenticationFailedException(string message, Exception innerException)
         : base(message, innerException)
         {
-
         }
     }
-
 
     public struct UserAuthInfo
     {
@@ -60,10 +55,8 @@ namespace SilverSim.Types.AuthInfo
 
         public string Password
         {
-            get
-            {
-                throw new NotSupportedException("Password");
-            }
+            get { throw new NotSupportedException("Password"); }
+
             set
             {
                 PasswordSalt = UUID.Random.ToString().ComputeMD5();
@@ -82,7 +75,6 @@ namespace SilverSim.Types.AuthInfo
             {
                 throw new PasswordAuthenticationFailedException("Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
-
         }
     }
 }

@@ -245,7 +245,6 @@ namespace SilverSim.Types
                 throw new XmlException();
             }
             return res;
-
         }
 
         public static byte[] ReadContentAsBase64(this XmlTextReader reader)
@@ -620,7 +619,6 @@ namespace SilverSim.Types
                                 return int.TryParse(val, out ival) && ival != 0;
                             }
                         }
-
                     case XmlNodeType.EndElement:
                         if (reader.Name != tagname)
                         {
@@ -633,6 +631,5 @@ namespace SilverSim.Types
                 }
             }
         }
-
     }
 }

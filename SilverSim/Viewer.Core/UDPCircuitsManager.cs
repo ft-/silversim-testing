@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
@@ -56,22 +59,22 @@ namespace SilverSim.Viewer.Core
     public partial class UDPCircuitsManager : IUDPCircuitsManager
     {
         private static readonly ILog m_Log = LogManager.GetLogger("UDP CIRCUITS MANAGER");
-        readonly IPAddress m_BindAddress;
-        readonly Socket m_UdpSocket;
-        readonly RwLockedDoubleDictionary<EndPoint, uint, Circuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, Circuit>();
-        bool m_InboundRunning;
-        readonly IMServiceInterface m_IMService;
-        readonly ChatServiceInterface m_ChatService;
-        readonly BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
-        readonly RwLockedDictionary<UUID, ViewerAgent> m_Agents = new RwLockedDictionary<UUID, ViewerAgent>();
-        readonly Thread m_ChatThread;
-        readonly object m_UseCircuitCodeProcessingLock = new object();
-        
+        private readonly IPAddress m_BindAddress;
+        private readonly Socket m_UdpSocket;
+        private readonly RwLockedDoubleDictionary<EndPoint, uint, Circuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, Circuit>();
+        private bool m_InboundRunning;
+        private readonly IMServiceInterface m_IMService;
+        private readonly ChatServiceInterface m_ChatService;
+        private readonly BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
+        private readonly RwLockedDictionary<UUID, ViewerAgent> m_Agents = new RwLockedDictionary<UUID, ViewerAgent>();
+        private readonly Thread m_ChatThread;
+        private readonly object m_UseCircuitCodeProcessingLock = new object();
+
         public SceneInterface Scene { get; private set; }
         public bool LogAssetFailures;
         public bool LogTransferPacket;
 
-        readonly List<IPortControlServiceInterface> m_PortControlServices;
+        private readonly List<IPortControlServiceInterface> m_PortControlServices;
 
         public int LocalPort { get; }
 
@@ -88,7 +91,7 @@ namespace SilverSim.Viewer.Core
             /* trigger early init of UDPPacketDecoder. We do not want this to happen on first teleport */
             AgentCircuit.m_PacketDecoder.CheckInit();
             m_UdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            
+
             try
             {
                 if (m_UdpSocket.Ttl < 128)
@@ -170,15 +173,15 @@ namespace SilverSim.Viewer.Core
                 {
                     break;
                 }
-                else if(ev is ListenEvent && null != m_ChatService)
+                else if(ev is ListenEvent)
                 {
-                    m_ChatService.Send((ListenEvent)ev);
+                    m_ChatService?.Send((ListenEvent)ev);
                 }
             }
         }
         #endregion
 
-        readonly object m_ThreadControlLock = new object();
+        private readonly object m_ThreadControlLock = new object();
         public void Start()
         {
             lock(m_ThreadControlLock)
@@ -223,15 +226,15 @@ namespace SilverSim.Viewer.Core
         }
 
         #region UDP Receive Handler
-        void BeginUdpReceive()
+        private void BeginUdpReceive()
         {
             var pck = new UDPReceivePacket();
-            
+
             m_UdpSocket.BeginReceiveFrom(pck.Data, 0, pck.Data.Length, SocketFlags.None, ref pck.RemoteEndPoint,
                 UdpReceiveEndHandler, pck);
         }
 
-        bool VerifyEndpointAddress(AgentCircuit circ, EndPoint newEp)
+        private bool VerifyEndpointAddress(AgentCircuit circ, EndPoint newEp)
         {
             if (circ.RemoteEndPoint.AddressFamily != newEp.AddressFamily)
             {
@@ -243,7 +246,7 @@ namespace SilverSim.Viewer.Core
             {
                 var ep1 = circ.RemoteEndPoint as IPEndPoint;
                 var ep2 = newEp as IPEndPoint;
-                if(null == ep1 || null == ep2)
+                if(ep1 == null || ep2 == null)
                 {
                     return false;
                 }
@@ -261,7 +264,7 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        void UdpReceiveEndHandler(IAsyncResult ar)
+        private void UdpReceiveEndHandler(IAsyncResult ar)
         {
             Circuit circuit;
             var pck = (UDPReceivePacket)ar.AsyncState;
@@ -303,7 +306,7 @@ namespace SilverSim.Viewer.Core
                                 var sessionID = pck.ReadUUID();
                                 var agentID = pck.ReadUUID();
                                 var acircuit = circuit as AgentCircuit;
-                                if (null != acircuit)
+                                if (acircuit != null)
                                 {
                                     /* there it is check for SessionID and AgentID */
                                     if (!acircuit.SessionID.Equals(sessionID) ||
@@ -446,18 +449,12 @@ namespace SilverSim.Viewer.Core
 
         public void RouteIM(GridInstantMessage im)
         {
-            if (null != m_IMService)
-            {
-                m_IMService.Send(im);
-            }
+            m_IMService?.Send(im);
         }
 
         public void RouteChat(ListenEvent ev)
         {
-            if (null != m_ChatService)
-            {
-                m_ChatService.Send(ev);
-            }
+            m_ChatService?.Send(ev);
         }
 
         public void AddCircuit(Circuit c)
@@ -466,7 +463,7 @@ namespace SilverSim.Viewer.Core
             try
             {
                 var ac = c as AgentCircuit;
-                if (null != ac)
+                if (ac != null)
                 {
                     m_Agents.Add(ac.AgentID, ac.Agent);
                 }
@@ -481,7 +478,7 @@ namespace SilverSim.Viewer.Core
         public void RemoveCircuit(Circuit c)
         {
             var ac = c as AgentCircuit;
-            if (null != ac)
+            if (ac != null)
             {
                 m_Agents.Remove(ac.AgentID);
             }

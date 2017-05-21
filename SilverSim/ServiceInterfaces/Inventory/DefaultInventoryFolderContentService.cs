@@ -28,7 +28,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
 {
     public class DefaultInventoryFolderContentService : IInventoryFolderContentServiceInterface
     {
-        readonly IInventoryFolderServiceInterface m_Service;
+        private readonly IInventoryFolderServiceInterface m_Service;
 
         public DefaultInventoryFolderContentService(IInventoryFolderServiceInterface service)
         {
@@ -78,7 +78,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public InventoryFolderContent this[UUID principalID, UUID folderID]
         {
-            get 
+            get
             {
                 var folderContent = new InventoryFolderContent();
                 InventoryFolder folder = m_Service[principalID, folderID];

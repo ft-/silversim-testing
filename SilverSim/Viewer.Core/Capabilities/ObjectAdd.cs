@@ -37,17 +37,11 @@ namespace SilverSim.Viewer.Core.Capabilities
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class ObjectAdd : ICapabilityInterface
     {
-        readonly SceneInterface m_Scene;
-        readonly UUI m_Creator;
-        readonly string m_RemoteIP;
+        private readonly SceneInterface m_Scene;
+        private readonly UUI m_Creator;
+        private readonly string m_RemoteIP;
 
-        public string CapabilityName
-        {
-            get
-            {
-                return "ObjectAdd";
-            }
-        }
+        public string CapabilityName => "ObjectAdd";
 
         public ObjectAdd(SceneInterface scene, UUI creator, string remoteip)
         {
@@ -56,18 +50,18 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_RemoteIP = remoteip;
         }
 
-        UInt32 BinToUInt(IValue v)
+        private UInt32 BinToUInt(IValue v)
         {
-            BinaryData bd = v as BinaryData;
-            if (null == bd)
+            var bd = v as BinaryData;
+            if (bd == null)
             {
-                throw new ArgumentOutOfRangeException("v");
+                throw new ArgumentOutOfRangeException(nameof(v));
             }
 
             byte[] b = bd;
             if(b.Length != 4)
             {
-                throw new ArgumentOutOfRangeException("v");
+                throw new ArgumentOutOfRangeException(nameof(v));
             }
 
             if(BitConverter.IsLittleEndian)
@@ -107,14 +101,16 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            if(null == rm)
+            if(rm == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 
-            var m = new Messages.Object.ObjectAdd();
-            m.AgentID = m_Creator.ID;
+            var m = new Messages.Object.ObjectAdd()
+            {
+                AgentID = m_Creator.ID
+            };
             try
             {
                 if (rm.ContainsKey("ObjectData"))

@@ -26,15 +26,15 @@ namespace SilverSim.Threading
 {
     public static class ThreadManager
     {
-        static readonly RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
+        private static readonly RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
 
         public static IList<Thread> Threads => new List<Thread>(m_Threads);
 
-        class ThreadStartContext
+        private class ThreadStartContext
         {
             internal Thread Thread;
-            readonly ThreadStart m_Start;
-            readonly ParameterizedThreadStart m_ParameterizedStart;
+            private readonly ThreadStart m_Start;
+            private readonly ParameterizedThreadStart m_ParameterizedStart;
 
             public ThreadStartContext(ThreadStart start)
             {
@@ -72,6 +72,7 @@ namespace SilverSim.Threading
                 }
             }
         }
+
         public static Thread CreateThread(ThreadStart start)
         {
             var tsc = new ThreadStartContext(start);
@@ -103,6 +104,5 @@ namespace SilverSim.Threading
             tsc.Thread = t;
             return t;
         }
-
     }
 }

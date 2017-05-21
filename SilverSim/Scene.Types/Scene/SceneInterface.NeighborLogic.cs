@@ -55,15 +55,15 @@ namespace SilverSim.Scene.Types.Scene
         public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
         public TryGetSceneDelegate TryGetScene;
 
-        readonly RwLockedList<UUID> m_ChatPassInEnableLocal = new RwLockedList<UUID>();
-        readonly RwLockedList<UUID> m_ChatPassInEnableGlobal = new RwLockedList<UUID>();
-        bool m_ChatPassInEnableSetToLocal;
+        private readonly RwLockedList<UUID> m_ChatPassInEnableLocal = new RwLockedList<UUID>();
+        private readonly RwLockedList<UUID> m_ChatPassInEnableGlobal = new RwLockedList<UUID>();
+        private bool m_ChatPassInEnableSetToLocal;
 
-        readonly RwLockedList<UUID> m_ChatPassOutEnableLocal = new RwLockedList<UUID>();
-        readonly RwLockedList<UUID> m_ChatPassOutEnableGlobal = new RwLockedList<UUID>();
-        bool m_ChatPassOutEnableSetToLocal;
+        private readonly RwLockedList<UUID> m_ChatPassOutEnableLocal = new RwLockedList<UUID>();
+        private readonly RwLockedList<UUID> m_ChatPassOutEnableGlobal = new RwLockedList<UUID>();
+        private bool m_ChatPassOutEnableSetToLocal;
 
-        void ChatPassEnableUpdated(
+        private void ChatPassEnableUpdated(
            RwLockedList<UUID> locallist,
            RwLockedList<UUID> globallist,
            ref bool settolocal,
@@ -170,10 +170,10 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
 
-                if(null != kvp.Value.RemoteCircuit)
+                if(kvp.Value.RemoteCircuit != null)
                 {
                     Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;
-                    if (newPosition.X >= -le.Distance && 
+                    if (newPosition.X >= -le.Distance &&
                         newPosition.Y >= -le.Distance &&
                         newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&
                         newPosition.Y <= kvp.Value.RemoteRegionData.Size.Y + le.Distance)
@@ -191,7 +191,7 @@ namespace SilverSim.Scene.Types.Scene
                         });
                     }
                 }
-                else if (null != m_TryGetScene && m_TryGetScene(kvp.Key, out remoteScene))
+                else if (m_TryGetScene != null && m_TryGetScene(kvp.Key, out remoteScene))
                 {
                     Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;
                     if (newPosition.X >= -le.Distance &&
@@ -224,7 +224,7 @@ namespace SilverSim.Scene.Types.Scene
             Neighbors.Remove(rinfo.ID);
         }
 
-        void CheckAgentsForNeighbors()
+        private void CheckAgentsForNeighbors()
         {
             foreach(IAgent ag in RootAgents)
             {
@@ -235,7 +235,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void VerifyNeighbor(RegionInfo rinfo)
+        private void VerifyNeighbor(RegionInfo rinfo)
         {
             if(rinfo.ServerURI == ServerURI)
             {
@@ -285,7 +285,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        void EnableSimCircuit(RegionInfo destinationInfo, out UUID sessionID, out uint circuitCode)
+        private void EnableSimCircuit(RegionInfo destinationInfo, out UUID sessionID, out uint circuitCode)
         {
             var reqmap = new Map
             {
@@ -305,17 +305,14 @@ namespace SilverSim.Scene.Types.Scene
             var ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
 
             Map resmap;
-            using(var responseStream = 
+            using(var responseStream =
                 HttpClient.DoStreamRequest(
-                    "POST", 
+                    "POST",
                     destinationInfo.ServerURI + "circuit",
                     null,
                     "application/llsd+xml",
                     reqdata.Length,
-                    delegate(Stream s)
-                    {
-                        s.Write(reqdata, 0, reqdata.Length);
-                    },
+                    (Stream s) => s.Write(reqdata, 0, reqdata.Length),
                     false,
                     10000,
                     null))

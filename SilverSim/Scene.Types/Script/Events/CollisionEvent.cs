@@ -33,6 +33,7 @@ namespace SilverSim.Scene.Types.Script.Events
             Start,
             End
         }
+
         public CollisionType Type;
         public List<DetectInfo> Detected { get; set; }
     }

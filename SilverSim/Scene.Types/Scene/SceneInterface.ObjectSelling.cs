@@ -38,7 +38,6 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-
         [PacketHandler(MessageType.ObjectSaleInfo)]
         public void HandleObjectSaleInfo(Message m)
         {
@@ -113,7 +112,6 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             continue;
                         }
-
                     }
 
                     if (d.SaleType != InventoryItem.SaleInfoData.SaleType.NoSale)
@@ -152,26 +150,20 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        struct ObjectBuyListen
+        private struct ObjectBuyListen
         {
             public UUID PrimitiveID;
             public UUID ItemID;
 
             public string Key
             {
-                get
-                {
-                    return GetKey(PrimitiveID, ItemID);
-                }
+                get { return GetKey(PrimitiveID, ItemID); }
             }
 
-            public static string GetKey(UUID primID, UUID itemID)
-            {
-                return primID.ToString() + "-" + itemID.ToString();
-            }
+            public static string GetKey(UUID primID, UUID itemID) => primID.ToString() + "-" + itemID.ToString();
         }
 
-        readonly RwLockedDictionary<string, ObjectBuyListen> m_ObjectBuyListeners = new RwLockedDictionary<string, ObjectBuyListen>();
+        private readonly RwLockedDictionary<string, ObjectBuyListen> m_ObjectBuyListeners = new RwLockedDictionary<string, ObjectBuyListen>();
 
         public void AddObjectBuyListen(ScriptInstance instance)
         {
@@ -179,11 +171,11 @@ namespace SilverSim.Scene.Types.Scene
             ObjectPartInventoryItem item = instance.Item;
             if(part != null && item != null)
             {
-                UUID partID = part.ID;
-                UUID itemID = item.ID;
-                ObjectBuyListen listen = new ObjectBuyListen();
-                listen.PrimitiveID = partID;
-                listen.ItemID = itemID;
+                var listen = new ObjectBuyListen()
+                {
+                    PrimitiveID = part.ID,
+                    ItemID = item.ID
+                };
                 m_ObjectBuyListeners.Add(listen.Key, listen);
             }
         }
@@ -396,7 +388,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public class ObjectBuyTransferItem : ObjectTransferItem
         {
-            readonly UUID m_SellingPrimitiveID;
+            private readonly UUID m_SellingPrimitiveID;
 
             public ObjectBuyTransferItem(
                 IAgent agent,
@@ -430,14 +422,12 @@ namespace SilverSim.Scene.Types.Scene
                             part.Owner.EqualsGrid(sellOwner))
                         {
                             ScriptInstance script = item.ScriptInstance;
-                            if (script != null)
-                            {
-                                ItemSoldEvent ev = new ItemSoldEvent();
-                                ev.Agent = m_DestinationAgent;
-                                ev.ObjectID = m_SellingPrimitiveID;
-                                ev.ObjectName = part.Name;
-                                script.PostEvent(ev);
-                            }
+                            script?.PostEvent(new ItemSoldEvent()
+                                {
+                                    Agent = m_DestinationAgent,
+                                    ObjectID = m_SellingPrimitiveID,
+                                    ObjectName = part.Name
+                                });
                         }
                     }
                 }

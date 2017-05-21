@@ -27,10 +27,7 @@ namespace SilverSim.Viewer.Core
     {
         public override Quaternion CameraRotation
         {
-            get
-            {
-                return Quaternion.Axes2Rot(CameraAtAxis, CameraLeftAxis, CameraUpAxis);
-            }
+            get { return Quaternion.Axes2Rot(CameraAtAxis, CameraLeftAxis, CameraUpAxis); }
 
             set
             {
@@ -40,10 +37,10 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        Vector3 m_CameraAtAxis;
-        Vector3 m_CameraLeftAxis;
-        Vector3 m_CameraUpAxis;
-        Vector3 m_CameraPosition;
+        private Vector3 m_CameraAtAxis;
+        private Vector3 m_CameraLeftAxis;
+        private Vector3 m_CameraUpAxis;
+        private Vector3 m_CameraPosition;
 
         public override Vector3 CameraPosition
         {

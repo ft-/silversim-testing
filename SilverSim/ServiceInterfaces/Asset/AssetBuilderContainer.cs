@@ -30,8 +30,8 @@ namespace SilverSim.ServiceInterfaces.Asset
 {
     public class AssetBuilderContainer : AssetServiceInterface, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
-        readonly RwLockedDictionary<UUID, AssetData> m_Assets = new RwLockedDictionary<UUID, AssetData>();
-        readonly DefaultAssetReferencesService m_DefReferences;
+        private readonly RwLockedDictionary<UUID, AssetData> m_Assets = new RwLockedDictionary<UUID, AssetData>();
+        private readonly DefaultAssetReferencesService m_DefReferences;
 
         public AssetBuilderContainer()
         {

@@ -33,10 +33,10 @@ namespace SilverSim.Scene.Types.Scene
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class NotecardCache
     {
-        readonly SceneInterface m_Scene;
-        readonly RwLockedDictionary<UUID, Notecard> m_Notecards = new RwLockedDictionary<UUID, Notecard>();
-        readonly RwLockedDictionary<UUID, int> m_LastAccessed = new RwLockedDictionary<UUID, int>();
-        readonly Timer m_Timer = new Timer(1);
+        private readonly SceneInterface m_Scene;
+        private readonly RwLockedDictionary<UUID, Notecard> m_Notecards = new RwLockedDictionary<UUID, Notecard>();
+        private readonly RwLockedDictionary<UUID, int> m_LastAccessed = new RwLockedDictionary<UUID, int>();
+        private readonly Timer m_Timer = new Timer(1);
 
         public NotecardCache(SceneInterface scene)
         {
@@ -82,10 +82,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
 
                 m_LastAccessed[assetid] = Environment.TickCount;
-                return m_Notecards.GetOrAddIfNotExists(assetid, delegate()
-                {
-                    return new Notecard(asset);
-                });
+                return m_Notecards.GetOrAddIfNotExists(assetid, () => new Notecard(asset));
             }
         }
     }

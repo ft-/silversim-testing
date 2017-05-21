@@ -29,7 +29,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        void Cap_MeshUploadFlag(HttpRequest httpreq)
+        private void Cap_MeshUploadFlag(HttpRequest httpreq)
         {
             if (httpreq.Method != "GET")
             {
@@ -40,15 +40,17 @@ namespace SilverSim.Viewer.Core
                 using (var res = httpreq.BeginResponse())
                 {
                     res.ContentType = "application/llsd+xml";
-                    var m = new Map();
-                    m.Add("username", Agent.FirstName + "." + Agent.LastName);
-                    m.Add("display_name_next_update", new Date());
-                    m.Add("legacy_first_name", Agent.FirstName);
-                    m.Add("mesh_upload_status", "valid");
-                    m.Add("display_name", Agent.FirstName + " " + Agent.LastName);
-                    m.Add("legacy_last_name", Agent.LastName);
-                    m.Add("id", Agent.ID);
-                    m.Add("is_display_name_default", false);
+                    var m = new Map
+                    {
+                        { "username", Agent.FirstName + "." + Agent.LastName },
+                        { "display_name_next_update", new Date() },
+                        { "legacy_first_name", Agent.FirstName },
+                        { "mesh_upload_status", "valid" },
+                        { "display_name", Agent.FirstName + " " + Agent.LastName },
+                        { "legacy_last_name", Agent.LastName },
+                        { "id", Agent.ID },
+                        { "is_display_name_default", false }
+                    };
                     using (var o = res.GetOutputStream())
                     {
                         LlsdXml.Serialize(m, o);

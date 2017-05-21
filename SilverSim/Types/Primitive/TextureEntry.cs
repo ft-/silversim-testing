@@ -30,16 +30,16 @@ namespace SilverSim.Types.Primitive
     {
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int MAX_TEXTURE_FACES = 32;
-        readonly TextureEntryFace[] m_FaceTextures = new TextureEntryFace[MAX_TEXTURE_FACES];
+        private readonly TextureEntryFace[] m_FaceTextures = new TextureEntryFace[MAX_TEXTURE_FACES];
         public TextureEntryFace DefaultTexture;
         public static readonly UUID WHITE_TEXTURE = "5748decc-f629-461c-9a36-a35a221fe21f";
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
 
         public TextureEntry()
         {
             DefaultTexture = new TextureEntryFace(null);
         }
-        
+
         public TextureEntry(byte[] data, int pos, int length)
         {
             FromBytes(data, pos, length);
@@ -151,7 +151,7 @@ namespace SilverSim.Types.Primitive
             return offset / 32767.0f;
         }
 
-        const float TwoPi = (float)Math.PI * 2;
+        private const float TwoPi = (float)Math.PI * 2;
         private static float TERotationFloat(byte[] bytes, int pos) => (bytes[pos] | (bytes[pos + 1] << 8)) / 32768.0f * TwoPi;
 
         private static float TEGlowFloat(byte[] bytes, int pos) => bytes[pos] / 255.0f;
@@ -384,7 +384,6 @@ namespace SilverSim.Types.Primitive
             }
             #endregion MaterialID
         }
-
 
         private static byte TEGlowByte(float glow) => (byte)(glow * 255.0f);
 

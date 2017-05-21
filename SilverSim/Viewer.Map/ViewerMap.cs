@@ -19,11 +19,13 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Threading;
@@ -49,15 +51,15 @@ namespace SilverSim.Viewer.Map
 
         [PacketHandler(MessageType.MapBlockRequest)]
         [PacketHandler(MessageType.MapNameRequest)]
-        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapBlocksRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapBlocksRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         [PacketHandler(MessageType.MapLayerRequest)]
         [PacketHandler(MessageType.MapItemRequest)]
-        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        List<IForeignGridConnectorPlugin> m_ForeignGridConnectorPlugins;
-        SceneList m_Scenes;
-        bool m_ShutdownMap;
+        private List<IForeignGridConnectorPlugin> m_ForeignGridConnectorPlugins;
+        private SceneList m_Scenes;
+        private bool m_ShutdownMap;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -125,7 +127,7 @@ namespace SilverSim.Viewer.Map
 
         #region MapNameRequest and MapBlockRequest
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleMapBlockRequest(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleMapBlockRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var results = new List<MapBlockReply.DataEntry>();
             var req = (MapBlockRequest)m;
@@ -168,7 +170,7 @@ namespace SilverSim.Viewer.Map
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleMapNameRequest(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleMapNameRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (MapNameRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -273,7 +275,7 @@ namespace SilverSim.Viewer.Map
                 }
                 else if(ri != null)
                 {
-                    var hgLoc = agent.CacheHgDestination(ri);
+                    var hgLoc = agent.CacheInterGridDestination(ri);
                     results.Add(new MapBlockReply.DataEntry()
                     {
                         /* we map foreign grid locations in specific agent only */
@@ -329,7 +331,7 @@ namespace SilverSim.Viewer.Map
             SendMapBlocks(agent, scene, req.Flags, results);
         }
 
-        void SendMapBlocks(ViewerAgent agent, SceneInterface scene, MapAgentFlags mapflags, List<MapBlockReply.DataEntry> mapBlocks)
+        private void SendMapBlocks(ViewerAgent agent, SceneInterface scene, MapAgentFlags mapflags, List<MapBlockReply.DataEntry> mapBlocks)
         {
             mapBlocks.Add(new MapBlockReply.DataEntry()
             {
@@ -349,13 +351,13 @@ namespace SilverSim.Viewer.Map
             foreach(var d in mapBlocks)
             {
                 int mapBlockDataSize = 27 + d.Name.Length;
-                if (mapBlockReplySize + mapBlockDataSize > 1400 && null != replymsg)
+                if (mapBlockReplySize + mapBlockDataSize > 1400 && replymsg != null)
                 {
                     agent.SendMessageAlways(replymsg, scene.ID);
                     replymsg = null;
                 }
 
-                if (null == replymsg)
+                if (replymsg == null)
                 {
                     replymsg = new MapBlockReply()
                     {
@@ -369,7 +371,7 @@ namespace SilverSim.Viewer.Map
                 replymsg.Data.Add(d);
             }
 
-            if(null != replymsg)
+            if(replymsg != null)
             {
                 agent.SendMessageAlways(replymsg, scene.ID);
             }
@@ -378,7 +380,7 @@ namespace SilverSim.Viewer.Map
 
         #region MapItemRequest
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        void HandleMapItemRequest(ViewerAgent agent, SceneInterface scene, Message m)
+        private void HandleMapItemRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (MapItemRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -387,18 +389,19 @@ namespace SilverSim.Viewer.Map
                 return;
             }
 
-            var reply = new MapItemReply();
-            reply.AgentID = agent.ID;
-            reply.Flags = req.Flags;
-            reply.ItemType = req.ItemType;
-
+            var reply = new MapItemReply()
+            {
+                AgentID = agent.ID,
+                Flags = req.Flags,
+                ItemType = req.ItemType
+            };
             SceneInterface accessScene = null;
             if(req.Location.RegionHandle == 0 ||
                 req.Location.Equals(scene.GridPosition))
             {
                 accessScene = scene;
             }
-            else 
+            else
             {
                 try
                 {
@@ -413,20 +416,22 @@ namespace SilverSim.Viewer.Map
             switch(req.ItemType)
             {
                 case MapItemType.AgentLocations:
-                    if(null != accessScene)
+                    if(accessScene != null)
                     {
                         /* local */
                         foreach(var sceneagent in accessScene.Agents)
                         {
                             if(sceneagent.IsInScene(accessScene) && !sceneagent.Owner.Equals(agent.Owner) && sceneagent is ViewerAgent)
                             {
-                                var d = new MapItemReply.DataEntry();
-                                d.X = (ushort)sceneagent.GlobalPosition.X;
-                                d.Y = (ushort)sceneagent.GlobalPosition.Y;
-                                d.ID = UUID.Zero;
-                                d.Name = sceneagent.Owner.FullName;
-                                d.Extra = 1;
-                                d.Extra2 = 0;
+                                var d = new MapItemReply.DataEntry()
+                                {
+                                    X = (ushort)sceneagent.GlobalPosition.X,
+                                    Y = (ushort)sceneagent.GlobalPosition.Y,
+                                    ID = UUID.Zero,
+                                    Name = sceneagent.Owner.FullName,
+                                    Extra = 1,
+                                    Extra2 = 0
+                                };
                                 reply.Data.Add(d);
                             }
                         }
@@ -438,7 +443,7 @@ namespace SilverSim.Viewer.Map
                     break;
 
                 case MapItemType.LandForSale:
-                    if(null != accessScene)
+                    if(accessScene != null)
                     {
                         /* local */
                         foreach(var parcel in accessScene.Parcels)
@@ -465,7 +470,7 @@ namespace SilverSim.Viewer.Map
                     break;
 
                 case MapItemType.Telehub:
-                    if(null != accessScene)
+                    if(accessScene != null)
                     {
                         /* local */
                     }
@@ -479,13 +484,7 @@ namespace SilverSim.Viewer.Map
         }
         #endregion
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get 
-            {
-                return ShutdownOrder.LogoutRegion;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public void Shutdown()
         {
@@ -496,9 +495,7 @@ namespace SilverSim.Viewer.Map
     [PluginName("ViewerMap")]
     public class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerMap();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerMap();
     }
 }

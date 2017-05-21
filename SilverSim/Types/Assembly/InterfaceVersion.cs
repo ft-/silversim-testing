@@ -21,12 +21,10 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 
 namespace SilverSim.Types.Assembly
 {
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
-    [ComVisible(true)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class InterfaceVersionAttribute : Attribute
     {

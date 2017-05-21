@@ -19,7 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Scene;
@@ -80,9 +82,7 @@ namespace SilverSim.Viewer.TerrainEdit
     [PluginName("ViewerTerrainEdit")]
     public class Factory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ViewerTerrainEdit();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ViewerTerrainEdit();
     }
 }

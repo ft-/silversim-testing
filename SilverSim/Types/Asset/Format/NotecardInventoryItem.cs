@@ -25,11 +25,8 @@ namespace SilverSim.Types.Asset.Format
 {
     public class NotecardInventoryItem : InventoryItem
     {
-        #region Fields
         public uint ExtCharIndex;
-        #endregion
 
-        #region Constructor
         public NotecardInventoryItem()
         {
         }
@@ -53,7 +50,5 @@ namespace SilverSim.Types.Asset.Format
             Permissions = item.Permissions;
             SaleInfo = item.SaleInfo;
         }
-
-        #endregion
     }
 }

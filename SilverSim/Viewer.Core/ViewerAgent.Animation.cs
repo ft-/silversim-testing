@@ -31,15 +31,12 @@ namespace SilverSim.Viewer.Core
     {
         protected override void SendAnimations(AvatarAnimation m)
         {
-            Circuits.ForEach(delegate(AgentCircuit c)
-            {
-                c.Scene.SendAgentAnimToAllAgents(m);
-            });
+            Circuits.ForEach((AgentCircuit c) => c.Scene.SendAgentAnimToAllAgents(m));
         }
 
         [PacketHandler(MessageType.AgentAnimation)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        void HandleAgentAnimation(Message m)
+        public void HandleAgentAnimation(Message m)
         {
             var req = (AgentAnimation)m;
 

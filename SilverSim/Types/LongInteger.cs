@@ -113,7 +113,7 @@ namespace SilverSim.Types
         }
 
         #region Serialization
-        public void FromBytes(byte[] byteArray, int pos, bool normalized)
+        public void FromBytes(byte[] byteArray, int pos)
         {
             if (!BitConverter.IsLittleEndian)
             {

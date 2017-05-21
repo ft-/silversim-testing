@@ -35,12 +35,12 @@ namespace SilverSim.Scene.Types.Transfer
 {
     public abstract class RezObjectHandler : AssetTransferWorkItem
     {
-        static readonly ILog m_Log = LogManager.GetLogger("REZOBJECT");
-        readonly SceneInterface m_Scene;
-        readonly Vector3 m_TargetPos;
-        readonly UUI m_RezzingAgent;
-        readonly InventoryPermissionsMask m_ItemOwnerPermissions;
-        readonly SceneInterface.RezObjectParams m_RezParams;
+        private static readonly ILog m_Log = LogManager.GetLogger("REZOBJECT");
+        private readonly SceneInterface m_Scene;
+        private readonly Vector3 m_TargetPos;
+        private readonly UUI m_RezzingAgent;
+        private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
+        private readonly SceneInterface.RezObjectParams m_RezParams;
 
         public abstract void PostProcessObjectGroups(List<ObjectGroup> grp);
 
@@ -58,7 +58,7 @@ namespace SilverSim.Scene.Types.Transfer
         {
             IAgent agent;
             if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
-            { 
+            {
                 agent.SendAlertMessage(msg, m_Scene.ID);
             }
         }
@@ -70,7 +70,7 @@ namespace SilverSim.Scene.Types.Transfer
             List<ObjectGroup> objgroups;
             try
             {
-                data = m_Scene.AssetService[m_AssetID];
+                data = m_Scene.AssetService[AssetID];
             }
             catch
             {

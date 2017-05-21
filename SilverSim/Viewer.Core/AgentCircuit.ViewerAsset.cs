@@ -27,9 +27,9 @@ using System.Net;
 
 namespace SilverSim.Viewer.Core
 {
-    partial class AgentCircuit
+    public partial class AgentCircuit
     {
-        void Cap_ViewerAsset(HttpRequest httpreq)
+        private void Cap_ViewerAsset(HttpRequest httpreq)
         {
             if (httpreq.CallerIP != RemoteIP)
             {

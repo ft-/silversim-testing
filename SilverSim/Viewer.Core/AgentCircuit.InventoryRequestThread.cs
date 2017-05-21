@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Core
         private const int MAX_FOLDERS_PER_PACKET = 6;
         private const int MAX_ITEMS_PER_PACKET = 5;
 
-        private void SendAssetNotFound(Messages.Transfer.TransferRequest req)
+        private void SendAssetNotFound(TransferRequest req)
         {
             var res = new TransferInfo()
             {
@@ -261,9 +261,8 @@ namespace SilverSim.Viewer.Core
                         return;
                     }
                 }
-
             }
-            else if (req.SourceType == Messages.Transfer.SourceType.Asset)
+            else if (req.SourceType == SourceType.Asset)
             {
                 assetID = new UUID(req.Params, 0);
                 denyLSLTextViaDirect = true;
@@ -309,7 +308,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            if(null == asset)
+            if(asset == null)
             {
                 /* safe guard here */
                 SendAssetNotFound(req);
@@ -423,7 +422,6 @@ namespace SilverSim.Viewer.Core
                         item.Permissions.EveryOne &= item.Permissions.NextOwner;
                     }
                     item.Owner = Agent.Owner;
-
                 }
                 catch
                 {
@@ -457,7 +455,6 @@ namespace SilverSim.Viewer.Core
 
             try
             {
-
                 InventoryFolder folder;
                 if(!Agent.InventoryService.Folder.ContainsKey(AgentID, req.ParentFolderID))
                 {
@@ -512,7 +509,7 @@ namespace SilverSim.Viewer.Core
                     continue;
                 }
 
-                if (null == res)
+                if (res == null)
                 {
                     res = new FetchInventoryReply()
                     {
@@ -552,7 +549,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            if (null != res)
+            if (res != null)
             {
                 SendMessage(res);
             }
@@ -606,7 +603,7 @@ namespace SilverSim.Viewer.Core
             {
                 foreach (InventoryFolder folder in folders)
                 {
-                    if (null == res)
+                    if (res == null)
                     {
                         res = new InventoryDescendents()
                         {
@@ -632,7 +629,7 @@ namespace SilverSim.Viewer.Core
                         res = null;
                     }
                 }
-                if (null != res)
+                if (res != null)
                 {
                     SendMessage(res);
                     message_sent = true;
@@ -644,7 +641,7 @@ namespace SilverSim.Viewer.Core
             {
                 foreach (InventoryItem item in items)
                 {
-                    if (null == res)
+                    if (res == null)
                     {
                         res = new InventoryDescendents()
                         {
@@ -687,7 +684,7 @@ namespace SilverSim.Viewer.Core
                         res = null;
                     }
                 }
-                if (null != res)
+                if (res != null)
                 {
                     SendMessage(res);
                     message_sent = true;
@@ -926,7 +923,7 @@ namespace SilverSim.Viewer.Core
                         EveryOne = d.EveryoneMask,
                         Group = d.GroupMask
                     };
-                    if ((item.Permissions.Base & InventoryPermissionsMask.All | InventoryPermissionsMask.Export) != (InventoryPermissionsMask.All | InventoryPermissionsMask.Export) ||
+                    if ((item.Permissions.Base & (InventoryPermissionsMask.All | InventoryPermissionsMask.Export)) != (InventoryPermissionsMask.All | InventoryPermissionsMask.Export) ||
                         (item.Permissions.Current & InventoryPermissionsMask.Export) == 0 ||
                         item.Creator.ID != item.Owner.ID)
                     {
@@ -977,7 +974,7 @@ namespace SilverSim.Viewer.Core
                     item.IsGroupOwned = d.IsGroupOwned;
 
                     item.CreationDate = (d.CreationDate == 0) ?
-                        new Date() : 
+                        new Date() :
                         Date.UnixTimeToDateTime(d.CreationDate);
 
                     item.InventoryType = d.InvType;
@@ -1059,11 +1056,9 @@ namespace SilverSim.Viewer.Core
             return asset.ID;
         }
 
-        private UUID CreateDefaultScriptForInventory(InventoryItem item)
-        {
+        private UUID CreateDefaultScriptForInventory(InventoryItem item) =>
             /* this is the KAN-Ed llSay script */
-            return new UUID("366ac8e9-b391-11dc-8314-0800200c9a66");
-        }
+            new UUID("366ac8e9-b391-11dc-8314-0800200c9a66");
 
         private UUID CreateDefaultGestureForInventory(InventoryItem item)
         {

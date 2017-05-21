@@ -95,11 +95,11 @@ namespace SilverSim.Types
         {
             get
             {
-                if(R > 1)
+                if (R > 1)
                 {
                     return 255;
                 }
-                else if(R < 0)
+                else if (R < 0)
                 {
                     return 0;
                 }
@@ -108,10 +108,8 @@ namespace SilverSim.Types
                     return (byte)(R * 255);
                 }
             }
-            set
-            {
-                R = value / 255f;
-            }
+
+            set { R = value / 255f; }
         }
 
         public byte G_AsByte
@@ -131,10 +129,8 @@ namespace SilverSim.Types
                     return (byte)(G * 255);
                 }
             }
-            set
-            {
-                G = value / 255f;
-            }
+
+            set { G = value / 255f; }
         }
 
         public byte B_AsByte
@@ -154,10 +150,8 @@ namespace SilverSim.Types
                     return (byte)(B * 255);
                 }
             }
-            set
-            {
-                B = value / 255f;
-            }
+
+            set { B = value / 255f; }
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
@@ -236,10 +230,8 @@ namespace SilverSim.Types
                     return (byte)(A * 255);
                 }
             }
-            set
-            {
-                A = value / 255f;
-            }
+
+            set { A = value / 255f; }
         }
 
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
@@ -251,6 +243,5 @@ namespace SilverSim.Types
 
         /// <summary>A Color4 with full RGB values (1.0) and fully opaque (alpha 1.0)</summary>
         public readonly static ColorAlpha White = new ColorAlpha(1f, 1f, 1f, 1f);
-
     }
 }

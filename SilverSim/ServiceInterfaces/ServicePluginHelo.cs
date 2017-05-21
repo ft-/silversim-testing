@@ -66,7 +66,7 @@ namespace SilverSim.ServiceInterfaces
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static string[] HeloRequest_HandleType(string uri, Dictionary<string, string> cachedheaders = null)
         {
-            var headers = cachedheaders != null ? cachedheaders : HeloRequest(uri);
+            var headers = cachedheaders ?? HeloRequest(uri);
             string protocols;
             if(!headers.TryGetValue("x-protocols-provided", out protocols) &&
                 !headers.TryGetValue("x-handlers-provided",out protocols))

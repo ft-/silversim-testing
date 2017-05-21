@@ -110,6 +110,7 @@ namespace SilverSim.Types
             n.AddRange(b);
             return n;
         }
+
         public static AnArray operator +(AnArray a, int b) => new AnArray(a)
             {
                 b
@@ -176,7 +177,7 @@ namespace SilverSim.Types
         public Vector3 ElementsToVector3 => new Vector3(this[0].AsReal, this[1].AsReal, this[2].AsReal);
 
         #region Stateful Enumerator
-        public sealed class MarkEnumerator : IEnumerator<IValue>, IEnumerator, IDisposable
+        public sealed class MarkEnumerator : IEnumerator<IValue>
         {
             private int m_CurrentIndex;
             private int m_MarkIndex;
@@ -187,6 +188,7 @@ namespace SilverSim.Types
                 m_Array = array;
                 m_CurrentIndex = -1;
             }
+
             public IValue Current => m_Array[m_CurrentIndex];
 
             object IEnumerator.Current => Current;

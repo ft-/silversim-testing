@@ -32,8 +32,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
     public partial class EnvironmentController
     {
         public event Action<byte[]> OnEnvironmentControllerChangeParams;
-        readonly object m_SerializationLock = new object();
-        int m_InDeserialization;
+        private readonly object m_SerializationLock = new object();
+        private int m_InDeserialization;
 
         public void TriggerOnEnvironmentControllerChange()
         {
@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        const uint HoursInSeconds = 3600;
+        private const uint HoursInSeconds = 3600;
 
         public void ResetSunToDefaults()
         {
@@ -83,7 +83,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             UpdateTidalModelEveryMsecs = 60000;
             Interlocked.Decrement(ref m_InDeserialization);
         }
-
 
         public void ResetWindToDefaults()
         {
@@ -192,6 +191,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 : base(message)
             {
             }
+
             public InvalidEnvironmentControllerSerializationException(string message, Exception innerException)
                 : base(message, innerException)
             {
@@ -201,10 +201,9 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 : base(info, context)
             {
             }
-
         }
 
-        void DeserializeRoot(XmlTextReader reader)
+        private void DeserializeRoot(XmlTextReader reader)
         {
             for(;;)
             {
@@ -233,7 +232,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        void DeserializeEnvironmentController(XmlTextReader reader)
+        private void DeserializeEnvironmentController(XmlTextReader reader)
         {
             for(;;)
             {
@@ -290,7 +289,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        void DeserializeEnvironmentController_Wind(XmlTextReader reader)
+        private void DeserializeEnvironmentController_Wind(XmlTextReader reader)
         {
             uint sun_secperday;
             uint sun_daysperyear;
@@ -336,7 +335,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        void DeserializeEnvironmentController_Sun(XmlTextReader reader)
+        private void DeserializeEnvironmentController_Sun(XmlTextReader reader)
         {
             uint sun_secperday;
             uint sun_daysperyear;
@@ -406,7 +405,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        void DeserializeEnvironmentController_Moon(XmlTextReader reader)
+        private void DeserializeEnvironmentController_Moon(XmlTextReader reader)
         {
             for (;;)
             {
@@ -451,7 +450,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        void DeserializeEnvironmentController_Water(XmlTextReader reader)
+        private void DeserializeEnvironmentController_Water(XmlTextReader reader)
         {
             for (;;)
             {
@@ -504,7 +503,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        void DeserializeEnvironmentController_Weather(XmlTextReader reader)
+        private void DeserializeEnvironmentController_Weather(XmlTextReader reader)
         {
             for (;;)
             {

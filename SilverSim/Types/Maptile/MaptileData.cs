@@ -30,7 +30,6 @@ namespace SilverSim.Types.Maptile
 
         public MaptileData()
         {
-
         }
 
         public MaptileData(MaptileData data)

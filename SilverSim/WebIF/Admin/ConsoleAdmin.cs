@@ -33,8 +33,8 @@ namespace SilverSim.WebIF.Admin
     [Description("WebIF Console Admin Support")]
     public class ConsoleAdmin : IPlugin, IPluginShutdown
     {
-        IAdminWebIF m_WebIF;
-        CommandRegistry m_Commands;
+        private IAdminWebIF m_WebIF;
+        private CommandRegistry m_Commands;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -46,7 +46,7 @@ namespace SilverSim.WebIF.Admin
 
         public class ConsoleAdminTty : TTY
         {
-            readonly StreamWriter m_StreamWriter;
+            private readonly StreamWriter m_StreamWriter;
 
             public ConsoleAdminTty(StreamWriter w)
             {
@@ -59,13 +59,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         [AdminWebIfRequiredRight("console.access")]
         public void ConsoleCommand(HttpRequest req, Map jsondata)
@@ -86,8 +80,10 @@ namespace SilverSim.WebIF.Admin
                         IAdminWebIF webif = m_WebIF;
                         if (webif != null)
                         {
-                            ConsoleAdminTty tty = new ConsoleAdminTty(w);
-                            tty.SelectedScene = webif.GetSelectedRegion(req, jsondata);
+                            var tty = new ConsoleAdminTty(w)
+                            {
+                                SelectedScene = webif.GetSelectedRegion(req, jsondata)
+                            };
                             m_Commands.ExecuteCommand(tty.GetCmdLine(cmd), tty);
                             webif.SetSelectedRegion(req, jsondata, tty.SelectedScene);
                         }
@@ -106,10 +102,8 @@ namespace SilverSim.WebIF.Admin
     [PluginName("ConsoleAdmin")]
     public class ConsoleAdminFactory : IPluginFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ConsoleAdmin();
-        }
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
+            new ConsoleAdmin();
     }
     #endregion
 }

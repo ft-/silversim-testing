@@ -36,9 +36,9 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        byte[] m_MaterialsData;
-        readonly Dictionary<UUID, Material> m_Materials = new Dictionary<UUID, Material>();
-        readonly ReaderWriterLock m_MaterialsRwLock = new ReaderWriterLock();
+        private byte[] m_MaterialsData;
+        private readonly Dictionary<UUID, Material> m_Materials = new Dictionary<UUID, Material>();
+        private readonly ReaderWriterLock m_MaterialsRwLock = new ReaderWriterLock();
 
         public byte[] MaterialsData
         {
@@ -182,7 +182,7 @@ namespace SilverSim.Scene.Types.Scene
                 foreach(IValue iv in (AnArray)m["Materials"])
                 {
                     var mmap = iv as Map;
-                    if(null == mmap)
+                    if(mmap == null)
                     {
                         continue;
                     }
@@ -222,7 +222,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        void UpdateMaterials()
+        private void UpdateMaterials()
         {
             byte[] buf;
             using (var ms = new MemoryStream())
@@ -235,8 +235,8 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     matArray.Add(new Map
                     {
-                        { "ID", kvp.Key },
-                        { "Material", kvp.Value.WriteMap() }
+                        ["ID"] = kvp.Key,
+                        ["Material"] = kvp.Value.WriteMap()
                     });
                 }
 

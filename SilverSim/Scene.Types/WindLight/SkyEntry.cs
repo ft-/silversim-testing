@@ -116,7 +116,7 @@ namespace SilverSim.Scene.Types.WindLight
                     writer.WriteNamedValue("real", Ambient.W);
                 }
                 writer.WriteEndElement();
-                
+
                 writer.WriteNamedValue("key", "blue_density");
                 writer.WriteStartElement("array");
                 {

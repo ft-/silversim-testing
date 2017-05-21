@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Types.ServerURIs
@@ -28,17 +27,10 @@ namespace SilverSim.Types.ServerURIs
     {
         public ServerURIs()
         {
-
         }
 
-        public ServerURIs(int capacity)
+        public ServerURIs(IDictionary<string, string> dictionary) : base(dictionary)
         {
-
-        }
-
-        public ServerURIs(IDictionary<string, string> dictionary)
-        {
-
         }
 
         public string IMServerURI => this["IMServerURI"];

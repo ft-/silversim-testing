@@ -19,6 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0018
+#pragma warning disable RCS1029
+
 using log4net;
 using log4net.Core;
 using Nini.Config;
@@ -50,19 +53,19 @@ namespace SilverSim.WebIF.Admin
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF");
 
-        ServerParamServiceInterface m_ServerParams;
-        BaseHttpServer m_HttpServer;
-        BaseHttpServer m_HttpsServer;
-        readonly string m_BasePath;
-        const string JsonContentType = "application/json";
-        RwLockedList<string> m_KnownConfigurationIssues;
-        ConfigurationLoader m_Loader;
-        AggregatingAvatarNameService m_AvatarNameService;
-        readonly string m_AvatarNameServiceNames;
-        readonly string m_Title;
-        readonly BlockingQueue<LoggingEvent> m_LogEventQueue = new BlockingQueue<LoggingEvent>();
+        private ServerParamServiceInterface m_ServerParams;
+        private BaseHttpServer m_HttpServer;
+        private BaseHttpServer m_HttpsServer;
+        private readonly string m_BasePath;
+        private const string JsonContentType = "application/json";
+        private RwLockedList<string> m_KnownConfigurationIssues;
+        private ConfigurationLoader m_Loader;
+        private AggregatingAvatarNameService m_AvatarNameService;
+        private readonly string m_AvatarNameServiceNames;
+        private readonly string m_Title;
+        private readonly BlockingQueue<LoggingEvent> m_LogEventQueue = new BlockingQueue<LoggingEvent>();
 
-        class SessionInfo
+        private class SessionInfo
         {
             public int LastSeenTickCount;
             public bool IsAuthenticated;
@@ -78,41 +81,23 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
-        readonly public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> m_AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(delegate () { return new RwLockedList<string>(); });
+        private readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
+        public readonly RwLockedDictionaryAutoAdd<string, RwLockedList<string>> m_AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(() => new RwLockedList<string>());
         public readonly RwLockedDictionary<string, Action<HttpRequest, Map>> m_JsonMethods = new RwLockedDictionary<string, Action<HttpRequest, Map>>();
         public readonly RwLockedList<string> m_Modules = new RwLockedList<string>();
         public readonly RwLockedList<HttpWebSocket> m_LogPlainReceivers = new RwLockedList<HttpWebSocket>();
         public readonly RwLockedList<HttpWebSocket> m_LogHtmlReceivers = new RwLockedList<HttpWebSocket>();
 
-        public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights
-        {
-            get
-            {
-                return m_AutoGrantRights;
-            }
-        }
+        public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights => m_AutoGrantRights;
 
-        public RwLockedDictionary<string, Action<HttpRequest, Map>> JsonMethods
-        {
-            get
-            {
-                return m_JsonMethods;
-            }
-        }
+        public RwLockedDictionary<string, Action<HttpRequest, Map>> JsonMethods => m_JsonMethods;
 
-        public RwLockedList<string> ModuleNames
-        {
-            get
-            {
-                return m_Modules;
-            }
-        }
+        public RwLockedList<string> ModuleNames => m_Modules;
 
-        readonly Timer m_Timer = new Timer(1);
-        readonly bool m_EnableSetPasswordCommand;
+        private readonly Timer m_Timer = new Timer(1);
+        private readonly bool m_EnableSetPasswordCommand;
 
-        bool m_ShutdownHandlerThreads;
+        private bool m_ShutdownHandlerThreads;
 
         private static readonly string[] LogColors =
         {
@@ -123,7 +108,7 @@ namespace SilverSim.WebIF.Admin
             "yellow"
         };
 
-        void LogThread()
+        private void LogThread()
         {
             System.Threading.Thread.CurrentThread.Name = "WebIF LogThread";
             while(!m_ShutdownHandlerThreads)
@@ -138,17 +123,11 @@ namespace SilverSim.WebIF.Admin
                     continue;
                 }
 
-                List<HttpWebSocket> plaintext_conns = new List<HttpWebSocket>();
-                m_LogPlainReceivers.ForEach(delegate (HttpWebSocket sock)
-                {
-                    plaintext_conns.Add(sock);
-                });
+                var plaintext_conns = new List<HttpWebSocket>();
+                m_LogPlainReceivers.ForEach((HttpWebSocket sock) => plaintext_conns.Add(sock));
 
-                List<HttpWebSocket> html_conns = new List<HttpWebSocket>();
-                m_LogHtmlReceivers.ForEach(delegate (HttpWebSocket sock)
-                {
-                    html_conns.Add(sock);
-                });
+                var html_conns = new List<HttpWebSocket>();
+                m_LogHtmlReceivers.ForEach((HttpWebSocket sock) => html_conns.Add(sock));
 
                 string colorbegin = string.Empty;
                 string colorend = string.Empty;
@@ -166,7 +145,7 @@ namespace SilverSim.WebIF.Admin
                 }
                 else
                 {
-                    colorbegin = "<span style=\"color: " + LogColors[(Math.Abs(logevent.LoggerName.ToUpper().GetHashCode()) % LogColors.Length)] + "\">";
+                    colorbegin = "<span style=\"color: " + LogColors[Math.Abs(logevent.LoggerName.ToUpper().GetHashCode()) % LogColors.Length] + "\">";
                     colorend = "</span>";
                 }
                 string msg = string.Format("{0}{1} - [{2}{3}{4}]: {5}{6}",
@@ -175,7 +154,7 @@ namespace SilverSim.WebIF.Admin
                     colorbegin,
                     System.Web.HttpUtility.HtmlEncode(logevent.LoggerName),
                     colorend,
-                    System.Web.HttpUtility.HtmlEncode(logevent.RenderedMessage.ToString()),
+                    System.Web.HttpUtility.HtmlEncode(logevent.RenderedMessage),
                     fullcolorend);
                 foreach(HttpWebSocket conn in html_conns)
                 {
@@ -192,7 +171,7 @@ namespace SilverSim.WebIF.Admin
                     logevent.TimeStamp.ToString(),
                     logevent.Level.Name,
                     logevent.LoggerName,
-                    logevent.RenderedMessage.ToString());
+                    logevent.RenderedMessage);
                 foreach (HttpWebSocket conn in plaintext_conns)
                 {
                     try
@@ -222,7 +201,7 @@ namespace SilverSim.WebIF.Admin
 
         public void ErrorResponse(HttpRequest req, AdminWebIfErrorResult reason)
         {
-            Map m = new Map
+            var m = new Map
             {
                 { "success", false },
                 { "reason", (int)reason }
@@ -266,13 +245,7 @@ namespace SilverSim.WebIF.Admin
             ThreadManager.CreateThread(LogThread).Start();
         }
 
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         public UUI ResolveName(UUI resolveuui)
         {
@@ -290,7 +263,7 @@ namespace SilverSim.WebIF.Admin
             return m_AvatarNameService.TranslateToUUI(arg, out uui);
         }
 
-        void HandleTimer(object o, EventArgs args)
+        private void HandleTimer(object o, EventArgs args)
         {
             var removeList = new List<string>();
             foreach(KeyValuePair<string, SessionInfo> kvp in m_Sessions)
@@ -307,7 +280,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        const string AdminUserReference = "WebIF.Admin.User.admin.";
+        private const string AdminUserReference = "WebIF.Admin.User.admin.";
 
         #region Initialization
         public void Startup(ConfigurationLoader loader)
@@ -336,7 +309,7 @@ namespace SilverSim.WebIF.Admin
                 m_HttpsServer = null;
             }
 
-            if(null != m_HttpsServer)
+            if(m_HttpsServer != null)
             {
                 m_HttpsServer.StartsWithUriHandlers.Add("/admin", HandleHttp);
             }
@@ -373,7 +346,7 @@ namespace SilverSim.WebIF.Admin
             m_Loader = null;
             JsonMethods.Clear();
             m_HttpServer.StartsWithUriHandlers.Remove("/admin");
-            if (null != m_HttpsServer)
+            if (m_HttpsServer != null)
             {
                 m_HttpsServer.StartsWithUriHandlers.Remove("/admin");
             }
@@ -383,7 +356,7 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region User Logic
-        bool SetUserPassword(string user, string pass)
+        private bool SetUserPassword(string user, string pass)
         {
             string userRef = "WebIF.Admin.User." + user + ".PassCode";
             string oldPass;
@@ -405,7 +378,8 @@ namespace SilverSim.WebIF.Admin
             }
             return false;
         }
-        void FindUser(SessionInfo sessionInfo, UUID challenge)
+
+        private void FindUser(SessionInfo sessionInfo, UUID challenge)
         {
             string userRef = "WebIF.Admin.User." + sessionInfo.UserName + ".";
             string pass_sha1;
@@ -442,7 +416,7 @@ namespace SilverSim.WebIF.Admin
         #region Core Json API handler (login, challenge, logout + method lookup)
         public void HandleUnsecureHttp(HttpRequest req)
         {
-            if(null == m_HttpsServer || m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", m_HttpsServer == null))
+            if(m_HttpsServer == null || m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", m_HttpsServer == null))
             {
                 HandleHttp(req);
             }
@@ -453,7 +427,7 @@ namespace SilverSim.WebIF.Admin
                 Uri uri;
                 if (req.TryGetHeader("Host", out host) &&
                     Uri.TryCreate("http://" + host, UriKind.Absolute, out uri))
-                { 
+                {
                     relocation_uri = "https://" + uri.Host + ":" + m_HttpsServer.Port.ToString() + "/admin";
                 }
 
@@ -464,12 +438,12 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        void HandleSessionValidateRequest(HttpRequest req, Map jsonreq)
+        private void HandleSessionValidateRequest(HttpRequest req, Map jsonreq)
         {
             SuccessResponse(req, new Map());
         }
 
-        void HandleLoginRequest(HttpRequest req, Map jsonreq)
+        private void HandleLoginRequest(HttpRequest req, Map jsonreq)
         {
             if(!jsonreq.ContainsKey("sessionid") || !jsonreq.ContainsKey("user") || !jsonreq.ContainsKey("response"))
             {
@@ -534,7 +508,7 @@ namespace SilverSim.WebIF.Admin
             }
             return UUID.Zero;
         }
-        
+
         public void SetSelectedRegion(HttpRequest req, Map jsonreq, UUID sceneID)
         {
             var sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
@@ -545,15 +519,16 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        void HandleChallengeRequest(HttpRequest req, Map jsonreq)
+        private void HandleChallengeRequest(HttpRequest req, Map jsonreq)
         {
-            var resdata = new Map();
             var sessionID = UUID.Random;
             var challenge = UUID.Random;
-            resdata["sessionid"] = sessionID;
-            resdata["challenge"] = challenge;
-
-            if(!jsonreq.ContainsKey("user"))
+            var resdata = new Map
+            {
+                ["sessionid"] = sessionID,
+                ["challenge"] = challenge
+            };
+            if (!jsonreq.ContainsKey("user"))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -566,9 +541,9 @@ namespace SilverSim.WebIF.Admin
             SuccessResponse(req, resdata);
         }
 
-        sealed class WebSocketTTY : TTY, IDisposable
+        private sealed class WebSocketTTY : TTY, IDisposable
         {
-            readonly HttpWebSocket m_Socket;
+            private readonly HttpWebSocket m_Socket;
             public WebSocketTTY(HttpWebSocket sock)
             {
                 m_Socket = sock;
@@ -589,13 +564,13 @@ namespace SilverSim.WebIF.Admin
                 m_Socket.WriteText(text + "\n");
             }
 
-            void DisableEcho()
+            private void DisableEcho()
             {
                 var echoOff = "disable echo".ToUTF8Bytes();
                 m_Socket.WriteBinary(echoOff, 0, echoOff.Length);
             }
 
-            void EnableEcho()
+            private void EnableEcho()
             {
                 var echoOn = "enable echo".ToUTF8Bytes();
                 m_Socket.WriteBinary(echoOn, 0, echoOn.Length);
@@ -652,7 +627,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        void HandleWebSocketConsole(HttpRequest req, string sessionid)
+        private void HandleWebSocketConsole(HttpRequest req, string sessionid)
         {
             var jsondata = new Map
             {
@@ -682,7 +657,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        void HandleWebSocketLog(HttpRequest req, RwLockedList<HttpWebSocket> logreceivers)
+        private void HandleWebSocketLog(HttpRequest req, RwLockedList<HttpWebSocket> logreceivers)
         {
             using (var sock = req.BeginWebSocket("log"))
             {
@@ -958,7 +933,7 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region HTTP File Serving
-        void ServeFile(HttpRequest req, string filepath)
+        private void ServeFile(HttpRequest req, string filepath)
         {
             try
             {
@@ -996,8 +971,8 @@ namespace SilverSim.WebIF.Admin
                         {
                             var buf = new byte[10240];
                             int blocklen;
-                            for (blocklen = file.Read(buf, 0, 10240); 
-                                0 != blocklen; 
+                            for (blocklen = file.Read(buf, 0, 10240);
+                                0 != blocklen;
                                 blocklen = file.Read(buf, 0, 10240))
                             {
                                 o.Write(buf, 0, blocklen);
@@ -1016,7 +991,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        void ServeFileNotFoundResponse(HttpRequest req)
+        private void ServeFileNotFoundResponse(HttpRequest req)
         {
             using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not Found"))
             {
@@ -1033,7 +1008,7 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region Commands
-        void DisplayAdminWebIFHelp(TTY io)
+        private void DisplayAdminWebIFHelp(TTY io)
         {
             var chgpwcmd = string.Empty;
             if(m_EnableSetPasswordCommand)
@@ -1276,7 +1251,7 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
-        void HandleFindExactUser(HttpRequest req, Map jsondata)
+        private void HandleFindExactUser(HttpRequest req, Map jsondata)
         {
             IValue q1;
             IValue q2;
@@ -1296,12 +1271,12 @@ namespace SilverSim.WebIF.Admin
 
             var resdata = new Map
             {
-                { "user", uui.ToMap() }
+                ["user"] = uui.ToMap()
             };
             SuccessResponse(req, resdata);
         }
 
-        void HandleFindUser(HttpRequest req, Map jsondata)
+        private void HandleFindUser(HttpRequest req, Map jsondata)
         {
             IValue q1;
             IValue q2;
@@ -1331,7 +1306,7 @@ namespace SilverSim.WebIF.Admin
             SuccessResponse(req, resdata);
         }
 
-        void HandleGetUserDetails(HttpRequest req, Map jsondata)
+        private void HandleGetUserDetails(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("uuid"))
             {
@@ -1348,13 +1323,13 @@ namespace SilverSim.WebIF.Admin
             {
                 var res = new Map
                 {
-                    { "user", uui.ToMap() }
+                    ["user"] = uui.ToMap()
                 };
                 SuccessResponse(req, res);
             }
         }
 
-        void AvailableModulesList(HttpRequest req, Map jsondata)
+        private void AvailableModulesList(HttpRequest req, Map jsondata)
         {
             var res = new AnArray();
             foreach(var module in m_Modules)
@@ -1370,7 +1345,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("dnscache.manage")]
-        void DnsCacheList(HttpRequest req, Map jsondata)
+        private void DnsCacheList(HttpRequest req, Map jsondata)
         {
             var res = new AnArray();
             foreach (var host in DnsNameCache.GetCachedDnsEntries())
@@ -1379,13 +1354,13 @@ namespace SilverSim.WebIF.Admin
             }
             var m = new Map
             {
-                { "entries", res }
+                ["entries"] = res
             };
             SuccessResponse(req, m);
         }
 
         [AdminWebIfRequiredRight("dnscache.manage")]
-        void DnsCacheRemove(HttpRequest req, Map jsondata)
+        private void DnsCacheRemove(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("host"))
             {
@@ -1404,7 +1379,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("modules.view")]
-        void ModulesList(HttpRequest req, Map jsondata)
+        private void ModulesList(HttpRequest req, Map jsondata)
         {
             var res = new AnArray();
             foreach(var kvp in m_Loader.AllServices)
@@ -1419,13 +1394,13 @@ namespace SilverSim.WebIF.Admin
             }
             var m = new Map
             {
-                { "modules", res }
+                ["modules"] = res
             };
             SuccessResponse(req, m);
         }
 
         [AdminWebIfRequiredRight("modules.view")]
-        void ModuleGet(HttpRequest req, Map jsondata)
+        private void ModuleGet(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("name"))
             {
@@ -1472,7 +1447,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("issues.view")]
-        void IssuesView(HttpRequest req, Map jsondata)
+        private void IssuesView(HttpRequest req, Map jsondata)
         {
             var res = new AnArray();
             foreach(var s in m_KnownConfigurationIssues)
@@ -1487,7 +1462,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("serverparams.manage")]
-        void ShowServerParams(HttpRequest req, Map jsondata)
+        private void ShowServerParams(HttpRequest req, Map jsondata)
         {
             var res = new AnArray();
             var resList = new Dictionary<string, ServerParamAttribute>();
@@ -1537,7 +1512,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("serverparams.manage")]
-        void SetServerParam(HttpRequest req, Map jsondata)
+        private void SetServerParam(HttpRequest req, Map jsondata)
         {
             if(!jsondata.ContainsKey("parameter") || !jsondata.ContainsKey("value"))
             {
@@ -1574,12 +1549,12 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("serverparams.manage")]
-        void GetServerParamsExplicitly(HttpRequest req, Map jsondata)
+        private void GetServerParamsExplicitly(HttpRequest req, Map jsondata)
         {
             IValue ipara;
             AnArray paradata;
             if (!jsondata.TryGetValue("parameters", out ipara) ||
-                null == (paradata = ipara as AnArray))
+                (paradata = ipara as AnArray) == null)
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
@@ -1589,7 +1564,7 @@ namespace SilverSim.WebIF.Admin
                 foreach (var iv in paradata)
                 {
                     var reqdata = iv as Map;
-                    if (null == reqdata || !reqdata.ContainsKey("parameter"))
+                    if (reqdata == null || !reqdata.ContainsKey("parameter"))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
@@ -1607,7 +1582,7 @@ namespace SilverSim.WebIF.Admin
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
-                    
+
                     if(m_ServerParams.TryGetExplicitValue(regionid, parameter, out value))
                     {
                         var entry = new Map
@@ -1620,19 +1595,19 @@ namespace SilverSim.WebIF.Admin
                 }
                 var res = new Map
                 {
-                    { "values", resultlist }
+                    ["values"] = resultlist
                 };
                 SuccessResponse(req, res);
             }
         }
 
         [AdminWebIfRequiredRight("serverparams.manage")]
-        void GetServerParams(HttpRequest req, Map jsondata)
+        private void GetServerParams(HttpRequest req, Map jsondata)
         {
             IValue ipara;
             AnArray paradata;
             if(!jsondata.TryGetValue("parameters", out ipara) ||
-                null == (paradata = ipara as AnArray))
+                (paradata = ipara as AnArray) == null)
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
@@ -1642,7 +1617,7 @@ namespace SilverSim.WebIF.Admin
                 foreach(var iv in paradata)
                 {
                     var reqdata = iv as Map;
-                    if(null == reqdata || !reqdata.ContainsKey("parameter"))
+                    if(reqdata == null || !reqdata.ContainsKey("parameter"))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
@@ -1660,7 +1635,7 @@ namespace SilverSim.WebIF.Admin
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
-                    
+
                     if(m_ServerParams.TryGetValue(regionid, parameter, out value))
                     {
                         var entry = new Map
@@ -1673,14 +1648,14 @@ namespace SilverSim.WebIF.Admin
                 }
                 var res = new Map
                 {
-                    { "values", resultlist }
+                    ["values"] = resultlist
                 };
                 SuccessResponse(req, res);
             }
         }
 
         [AdminWebIfRequiredRight("serverparams.manage")]
-        void GetServerParam(HttpRequest req, Map jsondata)
+        private void GetServerParam(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("parameter"))
             {
@@ -1721,7 +1696,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("webif.admin.users.manage")]
-        void GrantRight(HttpRequest req, Map jsondata)
+        private void GrantRight(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
             {
@@ -1765,7 +1740,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("webif.admin.users.manage")]
-        void RevokeRight(HttpRequest req, Map jsondata)
+        private void RevokeRight(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
             {
@@ -1808,7 +1783,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         [AdminWebIfRequiredRight("webif.admin.users.manage")]
-        void DeleteUser(HttpRequest req, Map jsondata)
+        private void DeleteUser(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("user"))
             {

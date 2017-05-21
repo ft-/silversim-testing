@@ -36,7 +36,6 @@ namespace SilverSim.ServiceInterfaces.Asset
         public HGAccessNotSupportedException(string message)
             : base(message)
         {
-
         }
 
         protected HGAccessNotSupportedException(SerializationInfo info, StreamingContext context)
@@ -47,7 +46,6 @@ namespace SilverSim.ServiceInterfaces.Asset
         public HGAccessNotSupportedException(string message, Exception innerException)
             : base(message, innerException)
         {
-
         }
     }
 
@@ -143,5 +141,4 @@ namespace SilverSim.ServiceInterfaces.Asset
         {
         }
     }
-
 }

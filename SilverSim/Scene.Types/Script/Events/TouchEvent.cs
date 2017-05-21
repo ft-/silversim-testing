@@ -33,6 +33,7 @@ namespace SilverSim.Scene.Types.Script.Events
             Start,
             End
         }
+
         public TouchType Type;
         public List<DetectInfo> Detected { get; set; }
     }

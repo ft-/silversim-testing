@@ -54,15 +54,9 @@ namespace SilverSim.ServiceInterfaces.Friends
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public abstract FriendInfo this[UUI user, UUI friend]
-        {
-            get;
-        }
+        public abstract FriendInfo this[UUI user, UUI friend] { get; }
 
-        public abstract List<FriendInfo> this[UUI user]
-        {
-            get;
-        }
+        public abstract List<FriendInfo> this[UUI user] { get; }
 
         public abstract bool TryGetValue(UUI user, UUI friend, out FriendInfo fInfo);
 

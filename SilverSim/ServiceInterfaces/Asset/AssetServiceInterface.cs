@@ -33,34 +33,22 @@ namespace SilverSim.ServiceInterfaces.Asset
         #endregion
 
         #region Accessors
-        public abstract AssetData this[UUID key]
-        {
-            get;
-        }
+        public abstract AssetData this[UUID key] { get; }
 
         public abstract bool TryGetValue(UUID key, out AssetData assetData);
 
         #endregion
 
         #region Metadata interface
-        public abstract IAssetMetadataServiceInterface Metadata
-        {
-            get;
-        }
+        public abstract IAssetMetadataServiceInterface Metadata { get; }
         #endregion
 
         #region References interface
-        public abstract AssetReferencesServiceInterface References
-        {
-            get;
-        }
+        public abstract AssetReferencesServiceInterface References { get; }
         #endregion
 
         #region Data interface
-        public abstract IAssetDataServiceInterface Data
-        {
-            get;
-        }
+        public abstract IAssetDataServiceInterface Data { get; }
         #endregion
 
         #region Store asset method

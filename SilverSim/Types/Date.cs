@@ -69,11 +69,7 @@ namespace SilverSim.Types
         public override bool Equals(object o)
         {
             var v = o as Date;
-            if(null == v)
-            {
-                return false;
-            }
-            return Equals(v);
+            return v?.Equals(v) == true;
         }
 
         public override int GetHashCode() => m_Value.GetHashCode();

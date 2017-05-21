@@ -35,7 +35,7 @@ namespace SilverSim.Scene.Types.Scene
                 if (Primitives.TryGetValue(primid, out part))
                 {
                     var grp = part.ObjectGroup;
-                    if(null == grp)
+                    if(grp == null)
                     {
                         continue;
                     }
@@ -78,7 +78,7 @@ namespace SilverSim.Scene.Types.Scene
             var targetGrp = groups[0];
             var newRootPos = targetGrp.GlobalPosition;
             var newRootRot = targetGrp.GlobalRotation;
-            
+
             for(int groupidx = 1; groupidx < groups.Count; ++groupidx)
             {
                 var srcGrp = groups[groupidx];
