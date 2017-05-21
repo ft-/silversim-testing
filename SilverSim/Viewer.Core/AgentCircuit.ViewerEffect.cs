@@ -24,6 +24,7 @@ using SilverSim.Viewer.Messages.Appearance;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Viewer.Core
 {
@@ -42,13 +43,18 @@ namespace SilverSim.Viewer.Core
 
             /* we only route valid messages here but keep SessionID from being broadcasted */
             ve.SessionID = UUID.Zero;
-            foreach(var agent in Scene.Agents)
+
+            SceneInterface scene = Scene;
+            if (scene != null)
             {
-                if(agent.Owner.Equals(Agent.Owner))
+                foreach (var agent in scene.Agents)
                 {
-                    continue;
+                    if (agent.Owner.Equals(Agent.Owner))
+                    {
+                        continue;
+                    }
+                    agent.SendMessageAlways(m, scene.ID);
                 }
-                agent.SendMessageAlways(m, Scene.ID);
             }
         }
     }
