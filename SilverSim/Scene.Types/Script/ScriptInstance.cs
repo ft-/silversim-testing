@@ -95,8 +95,7 @@ namespace SilverSim.Scene.Types.Script
         {
             IsRunning = false;
             IsAborting = true;
-            IScriptWorkerThreadPool pool = ThreadPool;
-            pool?.AbortScript(this);
+            ThreadPool?.AbortScript(this);
         }
 
         public abstract bool IsLinkMessageReceiver { get; }
