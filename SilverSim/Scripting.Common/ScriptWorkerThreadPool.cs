@@ -169,6 +169,11 @@ namespace SilverSim.Scripting.Common
             Thread.Sleep(milliseconds);
         }
 
+        public void Sleep(TimeSpan timespan)
+        {
+            Thread.Sleep(timespan);
+        }
+
         public void Shutdown()
         {
             m_ShutdownThreads = true;

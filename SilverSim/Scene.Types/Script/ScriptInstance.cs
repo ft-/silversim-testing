@@ -145,7 +145,7 @@ namespace SilverSim.Scene.Types.Script
 
         public void Sleep(double secs)
         {
-            Thread.Sleep(TimeSpan.FromSeconds(secs));
+            ThreadPool?.Sleep(TimeSpan.FromSeconds(secs));
         }
     }
 }

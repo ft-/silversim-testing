@@ -53,5 +53,6 @@ namespace SilverSim.Scene.Types.Script
         void AbortScript(ScriptInstance script);
         void Shutdown();
         void Sleep(int milliseconds);
+        void Sleep(TimeSpan timespan);
     }
 }
