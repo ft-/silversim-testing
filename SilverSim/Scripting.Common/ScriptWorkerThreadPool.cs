@@ -164,6 +164,11 @@ namespace SilverSim.Scripting.Common
             });
         }
 
+        public void Sleep(int milliseconds)
+        {
+            Thread.Sleep(milliseconds);
+        }
+
         public void Shutdown()
         {
             m_ShutdownThreads = true;
