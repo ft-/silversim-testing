@@ -22,9 +22,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -38,12 +36,10 @@ namespace SilverSim.ServiceInterfaces.Inventory
         bool TryGetValue(UUID key, out InventoryFolder folder);
         bool ContainsKey(UUID key);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder this[UUID principalID, UUID key] { get; }
         bool TryGetValue(UUID principalID, UUID key, out InventoryFolder folder);
         bool ContainsKey(UUID principalID, UUID key);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder this[UUID principalID, AssetType type] { get; }
         bool TryGetValue(UUID principalID, AssetType type, out InventoryFolder folder);
         bool ContainsKey(UUID principalID, AssetType type);
@@ -66,7 +62,6 @@ namespace SilverSim.ServiceInterfaces.Inventory
         void Purge(UUID folderID);
         void Purge(UUID principalID, UUID folderID);
         void IncrementVersion(UUID principalID, UUID folderID);
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         /* returns list of deleted folders */
         List<UUID> Delete(UUID principalID, List<UUID> folderIDs);
         #endregion

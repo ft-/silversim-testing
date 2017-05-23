@@ -28,7 +28,6 @@ using SilverSim.Types.Groups;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -90,7 +89,6 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power) => (GetGroupPowers(agentOwner, group) & power) != 0;
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private bool IsGroupMember(UUI agentOwner, UGI group)
         {
             if (GroupsService == null || group.ID == UUID.Zero)
@@ -227,7 +225,6 @@ namespace SilverSim.Scene.Types.Scene
             return activeList.Contains(agent);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool IsPossibleGod(UUI agent) => agent.EqualsGrid(Owner) ||
                 (EstateManagerIsGod && IsEstateManager(agent)) ||
                 IsInGodAgents(agent);
@@ -363,7 +360,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanMove(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
@@ -433,7 +429,6 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanEdit(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
@@ -479,7 +474,6 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanChangeGroup(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
@@ -520,7 +514,6 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanEditParcelDetails(UUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
@@ -541,7 +534,6 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanDelete(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
@@ -597,7 +589,6 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanReturn(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
@@ -672,7 +663,6 @@ namespace SilverSim.Scene.Types.Scene
                value);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanTakeCopy(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
@@ -728,7 +718,6 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanTake(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
@@ -777,7 +766,6 @@ namespace SilverSim.Scene.Types.Scene
         }
         #endregion
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanTerraform(UUI agentOwner, Vector3 location)
         {
             if (IsPossibleGod(agentOwner))

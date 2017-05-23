@@ -19,19 +19,16 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Appearance;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
         [PacketHandler(MessageType.ViewerEffect)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleViewerEffect(Message m)
         {
             var ve = (ViewerEffect)m;

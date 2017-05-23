@@ -23,7 +23,6 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Grid
@@ -100,26 +99,22 @@ namespace SilverSim.ServiceInterfaces.Grid
     public abstract class GridServiceInterface
     {
         #region Accessors
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract RegionInfo this[UUID scopeID, UUID regionID] { get; }
 
         public abstract bool TryGetValue(UUID scopeID, UUID regionID, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, UUID regionID);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public RegionInfo this[UUID scopeID, GridVector position] => this[scopeID, position.X, position.Y];
 
         public bool TryGetValue(UUID scopeID, GridVector position, out RegionInfo rInfo) => TryGetValue(scopeID, position.X, position.Y, out rInfo);
 
         public bool ContainsKey(UUID scopeID, GridVector position) => ContainsKey(scopeID, position.X, position.Y);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract RegionInfo this[UUID scopeID, uint gridX, uint gridY] { get; }
 
         public abstract bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, uint gridX, uint gridY);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract RegionInfo this[UUID scopeID, string regionName] { get; }
 
         public abstract bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo);

@@ -24,14 +24,12 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.WindLight
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class EnvironmentSettings
     {
         public readonly RwLockedList<KeyValuePair<double, string>> DayCycle = new RwLockedList<KeyValuePair<double, string>>();

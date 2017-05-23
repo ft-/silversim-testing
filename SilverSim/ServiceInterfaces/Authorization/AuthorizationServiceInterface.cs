@@ -24,14 +24,12 @@ using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Authorization
 {
     public abstract class AuthorizationServiceInterface
     {
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public struct AuthorizationData
         {
             public DestinationInfo DestinationInfo;

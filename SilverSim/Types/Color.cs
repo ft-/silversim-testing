@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
@@ -154,7 +153,6 @@ namespace SilverSim.Types
             set { B = value / 255f; }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public virtual byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte };
         #endregion
     }
@@ -234,7 +232,6 @@ namespace SilverSim.Types
             set { A = value / 255f; }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public override byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte, A_AsByte };
         #endregion
 

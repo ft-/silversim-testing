@@ -24,7 +24,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
@@ -34,7 +33,6 @@ namespace SilverSim.Database.Memory.SimulationData
         private readonly MemorySimulationDataParcelAccessListStorage m_WhiteListStorage = new MemorySimulationDataParcelAccessListStorage();
         private readonly MemorySimulationDataParcelAccessListStorage m_BlackListStorage = new MemorySimulationDataParcelAccessListStorage();
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
         {
             get

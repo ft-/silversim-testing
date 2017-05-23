@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.LoadStore.Terrain
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class TerrainStorageTypeAttribute : Attribute
     {
     }

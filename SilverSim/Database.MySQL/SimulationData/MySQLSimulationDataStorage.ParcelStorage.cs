@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -34,7 +33,6 @@ namespace SilverSim.Database.MySQL.SimulationData
         private readonly MySQLSimulationDataParcelAccessListStorage m_WhiteListStorage;
         private readonly MySQLSimulationDataParcelAccessListStorage m_BlackListStorage;
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
         {
             get

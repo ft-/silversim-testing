@@ -26,7 +26,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -93,7 +92,6 @@ namespace SilverSim.Scene.Management.Scene
 
         public SceneInterface this[string name] => this[m_RegionNames[name.ToLower()]];
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool TryGetValue(string name, out SceneInterface scene)
         {
             try
@@ -108,7 +106,6 @@ namespace SilverSim.Scene.Management.Scene
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void Add(SceneInterface scene)
         {
             m_RegionNames.Add(scene.ID, scene.Name.ToLower());
@@ -162,7 +159,6 @@ namespace SilverSim.Scene.Management.Scene
             Remove(scene, (CultureInfo culture) => this.GetLanguageString(culture, "RegionIsShuttingDown", "Region is shutting down"));
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void Remove(SceneInterface scene, Func<CultureInfo, string> GetLocalizedOutput)
         {
             scene.LoginControl.NotReady(SceneInterface.ReadyFlags.Remove);

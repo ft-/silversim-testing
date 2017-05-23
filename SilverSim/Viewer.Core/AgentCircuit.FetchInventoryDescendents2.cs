@@ -25,7 +25,6 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Xml;
 
@@ -94,7 +93,6 @@ namespace SilverSim.Viewer.Core
             writer.WriteEndElement();
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void Cap_FetchInventoryDescendents2(HttpRequest httpreq)
         {
             IValue o;

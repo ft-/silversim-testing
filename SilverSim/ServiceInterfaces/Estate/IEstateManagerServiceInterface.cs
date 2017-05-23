@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Estate
 {
@@ -32,7 +31,6 @@ namespace SilverSim.ServiceInterfaces.Estate
 
     public interface IEstateManagerServiceInterface
     {
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         bool this[uint estateID, UUI agent] { get; set; }
 
         IEstateManagerServiceListAccessInterface All { get; }

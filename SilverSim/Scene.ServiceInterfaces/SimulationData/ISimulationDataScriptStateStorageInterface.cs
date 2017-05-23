@@ -20,13 +20,11 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public interface ISimulationDataScriptStateStorageInterface
     {
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         byte[] this[UUID regionID, UUID primID, UUID itemID] { get; set; }
 
         bool TryGetValue(UUID regionID, UUID primID, UUID itemID, out byte[] state);

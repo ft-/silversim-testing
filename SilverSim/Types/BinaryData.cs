@@ -20,11 +20,9 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class BinaryData : IValue, IEquatable<BinaryData>
     {
         private readonly byte[] m_Data;

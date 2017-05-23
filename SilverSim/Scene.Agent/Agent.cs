@@ -75,6 +75,27 @@ namespace SilverSim.Scene.Agent
         public UInt32 LocalID { get; set; }
         #endregion
 
+        private UUID m_TracksAgentID;
+
+        public UUID TracksAgentID
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_TracksAgentID;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_TracksAgentID = value;
+                }
+            }
+        }
+
+
         public double PhysicsGravityMultiplier
         {
             get { return 1; }

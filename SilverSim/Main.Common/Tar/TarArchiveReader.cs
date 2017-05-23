@@ -21,14 +21,12 @@
 
 using log4net;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 
 namespace SilverSim.Main.Common.Tar
 {
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class TarArchiveReader : Stream
     {
 #if DEBUG

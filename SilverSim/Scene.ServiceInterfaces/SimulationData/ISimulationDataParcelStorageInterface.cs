@@ -22,7 +22,6 @@
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
@@ -38,7 +37,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         ParcelInfo this[UUID regionID, UUID parcelID]
         {
             get;

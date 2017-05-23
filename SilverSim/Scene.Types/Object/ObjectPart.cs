@@ -34,14 +34,12 @@ using SilverSim.Types.StructuredData.Json;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Object
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public partial class ObjectPart : IPhysicalObject
     {
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
@@ -343,7 +341,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void TriggerOnUpdate(UpdateChangedFlags flags)
         {
             /* we have to check the ObjectGroup during setup process before using it here */
@@ -402,7 +399,6 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void TriggerOnPositionChange()
         {
             /* we have to check the ObjectGroup during setup process before using it here */
@@ -1908,7 +1904,6 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private static void ShapeFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
         {
             var shape = new PrimitiveShape();
@@ -2280,8 +2275,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
         {
             var part = new ObjectPart()

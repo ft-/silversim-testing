@@ -22,14 +22,12 @@
 #pragma warning disable RCS1123
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace SilverSim.Types
 {
     [StructLayout(LayoutKind.Sequential)]
-    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public struct Quaternion : IEquatable<Quaternion>, IValue
     {
         /// <summary>X value</summary>
@@ -734,7 +732,6 @@ namespace SilverSim.Types
 
         public static Quaternion operator /(Quaternion a, Quaternion b) => a * b.Conjugate();
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Quaternion(string val) => Parse(val);
 
         public static explicit operator string(Quaternion val) => val.ToString();
@@ -744,7 +741,6 @@ namespace SilverSim.Types
         public bool IsLSLTrue => !Equals(Identity);
 
         #region Byte conversion
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public byte[] AsByte
         {
             get

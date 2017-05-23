@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object
 {
     [Flags]
-    [SuppressMessage("Gendarme.Rules.Design", "FlagsShouldNotDefineAZeroValueRule")]
     public enum XmlSerializationOptions
     {
         None = 0,

@@ -21,7 +21,6 @@
 
 using SilverSim.Types.StructuredData.Llsd;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml;
 
@@ -50,9 +49,7 @@ namespace SilverSim.Types.Asset.Format
         public int SpecRotation;
         #endregion
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const double MATERIALS_MULTIPLIER = 10000f;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const byte DEFAULT_SPECULAR_LIGHT_EXPONENT = (byte)(0.2f * 255);
 
         #region Constructors
@@ -61,7 +58,6 @@ namespace SilverSim.Types.Asset.Format
             MaterialID = UUID.Random;
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Material(UUID id, Map m)
         {
             MaterialID = id;
@@ -89,7 +85,6 @@ namespace SilverSim.Types.Asset.Format
             SpecRotation = m["SpecRotation"].AsInt;
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Material(AssetData asset)
         {
             var m = LlsdXml.Deserialize(asset.InputStream) as Map;

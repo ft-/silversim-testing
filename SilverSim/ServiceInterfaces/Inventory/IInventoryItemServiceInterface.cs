@@ -22,7 +22,6 @@
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -37,12 +36,10 @@ namespace SilverSim.ServiceInterfaces.Inventory
         bool TryGetValue(UUID key, out InventoryItem item);
         bool ContainsKey(UUID key);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryItem this[UUID principalID, UUID key] { get; }
         bool TryGetValue(UUID principalID, UUID key, out InventoryItem item);
         bool ContainsKey(UUID principalID, UUID key);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<InventoryItem> this[UUID principalID, List<UUID> itemids] { get; }
         #endregion
 

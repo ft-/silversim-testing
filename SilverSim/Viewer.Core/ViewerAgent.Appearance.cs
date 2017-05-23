@@ -30,7 +30,6 @@ using SilverSim.Viewer.Messages.Appearance;
 using SilverSim.Viewer.Messages.Generic;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -73,7 +72,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentSetAppearance)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleSetAgentAppearance(Message p)
         {
             var m = (AgentSetAppearance)p;
@@ -109,7 +107,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentWearablesRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleAgentWearablesRequest(Message p)
         {
             var m = (AgentWearablesRequest)p;
@@ -141,7 +138,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentIsNowWearing)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleAgentIsNowWearing(Message p)
         {
             var m = (AgentIsNowWearing)p;
@@ -172,7 +168,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentCachedTexture)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleAgentCachedTexture(Message p)
         {
             var m = (AgentCachedTexture)p;

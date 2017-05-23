@@ -24,14 +24,12 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public abstract class UploadAssetAbstractCapability : ICapabilityInterface
     {
         public abstract string CapabilityName { get; }

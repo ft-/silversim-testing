@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Updater;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -35,8 +34,6 @@ namespace SilverSim.Scripting.Common
 {
     public static class CompilerRegistry
     {
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public class RegistryImpl : IScriptCompilerRegistry
         {
             private readonly RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();
@@ -363,7 +360,6 @@ namespace SilverSim.Scripting.Common
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
         public static readonly RegistryImpl ScriptCompilers = new RegistryImpl();
     }
 }

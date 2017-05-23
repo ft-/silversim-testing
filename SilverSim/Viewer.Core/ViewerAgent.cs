@@ -51,22 +51,20 @@ using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Alert;
 using SilverSim.Viewer.Messages.Avatar;
-using SilverSim.Viewer.Messages.Parcel;
-using SilverSim.Viewer.Messages.Script;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using SilverSim.Viewer.Messages.User;
 using SilverSim.Viewer.Messages.Circuit;
 using SilverSim.Viewer.Messages.God;
 using SilverSim.Viewer.Messages.MuteList;
-using SilverSim.Viewer.Messages.Alert;
+using SilverSim.Viewer.Messages.Parcel;
+using SilverSim.Viewer.Messages.Script;
+using SilverSim.Viewer.Messages.User;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace SilverSim.Viewer.Core
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public partial class ViewerAgent : SilverSim.Scene.Agent.Agent
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
@@ -652,7 +650,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.RegionHandshakeReply)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleRegionHandshakeReply(Message m)
         {
             var rhr = (Messages.Region.RegionHandshakeReply)m;
@@ -780,7 +777,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.CompleteAgentMovement)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleCompleteAgentMovement(Message m)
         {
             var cam = (CompleteAgentMovement)m;
@@ -875,7 +871,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.LogoutRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleLogoutRequest(Message m)
         {
             var lr = (LogoutRequest)m;
@@ -908,7 +903,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.MuteListRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleMuteListRequest(Message m)
         {
             var req = (MuteListRequest)m;
@@ -921,6 +915,22 @@ namespace SilverSim.Viewer.Core
                 AgentID = req.AgentID
             };
             SendMessageAlways(res, m.CircuitSceneID);
+        }
+
+        [PacketHandler(MessageType.TrackAgent)]
+        public void HandleTrackAgent(Message m)
+        {
+            var req = (TrackAgent)m;
+            if(req.AgentID != ID || req.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+            TracksAgentID = req.PreyID;
+            AgentCircuit circuit;
+            if(Circuits.TryGetValue(m.CircuitSessionID, out circuit))
+            {
+                circuit.Scene?.SendCoarseLocationUpdateToSpecificAgent(this);
+            }
         }
 
         #region Enable Simulator call for Teleport handling

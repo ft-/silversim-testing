@@ -25,13 +25,10 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
     #region Service Implementation
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("Memory Simulation Data Backend")]
     public sealed partial class MemorySimulationDataStorage : SimulationDataStorageInterface, IPlugin
     {

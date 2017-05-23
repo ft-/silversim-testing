@@ -25,12 +25,10 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Timers;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class NotecardCache
     {
         private readonly SceneInterface m_Scene;
@@ -65,7 +63,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public Notecard this[UUID assetid]
         {
             get

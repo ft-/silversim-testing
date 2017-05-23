@@ -31,14 +31,12 @@ using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using DeRezAction = SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public struct RezObjectParams
         {
             public Vector3 RayStart;
@@ -173,8 +171,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.DeRezObject)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleDeRezObject(Message m)
         {
             Viewer.Messages.Object.DeRezAck ackres;

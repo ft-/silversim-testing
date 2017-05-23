@@ -28,7 +28,6 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Database.MySQL.Grid
@@ -78,7 +77,6 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
         #region Accessors
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override RegionInfo this[UUID scopeID, UUID regionID]
         {
             get
@@ -108,7 +106,6 @@ namespace SilverSim.Database.MySQL.Grid
             return m_Data.TryGetValue(regionID, out rInfo) && (scopeID == UUID.Zero || scopeID == rInfo.ScopeID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override RegionInfo this[UUID scopeID, uint gridX, uint gridY]
         {
             get
@@ -154,7 +151,6 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override RegionInfo this[UUID scopeID, string regionName]
         {
             get

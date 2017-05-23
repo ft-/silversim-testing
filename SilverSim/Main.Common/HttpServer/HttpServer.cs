@@ -28,7 +28,6 @@ using SilverSim.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -305,10 +304,6 @@ namespace SilverSim.Main.Common.HttpServer
             return ipAddr.ToString();
         }
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void AcceptedConnectionPlain(object socko)
         {
             try
@@ -344,10 +339,6 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void AcceptedConnectionSsl(object socko)
         {
             try
@@ -413,10 +404,6 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void AcceptedConnection_Internal(Stream httpstream, string remoteAddr, bool isSsl)
         {
             try

@@ -20,13 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Grid
 {
     [Flags]
-    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum TeleportFlags : uint
     {
         None = 0,

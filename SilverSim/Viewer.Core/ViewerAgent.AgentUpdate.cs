@@ -25,10 +25,8 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Viewer.Messages;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System;
 using SilverSim.Viewer.Messages.Agent;
+using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Core
 {
@@ -196,7 +194,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.SetAlwaysRun)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleSetAlwaysRun(Message m)
         {
             var sar = (SetAlwaysRun)m;
@@ -223,7 +220,6 @@ namespace SilverSim.Viewer.Core
         public override bool IsFlying => m_IsFlying;
 
         [PacketHandler(MessageType.AgentUpdate)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleAgentUpdateMessage(Message m)
         {
             /* only AgentUpdate is passed here */

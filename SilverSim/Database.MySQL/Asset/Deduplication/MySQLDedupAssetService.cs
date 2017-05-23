@@ -32,14 +32,12 @@ using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 
 namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
     #region Service Implementation
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Deduplication Asset Backend")]
     public sealed class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
@@ -271,7 +269,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #region Data interface
         public override IAssetDataServiceInterface Data => this;
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         Stream IAssetDataServiceInterface.this[UUID key]
         {
             get
@@ -310,7 +307,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region Store asset method
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Store(AssetData asset)
         {
             using (var sha = SHA1.Create())

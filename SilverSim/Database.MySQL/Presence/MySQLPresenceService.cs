@@ -32,7 +32,6 @@ using SilverSim.Types.Presence;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Presence
 {
@@ -142,7 +141,6 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
             get { throw new NotSupportedException(); }
@@ -157,10 +155,7 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public override PresenceInfo this[UUID sessionID, UUID userID, PresenceServiceInterface.SetType reportType]
+        public override PresenceInfo this[UUID sessionID, UUID userID, SetType reportType]
         {
             /* setting null means logout, != null login message */
             set

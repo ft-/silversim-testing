@@ -29,7 +29,6 @@ using SilverSim.Types.Presence;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Database.Memory.Presence
@@ -54,7 +53,6 @@ namespace SilverSim.Database.Memory.Presence
         public override List<PresenceInfo> this[UUID userID] =>
             new List<PresenceInfo>(from presence in m_Data.Values where presence.UserID.ID == userID select presence);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
             get { throw new NotSupportedException(); }
@@ -69,9 +67,6 @@ namespace SilverSim.Database.Memory.Presence
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID, PresenceServiceInterface.SetType reportType]
         {
             /* setting null means logout, != null login message */

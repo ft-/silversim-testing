@@ -29,11 +29,9 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class NewFileAgentInventory : UploadAssetAbstractCapability
     {
         private readonly InventoryServiceInterface m_InventoryService;

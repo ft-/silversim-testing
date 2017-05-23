@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Main.Common
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class PluginNameAttribute : Attribute
     {
         public PluginNameAttribute(string name)

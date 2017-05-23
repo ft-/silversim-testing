@@ -30,12 +30,9 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class UpdateScriptTask : UploadAssetAbstractCapability
     {
         private static readonly ILog m_Log = LogManager.GetLogger("UPDATE SCRIPT TASK");

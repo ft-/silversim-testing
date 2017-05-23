@@ -27,7 +27,6 @@ using SilverSim.Types;
 using SilverSim.Types.Account;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Database.Memory.UserAccounts
@@ -62,7 +61,6 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, UUID accountID]
         {
             get
@@ -108,7 +106,6 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string email]
         {
             get
@@ -155,7 +152,6 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string firstName, string lastName]
         {
             get

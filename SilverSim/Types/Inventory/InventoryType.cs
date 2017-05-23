@@ -19,11 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace SilverSim.Types.Inventory
 {
-    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum InventoryType : sbyte
     {
         Unknown = -1,

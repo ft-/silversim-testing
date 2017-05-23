@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
@@ -52,7 +51,6 @@ namespace SilverSim.Database.MySQL.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         bool IClassifiedsInterface.TryGetValue(UUI user, UUID id, out ProfileClassified classified)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))

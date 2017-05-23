@@ -25,7 +25,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace SilverSim.Main.Common.Caps
@@ -38,7 +37,6 @@ namespace SilverSim.Main.Common.Caps
 
         public readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>> Caps = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>>(() => new RwLockedDictionary<UUID, Action<HttpRequest>>());
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void RequestHandler(HttpRequest httpreq)
         {
             Action<HttpRequest> del;

@@ -23,7 +23,6 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Database.Memory.Estate
@@ -43,7 +42,6 @@ namespace SilverSim.Database.Memory.Estate
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         bool IEstateGroupsServiceInterface.this[uint estateID, UGI group]
         {
             get

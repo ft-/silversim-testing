@@ -19,12 +19,10 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.ServiceInterfaces.Account;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Presence
@@ -110,7 +108,6 @@ namespace SilverSim.ServiceInterfaces.Presence
 
         public abstract List<PresenceInfo> GetPresencesInRegion(UUID regionId);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract PresenceInfo this[UUID sessionID, UUID userID]
         {
             /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */
@@ -118,8 +115,6 @@ namespace SilverSim.ServiceInterfaces.Presence
             set; /* setting null means logout, != null not allowed */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public abstract PresenceInfo this[UUID sessionID, UUID userID, SetType reportType]
         {
             /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */

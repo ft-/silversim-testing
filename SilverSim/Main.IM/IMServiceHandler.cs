@@ -26,13 +26,11 @@ using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Threading;
 using SilverSim.Types.IM;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Main.IM
 {
     #region Service Implementation
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     [Description("IM Service")]
     public class IMServiceHandler : IMServiceInterface, IPlugin
     {
@@ -42,7 +40,6 @@ namespace SilverSim.Main.IM
         private readonly object m_Lock = new object();
         private IMRouter m_IMRouter;
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void IMSendThread(object s)
         {
             var service = (IMServiceHandler)s;

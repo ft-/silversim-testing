@@ -29,7 +29,6 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Database.Memory.Inventory
@@ -52,10 +51,8 @@ namespace SilverSim.Database.Memory.Inventory
 
         IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content => m_ContentService;
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override IInventoryFolderServiceInterface Folder => this;
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override IInventoryItemServiceInterface Item => this;
 
         public override List<InventoryItem> GetActiveGestures(UUID principalID)

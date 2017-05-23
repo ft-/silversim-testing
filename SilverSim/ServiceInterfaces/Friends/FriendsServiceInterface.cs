@@ -23,7 +23,6 @@ using SilverSim.Types;
 using SilverSim.Types.Friends;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Friends
@@ -53,7 +52,6 @@ namespace SilverSim.ServiceInterfaces.Friends
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract FriendInfo this[UUI user, UUI friend] { get; }
 
         public abstract List<FriendInfo> this[UUI user] { get; }

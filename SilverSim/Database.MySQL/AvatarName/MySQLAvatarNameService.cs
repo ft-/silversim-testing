@@ -27,10 +27,8 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.AvatarName
 {
@@ -78,7 +76,6 @@ namespace SilverSim.Database.MySQL.AvatarName
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UUI this[string firstName, string lastName]
         {
             get

@@ -20,8 +20,6 @@
 // exception statement from your version.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -158,7 +156,6 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private static IValue DeserializeInternal(XmlTextReader input)
         {
             switch(input.Name)

@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Viewer.Messages.LayerData
@@ -64,7 +63,6 @@ namespace SilverSim.Viewer.Messages.LayerData
                 return a.Value < b.Value;
             }
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
             public override bool Equals(object obj)
             {
                 if (obj is HeightmapLookupValue)
@@ -79,7 +77,6 @@ namespace SilverSim.Viewer.Messages.LayerData
                 return Value.GetHashCode();
             }
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
             public bool Equals(HeightmapLookupValue v)
             {
                 return Value.Equals(v.Value);

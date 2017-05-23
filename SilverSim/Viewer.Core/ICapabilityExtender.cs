@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     /* used on methods compatible with FactoryDelegate */
     public sealed class CapabilityHandlerAttribute : Attribute
     {

@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace SilverSim.Scene.Types.Script.Events
@@ -30,10 +29,8 @@ namespace SilverSim.Scene.Types.Script.Events
         string Localize(ListenEvent le, CultureInfo currentCulture);
     }
 
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct ListenEvent : IScriptEvent
     {
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
         public enum ChatType : byte
         {
             Whisper = 0,
@@ -47,7 +44,6 @@ namespace SilverSim.Scene.Types.Script.Events
             Broadcast = 0xFF
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
         public enum ChatSourceType : byte
         {
             System = 0,
@@ -55,9 +51,7 @@ namespace SilverSim.Scene.Types.Script.Events
             Object = 2,
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int PUBLIC_CHANNEL = 0;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int DEBUG_CHANNEL = 0x7FFFFFFF;
 
         #region Extension Fields for Chat Router

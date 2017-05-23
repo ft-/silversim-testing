@@ -21,14 +21,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Types.Primitive
 {
     public class TextureEntry : Asset.Format.IReferencesAccessor
     {
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int MAX_TEXTURE_FACES = 32;
         private readonly TextureEntryFace[] m_FaceTextures = new TextureEntryFace[MAX_TEXTURE_FACES];
         public TextureEntryFace DefaultTexture;
@@ -398,7 +396,6 @@ namespace SilverSim.Types.Primitive
 
         public static implicit operator byte[] (TextureEntry e) => e.GetBytes();
 
-        [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidComplexMethodsRule")]
         public byte[] GetBytes()
         {
             if (DefaultTexture == null)

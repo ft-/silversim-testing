@@ -20,13 +20,11 @@
 // exception statement from your version.
 
 using SilverSim.Types.StructuredData.Llsd;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Asset.Format.Mesh
 {
     public class PhysicsMesh : MeshLOD
     {
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public PhysicsMesh(AssetData asset)
         {
             if (asset.Type != AssetType.Mesh)

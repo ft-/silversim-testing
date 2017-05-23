@@ -23,13 +23,11 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 
 namespace SilverSim.Types.Asset.Format
 {
-    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum WearableType : byte
     {
         Shape = 0,
@@ -72,7 +70,6 @@ namespace SilverSim.Types.Asset.Format
             SaleInfo.PermMask = (InventoryPermissionsMask)0x7FFFFFFF;
         }
 
-        [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidComplexMethodsRule")]
         public Wearable(AssetData asset)
         {
             var lines = Encoding.UTF8.GetString(asset.Data).Split('\n');
@@ -328,8 +325,6 @@ namespace SilverSim.Types.Asset.Format
                 "}}\n" +
                 "type\t{11}\n";
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
         public byte[] WearableData
         {
             get

@@ -22,14 +22,10 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
-using System.Diagnostics.CodeAnalysis;
 using System.Timers;
-using System;
 
 namespace SilverSim.Scene.Types.Physics
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
-    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class AgentUfoPhysics : IAgentPhysicsObject
     {
         private readonly Timer m_UfoTimer;

@@ -23,14 +23,11 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Profile;
-using SilverSim.Threading;
 using SilverSim.Types;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.Memory.Profile
 {
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Profile Backend")]
     public partial class MemoryProfileService : ProfileServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {

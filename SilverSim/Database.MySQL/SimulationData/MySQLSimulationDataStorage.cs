@@ -25,17 +25,14 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.ServiceInterfaces.Database;
-using SilverSim.Types;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System;
 using SilverSim.ServiceInterfaces.Statistics;
+using SilverSim.Types;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
     #region Service Implementation
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Simulation Data Backend")]
     public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IQueueStatsAccess
     {

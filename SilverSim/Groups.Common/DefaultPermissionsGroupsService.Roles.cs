@@ -22,15 +22,12 @@
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Groups.Common
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupRolesInterface
     {
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         GroupRole IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUID roleID] =>
             m_InnerService.Roles[requestingAgent, group, roleID];
 
@@ -40,11 +37,9 @@ namespace SilverSim.Groups.Common
         bool IGroupRolesInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID) =>
             m_InnerService.Roles.ContainsKey(requestingAgent, group, roleID);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group] =>
             m_InnerService.Roles[requestingAgent, group];
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUI principal] =>
             m_InnerService.Roles[requestingAgent, group, principal];
 

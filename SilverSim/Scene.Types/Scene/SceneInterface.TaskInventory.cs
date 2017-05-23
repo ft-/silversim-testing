@@ -33,7 +33,6 @@ using SilverSim.Types.ServerURIs;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.TaskInventory;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 
@@ -110,7 +109,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.UpdateTaskInventory)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleUpdateTaskInventory(Message m)
         {
             var req = (UpdateTaskInventory)m;
@@ -310,7 +308,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.MoveTaskInventory)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleMoveTaskInventory(Message m)
         {
             var req = (MoveTaskInventory)m;
@@ -363,7 +360,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.RemoveTaskInventory)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRemoveTaskInventory(Message m)
         {
             var req = (RemoveTaskInventory)m;
@@ -424,9 +420,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.RequestTaskInventory)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleRequestTaskInventory(Message m)
         {
             var req = (RequestTaskInventory)m;

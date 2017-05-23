@@ -34,13 +34,10 @@ using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scripting.Common;
-using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.IM;
-using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Neighbor;
-using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -54,7 +51,6 @@ using SilverSim.Viewer.Messages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -104,10 +100,8 @@ namespace SilverSim.Scene.Implementation.Basic
                 });
             }
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<IObject> GetEnumerator() => m_Scene.m_Objects.Values.GetEnumerator();
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
@@ -130,10 +124,8 @@ namespace SilverSim.Scene.Implementation.Basic
 
             public int Count => m_Scene.m_PrimitiveCount;
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<ObjectPart> GetEnumerator() => m_Scene.m_Primitives.Values.GetEnumerator();
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
@@ -200,10 +192,8 @@ namespace SilverSim.Scene.Implementation.Basic
 
             public bool TryGetValue(int localID, out ParcelInfo pinfo) => m_Scene.m_Parcels.TryGetValue(localID, out pinfo);
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<ParcelInfo> GetEnumerator() => m_Scene.m_Parcels.Values.GetEnumerator();
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public void Add(ParcelInfo parcelInfo)
@@ -257,10 +247,8 @@ namespace SilverSim.Scene.Implementation.Basic
 
             public bool TryGetValue(UUID id, out IAgent obj) => m_BasicScene.m_Agents.TryGetValue(id, out obj);
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<IAgent> GetEnumerator() => m_BasicScene.m_Agents.Values.GetEnumerator();
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
@@ -316,7 +304,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 return true;
             }
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<IAgent> GetEnumerator()
             {
                 ICollection<IAgent> agents = m_BasicScene.m_Agents.Values;
@@ -331,7 +318,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 return rootAgents.GetEnumerator();
             }
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
         #endregion
@@ -522,7 +508,6 @@ namespace SilverSim.Scene.Implementation.Basic
         }
 
         #region Internal Delegates
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private bool IMSend(GridInstantMessage im)
         {
             IAgent agent;
@@ -866,8 +851,6 @@ namespace SilverSim.Scene.Implementation.Basic
         internal int m_PrimitiveCount;
         internal int m_AgentCount;
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Add(IObject obj)
         {
             var objgroup = obj as ObjectGroup;
@@ -1165,7 +1148,6 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #region Scene LL Message interface
         [PacketHandler(MessageType.RequestRegionInfo)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleRequestRegionInfo(Message m)
         {
             var req = (Viewer.Messages.Region.RequestRegionInfo)m;

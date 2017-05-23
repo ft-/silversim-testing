@@ -19,13 +19,11 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages;
-using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
-using System;
-using System.Diagnostics.CodeAnalysis;
+using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
+using System;
 
 namespace SilverSim.Viewer.Core
 {
@@ -71,7 +69,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentDataUpdateRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleAgentDataUpdateRequest(Message m)
         {
             var adur = (AgentDataUpdateRequest)m;

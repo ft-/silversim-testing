@@ -20,11 +20,9 @@
 // exception statement from your version.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct TouchEvent : IScriptDetectedEvent
     {
         public enum TouchType

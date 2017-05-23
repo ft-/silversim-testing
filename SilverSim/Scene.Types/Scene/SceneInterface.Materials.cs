@@ -26,11 +26,9 @@ using SilverSim.Types.Asset.Format;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Threading;
-using System.Xml;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -72,7 +70,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public Material GetMaterial(UUID matid)
         {
             Material mat;
@@ -116,7 +113,6 @@ namespace SilverSim.Scene.Types.Scene
             AddMaterial(mat);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void AddMaterials(List<Material> mats)
         {
             m_MaterialsRwLock.AcquireWriterLock(-1);
@@ -158,7 +154,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         /* Collect legacy materials and push them to materials */
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void AddLegacyMaterials(ObjectGroup sog)
         {
             var mats = new List<Material>();

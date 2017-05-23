@@ -23,7 +23,6 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml;
 
@@ -139,7 +138,6 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup.FromXml(reader, currentOwner)
         };
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private static List<ObjectGroup> FromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner)
         {
             var list = new List<ObjectGroup>();

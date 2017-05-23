@@ -24,7 +24,6 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -33,15 +32,12 @@ namespace SilverSim.ServiceInterfaces.Inventory
         public abstract void Remove(UUID scopeID, UUID accountID);
 
         #region Accessors
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract IInventoryFolderServiceInterface Folder { get; }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract IInventoryItemServiceInterface Item { get; }
 
         public abstract List<InventoryItem> GetActiveGestures(UUID principalID);
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void VerifyInventoryFolder(UUID principalID, UUID parentFolderID, string name, AssetType type)
         {
             InventoryFolder folder;
@@ -66,7 +62,6 @@ namespace SilverSim.ServiceInterfaces.Inventory
             throw new NotSupportedException("InventoryServiceInterface.GetInventorySkeleton");
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public virtual void CheckInventory(UUID principalID)
         {
             InventoryFolder rootFolder;

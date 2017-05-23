@@ -21,7 +21,6 @@
 
 using SilverSim.Http;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 
@@ -33,7 +32,6 @@ namespace SilverSim.Main.Common.HttpServer
         KeepAlive
     }
 
-    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public abstract class HttpRequest
     {
         #region Private Fields
@@ -123,8 +121,6 @@ namespace SilverSim.Main.Common.HttpServer
 
         public abstract void SetConnectionClose();
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         protected HttpRequest(bool isSsl)
         {
             IsSsl = isSsl;

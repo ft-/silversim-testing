@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Assembly
 {
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class InterfaceVersionAttribute : Attribute
     {
         public InterfaceVersionAttribute(string version)

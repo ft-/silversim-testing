@@ -26,7 +26,6 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace SilverSim.Viewer.Core
@@ -49,7 +48,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public static void HandleSimCircuitRequest(HttpRequest req, ConfigurationLoader loader)
         {
             if (req.ContainsHeader("X-SecondLife-Shard"))

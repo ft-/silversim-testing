@@ -25,12 +25,10 @@ using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages.Avatar;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Scene.Types.Agent
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class AgentAnimationController
     {
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT ANIMATION");
@@ -66,7 +64,6 @@ namespace SilverSim.Scene.Types.Agent
 
         private string m_CurrentDefaultAnimation = "standing";
         private uint m_NextAnimSeqNumber;
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         private struct AnimationInfo
         {
             public UUID AnimID;

@@ -25,7 +25,6 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 
@@ -69,7 +68,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return v;
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         internal static MeshLOD SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape, bool generate_uv = false)
         {
             bool mirror = shape.IsSculptMirrored;

@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
@@ -29,13 +28,11 @@ using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Database.Memory.Asset
 {
     #region Service Implementation
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("Memory Asset Backend")]
     public class MemoryAssetService : AssetServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
@@ -165,7 +162,6 @@ namespace SilverSim.Database.Memory.Asset
         #region Data interface
         public override IAssetDataServiceInterface Data => this;
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         Stream IAssetDataServiceInterface.this[UUID key]
         {
             get
@@ -196,7 +192,6 @@ namespace SilverSim.Database.Memory.Asset
         #endregion
 
         #region Store asset method
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Store(AssetData asset)
         {
             AssetData internalAsset;

@@ -30,7 +30,6 @@ using SilverSim.Viewer.Messages.Economy;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Viewer.Economy
@@ -51,7 +50,6 @@ namespace SilverSim.Viewer.Economy
             ThreadManager.CreateThread(HandlerThread).Start();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void HandlerThread()
         {
             Thread.CurrentThread.Name = "Economy Handler Thread";
@@ -93,7 +91,6 @@ namespace SilverSim.Viewer.Economy
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleEconomyDataRequest(AgentCircuit circuit, Message m)
         {
             SceneInterface scene;
@@ -135,7 +132,6 @@ namespace SilverSim.Viewer.Economy
             agent.SendMessageAlways(ed, scene.ID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleMoneyBalanceRequest(AgentCircuit circuit, Message m)
         {
             var mbr = (MoneyBalanceRequest)m;

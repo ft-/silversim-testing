@@ -19,20 +19,18 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Script;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types.Script;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Scene.Types.Agent;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Script;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
         [PacketHandler(MessageType.ScriptReset)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleScriptReset(Message m)
         {
             var req = (ScriptReset)m;
@@ -65,7 +63,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.GetScriptRunning)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleGetScriptRunning(Message m)
         {
             var req = (GetScriptRunning)m;
@@ -94,7 +91,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ScriptAnswerYes)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleScriptAnswerYes(Message m)
         {
             var req = (ScriptAnswerYes)m;
@@ -127,7 +123,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.RevokePermissions)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRevokePermissions(Message m)
         {
             var req = (RevokePermissions)m;

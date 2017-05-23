@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 
@@ -28,7 +27,6 @@ namespace SilverSim.Main.Common
 {
     public static class VersionInfo
     {
-        [SuppressMessage("Gendarme.Rules.Portability", "DoNotHardcodePathsRule", Justification = "Gendarme misinterprets the string")]
         public static string ProductName => "SilverSim/Arriba";
 
         public static string Shard => "Development";
@@ -37,7 +35,6 @@ namespace SilverSim.Main.Common
 
         public static bool IsPlatformMono => Type.GetType("Mono.Runtime") != null;
 
-        [SuppressMessage("Gendarme.Rules.Portability", "DoNotHardcodePathsRule", Justification = "Gendarme misinterprets the string")]
         public static string RuntimeInformation
         {
             get

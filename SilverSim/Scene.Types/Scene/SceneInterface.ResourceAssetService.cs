@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.StructuredData.AssetXml;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 
@@ -115,7 +114,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public override IAssetDataServiceInterface Data => this;
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             Stream IAssetDataServiceInterface.this[UUID key] => new MemoryStream(m_ResourceAssets.GetAsset(key).Data);
 
             bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)

@@ -21,15 +21,12 @@
 
 using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
         [PacketHandler(MessageType.RegionHandleRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleRegionHandleRequest(Message m)
         {
             var req = (Viewer.Messages.Region.RegionHandleRequest)m;

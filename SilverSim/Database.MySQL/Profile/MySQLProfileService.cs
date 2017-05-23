@@ -29,11 +29,9 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Types;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Profile Backend")]
     public sealed partial class MySQLProfileService : ProfileServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {

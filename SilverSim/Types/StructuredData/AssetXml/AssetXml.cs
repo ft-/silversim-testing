@@ -21,7 +21,6 @@
 
 using SilverSim.Types.Asset;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -91,7 +90,6 @@ namespace SilverSim.Types.StructuredData.AssetXml
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private static AssetData ParseAssetDataInternal(XmlTextReader reader)
         {
             var asset = new AssetData();

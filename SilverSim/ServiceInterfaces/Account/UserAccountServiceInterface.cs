@@ -23,7 +23,6 @@ using SilverSim.Types;
 using SilverSim.Types.Account;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Account
@@ -53,13 +52,10 @@ namespace SilverSim.ServiceInterfaces.Account
 
     public abstract class UserAccountServiceInterface : IUserAccountDeleteServiceInterface
     {
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UserAccount this[UUID scopeID, UUID accountID] { get; }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UserAccount this[UUID scopeID, string email] { get; }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UserAccount this[UUID scopeID, string firstName, string lastName] { get; }
 
         public abstract bool ContainsKey(UUID scopeID, UUID accountID);

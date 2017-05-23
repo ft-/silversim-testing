@@ -23,7 +23,6 @@
 
 using SilverSim.Threading;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -62,7 +61,6 @@ namespace SilverSim.Http.Client
         private static readonly RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>> m_StreamList = new RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>>(() => new RwLockedList<StreamInfo>());
         private static readonly Timer m_Timer;
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private static void CleanUpTimer(object sender, ElapsedEventArgs e)
         {
             try

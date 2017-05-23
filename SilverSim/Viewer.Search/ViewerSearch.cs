@@ -35,7 +35,6 @@ using SilverSim.Viewer.Messages.Search;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 using System.Xml;
@@ -62,7 +61,6 @@ namespace SilverSim.Viewer.Search
             ThreadManager.CreateThread(HandlerThread).Start();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void HandlerThread()
         {
             Thread.CurrentThread.Name = "Search Handler Thread";
@@ -296,7 +294,6 @@ namespace SilverSim.Viewer.Search
         }
 
         [CapabilityHandler("AvatarPickerSearch")]
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public void HandleAvatarPickerSearchCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
         {
             if (req.CallerIP != circuit.RemoteIP)

@@ -19,11 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace SilverSim.Scene.Types.Script.Events
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public class ResetScriptEvent : IScriptEvent
     {
     }

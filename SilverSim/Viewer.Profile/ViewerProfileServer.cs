@@ -41,7 +41,6 @@ using SilverSim.Viewer.Messages.Search;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Threading;
@@ -134,7 +133,6 @@ namespace SilverSim.Viewer.Profile
             ThreadManager.CreateThread(HandlerThread).Start();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void HandlerThread()
         {
             Thread.CurrentThread.Name = "Profile Handler Thread";
@@ -250,7 +248,6 @@ namespace SilverSim.Viewer.Profile
         }
 
         #region Lookup actual service for profile
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private ProfileServiceData LookupProfileService(SceneInterface scene, UUID agentID, out UUI agentUUI)
         {
             ProfileServiceData serviceData = null;
@@ -337,7 +334,6 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Classifieds
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleDirClassifiedQuery(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (DirClassifiedQuery)m;
@@ -349,7 +345,6 @@ namespace SilverSim.Viewer.Profile
 
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleAvatarClassifiedsRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if(m.AgentID != m.CircuitAgentID ||
@@ -432,7 +427,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleClassifiedInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (ClassifiedInfoRequest)m;
@@ -490,7 +484,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleClassifiedInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (ClassifiedInfoUpdate)m;
@@ -526,7 +519,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleClassifiedDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (ClassifiedDelete)m;
@@ -564,7 +556,6 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Notes
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleAvatarNotesRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if (m.AgentID != m.CircuitAgentID ||
@@ -610,7 +601,6 @@ namespace SilverSim.Viewer.Profile
             agent.SendMessageAlways(reply, scene.ID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleAvatarNotesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarNotesUpdate)m;
@@ -637,7 +627,6 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Picks
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleAvatarPicksRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if(m.AgentID != m.CircuitAgentID ||
@@ -719,7 +708,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandlePickInfoRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if (m.AgentID != m.CircuitAgentID ||
@@ -784,7 +772,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandlePickInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (PickInfoUpdate)m;
@@ -818,7 +805,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandlePickDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (PickDelete)m;
@@ -843,7 +829,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandlePickGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (PickGodDelete)m;
@@ -857,7 +842,6 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region User Info
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleUserInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (UserInfoRequest)m;
@@ -894,7 +878,6 @@ namespace SilverSim.Viewer.Profile
             agent.SendMessageAlways(reply, scene.ID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleUpdateUserInfo(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (UpdateUserInfo)m;
@@ -927,7 +910,6 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Avatar Properties
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleAvatarPropertiesRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarPropertiesRequest)m;
@@ -1061,7 +1043,6 @@ namespace SilverSim.Viewer.Profile
             agent.SendMessageAlways(res3, scene.ID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleAvatarPropertiesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarPropertiesUpdate)m;
@@ -1104,7 +1085,6 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void HandleAvatarInterestsUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (AvatarInterestsUpdate)m;

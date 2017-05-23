@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.AvatarName
 {
@@ -63,7 +62,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
         public abstract void Store(UUI uui);
         public abstract bool Remove(UUID key);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UUI this[string firstName, string lastName] { get; }
 
         public abstract bool TryGetValue(string firstName, string lastName, out UUI uui);

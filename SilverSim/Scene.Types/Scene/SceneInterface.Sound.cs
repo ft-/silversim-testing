@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Sound;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -187,8 +186,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.SoundTrigger)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleSoundTrigger(Message m)
         {
             var req = (SoundTrigger)m;

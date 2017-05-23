@@ -21,13 +21,11 @@
 
 using SilverSim.Types.Estate;
 using SilverSim.Viewer.Messages.Simulator;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum SimStatIndex
         {
             TimeDilation,

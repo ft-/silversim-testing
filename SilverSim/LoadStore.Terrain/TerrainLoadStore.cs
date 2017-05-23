@@ -19,18 +19,17 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Terrain;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 
 namespace SilverSim.LoadStore.Terrain
@@ -81,7 +80,6 @@ namespace SilverSim.LoadStore.Terrain
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void LoadTerrainCommand(List<string> args, TTY io, UUID limitedToScene)
         {
             UUID selectedScene = io.SelectedScene;
@@ -200,7 +198,6 @@ namespace SilverSim.LoadStore.Terrain
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void SaveTerrainCommand(List<string> args, TTY io, UUID limitedToScene)
         {
             UUID selectedScene = io.SelectedScene;

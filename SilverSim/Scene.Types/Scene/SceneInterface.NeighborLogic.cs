@@ -22,17 +22,16 @@
 using SilverSim.Http.Client;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script.Events;
-using SilverSim.Types.StructuredData.Llsd;
+using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages.Chat;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Threading;
-using SilverSim.ServiceInterfaces.ServerParam;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -51,7 +50,6 @@ namespace SilverSim.Scene.Types.Scene
 
         public readonly Dictionary<UUID, NeighborEntry> Neighbors = new Dictionary<UUID, NeighborEntry>();
 
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
         public TryGetSceneDelegate TryGetScene;
 
@@ -234,7 +232,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void VerifyNeighbor(RegionInfo rinfo)
         {
             if(rinfo.ServerURI == ServerURI)

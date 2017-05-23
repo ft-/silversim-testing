@@ -23,13 +23,11 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 namespace SilverSim.Main.Common.Tar
 {
-    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class TarArchiveWriter
     {
         private readonly Stream m_Stream;

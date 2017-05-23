@@ -23,7 +23,6 @@ using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Profile
 {
@@ -32,7 +31,6 @@ namespace SilverSim.ServiceInterfaces.Profile
         public interface IClassifiedsInterface
         {
             Dictionary<UUID, string> GetClassifieds(UUI user);
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             ProfileClassified this[UUI user, UUID id] { get; }
             bool TryGetValue(UUI user, UUID id, out ProfileClassified classified);
             bool ContainsKey(UUI user, UUID id);
@@ -43,7 +41,6 @@ namespace SilverSim.ServiceInterfaces.Profile
         public interface IPicksInterface
         {
             Dictionary<UUID, string> GetPicks(UUI user);
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             ProfilePick this[UUI user, UUID id] { get; }
             bool TryGetValue(UUI user, UUID id, out ProfilePick pick);
             bool ContainsKey(UUI user, UUID id);
@@ -53,7 +50,6 @@ namespace SilverSim.ServiceInterfaces.Profile
 
         public interface INotesInterface
         {
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             string this[UUI user, UUI target] { get; set; }
             bool TryGetValue(UUI user, UUI target, out string notes);
             bool ContainsKey(UUI user, UUI target);
@@ -67,7 +63,6 @@ namespace SilverSim.ServiceInterfaces.Profile
         }
 
         [Flags]
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum PropertiesUpdateFlags
         {
             None = 0,
@@ -78,8 +73,6 @@ namespace SilverSim.ServiceInterfaces.Profile
         public interface IPropertiesInterface
         {
             ProfileProperties this[UUI user] { get; }
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
             ProfileProperties this[UUI user, PropertiesUpdateFlags flags] { set; }
         }
 

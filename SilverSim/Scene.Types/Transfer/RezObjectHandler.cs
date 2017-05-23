@@ -29,7 +29,6 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Transfer
 {
@@ -63,7 +62,6 @@ namespace SilverSim.Scene.Types.Transfer
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void AssetTransferComplete()
         {
             AssetData data;

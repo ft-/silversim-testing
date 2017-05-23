@@ -28,14 +28,12 @@ using SilverSim.Threading;
 using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
 namespace SilverSim.Viewer.Core
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract partial class Circuit : ICircuit
     {
         public bool ForceUseCircuitCode;
@@ -97,7 +95,6 @@ namespace SilverSim.Viewer.Core
         protected uint NextSequenceNumber => (uint)Interlocked.Increment(ref __SequenceNumber);
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public sealed class IgnoreMethodAttribute : Attribute
         {
         }

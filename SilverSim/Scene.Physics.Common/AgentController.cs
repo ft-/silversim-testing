@@ -28,11 +28,9 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Physics.Common
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract class AgentController : CommonPhysicsController, IAgentPhysicsObject
     {
 #if DEBUG
@@ -139,7 +137,6 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         Vector3 ControlLinearInput
         {
             get

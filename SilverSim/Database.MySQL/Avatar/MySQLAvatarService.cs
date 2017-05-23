@@ -31,7 +31,6 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Avatar
 {
@@ -114,7 +113,6 @@ namespace SilverSim.Database.MySQL.Avatar
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override List<string> this[UUID avatarID, IList<string> itemKeys]
         {
             get
@@ -203,7 +201,6 @@ namespace SilverSim.Database.MySQL.Avatar
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override string this[UUID avatarID, string itemKey]
         {
             get

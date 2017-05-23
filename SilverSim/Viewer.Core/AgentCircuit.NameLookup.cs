@@ -19,18 +19,15 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Names;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
         [PacketHandler(MessageType.UUIDGroupNameRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void GroupNameLookup(Message m)
         {
             var req = (UUIDGroupNameRequest)m;
@@ -65,7 +62,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.UUIDNameRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void UserNameLookup(Message m)
         {
             var req = (UUIDNameRequest)m;

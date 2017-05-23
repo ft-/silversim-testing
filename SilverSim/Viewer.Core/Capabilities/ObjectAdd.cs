@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
@@ -28,13 +27,10 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class ObjectAdd : ICapabilityInterface
     {
         private readonly SceneInterface m_Scene;

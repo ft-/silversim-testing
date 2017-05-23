@@ -25,7 +25,6 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text;
@@ -64,12 +63,10 @@ namespace SilverSim.ServiceInterfaces.Avatar
             set; /* setting null means remove of avatar settings */
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract string this[UUID avatarID, string itemKey] { get; set; }
 
         public abstract bool TryGetValue(UUID avatarID, string itemKey, out string value);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract List<string> this[UUID avatarID, IList<string> itemKeys] { get; set; }
 
         public abstract void Remove(UUID avatarID, IList<string> nameList);

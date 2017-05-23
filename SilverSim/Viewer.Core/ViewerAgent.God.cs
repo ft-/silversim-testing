@@ -22,16 +22,14 @@
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.God;
-using System.Diagnostics.CodeAnalysis;
 using SilverSim.Viewer.Messages.Alert;
+using SilverSim.Viewer.Messages.God;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
         [PacketHandler(MessageType.RequestGodlikePowers)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleRequestGodlikePowers(Message p)
         {
             var m = (RequestGodlikePowers)p;

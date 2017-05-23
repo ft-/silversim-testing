@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.WindLight
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct WaterEntry
     {
         public double BlurMultiplier;
@@ -41,7 +39,6 @@ namespace SilverSim.Scene.Types.WindLight
         public Vector3 Wave1Direction;
         public Vector3 Wave2Direction;
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public WaterEntry(Map m)
         {
             BlurMultiplier = m["blurMultiplier"].AsReal;

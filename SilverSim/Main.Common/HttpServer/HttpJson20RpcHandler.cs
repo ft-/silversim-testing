@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Runtime.Serialization;
 
@@ -69,8 +68,6 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void RequestHandler(HttpRequest httpreq)
         {
             IValue req;
@@ -124,7 +121,6 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private Map ProcessJsonRequest(Map req)
         {
             Func<string, IValue, IValue> del;

@@ -23,7 +23,6 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.Transfer
@@ -64,7 +63,6 @@ namespace SilverSim.Scene.Types.Transfer
             m_AssetIDList = new List<UUID>(assetids);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void ProcessAssetTransfer()
         {
             List<UUID> new_assetids = m_AssetIDList;

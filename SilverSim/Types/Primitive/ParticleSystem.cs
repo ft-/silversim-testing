@@ -21,13 +21,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Primitive
 {
     public class ParticleSystem : Asset.Format.IReferencesAccessor
     {
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
         [Flags]
         public enum SourcePattern : byte
         {
@@ -49,8 +47,6 @@ namespace SilverSim.Types.Primitive
         /// Particle Data Flags
         /// </summary>
         [Flags]
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum ParticleDataFlags : uint
         {
             /// <summary>None</summary>
@@ -87,8 +83,6 @@ namespace SilverSim.Types.Primitive
         /// Particle Flags Enum
         /// </summary>
         [Flags]
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum ParticleFlags : uint
         {
             /// <summary>None</summary>
@@ -100,7 +94,6 @@ namespace SilverSim.Types.Primitive
             UseNewAngle = 0x02
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
         public enum BlendFunc : byte
         {
             One = 0,
@@ -189,13 +182,9 @@ namespace SilverSim.Types.Primitive
         /// <summary>OpenGL blend function to use at particle destination</summary>
         public BlendFunc BlendFuncDest = BlendFunc.OneMinusSourceAlpha;
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const byte MaxDataBlockSize = 98;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const byte LegacyDataBlockSize = 86;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const byte SysDataSize = 68;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const byte PartDataSize = 18;
 
         #region References accessor

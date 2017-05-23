@@ -31,7 +31,6 @@ using SilverSim.Types.Script;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Database.Memory.SimulationData
@@ -249,7 +248,6 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region Load all object groups of a single region
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<ObjectGroup> ISimulationDataObjectStorageInterface.this[UUID regionID]
         {
             get

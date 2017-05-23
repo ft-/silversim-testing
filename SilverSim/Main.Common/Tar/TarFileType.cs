@@ -19,11 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Main.Common.Tar
 {
-    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum TarFileType : byte
     {
         File = (byte)'0',

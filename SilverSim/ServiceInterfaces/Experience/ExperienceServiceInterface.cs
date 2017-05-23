@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Experience;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Experience
 {
@@ -37,7 +36,6 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         public interface IExperiencePermissionsInterface
         {
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             ExperiencePermissionsInfo this[UUID experienceID, UUI agent] { get; set; }
             bool TryGetValue(UUID experienceID, UUI agent, out ExperiencePermissionsInfo expPermInfo);
         }
@@ -46,7 +44,6 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         public interface IExperienceKeyInterface
         {
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             string this[UUID experienceID, string key] { get; set; }
             bool TryGetValue(UUID experienceID, string key, out string val);
         }

@@ -22,14 +22,12 @@
 #pragma warning disable RCS1123
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace SilverSim.Types
 {
     [StructLayout(LayoutKind.Sequential)]
-    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public struct Vector3 : IEquatable<Vector3>, IValue
     {
         public double X;
@@ -264,7 +262,6 @@ namespace SilverSim.Types
         /// <returns>A string representation of the vector</returns>
         public override string ToString() => string.Format(CultureInfo.InvariantCulture, "<{0},{1},{2}>", X, Y, Z);
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string X_String
         {
             get { return string.Format(CultureInfo.InvariantCulture, "{0}", X); }
@@ -272,7 +269,6 @@ namespace SilverSim.Types
             set { X = double.Parse(value, CultureInfo.InvariantCulture); }
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string Y_String
         {
             get { return string.Format(CultureInfo.InvariantCulture, "{0}", Y); }
@@ -280,7 +276,6 @@ namespace SilverSim.Types
             set { Y = double.Parse(value, CultureInfo.InvariantCulture); }
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string Z_String
         {
             get { return string.Format(CultureInfo.InvariantCulture, "{0}", Z); }
@@ -357,7 +352,6 @@ namespace SilverSim.Types
                 Z * value2.X - value2.Z * X,
                 X * value2.Y - value2.X * Y);
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Vector3(string val) => Parse(val);
 
         public static explicit operator string(Vector3 val) => val.ToString();

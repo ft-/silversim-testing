@@ -19,11 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
-using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -32,10 +30,9 @@ using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -247,7 +244,6 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Load all object groups of a single region
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<ObjectGroup> ISimulationDataObjectStorageInterface.this[UUID regionID]
         {
             get

@@ -24,7 +24,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Database.Memory.Inventory
@@ -71,7 +70,6 @@ namespace SilverSim.Database.Memory.Inventory
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<InventoryItem> IInventoryItemServiceInterface.this[UUID principalID, List<UUID> keys]
         {
             get
@@ -111,7 +109,6 @@ namespace SilverSim.Database.Memory.Inventory
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryItem IInventoryItemServiceInterface.this[UUID principalID, UUID key]
         {
             get
@@ -182,7 +179,6 @@ namespace SilverSim.Database.Memory.Inventory
             throw new InventoryFolderNotStoredException(id);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void IncrementVersion(UUID principalID, UUID folderID)
         {
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
@@ -194,7 +190,6 @@ namespace SilverSim.Database.Memory.Inventory
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<UUID> IInventoryItemServiceInterface.Delete(UUID principalID, List<UUID> itemids)
         {
             var deleted = new List<UUID>();

@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
@@ -109,7 +108,6 @@ namespace SilverSim.Database.MySQL.Profile
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         ProfilePick IPicksInterface.this[UUI user, UUID id]
         {
             get

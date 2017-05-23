@@ -33,7 +33,6 @@ using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.Telehub;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace SilverSim.Viewer.Core
@@ -43,7 +42,6 @@ namespace SilverSim.Viewer.Core
         private byte[] StringToBytes(string s) => (s + "\0").ToUTF8Bytes();
 
         [PacketHandler(MessageType.EstateOwnerMessage)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleEstateOwnerMessage(Message m)
         {
             var req = (EstateOwnerMessage)m;
@@ -328,7 +326,6 @@ namespace SilverSim.Viewer.Core
             SendMessageIfRootAgent(msg, fromSceneID);
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void EstateOwner_SetRegionInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 9)
@@ -470,7 +467,6 @@ namespace SilverSim.Viewer.Core
             return s == "1" || s == "y" || s == "yes" || s == "t" || s == "true";
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void EstateOwner_SetRegionTerrain(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count != 9)
@@ -509,7 +505,6 @@ namespace SilverSim.Viewer.Core
             circuit.Scene.RequestRegionRestart((int)timeToRestart);
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void EstateOwner_EstateChangeCovenantId(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
@@ -738,7 +733,6 @@ namespace SilverSim.Viewer.Core
             scene.TriggerRegionSettingsChanged();
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void EstateOwner_TeleportHomeUser(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if (req.ParamList.Count < 2)
@@ -814,7 +808,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void EstateOwner_EstateChangeInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)

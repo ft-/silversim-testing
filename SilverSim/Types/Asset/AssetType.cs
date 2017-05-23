@@ -19,11 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace SilverSim.Types.Asset
 {
-    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum AssetType : sbyte
     {
         Material = -2,

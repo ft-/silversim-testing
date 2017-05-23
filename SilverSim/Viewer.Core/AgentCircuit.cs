@@ -35,16 +35,15 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Chat;
+using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
-using SilverSim.Viewer.Messages.Chat;
-using SilverSim.Viewer.Messages.Generic;
 
 namespace SilverSim.Viewer.Core
 {
@@ -220,7 +219,6 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Message Handler Definitions
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         private sealed class MessageHandlerExtenderKeyValuePairCircuitQueue
         {
             private readonly WeakReference m_Circuit;
@@ -296,7 +294,6 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Message Handler Initialization
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private Action<Message> DeriveActionDelegateFromFieldInfo(FieldInfo fi, Type t, object o, string info)
         {
             if (typeof(Queue<Message>).IsAssignableFrom(fi.FieldType))
@@ -337,7 +334,6 @@ namespace SilverSim.Viewer.Core
             throw new ArgumentException("Handler resolver error");
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private Action<Message> DeriveActionDelegateFromMethodInfo(MethodInfo mi, Type t, object o, string info)
         {
             if (mi.ReturnType != typeof(void))
@@ -396,7 +392,6 @@ namespace SilverSim.Viewer.Core
             throw new ArgumentException("Handler resolver error");
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void AddMessageRouting(object o)
         {
             var types = new List<Type>();
@@ -663,7 +658,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void AddCapabilityExtensions(object o, UUID regionSeedID)
         {
             var types = new List<Type>();
@@ -835,7 +829,6 @@ namespace SilverSim.Viewer.Core
             m_TxObjectQueue.Enqueue(null);
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         protected override void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket p)
         {
             /* we know the message type now, so we have to decode it when possible */

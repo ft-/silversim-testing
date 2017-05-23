@@ -23,13 +23,11 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.Region;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
 {
     public partial class EnvironmentController
     {
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public class SunData
         {
             public UInt64 UsecSinceStart { get; internal set; }

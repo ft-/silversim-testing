@@ -30,14 +30,12 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Npc
 {
     partial class NpcAgent
     {
         #region NPC Appearance
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         private struct DetachEntry
         {
             public UUID ItemID;

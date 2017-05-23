@@ -24,7 +24,6 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
@@ -75,9 +74,6 @@ namespace SilverSim.Database.MySQL.Profile
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         ProfileProperties IPropertiesInterface.this[UUI user, PropertiesUpdateFlags flags]
         {
             set

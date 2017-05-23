@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
@@ -93,7 +92,6 @@ namespace SilverSim.Main.Common.HttpServer
             set { Headers["Content-Type"] = value; }
         }
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "DisposableFieldsShouldBeDisposedRule")]
         protected HttpResponse(HttpRequest request, HttpStatusCode statusCode, string statusDescription)
         {
             Headers["Content-Type"] = "text/html";

@@ -22,13 +22,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Linq;
+using System.Text;
 
 namespace SilverSim.Types
 {
-    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public sealed class AnArray : List<IValue>, IValue
     {
         #region Constructors
@@ -170,10 +168,8 @@ namespace SilverSim.Types
         public long AsLong => 0;
         #endregion
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Vector4 ElementsToVector4 => new Vector4(this[0].AsReal, this[1].AsReal, this[2].AsReal, this[3].AsReal);
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Vector3 ElementsToVector3 => new Vector3(this[0].AsReal, this[1].AsReal, this[2].AsReal);
 
         #region Stateful Enumerator

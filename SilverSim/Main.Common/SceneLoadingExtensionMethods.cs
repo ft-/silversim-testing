@@ -20,25 +20,21 @@
 // exception statement from your version.
 
 using log4net;
-using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Types;
-using SilverSim.Types.Parcel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Diagnostics.CodeAnalysis;
 using SilverSim.Scene.Types.SceneEnvironment;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.WindLight;
 using SilverSim.Scripting.Common;
-using SilverSim.Scene.Types.Script;
-using SilverSim.Types.Asset;
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
+using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Parcel;
+using SilverSim.Viewer.Messages.LayerData;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace SilverSim.Main.Common
 {
@@ -96,8 +92,6 @@ namespace SilverSim.Main.Common
             LoadSceneMain(loadparams);
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private static void LoadSceneMain(SceneLoadingParams loadparams)
         {
             List<UUID> parcels;

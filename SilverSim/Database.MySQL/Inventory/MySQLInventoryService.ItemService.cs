@@ -23,9 +23,8 @@ using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
@@ -88,7 +87,6 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<InventoryItem> IInventoryItemServiceInterface.this[UUID principalID, List<UUID> itemids]
         {
             get
@@ -170,7 +168,6 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryItem IInventoryItemServiceInterface.this[UUID principalID, UUID key]
         {
             get
@@ -236,7 +233,6 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersion(principalID, item.ParentFolderID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<UUID> IInventoryItemServiceInterface.Delete(UUID principalID, List<UUID> itemids)
         {
             var deleted = new List<UUID>();
@@ -275,7 +271,6 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersion(principalID, toFolderID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void IncrementVersion(UUID principalID, UUID folderID)
         {
             try

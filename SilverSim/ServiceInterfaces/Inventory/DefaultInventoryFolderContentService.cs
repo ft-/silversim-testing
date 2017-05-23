@@ -22,7 +22,6 @@
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -51,8 +50,6 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         public bool ContainsKey(UUID principalID, UUID folderID) => m_Service.ContainsKey(principalID, folderID);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public List<InventoryFolderContent> this[UUID principalID, UUID[] folderIDs]
         {
             get
@@ -74,8 +71,6 @@ namespace SilverSim.ServiceInterfaces.Inventory
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public InventoryFolderContent this[UUID principalID, UUID folderID]
         {
             get

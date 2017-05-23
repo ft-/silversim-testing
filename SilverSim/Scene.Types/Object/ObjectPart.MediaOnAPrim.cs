@@ -19,14 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -47,7 +41,6 @@ namespace SilverSim.Scene.Types.Object
             TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public void UpdateMedia(PrimitiveMedia media, UUID updaterID)
         {
             lock(m_DataLock)
@@ -69,7 +62,6 @@ namespace SilverSim.Scene.Types.Object
             TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public void UpdateMediaFace(int face, PrimitiveMedia.Entry entry, UUID updaterID)
         {
             if(face >= 32)

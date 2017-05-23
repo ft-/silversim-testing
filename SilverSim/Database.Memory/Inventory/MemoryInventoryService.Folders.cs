@@ -26,7 +26,6 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -93,7 +92,6 @@ namespace SilverSim.Database.Memory.Inventory
             return m_Folders.TryGetValue(principalID, out folderSet) && folderSet.ContainsKey(key);
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, UUID key]
         {
             get
@@ -173,7 +171,6 @@ namespace SilverSim.Database.Memory.Inventory
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, AssetType type]
         {
             get
@@ -212,7 +209,6 @@ namespace SilverSim.Database.Memory.Inventory
                 new List<InventoryItem>();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IInventoryFolderServiceInterface.Add(InventoryFolder folder)
         {
             m_Folders[folder.Owner.ID].Add(folder.ID, new InventoryFolder(folder));
@@ -223,7 +219,6 @@ namespace SilverSim.Database.Memory.Inventory
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IInventoryFolderServiceInterface.Update(InventoryFolder folder)
         {
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
@@ -279,7 +274,6 @@ namespace SilverSim.Database.Memory.Inventory
             Folder.Purge(folder.Owner.ID, folderID);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void PurgeOrDelete(UUID principalID, UUID folderID, bool deleteFolder)
         {
             List<UUID> folders;
@@ -364,7 +358,6 @@ namespace SilverSim.Database.Memory.Inventory
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         List<UUID> IInventoryFolderServiceInterface.Delete(UUID principalID, List<UUID> folderIDs)
         {
             var deleted = new List<UUID>();

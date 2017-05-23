@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace SilverSim.Types
@@ -133,7 +132,6 @@ namespace SilverSim.Types
         public override int GetHashCode() => (int)m_Value;
         #endregion Operators
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static Real Parse(string v) => new Real(Double.Parse(v.Trim(), CultureInfo.InvariantCulture));
 
         public static bool TryParse(string v, out Real res)

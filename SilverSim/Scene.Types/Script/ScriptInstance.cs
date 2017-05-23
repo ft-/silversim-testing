@@ -24,10 +24,8 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 
 namespace SilverSim.Scene.Types.Script
 {
@@ -72,10 +70,8 @@ namespace SilverSim.Scene.Types.Script
         public virtual bool HasTouchEvent => false;
         public virtual bool HasMoneyEvent => false;
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectPartInventoryItem Item { get; }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectPart Part { get; }
 
         public abstract double ExecutionTime { get; set; }
@@ -102,7 +98,6 @@ namespace SilverSim.Scene.Types.Script
 
         public abstract void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions);
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void TriggerOnStateChange()
         {
             var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
@@ -122,7 +117,6 @@ namespace SilverSim.Scene.Types.Script
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void TriggerOnScriptReset()
         {
             var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */

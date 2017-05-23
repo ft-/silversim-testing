@@ -24,7 +24,6 @@ using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Profile
 {
@@ -37,7 +36,6 @@ namespace SilverSim.Viewer.Profile
                 return new Dictionary<UUID, string>();
             }
 
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public ProfileClassified this[UUI user, UUID id]
             {
                 get { throw new KeyNotFoundException(); }
@@ -72,7 +70,6 @@ namespace SilverSim.Viewer.Profile
                 return new Dictionary<UUID, string>();
             }
 
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public ProfilePick this[UUI user, UUID id]
             {
                 get { throw new KeyNotFoundException(); }
@@ -102,7 +99,6 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyNotes : INotesInterface
         {
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public string this[UUI user, UUI target]
             {
                 get

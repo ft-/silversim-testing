@@ -25,7 +25,6 @@ using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.LoadStore.Terrain.Formats
@@ -55,7 +54,6 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
             public static bool operator <(HeightmapLookupValue a, HeightmapLookupValue b) => a.Value < b.Value;
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
             public override bool Equals(object obj)
             {
                 if(obj is HeightmapLookupValue)
@@ -67,7 +65,6 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
             public override int GetHashCode() => Value.GetHashCode();
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
             public bool Equals(HeightmapLookupValue v) => Value.Equals(v.Value);
         }
 

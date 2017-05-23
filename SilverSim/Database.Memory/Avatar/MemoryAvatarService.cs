@@ -28,7 +28,6 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.Memory.Avatar
 {
@@ -65,7 +64,6 @@ namespace SilverSim.Database.Memory.Avatar
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override List<string> this[UUID avatarID, IList<string> itemKeys]
         {
             get
@@ -115,7 +113,6 @@ namespace SilverSim.Database.Memory.Avatar
             return m_Data.TryGetValue(avatarID, out data) && data.TryGetValue(itemKey, out value);
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override string this[UUID avatarID, string itemKey]
         {
             get

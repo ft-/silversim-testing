@@ -22,11 +22,9 @@
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public sealed class VehicleParams
     {
         private VehicleType m_VehicleType;

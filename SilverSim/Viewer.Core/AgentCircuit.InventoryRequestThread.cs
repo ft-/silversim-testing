@@ -19,20 +19,19 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Alert;
+using SilverSim.Viewer.Messages.Inventory;
+using SilverSim.Viewer.Messages.Transfer;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Viewer.Messages.Transfer;
-using SilverSim.Viewer.Messages.Inventory;
-using SilverSim.Viewer.Messages.Alert;
 
 namespace SilverSim.Viewer.Core
 {
@@ -70,7 +69,6 @@ namespace SilverSim.Viewer.Core
             SendMessage(res);
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Inventory Fetch for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
@@ -170,10 +168,9 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_ChangeInventoryItemFlags(Message m)
         {
-            var req = (Messages.Inventory.ChangeInventoryItemFlags)m;
+            var req = (ChangeInventoryItemFlags)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
@@ -195,7 +192,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_TransferRequest(Message m)
         {
             UUID assetID;
@@ -386,10 +382,9 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_CopyInventoryItem(Message m)
         {
-            var req = (Messages.Inventory.CopyInventoryItem)m;
+            var req = (CopyInventoryItem)m;
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
                 return;
@@ -444,7 +439,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_CreateInventoryFolder(Message m)
         {
             var req = (CreateInventoryFolder)m;
@@ -483,11 +477,10 @@ namespace SilverSim.Viewer.Core
             catch (Exception e)
             {
                 m_Log.DebugFormat("Cannot create inventory folder: {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
-                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInvFolder"));
+                SendMessage(new AlertMessage("ALERT: CantCreateRequestedInvFolder"));
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_FetchInventory(Message m)
         {
             var req = (FetchInventory)m;
@@ -555,7 +548,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_FetchInventoryDescendents(Message m)
         {
             var req = (FetchInventoryDescendents)m;

@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
 
@@ -286,7 +285,6 @@ namespace SilverSim.Types
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static int ReadElementValueAsInt(this XmlTextReader reader)
         {
             if(reader.IsEmptyElement)
@@ -296,7 +294,6 @@ namespace SilverSim.Types
             return int.Parse(ReadElementValueAsString(reader));
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static uint ReadElementValueAsUInt(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -306,7 +303,6 @@ namespace SilverSim.Types
             return uint.Parse(ReadElementValueAsString(reader));
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static long ReadElementValueAsLong(this XmlTextReader reader)
         {
             if(reader.IsEmptyElement)
@@ -316,7 +312,6 @@ namespace SilverSim.Types
             return long.Parse(ReadElementValueAsString(reader));
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static ulong ReadElementValueAsULong(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -326,7 +321,6 @@ namespace SilverSim.Types
             return ulong.Parse(ReadElementValueAsString(reader));
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static double ReadElementValueAsFloat(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -336,7 +330,6 @@ namespace SilverSim.Types
             return float.Parse(ReadElementValueAsString(reader), NumberStyles.Float, CultureInfo.InvariantCulture);
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static double ReadElementValueAsDouble(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)

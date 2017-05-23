@@ -34,14 +34,13 @@ using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Circuit;
+using SilverSim.Viewer.Messages.Region;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using SilverSim.Viewer.Messages.Region;
-using SilverSim.Viewer.Messages.Circuit;
 
 namespace SilverSim.Viewer.Core
 {
@@ -53,9 +52,6 @@ namespace SilverSim.Viewer.Core
     #endregion
 
     #region LLUDP Server
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
-    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public partial class UDPCircuitsManager : IUDPCircuitsManager
     {
         private static readonly ILog m_Log = LogManager.GetLogger("UDP CIRCUITS MANAGER");

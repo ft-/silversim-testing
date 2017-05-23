@@ -66,6 +66,7 @@ namespace SilverSim.Scene.Types.Agent
         SessionInfo Session { get; }
         UserAccount UntrustedAccountInfo { get; }
         CultureInfo CurrentCulture { get; }
+        UUID TracksAgentID { get; }
 
         List<GridType> SupportedGridTypes { get; }
 

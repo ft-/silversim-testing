@@ -21,7 +21,6 @@
 
 using SilverSim.Http.Client;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -63,7 +62,6 @@ namespace SilverSim.ServiceInterfaces
             return headers;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static string[] HeloRequest_HandleType(string uri, Dictionary<string, string> cachedheaders = null)
         {
             var headers = cachedheaders ?? HeloRequest(uri);

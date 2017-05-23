@@ -23,12 +23,10 @@
 #pragma warning disable RCS1029
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Groups
 {
     [Flags]
-    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum GroupPowers : ulong
     {
         None = 0,

@@ -23,7 +23,6 @@ using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
@@ -75,7 +74,6 @@ namespace SilverSim.Database.MySQL.Profile
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         string INotesInterface.this[UUI user, UUI target]
         {
             get

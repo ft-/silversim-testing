@@ -42,9 +42,9 @@ using SilverSim.Types.Economy;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.Parcel;
+using SilverSim.Viewer.Messages.Agent;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -119,7 +119,7 @@ namespace SilverSim.Scene.Types.Scene
 
         #region Scene Loading fields (do not use for anything else)
         public Thread m_LoaderThread;
-        public object m_LoaderThreadLock = new object();
+        public readonly object m_LoaderThreadLock = new object();
         #endregion
 
         public UUID ID { get; protected set; }
@@ -198,6 +198,83 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void LoadScene();
         public abstract void LoadSceneSync();
+
+        private Dictionary<UUID, Vector3> BuildCoarseLocationData()
+        {
+            var coarseData = new Dictionary<UUID, Vector3>();
+
+            foreach(IAgent agent in RootAgents)
+            {
+                coarseData.Add(agent.ID, agent.GlobalPosition);
+            }
+
+            return coarseData;
+        }
+
+        public void SendCoarseLocationUpdateToAllAgents()
+        {
+            var data = BuildCoarseLocationData();
+
+            foreach(IAgent agent in Agents)
+            {
+                SendCoarseLocationUpdateToSpecificAgent(agent);
+            }
+        }
+
+        public void SendCoarseLocationUpdateToSpecificAgent(IAgent agent)
+        {
+            SendCoarseLocationUpdateToSpecificAgent(agent, BuildCoarseLocationData());
+        }
+
+        private void SendCoarseLocationUpdateToSpecificAgent(IAgent agent, Dictionary<UUID, Vector3> data)
+        {
+            const int NUM_OF_ENTRIES = 50;
+            CoarseLocationUpdate upd = null;
+            UUID ownId = agent.ID;
+            UUID trackId = agent.TracksAgentID;
+
+            foreach(KeyValuePair<UUID, Vector3> kvp in data)
+            {
+                if(upd == null)
+                {
+                    upd = new CoarseLocationUpdate()
+                    {
+                        Prey = -1,
+                        You = -1
+                    };
+                }
+
+                int count = upd.AgentData.Count;
+
+                if(kvp.Key == ownId)
+                {
+                    upd.You = (short)count;
+                }
+                if(kvp.Key == trackId)
+                {
+                    upd.Prey = (short)count;
+                }
+
+                upd.AgentData.Add(new CoarseLocationUpdate.AgentDataEntry
+                {
+                    AgentID = kvp.Key,
+                    X = (byte)kvp.Value.X.Clamp(0, 255),
+                    Y = (byte)kvp.Value.Y.Clamp(0, 255),
+                    Z = (byte)(kvp.Value.Z / 4).Clamp(0, 255)
+                });
+
+                if(count + 1 == NUM_OF_ENTRIES)
+                {
+                    agent.SendMessageAlways(upd, ID);
+                    upd = null;
+                }
+            }
+
+            if(upd != null)
+            {
+                agent.SendMessageAlways(upd, ID);
+            }
+        }
 
         #region Physics
         private IPhysicsScene m_PhysicsScene;
@@ -367,7 +444,6 @@ namespace SilverSim.Scene.Types.Scene
             InitializeParcelLayer();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void InvokeOnRemove()
         {
             LoginControl.OnLoginsEnabled -= LoginsEnabledHandler;
@@ -453,7 +529,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void AddNewLocalID(IObject v)
         {
             while (true)

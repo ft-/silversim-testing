@@ -23,7 +23,6 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.ServiceInterfaces.Chat
 {
@@ -58,9 +57,7 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 
         public abstract Listener AddAgentListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send);
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const Int32 ListenRegexName = 1;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const Int32 ListenRegexMessage = 2;
 
         public abstract Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> action);

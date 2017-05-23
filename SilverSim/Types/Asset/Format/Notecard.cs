@@ -23,7 +23,6 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -58,7 +57,6 @@ namespace SilverSim.Types.Asset.Format
         #endregion
 
         #region References
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public List<UUID> References
         {
             get
@@ -524,7 +522,6 @@ namespace SilverSim.Types.Asset.Format
                 "\t}}\n" +
                 "}}\n";
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
         private static string ItemToString(NotecardInventoryItem item) => string.Format(ItemFormatString,
                 item.ExtCharIndex,
                 item.ID, item.ParentFolderID,

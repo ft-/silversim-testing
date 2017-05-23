@@ -23,7 +23,6 @@ using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
@@ -42,7 +41,6 @@ namespace SilverSim.Database.Memory.SimulationData
         }
 
         /* setting value to null will delete the entry */
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         byte[] ISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID]
         {
             get

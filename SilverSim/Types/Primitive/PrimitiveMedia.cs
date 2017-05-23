@@ -21,7 +21,6 @@
 
 using SilverSim.Threading;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace SilverSim.Types.Primitive
@@ -50,7 +49,6 @@ namespace SilverSim.Types.Primitive
             public PrimitiveMediaPermission InteractPermissions = PrimitiveMediaPermission.All;
             public string[] WhiteList = new string[0];
 
-            [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
             public Entry(Map m)
             {
                 IsAlternativeImageEnabled = m["alt_image_enable"].AsBoolean;
@@ -78,7 +76,6 @@ namespace SilverSim.Types.Primitive
                 Width = m["width_pixels"].AsInt;
             }
 
-            [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
             public static explicit operator Map(Entry e)
             {
                 var m = new Map
@@ -110,7 +107,6 @@ namespace SilverSim.Types.Primitive
                 return m;
             }
 
-            [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
             public static explicit operator Entry(Map m)
             {
                 var e = new Entry()
@@ -142,7 +138,6 @@ namespace SilverSim.Types.Primitive
                 return e;
             }
 
-            [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
             public void ToXml(XmlTextWriter writer)
             {
                 writer.WriteStartElement("map");

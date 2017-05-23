@@ -22,12 +22,10 @@
 #pragma warning disable RCS1154
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Inventory
 {
     [Flags]
-    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum InventoryPermissionsMask : uint
     {
         None = 0,

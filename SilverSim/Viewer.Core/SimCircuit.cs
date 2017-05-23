@@ -30,11 +30,10 @@ using SilverSim.Types;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Viewer.Messages.Generic;
 
 namespace SilverSim.Viewer.Core
 {
@@ -89,7 +88,6 @@ namespace SilverSim.Viewer.Core
             /* intentionally left empty */
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         protected override void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket p)
         {
             /* we know the message type now, so we have to decode it when possible */

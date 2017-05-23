@@ -23,12 +23,11 @@
 #pragma warning disable RCS1029
 
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
-using SilverSim.Viewer.Messages.LayerData;
 
 namespace SilverSim.Viewer.Core
 {
@@ -176,7 +175,6 @@ namespace SilverSim.Viewer.Core
             return;
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void TransmitThread(object param)
         {
             int lastAckTick = Environment.TickCount;

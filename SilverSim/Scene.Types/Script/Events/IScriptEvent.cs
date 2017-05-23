@@ -21,7 +21,6 @@
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
@@ -29,7 +28,6 @@ namespace SilverSim.Scene.Types.Script.Events
     {
     }
 
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct DetectInfo
     {
         public UUID Key;

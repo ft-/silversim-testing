@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Scene.Types.Scene
@@ -29,8 +28,6 @@ namespace SilverSim.Scene.Types.Scene
     public partial class SceneInterface
     {
         [Flags]
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum ReadyFlags : ulong
         {
             None = 0,
@@ -44,7 +41,6 @@ namespace SilverSim.Scene.Types.Scene
 
         public readonly LoginController LoginControl;
 
-        [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
         public class LoginController
         {
             private ReadyFlags m_CurrentFlags = ReadyFlags.ExpectedFlags;
@@ -84,7 +80,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public bool IsLoginEnabled => m_CurrentFlags == ReadyFlags.None;
 
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             private void TriggerLoginsEnabled(bool state)
             {
                 var ev = OnLoginsEnabled;

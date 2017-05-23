@@ -24,15 +24,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace SilverSim.Types
 {
     [StructLayout(LayoutKind.Sequential)]
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public struct Matrix4 : IEquatable<Matrix4>
     {
         public double M11, M12, M13, M14;
@@ -1027,7 +1024,6 @@ namespace SilverSim.Types
         /// Get a formatted string representation of the vector
         /// </summary>
         /// <returns>A string representation of the vector</returns>
-        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
         public override string ToString() => string.Format(CultureInfo.InvariantCulture,
                 "|{0}, {1}, {2}, {3}|\n|{4}, {5}, {6}, {7}|\n|{8}, {9}, {10}, {11}|\n|{12}, {13}, {14}, {15}|",
                 M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44);
@@ -1040,7 +1036,6 @@ namespace SilverSim.Types
 
         public static bool operator !=(Matrix4 left, Matrix4 right) => !left.Equals(right);
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public double this[int row, int column]
         {
             get

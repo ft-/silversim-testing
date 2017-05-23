@@ -35,7 +35,6 @@ using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -43,7 +42,6 @@ namespace SilverSim.Viewer.Core
     {
         private readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID,UInt32,KeyValuePair<UUID, UUID>>();
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         private struct DetachEntry
         {
             public UUID ItemID;
@@ -60,7 +58,6 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.RezMultipleAttachmentsFromInv)]
         [PacketHandler(MessageType.RezSingleAttachmentFromInv)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleRezAttachment(Message m)
         {
             switch(m.Number)
@@ -112,7 +109,6 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.DetachAttachmentIntoInv)]
         [PacketHandler(MessageType.ObjectDetach)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleDetachAttachment(Message m)
         {
             var detachList = new List<DetachEntry>();

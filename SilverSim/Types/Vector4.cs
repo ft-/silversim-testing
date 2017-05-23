@@ -22,12 +22,10 @@
 #pragma warning disable RCS1123
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace SilverSim.Types
 {
-    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public struct Vector4 : IEquatable<Vector4>
     {
         public double X;

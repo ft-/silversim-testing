@@ -27,7 +27,6 @@ using SilverSim.Types;
 using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
@@ -312,7 +311,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         }
 
         #region Properties
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public double this[uint x, uint y]
         {
             get
@@ -515,7 +513,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 m_NumYPatches = yPatches;
             }
 
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public LayerPatch this[uint x, uint y]
             {
                 get

@@ -22,7 +22,6 @@
 using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
@@ -42,7 +41,6 @@ namespace SilverSim.ServiceInterfaces.Asset
         #endregion
 
         #region Accessor
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override List<UUID> this[UUID key]
         {
             get

@@ -56,7 +56,6 @@ namespace SilverSim.Database.Memory.AvatarName
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UUI this[string firstName, string lastName]
         {
             get

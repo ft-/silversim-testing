@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Asset
 {
@@ -36,7 +35,6 @@ namespace SilverSim.Types.Asset
         public Date CreateTime = new Date();
         public Date AccessTime = new Date();
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string FileExtension
         {
             get
@@ -67,7 +65,6 @@ namespace SilverSim.Types.Asset
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string FileName
         {
             get { return "assets/" + ID.ToString() + FileExtension; }
@@ -166,7 +163,6 @@ namespace SilverSim.Types.Asset
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string ContentType
         {
             get

@@ -26,7 +26,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
 
@@ -92,7 +91,6 @@ namespace SilverSim.Main.Common.Console
         }
 
         #region Output logic
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private int SetCursorTop(int top)
         {
             int left = System.Console.CursorLeft;
@@ -144,7 +142,6 @@ namespace SilverSim.Main.Common.Console
             return top;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private int SetCursorLeft(int left)
         {
             int top = System.Console.CursorTop;
@@ -235,8 +232,6 @@ namespace SilverSim.Main.Common.Console
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotUseLockedRegionOutsideMethodRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void LockOutput()
         {
             Monitor.Enter(m_CommandLineBuffer);
@@ -264,7 +259,6 @@ namespace SilverSim.Main.Common.Console
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotUseLockedRegionOutsideMethodRule")]
         public override void UnlockOutput()
         {
             if (m_CursorYPosition != -1)
@@ -275,8 +269,6 @@ namespace SilverSim.Main.Common.Console
             Monitor.Exit(m_CommandLineBuffer);
         }
 
-        [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void WriteColorText(ConsoleColor color, string sender)
         {
             try
@@ -534,7 +526,6 @@ namespace SilverSim.Main.Common.Console
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void PromptThread()
         {
             Thread.CurrentThread.Name = "Local Console Input Thread";

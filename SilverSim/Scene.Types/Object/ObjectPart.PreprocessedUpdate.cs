@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages.Object;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -201,8 +200,6 @@ namespace SilverSim.Scene.Types.Object
         }
 
         [Flags]
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum UpdateDataFlags : uint
         {
             None = 0,
@@ -227,7 +224,6 @@ namespace SilverSim.Scene.Types.Object
             UpdateData(flags, true);
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void UpdateData(UpdateDataFlags flags, bool incSerial)
         {
             lock (m_UpdateDataLock)

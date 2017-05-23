@@ -24,13 +24,11 @@ using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Groups.Common
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupInvitesInterface
     {
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         GroupInvite IGroupInvitesInterface.this[UUI requestingAgent, UUID groupInviteID] => m_InnerService.Invites[requestingAgent, groupInviteID];
 
         bool IGroupInvitesInterface.TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite) =>
@@ -41,13 +39,11 @@ namespace SilverSim.Groups.Common
 
         bool IGroupInvitesInterface.DoesSupportListGetters => false;
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
         {
             get { throw new NotSupportedException(); }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UUI principal]
         {
             get { throw new NotSupportedException(); }

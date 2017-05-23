@@ -33,13 +33,11 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Object
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public partial class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
     {
         private static IScriptCompilerRegistry m_CompilerRegistry;
@@ -73,15 +71,10 @@ namespace SilverSim.Scene.Types.Object
             set { RootPart.LocalID = value; }
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_SET = -1;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_ALL_OTHERS = -2;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_ALL_CHILDREN = -3;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_THIS = -4;
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_ROOT = 1;
 
         private bool m_IsTempOnRez;
@@ -227,7 +220,6 @@ namespace SilverSim.Scene.Types.Object
             RootPart.TriggerOnNextOwnerAssetIDChange();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void TriggerOnUpdate(UpdateChangedFlags flags)
         {
             if (Count == 0)
@@ -1349,7 +1341,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart part;
@@ -1663,7 +1654,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private static void FromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             string tagname = reader.Name;

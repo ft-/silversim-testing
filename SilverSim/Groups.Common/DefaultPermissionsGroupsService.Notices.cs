@@ -23,7 +23,6 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Groups.Common
 {
@@ -35,7 +34,6 @@ namespace SilverSim.Groups.Common
             return m_InnerService.Notices.GetNotices(requestingAgent, group);
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         GroupNotice IGroupNoticesInterface.this[UUI requestingAgent, UUID groupNoticeID]
         {
             get

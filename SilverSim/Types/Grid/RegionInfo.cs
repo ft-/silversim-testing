@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System.Diagnostics.CodeAnalysis;
 namespace SilverSim.Types.Grid
 {
     public class RegionInfo
@@ -73,12 +72,9 @@ namespace SilverSim.Types.Grid
         public string ProtocolVariant = string.Empty; /* see ProtocolVariantId */
         public string GridURI = string.Empty; /* empty when addressing local grid */
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public static class ProtocolVariantId
         {
-            [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
             public static readonly string Local = string.Empty;
-            [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
             public static readonly string OpenSim = "OpenSim";
         }
         #endregion

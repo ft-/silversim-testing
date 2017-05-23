@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Types.Asset.Format
 {
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class ObjectXmlStreamFilter : Stream
     {
         private readonly byte[] m_Buffer = new byte[10240];

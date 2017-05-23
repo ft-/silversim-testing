@@ -28,7 +28,6 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
@@ -180,7 +179,6 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Transaction Helper
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static void InsideTransaction(this MySqlConnection connection, Action del)
         {
             using (var cmd = new MySqlCommand("BEGIN", connection))

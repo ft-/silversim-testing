@@ -28,15 +28,12 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Estate
 {
     #region Service Implementation
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("MySQL Estate Backend")]
     public sealed partial class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {

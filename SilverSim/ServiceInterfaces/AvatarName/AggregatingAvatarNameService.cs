@@ -22,7 +22,6 @@
 using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.AvatarName
 {
@@ -85,8 +84,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return true;
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override UUI this[string firstName, string lastName]
         {
             get
@@ -100,7 +97,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override List<UUI> Search(string[] names)
         {
             Dictionary<UUID, UUI> results = new Dictionary<UUID, UUI>();
@@ -175,7 +171,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return true;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override UUI this[UUID key]
         {
             get

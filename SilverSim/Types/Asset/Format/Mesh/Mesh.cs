@@ -22,7 +22,6 @@
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -41,7 +40,6 @@ namespace SilverSim.Types.Asset.Format.Mesh
         }
     }
 
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct Triangle
     {
         public int FaceIdx;

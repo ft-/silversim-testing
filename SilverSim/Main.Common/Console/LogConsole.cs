@@ -23,12 +23,10 @@ using log4net.Core;
 using SilverSim.Threading;
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Main.Common.Console
 {
-    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     [Description("Log Console")]
     public class LogConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
@@ -37,7 +35,6 @@ namespace SilverSim.Main.Common.Console
         private bool m_Shutdown;
         readonly object m_Lock = new object();
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public LogConsole(string consoleTitle)
         {
             try

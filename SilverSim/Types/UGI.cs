@@ -20,11 +20,9 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
-    [SuppressMessage("Gendarme.Rules.Maintainability", "VariableNamesShouldNotMatchFieldNamesRule")]
     public sealed class UGI : IEquatable<UGI>
     {
         public UUID ID = UUID.Zero;

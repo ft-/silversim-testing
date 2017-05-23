@@ -34,7 +34,6 @@ using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Teleport;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Teleport
 {
@@ -99,7 +98,6 @@ namespace SilverSim.Viewer.Teleport
         }
 
         [PacketHandler(MessageType.TeleportCancel)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportCancel(Message m)
         {
             var req = (TeleportCancel)m;
@@ -113,7 +111,6 @@ namespace SilverSim.Viewer.Teleport
         }
 
         [PacketHandler(MessageType.TeleportLandmarkRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportLandmarkRequest(Message m)
         {
             var req = (TeleportLandmarkRequest)m;
@@ -127,7 +124,6 @@ namespace SilverSim.Viewer.Teleport
         }
 
         [PacketHandler(MessageType.TeleportLocationRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportLocationRequest(Message m)
         {
             var req = (TeleportLocationRequest)m;
@@ -170,7 +166,6 @@ namespace SilverSim.Viewer.Teleport
         }
 
         [PacketHandler(MessageType.TeleportRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleTeleportRequest(Message m)
         {
             var req = (TeleportRequest)m;

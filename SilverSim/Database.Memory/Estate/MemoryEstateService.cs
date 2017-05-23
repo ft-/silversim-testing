@@ -26,13 +26,11 @@ using SilverSim.Threading;
 using SilverSim.Types.Estate;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Database.Memory.Estate
 {
     #region Service Implementation
-    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     [Description("Memory Estate Backend")]
     public sealed partial class MemoryEstateService : EstateServiceInterface, IPlugin
     {

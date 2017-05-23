@@ -30,7 +30,6 @@ using SilverSim.Types.Groups;
 using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Scene
@@ -161,7 +160,6 @@ namespace SilverSim.Scene.Types.Scene
 
         protected abstract void TriggerSpawnpointUpdate();
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
         {
             reason = string.Empty;
@@ -223,7 +221,6 @@ namespace SilverSim.Scene.Types.Scene
             return true;
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private ParcelInfo FindNonBlockedParcel(IAgent agent, Vector3 destinationLocation)
         {
             ParcelInfo selectedParcel = null;

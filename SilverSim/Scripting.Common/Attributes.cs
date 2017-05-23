@@ -20,20 +20,17 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scripting.Common
 {
     [Serializable]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class CompilerUsesRunAndCollectModeAttribute : Attribute
     {
     }
 
     [Serializable]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class CompilerUsesInMemoryCompilationAttribute : Attribute
     {
     }

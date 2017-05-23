@@ -22,7 +22,6 @@
 using SilverSim.Http;
 using SilverSim.Types;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -88,8 +87,6 @@ namespace SilverSim.Main.Common.HttpServer
             return headerLine.ToString();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Http1Request(Stream httpStream, string callerIP, bool isBehindProxy, bool isSsl)
             : base(isSsl)
         {

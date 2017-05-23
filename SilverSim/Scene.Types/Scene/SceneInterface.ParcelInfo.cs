@@ -27,7 +27,6 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.Scene
@@ -190,8 +189,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ParcelInfoRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelInfoRequest(Message m)
         {
             var req = (ParcelInfoRequest)m;
@@ -294,8 +291,6 @@ namespace SilverSim.Scene.Types.Scene
         };
 
         [PacketHandler(MessageType.ParcelPropertiesRequest)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelPropertiesRequest(Message m)
         {
             var results = new Dictionary<UUID, ParcelInfo>();
@@ -363,8 +358,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ParcelPropertiesRequestByID)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelPropertiesRequestByID(Message m)
         {
             var req = (ParcelPropertiesRequestByID)m;
@@ -382,7 +375,6 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ParcelGodForceOwner)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleParcelGodForceOwner(Message m)
         {
             var req = (ParcelGodForceOwner)m;

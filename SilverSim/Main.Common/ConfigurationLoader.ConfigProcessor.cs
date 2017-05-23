@@ -24,7 +24,6 @@ using SilverSim.Http.Client;
 using SilverSim.Types.Assembly;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -142,9 +141,6 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public IConfigSource ConfigSource
             {
                 get
@@ -216,9 +212,6 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public IConfigSource ConfigSource
             {
                 get
@@ -417,8 +410,6 @@ namespace SilverSim.Main.Common
 
         private readonly InterfaceVersionAttribute m_OwnInterfaceVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadModule(IConfig config, string modulename)
         {
             string[] modulenameparts = modulename.Split(new char[] { ':' }, 2, StringSplitOptions.None);
@@ -475,8 +466,6 @@ namespace SilverSim.Main.Common
             PluginInstances.Add(config.Name, module.Initialize(this, config));
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadModules()
         {
             string archModule = "Module-" + VersionInfo.ArchSpecificId;
@@ -527,7 +516,6 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Process [ParameterMap] section
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void ProcessParameterMap()
         {
             IConfig parameterMap = m_Config.Configs["ParameterMap"];
@@ -593,7 +581,6 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Process [ResourceMap] section
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void ProcessResourceMap()
         {
             IConfig resourceMap = m_Config.Configs["ResourceMap"];

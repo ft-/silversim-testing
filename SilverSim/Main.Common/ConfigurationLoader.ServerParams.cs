@@ -24,7 +24,6 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -163,7 +162,6 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void GetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help" || args.Count < 3 || args.Count > 4)
@@ -209,7 +207,6 @@ namespace SilverSim.Main.Common
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void SetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help" || args.Count < 4 || args.Count > 5)

@@ -23,7 +23,6 @@ using SilverSim.Http;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -37,7 +36,6 @@ namespace SilverSim.Main.Common.HttpServer
         private Stream ResponseBody;
         private readonly bool IsChunkedAccepted;
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "DisposableFieldsShouldBeDisposedRule")]
         public Http1Response(Stream output, HttpRequest request, HttpStatusCode statusCode, string statusDescription)
             : base(request, statusCode, statusDescription)
         {

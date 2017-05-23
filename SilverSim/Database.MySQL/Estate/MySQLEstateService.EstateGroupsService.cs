@@ -23,7 +23,6 @@ using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Estate
 {
@@ -57,7 +56,6 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         bool IEstateGroupsServiceInterface.this[uint estateID, UGI group]
         {
             get

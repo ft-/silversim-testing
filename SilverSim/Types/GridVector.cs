@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
@@ -85,7 +84,6 @@ namespace SilverSim.Types
         #endregion
 
         #region Properties
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public byte[] AsBytes
         {
             get

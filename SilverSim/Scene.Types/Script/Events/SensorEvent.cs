@@ -20,11 +20,9 @@
 // exception statement from your version.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
-    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct SensorEvent : IScriptDetectedEvent
     {
         public List<DetectInfo> Detected { get; set; }

@@ -23,7 +23,6 @@ using SilverSim.Threading;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Transfer;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -48,7 +47,6 @@ namespace SilverSim.Viewer.Core
         internal RwLockedDictionary<ulong, DownloadTransferData> m_DownloadTransfersByXferID = new RwLockedDictionary<ulong, DownloadTransferData>();
 
         [PacketHandler(MessageType.RequestXfer)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleRequestXfer(Message m)
         {
             var req = (RequestXfer)m;
@@ -88,7 +86,6 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.ConfirmXferPacket)]
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleConfirmXferPacket(Message m)
         {
             var req = (ConfirmXferPacket)m;

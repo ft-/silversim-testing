@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Types.Asset
@@ -29,7 +28,6 @@ namespace SilverSim.Types.Asset
     {
         public byte[] Data = new byte[0];
 
-        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         public Stream InputStream
         {
             get { return new MemoryStream(Data); }

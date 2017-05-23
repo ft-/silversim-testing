@@ -23,7 +23,6 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.Scene.Types.Scene
@@ -39,7 +38,6 @@ namespace SilverSim.Scene.Types.Scene
                 m_Scene = scene;
             }
 
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override List<UUID> this[UUID key]
             {
                 get
@@ -76,7 +74,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public override IAssetMetadataServiceInterface Metadata => this;
 
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
             {
                 get
@@ -124,8 +121,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public override IAssetDataServiceInterface Data => this;
 
-            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             Stream IAssetDataServiceInterface.this[UUID key]
             {
                 get
@@ -161,7 +156,6 @@ namespace SilverSim.Scene.Types.Scene
                 return false;
             }
 
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override AssetData this[UUID key]
             {
                 get
@@ -198,7 +192,6 @@ namespace SilverSim.Scene.Types.Scene
                 return false;
             }
 
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override void Delete(UUID id)
             {
                 bool success = false;

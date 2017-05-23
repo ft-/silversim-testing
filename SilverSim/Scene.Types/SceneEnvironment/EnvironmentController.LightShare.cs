@@ -24,7 +24,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.Generic;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
@@ -83,7 +82,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public static implicit operator Quaternion(WLVector4 v) => new Quaternion(v.X, v.Y, v.Z, v.W);
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public struct WindlightSkyData
         {
             public WLVector4 Ambient;
@@ -140,7 +138,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             };
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public struct WindlightWaterData
         {
             public WLVector2 BigWaveDirection;

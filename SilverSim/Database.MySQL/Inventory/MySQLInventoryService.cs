@@ -32,7 +32,6 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
@@ -103,10 +102,8 @@ namespace SilverSim.Database.MySQL.Inventory
             };
         }
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override IInventoryFolderServiceInterface Folder => this;
 
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override IInventoryItemServiceInterface Item => this;
 
         IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content => m_ContentService;

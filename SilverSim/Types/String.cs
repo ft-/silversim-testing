@@ -20,12 +20,10 @@
 // exception statement from your version.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace SilverSim.Types
 {
-    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public sealed class AString : IEquatable<AString>, IEquatable<string>, IValue
     {
         private readonly string m_Value;
@@ -100,16 +98,12 @@ namespace SilverSim.Types
             return false;
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Integer(AString v) => Integer.Parse(v.m_Value);
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Real(AString v) => Real.Parse(v.m_Value);
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator double(AString v) => double.Parse(v.m_Value.Trim(), CultureInfo.InvariantCulture);
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Vector3(AString v) => new Vector3((double)v);
         #endregion Operators
 
@@ -123,23 +117,15 @@ namespace SilverSim.Types
 
         #region Helpers
         public ABoolean AsBoolean => new ABoolean(!string.IsNullOrEmpty(m_Value));
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Integer AsInteger => new Integer(Int32.Parse(m_Value));
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Quaternion AsQuaternion => Quaternion.Parse(m_Value);
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Real AsReal => Real.Parse(m_Value);
         public AString AsString => new AString(m_Value);
         public UUID AsUUID => new UUID(m_Value);
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Vector3 AsVector3 => Vector3.Parse(m_Value);
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public uint AsUInt => uint.Parse(m_Value);
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public int AsInt => int.Parse(m_Value);
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public ulong AsULong => ulong.Parse(m_Value);
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public long AsLong => long.Parse(m_Value);
         #endregion
     }
