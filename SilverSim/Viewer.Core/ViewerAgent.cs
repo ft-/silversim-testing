@@ -72,12 +72,11 @@ namespace SilverSim.Viewer.Core
 
         #region Agent fields
         private UUID m_CurrentSceneID;
+
         #endregion
 
-        private readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
-
         /** <summary>Key is region ID</summary> */
-        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds => m_ActiveChilds;
+        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds { get; } = new RwLockedDictionary<UUID, AgentChildInfo>();
         public override ClientInfo Client { get; }
 
         private readonly UserAccount m_UntrustedAccountInfo;
@@ -141,9 +140,7 @@ namespace SilverSim.Viewer.Core
         public readonly RwLockedDictionary<UUID, AgentCircuit> Circuits = new RwLockedDictionary<UUID, AgentCircuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
 
-        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(() => new RwLockedDictionary<uint, uint>());
-
-        public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials => m_TransmittedTerrainSerials;
+        public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; } = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(() => new RwLockedDictionary<uint, uint>());
 
         #region IObject Calls
         public override void InvokeOnPositionUpdate()
@@ -578,9 +575,8 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Physics Linkage
-        private readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
-        public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors => m_PhysicsActors;
+        public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors { get; } = new RwLockedDictionary<UUID, IPhysicsObject>();
 
         public override IPhysicsObject PhysicsActor
         {

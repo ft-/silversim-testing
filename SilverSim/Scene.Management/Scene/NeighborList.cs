@@ -58,7 +58,7 @@ namespace SilverSim.Scene.Management.Scene
                     }
                     else if(thisRegion.Location.Y == otherExtentPos.Y || otherRegion.Location.Y == thisExtentPos.Y)
                     {
-                        if (thisRegion.Location.Y >= otherRegion.Location.Y && thisRegion.Location.Y < otherExtentPos.Y ||
+                        if ((thisRegion.Location.Y >= otherRegion.Location.Y && thisRegion.Location.Y < otherExtentPos.Y) ||
                             (otherRegion.Location.Y >= thisRegion.Location.Y && otherRegion.Location.Y < thisExtentPos.Y))
                         {
                             neighbors.Add(otherRegion);

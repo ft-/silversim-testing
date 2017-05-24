@@ -29,10 +29,6 @@ namespace SilverSim.Main.Common.CmdIO
 {
     public class CommandRegistry
     {
-        // for documentation:
-        //public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
-
-        private readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_CreateCommands;
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_DeleteCommands;
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_LoadCommands;
@@ -57,7 +53,7 @@ namespace SilverSim.Main.Common.CmdIO
 
         private readonly object m_RegisterCmdGroupLock = new object();
 
-        public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands => m_Commands;
+        public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands { get; } = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
 
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CheckAddCommandType(string cmd, ref RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
         {

@@ -28,6 +28,21 @@ namespace SilverSim.Http
     [Serializable]
     public class WebSocketClosedException : Exception
     {
+        public WebSocketClosedException()
+        {
+        }
+
+        public WebSocketClosedException(string message) : base(message)
+        {
+        }
+
+        public WebSocketClosedException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected WebSocketClosedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+        {
+        }
     }
 
     public class HttpWebSocket : IDisposable

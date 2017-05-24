@@ -61,8 +61,7 @@ namespace SilverSim.Scene.Agent
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT");
         protected readonly object m_DataLock = new object();
 
-        #region Agent fields
-        private readonly UUID m_AgentID;
+#region Agent fields
         private double m_Health = 100f;
         #endregion
 
@@ -95,7 +94,6 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-
         public double PhysicsGravityMultiplier
         {
             get { return 1; }
@@ -120,7 +118,7 @@ namespace SilverSim.Scene.Agent
         {
             Attachments = new AgentAttachments();
             Group = UGI.Unknown;
-            m_AgentID = agentId;
+            ID = agentId;
             HomeURI = homeURI;
             m_AnimationController = new AgentAnimationController(ID, SendAnimations);
             AllowUnsit = true;
@@ -204,7 +202,7 @@ namespace SilverSim.Scene.Agent
         public abstract bool IsRunning { get; }
         public abstract bool IsFlying { get; }
 
-        public UUID ID => m_AgentID;
+        public UUID ID { get; }
 
         public string Name
         {
@@ -222,7 +220,6 @@ namespace SilverSim.Scene.Agent
         }
 
         public UGI Group { get; set; }
-
 
         public Vector3 LookAt
         {
@@ -247,10 +244,8 @@ namespace SilverSim.Scene.Agent
                     HomeURI = HomeURI
                 };
             }
-            set
-            {
-                throw new NotSupportedException();
-            }
+
+            set { throw new NotSupportedException(); }
         }
 
         public string Description

@@ -28,27 +28,15 @@ using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Profile
 {
-    sealed class DummyUserAgentService : UserAgentServiceInterface, IDisplayNameAccessor
+    internal sealed class DummyUserAgentService : UserAgentServiceInterface, IDisplayNameAccessor
     {
-        public override IDisplayNameAccessor DisplayName
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public override IDisplayNameAccessor DisplayName => this;
 
         string IDisplayNameAccessor.this[UUI agent]
         {
-            get
-            {
-                return string.Empty;
-            }
+            get { return string.Empty; }
 
-            set
-            {
-                throw new NotSupportedException();
-            }
+            set { throw new NotSupportedException(); }
         }
 
         public override void VerifyAgent(UUID sessionID, string token)
@@ -76,17 +64,14 @@ namespace SilverSim.Viewer.Profile
             throw new NotSupportedException();
         }
 
-        public override UserInfo GetUserInfo(UUI user)
+        public override UserInfo GetUserInfo(UUI user) => new UserInfo()
         {
-            return new UserInfo()
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserTitle = string.Empty,
-                UserFlags = 0,
-                UserCreated = new Date()
-            };
-        }
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            UserTitle = string.Empty,
+            UserFlags = 0,
+            UserCreated = new Date()
+        };
 
         public override ServerURIs GetServerURLs(UUI user)
         {

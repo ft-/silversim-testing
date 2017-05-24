@@ -334,7 +334,7 @@ namespace SilverSim.Viewer.Core
             throw new ArgumentException("Handler resolver error");
         }
 
-        private Action<Message> DeriveActionDelegateFromMethodInfo(MethodInfo mi, Type t, object o, string info)
+        private Action<Message> DeriveActionDelegateFromMethodInfo(MethodInfo mi, object o, string info)
         {
             if (mi.ReturnType != typeof(void))
             {
@@ -540,7 +540,7 @@ namespace SilverSim.Viewer.Core
                         {
                             try
                             {
-                                m_MessageRouting.Add(pa.Number, DeriveActionDelegateFromMethodInfo(mi, t, o, "message " + pa.Number.ToString()));
+                                m_MessageRouting.Add(pa.Number, DeriveActionDelegateFromMethodInfo(mi, o, "message " + pa.Number.ToString()));
                                 messageRegisteredHere.Add(pa.Number);
                             }
                             catch
@@ -563,7 +563,7 @@ namespace SilverSim.Viewer.Core
                         {
                             try
                             {
-                                m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "generic " + gm.Method));
+                                m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, o, "generic " + gm.Method));
                                 genericMsgRegisteredHere.Add(gm.Method);
                             }
                             catch
@@ -586,7 +586,7 @@ namespace SilverSim.Viewer.Core
                         {
                             try
                             {
-                                m_GodlikeMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "godlike " + gm.Method));
+                                m_GodlikeMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, o, "godlike " + gm.Method));
                                 godlikeMsgRegisteredHere.Add(gm.Method);
                             }
                             catch
@@ -609,7 +609,7 @@ namespace SilverSim.Viewer.Core
                         {
                             try
                             {
-                                m_IMMessageRouting.Add(im.Dialog, DeriveActionDelegateFromMethodInfo(mi, t, o, "im " + im.Dialog.ToString()));
+                                m_IMMessageRouting.Add(im.Dialog, DeriveActionDelegateFromMethodInfo(mi, o, "im " + im.Dialog.ToString()));
                                 imTypeRegisteredHere.Add(im.Dialog);
                             }
                             catch
@@ -1029,7 +1029,7 @@ namespace SilverSim.Viewer.Core
         #region Log Incoming Agent
         public void LogIncomingAgent(ILog log, bool isChild)
         {
-            m_Log.InfoFormat("Incoming agent {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Type {6} Region {7} ({8})",
+            log.InfoFormat("Incoming agent {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Type {6} Region {7} ({8})",
                 Agent.Owner.FirstName,
                 Agent.Owner.LastName,
                 Agent.Owner.HomeURI,

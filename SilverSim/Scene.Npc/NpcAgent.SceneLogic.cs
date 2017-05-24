@@ -40,8 +40,7 @@ namespace SilverSim.Scene.Npc
 
         protected override void SendAnimations(AvatarAnimation m)
         {
-            SceneInterface scene = CurrentScene;
-            scene?.SendAgentAnimToAllAgents(m);
+            CurrentScene?.SendAgentAnimToAllAgents(m);
         }
 
         internal SceneInterface CurrentScene { get; set; }

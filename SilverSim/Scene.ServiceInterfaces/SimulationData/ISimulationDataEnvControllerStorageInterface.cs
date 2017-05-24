@@ -26,11 +26,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
     public interface ISimulationDataEnvControllerStorageInterface
     {
         /* setting value to null will delete the entry */
-        byte[] this[UUID regionID]
-        {
-            get;
-            set;
-        }
+        byte[] this[UUID regionID] { get; set; }
 
         bool TryGetValue(UUID regionID, out byte[] settings);
 

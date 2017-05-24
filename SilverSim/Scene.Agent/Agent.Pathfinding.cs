@@ -24,7 +24,7 @@ using System;
 
 namespace SilverSim.Scene.Agent
 {
-    partial class Agent
+    public partial class Agent
     {
         public void MoveToTarget(Vector3 target, double tau, UUID notifyPrimId, UUID itemId)
         {

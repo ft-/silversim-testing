@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.Agent
 {
-    partial class Agent
+    public partial class Agent
     {
         protected abstract void SendAnimations(AvatarAnimation m);
 

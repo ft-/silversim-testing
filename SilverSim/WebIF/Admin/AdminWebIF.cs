@@ -67,18 +67,12 @@ namespace SilverSim.WebIF.Admin
 
         private class SessionInfo
         {
-            public int LastSeenTickCount;
+            public int LastSeenTickCount = Environment.TickCount;
             public bool IsAuthenticated;
             public string UserName = string.Empty;
             public string ExpectedResponse = string.Empty;
             public List<string> Rights = new List<string>();
             public UUID SelectedSceneID = UUID.Zero;
-
-            public SessionInfo()
-            {
-                LastSeenTickCount = Environment.TickCount;
-                IsAuthenticated = false;
-            }
         }
 
         private readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();

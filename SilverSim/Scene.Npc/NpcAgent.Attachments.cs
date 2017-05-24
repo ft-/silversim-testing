@@ -33,7 +33,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.Npc
 {
-    partial class NpcAgent
+    public partial class NpcAgent
     {
         #region NPC Appearance
         private struct DetachEntry
@@ -202,6 +202,7 @@ namespace SilverSim.Scene.Npc
                     item.Permissions.Group = InventoryPermissionsMask.None;
                     item.Permissions.NextOwner = InventoryPermissionsMask.None;
                     InventoryService.Item.Add(item);
+                    ++layer;
                 }
             }
 

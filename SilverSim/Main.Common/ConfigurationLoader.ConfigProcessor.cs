@@ -32,7 +32,7 @@ using System.Xml;
 
 namespace SilverSim.Main.Common
 {
-    partial class ConfigurationLoader
+    public partial class ConfigurationLoader
     {
         #region Configuration Loader Helpers
         private interface ICFG_Source

@@ -52,13 +52,13 @@ namespace SilverSim.Viewer.TerrainEdit
                 return;
             }
             var scene = circuit.Scene;
-            if(null == scene)
+            if(scene == null)
             {
                 return;
             }
 
             Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data> modifier;
-            
+
             foreach (var data in req.ParcelData)
             {
                 if (data.South == data.North && data.West == data.East)

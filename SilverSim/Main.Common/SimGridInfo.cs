@@ -34,6 +34,21 @@ namespace SilverSim.Main.Common
 
         public class SimGridInfoXmlException : Exception
         {
+            public SimGridInfoXmlException()
+            {
+            }
+
+            public SimGridInfoXmlException(string message) : base(message)
+            {
+            }
+
+            public SimGridInfoXmlException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected SimGridInfoXmlException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+            {
+            }
         }
 
         private static void LoadFromGridsXml_Grid(IConfigSource config, XmlTextReader reader, string tagname)

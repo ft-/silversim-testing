@@ -27,20 +27,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public interface ISimulationDataParcelStorageInterface
     {
-        ISimulationDataParcelAccessListStorageInterface WhiteList
-        {
-            get;
-        }
+        ISimulationDataParcelAccessListStorageInterface WhiteList { get; }
 
-        ISimulationDataParcelAccessListStorageInterface BlackList
-        {
-            get;
-        }
+        ISimulationDataParcelAccessListStorageInterface BlackList { get; }
 
-        ParcelInfo this[UUID regionID, UUID parcelID]
-        {
-            get;
-        }
+        ParcelInfo this[UUID regionID, UUID parcelID] { get; }
         List<UUID> ParcelsInRegion(UUID key);
 
         void Store(UUID regionID, ParcelInfo parcel);

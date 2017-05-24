@@ -122,8 +122,8 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 hoverHeight = m_Params[VehicleFloatParamId.HoverHeight];
             }
             else if((flags & VehicleFlags.HoverWaterOnly) != 0 ||
-                (flags & VehicleFlags.HoverTerrainOnly) == 0 &&
-                hoverHeight < waterHeight)
+                ((flags & VehicleFlags.HoverTerrainOnly) == 0 &&
+                hoverHeight < waterHeight))
             {
                 hoverHeight = waterHeight;
             }

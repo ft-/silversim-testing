@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         private static extern IntPtr LoadLibrary(string dllToLoad);
 
         private static readonly object m_InitLock = new object();
-        static bool m_Inited;
+        private static readonly bool m_Inited;
 
         private IntPtr m_VHacd;
 

@@ -90,27 +90,14 @@ namespace SilverSim.Scene.Types.Agent
         void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true);
         void AddWaitForRoot(SceneInterface scene, Action<object, bool> del, object o);
 
-        bool IsFlying
-        {
-            get;
-        }
+        bool IsFlying { get; }
 
-        bool IsRunning
-        {
-            get;
-        }
+        bool IsRunning { get; }
 
-        IAgentTeleportServiceInterface ActiveTeleportService
-        {
-            get;
-            set;
-        }
+        IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
         void RemoveActiveTeleportService(IAgentTeleportServiceInterface service);
 
-        int NextParcelSequenceId
-        {
-            get;
-        }
+        int NextParcelSequenceId { get; }
 
         int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {
@@ -118,46 +105,19 @@ namespace SilverSim.Scene.Types.Agent
             set;
         }
 
-        Vector4 CollisionPlane
-        {
-            get;
-            set;
-        }
+        Vector4 CollisionPlane { get; set; }
 
-        AgentAttachments Attachments
-        {
-            get;
-        }
+        AgentAttachments Attachments { get; }
 
-        Vector3 CameraPosition
-        {
-            get;
-            set;
-        }
+        Vector3 CameraPosition { get; set; }
 
-        Quaternion CameraRotation
-        {
-            get;
-            set;
-        }
+        Quaternion CameraRotation { get; set; }
 
-        Vector3 CameraAtAxis
-        {
-            get;
-            set;
-        }
+        Vector3 CameraAtAxis { get; set; }
 
-        Vector3 CameraLeftAxis
-        {
-            get;
-            set;
-        }
+        Vector3 CameraLeftAxis { get; set; }
 
-        Vector3 CameraUpAxis
-        {
-            get;
-            set;
-        }
+        Vector3 CameraUpAxis { get; set; }
 
         AgentWearables Wearables
         {
@@ -171,24 +131,12 @@ namespace SilverSim.Scene.Types.Agent
             set; /* must not replace data and not the internal reference */
         }
 
-        byte[] VisualParams
-        {
-            get;
-            set;
-        }
+        byte[] VisualParams { get; set; }
 
-        ObjectGroup SittingOnObject
-        {
-            get;
-            set;
-        }
+        ObjectGroup SittingOnObject { get; set; }
 
         [Description("Health in %")]
-        double Health
-        {
-            get;
-            set;
-        }
+        double Health { get; set; }
 
         void IncreaseHealth(double v);
         void DecreaseHealth(double v);
@@ -207,55 +155,25 @@ namespace SilverSim.Scene.Types.Agent
             set; /* must not replace data and not the internal reference */
         }
 
-        AssetServiceInterface AssetService
-        {
-            get;
-        }
+        AssetServiceInterface AssetService { get; }
 
-        InventoryServiceInterface InventoryService
-        {
-            get;
-        }
+        InventoryServiceInterface InventoryService { get; }
 
-        GroupsServiceInterface GroupsService
-        {
-            get;
-        }
+        GroupsServiceInterface GroupsService { get; }
 
-        ProfileServiceInterface ProfileService
-        {
-            get;
-        }
+        ProfileServiceInterface ProfileService { get; }
 
-        FriendsServiceInterface FriendsService
-        {
-            get;
-        }
+        FriendsServiceInterface FriendsService { get; }
 
-        UserAgentServiceInterface UserAgentService
-        {
-            get;
-        }
+        UserAgentServiceInterface UserAgentService { get; }
 
-        PresenceServiceInterface PresenceService
-        {
-            get;
-        }
+        PresenceServiceInterface PresenceService { get; }
 
-        GridUserServiceInterface GridUserService
-        {
-            get;
-        }
+        GridUserServiceInterface GridUserService { get; }
 
-        EconomyServiceInterface EconomyService
-        {
-            get;
-        }
+        EconomyServiceInterface EconomyService { get; }
 
-        OfflineIMServiceInterface OfflineIMService
-        {
-            get;
-        }
+        OfflineIMServiceInterface OfflineIMService { get; }
 
         void SendMessageIfRootAgent(Message m, UUID fromSceneID);
         void SendMessageAlways(Message m, UUID fromSceneID);
@@ -269,26 +187,13 @@ namespace SilverSim.Scene.Types.Agent
 
         ulong AddNewFile(string filename, byte[] data);
 
-        bool IsActiveGod
-        {
-            get;
-        }
+        bool IsActiveGod { get; }
 
-        bool IsNpc
-        {
-            get;
-        }
+        bool IsNpc { get; }
 
-        bool IsInMouselook
-        {
-            get;
-        }
+        bool IsInMouselook { get; }
 
-        Vector3 LookAt
-        {
-            get;
-            set;
-        }
+        Vector3 LookAt { get; set; }
 
         Vector3 GlobalPositionOnGround { get; }
 

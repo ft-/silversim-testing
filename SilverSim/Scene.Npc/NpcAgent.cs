@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Npc
 
         internal void DisableListen()
         {
-            if(null != m_ChatListener)
+            if(m_ChatListener != null)
             {
                 m_ChatListener.Remove();
                 m_ChatListener = null;
@@ -118,14 +118,10 @@ namespace SilverSim.Scene.Npc
 
         private void HandleAppearanceUpdate(IAgent agent)
         {
-            SceneInterface scene = CurrentScene;
-            if (null != scene)
-            {
-                scene.SendAgentAppearanceToAllAgents(this);
-            }
+            CurrentScene?.SendAgentAppearanceToAllAgents(this);
         }
 
-        UUI m_NpcOwner = UUI.Unknown;
+        private UUI m_NpcOwner = UUI.Unknown;
 
         /* as the Npc must own itself, we actually have to provide a separate means to declare a NPC owner */
         public UUI NpcOwner
@@ -146,8 +142,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        private readonly RwLockedDictionary<UUID, AgentChildInfo> m_ActiveChilds = new RwLockedDictionary<UUID, AgentChildInfo>();
-        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds => m_ActiveChilds;
+        public override RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds { get; } = new RwLockedDictionary<UUID, AgentChildInfo>();
 
         public override IAgentTeleportServiceInterface ActiveTeleportService
         {
@@ -277,9 +272,8 @@ namespace SilverSim.Scene.Npc
         }
 
         #region Physics Linkage
-        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
 
-        public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors => m_PhysicsActors;
+        public override RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors { get; } = new RwLockedDictionary<UUID, IPhysicsObject>();
 
         public override IPhysicsObject PhysicsActor
         {
@@ -331,9 +325,7 @@ namespace SilverSim.Scene.Npc
         };
 
         public override List<GridType> SupportedGridTypes => new List<GridType>();
-
-        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate () { return new RwLockedDictionary<uint, uint>(); });
-        public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials => m_TransmittedTerrainSerials;
+        public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; } = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(() => new RwLockedDictionary<uint, uint>());
 
         public override UserAccount UntrustedAccountInfo => new UserAccount()
         {
@@ -403,7 +395,7 @@ namespace SilverSim.Scene.Npc
             RevokeAnimPermissions(sourceID, permissions);
         }
 
-        readonly RwLockedList<UUID> m_SelectedObjects = new RwLockedList<UUID>();
+        private readonly RwLockedList<UUID> m_SelectedObjects = new RwLockedList<UUID>();
         public override RwLockedList<UUID> SelectedObjects(UUID scene) => m_SelectedObjects;
 
         public override void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
@@ -445,11 +437,7 @@ namespace SilverSim.Scene.Npc
         {
             base.InvokeOnPositionUpdate();
 
-            SceneInterface currentScene = CurrentScene;
-            if(currentScene != null)
-            {
-                currentScene.SendAgentObjectToAllAgents(this);
-            }
+            CurrentScene?.SendAgentObjectToAllAgents(this);
         }
 
     }

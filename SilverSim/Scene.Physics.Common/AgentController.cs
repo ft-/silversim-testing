@@ -87,18 +87,15 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
-        public bool IsPhantom 
+        public bool IsPhantom
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
+
             set
             {
                 /* nothing to do for agents */
             }
         }
-
 
         public double Mass => 2;
 
@@ -108,7 +105,7 @@ namespace SilverSim.Scene.Physics.Common
         public abstract bool IsRotateYEnabled { get; set; }
         public abstract bool IsRotateZEnabled { get; set; }
 
-        ControlFlags m_ControlFlags = ControlFlags.None;
+        private ControlFlags m_ControlFlags;
         public void SetControlFlags(ControlFlags flags)
         {
             if (IsPhysicsActive)
@@ -127,8 +124,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-
-        Vector3 m_ControlDirectionalInput = Vector3.Zero;
+        private Vector3 m_ControlDirectionalInput = Vector3.Zero;
         public void SetControlDirectionalInput(Vector3 value)
         {
             lock (m_Lock)
@@ -137,7 +133,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        Vector3 ControlLinearInput
+        private Vector3 ControlLinearInput
         {
             get
             {
@@ -148,24 +144,19 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public VehicleType VehicleType 
+        public VehicleType VehicleType
         {
-            get
-            {
-                return VehicleType.None;
-            }
+            get { return VehicleType.None; }
             set
             {
                 /* nothing to do for agents */
             }
         }
 
-        public VehicleFlags VehicleFlags 
+        public VehicleFlags VehicleFlags
         {
-            get
-            {
-                return VehicleFlags.None;
-            }
+            get { return VehicleFlags.None; }
+
             set
             {
                 /* nothing to do for agents */
@@ -184,10 +175,8 @@ namespace SilverSim.Scene.Physics.Common
 
         public Quaternion this[VehicleRotationParamId id]
         {
-            get
-            {
-                return Quaternion.Identity;
-            }
+            get { return Quaternion.Identity; }
+
             set
             {
                 /* nothing to do for agents */
@@ -196,10 +185,8 @@ namespace SilverSim.Scene.Physics.Common
 
         public Vector3 this[VehicleVectorParamId id]
         {
-            get
-            {
-                return Vector3.Zero;
-            }
+            get { return Vector3.Zero; }
+
             set
             {
                 /* nothing to do for agents */
@@ -208,17 +195,15 @@ namespace SilverSim.Scene.Physics.Common
 
         public double this[VehicleFloatParamId id]
         {
-            get
-            {
-                return 0;
-            }
+            get { return 0; }
+
             set
             {
                 /* nothing to do for agents */
             }
         }
 
-        Vector3 m_AppliedForce = Vector3.Zero;
+        private Vector3 m_AppliedForce = Vector3.Zero;
 
         public void SetAppliedForce(Vector3 value)
         {
@@ -233,7 +218,7 @@ namespace SilverSim.Scene.Physics.Common
             /* nothing to do here */
         }
 
-        Vector3 m_LinearImpulse = Vector3.Zero;
+        private Vector3 m_LinearImpulse = Vector3.Zero;
         public void SetLinearImpulse(Vector3 value)
         {
             lock (m_Lock)
@@ -253,7 +238,7 @@ namespace SilverSim.Scene.Physics.Common
         protected double WalkRunSpeedSwitchThreshold { get; set; }
         protected double FlySlowFastSpeedSwitchThreshold { get; set; }
         protected double StandstillSpeedThreshold { get; set; }
-        Quaternion m_LastKnownBodyRotation = Quaternion.Identity;
+        private Quaternion m_LastKnownBodyRotation = Quaternion.Identity;
 
         protected List<PositionalForce> CalculateForces(double dt, out Vector3 agentTorque)
         {

@@ -28,10 +28,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
     public interface ISimulationDataObjectStorageInterface
     {
         /* load all objects of region */
-        List<ObjectGroup> this[UUID regionID]
-        {
-            get;
-        }
+        List<ObjectGroup> this[UUID regionID] { get; }
 
         List<UUID> ObjectsInRegion(UUID key);
 

@@ -26,7 +26,7 @@ using System.Text;
 
 namespace SilverSim.Main.Common
 {
-    partial class ConfigurationLoader
+    public partial class ConfigurationLoader
     {
         private void ShowCachedDnsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {

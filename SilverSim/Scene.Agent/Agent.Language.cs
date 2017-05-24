@@ -23,7 +23,7 @@ using System.Globalization;
 
 namespace SilverSim.Scene.Agent
 {
-    partial class Agent
+    public partial class Agent
     {
         #region AgentLanguage
         private string m_AgentLanguage = string.Empty;

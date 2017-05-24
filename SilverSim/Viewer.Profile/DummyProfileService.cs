@@ -101,14 +101,9 @@ namespace SilverSim.Viewer.Profile
         {
             public string this[UUI user, UUI target]
             {
-                get
-                {
-                    return string.Empty;
-                }
-                set
-                {
-                    throw new NotSupportedException();
-                }
+                get { return string.Empty; }
+
+                set { throw new NotSupportedException(); }
             }
 
             public bool TryGetValue(UUI user, UUI target, out string notes)
@@ -129,16 +124,14 @@ namespace SilverSim.Viewer.Profile
             {
                 get
                 {
-                    var prefs = new ProfilePreferences();
-                    prefs.IMviaEmail = false;
-                    prefs.User = user;
-                    prefs.Visible = false;
-                    return prefs;
+                    return new ProfilePreferences()
+                    {
+                        IMviaEmail = false,
+                        User = user,
+                        Visible = false
+                    };
                 }
-                set
-                {
-                    throw new NotSupportedException();
-                }
+                set { throw new NotSupportedException(); }
             }
 
             public bool TryGetValue(UUI user, out ProfilePreferences prefs)
@@ -157,7 +150,7 @@ namespace SilverSim.Viewer.Profile
         {
             public ProfileProperties this[UUI user]
             {
-                get 
+                get
                 {
                     return new ProfileProperties()
                     {

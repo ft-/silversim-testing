@@ -533,7 +533,7 @@ namespace SilverSim.Main.Common.Console
             for ( ;; )
             {
                 string consoleTitle;
-                if (SelectedScene == null)
+                if (SelectedScene == UUID.Zero)
                 {
                     CmdPrompt = "(root) # ";
                     consoleTitle = m_ConsoleTitle + " # (root)";

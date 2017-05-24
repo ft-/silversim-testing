@@ -30,7 +30,7 @@ using System.Text;
 
 namespace SilverSim.Main.Common
 {
-    partial class ConfigurationLoader
+    public partial class ConfigurationLoader
     {
         #region Load Server Params
         private void LoadServerParamsForPlugin(string name, IPlugin instance, Dictionary<string, List<KeyValuePair<UUID, string>>> cachedResults)

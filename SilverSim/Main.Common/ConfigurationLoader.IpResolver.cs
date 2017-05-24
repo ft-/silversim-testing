@@ -27,7 +27,7 @@ using System.Net.NetworkInformation;
 
 namespace SilverSim.Main.Common
 {
-    partial class ConfigurationLoader
+    public partial class ConfigurationLoader
     {
         private sealed class SystemIPv4Service : ExternalHostNameServiceInterface
         {

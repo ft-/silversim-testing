@@ -27,9 +27,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public interface ISimulationDataTerrainStorageInterface
     {
-        List<LayerPatch> this[UUID key]
-        {
-            get;
-        }
+        List<LayerPatch> this[UUID key] { get; }
     }
 }

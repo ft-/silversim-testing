@@ -35,6 +35,21 @@ namespace SilverSim.Http
     [Serializable]
     public class NotAWebSocketConnectionException : Exception
     {
+        public NotAWebSocketConnectionException()
+        {
+        }
+
+        public NotAWebSocketConnectionException(string message) : base(message)
+        {
+        }
+
+        public NotAWebSocketConnectionException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected NotAWebSocketConnectionException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+        {
+        }
     }
 
     public class WebSocketClient : HttpWebSocket

@@ -37,7 +37,7 @@ using System.Threading;
 
 namespace SilverSim.Main.Common
 {
-    partial class ConfigurationLoader
+    public partial class ConfigurationLoader
     {
         #region List TCP Ports
         public Dictionary<int, string> KnownTcpPorts

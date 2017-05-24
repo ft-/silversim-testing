@@ -77,7 +77,7 @@ namespace SilverSim.Viewer.Economy
                             break;
 
                         case MessageType.EconomyDataRequest:
-                            HandleEconomyDataRequest(req.Key, req.Value);
+                            HandleEconomyDataRequest(req.Key);
                             break;
 
                         default:
@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Economy
             }
         }
 
-        private void HandleEconomyDataRequest(AgentCircuit circuit, Message m)
+        private void HandleEconomyDataRequest(AgentCircuit circuit)
         {
             SceneInterface scene;
             ViewerAgent agent;
