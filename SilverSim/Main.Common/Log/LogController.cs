@@ -42,7 +42,7 @@ namespace SilverSim.Main.Common.Log
                 }
                 catch
                 {
-                    /* ignore exceptions here */
+                    /* ignore exceptions here. If not, we would end up in endless loops */
                 }
             }
         }
