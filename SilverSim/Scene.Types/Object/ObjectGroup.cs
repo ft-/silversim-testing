@@ -769,14 +769,8 @@ namespace SilverSim.Scene.Types.Object
             {
                 return;
             }
-            var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
-            if (e != null)
-            {
-                foreach (Action<IObject> del in e.GetInvocationList().OfType<Action<IObject>>())
-                {
-                    del(this);
-                }
-            }
+
+            OnPositionChange?.Invoke(this);
         }
 
         #region Primitive Params Methods

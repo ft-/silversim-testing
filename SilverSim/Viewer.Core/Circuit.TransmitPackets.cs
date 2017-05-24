@@ -141,14 +141,7 @@ namespace SilverSim.Viewer.Core
             m_CircuitIsClosing = true;
 
             /* events are not exactly thread-safe, so we have to take the value first */
-            var ev = OnTerminateCircuit;
-            if (ev != null)
-            {
-                foreach (var d in ev.GetInvocationList().OfType<Action>())
-                {
-                    d.Invoke();
-                }
-            }
+            OnTerminateCircuit?.Invoke();
 
             lock (m_UnackedPacketsHash)
             {

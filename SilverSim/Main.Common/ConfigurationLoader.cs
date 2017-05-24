@@ -169,7 +169,6 @@ namespace SilverSim.Main.Common
 
         private readonly ILog m_Log;
         private readonly ILog m_UpdaterLog;
-        private readonly IConfigSource m_Config = new IniConfigSource();
         private readonly Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
         private readonly RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
         private readonly ManualResetEvent m_ShutdownEvent;
@@ -180,9 +179,7 @@ namespace SilverSim.Main.Common
         public readonly SceneList Scenes = new SceneList();
         public readonly IMRouter IMRouter = new IMRouter();
         public readonly CmdIO.CommandRegistry CommandRegistry = new CmdIO.CommandRegistry();
-
-        private static readonly string m_InstallationBinPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static string InstallationBinPath => m_InstallationBinPath;
+        public static string InstallationBinPath { get; } = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         #region Simulator Shutdown Handler
         private readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
@@ -308,7 +305,7 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
-        private static Assembly m_MonoSecurity;
+        private static readonly Assembly m_MonoSecurity;
 
         private static Assembly ResolveMonoSecurityEventHandler(object sender, ResolveEventArgs args)
         {
@@ -373,7 +370,7 @@ namespace SilverSim.Main.Common
             AppDomain.CurrentDomain.AssemblyResolve += ArchSpecificResolveEventHandler;
         }
 
-        public IConfigSource Config => m_Config;
+        public IConfigSource Config { get; } = new IniConfigSource();
 
         #region Plugin Registry
         private readonly bool m_ServerParamInitialLoadProcessed;
@@ -657,7 +654,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                IConfig cfg = m_Config.AddConfig("HTTP");
+                IConfig cfg = Config.AddConfig("HTTP");
                 cfg.Set("ListenerPort", "9000");
             }
 
@@ -702,12 +699,12 @@ namespace SilverSim.Main.Common
                 switch (parts.Length)
                 {
                     case 1:
-                        cfg = m_Config.Configs["Startup"] ?? m_Config.AddConfig("Startup");
+                        cfg = Config.Configs["Startup"] ?? Config.AddConfig("Startup");
                         cfg.Set(parts[0], varvalue);
                         break;
 
                     case 2:
-                        cfg = m_Config.Configs[parts[0]] ?? m_Config.AddConfig(parts[0]);
+                        cfg = Config.Configs[parts[0]] ?? Config.AddConfig(parts[0]);
                         cfg.Set(parts[1], varvalue);
                         break;
 
@@ -717,9 +714,9 @@ namespace SilverSim.Main.Common
             }
             ProcessConfigurations();
 
-            foreach(IConfig cfg in m_Config.Configs)
+            foreach(IConfig cfg in Config.Configs)
             {
-                foreach (IConfig config in m_Config.Configs)
+                foreach (IConfig config in Config.Configs)
                 {
                     if (!config.Contains("UseSourceParameter"))
                     {
@@ -732,7 +729,7 @@ namespace SilverSim.Main.Common
                         continue;
                     }
 
-                    IConfig sourceConfig = m_Config.Configs[useparam[0]];
+                    IConfig sourceConfig = Config.Configs[useparam[0]];
                     if (sourceConfig == null || !sourceConfig.Contains(useparam[1]))
                     {
                         continue;
@@ -753,7 +750,7 @@ namespace SilverSim.Main.Common
             {
                 using (var writer = new StreamWriter(dumpResultingIniName))
                 {
-                    foreach (IConfig cfg in m_Config.Configs)
+                    foreach (IConfig cfg in Config.Configs)
                     {
                         writer.WriteLine("[{0}]", cfg.Name);
                         foreach (string key in cfg.GetKeys())
@@ -766,7 +763,7 @@ namespace SilverSim.Main.Common
             }
 
             string logConfigFile = string.Empty;
-            IConfig startupConfig = m_Config.Configs["Startup"];
+            IConfig startupConfig = Config.Configs["Startup"];
             if(startupConfig != null)
             {
                 logConfigFile = startupConfig.GetString("LogConfig", string.Empty);
@@ -815,7 +812,7 @@ namespace SilverSim.Main.Common
             m_UpdaterLog = LogManager.GetLogger("UPDATER");
             CoreUpdater.Instance.OnUpdateLog += UpdaterLogEvent;
 
-            IConfig heloConfig = m_Config.Configs["Helo.Headers"];
+            IConfig heloConfig = Config.Configs["Helo.Headers"];
             if(heloConfig != null)
             {
                 foreach (string key in heloConfig.GetKeys())
@@ -824,7 +821,7 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            heloConfig = m_Config.Configs["Helo.X-Protocols-Provided"];
+            heloConfig = Config.Configs["Helo.X-Protocols-Provided"];
             if(heloConfig != null)
             {
                 foreach(string key in heloConfig.GetKeys())
@@ -833,7 +830,7 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            IConfig consoleConfig = m_Config.Configs["Console"];
+            IConfig consoleConfig = Config.Configs["Console"];
             string consoleTitle = string.Empty;
             if(consoleConfig != null)
             {
@@ -941,7 +938,7 @@ namespace SilverSim.Main.Common
                 p.Value.ProcessMigrations();
             }
 
-            IConfig httpConfig = m_Config.Configs["HTTP"];
+            IConfig httpConfig = Config.Configs["HTTP"];
             if(httpConfig == null)
             {
                 m_Log.Fatal("Missing configuration section [HTTP]");
@@ -962,7 +959,7 @@ namespace SilverSim.Main.Common
             httpServer.StartsWithUriHandlers.Add("/helo", HeloResponseHandler);
             httpServer.UriHandlers.Add("/robots.txt", HandleRobotsTxt);
 
-            IConfig httpsConfig = m_Config.Configs["HTTPS"];
+            IConfig httpsConfig = Config.Configs["HTTPS"];
             if(httpsConfig != null)
             {
                 httpsServer = new BaseHttpServer(httpsConfig, this, true);

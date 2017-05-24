@@ -177,14 +177,7 @@ namespace SilverSim.Viewer.Messages
 
         public void OnSendComplete(bool flag)
         {
-            var ev = OnSendCompletion;
-            if (ev != null)
-            {
-                foreach (Action<bool> del in ev.GetInvocationList().OfType<Action<bool>>())
-                {
-                    del(flag);
-                }
-            }
+            OnSendCompletion?.Invoke(flag);
         }
 
         #region Overloaded methods

@@ -283,7 +283,7 @@ namespace SilverSim.Main.Common
 
         private void AddIncludes(ICFG_Source cfgsource)
         {
-            foreach (IConfig config in m_Config.Configs)
+            foreach (IConfig config in Config.Configs)
             {
                 foreach (string key in config.GetKeys())
                 {
@@ -469,7 +469,7 @@ namespace SilverSim.Main.Common
         private void LoadModules()
         {
             string archModule = "Module-" + VersionInfo.ArchSpecificId;
-            foreach (IConfig config in m_Config.Configs)
+            foreach (IConfig config in Config.Configs)
             {
                 if (config.Contains("IsTemplate"))
                 {
@@ -493,7 +493,7 @@ namespace SilverSim.Main.Common
         private void LoadArchDlls()
         {
             string archModule = "UnmanagedModule-" + VersionInfo.ArchSpecificId;
-            foreach (IConfig config in m_Config.Configs)
+            foreach (IConfig config in Config.Configs)
             {
                 if (config.Contains("IsTemplate"))
                 {
@@ -518,13 +518,13 @@ namespace SilverSim.Main.Common
         #region Process [ParameterMap] section
         private void ProcessParameterMap()
         {
-            IConfig parameterMap = m_Config.Configs["ParameterMap"];
+            IConfig parameterMap = Config.Configs["ParameterMap"];
             if (parameterMap == null)
             {
                 return;
             }
 
-            IConfig processedParameterMaps = m_Config.Configs["ProcessedParameterMaps"] ?? m_Config.AddConfig("ProcessedParameterMaps");
+            IConfig processedParameterMaps = Config.Configs["ProcessedParameterMaps"] ?? Config.AddConfig("ProcessedParameterMaps");
 
             foreach (string key in parameterMap.GetKeys())
             {
@@ -536,7 +536,7 @@ namespace SilverSim.Main.Common
                     continue;
                 }
 
-                IConfig fromconfig = m_Config.Configs[fromparts[0]];
+                IConfig fromconfig = Config.Configs[fromparts[0]];
                 if (fromconfig == null)
                 {
                     continue;
@@ -547,7 +547,7 @@ namespace SilverSim.Main.Common
                     continue;
                 }
 
-                IConfig toconfig = m_Config.Configs[toparts[0]] ?? m_Config.AddConfig(toparts[0]);
+                IConfig toconfig = Config.Configs[toparts[0]] ?? Config.AddConfig(toparts[0]);
 
                 if (toconfig.Contains(toparts[1]))
                 {
@@ -565,7 +565,7 @@ namespace SilverSim.Main.Common
         #region Process ImportResource* entries
         private void ProcessImportResources()
         {
-            foreach (IConfig config in m_Config.Configs)
+            foreach (IConfig config in Config.Configs)
             {
                 foreach (string key in config.GetKeys())
                 {
@@ -583,7 +583,7 @@ namespace SilverSim.Main.Common
         #region Process [ResourceMap] section
         private void ProcessResourceMap()
         {
-            IConfig resourceMap = m_Config.Configs["ResourceMap"];
+            IConfig resourceMap = Config.Configs["ResourceMap"];
             if (resourceMap == null)
             {
                 return;
@@ -596,7 +596,7 @@ namespace SilverSim.Main.Common
                 {
                     continue;
                 }
-                IConfig config = m_Config.Configs[parts[0]];
+                IConfig config = Config.Configs[parts[0]];
                 if (config == null)
                 {
                     continue;
@@ -616,7 +616,7 @@ namespace SilverSim.Main.Common
         #region Process UseSourceParameter lines
         private void ProcessUseSourceParameter()
         {
-            foreach (IConfig config in m_Config.Configs)
+            foreach (IConfig config in Config.Configs)
             {
                 if (!config.Contains("UseSourceParameter"))
                 {
@@ -629,7 +629,7 @@ namespace SilverSim.Main.Common
                     config.Remove("UseSourceParameter");
                     continue;
                 }
-                IConfig sourceConfig = m_Config.Configs[useparam[0]];
+                IConfig sourceConfig = Config.Configs[useparam[0]];
                 if (sourceConfig == null || !sourceConfig.Contains(useparam[1]))
                 {
                     continue;
@@ -660,7 +660,7 @@ namespace SilverSim.Main.Common
         #region Process UseTemplates lines
         private void ProcessUseTemplates()
         {
-            foreach (IConfig config in m_Config.Configs)
+            foreach (IConfig config in Config.Configs)
             {
                 foreach (string section in config.GetString("Use", string.Empty).Split(new char[] { ',', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries))
                 {
@@ -670,7 +670,7 @@ namespace SilverSim.Main.Common
                         System.Console.WriteLine();
                         throw new ConfigurationErrorException();
                     }
-                    IConfig configSection = m_Config.Configs[section];
+                    IConfig configSection = Config.Configs[section];
                     if (!configSection.Contains("IsTemplate"))
                     {
                         System.Console.Write("Use does not reference a valid template");
@@ -695,7 +695,7 @@ namespace SilverSim.Main.Common
         {
             if (m_GridsXmlConfig == null)
             {
-                IConfig gridMap = m_Config.Configs["Grid"];
+                IConfig gridMap = Config.Configs["Grid"];
                 if (gridMap == null)
                 {
                     return;
@@ -709,7 +709,7 @@ namespace SilverSim.Main.Common
                     {
                         throw new ConfigurationErrorException(string.Format("Unknown grid id {0}", gridid));
                     }
-                    m_Config.Merge(m_GridsXmlConfig);
+                    Config.Merge(m_GridsXmlConfig);
                 }
             }
         }
@@ -717,7 +717,7 @@ namespace SilverSim.Main.Common
 
         private void ProcessConfigurations(bool processParameterMap = true)
         {
-            IConfig importedInfo = m_Config.Configs["ImportedConfigs"] ?? m_Config.AddConfig("ImportedConfigs");
+            IConfig importedInfo = Config.Configs["ImportedConfigs"] ?? Config.AddConfig("ImportedConfigs");
             while (m_Sources.Count != 0)
             {
                 ICFG_Source source = m_Sources.Dequeue();
@@ -727,7 +727,7 @@ namespace SilverSim.Main.Common
                     System.Console.WriteLine("Processing config {0}", source.Name);
 #endif
                     importedInfo.Set("Imported-" + source.Name, true);
-                    m_Config.Merge(source.ConfigSource);
+                    Config.Merge(source.ConfigSource);
                 }
                 catch(Exception e)
                 {

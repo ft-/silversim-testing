@@ -40,14 +40,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             if (0 == m_InDeserialization)
             {
                 byte[] data = Serialization;
-                var ev = OnEnvironmentControllerChangeParams; /* events are not exactly thread-safe */
-                if (ev != null)
-                {
-                    foreach (Action<byte[]> del in ev.GetInvocationList().OfType<Action<byte[]>>())
-                    {
-                        del(data);
-                    }
-                }
+                OnEnvironmentControllerChangeParams?.Invoke(data);
             }
         }
 

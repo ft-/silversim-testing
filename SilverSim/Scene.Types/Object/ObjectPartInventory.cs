@@ -190,14 +190,7 @@ namespace SilverSim.Scene.Types.Object
             base.Add(key1, key2, item);
             Interlocked.Increment(ref InventorySerial);
 
-            var addDelegate = OnChange;
-            if(addDelegate != null)
-            {
-                foreach (var d in addDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                {
-                    d(ChangeAction.Add, PartID, item.ID);
-                }
-            }
+            OnChange?.Invoke(ChangeAction.Add, PartID, item.ID);
         }
 
         public void SetAssetID(UUID key1, UUID assetID)
@@ -208,14 +201,7 @@ namespace SilverSim.Scene.Types.Object
                 item.AssetID = assetID;
                 Interlocked.Increment(ref InventorySerial);
 
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.Change, PartID, item.ID);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
             }
         }
 
@@ -227,14 +213,7 @@ namespace SilverSim.Scene.Types.Object
                 item.NextOwnerAssetID = assetID;
                 Interlocked.Increment(ref InventorySerial);
 
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.NextOwnerAssetID, PartID, item.ID);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.NextOwnerAssetID, PartID, item.ID);
             }
         }
 
@@ -249,14 +228,7 @@ namespace SilverSim.Scene.Types.Object
             }
             Interlocked.Increment(ref InventorySerial);
 
-            var updateDelegate = OnChange;
-            if(updateDelegate != null)
-            {
-                foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                {
-                    d(ChangeAction.Change, PartID, item.ID);
-                }
-            }
+            OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
         }
 
         public bool Rename(string newKey, UUID itemid)
@@ -277,14 +249,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 Interlocked.Increment(ref InventorySerial);
 
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.Change, PartID, item.ID);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
             }
             return renamed;
         }
@@ -307,14 +272,7 @@ namespace SilverSim.Scene.Types.Object
             }
             script?.Remove();
             Interlocked.Increment(ref InventorySerial);
-            var updateDelegate = OnChange;
-            if (updateDelegate != null)
-            {
-                foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                {
-                    d(ChangeAction.Add, PartID, newItem.ID);
-                }
-            }
+            OnChange?.Invoke(ChangeAction.Add, PartID, newItem.ID);
         }
 
         public new bool Remove(UUID key1)
@@ -325,14 +283,7 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.Remove, PartID, key1);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.Remove, PartID, key1);
                 return true;
             }
             return false;
@@ -346,14 +297,7 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.Remove, PartID, item.ID);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
                 return true;
             }
             return false;
@@ -366,14 +310,7 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.Remove, PartID, item.ID);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
                 return true;
             }
             return false;
@@ -386,14 +323,7 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.Remove, PartID, item.ID);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
                 return true;
             }
             return false;
@@ -405,14 +335,7 @@ namespace SilverSim.Scene.Types.Object
             {
 #warning check this for Script removal
                 Interlocked.Increment(ref InventorySerial);
-                var updateDelegate = OnChange;
-                if (updateDelegate != null)
-                {
-                    foreach (var d in updateDelegate.GetInvocationList().OfType<Action<ChangeAction, UUID, UUID>>())
-                    {
-                        d(ChangeAction.Remove, PartID, key1);
-                    }
-                }
+                OnChange?.Invoke(ChangeAction.Remove, PartID, key1);
                 return true;
             }
             return false;
