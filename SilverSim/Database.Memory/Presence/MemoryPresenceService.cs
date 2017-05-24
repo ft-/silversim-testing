@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Presence;
@@ -33,8 +32,8 @@ using System.Linq;
 
 namespace SilverSim.Database.Memory.Presence
 {
-    #region Service Implementation
     [Description("Memory Presence Backend")]
+    [PluginName("Presence")]
     public sealed class MemoryPresenceService : PresenceServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly RwLockedDictionary<UUID, PresenceInfo> m_Data = new RwLockedDictionary<UUID, PresenceInfo>();
@@ -115,14 +114,4 @@ namespace SilverSim.Database.Memory.Presence
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Presence")]
-    public class MemoryPresenceServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryPresenceService();
-    }
-    #endregion
 }

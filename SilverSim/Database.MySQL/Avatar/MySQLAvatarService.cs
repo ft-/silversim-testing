@@ -34,16 +34,16 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Avatar
 {
-    #region Service Implementation
     [Description("MySQL Avatar Backend")]
+    [PluginName("Avatar")]
     public sealed class MySQLAvatarService : AvatarServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");
 
-        public MySQLAvatarService(string connectionString)
+        public MySQLAvatarService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -294,16 +294,4 @@ namespace SilverSim.Database.MySQL.Avatar
             this[userAccount] = null;
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Avatar")]
-    public class MySQLInventoryServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLAvatarService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

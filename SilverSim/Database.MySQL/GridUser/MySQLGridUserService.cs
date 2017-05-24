@@ -34,17 +34,17 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.GridUser
 {
-    #region Service Implementation
     [Description("MySQL GridUser Backend")]
+    [PluginName("GridUser")]
     public sealed class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
 
         #region Constructor
-        public MySQLGridUserService(string connectionString)
+        public MySQLGridUserService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -259,17 +259,4 @@ namespace SilverSim.Database.MySQL.GridUser
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("GridUser")]
-    public class MySQLGridUserServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLGridUserService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
-
 }

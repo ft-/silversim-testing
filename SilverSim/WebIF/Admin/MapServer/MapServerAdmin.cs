@@ -34,6 +34,7 @@ using System.ComponentModel;
 namespace SilverSim.WebIF.Admin.MapServer
 {
     [Description("WebIF MapServer Admin Support")]
+    [PluginName("MapServerAdmin")]
     public class MapServerAdmin : IPlugin
     {
         private readonly string m_GridServiceName;
@@ -263,12 +264,5 @@ namespace SilverSim.WebIF.Admin.MapServer
             }
             ReturnRegionsResult(req, regions);
         }
-    }
-
-    [PluginName("MapServerAdmin")]
-    public class MapServerAdminFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MapServerAdmin(ownSection);
     }
 }

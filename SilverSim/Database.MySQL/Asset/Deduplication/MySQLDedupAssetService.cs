@@ -37,8 +37,8 @@ using System.Security.Cryptography;
 
 namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
-    #region Service Implementation
     [Description("MySQL Deduplication Asset Backend")]
+    [PluginName("DedupAssets")]
     public sealed class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
@@ -48,10 +48,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         private readonly RwLockedList<string> m_ConfigurationIssues;
 
         #region Constructor
-        public MySQLDedupAssetService(string connectionString, RwLockedList<string> configurationIssues)
+        public MySQLDedupAssetService(ConfigurationLoader loader, IConfig ownSection)
         {
-            m_ConfigurationIssues = configurationIssues;
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
+            m_ConfigurationIssues = loader.KnownConfigurationIssues;
             m_ReferencesService = new DefaultAssetReferencesService(this);
         }
 
@@ -449,18 +449,4 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         private const int MAX_ASSET_NAME = 64;
     }
-    #endregion
-
-    #region Factory
-    [PluginName("DedupAssets")]
-    public class MySQLDedupAssetServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MySQLDedupAssetService(MySQLUtilities.BuildConnectionString(ownSection, m_Log), loader.KnownConfigurationIssues);
-        }
-    }
-    #endregion
 }

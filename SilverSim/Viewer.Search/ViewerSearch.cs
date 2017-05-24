@@ -42,6 +42,7 @@ using System.Xml;
 namespace SilverSim.Viewer.Search
 {
     [Description("Viewer Search Handler")]
+    [PluginName("ViewerSearch")]
     public class ViewerSearch : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL SEARCH");
@@ -404,12 +405,5 @@ namespace SilverSim.Viewer.Search
         {
             m_ShutdownSearch = true;
         }
-    }
-
-    [PluginName("ViewerSearch")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerSearch();
     }
 }

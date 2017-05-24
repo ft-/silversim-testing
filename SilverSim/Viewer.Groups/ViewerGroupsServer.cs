@@ -24,7 +24,6 @@
 #pragma warning disable RCS1163
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.IM;
@@ -54,6 +53,7 @@ using System.Threading;
 namespace SilverSim.Viewer.Groups
 {
     [Description("Viewer Groups Handler")]
+    [PluginName("ViewerGroupsServer")]
     public class ViewerGroupsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown, ITriggerOnRootAgentActions
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL GROUPS");
@@ -1761,12 +1761,5 @@ namespace SilverSim.Viewer.Groups
         {
             m_ShutdownGroups = true;
         }
-    }
-
-    [PluginName("ViewerGroupsServer")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerGroupsServer();
     }
 }

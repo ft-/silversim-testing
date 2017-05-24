@@ -36,6 +36,7 @@ using System.ComponentModel;
 namespace SilverSim.WebIF.Admin.UserServer
 {
     [Description("WebIF User Account Admin Support")]
+    [PluginName("UserAccountAdmin")]
     public class UserAccountAdmin : IPlugin
     {
         private readonly string m_UserAccountServiceName;
@@ -372,12 +373,5 @@ namespace SilverSim.WebIF.Admin.UserServer
             res.Add("accounts", accountsRes);
             m_WebIF.SuccessResponse(req, res);
         }
-    }
-
-    [PluginName("UserAccountAdmin")]
-    public class UserAccountAdminFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new UserAccountAdmin(ownSection);
     }
 }

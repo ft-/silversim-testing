@@ -23,7 +23,6 @@
 #pragma warning disable RCS1029
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
@@ -49,6 +48,7 @@ using System.Threading;
 namespace SilverSim.Viewer.Friends
 {
     [Description("Viewer Friends Handler")]
+    [PluginName("ViewerFriendsServer")]
     public class ViewerFriendsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER FRIENDS");
@@ -610,12 +610,5 @@ namespace SilverSim.Viewer.Friends
 
             return false;
         }
-    }
-
-    [PluginName("ViewerFriendsServer")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerFriendsServer(ownSection.GetString("IMService", "IMService"));
     }
 }

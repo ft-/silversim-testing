@@ -53,6 +53,7 @@ namespace SilverSim.Main.Cmd.Region
 {
     #region Service Implementation
     [Description("Region Console Commands")]
+    [PluginName("Commands")]
     public class RegionCommands : IPlugin
     {
         private readonly string m_RegionStorageName;
@@ -69,11 +70,11 @@ namespace SilverSim.Main.Cmd.Region
         private SceneList m_Scenes;
         private AvatarNameServiceInterface m_AvatarNameService;
 
-        public RegionCommands(string regionStorageName, string estateServiceName, string simulationStorageName)
+        public RegionCommands(IConfig ownSection)
         {
-            m_RegionStorageName = regionStorageName;
-            m_EstateServiceName = estateServiceName;
-            m_SimulationStorageName = simulationStorageName;
+            m_RegionStorageName = ownSection.GetString("RegionStorage", "RegionStorage");
+            m_EstateServiceName = ownSection.GetString("EstateService", "EstateService");
+            m_SimulationStorageName = ownSection.GetString("SimulationDataStorage", "SimulationDataStorage");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -2486,17 +2487,6 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
         #endregion
-    }
-    #endregion
-
-    #region Factory
-    [PluginName("Commands")]
-    public class RegionCommandsFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new RegionCommands(ownSection.GetString("RegionStorage", "RegionStorage"),
-                ownSection.GetString("EstateService", "EstateService"),
-                ownSection.GetString("SimulationDataStorage", "SimulationDataStorage"));
     }
     #endregion
 }

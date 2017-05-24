@@ -34,14 +34,15 @@ using System.ComponentModel;
 namespace SilverSim.Database.MySQL.Maptile
 {
     [Description("MySQL Maptile Backend")]
+    [PluginName("Maptile")]
     public class MySQLMaptileService : MaptileServiceInterface, IPlugin, IDBServiceInterface
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL MAPTILE SERVICE");
 
-        public MySQLMaptileService(string connectionString)
+        public MySQLMaptileService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
@@ -177,14 +178,5 @@ namespace SilverSim.Database.MySQL.Maptile
             }
             return infos;
         }
-    }
-
-    [PluginName("Maptile")]
-    public class MySQLMaptileServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL MAPTILE SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLMaptileService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
 }

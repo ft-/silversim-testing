@@ -23,7 +23,6 @@
 #pragma warning disable RCS1029
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
@@ -38,6 +37,7 @@ using System.ComponentModel;
 namespace SilverSim.Viewer.Teleport
 {
     [Description("Viewer Teleport Handler")]
+    [PluginName("ViewerTeleport")]
     public class ViewerTeleport : IPlugin, IPacketHandlerExtender
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER TELEPORT");
@@ -192,12 +192,5 @@ namespace SilverSim.Viewer.Teleport
                 }
             }
         }
-    }
-
-    [PluginName("ViewerTeleport")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerTeleport();
     }
 }

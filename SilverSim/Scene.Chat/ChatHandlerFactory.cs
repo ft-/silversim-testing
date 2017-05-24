@@ -26,19 +26,19 @@ using System.ComponentModel;
 
 namespace SilverSim.Scene.Chat
 {
-    #region Chat Factory Service
     [Description("Region Chat Handler")]
+    [PluginName("Chat")]
     public sealed class ChatHandlerFactory : ChatServiceFactoryInterface, IPlugin
     {
         private readonly double m_WhisperDistance;
         private readonly double m_SayDistance;
         private readonly double m_ShoutDistance;
 
-        public ChatHandlerFactory(double whisperDistance, double sayDistance, double shoutDistance)
+        public ChatHandlerFactory(IConfig ownConfig)
         {
-            m_WhisperDistance = whisperDistance;
-            m_SayDistance = sayDistance;
-            m_ShoutDistance = shoutDistance;
+            m_WhisperDistance = ownConfig.GetDouble("WhisperDistance", 10f);
+            m_SayDistance = ownConfig.GetDouble("SayDistance", 20f);
+            m_ShoutDistance = ownConfig.GetDouble("ShoutDistance", 20f);
         }
 
         public override ChatServiceInterface Instantiate() =>
@@ -49,20 +49,4 @@ namespace SilverSim.Scene.Chat
             /* intentionally left empty */
         }
     }
-    #endregion
-
-    #region Factory Implementation
-    [PluginName("Chat")]
-    public class HandlerFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
-        {
-            double whisperDistance = ownConfig.GetDouble("WhisperDistance", 10f);
-            double sayDistance = ownConfig.GetDouble("SayDistance", 20f);
-            double shoutDistance = ownConfig.GetDouble("ShoutDistance", 20f);
-
-            return new ChatHandlerFactory(whisperDistance, sayDistance, shoutDistance);
-        }
-    }
-    #endregion
 }

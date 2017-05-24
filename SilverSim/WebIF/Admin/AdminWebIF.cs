@@ -47,8 +47,8 @@ using System.Timers;
 
 namespace SilverSim.WebIF.Admin
 {
-    #region Service Implementation
     [Description("Administration Web-Interface (WebIF)")]
+    [PluginName("AdminWebIF")]
     public sealed class AdminWebIF : IPlugin, IPluginShutdown, IPostLoadStep, IAdminWebIF
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF");
@@ -210,12 +210,25 @@ namespace SilverSim.WebIF.Admin
         }
         #endregion
 
-        public AdminWebIF(string basepath, bool enablesetpasscommand, string avatarnameservicenames, string title)
+        public AdminWebIF(ConfigurationLoader loader, IConfig ownSection)
         {
-            m_AvatarNameServiceNames = avatarnameservicenames;
-            m_EnableSetPasswordCommand = enablesetpasscommand;
-            m_Title = title;
-            m_BasePath = basepath;
+            m_EnableSetPasswordCommand = ownSection.GetBoolean("EnableSetPasswordCommand",
+#if DEBUG
+                    true
+#else
+                    false
+#endif
+                    );
+
+            if (m_EnableSetPasswordCommand)
+            {
+                loader.KnownConfigurationIssues.Add("Set EnableSetPasswordCommand=false in section [" + ownSection.Name + "]");
+                m_Log.ErrorFormat("[SECURITY] Set EnableSetPasswordCommand=false in section [{0}]", ownSection.Name);
+            }
+            m_BasePath = ownSection.GetString("BasePath", string.Empty);
+            m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", "AvatarNameStorage").Trim();
+            m_Title = ownSection.GetString("Title", "SilverSim");
+
             m_Timer.Elapsed += HandleTimer;
             JsonMethods.Add("webif.admin.user.grantright", GrantRight);
             JsonMethods.Add("webif.admin.user.revokeright", RevokeRight);
@@ -1800,35 +1813,4 @@ namespace SilverSim.WebIF.Admin
         }
         #endregion
     }
-    #endregion
-
-    #region Factory
-    [PluginName("AdminWebIF")]
-    public class AdminWebIFFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            bool enableSetPasswordCommand = ownSection.GetBoolean("EnableSetPasswordCommand",
-#if DEBUG
-                    true
-#else
-                    false
-#endif
-                    );
-
-            if (enableSetPasswordCommand)
-            {
-                loader.KnownConfigurationIssues.Add("Set EnableSetPasswordCommand=false in section [" + ownSection.Name + "]");
-                m_Log.ErrorFormat("[SECURITY] Set EnableSetPasswordCommand=false in section [{0}]", ownSection.Name);
-            }
-            return new AdminWebIF(
-                ownSection.GetString("BasePath", ""),
-                enableSetPasswordCommand,
-                ownSection.GetString("AvatarNameServices", "AvatarNameStorage").Trim(),
-                ownSection.GetString("Title", "SilverSim"));
-        }
-    }
-#endregion
 }

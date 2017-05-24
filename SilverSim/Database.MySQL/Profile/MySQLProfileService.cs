@@ -33,15 +33,16 @@ using System.ComponentModel;
 namespace SilverSim.Database.MySQL.Profile
 {
     [Description("MySQL Profile Backend")]
+    [PluginName("Profile")]
     public sealed partial class MySQLProfileService : ProfileServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");
 
         private readonly string m_ConnectionString;
 
-        public MySQLProfileService(string connectionString)
+        public MySQLProfileService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -197,15 +198,4 @@ namespace SilverSim.Database.MySQL.Profile
             new PrimaryKeyInfo("useruuid")
         };
     }
-
-    #region Factory
-    [PluginName("Profile")]
-    public sealed class MySQLProfileServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLProfileService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

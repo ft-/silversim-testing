@@ -34,16 +34,16 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.AuthInfo
 {
-    #region Service implementation
     [Description("MySQL AuthInfo Backend")]
+    [PluginName("AuthInfo")]
     public class MySQLAuthInfoService : AuthInfoServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AUTHINFO SERVICE");
         private readonly string m_ConnectionString;
 
-        public MySQLAuthInfoService(string connectionString)
+        public MySQLAuthInfoService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -253,16 +253,4 @@ namespace SilverSim.Database.MySQL.AuthInfo
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("AuthInfo")]
-    public class MySQLAuthInfoServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AUTHINFO SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLAuthInfoService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

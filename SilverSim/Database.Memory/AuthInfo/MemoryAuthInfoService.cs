@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AuthInfo;
@@ -33,6 +32,7 @@ namespace SilverSim.Database.Memory.AuthInfo
 {
     #region Service implementation
     [Description("Memory AuthInfo backend")]
+    [PluginName("AuthInfo")]
     public class MemoryAuthInfoService : AuthInfoServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private class AuthToken
@@ -125,15 +125,6 @@ namespace SilverSim.Database.Memory.AuthInfo
                 }
             }
         }
-    }
-    #endregion
-
-    #region Factory
-    [PluginName("AuthInfo")]
-    public class MemoryAuthInfoServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryAuthInfoService();
     }
     #endregion
 }

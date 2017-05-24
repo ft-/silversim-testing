@@ -35,17 +35,17 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Presence
 {
-    #region Service Implementation
     [Description("MySQL Presence Backend")]
+    [PluginName("Presence")]
     public sealed class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
 
         #region Constructor
-        public MySQLPresenceService(string connectionString)
+        public MySQLPresenceService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -246,16 +246,4 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Presence")]
-    public class MySQLPresenceServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLPresenceService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

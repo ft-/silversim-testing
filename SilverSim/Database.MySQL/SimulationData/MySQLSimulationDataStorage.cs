@@ -34,17 +34,18 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     #region Service Implementation
     [Description("MySQL Simulation Data Backend")]
+    [PluginName("SimulationData")]
     public sealed partial class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IQueueStatsAccess
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         private readonly string m_ConnectionString;
 
         #region Constructor
-        public MySQLSimulationDataStorage(string connectionString)
+        public MySQLSimulationDataStorage(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
-            m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccesswhitelist");
-            m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccessblacklist");
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
+            m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccesswhitelist");
+            m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccessblacklist");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -133,17 +134,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return statFuncs;
             }
         }
-    }
-    #endregion
-
-    #region Factory
-    [PluginName("SimulationData")]
-    public class MySQLSimulationDataServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLSimulationDataStorage(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

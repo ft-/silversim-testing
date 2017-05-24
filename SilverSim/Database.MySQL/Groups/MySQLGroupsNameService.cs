@@ -27,23 +27,22 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    #region Service Implementation
     [Description("MySQL GroupsName Backend")]
+    [PluginName("GroupNames")]
     public sealed class MySQLGroupsNameService : GroupsNameServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUP NAMES SERVICE");
 
         #region Constructor
-        public MySQLGroupsNameService(string connectionString)
+        public MySQLGroupsNameService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -161,16 +160,4 @@ namespace SilverSim.Database.MySQL.Groups
             new ChangeColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
         };
     }
-    #endregion
-
-    #region Factory
-    [PluginName("GroupNames")]
-    public class MySQLGroupsNameServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUP NAMES SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLGroupsNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

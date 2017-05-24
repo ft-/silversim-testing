@@ -34,7 +34,6 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.TravelingData
 {
-    #region Service implementation
     internal static class MySQLTravelingDataExtensionMethods
     {
         public static TravelingDataInfo ToTravelingData(this MySqlDataReader reader) => new TravelingDataInfo()
@@ -49,14 +48,15 @@ namespace SilverSim.Database.MySQL.TravelingData
     }
 
     [Description("MySQL TravelingData Backend")]
+    [PluginName("TravelingData")]
     public class MySQLTravelingDataService : TravelingDataServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL TRAVELINGDATA SERVICE");
         private readonly string m_ConnectionString;
 
-        public MySQLTravelingDataService(string connectionString)
+        public MySQLTravelingDataService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -234,16 +234,4 @@ namespace SilverSim.Database.MySQL.TravelingData
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("TravelingData")]
-    public class MySQLTravelingDataServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL TRAVELINGDATA SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLTravelingDataService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

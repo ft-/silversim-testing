@@ -22,7 +22,6 @@
 #pragma warning disable IDE0018
 #pragma warning disable RCS1029
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
@@ -35,6 +34,7 @@ using System.ComponentModel;
 namespace SilverSim.Viewer.TerrainEdit
 {
     [Description("Viewer Terraforming Handler")]
+    [PluginName("ViewerTerrainEdit")]
     public class ViewerTerrainEdit : IPlugin, IPacketHandlerExtender
     {
         public void Startup(ConfigurationLoader loader)
@@ -77,12 +77,5 @@ namespace SilverSim.Viewer.TerrainEdit
                 }
             }
         }
-    }
-
-    [PluginName("ViewerTerrainEdit")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerTerrainEdit();
     }
 }

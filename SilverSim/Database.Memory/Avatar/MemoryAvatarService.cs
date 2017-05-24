@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Avatar;
@@ -31,8 +30,8 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.Avatar
 {
-    #region Service Implementation
     [Description("Memory Avatar Backend")]
+    [PluginName("Avatar")]
     public sealed class MemoryAvatarService : AvatarServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Data = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(delegate () { return new RwLockedDictionary<string, string>(); });
@@ -158,14 +157,4 @@ namespace SilverSim.Database.Memory.Avatar
             m_Data.Remove(userAccount);
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Avatar")]
-    public class MemoryInventoryServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryAvatarService();
-    }
-    #endregion
 }

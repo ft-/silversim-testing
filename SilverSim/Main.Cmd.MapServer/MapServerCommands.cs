@@ -32,6 +32,7 @@ using System.Text;
 namespace SilverSim.Main.Cmd.MapServer
 {
     [Description("Map Server Console Commands")]
+    [PluginName("MapServerCommands")]
     public class MapServerCommands : IPlugin
     {
         private readonly string m_GridServiceName;
@@ -343,15 +344,6 @@ namespace SilverSim.Main.Cmd.MapServer
                     io.Write("Failed to set clear region flag defaults");
                 }
             }
-        }
-    }
-
-    [PluginName("MapServerCommands")]
-    public class MapServerCommandsFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MapServerCommands(ownSection);
         }
     }
 }

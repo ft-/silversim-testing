@@ -34,16 +34,16 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.OfflineIM
 {
-    #region Service implementation
     [Description("MySQL OfflineIM Backend")]
+    [PluginName("OfflineIM")]
     public class MySQLOfflineIMService : OfflineIMServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL OFFLINEIM SERVICE");
         private readonly string m_ConnectionString;
 
-        public MySQLOfflineIMService(string connectionString)
+        public MySQLOfflineIMService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public override void DeleteOfflineIM(ulong offlineImID)
@@ -175,17 +175,4 @@ namespace SilverSim.Database.MySQL.OfflineIM
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("OfflineIM")]
-    public class MySQLOfflineIMServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLOfflineIMService(
-                MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

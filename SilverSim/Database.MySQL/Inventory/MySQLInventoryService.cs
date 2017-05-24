@@ -35,8 +35,8 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
-    #region Service Implementation
     [Description("MySQL Inventory Backend")]
+    [PluginName("Inventory")]
     public sealed partial class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly string m_ConnectionString;
@@ -47,11 +47,11 @@ namespace SilverSim.Database.MySQL.Inventory
 
         private readonly IMigrationElement[] Migrations;
 
-        public MySQLInventoryService(string connectionString, string inventoryitemtable, string inventoryfoldertable)
+        public MySQLInventoryService(IConfig ownSection)
         {
-            m_InventoryItemTable = inventoryitemtable;
-            m_InventoryFolderTable = inventoryfoldertable;
-            m_ConnectionString = connectionString;
+            m_InventoryItemTable = ownSection.GetString("ItemTable", "inventoryitems");
+            m_InventoryFolderTable = ownSection.GetString("FolderTable", "inventoryfolders");
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
             m_ContentService = new DefaultInventoryFolderContentService(this);
 
             /* renaming of tables for NPCs required so creating those on the fly */
@@ -199,19 +199,4 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Inventory")]
-    public class MySQLInventoryServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLInventoryService(
-                MySQLUtilities.BuildConnectionString(ownSection, m_Log),
-                ownSection.GetString("ItemTable", "inventoryitems"),
-                ownSection.GetString("FolderTable", "inventoryfolders"));
-    }
-    #endregion
 }

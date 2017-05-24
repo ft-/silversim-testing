@@ -455,15 +455,44 @@ namespace SilverSim.Main.Common
                 throw new ConfigurationErrorException();
             }
 
+            Type[] interfaces = t.GetInterfaces();
             /* check type inheritance first */
-            if (!t.GetInterfaces().Contains(typeof(IPluginFactory)))
+            if (interfaces.Contains(typeof(IPluginFactory)))
             {
+                var module = (IPluginFactory)assembly.CreateInstance(t.FullName);
+                PluginInstances.Add(config.Name, module.Initialize(this, config));
+            }
+            else if(interfaces.Contains(typeof(IPlugin)))
+            {
+                ConstructorInfo ci;
+                if((ci = t.GetConstructor(new Type[] { typeof(IConfig) })) != null)
+                {
+                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { config }));
+                }
+                else if ((ci = t.GetConstructor(new Type[] { typeof(ConfigurationLoader), typeof(IConfig) })) != null)
+                {
+                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { this, config }));
+                }
+                else if ((ci = t.GetConstructor(new Type[] { typeof(ConfigurationLoader) })) != null)
+                {
+                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { this }));
+                }
+                else if ((ci = t.GetConstructor(Type.EmptyTypes)) != null)
+                {
+                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[0]));
+                }
+                else
+                {
+                    m_Log.FatalFormat("Failed to load factory for {1} in module {0}: plugin does not have a suitable constructor", assemblyname, modulenameparts[1]);
+                    throw new ConfigurationErrorException();
+                }
+            }
+            else
+            { 
                 m_Log.FatalFormat("Failed to load factory for {1} in module {0}: not a factory", assemblyname, modulenameparts[1]);
                 throw new ConfigurationErrorException();
             }
 
-            var module = (IPluginFactory)assembly.CreateInstance(t.FullName);
-            PluginInstances.Add(config.Name, module.Initialize(this, config));
         }
 
         private void LoadModules()

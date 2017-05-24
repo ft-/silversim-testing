@@ -56,8 +56,8 @@ using System.Net;
 
 namespace SilverSim.Grid.Login
 {
-    #region Service Implementation
     [Description("XmlRpc Login Handler")]
+    [PluginName("XmlRpcLoginHandler")]
     [ServerParam("AllowLoginViaHttpWhenHttpsIsConfigured", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly, DefaultValue = false)]
     [ServerParam("WelcomeMessage", ParameterType = typeof(string), Type = ServerParamType.GlobalOnly, DefaultValue = "Welcome to your new world!")]
     [ServerParam("GridLibraryOwner", ParameterType = typeof(UUID), Type = ServerParamType.GlobalOnly, DefaultValue = "11111111-1111-0000-0000-000100bba000")]
@@ -1194,14 +1194,4 @@ namespace SilverSim.Grid.Login
         }
         #endregion
     }
-    #endregion
-
-    #region Service factory
-    [PluginName("XmlRpcLoginHandler")]
-    public class XmlRpcLoginHandlerFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new XmlRpcLoginHandler(ownSection);
-    }
-    #endregion
 }

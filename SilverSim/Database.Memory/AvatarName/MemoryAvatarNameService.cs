@@ -19,20 +19,18 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SilverSim.Database.Memory.AvatarName
 {
-    #region Service Implementation
     [Description("Memory AvatarName Backend")]
+    [PluginName("AvatarNames")]
     public sealed class MemoryAvatarNameService : AvatarNameServiceInterface, IPlugin
     {
         private readonly RwLockedDictionary<UUID, UUI> m_Data = new RwLockedDictionary<UUID, UUI>();
@@ -108,14 +106,4 @@ namespace SilverSim.Database.Memory.AvatarName
             return new List<UUI>(res);
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("AvatarNames")]
-    public class MemoryAvatarNameServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryAvatarNameService();
-    }
-    #endregion
 }

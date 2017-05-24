@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.GridUser;
@@ -30,8 +29,8 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.GridUser
 {
-    #region Service Implementation
     [Description("Memory GridUser Backend")]
+    [PluginName("GridUser")]
     public sealed class MemoryGridUserService : GridUserServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly RwLockedDictionary<UUID, GridUserInfo> m_Data = new RwLockedDictionary<UUID, GridUserInfo>();
@@ -160,15 +159,4 @@ namespace SilverSim.Database.Memory.GridUser
             m_Data.Remove(userAccount);
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("GridUser")]
-    public class MemoryGridUserServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryGridUserService();
-    }
-    #endregion
-
 }

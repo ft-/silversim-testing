@@ -34,14 +34,15 @@ using System.ComponentModel;
 namespace SilverSim.Database.MySQL.Grid
 {
     [Description("MySQL RegionDefaultFlags Backend")]
+    [PluginName("RegionDefaultFlags")]
     public class MySQLRegionDefaultFlagsService : RegionDefaultFlagsServiceInterface, IPlugin, IDBServiceInterface
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL REGIONDEFAULTFLAGS SERVICE");
 
-        public MySQLRegionDefaultFlagsService(string connectionString)
+        public MySQLRegionDefaultFlagsService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void ProcessMigrations()
@@ -159,14 +160,5 @@ namespace SilverSim.Database.MySQL.Grid
             new AddColumn<RegionFlags>("flags") { IsNullAllowed = false, Default = RegionFlags.None },
             new PrimaryKeyInfo("uuid")
         };
-    }
-
-    [PluginName("RegionDefaultFlags")]
-    public class MySQLRegionDefaultFlagsServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL REGIONDEFAULTFLAGS SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLRegionDefaultFlagsService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
 }

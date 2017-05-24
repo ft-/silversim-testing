@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Maptile;
 using SilverSim.Threading;
@@ -31,6 +30,7 @@ using System.ComponentModel;
 namespace SilverSim.Database.Memory.Maptile
 {
     [Description("Memory Maptile Backend")]
+    [PluginName("Maptile")]
     public class MemoryMaptileService : MaptileServiceInterface, IPlugin
     {
         private readonly RwLockedDictionary<string, MaptileData> m_Maptiles = new RwLockedDictionary<string, MaptileData>();
@@ -72,12 +72,5 @@ namespace SilverSim.Database.Memory.Maptile
 
         public override bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data) =>
             m_Maptiles.TryGetValue(GetKey(scopeid, location, zoomlevel), out data);
-    }
-
-    [PluginName("Maptile")]
-    public class MemoryMaptileServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryMaptileService();
     }
 }

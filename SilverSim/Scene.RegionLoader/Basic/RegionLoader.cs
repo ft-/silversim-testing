@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
@@ -33,6 +34,7 @@ using System.ComponentModel;
 namespace SilverSim.Scene.RegionLoader.Basic
 {
     [Description("Region Loader")]
+    [PluginName("Basic")]
     public class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
         private readonly string m_RegionStorage = string.Empty;
@@ -44,9 +46,9 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private string m_GatekeeperUri;
 
         #region Constructor
-        internal RegionLoaderService(string regionStorage)
+        internal RegionLoaderService(IConfig ownConfig)
         {
-            m_RegionStorage = regionStorage;
+            m_RegionStorage = ownConfig.GetString("RegionStorage");
         }
 
         public void Startup(ConfigurationLoader loader)

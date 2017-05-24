@@ -30,8 +30,8 @@ using System.Threading;
 
 namespace SilverSim.Main.IM
 {
-    #region Service Implementation
     [Description("IM Service")]
+    [PluginName("IMService")]
     public class IMServiceHandler : IMServiceInterface, IPlugin
     {
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();
@@ -68,9 +68,9 @@ namespace SilverSim.Main.IM
         }
 
         #region Constructor
-        public IMServiceHandler(uint maxThreads)
+        public IMServiceHandler(IConfig ownSection)
         {
-            m_MaxThreads = maxThreads;
+            m_MaxThreads = (uint)ownSection.GetInt("MaxThreads");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -93,14 +93,4 @@ namespace SilverSim.Main.IM
         }
         #endregion
     }
-    #endregion
-
-    #region Factory
-    [PluginName("IMService")]
-    public class IMServiceHandlerFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new IMServiceHandler((uint)ownSection.GetInt("MaxThreads"));
-    }
-    #endregion
 }

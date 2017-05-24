@@ -21,19 +21,17 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
-using System.ComponentModel;
-using System;
-using SilverSim.ServiceInterfaces.AvatarName;
-using System.Collections.Generic;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces.Presence;
-using SilverSim.Types.StructuredData.XmlRpc;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
-using SilverSim.Main.Common.HttpServer;
+using SilverSim.Types.StructuredData.XmlRpc;
+using System.ComponentModel;
 
 namespace SilverSim.Grid.BasicLandtool
 {
     [Description("Basic Landtool")]
+    [PluginName("BasicLandtool")]
     public class Landtool : IPlugin
     {
         private readonly string m_PresenceServiceName;
@@ -116,12 +114,5 @@ namespace SilverSim.Grid.BasicLandtool
 
             return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
         }
-    }
-
-    [PluginName("BasicLandtool")]
-    public class LandtoolFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new Landtool(ownSection);
     }
 }

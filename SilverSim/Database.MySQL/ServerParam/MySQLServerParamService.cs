@@ -35,6 +35,7 @@ namespace SilverSim.Database.MySQL.ServerParam
 {
     #region Service Implementation
     [Description("MySQL ServerParam Backend")]
+    [PluginName("ServerParams")]
     public sealed class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin, IPluginShutdown
     {
         private readonly string m_ConnectionString;
@@ -45,9 +46,9 @@ namespace SilverSim.Database.MySQL.ServerParam
         #endregion
 
         #region Constructor
-        public MySQLServerParamService(string connectionString)
+        public MySQLServerParamService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -322,17 +323,6 @@ namespace SilverSim.Database.MySQL.ServerParam
         };
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutDatabase;
-    }
-    #endregion
-
-    #region Factory
-    [PluginName("ServerParams")]
-    public class MySQLServerParamServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLServerParamService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

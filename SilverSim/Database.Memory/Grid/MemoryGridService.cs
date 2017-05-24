@@ -32,8 +32,8 @@ using System.Linq;
 
 namespace SilverSim.Database.MySQL.Grid
 {
-    #region Service Implementation
     [Description("Memory Grid Backend")]
+    [PluginName("Grid")]
     [ServerParam("DeleteOnUnregister")]
     [ServerParam("AllowDuplicateRegionNames")]
     public sealed class MemoryGridService : GridServiceInterface, IPlugin, IServerParamListener
@@ -353,15 +353,4 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Grid")]
-    public class MemoryGridServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryGridService(ownSection);
-    }
-    #endregion
-
 }

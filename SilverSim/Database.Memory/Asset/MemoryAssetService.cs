@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
@@ -32,8 +31,8 @@ using System.IO;
 
 namespace SilverSim.Database.Memory.Asset
 {
-    #region Service Implementation
     [Description("Memory Asset Backend")]
+    [PluginName("Assets")]
     public class MemoryAssetService : AssetServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
         private readonly DefaultAssetReferencesService m_ReferencesService;
@@ -246,14 +245,4 @@ namespace SilverSim.Database.Memory.Asset
 
         private const int MAX_ASSET_NAME = 64;
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Assets")]
-    public class MemoryAssetServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryAssetService();
-    }
-    #endregion
 }

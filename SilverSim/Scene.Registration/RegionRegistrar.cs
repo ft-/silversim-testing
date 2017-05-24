@@ -19,9 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
-using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
@@ -32,8 +30,8 @@ using System.ComponentModel;
 
 namespace SilverSim.Scene.Registration
 {
-    #region Service Implementation
     [Description("Grid Registration Handler")]
+    [PluginName("SceneRegistrar")]
     public class SceneRegistrar : IPlugin
     {
         private readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
@@ -78,14 +76,4 @@ namespace SilverSim.Scene.Registration
             m_RegisteredScenes.Remove(scene);
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("SceneRegistrar")]
-    public class SceneRegistrarFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new SceneRegistrar();
-    }
-    #endregion
 }

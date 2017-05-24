@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
@@ -30,8 +29,8 @@ using System.Linq;
 
 namespace SilverSim.Database.Memory.Groups
 {
-    #region Service Implementation
     [Description("Memory GroupsName Backend")]
+    [PluginName("GroupNames")]
     public sealed class MemoryGroupsNameService : GroupsNameServiceInterface, IPlugin
     {
         private readonly RwLockedDictionary<UUID, UGI> m_Data = new RwLockedDictionary<UUID, UGI>();
@@ -89,14 +88,4 @@ namespace SilverSim.Database.Memory.Groups
         }
         #endregion
     }
-    #endregion
-
-    #region Factory
-    [PluginName("GroupNames")]
-    public class MemoryGroupsNameServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryGroupsNameService();
-    }
-    #endregion
 }

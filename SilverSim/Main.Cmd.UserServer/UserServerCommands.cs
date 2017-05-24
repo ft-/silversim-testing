@@ -35,6 +35,7 @@ using System.Text;
 namespace SilverSim.Main.Cmd.UserServer
 {
     [Description("User Server Console Commands")]
+    [PluginName("UserServerCommands")]
     public class UserServerCommands : IPlugin
     {
         private readonly string m_UserAccountServiceName;
@@ -301,11 +302,5 @@ namespace SilverSim.Main.Cmd.UserServer
                 io.WriteFormatted("{0}/{1} processed", index++, count);
             }
         }
-    }
-
-    [PluginName("UserServerCommands")]
-    public class UserServerCommandsFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => new UserServerCommands(ownSection);
     }
 }

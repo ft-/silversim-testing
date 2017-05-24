@@ -36,8 +36,8 @@ using System.IO;
 
 namespace SilverSim.Database.MySQL.Asset
 {
-    #region Service Implementation
     [Description("MySQL Asset Backend")]
+    [PluginName("Assets")]
     public sealed class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetDataServiceInterface, IAssetMetadataServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
@@ -47,10 +47,10 @@ namespace SilverSim.Database.MySQL.Asset
         private readonly RwLockedList<string> m_ConfigurationIssues;
 
         #region Constructor
-        public MySQLAssetService(string connectionString, RwLockedList<string> configurationIssues)
+        public MySQLAssetService(ConfigurationLoader loader, IConfig ownSection)
         {
-            m_ConfigurationIssues = configurationIssues;
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
+            m_ConfigurationIssues = loader.KnownConfigurationIssues;
             m_ReferencesService = new DefaultAssetReferencesService(this);
         }
 
@@ -427,16 +427,4 @@ namespace SilverSim.Database.MySQL.Asset
 
         private const int MAX_ASSET_NAME = 64;
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Assets")]
-    public class MySQLAssetServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLAssetService(MySQLUtilities.BuildConnectionString(ownSection, m_Log), loader.KnownConfigurationIssues);
-    }
-    #endregion
 }

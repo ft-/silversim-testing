@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Traveling;
@@ -31,8 +30,8 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.TravelingData
 {
-    #region Service implementation
     [Description("Memory TravelingData backend")]
+    [PluginName("TravelingData")]
     public class MemoryTravelingDataService : TravelingDataServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly RwLockedDictionary<UUID, TravelingDataInfo> m_HGTravelingDatas = new RwLockedDictionary<UUID, TravelingDataInfo>();
@@ -117,14 +116,4 @@ namespace SilverSim.Database.Memory.TravelingData
             m_HGTravelingDatas[data.SessionID] = data;
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("TravelingData")]
-    public class MemoryTravelingDataServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryTravelingDataService();
-    }
-    #endregion
 }

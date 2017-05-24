@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
@@ -40,6 +39,7 @@ using System.Text;
 namespace SilverSim.Main.Cmd.Estate
 {
     [Description("Estate Console Commands")]
+    [PluginName("Commands")]
     public class EstateCommands : IPlugin
     {
         private readonly string m_RegionStorageName;
@@ -49,10 +49,10 @@ namespace SilverSim.Main.Cmd.Estate
         private AggregatingAvatarNameService m_AvatarNameService;
         private SceneList m_Scenes;
 
-        public EstateCommands(string regionStorageName, string estateServiceName)
+        public EstateCommands(IConfig ownSection)
         {
-            m_RegionStorageName = regionStorageName;
-            m_EstateServiceName = estateServiceName;
+            m_RegionStorageName = ownSection.GetString("RegionStorage", "RegionStorage");
+            m_EstateServiceName = ownSection.GetString("EstateService", "EstateService");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -404,25 +404,4 @@ namespace SilverSim.Main.Cmd.Estate
             }
         }
     }
-
-    #region Factory
-    [PluginName("Commands")]
-    public class EstateCommandsFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            var avatarNameServiceNames = new List<string>();
-            string avatarNameServices = ownSection.GetString("AvatarNameServices", string.Empty);
-            if (!string.IsNullOrEmpty(avatarNameServices))
-            {
-                foreach (string p in avatarNameServices.Split(','))
-                {
-                    avatarNameServiceNames.Add(p.Trim());
-                }
-            }
-
-            return new EstateCommands(ownSection.GetString("RegionStorage", "RegionStorage"), ownSection.GetString("EstateService", "EstateService"));
-        }
-    }
-    #endregion
 }

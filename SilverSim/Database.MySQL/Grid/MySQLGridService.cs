@@ -36,6 +36,7 @@ namespace SilverSim.Database.MySQL.Grid
 {
     #region Service Implementation
     [Description("MySQL Grid Backend")]
+    [PluginName("Grid")]
     [ServerParam("DeleteOnUnregister", Type = ServerParamType.GlobalOnly, ParameterType = typeof(bool), DefaultValue = false)]
     [ServerParam("AllowDuplicateRegionNames", Type = ServerParamType.GlobalOnly, ParameterType = typeof(bool), DefaultValue = false)]
     public sealed class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin, IServerParamListener
@@ -67,11 +68,11 @@ namespace SilverSim.Database.MySQL.Grid
         }
 
         #region Constructor
-        public MySQLGridService(string connectionString, string tableName, bool useRegionDefaultServices)
+        public MySQLGridService(IConfig ownSection)
         {
-            m_UseRegionDefaultServices = useRegionDefaultServices;
-            m_ConnectionString = connectionString;
-            m_TableName = tableName;
+            m_UseRegionDefaultServices = ownSection.GetBoolean("UseRegionDefaultServices", true);
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
+            m_TableName = ownSection.GetString("TableName", "regions");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -695,18 +696,4 @@ namespace SilverSim.Database.MySQL.Grid
         };
     }
     #endregion
-
-    #region Factory
-    [PluginName("Grid")]
-    public class MySQLGridServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLGridService(MySQLUtilities.BuildConnectionString(ownSection, m_Log),
-                ownSection.GetString("TableName", "regions"),
-                ownSection.GetBoolean("UseRegionDefaultServices", true));
-    }
-    #endregion
-
 }

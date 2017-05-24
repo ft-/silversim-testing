@@ -35,6 +35,7 @@ using System.Threading;
 namespace SilverSim.Viewer.Economy
 {
     [Description("Viewer Economy Handler")]
+    [PluginName("ViewerEconomy")]
     public class ViewerEconomy : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL ECONOMY");
@@ -180,12 +181,5 @@ namespace SilverSim.Viewer.Economy
         {
             m_ShutdownEconomy = true;
         }
-    }
-
-    [PluginName("ViewerEconomy")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerEconomy();
     }
 }

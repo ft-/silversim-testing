@@ -24,7 +24,6 @@
 #pragma warning disable RCS1163
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
@@ -49,6 +48,7 @@ using System.Timers;
 namespace SilverSim.Viewer.Profile
 {
     [Description("Viewer Profile Handler")]
+    [PluginName("ViewerProfileServer")]
     public class ViewerProfileServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL PROFILE");
@@ -1132,12 +1132,5 @@ namespace SilverSim.Viewer.Profile
             m_CleanupTimer.Elapsed -= CleanupTimer;
             m_ShutdownProfile = true;
         }
-    }
-
-    [PluginName("ViewerProfileServer")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerProfileServer();
     }
 }

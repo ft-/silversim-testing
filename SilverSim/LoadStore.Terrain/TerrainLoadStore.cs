@@ -35,6 +35,7 @@ using System.Text;
 namespace SilverSim.LoadStore.Terrain
 {
     [Description("Terrain Load/Store Support")]
+    [PluginName("TerrainFileSupport")]
     public class TerrainLoadStore : IPlugin
     {
         private readonly Dictionary<string, ITerrainFileStorage> m_TerrainFileStorages = new Dictionary<string, ITerrainFileStorage>();

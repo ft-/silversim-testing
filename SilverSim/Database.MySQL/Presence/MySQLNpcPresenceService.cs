@@ -33,17 +33,17 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Presence
 {
-    #region Service Implementation
     [Description("MySQL NpcPresence Backend")]
+    [PluginName("NpcPresence")]
     public class MySQLNpcPresenceService : NpcPresenceServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
 
         #region Constructor
-        public MySQLNpcPresenceService(string connectionString)
+        public MySQLNpcPresenceService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -225,16 +225,4 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("NpcPresence")]
-    public class MySQLNpcPresenceServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL NPCPRESENCE SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLNpcPresenceService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

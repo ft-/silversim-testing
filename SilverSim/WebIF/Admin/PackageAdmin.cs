@@ -32,6 +32,7 @@ using System.ComponentModel;
 namespace SilverSim.WebIF.Admin
 {
     [Description("WebIF Package Administration")]
+    [PluginName("PackageAdmin")]
     public class PackageAdmin : IPlugin
     {
         private IAdminWebIF m_WebIF;
@@ -254,15 +255,6 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
             m_WebIF.SuccessResponse(req, new Map());
-        }
-    }
-
-    [PluginName("PackageAdmin")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new PackageAdmin();
         }
     }
 }

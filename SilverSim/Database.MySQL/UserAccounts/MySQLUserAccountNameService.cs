@@ -19,27 +19,29 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
-using Nini.Config;
-using log4net;
 using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.UserAccounts
 {
     [Description("MySQL UserAccount AvatarName backend")]
+    [PluginName("UserAccountNames")]
     public class MySQLUserAccountNameService : AvatarNameServiceInterface, IPlugin, IDBServiceInterface
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNTNAME SERVICE");
+
         private readonly string m_ConnectionString;
 
-        public MySQLUserAccountNameService(string connectionString)
+        public MySQLUserAccountNameService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public override UUI this[UUID key]
@@ -189,14 +191,5 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
             }
         }
-    }
-
-    [PluginName("UserAccountNames")]
-    public class MySQLUserAccountNameServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNTNAME SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLUserAccountNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
 }

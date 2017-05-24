@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
@@ -30,6 +29,7 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     #region Service Implementation
     [Description("Memory Simulation Data Backend")]
+    [PluginName("SimulationData")]
     public sealed partial class MemorySimulationDataStorage : SimulationDataStorageInterface, IPlugin
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MEMORY SIMULATION STORAGE");
@@ -74,15 +74,6 @@ namespace SilverSim.Database.Memory.SimulationData
             EnvironmentSettings.Remove(regionID);
             RemoveAllObjectsInRegion(regionID);
         }
-    }
-    #endregion
-
-    #region Factory
-    [PluginName("SimulationData")]
-    public class MemorySimulationDataServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemorySimulationDataStorage();
     }
     #endregion
 }

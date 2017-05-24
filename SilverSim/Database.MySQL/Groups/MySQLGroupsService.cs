@@ -33,6 +33,7 @@ using SilverSim.Types.Groups;
 
 namespace SilverSim.Database.MySQL.Groups
 {
+    [PluginName("Groups")]
     public sealed partial class MySQLGroupsService : GroupsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUPS SERVICE");
@@ -181,12 +182,5 @@ namespace SilverSim.Database.MySQL.Groups
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
             m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", "AvatarNameStorage");
         }
-    }
-
-    [PluginName("Groups")]
-    public class MySQLGroupsServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLGroupsService(ownSection);
     }
 }

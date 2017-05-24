@@ -37,6 +37,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 {
     /** <summary>PhysicsShapeManager provides a common accessor to Convex Hull generation from primitives</summary> */
     [Description("Physics Shape Manager")]
+    [PluginName("PhysicsShapeManager")]
     public sealed class PhysicsShapeManager : IPlugin, IPhysicsHacdCleanCache
     {
         private AssetServiceInterface m_AssetService;
@@ -92,11 +93,10 @@ namespace SilverSim.Scene.Physics.ShapeManager
         }
 
         public PhysicsShapeManager(
-            string assetServiceName,
-            string simulationStorageName)
+            IConfig ownSection)
         {
-            m_AssetServiceName = assetServiceName;
-            m_SimulationDataStorageName = simulationStorageName;
+            m_AssetServiceName = ownSection.GetString("AssetService");
+            m_SimulationDataStorageName = ownSection.GetString("SimulationDataStorage");
         }
 
         private static PhysicsConvexShape GenerateDefaultAvatarShape()
@@ -392,13 +392,5 @@ namespace SilverSim.Scene.Physics.ShapeManager
         }
 
         HacdCleanCacheOrder IPhysicsHacdCleanCache.CleanOrder => HacdCleanCacheOrder.PhysicsShapeManager;
-    }
-
-    [PluginName("PhysicsShapeManager")]
-    public class PhysicsShapeManagerFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => new PhysicsShapeManager(
-                ownSection.GetString("AssetService"),
-                ownSection.GetString("SimulationDataStorage"));
     }
 }

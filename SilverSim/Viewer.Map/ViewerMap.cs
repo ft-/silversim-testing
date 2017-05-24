@@ -23,7 +23,6 @@
 #pragma warning disable RCS1029
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
@@ -44,6 +43,7 @@ using System.Threading;
 namespace SilverSim.Viewer.Map
 {
     [Description("Viewer Map Handler")]
+    [PluginName("ViewerMap")]
     public class ViewerMap : IPlugin, IPluginShutdown, IPacketHandlerExtender
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL MAP");
@@ -485,12 +485,5 @@ namespace SilverSim.Viewer.Map
         {
             m_ShutdownMap = true;
         }
-    }
-
-    [PluginName("ViewerMap")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerMap();
     }
 }

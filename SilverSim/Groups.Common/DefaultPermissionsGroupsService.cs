@@ -27,6 +27,7 @@ using SilverSim.Types.Groups;
 
 namespace SilverSim.Groups.Common
 {
+    [PluginName("DefaultPermissions")]
     public sealed partial class DefaultPermissionsGroupsService : GroupsServiceInterface, IPlugin
     {
         private GroupsServiceInterface m_InnerService;
@@ -82,12 +83,5 @@ namespace SilverSim.Groups.Common
                 return false;
             }
         }
-    }
-
-    [PluginName("DefaultPermissions")]
-    public class DefaultPermissionsGroupServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new DefaultPermissionsGroupsService(ownSection);
     }
 }

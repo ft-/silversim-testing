@@ -51,6 +51,7 @@ namespace SilverSim.Database.MySQL.Friends
     }
 
     [Description("MySQL Friends Backend")]
+    [PluginName("Friends")]
     public class MySQLFriendsService : FriendsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
         private readonly string m_ConnectionString;
@@ -58,10 +59,10 @@ namespace SilverSim.Database.MySQL.Friends
         private readonly string[] m_AvatarNameServiceNames;
         private AggregatingAvatarNameService m_AvatarNameService;
 
-        public MySQLFriendsService(string connectionString, string avatarNameServices)
+        public MySQLFriendsService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
-            m_AvatarNameServiceNames = avatarNameServices.Split(',');
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
+            m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", string.Empty).Split(',');
         }
 
         private const string m_InnerJoinSelectFull = "SELECT A.*, B.RightsToFriend AS RightsToUser FROM friends AS A INNER JOIN friends as B ON A.FriendID LIKE B.UserID AND A.UserID LIKE B.FriendID ";
@@ -268,19 +269,5 @@ namespace SilverSim.Database.MySQL.Friends
             new NamedKeyInfo("PrincipalIndex", "UserID") { IsUnique = false },
             new NamedKeyInfo("FriendIndex", "FriendID") { IsUnique = false }
         };
-
     }
-
-    #region Factory
-    [PluginName("Friends")]
-    public class MySQLFriendsServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL FRIENDS SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLFriendsService(MySQLUtilities.BuildConnectionString(ownSection, m_Log),
-                ownSection.GetString("AvatarNameServices", string.Empty));
-    }
-    #endregion
-
 }

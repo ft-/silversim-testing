@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
@@ -29,8 +28,8 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.ServerParam
 {
-    #region Service Implementation
     [Description("Memory ServerParam Backend")]
+    [PluginName("ServerParams")]
     public sealed class MemoryServerParamService : ServerParamServiceInterface, IPlugin
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Parameters = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(() => new RwLockedDictionary<string, string>());
@@ -157,14 +156,4 @@ namespace SilverSim.Database.Memory.ServerParam
         public override bool Remove(UUID regionID, string parameter) =>
             m_Parameters[regionID].Remove(parameter);
     }
-    #endregion
-
-    #region Factory
-    [PluginName("ServerParams")]
-    public class MemoryServerParamServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryServerParamService();
-    }
-    #endregion
 }

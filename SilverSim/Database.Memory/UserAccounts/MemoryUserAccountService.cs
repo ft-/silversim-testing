@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.Threading;
@@ -31,8 +30,8 @@ using System.Linq;
 
 namespace SilverSim.Database.Memory.UserAccounts
 {
-    #region Service Implementation
     [Description("Memory UserAccount Backend")]
+    [PluginName("UserAccounts")]
     public sealed class MemoryUserAccountService : UserAccountServiceInterface, IPlugin
     {
         private readonly RwLockedDictionary<UUID, UserAccount> m_Data = new RwLockedDictionary<UUID, UserAccount>();
@@ -215,15 +214,4 @@ namespace SilverSim.Database.Memory.UserAccounts
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("UserAccounts")]
-    public class MemoryUserAccountServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryUserAccountService();
-    }
-    #endregion
-
 }

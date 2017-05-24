@@ -33,6 +33,7 @@ using System.IO;
 namespace SilverSim.Grid.Maptile
 {
     [Description("Generator for maptile zoom levels")]
+    [PluginName("MaptileZoomGenerator")]
     public class MaptileZoomGenerator : MaptileServiceInterface, IPlugin
     {
         private readonly string m_MaptileServiceName;
@@ -212,15 +213,6 @@ namespace SilverSim.Grid.Maptile
         public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
         {
             return m_MaptileService.GetUpdateTimes(scopeid, minloc, maxloc, zoomlevel);
-        }
-    }
-
-    [PluginName("MaptileZoomGenerator")]
-    public class MaptileZoomGeneratorFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new MaptileZoomGenerator(ownSection);
         }
     }
 }

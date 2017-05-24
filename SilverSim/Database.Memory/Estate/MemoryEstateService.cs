@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Threading;
@@ -32,6 +31,7 @@ namespace SilverSim.Database.Memory.Estate
 {
     #region Service Implementation
     [Description("Memory Estate Backend")]
+    [PluginName("Estate")]
     public sealed partial class MemoryEstateService : EstateServiceInterface, IPlugin
     {
         private readonly RwLockedDictionary<uint, EstateInfo> m_Data = new RwLockedDictionary<uint, EstateInfo>();
@@ -132,14 +132,4 @@ namespace SilverSim.Database.Memory.Estate
         public override IEstateRegionMapServiceInterface RegionMap => this;
     }
     #endregion
-
-    #region Factory
-    [PluginName("Estate")]
-    public class MemoryEstateServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryEstateService();
-    }
-    #endregion
-
 }

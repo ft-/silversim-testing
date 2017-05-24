@@ -49,6 +49,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 {
     #region Service implementation
     [Description("WebIF Region Admin Support")]
+    [PluginName("RegionAdmin")]
     public class RegionAdmin : IPlugin
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF - REGION");
@@ -66,11 +67,11 @@ namespace SilverSim.WebIF.Admin.Simulator
         private SceneList m_Scenes;
         private ConfigurationLoader m_Loader;
 
-        public RegionAdmin(string regionStorageName, string simulationDataName, string estateServiceName)
+        public RegionAdmin(IConfig ownSection)
         {
-            m_RegionStorageName = regionStorageName;
-            m_SimulationDataName = simulationDataName;
-            m_EstateServiceName = estateServiceName;
+            m_RegionStorageName = ownSection.GetString("RegionStorage", "RegionStorage");
+            m_SimulationDataName = ownSection.GetString("SimulationDataStorage", "SimulationDataStorage");
+            m_EstateServiceName = ownSection.GetString("EstateService", "EstateService");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -1597,18 +1598,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
         }
         #endregion
-    }
-    #endregion
-
-    #region Factory
-    [PluginName("RegionAdmin")]
-    public class RegionAdminFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new RegionAdmin(
-                ownSection.GetString("RegionStorage", "RegionStorage"),
-                ownSection.GetString("SimulationDataStorage", "SimulationDataStorage"),
-                ownSection.GetString("EstateService", "EstateService"));
     }
     #endregion
 }

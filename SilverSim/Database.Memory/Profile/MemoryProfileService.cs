@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Profile;
@@ -29,6 +28,7 @@ using System.ComponentModel;
 namespace SilverSim.Database.Memory.Profile
 {
     [Description("MySQL Profile Backend")]
+    [PluginName("Profile")]
     public partial class MemoryProfileService : ProfileServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         public override IClassifiedsInterface Classifieds => this;
@@ -65,12 +65,4 @@ namespace SilverSim.Database.Memory.Profile
             /* intentionally left empty */
         }
     }
-    #region Factory
-    [PluginName("Profile")]
-    public class MemoryProfileServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryProfileService();
-    }
-    #endregion
 }

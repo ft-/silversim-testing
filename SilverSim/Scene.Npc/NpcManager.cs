@@ -40,6 +40,7 @@ using System.Text;
 namespace SilverSim.Scene.Npc
 {
     [Description("NPC Manager")]
+    [PluginName("NpcManager")]
     public class NpcManager : IPlugin
     {
         private sealed class NpcNonPersistentPresenceService : NpcPresenceServiceInterface
@@ -617,11 +618,5 @@ namespace SilverSim.Scene.Npc
             m_AdminWebIF.SuccessResponse(req, res);
         }
         #endregion
-    }
-
-    [PluginName("NpcManager")]
-    public class NpcManagerFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) => new NpcManager(ownSection);
     }
 }

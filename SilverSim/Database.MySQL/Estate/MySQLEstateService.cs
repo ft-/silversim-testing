@@ -33,17 +33,17 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    #region Service Implementation
     [Description("MySQL Estate Backend")]
+    [PluginName("Estate")]
     public sealed partial class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
 
         #region Constructor
-        public MySQLEstateService(string connectionString)
+        public MySQLEstateService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -382,17 +382,4 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override IEstateRegionMapServiceInterface RegionMap => this;
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Estate")]
-    public class MySQLEstateServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLEstateService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
-
 }

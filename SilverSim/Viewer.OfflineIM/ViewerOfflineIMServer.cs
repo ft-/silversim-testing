@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Threading;
@@ -34,6 +33,7 @@ using System.Threading;
 namespace SilverSim.Viewer.OfflineIM
 {
     [Description("Viewer Offline IM Handler")]
+    [PluginName("ViewerOfflineIMServer")]
     public class ViewerOfflineIMServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         [PacketHandler(MessageType.RetrieveInstantMessages)]
@@ -104,12 +104,5 @@ namespace SilverSim.Viewer.OfflineIM
         {
             m_ShutdownOfflineIM = true;
         }
-    }
-
-    [PluginName("ViewerOfflineIMServer")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ViewerOfflineIMServer();
     }
 }

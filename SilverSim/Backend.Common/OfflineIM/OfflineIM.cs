@@ -32,8 +32,8 @@ using System.ComponentModel;
 
 namespace SilverSim.Backend.Common.OfflineIM
 {
-    #region Service implementation
     [Description("Offline IM Handler")]
+    [PluginName("OfflineIMHandler")]
     public sealed class OfflineIM : IPlugin, IPluginShutdown
     {
 #if DEBUG
@@ -46,10 +46,18 @@ namespace SilverSim.Backend.Common.OfflineIM
         private OfflineIMServiceInterface m_OfflineIMService;
         private IMRouter m_IMRouter;
 
-        public OfflineIM(string avatarNameServiceName, string offlineIMServiceName)
+        public OfflineIM(IConfig ownConfig)
         {
-            m_AvatarNameServiceName = avatarNameServiceName;
-            m_OfflineIMServiceName = offlineIMServiceName;
+            m_AvatarNameServiceName = ownConfig.GetString("GridAvatarNameService", string.Empty);
+            m_OfflineIMServiceName = ownConfig.GetString("OfflineIMService", string.Empty);
+            if (string.IsNullOrEmpty(m_AvatarNameServiceName))
+            {
+                throw new ArgumentException("GridAvatarNameService not set");
+            }
+            if (string.IsNullOrEmpty(m_OfflineIMServiceName))
+            {
+                throw new ArgumentException("OfflineIMService not set");
+            }
         }
 
         public bool Send(GridInstantMessage im)
@@ -143,26 +151,4 @@ namespace SilverSim.Backend.Common.OfflineIM
             m_IMRouter.OfflineIM.Remove(Send);
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("OfflineIMHandler")]
-    public class OfflineIMFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
-        {
-            string avatarNameServiceName = ownConfig.GetString("GridAvatarNameService", string.Empty);
-            string offlineIMServiceName = ownConfig.GetString("OfflineIMService", string.Empty);
-            if (string.IsNullOrEmpty(avatarNameServiceName))
-            {
-                throw new ArgumentException("GridAvatarNameService not set");
-            }
-            if (string.IsNullOrEmpty(offlineIMServiceName))
-            {
-                throw new ArgumentException("OfflineIMService not set");
-            }
-            return new OfflineIM(avatarNameServiceName, offlineIMServiceName);
-        }
-    }
-    #endregion
 }

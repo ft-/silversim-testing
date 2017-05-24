@@ -34,15 +34,16 @@ namespace SilverSim.Database.MySQL.AvatarName
 {
     #region Service Implementation
     [Description("MySQL AvatarName Backend")]
+    [PluginName("AvatarNames")]
     public sealed class MySQLAvatarNameService : AvatarNameServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR NAMES SERVICE");
 
         #region Constructor
-        public MySQLAvatarNameService(string connectionString)
+        public MySQLAvatarNameService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -246,17 +247,6 @@ namespace SilverSim.Database.MySQL.AvatarName
             new AddColumn<string>("LastName") { Cardinality = 255 },
             new PrimaryKeyInfo("AvatarID", "HomeURI")
         };
-    }
-    #endregion
-
-    #region Factory
-    [PluginName("AvatarNames")]
-    public class MySQLAvatarNameServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR NAMES SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLAvatarNameService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
     }
     #endregion
 }

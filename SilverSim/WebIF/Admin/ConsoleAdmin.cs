@@ -31,6 +31,7 @@ using System.Net;
 namespace SilverSim.WebIF.Admin
 {
     [Description("WebIF Console Admin Support")]
+    [PluginName("ConsoleAdmin")]
     public class ConsoleAdmin : IPlugin, IPluginShutdown
     {
         private IAdminWebIF m_WebIF;
@@ -97,13 +98,4 @@ namespace SilverSim.WebIF.Admin
             m_WebIF = null;
         }
     }
-
-    #region Factory
-    [PluginName("ConsoleAdmin")]
-    public class ConsoleAdminFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new ConsoleAdmin();
-    }
-    #endregion
 }

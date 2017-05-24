@@ -33,17 +33,17 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.UserAccounts
 {
-    #region Service Implementation
     [Description("MySQL UserAccount Backend")]
+    [PluginName("UserAccounts")]
     public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
 
         #region Constructor
-        public MySQLUserAccountService(string connectionString)
+        public MySQLUserAccountService(IConfig ownSection)
         {
-            m_ConnectionString = connectionString;
+            m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -475,16 +475,4 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("UserAccounts")]
-    public class MySQLUserAccountServiceFactory : IPluginFactory
-    {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MySQLUserAccountService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
-    }
-    #endregion
 }

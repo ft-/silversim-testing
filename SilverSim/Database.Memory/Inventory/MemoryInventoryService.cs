@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -33,8 +32,8 @@ using System.Linq;
 
 namespace SilverSim.Database.Memory.Inventory
 {
-    #region Service Implementation
     [Description("Memory Inventory Backend")]
+    [PluginName("Inventory")]
     public sealed partial class MemoryInventoryService : InventoryServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly DefaultInventoryFolderContentService m_ContentService;
@@ -74,14 +73,4 @@ namespace SilverSim.Database.Memory.Inventory
             m_Folders.Remove(userAccount);
         }
     }
-    #endregion
-
-    #region Factory
-    [PluginName("Inventory")]
-    public class MemoryInventoryServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryInventoryService();
-    }
-    #endregion
 }

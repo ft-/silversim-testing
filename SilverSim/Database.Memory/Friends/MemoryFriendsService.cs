@@ -26,13 +26,13 @@ using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Friends;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.Friends
 {
     [Description("Memory Friends Backend")]
+    [PluginName("Friends")]
     public class MemoryFriendsService : FriendsServiceInterface, IPlugin
     {
         private class FriendData
@@ -54,9 +54,9 @@ namespace SilverSim.Database.Memory.Friends
         private readonly string[] m_AvatarNameServiceNames;
         private AggregatingAvatarNameService m_AvatarNameService;
 
-        public MemoryFriendsService(string avatarNameServices)
+        public MemoryFriendsService(IConfig ownSection)
         {
-            m_AvatarNameServiceNames = avatarNameServices.Split(',');
+            m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", string.Empty).Split(',');
         }
 
         public void ResolveUUI(FriendInfo fi)
@@ -199,13 +199,4 @@ namespace SilverSim.Database.Memory.Friends
             return false;
         }
     }
-
-    #region Factory
-    [PluginName("Friends")]
-    public class MemoryFriendsServiceFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection) =>
-            new MemoryFriendsService(ownSection.GetString("AvatarNameServices", string.Empty));
-    }
-    #endregion
 }

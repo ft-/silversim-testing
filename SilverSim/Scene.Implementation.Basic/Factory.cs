@@ -48,6 +48,7 @@ using System.ComponentModel;
 namespace SilverSim.Scene.Implementation.Basic
 {
     [Description("Basic Scene Factory")]
+    [PluginName("Scene")]
     public sealed class SceneFactory : SceneFactoryInterface, IPlugin
     {
         internal ChatServiceFactoryInterface ChatFactory { get; private set; }
@@ -177,12 +178,5 @@ namespace SilverSim.Scene.Implementation.Basic
         public override SceneInterface Instantiate(RegionInfo ri) => new BasicScene(
                     this,
                     ri);
-    }
-
-    [PluginName("Scene")]
-    public class Factory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig config) =>
-            new SceneFactory(config);
     }
 }
