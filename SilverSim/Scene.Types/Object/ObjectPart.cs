@@ -351,19 +351,15 @@ namespace SilverSim.Scene.Types.Object
 
             ObjectGroup.OriginalAssetID = UUID.Zero;
 
-            var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
+            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
             {
-                foreach (Action<ObjectPart, UpdateChangedFlags> del in ev.GetInvocationList().OfType<Action<ObjectPart, UpdateChangedFlags>>())
+                try
                 {
-                    try
-                    {
-                        del(this, flags);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                    }
+                    del(this, flags);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
 
@@ -379,19 +375,15 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
+            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
             {
-                foreach (Action<ObjectPart, UpdateChangedFlags> del in ev.GetInvocationList().OfType<Action<ObjectPart, UpdateChangedFlags>>())
+                try
                 {
-                    try
-                    {
-                        del(this, 0);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                    }
+                    del(this, 0);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
 
@@ -407,19 +399,15 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            var ev = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
+            foreach(Action<IObject> del in OnPositionChange?.GetInvocationList())
             {
-                foreach(Action<IObject> del in ev.GetInvocationList().OfType<Action<IObject>>())
+                try
                 {
-                    try
-                    {
-                        del(this);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                    }
+                    del(this);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
             UpdateData(UpdateDataFlags.Full | UpdateDataFlags.Terse);

@@ -88,19 +88,15 @@ namespace SilverSim.Scene.Agent
 
         protected void InvokeOnAppearanceUpdate()
         {
-            var ev = OnAppearanceUpdate; /* events are not exactly thread safe */
-            if(ev != null)
+            foreach(Action<IAgent> del in OnAppearanceUpdate?.GetInvocationList())
             {
-                foreach(Action<IAgent> del in ev.GetInvocationList().OfType<Action<IAgent>>())
+                try
                 {
-                    try
-                    {
-                        del(this);
-                    }
-                    catch(Exception e)
-                    {
-                        m_Log.Debug("Exception on OnAppearanceUpdate", e);
-                    }
+                    del(this);
+                }
+                catch(Exception e)
+                {
+                    m_Log.Debug("Exception on OnAppearanceUpdate", e);
                 }
             }
         }

@@ -447,19 +447,15 @@ namespace SilverSim.Scene.Types.Scene
         public void InvokeOnRemove()
         {
             LoginControl.OnLoginsEnabled -= LoginsEnabledHandler;
-            var ev = OnRemove;
-            if (ev != null)
+            foreach (Action<SceneInterface> del in OnRemove?.GetInvocationList())
             {
-                foreach (Action<SceneInterface> del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
+                try
                 {
-                    try
-                    {
-                        del(this);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                    }
+                    del(this);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
         }

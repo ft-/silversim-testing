@@ -100,38 +100,30 @@ namespace SilverSim.Scene.Types.Script
 
         protected void TriggerOnStateChange()
         {
-            var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
+            foreach (Action<ScriptInstance> del in OnStateChange?.GetInvocationList())
             {
-                foreach (var del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
+                try
                 {
-                    try
-                    {
-                        del(this);
-                    }
-                    catch
-                    {
-                        /* no action required */
-                    }
+                    del(this);
+                }
+                catch
+                {
+                    /* no action required */
                 }
             }
         }
 
         protected void TriggerOnScriptReset()
         {
-            var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
+            foreach (Action<ScriptInstance> del in OnScriptReset?.GetInvocationList())
             {
-                foreach (var del in ev.GetInvocationList().OfType<Action<ScriptInstance>>())
+                try
                 {
-                    try
-                    {
-                        del(this);
-                    }
-                    catch
-                    {
-                        /* no action required */
-                    }
+                    del(this);
+                }
+                catch
+                {
+                    /* no action required */
                 }
             }
         }

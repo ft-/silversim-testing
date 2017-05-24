@@ -201,19 +201,15 @@ namespace SilverSim.Scene.Types.Object
 
         internal void TriggerOnAssetIDChange()
         {
-            var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
+            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
             {
-                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList().OfType<Action<ObjectGroup, UpdateChangedFlags>>())
+                try
                 {
-                    try
-                    {
-                        del(this, 0);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                    }
+                    del(this, 0);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
 
@@ -233,19 +229,15 @@ namespace SilverSim.Scene.Types.Object
                 m_BoundingBox = null;
             }
 
-            var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
+            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
             {
-                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList().OfType<Action<ObjectGroup, UpdateChangedFlags>>())
+                try
                 {
-                    try
-                    {
-                        del(this, flags);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                    }
+                    del(this, flags);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
 

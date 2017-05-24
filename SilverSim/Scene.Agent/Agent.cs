@@ -148,19 +148,15 @@ namespace SilverSim.Scene.Agent
 
         public virtual void InvokeOnPositionUpdate()
         {
-            var ev = OnPositionChange; /* events are not exactly thread-safe */
-            if (ev != null)
+            foreach (Action<IObject> del in OnPositionChange?.GetInvocationList())
             {
-                foreach (Action<IObject> del in ev.GetInvocationList().OfType<Action<IObject>>())
+                try
                 {
-                    try
-                    {
-                        del(this);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.Debug("Exception during OnPositionUpdate processing", e);
-                    }
+                    del(this);
+                }
+                catch (Exception e)
+                {
+                    m_Log.Debug("Exception during OnPositionUpdate processing", e);
                 }
             }
         }

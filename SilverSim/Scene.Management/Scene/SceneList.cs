@@ -119,22 +119,15 @@ namespace SilverSim.Scene.Management.Scene
                 throw;
             }
             m_Log.InfoFormat("Adding region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
-            if (OnRegionAdd != null)
+            foreach (Action<SceneInterface> del in OnRegionAdd?.GetInvocationList())
             {
-                var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
-                if (ev != null)
+                try
                 {
-                    foreach (var del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
-                    {
-                        try
-                        {
-                            del(scene);
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                        }
-                    }
+                    del(scene);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
         }
@@ -163,22 +156,15 @@ namespace SilverSim.Scene.Management.Scene
         {
             scene.LoginControl.NotReady(SceneInterface.ReadyFlags.Remove);
             m_Log.InfoFormat("Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
-            if (OnRegionRemove != null)
+            foreach (Action<SceneInterface> del in OnRegionRemove?.GetInvocationList())
             {
-                var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
-                if (ev != null)
+                try
                 {
-                    foreach (var del in ev.GetInvocationList().OfType<Action<SceneInterface>>())
-                    {
-                        try
-                        {
-                            del(scene);
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                        }
-                    }
+                    del(scene);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
 

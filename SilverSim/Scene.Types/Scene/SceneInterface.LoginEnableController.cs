@@ -82,20 +82,16 @@ namespace SilverSim.Scene.Types.Scene
 
             private void TriggerLoginsEnabled(bool state)
             {
-                var ev = OnLoginsEnabled;
-                if(ev != null)
+                UUID sceneID = m_Scene.ID;
+                foreach (Action<UUID, bool> del in OnLoginsEnabled?.GetInvocationList())
                 {
-                    UUID sceneID = m_Scene.ID;
-                    foreach (Action<UUID, bool> del in ev.GetInvocationList().OfType<Action<UUID, bool>>())
+                    try
                     {
-                        try
-                        {
-                            del(sceneID, state);
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
-                        }
+                        del(sceneID, state);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                     }
                 }
             }
