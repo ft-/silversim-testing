@@ -24,7 +24,6 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SilverSim.Scene.Management.Scene
 {

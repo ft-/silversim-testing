@@ -33,7 +33,6 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Object

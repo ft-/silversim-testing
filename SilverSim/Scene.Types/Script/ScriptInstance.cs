@@ -25,7 +25,6 @@ using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
 using System.Globalization;
-using System.Linq;
 
 namespace SilverSim.Scene.Types.Script
 {

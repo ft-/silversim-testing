@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using System;
-using System.Linq;
 
 namespace SilverSim.Scene.Types.Scene
 {
