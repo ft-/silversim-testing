@@ -29,12 +29,22 @@ namespace SilverSim.Main.Common.Log
     public class LogController : AppenderSkeleton
     {
         public readonly static RwLockedList<BlockingQueue<LoggingEvent>> Queues = new RwLockedList<BlockingQueue<LoggingEvent>>();
-        public event Action<DateTime, string, string, string> LogCallbacks;
+        public static event Action<DateTime, string, string, string> LogCallbacks;
 
         protected override void Append(LoggingEvent loggingEvent)
         {
             Queues.ForEach((BlockingQueue<LoggingEvent> q) => q.Enqueue(loggingEvent));
             LogCallbacks?.Invoke(loggingEvent.TimeStamp, loggingEvent.Level.Name, loggingEvent.LoggerName, loggingEvent.RenderedMessage);
+        }
+
+        public static void AddLogAction(Action<DateTime, string, string, string> d)
+        {
+            LogCallbacks += d;
+        }
+
+        public static void RemoveLogAction(Action<DateTime, string, string, string> d)
+        {
+            LogCallbacks -= d;
         }
     }
 }

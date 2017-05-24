@@ -73,7 +73,7 @@ namespace SilverSim.Main.Common
 
         public void Shutdown()
         {
-            m_ConfigLoader.TriggerShutdown();
+            m_ConfigLoader?.TriggerShutdown();
         }
 
         ~Startup()
