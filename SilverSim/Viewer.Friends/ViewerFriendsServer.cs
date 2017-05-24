@@ -23,6 +23,7 @@
 #pragma warning disable RCS1029
 
 using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
@@ -71,9 +72,9 @@ namespace SilverSim.Viewer.Friends
 
         private bool m_ShutdownFriends;
 
-        public ViewerFriendsServer(string imService)
+        public ViewerFriendsServer(IConfig ownSection)
         {
-            m_IMServiceName = imService;
+            m_IMServiceName = ownSection.GetString("IMService", "IMService");
         }
 
         public void Startup(ConfigurationLoader loader)

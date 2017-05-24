@@ -457,12 +457,7 @@ namespace SilverSim.Main.Common
 
             Type[] interfaces = t.GetInterfaces();
             /* check type inheritance first */
-            if (interfaces.Contains(typeof(IPluginFactory)))
-            {
-                var module = (IPluginFactory)assembly.CreateInstance(t.FullName);
-                PluginInstances.Add(config.Name, module.Initialize(this, config));
-            }
-            else if(interfaces.Contains(typeof(IPlugin)))
+            if(interfaces.Contains(typeof(IPlugin)))
             {
                 ConstructorInfo ci;
                 if((ci = t.GetConstructor(new Type[] { typeof(IConfig) })) != null)

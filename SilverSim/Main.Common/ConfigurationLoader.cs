@@ -330,7 +330,6 @@ namespace SilverSim.Main.Common
 
             /* prevent circular dependencies by assigning relevant parts here */
             ObjectGroup.CompilerRegistry = CompilerRegistry.ScriptCompilers;
-            FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
             FeaturesTable[typeof(IPluginSubFactory)] = "Plugin Sub Factory";
 
             FeaturesTable[typeof(AssetServiceInterface)] = "Asset Service";

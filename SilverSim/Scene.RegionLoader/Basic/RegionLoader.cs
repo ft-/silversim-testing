@@ -46,7 +46,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private string m_GatekeeperUri;
 
         #region Constructor
-        internal RegionLoaderService(IConfig ownConfig)
+        public RegionLoaderService(IConfig ownConfig)
         {
             m_RegionStorage = ownConfig.GetString("RegionStorage");
         }
