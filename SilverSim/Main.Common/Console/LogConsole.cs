@@ -30,10 +30,10 @@ namespace SilverSim.Main.Common.Console
     [Description("Log Console")]
     public class LogConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
-        readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
-        readonly Thread m_LogThread;
+        private readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
+        private readonly Thread m_LogThread;
         private bool m_Shutdown;
-        readonly object m_Lock = new object();
+        private readonly object m_Lock = new object();
 
         public LogConsole(string consoleTitle)
         {

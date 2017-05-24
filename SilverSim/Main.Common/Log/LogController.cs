@@ -34,7 +34,17 @@ namespace SilverSim.Main.Common.Log
         protected override void Append(LoggingEvent loggingEvent)
         {
             Queues.ForEach((BlockingQueue<LoggingEvent> q) => q.Enqueue(loggingEvent));
-            LogCallbacks?.Invoke(loggingEvent.TimeStamp, loggingEvent.Level.Name, loggingEvent.LoggerName, loggingEvent.RenderedMessage);
+            foreach(Action<DateTime, string, string, string> d in LogCallbacks?.GetInvocationList())
+            {
+                try
+                {
+                    d(loggingEvent.TimeStamp, loggingEvent.Level.Name, loggingEvent.LoggerName, loggingEvent.RenderedMessage);
+                }
+                catch
+                {
+                    /* ignore exceptions here */
+                }
+            }
         }
 
         public static void AddLogAction(Action<DateTime, string, string, string> d)
