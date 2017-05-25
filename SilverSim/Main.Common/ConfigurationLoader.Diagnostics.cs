@@ -225,14 +225,14 @@ namespace SilverSim.Main.Common
                 }
 
                 var output = new StringBuilder("Module List:\n----------------------------------------------");
-                if (searchstring?.Length != 0)
+                if (!string.IsNullOrEmpty(searchstring))
                 {
                     output.AppendFormat("\n<limited to modules containing \"{0}\">\n", searchstring);
                 }
                 foreach (KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
                 {
                     var desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
-                    if (searchstring?.Length != 0 &&
+                    if (!string.IsNullOrEmpty(searchstring) &&
                         !moduledesc.Key.ToLower().Contains(searchstring))
                     {
                         continue;

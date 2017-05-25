@@ -1023,7 +1023,7 @@ namespace SilverSim.Viewer.Core
             }
 
             var lm = new Landmark();
-            if (GatekeeperURI?.Length != 0)
+            if (!string.IsNullOrEmpty(GatekeeperURI))
             {
                 lm.GatekeeperURI = new URI(GatekeeperURI);
             }

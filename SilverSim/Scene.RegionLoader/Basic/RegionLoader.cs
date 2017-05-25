@@ -72,7 +72,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
             {
                 m_Log.InfoFormat("Starting Region {0}", ri.Name);
                 ri.GridURI = m_GatekeeperUri;
-                if(ri.ServerIP?.Length == 0)
+                if(string.IsNullOrEmpty(ri.ServerIP))
                 {
                     ri.ServerIP = m_ExternalHostNameService.ExternalHostName;
                 }

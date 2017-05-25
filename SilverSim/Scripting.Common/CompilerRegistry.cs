@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.Common
                 }
                 set
                 {
-                    if (name?.Length == 0)
+                    if (string.IsNullOrEmpty(name))
                     {
                         throw new ArgumentException("value");
                     }

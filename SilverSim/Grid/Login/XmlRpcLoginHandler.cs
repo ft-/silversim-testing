@@ -1069,7 +1069,7 @@ namespace SilverSim.Grid.Login
             }
             lock (m_ConfigUpdateLock)
             {
-                if(value?.Length == 0)
+                if(string.IsNullOrEmpty(value))
                 {
                     m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
                 }
@@ -1089,7 +1089,7 @@ namespace SilverSim.Grid.Login
             }
             lock (m_ConfigUpdateLock)
             {
-                if (value?.Length == 0)
+                if (string.IsNullOrEmpty(value))
                 {
                     m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
                 }
@@ -1110,7 +1110,7 @@ namespace SilverSim.Grid.Login
             lock (m_ConfigUpdateLock)
             {
                 bool val;
-                m_GridLibraryEnabled = value?.Length != 0 && bool.TryParse(value, out val) && val;
+                m_GridLibraryEnabled = !string.IsNullOrEmpty(value) && bool.TryParse(value, out val) && val;
             }
         }
 

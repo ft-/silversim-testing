@@ -62,7 +62,7 @@ namespace SilverSim.Scene.Chat
             IsActive = true;
             m_Handler = handler;
             Channel = channel;
-            if(name?.Length != 0)
+            if(!string.IsNullOrEmpty(name))
             {
                 if((m_RegexBitfield & 1) != 0)
                 {
@@ -75,7 +75,7 @@ namespace SilverSim.Scene.Chat
                 }
             }
             m_ID = id;
-            if(message?.Length != 0)
+            if(!string.IsNullOrEmpty(name))
             {
                 if ((m_RegexBitfield & 2) != 0)
                 {

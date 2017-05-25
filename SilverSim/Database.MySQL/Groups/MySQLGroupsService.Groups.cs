@@ -170,7 +170,7 @@ namespace SilverSim.Database.MySQL.Groups
                             info.ID.ID = reader.GetUUID("GroupID");
                             info.ID.GroupName = reader.GetString("Name");
                             string uri = reader.GetString("Location");
-                            if (uri?.Length != 0)
+                            if (!string.IsNullOrEmpty(uri))
                             {
                                 info.ID.HomeURI = new Uri(uri, UriKind.Absolute);
                             }
@@ -247,7 +247,7 @@ namespace SilverSim.Database.MySQL.Groups
                                 ID = groupID
                             };
                             string uri = reader.GetString("Location");
-                            if(uri?.Length != 0)
+                            if(!string.IsNullOrEmpty(uri))
                             {
                                 ugi.HomeURI = new Uri(uri, UriKind.Absolute);
                             }

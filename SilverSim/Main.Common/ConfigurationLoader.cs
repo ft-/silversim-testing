@@ -153,7 +153,7 @@ namespace SilverSim.Main.Common
 
         ~ConfigurationLoader()
         {
-            if (m_PIDFile?.Length != 0)
+            if (!string.IsNullOrEmpty(m_PIDFile))
             {
                 try
                 {
@@ -647,7 +647,7 @@ namespace SilverSim.Main.Common
 
             /* make the resource assets available for all users not just scene */
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
-            if (mainConfig?.Length != 0)
+            if (!string.IsNullOrEmpty(mainConfig))
             {
                 AddSource(mainConfig);
             }
@@ -737,7 +737,7 @@ namespace SilverSim.Main.Common
 
                     string sourceParam = sourceConfig.GetString(useparam[1]);
 
-                    if (sourceParam?.Length == 0)
+                    if (string.IsNullOrEmpty(sourceParam))
                     {
                         continue;
                     }

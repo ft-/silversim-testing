@@ -43,7 +43,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             if (regionId == UUID.Zero)
             {
-                if (value?.Length == 0)
+                if (string.IsNullOrEmpty(value))
                 {
                     localval = false;
                 }
@@ -54,7 +54,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
-                if (value?.Length == 0)
+                if (string.IsNullOrEmpty(value))
                 {
                     settolocalval = false;
                 }
@@ -160,7 +160,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private void UpdateGodAgentsList(RwLockedList<UUI> list, UUID regionId, string value)
         {
-            if(value?.Length == 0)
+            if(string.IsNullOrEmpty(value))
             {
                 list.Clear();
             }
@@ -206,7 +206,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             if(regionID != UUID.Zero)
             {
-                if (value?.Length == 0)
+                if (string.IsNullOrEmpty(value))
                 {
                     m_GodAgentsSetToLocal = false;
                     m_GodAgentsLocal.Clear();

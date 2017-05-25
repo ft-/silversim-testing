@@ -263,7 +263,7 @@ namespace SilverSim.Viewer.Search
 
             res.AgentID = req.AgentID;
             res.QueryID = req.QueryID;
-            if (req.Name?.Length < 3)
+            if (string.IsNullOrEmpty(req.Name) || req.Name.Length < 3)
             {
                 agent.SendMessageAlways(res, scene.ID);
                 return;
@@ -337,7 +337,7 @@ namespace SilverSim.Viewer.Search
                 }
             }
 
-            if (names?.Length < 3)
+            if (string.IsNullOrEmpty(names) || names.Length < 3)
             {
                 req.ErrorResponse(HttpStatusCode.NotFound, string.Empty);
                 return;

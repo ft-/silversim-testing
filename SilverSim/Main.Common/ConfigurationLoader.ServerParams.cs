@@ -315,7 +315,7 @@ namespace SilverSim.Main.Common
             foreach (KeyValuePair<string, ServerParamAttribute> kvp in resList)
             {
                 sb.AppendFormat(kvp.Value.Type == ServerParamType.GlobalOnly ? "{0} - global only\n" : "{0} - global and region\n", kvp.Key);
-                if (kvp.Value.Description?.Length != 0)
+                if (!string.IsNullOrEmpty(kvp.Value.Description))
                 {
                     sb.AppendFormat("- {0}\n", kvp.Value.Description);
                 }

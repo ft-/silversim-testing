@@ -50,11 +50,11 @@ namespace SilverSim.Backend.Common.OfflineIM
         {
             m_AvatarNameServiceName = ownConfig.GetString("GridAvatarNameService", string.Empty);
             m_OfflineIMServiceName = ownConfig.GetString("OfflineIMService", string.Empty);
-            if (m_AvatarNameServiceName?.Length == 0)
+            if (string.IsNullOrEmpty(m_AvatarNameServiceName))
             {
                 throw new ArgumentException("GridAvatarNameService not set");
             }
-            if (m_OfflineIMServiceName?.Length == 0)
+            if (string.IsNullOrEmpty(m_OfflineIMServiceName))
             {
                 throw new ArgumentException("OfflineIMService not set");
             }

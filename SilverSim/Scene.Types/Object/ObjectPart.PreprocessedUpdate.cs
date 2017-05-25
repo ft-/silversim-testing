@@ -514,22 +514,22 @@ namespace SilverSim.Scene.Types.Object
                             compressedSize += 4;
                         }
 
-                        if(name?.Length != 0)
+                        if(!string.IsNullOrEmpty(name))
                         {
                             namebytes = (name + "\0").ToUTF8Bytes();
                             compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasNameValues;
                             compressedSize += namebytes.Length;
                         }
 
-                        if(textparam.Text?.Length != 0)
+                        if(textparam.Text.Length != 0)
                         {
                             compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasText;
                             textbytes = (textparam.Text + "\0").ToUTF8Bytes();
-                            compressedSize += textbytes.Length + 4;
+                            compressedSize += (textbytes.Length + 4);
                         }
 
                         string mediaUrl = MediaURL;
-                        if(mediaUrl?.Length != 0)
+                        if(!string.IsNullOrEmpty(mediaUrl))
                         {
                             mediaurlbytes = (MediaURL + "\0").ToUTF8Bytes();
                             compressedSize += mediaurlbytes.Length;

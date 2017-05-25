@@ -97,12 +97,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.LandBitmap.DataNoAABBUpdate = dbReader.GetBytes("Bitmap");
 
                             var uri = (string)dbReader["MusicURI"];
-                            if (uri?.Length != 0)
+                            if (!string.IsNullOrEmpty(uri))
                             {
                                 pi.MusicURI = new URI(uri);
                             }
                             uri = (string)dbReader["MediaURI"];
-                            if (uri?.Length != 0)
+                            if (!string.IsNullOrEmpty(uri))
                             {
                                 pi.MediaURI = new URI(uri);
                             }

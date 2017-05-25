@@ -112,7 +112,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                         }
                         else if (reader.Name == "value")
                         {
-                            if(fieldname?.Length == 0)
+                            if(string.IsNullOrEmpty(fieldname))
                             {
                                 throw new InvalidXmlRpcSerializationException();
                             }

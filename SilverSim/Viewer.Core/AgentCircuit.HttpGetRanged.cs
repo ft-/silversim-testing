@@ -80,7 +80,7 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     start = int.Parse(v[0]);
-                    end = v[1]?.Length == 0 ?
+                    end = string.IsNullOrEmpty(v[1]) ?
                         asset.Data.Length - 1 :
                         int.Parse(v[1]);
 

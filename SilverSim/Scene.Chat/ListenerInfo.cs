@@ -90,7 +90,7 @@ namespace SilverSim.Scene.Chat
 
         public override void Send(ListenEvent ev)
         {
-            if(m_Name?.Length != 0 &&
+            if(!string.IsNullOrEmpty(m_Name) &&
                 ev.Name != m_Name)
             {
                 return;
@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Chat
                     return;
                 }
             }
-            if(m_Message?.Length != 0 &&
+            if(!string.IsNullOrEmpty(m_Message) &&
                 ev.Message != m_Message)
             {
                 return;

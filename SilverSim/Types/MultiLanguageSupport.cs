@@ -97,7 +97,7 @@ namespace SilverSim.Types
             try
             {
                 var str = res.GetString(name);
-                if(str?.Length == 0)
+                if(string.IsNullOrEmpty(str))
                 {
                     str = defvalue;
                 }
