@@ -117,7 +117,7 @@ namespace SilverSim.Scene.Npc
             m_NonpersistentAgentServices.Add(new NpcNonPersistentPresenceService());
 
             /* persistence is optional */
-            if (!string.IsNullOrEmpty(m_NpcPresenceServiceName) || !string.IsNullOrEmpty(m_PersistentInventoryServiceName))
+            if (m_NpcPresenceServiceName?.Length != 0 || m_PersistentInventoryServiceName?.Length != 0)
             {
                 m_NpcPresenceService = loader.GetService<NpcPresenceServiceInterface>(m_NpcPresenceServiceName);
                 m_PersistentAgentServices.Add(m_NpcPresenceService);
@@ -125,7 +125,7 @@ namespace SilverSim.Scene.Npc
                 m_PersistentAgentServices.Add(m_PersistentInventoryService);
 
                 /* profile is optional */
-                if (!string.IsNullOrEmpty(m_PersistentProfileServiceName))
+                if (m_PersistentProfileServiceName?.Length != 0)
                 {
                     m_PersistentProfileService = loader.GetService<ProfileServiceInterface>(m_PersistentProfileServiceName);
                     m_PersistentAgentServices.Add(m_PersistentProfileService);
@@ -133,7 +133,7 @@ namespace SilverSim.Scene.Npc
             }
 
             /* profile is optional */
-            if (!string.IsNullOrEmpty(m_NonpersistentProfileServiceName))
+            if (m_NonpersistentProfileServiceName?.Length != 0)
             {
                 m_NonpersistentProfileService = loader.GetService<ProfileServiceInterface>(m_NonpersistentProfileServiceName);
                 m_NonpersistentAgentServices.Add(m_NonpersistentProfileService);

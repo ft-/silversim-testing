@@ -71,7 +71,7 @@ namespace SilverSim.Main.Cmd.Estate
             if(sceneConfig != null)
             {
                 string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
-                if (!string.IsNullOrEmpty(avatarNameServices))
+                if (avatarNameServices?.Length != 0)
                 {
                     foreach (string p in avatarNameServices.Split(','))
                     {

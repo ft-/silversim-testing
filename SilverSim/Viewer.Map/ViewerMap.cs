@@ -287,7 +287,7 @@ namespace SilverSim.Viewer.Map
                     });
                 }
             }
-            else if(string.IsNullOrEmpty(regionName))
+            else if(regionName?.Length == 0)
             {
                 agent.SendAlertMessage("Please enter a string", scene.ID);
             }

@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL.Groups
             var info = new GroupInfo();
             info.ID.ID = reader.GetUUID("GroupID");
             string uri = reader.GetString("Location");
-            if (!string.IsNullOrEmpty(uri))
+            if (uri?.Length != 0)
             {
                 info.ID.HomeURI = new Uri(uri, UriKind.Absolute);
             }

@@ -110,7 +110,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_WindModelFactoryName = ownConfig.GetString("WindPlugin", string.Empty);
             m_PathfindingServiceFactoryName = ownConfig.GetString("PathfindingPlugin", string.Empty);
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
-            if (!string.IsNullOrEmpty(avatarNameServices))
+            if (avatarNameServices?.Length != 0)
             {
                 foreach (string p in avatarNameServices.Split(','))
                 {
@@ -129,11 +129,11 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public void Startup(ConfigurationLoader loader)
         {
-            if(!string.IsNullOrEmpty(m_WindModelFactoryName))
+            if(m_WindModelFactoryName?.Length != 0)
             {
                 WindModelFactory = loader.GetService<IWindModelFactory>(m_WindModelFactoryName);
             }
-            if(!string.IsNullOrEmpty(m_PathfindingServiceFactoryName))
+            if(m_PathfindingServiceFactoryName?.Length != 0)
             {
                 PathfindingServiceFactory = loader.GetService<IPathfindingServiceFactory>(m_PathfindingServiceFactoryName);
             }

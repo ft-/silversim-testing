@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.Scene
            string varname,
            string value)
         {
-            if(string.IsNullOrEmpty(value))
+            if(value?.Length == 0)
             {
                 if(regionId != UUID.Zero)
                 {

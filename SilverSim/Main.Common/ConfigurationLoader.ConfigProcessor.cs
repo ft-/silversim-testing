@@ -661,7 +661,7 @@ namespace SilverSim.Main.Common
 
                 string sourceParam = sourceConfig.GetString(useparam[1]);
 
-                if (string.IsNullOrEmpty(sourceParam) || sourceParam.StartsWith("SourceParameter") ||
+                if (sourceParam?.Length == 0 || sourceParam.StartsWith("SourceParameter") ||
                     !config.Contains("SourceParameter-" + sourceParam))
                 {
                     continue;
@@ -793,11 +793,11 @@ namespace SilverSim.Main.Common
                         IConfigSource modeParamsSource = new CFG_IniResourceSource("ModeConfig." + modepara.ToLower() + ".ini").ConfigSource;
                         IConfig modeConfig = modeParamsSource.Configs["ModeConfig"];
                         string description = modeConfig.GetString("Description", string.Empty);
-                        if (!string.IsNullOrEmpty(description))
+                        if (description?.Length != 0)
                         {
                             System.Console.WriteLine(string.Format("-m={0}\n  {1}", modepara, description));
                             string defaultsIniName = modeConfig.GetString("DefaultConfigName", string.Empty);
-                            if (!string.IsNullOrEmpty(defaultsIniName))
+                            if (defaultsIniName?.Length != 0)
                             {
                                 System.Console.WriteLine(string.Format("  defaults to use {0}", defaultsIniName));
                             }

@@ -51,16 +51,16 @@ namespace SilverSim.Viewer.Core.Capabilities
             };
             Features.Add("PhysicsShapeTypes", typesMap);
             var extrasMap = new Map();
-            if (!string.IsNullOrEmpty(gridURL))
+            if (gridURL?.Length != 0)
             {
                 extrasMap.Add("GridURL", gridURL);
             }
-            if (!string.IsNullOrEmpty(gridName))
+            if (gridName?.Length != 0)
             {
                 extrasMap.Add("GridName", gridName);
             }
 
-            if(!string.IsNullOrEmpty(searchUrl))
+            if(searchUrl?.Length != 0)
             {
                 extrasMap.Add("search-server-url", searchUrl);
             }

@@ -46,7 +46,7 @@ namespace SilverSim.Scene.Types.Object
             lock(m_DataLock)
             {
                 string mediaURL;
-                if(string.IsNullOrEmpty(m_MediaURL))
+                if(m_MediaURL?.Length == 0)
                 {
                     mediaURL = "x-mv:00000000/" + updaterID.ToString();
                 }
@@ -71,7 +71,7 @@ namespace SilverSim.Scene.Types.Object
             lock (m_DataLock)
             {
                 string mediaURL;
-                if (string.IsNullOrEmpty(m_MediaURL))
+                if (m_MediaURL?.Length == 0)
                 {
                     mediaURL = "x-mv:00000000/" + updaterID.ToString();
                 }

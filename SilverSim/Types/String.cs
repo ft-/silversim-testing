@@ -116,7 +116,7 @@ namespace SilverSim.Types
         public static AString Format(string format, object arg0, object arg1, object arg2) => new AString(string.Format(format, arg0, arg1, arg2));
 
         #region Helpers
-        public ABoolean AsBoolean => new ABoolean(!string.IsNullOrEmpty(m_Value));
+        public ABoolean AsBoolean => new ABoolean(m_Value?.Length != 0);
         public Integer AsInteger => new Integer(Int32.Parse(m_Value));
         public Quaternion AsQuaternion => Quaternion.Parse(m_Value);
         public Real AsReal => Real.Parse(m_Value);

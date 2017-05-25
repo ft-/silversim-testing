@@ -294,7 +294,7 @@ namespace SilverSim.WebIF.Admin
         {
             m_Loader = loader;
             var avatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
-            if (!string.IsNullOrEmpty(m_AvatarNameServiceNames))
+            if (m_AvatarNameServiceNames?.Length != 0)
             {
                 foreach (string p in m_AvatarNameServiceNames.Split(','))
                 {
@@ -590,7 +590,7 @@ namespace SilverSim.WebIF.Admin
                 {
                     DisableEcho();
                 }
-                if (!string.IsNullOrEmpty(p))
+                if (p?.Length != 0)
                 {
                     Write(p);
                 }
@@ -1488,7 +1488,7 @@ namespace SilverSim.WebIF.Admin
                 {
                     { "name", kvp.Key }
                 };
-                if (!string.IsNullOrEmpty(kvp.Value.Description))
+                if (kvp.Value.Description?.Length != 0)
                 {
                     eres.Add("description", kvp.Value.Description);
                 }

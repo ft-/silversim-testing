@@ -48,13 +48,13 @@ namespace SilverSim.Scripting.Common
             {
                 get
                 {
-                    return string.IsNullOrEmpty(name) ?
+                    return name?.Length == 0 ?
                         m_ScriptCompilers[DefaultCompilerName] :
                         m_ScriptCompilers[name];
                 }
                 set
                 {
-                    if (string.IsNullOrEmpty(name))
+                    if (name?.Length == 0)
                     {
                         throw new ArgumentException("value");
                     }

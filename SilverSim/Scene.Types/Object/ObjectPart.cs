@@ -1705,7 +1705,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     writer.WriteNamedValue("AllowedDrop", IsAllowedDrop);
                     writer.WriteUUID("CreatorID", Creator.ID);
-                    if (!string.IsNullOrEmpty(Creator.CreatorData))
+                    if (Creator.CreatorData?.Length != 0)
                     {
                         writer.WriteNamedValue("CreatorData", Creator.CreatorData);
                     }
@@ -1860,7 +1860,7 @@ namespace SilverSim.Scene.Types.Object
                     CollisionSoundParam sp = CollisionSound;
                     writer.WriteUUID("CollisionSound", sp.ImpactSound);
                     writer.WriteNamedValue("CollisionSoundVolume", sp.ImpactVolume);
-                    if (!string.IsNullOrEmpty(MediaURL))
+                    if (MediaURL?.Length != 0)
                     {
                         writer.WriteNamedValue("MediaUrl", MediaURL);
                     }
@@ -2719,7 +2719,7 @@ namespace SilverSim.Scene.Types.Object
                                     string json = reader.ReadElementValueAsString();
                                     try
                                     {
-                                        if (!string.IsNullOrEmpty(json))
+                                        if (json?.Length != 0)
                                         {
                                             using (var ms = new MemoryStream(json.ToUTF8Bytes()))
                                             {

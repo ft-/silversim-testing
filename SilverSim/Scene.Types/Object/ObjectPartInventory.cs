@@ -543,7 +543,7 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("BasePermissions", (uint)item.Permissions.Base);
                         writer.WriteNamedValue("CreationDate", item.CreationDate.AsUInt);
                         writer.WriteUUID("CreatorID", item.Creator.ID);
-                        if (!string.IsNullOrEmpty(item.Creator.CreatorData))
+                        if (item.Creator.CreatorData?.Length != 0)
                         {
                             writer.WriteNamedValue("CreatorData", item.Creator.CreatorData);
                         }

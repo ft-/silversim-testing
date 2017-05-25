@@ -413,7 +413,7 @@ namespace SilverSim.Main.Common.HttpServer
                     w.Write(string.Format("HTTP/{0}.{1} 101 Switching Protocols\r\n", MajorVersion, MinorVersion));
                     w.Write("Upgrade: websocket\r\nConnection: Upgrade\r\n");
                     w.Write(string.Format("Sec-WebSocket-Accept: {0}\r\n", websocketaccept));
-                    if (!string.IsNullOrEmpty(websocketprotocol))
+                    if (websocketprotocol?.Length != 0)
                     {
                         w.Write(string.Format("Sec-WebSocket-Protocol: {0}\r\n", websocketprotocol));
                     }

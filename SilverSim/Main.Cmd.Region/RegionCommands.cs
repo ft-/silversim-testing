@@ -142,7 +142,7 @@ namespace SilverSim.Main.Cmd.Region
             if (sceneConfig != null)
             {
                 string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
-                if (!string.IsNullOrEmpty(avatarNameServices))
+                if (avatarNameServices?.Length != 0)
                 {
                     foreach (string p in avatarNameServices.Split(','))
                     {
@@ -556,7 +556,7 @@ namespace SilverSim.Main.Cmd.Region
 
                         case "productname":
                             rInfo.ProductName = args[argi + 1];
-                            if(string.IsNullOrEmpty(rInfo.ProductName))
+                            if(rInfo.ProductName?.Length == 0)
                             {
                                 rInfo.ProductName = "Mainland";
                             }
@@ -897,7 +897,7 @@ namespace SilverSim.Main.Cmd.Region
 
                         case "productname":
                             rInfo.ProductName = args[argi + 1];
-                            if(string.IsNullOrEmpty(rInfo.ProductName))
+                            if(rInfo.ProductName?.Length == 0)
                             {
                                 rInfo.ProductName = "Mainland";
                             }
@@ -1136,7 +1136,7 @@ namespace SilverSim.Main.Cmd.Region
                 else
                 {
                     rInfo.GridURI = m_Loader.GatekeeperURI;
-                    if (string.IsNullOrEmpty(rInfo.ServerIP))
+                    if (rInfo.ServerIP?.Length != 0)
                     {
                         rInfo.ServerIP = m_ExternalHostNameService.ExternalHostName;
                     }

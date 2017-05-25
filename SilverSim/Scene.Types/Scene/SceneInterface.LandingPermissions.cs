@@ -65,7 +65,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             if (regionID != UUID.Zero)
             {
-                if (string.IsNullOrEmpty(value))
+                if (value?.Length == 0)
                 {
                     m_SpawnPointRoutingSetToLocal = false;
                 }
@@ -77,7 +77,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
-                if (string.IsNullOrEmpty(value))
+                if (value?.Length == 0)
                 {
                     m_SpawnPointRoutingLocal = "closest";
                 }

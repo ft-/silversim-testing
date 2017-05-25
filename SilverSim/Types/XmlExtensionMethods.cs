@@ -257,7 +257,7 @@ namespace SilverSim.Types
 
         public static void ReadToEndElement(this XmlTextReader reader, string tagname = null)
         {
-            if (string.IsNullOrEmpty(tagname))
+            if (tagname?.Length == 0)
             {
                 tagname = reader.Name;
             }
