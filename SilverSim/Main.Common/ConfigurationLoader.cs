@@ -670,6 +670,7 @@ namespace SilverSim.Main.Common
             CommandRegistry.AddShowCommand("modules", ShowModulesCommand);
             CommandRegistry.AddGetCommand("serverparam", GetServerParamCommand);
             CommandRegistry.AddSetCommand("serverparam", SetServerParamCommand);
+            CommandRegistry.AddResetCommand("serverparam", ResetServerParamCommand);
             CommandRegistry.AddShowCommand("serverparams", ShowServerParamsCommand);
             CommandRegistry.AddShowCommand("issues", ShowIssuesCommand);
             CommandRegistry.AddShowCommand("cacheddns", ShowCachedDnsCommand);

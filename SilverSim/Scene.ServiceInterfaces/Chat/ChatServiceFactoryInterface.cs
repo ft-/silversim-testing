@@ -19,10 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
+
 namespace SilverSim.Scene.ServiceInterfaces.Chat
 {
     public abstract class ChatServiceFactoryInterface
     {
-        public abstract ChatServiceInterface Instantiate();
+        public abstract ChatServiceInterface Instantiate(UUID regionId);
     }
 }

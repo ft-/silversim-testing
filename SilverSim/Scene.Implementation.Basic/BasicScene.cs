@@ -404,7 +404,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
 
             #region Setup services
-            m_ChatService = sceneParams.ChatFactory.Instantiate();
+            m_ChatService = sceneParams.ChatFactory.Instantiate(ri.ID);
             RegionStorage = sceneParams.RegionStorage;
             GroupsNameService = sceneParams.GroupsNameService;
             GroupsService = sceneParams.GroupsService;

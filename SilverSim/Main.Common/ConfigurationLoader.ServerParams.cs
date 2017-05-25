@@ -207,6 +207,51 @@ namespace SilverSim.Main.Common
             }
         }
 
+        private void ResetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help" || args.Count < 3 || args.Count > 4)
+            {
+                io.Write("reset serverparam <regionid> <param>\nreset serverparam <regionname> <param>\nreset serverparam <param>");
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                io.Write("reset serverparam is not possible with limited console");
+            }
+            else if (args.Count == 3)
+            {
+                try
+                {
+                    GetServerParamStorage()[UUID.Zero, args[2]] = string.Empty;
+                }
+                catch (Exception e)
+                {
+                    io.Write(e.Message);
+                }
+            }
+            else if (args.Count == 4)
+            {
+                UUID regionId;
+                if (!UUID.TryParse(args[2], out regionId))
+                {
+                    SceneInterface scene;
+                    if (!Scenes.TryGetValue(args[2], out scene))
+                    {
+                        io.Write("regionid is not a UUID nor a region name");
+                        return;
+                    }
+                    regionId = scene.ID;
+                }
+                try
+                {
+                    GetServerParamStorage()[regionId, args[3]] = string.Empty;
+                }
+                catch (Exception e)
+                {
+                    io.Write(e.Message);
+                }
+            }
+        }
+
         private void SetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help" || args.Count < 4 || args.Count > 5)

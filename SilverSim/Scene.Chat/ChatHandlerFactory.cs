@@ -23,30 +23,200 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using Nini.Config;
 using System.ComponentModel;
+using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
+using SilverSim.Types;
+using System.Globalization;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Scene.Chat
 {
     [Description("Region Chat Handler")]
     [PluginName("Chat")]
-    public sealed class ChatHandlerFactory : ChatServiceFactoryInterface, IPlugin
+    [ServerParam("Chat.WhisperDistance", DefaultValue = 10.0, Description = "Whisper distance", ParameterType = typeof(double))]
+    [ServerParam("Chat.SayDistance", DefaultValue = 20.0, Description = "Say distance", ParameterType = typeof(double))]
+    [ServerParam("Chat.ShoutDistance", DefaultValue = 100.0, Description = "Shout distance", ParameterType = typeof(double))]
+    public sealed class ChatHandlerFactory : ChatServiceFactoryInterface, IPlugin, IServerParamListener
     {
-        private readonly double m_WhisperDistance;
-        private readonly double m_SayDistance;
-        private readonly double m_ShoutDistance;
+        private readonly RwLockedDictionary<UUID, double> m_WhisperDistances = new RwLockedDictionary<UUID, double>();
+        private readonly RwLockedDictionary<UUID, double> m_SayDistances = new RwLockedDictionary<UUID, double>();
+        private readonly RwLockedDictionary<UUID, double> m_ShoutDistances = new RwLockedDictionary<UUID, double>();
 
-        public ChatHandlerFactory(IConfig ownConfig)
+        private double GetWhisperDistance(UUID regionid)
         {
-            m_WhisperDistance = ownConfig.GetDouble("WhisperDistance", 10f);
-            m_SayDistance = ownConfig.GetDouble("SayDistance", 20f);
-            m_ShoutDistance = ownConfig.GetDouble("ShoutDistance", 20f);
+            double val;
+            if(!m_WhisperDistances.TryGetValue(regionid, out val) &&
+                !m_WhisperDistances.TryGetValue(UUID.Zero, out val))
+            {
+                val = 10;
+            }
+            return val;
         }
 
-        public override ChatServiceInterface Instantiate() =>
-            new ChatHandler(m_WhisperDistance, m_SayDistance, m_ShoutDistance);
+        private double GetSayDistance(UUID regionid)
+        {
+            double val;
+            if (!m_SayDistances.TryGetValue(regionid, out val) &&
+                !m_SayDistances.TryGetValue(UUID.Zero, out val))
+            {
+                val = 20;
+            }
+            return val;
+        }
+
+        private double GetShoutDistance(UUID regionid)
+        {
+            double val;
+            if (!m_ShoutDistances.TryGetValue(regionid, out val) &&
+                !m_ShoutDistances.TryGetValue(UUID.Zero, out val))
+            {
+                val = 100;
+            }
+            return val;
+        }
+
+        private bool TryGetChatHandler(SceneInterface scene, out ChatHandler chat)
+        {
+            try
+            {
+                chat = scene.GetService<ChatServiceInterface>() as ChatHandler;
+            }
+            catch
+            {
+                chat = null;
+            }
+            return chat != null;
+        }
+
+        [ServerParam("Chat.WhisperDistance")]
+        public void HandleChatDistanceWhisperUpdated(UUID regionid, string value)
+        {
+            double val;
+            if(value?.Length == 0)
+            {
+                m_WhisperDistances.Remove(regionid);
+            }
+            else if(double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out val))
+            {
+                m_WhisperDistances[regionid] = val;
+            }
+
+            /* update regions */
+            if(regionid != UUID.Zero)
+            {
+                SceneInterface scene;
+                if(m_Scenes.TryGetValue(regionid, out scene))
+                {
+                    ChatHandler chat;
+                    if(TryGetChatHandler(scene, out chat))
+                    {
+                        chat.WhisperDistance = GetWhisperDistance(regionid);
+                    }
+                }
+            }
+            else
+            {
+                foreach(SceneInterface scene in m_Scenes.Values)
+                {
+                    ChatHandler chat;
+                    if (TryGetChatHandler(scene, out chat))
+                    {
+                        chat.WhisperDistance = GetWhisperDistance(regionid);
+                    }
+                }
+            }
+        }
+
+        [ServerParam("Chat.SayDistance")]
+        public void HandleChatDistanceSayUpdated(UUID regionid, string value)
+        {
+            double val;
+            if (value?.Length == 0)
+            {
+                m_SayDistances.Remove(regionid);
+            }
+            else if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out val))
+            {
+                m_SayDistances[regionid] = val;
+            }
+
+            /* update regions */
+            if (regionid != UUID.Zero)
+            {
+                SceneInterface scene;
+                if (m_Scenes.TryGetValue(regionid, out scene))
+                {
+                    ChatHandler chat;
+                    if (TryGetChatHandler(scene, out chat))
+                    {
+                        chat.SayDistance = GetSayDistance(regionid);
+                    }
+                }
+            }
+            else
+            {
+                foreach (SceneInterface scene in m_Scenes.Values)
+                {
+                    ChatHandler chat;
+                    if (TryGetChatHandler(scene, out chat))
+                    {
+                        chat.SayDistance = GetSayDistance(regionid);
+                    }
+                }
+            }
+        }
+
+        [ServerParam("Chat.ShoutDistance")]
+        public void HandleChatDistanceShoutUpdated(UUID regionid, string value)
+        {
+            double val;
+            if (value?.Length == 0)
+            {
+                m_ShoutDistances.Remove(regionid);
+            }
+            else if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out val))
+            {
+                m_ShoutDistances[regionid] = val;
+            }
+
+            /* update regions */
+            if (regionid != UUID.Zero)
+            {
+                SceneInterface scene;
+                if (m_Scenes.TryGetValue(regionid, out scene))
+                {
+                    ChatHandler chat;
+                    if (TryGetChatHandler(scene, out chat))
+                    {
+                        chat.ShoutDistance = GetShoutDistance(regionid);
+                    }
+                }
+            }
+            else
+            {
+                foreach (SceneInterface scene in m_Scenes.Values)
+                {
+                    ChatHandler chat;
+                    if (TryGetChatHandler(scene, out chat))
+                    {
+                        chat.ShoutDistance = GetShoutDistance(regionid);
+                    }
+                }
+            }
+        }
+
+        public override ChatServiceInterface Instantiate(UUID regionId) =>
+            new ChatHandler(
+                GetWhisperDistance(regionId),
+                GetSayDistance(regionId),
+                GetShoutDistance(regionId));
+
+        private SceneList m_Scenes;
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_Scenes = loader.Scenes;
         }
     }
 }

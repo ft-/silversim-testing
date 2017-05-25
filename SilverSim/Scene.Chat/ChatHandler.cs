@@ -43,9 +43,9 @@ namespace SilverSim.Scene.Chat
         #endregion
 
         #region Properties
-        public double WhisperDistance { get; }
-        public double SayDistance { get; }
-        public double ShoutDistance { get; }
+        public double WhisperDistance { get; internal set; }
+        public double SayDistance { get; internal set; }
+        public double ShoutDistance { get; internal set; }
         #endregion
 
         #region Send Chat
