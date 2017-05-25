@@ -350,7 +350,7 @@ namespace SilverSim.Scene.Types.Object
 
             ObjectGroup.OriginalAssetID = UUID.Zero;
 
-            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
+            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {
@@ -374,7 +374,7 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
+            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {
@@ -398,7 +398,7 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            foreach(Action<IObject> del in OnPositionChange?.GetInvocationList())
+            foreach(Action<IObject> del in OnPositionChange?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {

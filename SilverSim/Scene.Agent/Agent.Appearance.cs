@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Agent
 
         protected void InvokeOnAppearanceUpdate()
         {
-            foreach(Action<IAgent> del in OnAppearanceUpdate?.GetInvocationList())
+            foreach(Action<IAgent> del in OnAppearanceUpdate?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {

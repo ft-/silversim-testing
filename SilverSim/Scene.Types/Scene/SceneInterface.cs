@@ -446,7 +446,7 @@ namespace SilverSim.Scene.Types.Scene
         public void InvokeOnRemove()
         {
             LoginControl.OnLoginsEnabled -= LoginsEnabledHandler;
-            foreach (Action<SceneInterface> del in OnRemove?.GetInvocationList())
+            foreach (Action<SceneInterface> del in OnRemove?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {

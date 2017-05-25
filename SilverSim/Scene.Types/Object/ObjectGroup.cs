@@ -200,7 +200,7 @@ namespace SilverSim.Scene.Types.Object
 
         internal void TriggerOnAssetIDChange()
         {
-            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
+            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {
@@ -228,7 +228,7 @@ namespace SilverSim.Scene.Types.Object
                 m_BoundingBox = null;
             }
 
-            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList())
+            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {

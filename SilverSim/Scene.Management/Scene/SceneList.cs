@@ -118,7 +118,7 @@ namespace SilverSim.Scene.Management.Scene
                 throw;
             }
             m_Log.InfoFormat("Adding region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
-            foreach (Action<SceneInterface> del in OnRegionAdd?.GetInvocationList())
+            foreach (Action<SceneInterface> del in OnRegionAdd?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {
@@ -155,7 +155,7 @@ namespace SilverSim.Scene.Management.Scene
         {
             scene.LoginControl.NotReady(SceneInterface.ReadyFlags.Remove);
             m_Log.InfoFormat("Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
-            foreach (Action<SceneInterface> del in OnRegionRemove?.GetInvocationList())
+            foreach (Action<SceneInterface> del in OnRegionRemove?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {

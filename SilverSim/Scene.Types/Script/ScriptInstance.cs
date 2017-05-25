@@ -99,7 +99,7 @@ namespace SilverSim.Scene.Types.Script
 
         protected void TriggerOnStateChange()
         {
-            foreach (Action<ScriptInstance> del in OnStateChange?.GetInvocationList())
+            foreach (Action<ScriptInstance> del in OnStateChange?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {
@@ -114,7 +114,7 @@ namespace SilverSim.Scene.Types.Script
 
         protected void TriggerOnScriptReset()
         {
-            foreach (Action<ScriptInstance> del in OnScriptReset?.GetInvocationList())
+            foreach (Action<ScriptInstance> del in OnScriptReset?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {

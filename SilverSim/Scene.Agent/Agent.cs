@@ -146,7 +146,7 @@ namespace SilverSim.Scene.Agent
 
         public virtual void InvokeOnPositionUpdate()
         {
-            foreach (Action<IObject> del in OnPositionChange?.GetInvocationList())
+            foreach (Action<IObject> del in OnPositionChange?.GetInvocationList() ?? new Delegate[0])
             {
                 try
                 {

@@ -102,7 +102,7 @@ namespace SilverSim.Scene.Management.Scene
         public void Remove(RegionInfo region)
         {
             Remove(region.ID);
-            foreach (Action<RegionInfo> del in OnNeighborRemove?.GetInvocationList())
+            foreach (Action<RegionInfo> del in OnNeighborRemove?.GetInvocationList() ?? new Delegate[0])
             {
                 del(region);
             }
