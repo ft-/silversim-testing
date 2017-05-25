@@ -99,6 +99,7 @@ namespace SilverSim.Main.Common
             {
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
+                    loadparams.Scene.UpdateRunState(SceneInterface.RunState.Starting, SceneInterface.RunState.None);
                     try
                     {
                         EnvironmentSettings settings;
@@ -425,6 +426,7 @@ namespace SilverSim.Main.Common
             }
             finally
             {
+                loadparams.Scene.UpdateRunState(SceneInterface.RunState.Started, SceneInterface.RunState.Starting);
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
                     loadparams.Scene.m_LoaderThread = null;

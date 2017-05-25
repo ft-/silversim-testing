@@ -198,6 +198,26 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void LoadScene();
         public abstract void LoadSceneSync();
 
+        [Flags]
+        public enum RunState
+        {
+            None = 0,
+            Stopped = 1,
+            Started = 2,
+            Starting = 4,
+            Stopping = 8,
+        }
+
+        public RunState CurrentRunState { get; private set; }
+
+        public void UpdateRunState(RunState setState, RunState clrState)
+        {
+            lock (m_LoaderThreadLock)
+            {
+                CurrentRunState = (CurrentRunState | setState) & (~clrState);
+            }
+        }
+
         private Dictionary<UUID, Vector3> BuildCoarseLocationData()
         {
             var coarseData = new Dictionary<UUID, Vector3>();

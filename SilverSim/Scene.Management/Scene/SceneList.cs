@@ -154,6 +154,7 @@ namespace SilverSim.Scene.Management.Scene
         public void Remove(SceneInterface scene, Func<CultureInfo, string> GetLocalizedOutput)
         {
             scene.LoginControl.NotReady(SceneInterface.ReadyFlags.Remove);
+            scene.UpdateRunState(SceneInterface.RunState.Stopping, SceneInterface.RunState.Started);
             m_Log.InfoFormat("Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
             foreach (Action<SceneInterface> del in OnRegionRemove?.GetInvocationList() ?? new Delegate[0])
             {
@@ -213,6 +214,7 @@ namespace SilverSim.Scene.Management.Scene
 
             scene.InvokeOnRemove();
             scene.PhysicsScene.Shutdown();
+            scene.UpdateRunState(SceneInterface.RunState.Stopped, SceneInterface.RunState.Stopping);
             m_RegionNames.Remove(scene.ID);
             base.Remove(scene.ID);
         }
