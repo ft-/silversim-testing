@@ -31,7 +31,7 @@ namespace SilverSim.Types
         #region Constructors
         public UUID(string s)
         {
-            m_Guid = s?.Length == 0 ? new Guid() : new Guid(s);
+            m_Guid = string.IsNullOrEmpty(s) ? new Guid() : new Guid(s);
         }
 
         public UUID(Guid val)

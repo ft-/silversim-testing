@@ -1046,7 +1046,7 @@ namespace SilverSim.Grid.Login
                 return;
             }
             int val;
-            m_MaxAgentGroups = (value?.Length != 0 && int.TryParse(value, out val)) ?
+            m_MaxAgentGroups = (!string.IsNullOrEmpty(value) && int.TryParse(value, out val)) ?
                  val : 42;
         }
 

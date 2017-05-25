@@ -48,7 +48,7 @@ namespace SilverSim.Scripting.Common
             {
                 get
                 {
-                    return name?.Length == 0 ?
+                    return string.IsNullOrEmpty(name) ?
                         m_ScriptCompilers[DefaultCompilerName] :
                         m_ScriptCompilers[name];
                 }

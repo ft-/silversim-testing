@@ -343,8 +343,8 @@ namespace SilverSim.Viewer.Search
                 return;
             }
 
-            int page_size = psize?.Length == 0 ? 500 : int.Parse(psize);
-            int page_number = pnumber?.Length == 0 ? 1 : int.Parse(pnumber);
+            int page_size = string.IsNullOrEmpty(psize) ? 500 : int.Parse(psize);
+            int page_number = string.IsNullOrEmpty(pnumber) ? 1 : int.Parse(pnumber);
             SceneInterface scene = circuit.Scene;
             if(scene == null)
             {
