@@ -979,6 +979,7 @@ namespace SilverSim.Scene.Types.Object
                 case PrimitiveParamsType.Text:
                     {
                         TextParam text = Text;
+                        paramList.Add(text.Text);
                         paramList.Add(text.TextColor.AsVector3);
                         paramList.Add(text.TextColor.A);
                     }
