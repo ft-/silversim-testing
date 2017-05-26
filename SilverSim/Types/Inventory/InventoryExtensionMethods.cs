@@ -30,7 +30,7 @@ namespace SilverSim.Types.Inventory
             var o = new StringBuilder();
             foreach(char c in s)
             {
-                o.Append((c >= 32 && c <= 126) ? c.ToString() : "??");
+                o.Append((c >= 32 && c <= 126 & c != '|') ? c.ToString() : "??");
             }
             return o.ToString();
         }
@@ -40,7 +40,7 @@ namespace SilverSim.Types.Inventory
             var o = new StringBuilder();
             foreach (char c in s)
             {
-                o.Append((c >= 32) ? c.ToString() : " ");
+                o.Append((c >= 32 || c== '|') ? c.ToString() : " ");
             }
             return o.ToString();
         }
