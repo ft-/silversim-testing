@@ -22,7 +22,6 @@
 using log4net;
 using OpenJp2.Net;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -35,7 +34,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Agent
@@ -68,15 +67,15 @@ namespace SilverSim.Scene.Types.Agent
         private class BakeStatus : IDisposable
         {
             public readonly Dictionary<UUID, OutfitItem> OutfitItems = new Dictionary<UUID, OutfitItem>();
-            public readonly Dictionary<UUID, Image> Textures = new Dictionary<UUID, Image>();
-            public readonly Dictionary<UUID, Image> TexturesResized128 = new Dictionary<UUID, Image>();
-            public readonly Dictionary<UUID, Image> TexturesResized512 = new Dictionary<UUID, Image>();
+            public readonly Dictionary<UUID, BakeImage> Textures = new Dictionary<UUID, BakeImage>();
+            public readonly Dictionary<UUID, BakeImage> TexturesResized128 = new Dictionary<UUID, BakeImage>();
+            public readonly Dictionary<UUID, BakeImage> TexturesResized512 = new Dictionary<UUID, BakeImage>();
             public UUID Layer0TextureID = UUID.Zero;
 
-            public bool TryGetTexture(BakeType bakeType, UUID textureID, out Image img)
+            public bool TryGetTexture(BakeType bakeType, UUID textureID, out BakeImage img)
             {
                 int targetDimension;
-                Dictionary<UUID, Image> resizeCache;
+                Dictionary<UUID, BakeImage> resizeCache;
                 if (bakeType == BakeType.Eyes)
                 {
                     resizeCache = TexturesResized128;
@@ -98,7 +97,7 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     if (img.Width != targetDimension || img.Height != targetDimension)
                     {
-                        img = new Bitmap(img, targetDimension, targetDimension);
+                        img = new BakeImage(img, targetDimension, targetDimension);
                         resizeCache.Add(textureID, img);
                     }
                     return true;
@@ -267,6 +266,111 @@ namespace SilverSim.Scene.Types.Agent
         #region Actual Baking Code
         private const int MAX_WEARABLES_PER_TYPE = 5;
 
+        public class BakeImage : IDisposable
+        {
+            private Bitmap m_Bitmap;
+            private byte[] m_ArgbImage;
+
+            public BakeImage(Stream s)
+            {
+                m_Bitmap = new Bitmap(s);
+            }
+
+            public BakeImage(int width, int height)
+            {
+                m_Bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            }
+
+            public BakeImage(BakeImage img, int newWidth, int newHeight)
+            {
+                m_Bitmap = new Bitmap(img.m_Bitmap, newWidth, newHeight);
+            }
+
+            public BakeImage(Image i)
+            {
+                m_Bitmap = new Bitmap(i);
+            }
+
+            public int Width => m_Bitmap.Width;
+            public int Height => m_Bitmap.Height;
+
+            public static implicit operator Bitmap(BakeImage img)
+            {
+                return img.m_Bitmap;
+            }
+
+            public byte[] ArgbImage
+            {
+                get
+                {
+                    Bitmap bmp = m_Bitmap;
+                    if(m_ArgbImage == null && (bmp.PixelFormat == PixelFormat.Format32bppArgb || bmp.PixelFormat == PixelFormat.Format24bppRgb))
+                    {
+                        BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
+                            ImageLockMode.ReadOnly,
+                            bmp.PixelFormat);
+                        if (bmp.PixelFormat == PixelFormat.Format32bppArgb)
+                        {
+                            int bytes = Math.Abs(bmpData.Stride) * bmpData.Height;
+                            m_ArgbImage = new byte[bytes];
+                            Marshal.Copy(bmpData.Scan0, m_ArgbImage, 0, bytes);
+                        }
+                        else
+                        {
+                            int actbytes = Math.Abs(bmpData.Stride) * bmp.Height;
+                            int finalbytes = bmpData.Width * bmpData.Height * 4;
+                            m_ArgbImage = new byte[finalbytes];
+                            Marshal.Copy(bmpData.Scan0, m_ArgbImage, 0, actbytes);
+
+                            /* make it argb format */
+                            for(int i = bmpData.Width * bmpData.Height; i-- != 0; )
+                            {
+                                int targetidx = i * 4;
+                                int sourceidx = i * 3;
+                                m_ArgbImage[targetidx + 3] = 255;
+                                m_ArgbImage[targetidx + 2] = m_ArgbImage[sourceidx + 2];
+                                m_ArgbImage[targetidx + 1] = m_ArgbImage[sourceidx + 1];
+                                m_ArgbImage[targetidx + 0] = m_ArgbImage[sourceidx + 0];
+                            }
+                        }
+                        bmp.UnlockBits(bmpData);
+                    }
+                    return m_ArgbImage;
+                }
+            }
+
+            public void Update()
+            {
+                if (m_Bitmap.PixelFormat == PixelFormat.Format32bppArgb)
+                {
+                    BitmapData bmpData = m_Bitmap.LockBits(new Rectangle(0, 0, m_Bitmap.Width, m_Bitmap.Height),
+                        ImageLockMode.ReadWrite,
+                        m_Bitmap.PixelFormat);
+                    Marshal.Copy(m_ArgbImage, 0, bmpData.Scan0, m_ArgbImage.Length);
+                    m_Bitmap.UnlockBits(bmpData);
+                }
+                else
+                {
+                    Bitmap bmp = m_Bitmap;
+
+                    /* make a new image with Argb format */
+                    m_Bitmap = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);
+
+                    BitmapData bmpData = m_Bitmap.LockBits(new Rectangle(0, 0, m_Bitmap.Width, m_Bitmap.Height),
+                        ImageLockMode.ReadWrite,
+                        bmp.PixelFormat);
+                    Marshal.Copy(m_ArgbImage, 0, bmpData.Scan0, m_ArgbImage.Length);
+                    m_Bitmap.UnlockBits(bmpData);
+                    bmp.Dispose();
+                }
+            }
+
+            public void Dispose()
+            {
+                m_Bitmap?.Dispose();
+            }
+        }
+
         public static void BakeAppearanceFromWearablesInfo(this IAgent agent, AssetServiceInterface sceneAssetService, Action<string> logOutput = null)
         {
             var agentOwner = agent.Owner;
@@ -364,7 +468,10 @@ namespace SilverSim.Scene.Types.Agent
 
                                         try
                                         {
-                                            bakeStatus.Textures.Add(textureData.ID, CSJ2K.J2kImage.FromStream(textureData.InputStream));
+                                            using (Image img = CSJ2K.J2kImage.FromStream(textureData.InputStream))
+                                            {
+                                                bakeStatus.Textures.Add(textureData.ID, new BakeImage(img));
+                                            }
                                         }
                                         catch (Exception e)
                                         {
@@ -406,77 +513,60 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        private static void AddAlpha(Bitmap bmp, Image inp)
+        private static void AddAlpha(BakeImage bmp, BakeImage inp)
         {
-            Bitmap bmpin = null;
+            byte[] target = bmp.ArgbImage;
+            byte[] source = inp.ArgbImage;
+            BakeImage bakeIntermediate = null;
+            if (bmp.Width != inp.Width || bmp.Height != inp.Height)
+            {
+                bakeIntermediate = new BakeImage(inp, bmp.Width, bmp.Height);
+                inp = bakeIntermediate;
+            }
+
             try
             {
-                if (inp.Width != bmp.Width || inp.Height != bmp.Height)
+                for (int i = 0; i < bmp.Width * bmp.Height * 4; ++i)
                 {
-                    bmpin = new Bitmap(inp, bmp.Size);
-                }
-                else
-                {
-                    bmpin = new Bitmap(inp);
+                    i += 3;
+                    target[i] = (byte)Math.Min(target[i], source[i]);
                 }
 
-                int x;
-                int y;
-
-                for (y = 0; y < bmp.Height; ++y)
-                {
-                    for (x = 0; x < bmp.Width; ++x)
-                    {
-                        System.Drawing.Color dst = bmp.GetPixel(x, y);
-                        System.Drawing.Color src = bmpin.GetPixel(x, y);
-                        bmp.SetPixel(x, y, System.Drawing.Color.FromArgb(
-                            dst.A > src.A ? src.A : dst.A,
-                            dst.R,
-                            dst.G,
-                            dst.B));
-                    }
-                }
+                bmp.Update();
             }
             finally
             {
-                bmpin?.Dispose();
+                bakeIntermediate?.Dispose();
             }
         }
 
-        private static void MultiplyLayerFromAlpha(Bitmap bmp, Image inp)
+        private static void MultiplyLayerFromAlpha(BakeImage bmp, BakeImage inp)
         {
-            Bitmap bmpin = null;
+            byte[] target = bmp.ArgbImage;
+            byte[] source = inp.ArgbImage;
+            BakeImage bakeIntermediate = null;
+            if(bmp.Width != inp.Width || bmp.Height != inp.Height)
+            {
+                bakeIntermediate = new BakeImage(inp, bmp.Width, bmp.Height);
+                inp = bakeIntermediate;
+            }
             try
             {
-                if (inp.Width != bmp.Width || inp.Height != bmp.Height)
+                for (int i = 0; i < bmp.Width * bmp.Height * 4; ++i)
                 {
-                    bmpin = new Bitmap(inp, bmp.Size);
-                }
-                else
-                {
-                    bmpin = new Bitmap(inp);
+                    target[i] = (byte)(target[i] * source[i] / 255);
+                    ++i;
+                    target[i] = (byte)(target[i] * source[i] / 255);
+                    ++i;
+                    target[i] = (byte)(target[i] * source[i] / 255);
+                    ++i;
                 }
 
-                int x;
-                int y;
-
-                for (y = 0; y < bmp.Height; ++y)
-                {
-                    for (x = 0; x < bmp.Width; ++x)
-                    {
-                        System.Drawing.Color dst = bmp.GetPixel(x, y);
-                        System.Drawing.Color src = bmpin.GetPixel(x, y);
-                        bmp.SetPixel(x, y, System.Drawing.Color.FromArgb(
-                            dst.A,
-                            (byte)((dst.R * src.A) / 255),
-                            (byte)((dst.G * src.A) / 255),
-                            (byte)((dst.B * src.A) / 255)));
-                    }
-                }
+                bmp.Update();
             }
             finally
             {
-                bmpin?.Dispose();
+                bakeIntermediate?.Dispose();
             }
         }
 
@@ -606,28 +696,27 @@ namespace SilverSim.Scene.Types.Agent
             return System.Drawing.Color.FromArgb(wColor.R_AsByte, wColor.G_AsByte, wColor.B_AsByte);
         }
 
-        private static void ApplyTint(Bitmap bmp, SilverSim.Types.Color col)
+        private static void ApplyTint(BakeImage bmp, SilverSim.Types.Color col)
         {
             int x;
             int y;
-            for (y = 0; y < bmp.Height; ++y)
+            byte[] argb = bmp.ArgbImage;
+            for(int i = 0; i < bmp.Width * bmp.Height * 4; ++i)
             {
-                for (x = 0; x < bmp.Width; ++x)
-                {
-                    var inp = bmp.GetPixel(x, y);
-                    bmp.SetPixel(x, y, System.Drawing.Color.FromArgb(
-                        inp.A,
-                        (byte)(inp.R * col.R).Clamp(0, 255),
-                        (byte)(inp.G * col.G).Clamp(0, 255),
-                        (byte)(inp.B * col.B).Clamp(0, 255)));
-                }
+                argb[i] = (byte)(argb[i] * col.B).Clamp(0, 255);
+                ++i;
+                argb[i] = (byte)(argb[i] * col.G).Clamp(0, 255);
+                ++i;
+                argb[i] = (byte)(argb[i] * col.R).Clamp(0, 255);
+                ++i;
             }
+            bmp.Update();
         }
 
-        private static AssetData BakeTexture(BakeStatus status, BakeType bake, AssetServiceInterface sceneAssetService)
+        private static AssetData BakeTexture(BakeStatus status, BakeType bake)
         {
             int bakeDimensions = (bake == BakeType.Eyes) ? 128 : 512;
-            Image srcimg;
+            BakeImage srcimg;
             var data = new AssetData()
             {
                 Type = AssetType.Texture,
@@ -672,7 +761,7 @@ namespace SilverSim.Scene.Types.Agent
                     throw new ArgumentOutOfRangeException(nameof(bake));
             }
 
-            using (var bitmap = new Bitmap(bakeDimensions, bakeDimensions, PixelFormat.Format32bppArgb))
+            using (var bitmap = new BakeImage(bakeDimensions, bakeDimensions))
             {
                 using (var gfx = Graphics.FromImage(bitmap))
                 {
@@ -721,29 +810,30 @@ namespace SilverSim.Scene.Types.Agent
                         foreach (var item in status.OutfitItems.Values)
                         {
                             UUID texture;
-                            Image img;
+                            BakeImage img;
                             if ((item.WearableData != null && item.WearableData.Textures.TryGetValue(texIndex, out texture)) &&
                                 status.TryGetTexture(bake, texture, out img))
                             {
-                                /* duplicate texture */
-                                using (var bmp = new Bitmap(img))
+                                switch (texIndex)
                                 {
-                                    switch (texIndex)
-                                    {
-                                        case AvatarTextureIndex.HeadBodypaint:
-                                        case AvatarTextureIndex.UpperBodypaint:
-                                        case AvatarTextureIndex.LowerBodypaint:
-                                            /* no tinting here */
-                                            break;
+                                    case AvatarTextureIndex.HeadBodypaint:
+                                    case AvatarTextureIndex.UpperBodypaint:
+                                    case AvatarTextureIndex.LowerBodypaint:
+                                        /* no tinting here */
+                                        gfx.DrawImage(img, 0, 0, bakeDimensions, bakeDimensions);
+                                        AddAlpha(bitmap, img);
+                                        break;
 
-                                        default:
-                                            ApplyTint(bmp, item.WearableData.GetTint());
-                                            break;
-                                    }
-
-                                    gfx.DrawImage(bmp, 0, 0, bakeDimensions, bakeDimensions);
-                                    AddAlpha(bitmap, bmp);
+                                    default:
+                                        using (BakeImage img2 = new BakeImage(img))
+                                        {
+                                            gfx.DrawImage(img, 0, 0, bakeDimensions, bakeDimensions);
+                                            ApplyTint(img2, item.WearableData.GetTint());
+                                            AddAlpha(bitmap, img2);
+                                        }
+                                        break;
                                 }
+
                             }
                         }
                     }
@@ -804,11 +894,11 @@ namespace SilverSim.Scene.Types.Agent
 
         private static void CoreBakeLogic(this IAgent agent, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
         {
-            var bakeHead = BakeTexture(bakeStatus, BakeType.Head, sceneAssetService);
-            var bakeUpperBody = BakeTexture(bakeStatus, BakeType.UpperBody, sceneAssetService);
-            var bakeLowerBody = BakeTexture(bakeStatus, BakeType.LowerBody, sceneAssetService);
-            var bakeEyes = BakeTexture(bakeStatus, BakeType.Eyes, sceneAssetService);
-            var bakeHair = BakeTexture(bakeStatus, BakeType.Hair, sceneAssetService);
+            var bakeHead = BakeTexture(bakeStatus, BakeType.Head);
+            var bakeUpperBody = BakeTexture(bakeStatus, BakeType.UpperBody);
+            var bakeLowerBody = BakeTexture(bakeStatus, BakeType.LowerBody);
+            var bakeEyes = BakeTexture(bakeStatus, BakeType.Eyes);
+            var bakeHair = BakeTexture(bakeStatus, BakeType.Hair);
             AssetData bakeSkirt = null;
 
             var haveSkirt = false;
@@ -823,7 +913,7 @@ namespace SilverSim.Scene.Types.Agent
 
             if (haveSkirt)
             {
-                bakeSkirt = BakeTexture(bakeStatus, BakeType.Skirt, sceneAssetService);
+                bakeSkirt = BakeTexture(bakeStatus, BakeType.Skirt);
             }
 
             sceneAssetService.Store(bakeEyes);
@@ -849,12 +939,12 @@ namespace SilverSim.Scene.Types.Agent
         #region Base Bake textures
         private static class BaseBakes
         {
-            public static readonly Image HeadAlpha;
-            public static readonly Image HeadColor;
-            public static readonly Image HeadHair;
-            public static readonly Image HeadSkinGrain;
-            public static readonly Image LowerBodyColor;
-            public static readonly Image UpperBodyColor;
+            public static readonly BakeImage HeadAlpha;
+            public static readonly BakeImage HeadColor;
+            public static readonly BakeImage HeadHair;
+            public static readonly BakeImage HeadSkinGrain;
+            public static readonly BakeImage LowerBodyColor;
+            public static readonly BakeImage UpperBodyColor;
 
             static BaseBakes()
             {
@@ -866,7 +956,7 @@ namespace SilverSim.Scene.Types.Agent
                 UpperBodyColor = LoadResourceImage("upperbody_color.tga.gz");
             }
 
-            private static Image LoadResourceImage(string name)
+            private static BakeImage LoadResourceImage(string name)
             {
                 var assembly = typeof(BaseBakes).Assembly;
                 using (var resource = assembly.GetManifestResourceStream(assembly.GetName().Name + ".Resources." + name))
@@ -884,7 +974,7 @@ namespace SilverSim.Scene.Types.Agent
                                 ms.Write(buf, 0, bytesRead);
                             }
                             ms.Seek(0, SeekOrigin.Begin);
-                            return Paloma.TargaImage.LoadTargaImage(ms);
+                            return new BakeImage(Paloma.TargaImage.LoadTargaImage(ms));
                         }
                     }
                 }
