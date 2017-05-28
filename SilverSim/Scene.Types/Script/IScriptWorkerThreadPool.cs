@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using System;
 using System.Runtime.Serialization;
 
@@ -54,5 +55,6 @@ namespace SilverSim.Scene.Types.Script
         void Shutdown();
         void Sleep(int milliseconds);
         void Sleep(TimeSpan timespan);
+        RwLockedDictionary<uint /* localids */, double> GetExecutionTimes();
     }
 }

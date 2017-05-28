@@ -24,7 +24,9 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Timers;
 
 namespace SilverSim.Scripting.Common
 {
@@ -38,6 +40,7 @@ namespace SilverSim.Scripting.Common
         private int m_MaximumThreads = 150;
         private readonly UUID m_SceneID;
         private bool m_ShutdownThreads;
+        private System.Timers.Timer m_FrameTimer = new System.Timers.Timer(1 / 10.0);
 
         public class ScriptThreadContext
         {
@@ -47,6 +50,20 @@ namespace SilverSim.Scripting.Common
         }
 
         private readonly RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
+        private RwLockedDictionary<uint /* localids */, double> m_TopScripts = new RwLockedDictionary<uint, double>();
+        private RwLockedDictionary<uint /* localids */, double> m_LastTopScripts = new RwLockedDictionary<uint, double>();
+
+        public RwLockedDictionary<uint /* localids */, double> GetExecutionTimes()
+        {
+            return m_LastTopScripts;
+        }
+
+        public void FrameTimer(object o, ElapsedEventArgs args)
+        {
+            RwLockedDictionary<uint /* localids */, double> oldTopScripts = m_TopScripts;
+            m_TopScripts = new RwLockedDictionary<uint, double>();
+            m_LastTopScripts = oldTopScripts;
+        }
 
         public int MinimumThreads
         {
@@ -90,6 +107,8 @@ namespace SilverSim.Scripting.Common
                 tc.ScriptThread.Start(tc);
                 m_Threads.Add(tc);
             }
+            m_FrameTimer.Elapsed += FrameTimer;
+            m_FrameTimer.Start();
         }
 
         ~ScriptWorkerThreadPool()
@@ -174,6 +193,7 @@ namespace SilverSim.Scripting.Common
 
         public void Shutdown()
         {
+            m_FrameTimer.Stop();
             m_ShutdownThreads = true;
             if (m_Threads.Count != 0)
             {
@@ -229,6 +249,7 @@ namespace SilverSim.Scripting.Common
                     continue;
                 }
 
+                int executionStart = Environment.TickCount;
                 try
                 {
                     lock (tc)
@@ -306,8 +327,25 @@ namespace SilverSim.Scripting.Common
                 }
                 finally
                 {
+                    uint localId;
                     lock (tc)
                     {
+                        try
+                        {
+                            localId = tc.CurrentScriptInstance.Part.LocalID;
+                            executionStart = Environment.TickCount - executionStart;
+                            if (executionStart > 0)
+                            {
+                                RwLockedDictionary<uint, double> execTime = m_TopScripts;
+                                double prevexectime;
+                                execTime.TryGetValue(localId, out prevexectime);
+                                execTime[localId] = prevexectime + executionStart;
+                            }
+                        }
+                        catch
+                        {
+                            /* ignore it here */
+                        }
                         tc.CurrentScriptInstance = null;
                     }
                 }
