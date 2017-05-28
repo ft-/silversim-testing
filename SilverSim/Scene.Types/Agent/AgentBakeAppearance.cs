@@ -526,10 +526,12 @@ namespace SilverSim.Scene.Types.Agent
 
             try
             {
-                for (int i = 0; i < bmp.Width * bmp.Height * 4; ++i)
+                for (int i = bmp.Width * bmp.Height * 4; i-- != 0;)
                 {
+                    target[i] = Math.Min(target[i], source[i]);
+
+                    /* skip RGB */
                     i += 3;
-                    target[i] = (byte)Math.Min(target[i], source[i]);
                 }
 
                 bmp.Update();
@@ -552,14 +554,15 @@ namespace SilverSim.Scene.Types.Agent
             }
             try
             {
-                for (int i = 0; i < bmp.Width * bmp.Height * 4; ++i)
+                for (int i = bmp.Width * bmp.Height * 4; i-- != 0;)
                 {
+                    /* skip A */
+                    --i;
                     target[i] = (byte)(target[i] * source[i] / 255);
-                    ++i;
+                    --i;
                     target[i] = (byte)(target[i] * source[i] / 255);
-                    ++i;
+                    --i;
                     target[i] = (byte)(target[i] * source[i] / 255);
-                    ++i;
                 }
 
                 bmp.Update();
@@ -701,14 +704,15 @@ namespace SilverSim.Scene.Types.Agent
             int x;
             int y;
             byte[] argb = bmp.ArgbImage;
-            for(int i = 0; i < bmp.Width * bmp.Height * 4; ++i)
+            for(int i = bmp.Width * bmp.Height * 4; i-- != 0;)
             {
-                argb[i] = (byte)(argb[i] * col.B).Clamp(0, 255);
-                ++i;
-                argb[i] = (byte)(argb[i] * col.G).Clamp(0, 255);
-                ++i;
+                /* skip A */
+                --i;
                 argb[i] = (byte)(argb[i] * col.R).Clamp(0, 255);
-                ++i;
+                --i;
+                argb[i] = (byte)(argb[i] * col.G).Clamp(0, 255);
+                --i;
+                argb[i] = (byte)(argb[i] * col.B).Clamp(0, 255);
             }
             bmp.Update();
         }
