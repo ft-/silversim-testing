@@ -25,15 +25,19 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
+using SilverSim.Viewer.Messages.Land;
 using SilverSim.Viewer.Messages.Telehub;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace SilverSim.Viewer.Core
 {
@@ -775,7 +779,67 @@ namespace SilverSim.Viewer.Core
 
         private void EstateOwner_Scripts(AgentCircuit circuit, EstateOwnerMessage req)
         {
+            SceneInterface scene = circuit.Scene;
+            if(scene == null)
+            {
+                return;
+            }
 
+            RwLockedDictionary<uint, ScriptReportData> execTimes = scene.ScriptThreadPool.GetExecutionTimes();
+            var reply = new LandStatReply()
+            {
+                ReportType = 0,
+                RequestFlags = 0,
+                TotalObjectCount = (uint)execTimes.Count
+            };
+
+            int allocedlength = 0;
+
+            /* make top objects go first */
+            foreach (KeyValuePair<uint, ScriptReportData> kvp in execTimes.OrderByDescending(x => x.Value))
+            {
+                if(reply.ReportData.Count == 100)
+                {
+                    break;
+                }
+                ObjectPart p;
+                try
+                {
+                    if (!scene.Primitives.TryGetValue(kvp.Key, out p))
+                    {
+                        continue;
+                    }
+
+                    var entry = new LandStatReply.ReportDataEntry()
+                    {
+                        Location = p.GlobalPosition,
+                        Score = kvp.Value.Score,
+                        TaskID = p.ID,
+                        TaskLocalID = kvp.Key,
+                        TaskName = p.Name,
+                        OwnerName = p.Owner.FullName
+                    };
+
+                    if(allocedlength + entry.MessageLength > 1400)
+                    {
+                        circuit.SendMessage(reply);
+                        reply = new LandStatReply()
+                        {
+                            ReportType = 0,
+                            RequestFlags = 0,
+                            TotalObjectCount = (uint)execTimes.Count
+                        };
+                    }
+
+                    reply.ReportData.Add(entry);
+                    allocedlength += entry.MessageLength;
+                }
+                catch
+                {
+                    /* ignore the report */
+                }
+            }
+            circuit.SendMessage(reply);
         }
 
         private void EstateOwner_Terrain(AgentCircuit circuit, EstateOwnerMessage req)

@@ -40,7 +40,7 @@ namespace SilverSim.Scripting.Common
         private int m_MaximumThreads = 150;
         private readonly UUID m_SceneID;
         private bool m_ShutdownThreads;
-        private System.Timers.Timer m_FrameTimer = new System.Timers.Timer(1 / 10.0);
+        private readonly System.Timers.Timer m_FrameTimer = new System.Timers.Timer(1 / 10.0);
 
         public class ScriptThreadContext
         {
@@ -50,18 +50,18 @@ namespace SilverSim.Scripting.Common
         }
 
         private readonly RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
-        private RwLockedDictionary<uint /* localids */, double> m_TopScripts = new RwLockedDictionary<uint, double>();
-        private RwLockedDictionary<uint /* localids */, double> m_LastTopScripts = new RwLockedDictionary<uint, double>();
+        private RwLockedDictionary<uint /* localids */, ScriptReportData> m_TopScripts = new RwLockedDictionary<uint, ScriptReportData>();
+        private RwLockedDictionary<uint /* localids */, ScriptReportData> m_LastTopScripts = new RwLockedDictionary<uint, ScriptReportData>();
 
-        public RwLockedDictionary<uint /* localids */, double> GetExecutionTimes()
+        public RwLockedDictionary<uint /* localids */, ScriptReportData> GetExecutionTimes()
         {
             return m_LastTopScripts;
         }
 
         public void FrameTimer(object o, ElapsedEventArgs args)
         {
-            RwLockedDictionary<uint /* localids */, double> oldTopScripts = m_TopScripts;
-            m_TopScripts = new RwLockedDictionary<uint, double>();
+            RwLockedDictionary<uint /* localids */, ScriptReportData> oldTopScripts = m_TopScripts;
+            m_TopScripts = new RwLockedDictionary<uint, ScriptReportData>();
             m_LastTopScripts = oldTopScripts;
         }
 
@@ -336,10 +336,14 @@ namespace SilverSim.Scripting.Common
                             executionStart = Environment.TickCount - executionStart;
                             if (executionStart > 0)
                             {
-                                RwLockedDictionary<uint, double> execTime = m_TopScripts;
-                                double prevexectime;
-                                execTime.TryGetValue(localId, out prevexectime);
-                                execTime[localId] = prevexectime + executionStart;
+                                RwLockedDictionary<uint, ScriptReportData> execTime = m_TopScripts;
+                                ScriptReportData prevexectime;
+                                if(!execTime.TryGetValue(localId, out prevexectime))
+                                {
+                                    prevexectime = new ScriptReportData();
+                                    execTime.Add(localId, prevexectime);
+                                }
+                                prevexectime.AddScore(executionStart);
                             }
                         }
                         catch

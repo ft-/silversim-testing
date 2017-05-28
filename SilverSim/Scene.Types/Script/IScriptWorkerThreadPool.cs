@@ -48,6 +48,31 @@ namespace SilverSim.Scene.Types.Script
         }
     }
 
+    public class ScriptReportData
+    {
+        private double m_Score;
+        private readonly object m_ScoreLock = new object();
+
+        public double Score
+        {
+            get
+            {
+                lock(m_ScoreLock)
+                {
+                    return m_Score;
+                }
+            }
+        }
+
+        public void AddScore(double f)
+        {
+            lock(m_ScoreLock)
+            {
+                m_Score += f;
+            }
+        }
+    }
+
     public interface IScriptWorkerThreadPool
     {
         void PostScript(ScriptInstance script);
@@ -55,6 +80,6 @@ namespace SilverSim.Scene.Types.Script
         void Shutdown();
         void Sleep(int milliseconds);
         void Sleep(TimeSpan timespan);
-        RwLockedDictionary<uint /* localids */, double> GetExecutionTimes();
+        RwLockedDictionary<uint /* localids */, ScriptReportData> GetExecutionTimes();
     }
 }

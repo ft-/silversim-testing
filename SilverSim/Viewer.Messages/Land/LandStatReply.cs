@@ -38,6 +38,14 @@ namespace SilverSim.Viewer.Messages.Land
             public double Score;
             public string TaskName;
             public string OwnerName;
+
+            public int MessageLength
+            {
+                get
+                {
+                    return 40 + TaskName.ToUTF8ByteCount() + OwnerName.ToUTF8ByteCount();
+                }
+            }
         }
 
         public UInt32 ReportType;
