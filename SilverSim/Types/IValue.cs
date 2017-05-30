@@ -50,7 +50,8 @@ namespace SilverSim.Types
         String = 3,
         Key = 4,
         Vector = 5,
-        Rotation = 6
+        Rotation = 6,
+        LongInteger = 7
     }
 
     /**************************************************************************/

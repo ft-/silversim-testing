@@ -31,7 +31,7 @@ namespace SilverSim.Types
         #region Properties
         public ValueType Type => ValueType.LongInteger;
 
-        public LSLValueType LSL_Type => LSLValueType.Integer;
+        public LSLValueType LSL_Type => LSLValueType.LongInteger;
         #endregion Properties
 
         public LongInteger()
