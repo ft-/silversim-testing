@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SilverSim.Scene.Types.Physics
@@ -93,5 +94,7 @@ namespace SilverSim.Scene.Types.Physics
         public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags) => new RayResult[0];
 
         public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits) => new RayResult[0];
+
+        public Dictionary<uint, double> GetTopColliders() => new Dictionary<uint, double>();
     }
 }

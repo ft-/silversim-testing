@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.Physics
@@ -75,5 +76,7 @@ namespace SilverSim.Scene.Types.Physics
         RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags);
         RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags);
         RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits);
+
+        Dictionary<uint, double> GetTopColliders();
     }
 }
