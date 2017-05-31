@@ -781,6 +781,14 @@ namespace SilverSim.Viewer.Core
                     }
                 }
             }
+
+#if DEBUG
+            m_Log.DebugFormat("Registered {0} message handlers", m_MessageRouting.Count);
+            m_Log.DebugFormat("Registered {0} IM handlers", m_IMMessageRouting.Count);
+            m_Log.DebugFormat("Registered {0} GenericMessage handlers", m_GenericMessageRouting.Count);
+            m_Log.DebugFormat("Registered {0} GodlikeMessage handlers", m_GodlikeMessageRouting.Count);
+            m_Log.DebugFormat("Registered {0} capabilities", m_RegisteredCapabilities.Count);
+#endif
         }
 
         protected void CloseCircuit()
