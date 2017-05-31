@@ -749,6 +749,8 @@ namespace SilverSim.Viewer.Core
             m_MessageRouting.Add(MessageType.UpdateInventoryItem, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.LinkInventoryItem, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.RemoveInventoryObjects, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.ActivateGestures, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.DeactivateGestures, m_InventoryRequestQueue.Enqueue);
 
             m_MessageRouting.Add(MessageType.RequestImage, m_TextureDownloadQueue.Enqueue);
 

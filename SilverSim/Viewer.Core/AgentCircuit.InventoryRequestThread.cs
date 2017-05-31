@@ -27,6 +27,7 @@ using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Alert;
+using SilverSim.Viewer.Messages.Gestures;
 using SilverSim.Viewer.Messages.Inventory;
 using SilverSim.Viewer.Messages.Transfer;
 using System;
@@ -155,6 +156,14 @@ namespace SilverSim.Viewer.Core
 
                         case MessageType.UpdateInventoryItem:
                             FetchInventoryThread_UpdateInventoryItem(m);
+                            break;
+
+                        case MessageType.ActivateGestures:
+                            FetchInventoryThread_ActivateGestures(m);
+                            break;
+
+                        case MessageType.DeactivateGestures:
+                            FetchInventoryThread_DeactivateGestures(m);
                             break;
 
                         default:
@@ -872,6 +881,70 @@ namespace SilverSim.Viewer.Core
                         Message = string.Format("Could not update folder {0}", d.Name)
                     };
                     SendMessage(res);
+                }
+            }
+        }
+
+        private void FetchInventoryThread_ActivateGestures(Message m)
+        {
+            var req = (ActivateGestures)m;
+            if(req.SessionID != SessionID || req.AgentID != AgentID)
+            {
+                return;
+            }
+
+            foreach(var d in req.Data)
+            {
+                InventoryItem item;
+                try
+                {
+                    item = Agent.InventoryService.Item[AgentID, d.ItemID];
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (item.Owner.ID != AgentID)
+                {
+                    continue;
+                }
+                if (item.InventoryType == InventoryType.Gesture)
+                {
+                    item.Flags |= InventoryFlags.GestureActive;
+                    SendMessage(new BulkUpdateInventory(AgentID, UUID.Zero, 0, item));
+                }
+            }
+        }
+
+        private void FetchInventoryThread_DeactivateGestures(Message m)
+        {
+            var req = (DeactivateGestures)m;
+            if (req.SessionID != SessionID || req.AgentID != AgentID)
+            {
+                return;
+            }
+
+            foreach (var d in req.Data)
+            {
+                InventoryItem item;
+                try
+                {
+                    item = Agent.InventoryService.Item[AgentID, d.ItemID];
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (item.Owner.ID != AgentID)
+                {
+                    continue;
+                }
+                if (item.InventoryType == InventoryType.Gesture)
+                {
+                    item.Flags &= ~InventoryFlags.GestureActive;
+                    SendMessage(new BulkUpdateInventory(AgentID, UUID.Zero, 0, item));
                 }
             }
         }
