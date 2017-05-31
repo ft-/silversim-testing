@@ -30,6 +30,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         public uint Y;
 
         private uint m_Serial = 1; /* we use a serial number similar to other places to know what an agent has already got */
+        public bool Dirty; /* used by TerrainController */
 
         public uint Serial
         {

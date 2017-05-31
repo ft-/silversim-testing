@@ -347,15 +347,48 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     m_TerrainRwLock.ReleaseWriterLock();
                 }
-                UpdateTerrainDataToClients();
                 if (lp != null)
                 {
-                    foreach (ITerrainListener listener in TerrainListeners)
+                    lp.Dirty = true;
+                }
+            }
+        }
+
+        public void Flush()
+        {
+            var updatedPatches = new List<LayerPatch>();
+            m_TerrainRwLock.AcquireReaderLock(-1);
+            try
+            {
+                int x;
+                int y;
+
+                for (y = 0; y < m_Scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
+                {
+                    for (x = 0; x < m_Scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                     {
-                        listener.TerrainUpdate(new LayerPatch(lp));
+                        LayerPatch patch = m_TerrainPatches[y, x];
+                        if(patch.Dirty)
+                        {
+                            updatedPatches.Add(patch);
+                            patch.Dirty = false;
+                        }
                     }
                 }
             }
+            finally
+            {
+                m_TerrainRwLock.ReleaseReaderLock();
+            }
+            UpdateTerrainDataToClients();
+            foreach (LayerPatch lp in updatedPatches)
+            {
+                foreach (ITerrainListener listener in TerrainListeners)
+                {
+                    listener.TerrainUpdate(new LayerPatch(lp));
+                }
+            }
+
         }
 
         public LayerPatch AdjustTerrain(uint x, uint y, double change)
