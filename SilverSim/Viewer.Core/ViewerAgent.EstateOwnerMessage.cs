@@ -848,9 +848,15 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                return;
+            }
             switch (req.ParamList[0].FromUTF8Bytes())
             {
                 case "bake":
+                    scene.Terrain.Flush();
                     break;
 
                 case "download filename":
