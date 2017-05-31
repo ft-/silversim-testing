@@ -805,6 +805,7 @@ namespace SilverSim.Viewer.Core
                 Scene.Remove(Agent);
                 Agent.Circuits.Remove(Scene.ID);
             }
+            ChatSessionRequestCapability = null;
             m_UploadCapabilities.Clear();
             Agent = null;
             Scene = null;
