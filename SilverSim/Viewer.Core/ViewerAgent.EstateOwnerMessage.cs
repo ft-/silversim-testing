@@ -33,7 +33,9 @@ using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.Land;
+using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Viewer.Messages.Telehub;
+using SilverSim.Viewer.Messages.Transfer;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -860,6 +862,18 @@ namespace SilverSim.Viewer.Core
                     break;
 
                 case "download filename":
+                    if(req.ParamList.Count > 1)
+                    {
+                        string viewerFilename = req.ParamList[1].FromUTF8Bytes();
+
+                        AddNewFile("terrain.raw", LLRAWData.ToLLRaw(scene.Terrain.AllPatches));
+                        circuit.SendMessage(new InitiateDownload
+                        {
+                            AgentID = ID,
+                            SimFilename = "terrain.raw",
+                            ViewerFilename = viewerFilename
+                        });
+                    }
                     break;
 
                 case "upload filename":
