@@ -36,6 +36,8 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
+        private ChatSessionRequest ChatSessionRequestCapability { get; set; }
+
         #region Capabilities registration
         public void AddCapability(string type, UUID id, Action<HttpRequest> del)
         {
@@ -286,10 +288,15 @@ namespace SilverSim.Viewer.Core
             {
                 if(kvp.Key.StartsWith("Cap_"))
                 {
-                    m_ServiceURLCapabilities.Add(kvp.Key.Substring(4), kvp.Value);
+                    string capName = kvp.Key.Substring(4);
+                    if (capName != "ChatSessionRequest")
+                    {
+                        m_ServiceURLCapabilities.Add(capName, kvp.Value);
+                    }
                 }
             }
 
+            ChatSessionRequestCapability = new ChatSessionRequest(Agent, this, RemoteIP);
             try
             {
                 /* The LSLCompiler is the only one that has this method */
@@ -323,6 +330,7 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
             AddDefCapability("MeshUploadFlag", regionSeedID, Cap_MeshUploadFlag, capConfig);
             AddDefCapability("GetPhysicsObjectData", regionSeedID, Cap_GetObjectsPhysicsData, capConfig);
+            AddDefCapability("ChatSessionRequest", regionSeedID, ChatSessionRequestCapability.HttpRequestHandler, capConfig);
             string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
             AddDefCapabilityFactory("DispatchRegionInfo", regionSeedID, (ViewerAgent agent) => new DispatchRegionInfo(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapabilityFactory("CopyInventoryFromNotecard", regionSeedID, (ViewerAgent agent) => new CopyInventoryFromNotecard(agent, Server.Scene, RemoteIP), capConfig);
