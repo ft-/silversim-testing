@@ -1141,6 +1141,20 @@ namespace SilverSim.Scene.Types.Object
                 }
                 return res;
             }
+
+            public void UnSitAll()
+            {
+                var agents = new List<IAgent>();
+                lock (m_SitLock)
+                {
+                    agents = new List<IAgent>(m_Group.m_SittingAgents.Keys1);
+                }
+
+                foreach(IAgent agent in agents)
+                {
+                    UnSit(agent);
+                }
+            }
         }
         #endregion
 
