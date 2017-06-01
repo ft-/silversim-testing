@@ -31,43 +31,20 @@ namespace SilverSim.Viewer.Messages.Parcel
     {
         public UUID AgentID;
         public UUID SessionID;
-        public UUID GroupID;
-        public bool IsGroupOwned;
-        public bool IsFinal;
+        public int LocalID;
 
-        public struct ParcelDataEntry
+        public static Message Decode(UDPPacket p) => new ParcelReclaim()
         {
-            public double West;
-            public double South;
-            public double East;
-            public double North;
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            LocalID = p.ReadInt32()
+        };
 
-        public List<ParcelDataEntry> ParcelData = new List<ParcelDataEntry>();
-
-        public static Message Decode(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
-            var m = new ParcelReclaim()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID(),
-                GroupID = p.ReadUUID(),
-                IsGroupOwned = p.ReadBoolean(),
-                IsFinal = p.ReadBoolean()
-            };
-            uint c = p.ReadUInt8();
-            for (uint i = 0; i < c; ++i)
-            {
-                m.ParcelData.Add(new ParcelDataEntry()
-                {
-                    West = p.ReadFloat(),
-                    South = p.ReadFloat(),
-                    East = p.ReadFloat(),
-                    North = p.ReadFloat()
-                });
-            }
-
-            return m;
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteInt32(LocalID);
         }
     }
 }

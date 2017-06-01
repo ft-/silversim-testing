@@ -32,13 +32,20 @@ namespace SilverSim.Viewer.Messages.Parcel
     {
         public UUID AgentID;
         public UUID SessionID;
-        public UInt32 LocalID;
+        public int LocalID;
 
         public static Message Decode(UDPPacket p) => new ParcelRelease()
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),
-            LocalID = p.ReadUInt32()
+            LocalID = p.ReadInt32()
         };
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteInt32(LocalID);
+        }
     }
 }

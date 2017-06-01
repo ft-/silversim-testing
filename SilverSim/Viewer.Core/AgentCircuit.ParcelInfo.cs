@@ -34,6 +34,105 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
+        [PacketHandler(MessageType.ParcelGodForceOwner)]
+        public void HandleParcelGodForceOwner(Message m)
+        {
+            var req = (ParcelGodForceOwner)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                Scene.CanGodForceParcelOwner(Agent.Owner, pInfo))
+            {
+                pInfo.Group = UGI.Unknown;
+                pInfo.GroupOwned = false;
+                pInfo.ClaimDate = Date.Now;
+                pInfo.SalePrice = 0;
+                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.Owner = new UUI(req.OwnerID);
+                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                Scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        [PacketHandler(MessageType.ParcelGodMarkAsContent)]
+        public void HandleParcelGodMarkAsContent(Message m)
+        {
+            var req = (ParcelGodForceOwner)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                Scene.CanGodMarkParcelAsContent(Agent.Owner, pInfo))
+            {
+                pInfo.Group = UGI.Unknown;
+                pInfo.GroupOwned = false;
+                pInfo.ClaimDate = Date.Now;
+                pInfo.SalePrice = 0;
+                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.Owner = UUI.Unknown;
+                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                Scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        [PacketHandler(MessageType.ParcelRelease)]
+        public void HandleParcelRelease(Message m)
+        {
+            var req = (ParcelRelease)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                Scene.CanReleaseParcel(Agent.Owner, pInfo))
+            {
+                pInfo.Group = UGI.Unknown;
+                pInfo.GroupOwned = false;
+                pInfo.Owner = Scene.Owner;
+                pInfo.SalePrice = 0;
+                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                Scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        [PacketHandler(MessageType.ParcelReclaim)]
+        public void HandleParcelReclaim(Message m)
+        {
+            var req = (ParcelReclaim)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                Scene.CanReclaimParcel(Agent.Owner, pInfo))
+            {
+                pInfo.Group = UGI.Unknown;
+                pInfo.GroupOwned = false;
+                pInfo.ClaimDate = Date.Now;
+                pInfo.SalePrice = 0;
+                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.Owner = Scene.Owner;
+                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                Scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
         [PacketHandler(MessageType.ParcelSetOtherCleanTime)]
         public void HandleParcelSetOtherCleanTime(Message m)
         {

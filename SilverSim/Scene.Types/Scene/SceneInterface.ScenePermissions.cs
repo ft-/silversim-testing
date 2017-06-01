@@ -534,6 +534,61 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
+        public bool CanReclaimParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        {
+            if (IsPossibleGod(agentOwner))
+            {
+                return true;
+            }
+
+            if (parcelInfo.Owner.EqualsGrid(agentOwner))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool CanGodForceParcelOwner(UUI agentOwner, ParcelInfo parcelInfo)
+        {
+            if (IsPossibleGod(agentOwner))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool CanGodMarkParcelAsContent(UUI agentOwner, ParcelInfo parcelInfo)
+        {
+            if (IsPossibleGod(agentOwner))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool CanReleaseParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        {
+            if (IsPossibleGod(agentOwner))
+            {
+                return true;
+            }
+
+            if (parcelInfo.Owner.EqualsGrid(agentOwner))
+            {
+                return true;
+            }
+
+            if (HasGroupPower(agentOwner, parcelInfo.Group, GroupPowers.LandRelease))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public bool CanDelete(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
