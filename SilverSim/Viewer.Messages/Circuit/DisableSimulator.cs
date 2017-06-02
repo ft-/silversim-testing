@@ -23,7 +23,6 @@ namespace SilverSim.Viewer.Messages.Circuit
 {
     [UDPMessage(MessageType.DisableSimulator)]
     [Reliable]
-    [EventQueueGet("DisableSimulator")]
     [Trusted]
     public class DisableSimulator : Message
     {
@@ -33,7 +32,5 @@ namespace SilverSim.Viewer.Messages.Circuit
         }
 
         public static Message Decode(UDPPacket p) => new DisableSimulator();
-
-        public override Types.IValue SerializeEQG() => new Types.Map();
     }
 }
