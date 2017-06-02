@@ -298,6 +298,17 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
+            public void ClearAllBits()
+            {
+                for (int x = 0; x < BitmapWidth / 8; ++x)
+                {
+                    for (int y = 0; y < BitmapHeight; ++y)
+                    {
+                        m_LandBitmap[y, x] = 0x00;
+                    }
+                }
+            }
+
             public bool ContainsLocation(Vector3 v)
             {
                 int x = ((int)v.X) / 4;
@@ -446,7 +457,7 @@ namespace SilverSim.Types.Parcel
             LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock, this);
         }
 
-        public ParcelInfo(ParcelInfo src)
+        public ParcelInfo(ParcelInfo src, bool noCopyBitmap = false)
         {
             m_LandBitmap = new byte[src.m_BitmapHeight, src.m_BitmapHeight / 8];
             m_BitmapWidth = src.m_BitmapWidth;
@@ -497,7 +508,10 @@ namespace SilverSim.Types.Parcel
             AnyAvatarSounds = src.AnyAvatarSounds;
             GroupAvatarSounds = src.GroupAvatarSounds;
             IsPrivate = src.IsPrivate;
-            LandBitmap.DataNoAABBUpdate = src.LandBitmap.Data;
+            if (!noCopyBitmap)
+            {
+                LandBitmap.DataNoAABBUpdate = src.LandBitmap.Data;
+            }
         }
     }
 }

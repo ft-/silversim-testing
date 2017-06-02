@@ -32,50 +32,29 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID AgentID;
         public UUID SessionID;
 
-        public struct ParcelDataEntry
+        public double West;
+        public double South;
+        public double East;
+        public double North;
+
+        public static Message Decode(UDPPacket p) => new ParcelDivide()
         {
-            public double West;
-            public double South;
-            public double East;
-            public double North;
-        }
-
-        public List<ParcelDataEntry> ParcelData = new List<ParcelDataEntry>();
-
-        public static Message Decode(UDPPacket p)
-        {
-            var m = new ParcelDivide()
-            {
-                AgentID = p.ReadUUID(),
-                SessionID = p.ReadUUID()
-            };
-            uint c = p.ReadUInt8();
-            for (uint i = 0; i < c; ++i)
-            {
-                m.ParcelData.Add(new ParcelDataEntry()
-                {
-                    West = p.ReadFloat(),
-                    South = p.ReadFloat(),
-                    East = p.ReadFloat(),
-                    North = p.ReadFloat()
-                });
-            }
-
-            return m;
-        }
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID(),
+            West = p.ReadFloat(),
+            South = p.ReadFloat(),
+            East = p.ReadFloat(),
+            North = p.ReadFloat()
+        };
 
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
-            p.WriteUInt8((byte)ParcelData.Count);
-            foreach(var e in ParcelData)
-            {
-                p.WriteFloat((float)e.West);
-                p.WriteFloat((float)e.South);
-                p.WriteFloat((float)e.East);
-                p.WriteFloat((float)e.North);
-            }
+            p.WriteFloat((float)West);
+            p.WriteFloat((float)South);
+            p.WriteFloat((float)East);
+            p.WriteFloat((float)North);
         }
     }
 }
