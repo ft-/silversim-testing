@@ -291,7 +291,7 @@ namespace SilverSim.Scene.Types.Scene
         };
 
         [PacketHandler(MessageType.ParcelPropertiesRequest)]
-        internal void HandleParcelPropertiesRequest(Message m)
+        public void HandleParcelPropertiesRequest(Message m)
         {
             var results = new Dictionary<UUID, ParcelInfo>();
             var req = (ParcelPropertiesRequest)m;
@@ -358,7 +358,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ParcelPropertiesRequestByID)]
-        internal void HandleParcelPropertiesRequestByID(Message m)
+        public void HandleParcelPropertiesRequestByID(Message m)
         {
             var req = (ParcelPropertiesRequestByID)m;
             if (req.CircuitSessionID != req.SessionID ||
@@ -401,6 +401,34 @@ namespace SilverSim.Scene.Types.Scene
             pInfo.Owner = agentID;
             pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
             TriggerParcelUpdate(pInfo);
+        }
+
+        [PacketHandler(MessageType.ParcelDeedToGroup)]
+        public void HandleParcelDeedToGroup(Message m)
+        {
+            var req = (ParcelDeedToGroup)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                CanDeedParcel(agent.Owner, pInfo))
+            {
+                if (!pInfo.Group.Equals(UUI.Unknown))
+                {
+                    pInfo.GroupOwned = true;
+                }
+                TriggerParcelUpdate(pInfo);
+            }
         }
 
         [PacketHandler(MessageType.ParcelGodMarkAsContent)]
@@ -680,7 +708,7 @@ namespace SilverSim.Scene.Types.Scene
             /* check rights on parcels */
             foreach (ParcelInfo pInfo in parcels)
             {
-                if(!remainingParcel.Owner.EqualsGrid(pInfo.Owner) || !CanEditParcelDetails(requestingAgent, pInfo))
+                if(!remainingParcel.Owner.EqualsGrid(pInfo.Owner) || !CanDivideJoinParcel(requestingAgent, pInfo))
                 {
                     return false;
                 }
@@ -726,7 +754,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            if(!CanEditParcelDetails(requestingAgent, pInfo))
+            if(!CanDivideJoinParcel(requestingAgent, pInfo))
             {
                 return false;
             }

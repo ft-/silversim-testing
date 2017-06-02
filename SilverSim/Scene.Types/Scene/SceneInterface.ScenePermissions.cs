@@ -569,6 +569,46 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
+        public bool CanDeedParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        {
+            if (IsPossibleGod(agentOwner))
+            {
+                return true;
+            }
+
+            if (parcelInfo.Owner.EqualsGrid(agentOwner))
+            {
+                return true;
+            }
+
+            if (HasGroupPower(agentOwner, parcelInfo.Group, GroupPowers.LandDeed))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool CanDivideJoinParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        {
+            if (IsPossibleGod(agentOwner))
+            {
+                return true;
+            }
+
+            if (parcelInfo.Owner.EqualsGrid(agentOwner))
+            {
+                return true;
+            }
+
+            if (HasGroupPower(agentOwner, parcelInfo.Group, GroupPowers.LandDivideJoin))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public bool CanReleaseParcel(UUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
