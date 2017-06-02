@@ -962,6 +962,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     removed = m_Parcels.Remove(p.ID);
                     m_SimulationDataStorage.RemoveRegion(p.ID);
                     mergeParcel.LandBitmap.Merge(p.LandBitmap);
+                    TriggerParcelUpdate(mergeParcel);
                 }
             }
             return removed;
