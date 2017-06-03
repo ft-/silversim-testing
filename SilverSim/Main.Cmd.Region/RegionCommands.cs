@@ -1192,7 +1192,7 @@ namespace SilverSim.Main.Cmd.Region
         private void AlertRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
-            if (args[0] == "help")
+            if (args[0] == "help" || args.Count < 3)
             {
                 io.Write("alert region <message>");
                 return;
@@ -1218,13 +1218,10 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            if (args.Count >= 3)
+            string msg = string.Join(" ", args.GetRange(2, args.Count - 2));
+            foreach (IAgent agent in scene.RootAgents)
             {
-                string msg = string.Join(" ", args.GetRange(2, args.Count - 2));
-                foreach (IAgent agent in scene.RootAgents)
-                {
-                    agent.SendAlertMessage(msg, scene.ID);
-                }
+                agent.SendAlertMessage(msg, scene.ID);
             }
         }
 
@@ -1256,7 +1253,7 @@ namespace SilverSim.Main.Cmd.Region
         private void AlertAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
-            if (args[0] == "help" && args.Count < 5)
+            if (args[0] == "help" || args.Count < 5)
             {
                 io.Write("alert agent <firstname> <lastname> <message>");
                 return;
