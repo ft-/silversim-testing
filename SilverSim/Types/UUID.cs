@@ -144,6 +144,8 @@ namespace SilverSim.Types
         public static implicit operator UUID(Guid val) => new UUID(val);
 
         public static explicit operator string(UUID val) => val.ToString();
+
+        public static explicit operator Guid(UUID val) => val.m_Guid;
         #endregion
 
         #region Helpers
