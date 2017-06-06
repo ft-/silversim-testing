@@ -1131,7 +1131,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 rInfo.Flags |= RegionFlags.RegionOnline;
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
-            this.LoadScene(m_SimulationDataStorage);
+            this.LoadScene(m_SimulationDataStorage, m_Scenes);
         }
 
         /** <summary>for testing purposes only</summary> */
@@ -1143,7 +1143,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 rInfo.Flags |= RegionFlags.RegionOnline;
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
-            this.LoadSceneSync(m_SimulationDataStorage);
+            this.LoadSceneSync(m_SimulationDataStorage, m_Scenes);
         }
         #endregion
 

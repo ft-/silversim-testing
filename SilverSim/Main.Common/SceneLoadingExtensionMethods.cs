@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using log4net;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
@@ -44,11 +45,12 @@ namespace SilverSim.Main.Common
 
         private struct SceneLoadingParams
         {
+            public SceneList Scenes;
             public SceneInterface Scene;
             public SimulationDataStorageInterface SimulationDataStorage;
         }
 
-        public static void LoadScene(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage)
+        public static void LoadScene(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage, SceneList scenes)
         {
             lock (scene.m_LoaderThreadLock)
             {
@@ -56,6 +58,7 @@ namespace SilverSim.Main.Common
                 {
                     var loadparams = new SceneLoadingParams()
                     {
+                        Scenes = scenes,
                         Scene = scene,
                         SimulationDataStorage = simulationDataStorage
                     };
@@ -66,7 +69,7 @@ namespace SilverSim.Main.Common
         }
 
         /** <summary>only for testing code</summary> */
-        public static void LoadSceneSync(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage)
+        public static void LoadSceneSync(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage, SceneList scenes)
         {
             m_Log.Error("Do not use LoadSceneSync in production software");
             lock (scene.m_LoaderThreadLock)
@@ -75,6 +78,7 @@ namespace SilverSim.Main.Common
                 {
                     var loadparams = new SceneLoadingParams()
                     {
+                        Scenes = scenes,
                         Scene = scene,
                         SimulationDataStorage = simulationDataStorage
                     };
@@ -423,10 +427,20 @@ namespace SilverSim.Main.Common
                 loadparams.Scene.IsKeyframedMotionEnabled = true;
 
                 loadparams.Scene.LoginControl.Ready(SceneInterface.ReadyFlags.SceneObjects);
+                loadparams.Scene.UpdateRunState(SceneInterface.RunState.Started, SceneInterface.RunState.Starting);
+            }
+            catch (Exception e)
+            {
+                m_Log.ErrorFormat("Loading error for {0} ({1}): Exception {2}: {3}\nat {4}",
+                    loadparams.Scene.Name,
+                    loadparams.Scene.ID,
+                    e.GetType().FullName,
+                    e.Message,
+                    e.StackTrace);
+                loadparams.Scenes.Remove(loadparams.Scene);
             }
             finally
             {
-                loadparams.Scene.UpdateRunState(SceneInterface.RunState.Started, SceneInterface.RunState.Starting);
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
                     loadparams.Scene.m_LoaderThread = null;
