@@ -67,6 +67,7 @@ namespace SilverSim.Main.Cmd.UserServer
             loader.CommandRegistry.AddChangeCommand("user", ChangeUserCommand);
             loader.CommandRegistry.AddShowCommand("user", ShowUserCommand);
             loader.CommandRegistry.AddShowCommand("serviceurls", ShowServiceUrlsCommand);
+            loader.CommandRegistry.AddResetCommand("user", ResetUserPasswordCommand);
         }
 
         private bool IsNameValid(string s)
@@ -132,6 +133,33 @@ namespace SilverSim.Main.Cmd.UserServer
             else
             {
                 io.WriteFormatted("Account {0} {1} does not exist", args[2], args[3]);
+            }
+        }
+
+        [Description("Reset user password")]
+        private void ResetUserPasswordCommand(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UserAccount account;
+            if (args[0] == "help" || args.Count < 5 || args[2] != "password")
+            {
+                io.Write("reset user password <firstname> <lastname>");
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                io.Write("reset user password not allowed on limited console");
+            }
+            else if (m_UserAccountService.TryGetValue(UUID.Zero, args[3], args[4], out account))
+            {
+                UserAuthInfo authInfo = new UserAuthInfo()
+                {
+                    ID = account.Principal.ID,
+                    Password = io.GetPass("New password")
+                };
+                m_AuthInfoService.Store(authInfo);
+            }
+            else
+            {
+                io.WriteFormatted("User \"{0}\" \"{1}\" not found", args[2], args[3]);
             }
         }
 

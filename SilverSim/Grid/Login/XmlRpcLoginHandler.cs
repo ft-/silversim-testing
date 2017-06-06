@@ -427,8 +427,14 @@ namespace SilverSim.Grid.Login
                 loginData.SessionInfo.SecureSessionID = Authenticate(loginData.Account.Principal.ID, loginData.SessionInfo.SessionID, passwd);
             }
             catch
+#if DEBUG
+                (Exception e)
+#endif
             {
                 m_Log.ErrorFormat("Request from {0} failed to authenticate account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+#if DEBUG
+                m_Log.Debug("Exception", e);
+#endif
                 return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
 
@@ -1008,7 +1014,7 @@ namespace SilverSim.Grid.Login
         {
             using (var httpres = httpreq.BeginResponse(HttpStatusCode.RedirectKeepVerb, "Permanently moved"))
             {
-                httpres.Headers.Add("Location", m_HttpsServer.ServerURI + "login");
+                httpres.Headers.Add("Location", m_HttpsServer.ServerURI);
             }
         }
 
