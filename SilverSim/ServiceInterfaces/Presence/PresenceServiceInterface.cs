@@ -104,7 +104,7 @@ namespace SilverSim.ServiceInterfaces.Presence
 
         public abstract PresenceInfo this[UUID sessionID, UUID userID]
         {
-            /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */
+            /* If userID is set to UUID.Zero, the session has to be retrieved based on sessionID alone */
             get;
         }
 
