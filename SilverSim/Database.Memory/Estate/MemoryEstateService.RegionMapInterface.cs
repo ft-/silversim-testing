@@ -28,41 +28,29 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateRegionMapServiceInterface
     {
-        private readonly RwLockedDictionaryAutoAdd<uint, RwLockedList<UUID>> m_RegionMapData = new RwLockedDictionaryAutoAdd<uint, RwLockedList<UUID>>(() => new RwLockedList<UUID>());
+        private readonly RwLockedDictionary<UUID, uint> m_RegionMapData = new RwLockedDictionary<UUID, uint>();
 
         List<UUID> IEstateRegionMapServiceInterface.this[uint estateID]
         {
             get
             {
-                RwLockedList<UUID> regions;
-                return (m_RegionMapData.TryGetValue(estateID, out regions)) ? new List<UUID>(regions) : new List<UUID>();
-            }
-        }
-
-        bool IEstateRegionMapServiceInterface.TryGetValue(UUID regionID, out uint estateID)
-        {
-            foreach(var kvp in m_RegionMapData)
-            {
-                if(kvp.Value.Contains(regionID))
+                List<UUID> res = new List<UUID>();
+                foreach(KeyValuePair<UUID, uint> kvp in m_RegionMapData)
                 {
-                    estateID = kvp.Key;
-                    return true;
+                    if(kvp.Value == estateID)
+                    {
+                        res.Add(kvp.Key);
+                    }
                 }
+                return res;
             }
-            estateID = 0;
-            return false;
         }
 
-        bool IEstateRegionMapServiceInterface.Remove(UUID regionID)
-        {
-            bool found = false;
-            foreach (var kvp in m_RegionMapData)
-            {
-                kvp.Value.Remove(regionID);
-                found = true;
-            }
-            return found;
-        }
+        bool IEstateRegionMapServiceInterface.TryGetValue(UUID regionID, out uint estateID) =>
+            m_RegionMapData.TryGetValue(regionID, out estateID);
+
+        bool IEstateRegionMapServiceInterface.Remove(UUID regionID) =>
+            m_RegionMapData.Remove(regionID);
 
         uint IEstateRegionMapServiceInterface.this[UUID regionID]
         {
@@ -77,10 +65,7 @@ namespace SilverSim.Database.Memory.Estate
             }
             set
             {
-                if(!m_RegionMapData[value].Contains(regionID))
-                {
-                    m_RegionMapData[value].Add(regionID);
-                }
+                m_RegionMapData[regionID] = value;
             }
         }
     }
