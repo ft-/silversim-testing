@@ -98,12 +98,6 @@ namespace SilverSim.ServiceInterfaces.Presence
 
     public abstract class PresenceServiceInterface
     {
-        public enum SetType
-        {
-            Login,
-            Report
-        }
-
         public abstract List<PresenceInfo> this[UUID userID] { get; }
 
         public abstract List<PresenceInfo> GetPresencesInRegion(UUID regionId);
@@ -112,14 +106,12 @@ namespace SilverSim.ServiceInterfaces.Presence
         {
             /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */
             get;
-            set; /* setting null means logout, != null not allowed */
         }
 
-        public abstract PresenceInfo this[UUID sessionID, UUID userID, SetType reportType]
-        {
-            /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */
-            set; /* setting null means logout, != null login message */
-        }
+        public abstract void Login(PresenceInfo pInfo);
+        public abstract void Report(PresenceInfo pInfo);
+        /* If userID is set to UUID.Zero, the session has to be retrieved/ deleted based on sessionID alone */
+        public abstract void Logout(UUID sessionID, UUID userID);
 
         public abstract void LogoutRegion(UUID regionID);
         public abstract void Remove(UUID scopeID, UUID accountID);

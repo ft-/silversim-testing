@@ -54,47 +54,32 @@ namespace SilverSim.Database.Memory.Presence
 
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
-            get { throw new NotSupportedException(); }
-
-            set /* setting null means logout, != null not allowed */
+            get
             {
-                if (value != null)
-                {
-                    throw new ArgumentException("setting value != null is not allowed without reportType");
-                }
-                this[sessionID, userID, SetType.Report] = null;
+                return new PresenceInfo(m_Data[sessionID]);
             }
         }
 
-        public override PresenceInfo this[UUID sessionID, UUID userID, PresenceServiceInterface.SetType reportType]
+        public override void Login(PresenceInfo value)
         {
-            /* setting null means logout, != null login message */
-            set
+            m_Data[value.SessionID] = new PresenceInfo(value)
             {
-                if (value == null)
-                {
-                    m_Data.Remove(sessionID);
-                }
-                else if (reportType == SetType.Login)
-                {
-                    m_Data[sessionID] = new PresenceInfo(value)
-                    {
-                        RegionID = UUID.Zero
-                    };
-                }
-                else if (reportType == SetType.Report)
-                {
-                    PresenceInfo pInfo;
-                    if(m_Data.TryGetValue(sessionID, out pInfo))
-                    {
-                        pInfo.RegionID = value.RegionID;
-                    }
-                }
-                else
-                {
-                    throw new ArgumentException("Invalid reportType specified");
-                }
+                RegionID = UUID.Zero
+            };
+        }
+
+        public override void Report(PresenceInfo value)
+        {
+            PresenceInfo pInfo;
+            if (m_Data.TryGetValue(value.SessionID, out pInfo))
+            {
+                pInfo.RegionID = value.RegionID;
             }
+        }
+
+        public override void Logout(UUID sessionID, UUID userID)
+        {
+            m_Data.Remove(sessionID);
         }
 
         public override void LogoutRegion(UUID regionID)

@@ -586,7 +586,7 @@ namespace SilverSim.Grid.Login
             };
             try
             {
-                m_PresenceService[pInfo.SessionID, pInfo.UserID.ID, PresenceServiceInterface.SetType.Login] = pInfo;
+                m_PresenceService.Login(pInfo);
             }
             catch(Exception e)
             {
@@ -600,7 +600,7 @@ namespace SilverSim.Grid.Login
             }
             catch
             {
-                m_PresenceService[pInfo.SessionID, pInfo.UserID.ID] = null;
+                m_PresenceService.Logout(pInfo.SessionID, pInfo.UserID.ID);
                 throw;
             }
         }
