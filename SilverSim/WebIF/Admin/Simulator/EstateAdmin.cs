@@ -33,6 +33,7 @@ using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using System.ComponentModel;
+using System.IO;
 
 namespace SilverSim.WebIF.Admin.Simulator
 {
@@ -190,7 +191,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             try
             {
-                m_EstateService[estateInfo.ID] = estateInfo;
+                m_EstateService.Update(estateInfo);
             }
             catch
             {
@@ -284,7 +285,10 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             try
             {
-                m_EstateService[estateID] = null;
+                if(!m_EstateService.Remove(estateID))
+                {
+                    throw new InvalidDataException();
+                }
             }
             catch
             {

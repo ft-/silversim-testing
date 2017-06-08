@@ -148,7 +148,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 {
                     estate.Flags &= ~RegionOptionFlags.AllowVoice;
                 }
-                m_Scene.EstateService[estate.ID] = estate;
+                m_Scene.EstateService.Update(estate);
 
                 m_Agent.SendEstateUpdateInfo(invoiceID, UUID.Zero, estate, m_Scene.ID);
                 m_Scene.TriggerEstateUpdate();

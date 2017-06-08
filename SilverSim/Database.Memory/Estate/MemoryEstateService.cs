@@ -26,6 +26,7 @@ using SilverSim.Types.Estate;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System;
 
 namespace SilverSim.Database.Memory.Estate
 {
@@ -96,6 +97,11 @@ namespace SilverSim.Database.Memory.Estate
             return m_Data.Remove(estateID);
         }
 
+        public override void Update(EstateInfo estateInfo)
+        {
+            m_Data[estateInfo.ID] = new EstateInfo(estateInfo);
+        }
+
         public override EstateInfo this[uint estateID]
         {
             get
@@ -106,17 +112,6 @@ namespace SilverSim.Database.Memory.Estate
                     return info;
                 }
                 throw new KeyNotFoundException();
-            }
-            set
-            {
-                if (value != null)
-                {
-                    m_Data[estateID] = new EstateInfo(value);
-                }
-                else
-                {
-                    m_Data.Remove(estateID);
-                }
             }
         }
 

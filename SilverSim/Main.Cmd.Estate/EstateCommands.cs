@@ -203,7 +203,7 @@ namespace SilverSim.Main.Cmd.Estate
                 {
                     try
                     {
-                        m_EstateService[estateInfo.ID] = estateInfo;
+                        m_EstateService.Update(estateInfo);
                     }
                     catch (Exception e)
                     {
@@ -310,7 +310,7 @@ namespace SilverSim.Main.Cmd.Estate
 
                 try
                 {
-                    m_EstateService[estateInfo.ID] = estateInfo;
+                    m_EstateService.Update(estateInfo);
                 }
                 catch (Exception e)
                 {
@@ -361,7 +361,10 @@ namespace SilverSim.Main.Cmd.Estate
                 {
                     try
                     {
-                        m_EstateService[estateID] = null;
+                        if(!m_EstateService.Remove(estateID))
+                        {
+                            throw new InvalidOperationException();
+                        }
                     }
                     catch (Exception e)
                     {

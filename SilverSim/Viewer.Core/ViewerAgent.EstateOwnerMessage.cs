@@ -527,7 +527,7 @@ namespace SilverSim.Viewer.Core
             {
                 estate.CovenantID = covenantID;
                 estate.CovenantTimestamp = Date.Now;
-                estateService[estate.ID] = estate;
+                estateService.Update(estate);
                 foreach(var regionID in estateService.RegionMap[estateID])
                 {
                     SceneInterface estateScene;
@@ -988,7 +988,7 @@ namespace SilverSim.Viewer.Core
                     estate.Name = estateName;
                 }
                 estate.Flags = param1;
-                estateService[estateID] = estate;
+                estateService.Update(estate);
 
                 SendEstateUpdateInfo(req.Invoice, req.TransactionID, estate, scene.ID);
                 foreach (var regionID in estateService.RegionMap[estateID])

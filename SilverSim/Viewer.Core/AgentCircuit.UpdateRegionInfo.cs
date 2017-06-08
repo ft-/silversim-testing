@@ -63,7 +63,7 @@ namespace SilverSim.Viewer.Core
 
                 estate.BillableFactor = req.BillableFactor;
                 estate.PricePerMeter = req.PricePerMeter;
-                estateService[estate.ID] = estate;
+                estateService.Update(estate);
             }
 
             var regionFlags = req.RegionFlags;
