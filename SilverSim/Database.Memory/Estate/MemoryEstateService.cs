@@ -91,6 +91,11 @@ namespace SilverSim.Database.Memory.Estate
             m_Data.Add(estateInfo.ID, new EstateInfo(estateInfo));
         }
 
+        public override bool Remove(uint estateID)
+        {
+            return m_Data.Remove(estateID);
+        }
+
         public override EstateInfo this[uint estateID]
         {
             get

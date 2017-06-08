@@ -29,6 +29,7 @@ namespace SilverSim.ServiceInterfaces.Estate
         public abstract EstateInfo this[uint estateID] { get; set; }
 
         public abstract void Add(EstateInfo estateInfo);
+        public abstract bool Remove(uint estateID);
 
         public abstract bool TryGetValue(uint estateID, out EstateInfo estateInfo);
         public abstract bool TryGetValue(string estateName, out EstateInfo estateInfo);
