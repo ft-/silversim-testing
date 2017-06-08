@@ -20,8 +20,8 @@
 // exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Estate;
-using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,13 +29,12 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateOwnerServiceInterface
     {
-        private readonly RwLockedDictionary<uint, UUI> m_EstateOwnerData = new RwLockedDictionary<uint, UUI>();
-
         bool IEstateOwnerServiceInterface.TryGetValue(uint estateID, out UUI uui)
         {
-            if(m_EstateOwnerData.TryGetValue(estateID, out uui))
+            EstateInfo estate;
+            if(TryGetValue(estateID, out estate))
             {
-                uui = new UUI(uui);
+                uui = new UUI(estate.Owner);
                 return true;
             }
             uui = default(UUI);
@@ -43,7 +42,7 @@ namespace SilverSim.Database.Memory.Estate
         }
 
         List<uint> IEstateOwnerServiceInterface.this[UUI owner] =>
-            new List<uint>(from data in m_EstateOwnerData where data.Value.EqualsGrid(owner) select data.Key);
+            new List<uint>(from data in m_Data where data.Value.Owner.EqualsGrid(owner) select data.Key);
 
         UUI IEstateOwnerServiceInterface.this[uint estateID]
         {
@@ -57,7 +56,7 @@ namespace SilverSim.Database.Memory.Estate
                 return uui;
             }
 
-            set { m_EstateOwnerData[estateID] = new UUI(value); }
+            set { m_Data[estateID].Owner = new UUI(value); }
         }
     }
 }
