@@ -153,7 +153,7 @@ namespace SilverSim.Types.Parcel
         public int MediaWidth;
         public int MediaHeight;
         public bool MediaLoop;
-        public string MediaDescription;
+        public string MediaDescription = string.Empty;
         public Int32 RentPrice;
         public Vector3 AABBMin;
         public Vector3 AABBMax;
