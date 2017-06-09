@@ -1691,6 +1691,16 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void MoveToTarget(Vector3 target, double tau, UUID notifyPrimId, UUID itemId)
+        {
+            ObjectGroup.MoveToTarget(target, tau, notifyPrimId, itemId);
+        }
+
+        public void StopMoveToTarget()
+        {
+            ObjectGroup.StopMoveToTarget();
+        }
+
         #region XML Serialization
         public void ToXml(XmlTextWriter writer,XmlSerializationOptions options = XmlSerializationOptions.None)
         {
@@ -1877,7 +1887,9 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("PayPrice2", ObjectGroup.PayPrice2);
                     writer.WriteNamedValue("PayPrice3", ObjectGroup.PayPrice3);
                     writer.WriteNamedValue("PayPrice4", ObjectGroup.PayPrice4);
+                    writer.WriteNamedValue("Buoyancy", (float)Buoyancy);
                     writer.WriteNamedValue("PhysicsShapeType", (int)PhysicsShapeType);
+                    writer.WriteNamedValue("VolumeDetectActive", IsVolumeDetect);
                     writer.WriteNamedValue("Density", (float)PhysicsDensity);
                     writer.WriteNamedValue("Friction", (float)PhysicsFriction);
                     writer.WriteNamedValue("Bounce", (float)PhysicsRestitution);
@@ -2210,16 +2222,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void MoveToTarget(Vector3 target, double tau, UUID notifyPrimId, UUID itemId)
-        {
-            ObjectGroup.MoveToTarget(target, tau, notifyPrimId, itemId);
-        }
-
-        public void StopMoveToTarget()
-        {
-            ObjectGroup.StopMoveToTarget();
-        }
-
         private static Map DynAttrsFromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
         {
             if(reader.IsEmptyElement)
@@ -2273,6 +2275,8 @@ namespace SilverSim.Scene.Types.Object
             bool IsPassCollisions = true;
             bool IsPassTouches = false;
             bool IsPassTouchesAlways = true;
+            bool IsVolumeDetect = false;
+
             if(reader.IsEmptyElement)
             {
                 throw new InvalidObjectXmlException();
@@ -2353,6 +2357,14 @@ namespace SilverSim.Scene.Types.Object
 
                             case "Material":
                                 part.Material = (PrimitiveMaterial)reader.ReadElementValueAsInt();
+                                break;
+
+                            case "VolumeDetectActive":
+                                IsVolumeDetect = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "Buoyancy":
+                                part.Buoyancy = reader.ReadElementValueAsDouble();
                                 break;
 
                             case "IsRotateXEnabled":
@@ -2783,11 +2795,13 @@ namespace SilverSim.Scene.Types.Object
                                 rootGroup.IsTempOnRez = true;
                             }
                         }
+
                         if ((part.Flags & PrimitiveFlags.Physics) != 0)
                         {
                             part.IsPhysics = true;
                         }
-                        if ((part.Flags & PrimitiveFlags.VolumeDetect) != 0)
+
+                        if ((part.Flags & PrimitiveFlags.VolumeDetect) != 0 || IsVolumeDetect)
                         {
                             part.IsVolumeDetect = true;
                         }
