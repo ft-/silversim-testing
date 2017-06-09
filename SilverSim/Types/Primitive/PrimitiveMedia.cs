@@ -195,7 +195,7 @@ namespace SilverSim.Types.Primitive
                         {
                             break;
                         }
-
+                        reader.ReadToEndElement();
                         break;
 
                     case XmlNodeType.EndElement:
