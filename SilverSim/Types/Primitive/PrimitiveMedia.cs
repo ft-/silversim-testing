@@ -21,6 +21,8 @@
 
 using SilverSim.Threading;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Xml;
 
 namespace SilverSim.Types.Primitive
@@ -217,6 +219,8 @@ namespace SilverSim.Types.Primitive
             }
 
             PrimitiveMedia media = new PrimitiveMedia();
+            StringBuilder textNode = new StringBuilder();
+            bool haveNodeInside = false;
 
             for (; ; )
             {
@@ -235,6 +239,7 @@ namespace SilverSim.Types.Primitive
                         switch(reader.Name)
                         {
                             case "OSMedia":
+                                haveNodeInside = true;
                                 FromXmlOSMedia(media, reader);
                                 break;
 
@@ -244,10 +249,25 @@ namespace SilverSim.Types.Primitive
                         }
                         break;
 
+                    case XmlNodeType.Text:
+                        textNode.Append(reader.Value);
+                        break;
+
                     case XmlNodeType.EndElement:
                         if (reader.Name != "Media")
                         {
                             throw new XmlException();
+                        }
+                        if(!haveNodeInside)
+                        {
+                            /* this is old stringified version */
+                            using (MemoryStream ms = new MemoryStream(textNode.ToString().ToUTF8Bytes()))
+                            {
+                                using (XmlTextReader insetReader = new XmlTextReader(ms))
+                                {
+                                    FromXmlOSMedia(media, insetReader);
+                                }
+                            }
                         }
                         return media;
 
