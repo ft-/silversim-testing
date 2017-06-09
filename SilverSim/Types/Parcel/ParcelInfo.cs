@@ -459,7 +459,7 @@ namespace SilverSim.Types.Parcel
 
         public ParcelInfo(ParcelInfo src, bool noCopyBitmap = false)
         {
-            m_LandBitmap = new byte[src.m_BitmapHeight, src.m_BitmapHeight / 8];
+            m_LandBitmap = new byte[src.m_BitmapHeight, src.m_BitmapWidth / 8];
             m_BitmapWidth = src.m_BitmapWidth;
             m_BitmapHeight = src.m_BitmapHeight;
             LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock, this);
