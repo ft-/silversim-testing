@@ -154,6 +154,14 @@ namespace SilverSim.Types.Primitive
 
         private static float TEGlowFloat(byte[] bytes, int pos) => bytes[pos] / 255.0f;
 
+        private static ColorAlpha ColorFromBytes(byte[] data, int pos) => new ColorAlpha()
+        {
+            R = (255 - data[pos + 0]) / 255f,
+            G = (255 - data[pos + 1]) / 255f,
+            B = (255 - data[pos + 2]) / 255f,
+            A = (255 - data[pos + 3]) / 255f
+        };
+
         private void FromBytes(byte[] data, int pos, int length)
         {
             if(length < 16)
@@ -190,12 +198,12 @@ namespace SilverSim.Types.Primitive
             #endregion Texture
 
             #region Color
-            DefaultTexture.TextureColor = new ColorAlpha(data, i);
+            DefaultTexture.TextureColor = ColorFromBytes(data, i);
             i += 4;
 
             while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
             {
-                var tmpColor = new ColorAlpha(data, i);
+                var tmpColor = ColorFromBytes(data, i);
                 i += 4;
 
                 for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
@@ -396,6 +404,14 @@ namespace SilverSim.Types.Primitive
 
         public static implicit operator byte[] (TextureEntry e) => e.GetBytes();
 
+        private static byte[] ColorToBytes(ColorAlpha color) => new byte[] 
+        {
+            (byte)(255 - color.R_AsByte),
+            (byte)(255 - color.G_AsByte),
+            (byte)(255 - color.B_AsByte),
+            (byte)(255 - color.A_AsByte)
+        };
+
         public byte[] GetBytes()
         {
             if (DefaultTexture == null)
@@ -546,14 +562,14 @@ namespace SilverSim.Types.Primitive
 
                     #region Color
                     // Serialize the color bytes inverted to optimize for zerocoding
-                    binWriter.Write(DefaultTexture.TextureColor.AsByte);
+                    binWriter.Write(ColorToBytes(DefaultTexture.TextureColor));
                     for (int i = 0; i < texturecolors.Length; i++)
                     {
                         if (texturecolors[i] != UInt32.MaxValue)
                         {
                             binWriter.Write(GetFaceBitfieldBytes(texturecolors[i]));
                             // Serialize the color bytes inverted to optimize for zerocoding
-                            binWriter.Write(m_FaceTextures[i].TextureColor.AsByte);
+                            binWriter.Write(ColorToBytes(m_FaceTextures[i].TextureColor));
                         }
                     }
                     binWriter.Write((byte)0);

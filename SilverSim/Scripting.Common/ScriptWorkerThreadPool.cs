@@ -24,7 +24,6 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Timers;
 
@@ -43,6 +42,9 @@ namespace SilverSim.Scripting.Common
         private readonly System.Timers.Timer m_FrameTimer = new System.Timers.Timer(1 / 10.0);
 
         private int m_ScriptEventCounter;
+        private int m_LastScriptEventCounter;
+        private int m_LastScriptEventTickCount;
+        private bool m_FirstEventEps = true;
 
         public void IncrementScriptEventCounter()
         {
@@ -50,6 +52,12 @@ namespace SilverSim.Scripting.Common
         }
 
         public int ScriptEventCounter => m_ScriptEventCounter;
+
+        public double ScriptEventsPerSec
+        {
+            get;
+            private set;
+        }
 
         public class ScriptThreadContext
         {
@@ -72,6 +80,20 @@ namespace SilverSim.Scripting.Common
             RwLockedDictionary<uint /* localids */, ScriptReportData> oldTopScripts = m_TopScripts;
             m_TopScripts = new RwLockedDictionary<uint, ScriptReportData>();
             m_LastTopScripts = oldTopScripts;
+            int tickCount = Environment.TickCount;
+            if (m_FirstEventEps)
+            {
+                m_LastScriptEventTickCount = tickCount;
+                m_LastScriptEventCounter = m_ScriptEventCounter;
+                m_FirstEventEps = false;
+            }
+            else if (tickCount - m_LastScriptEventTickCount >= 1000)
+            {
+                int newEvents = m_ScriptEventCounter;
+                ScriptEventsPerSec = (newEvents - m_LastScriptEventCounter) * 1000.0 / (tickCount - m_LastScriptEventTickCount);
+                m_LastScriptEventTickCount = tickCount;
+                m_LastScriptEventCounter = newEvents;
+            }
         }
 
         public int MinimumThreads

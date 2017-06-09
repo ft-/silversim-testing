@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using System;
@@ -29,6 +30,8 @@ namespace SilverSim.Scene.Types.Transfer
 {
     public abstract class AssetTransferWorkItem
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("ASSET TRANSFER");
+
         private readonly AssetServiceInterface m_DestinationAssetService;
         private readonly AssetServiceInterface m_SourceAssetService;
         protected UUID AssetID { get; }
@@ -121,7 +124,14 @@ namespace SilverSim.Scene.Types.Transfer
         private static void HandleWorkItem(object o)
         {
             var wi = (AssetTransferWorkItem)o;
-            wi.ProcessAssetTransfer();
+            try
+            {
+                wi.ProcessAssetTransfer();
+            }
+            catch(Exception e)
+            {
+                m_Log.Error("Unhandled exception at ProcessAssetTransfer", e);
+            }
         }
 
         public void QueueWorkItem()

@@ -338,11 +338,8 @@ namespace SilverSim.Types
 
         public static Vector3 operator %(Vector3 v1, Vector3 v2) => v1.Cross(v2);
 
-        public static Vector3 operator /(Vector3 value, double divider)
-        {
-            double factor = 1f / divider;
-            return new Vector3(value.X * factor, value.Y * factor, value.Z * factor);
-        }
+        public static Vector3 operator /(Vector3 value, double divider) =>
+            new Vector3(value.X / divider, value.Y / divider, value.Z / divider);
 
         /// <summary>
         /// Cross product between two vectors
