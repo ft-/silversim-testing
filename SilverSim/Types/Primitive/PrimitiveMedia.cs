@@ -260,7 +260,7 @@ namespace SilverSim.Types.Primitive
                         }
                         if(!haveNodeInside)
                         {
-                            /* this is old stringified version */
+                            /* this is stringified version */
                             using (MemoryStream ms = new MemoryStream(textNode.ToString().ToUTF8Bytes()))
                             {
                                 using (XmlTextReader insetReader = new XmlTextReader(ms))
