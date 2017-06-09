@@ -211,6 +211,31 @@ namespace SilverSim.Types.Primitive
             }
         }
 
+        private static void FromStringifiedXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
+        {
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new XmlException();
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if(reader.Name =="OSMedia")
+                        {
+                            FromXmlOSMedia(media, reader);
+                            return;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
         public static PrimitiveMedia FromXml(XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -265,7 +290,7 @@ namespace SilverSim.Types.Primitive
                             {
                                 using (XmlTextReader insetReader = new XmlTextReader(ms))
                                 {
-                                    FromXmlOSMedia(media, insetReader);
+                                    FromStringifiedXmlOSMedia(media, insetReader);
                                 }
                             }
                         }
