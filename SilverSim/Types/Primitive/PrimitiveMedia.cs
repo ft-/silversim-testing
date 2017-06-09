@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Threading;
+using SilverSim.Types.StructuredData.Llsd;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -179,6 +180,50 @@ namespace SilverSim.Types.Primitive
             }
         }
 
+        private static void FromXmlOSData(PrimitiveMedia media, XmlTextReader reader)
+        {
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new XmlException();
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.Name == "llsd")
+                        {
+                            AnArray entries = LlsdXml.DeserializeLLSDNode(reader) as AnArray;
+                            foreach (IValue iv in entries)
+                            {
+                                Map m = iv as Map;
+                                if (m != null)
+                                {
+                                    media.Add(new Entry(m));
+                                }
+                                else
+                                {
+                                    media.Add(null);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            reader.ReadToEndElement();
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != "OSData")
+                        {
+                            throw new XmlException();
+                        }
+                        return;
+                }
+            }
+        }
+
         private static void FromXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
         {
             for (; ; )
@@ -195,7 +240,14 @@ namespace SilverSim.Types.Primitive
                         {
                             break;
                         }
-                        reader.ReadToEndElement();
+                        if (reader.Name == "OSData")
+                        {
+                            FromXmlOSData(media, reader);
+                        }
+                        else
+                        {
+                            reader.ReadToEndElement();
+                        }
                         break;
 
                     case XmlNodeType.EndElement:
