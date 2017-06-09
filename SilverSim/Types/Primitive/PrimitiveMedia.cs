@@ -223,7 +223,7 @@ namespace SilverSim.Types.Primitive
                 switch(reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        if(reader.Name =="OSMedia")
+                        if(reader.Name == "OSMedia")
                         {
                             FromXmlOSMedia(media, reader);
                             return;
