@@ -1807,7 +1807,16 @@ namespace SilverSim.Scene.Types.Object
                         PrimitiveMedia media = Media;
                         if (media != null)
                         {
-                            Media.ToXml(writer);
+                            writer.WriteStartElement("Media");
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                using (XmlTextWriter innerWriter = ms.UTF8XmlTextWriter())
+                                {
+                                    Media.ToXml(writer);
+                                }
+                                writer.WriteValue(ms.ToArray().FromUTF8Bytes());
+                            }
+                            writer.WriteEndElement();
                         }
                     }
                     writer.WriteEndElement();
