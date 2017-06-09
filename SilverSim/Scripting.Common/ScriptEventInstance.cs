@@ -83,6 +83,7 @@ namespace SilverSim.Scripting.Common
         public override void ProcessEvent()
         {
             IScriptEvent evgot;
+            IncrementScriptEventCounter();
             try
             {
                 evgot = m_Events.Dequeue();

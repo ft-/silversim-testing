@@ -131,5 +131,10 @@ namespace SilverSim.Scene.Types.Script
         {
             ThreadPool?.Sleep(TimeSpan.FromSeconds(secs));
         }
+
+        public void IncrementScriptEventCounter()
+        {
+            ThreadPool?.IncrementScriptEventCounter();
+        }
     }
 }

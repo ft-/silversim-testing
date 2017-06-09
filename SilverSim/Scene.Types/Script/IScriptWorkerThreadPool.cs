@@ -81,5 +81,7 @@ namespace SilverSim.Scene.Types.Script
         void Sleep(int milliseconds);
         void Sleep(TimeSpan timespan);
         RwLockedDictionary<uint /* localids */, ScriptReportData> GetExecutionTimes();
+        void IncrementScriptEventCounter();
+        int ScriptEventCounter { get; }
     }
 }

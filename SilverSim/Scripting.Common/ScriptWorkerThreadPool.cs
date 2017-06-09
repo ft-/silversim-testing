@@ -42,6 +42,15 @@ namespace SilverSim.Scripting.Common
         private bool m_ShutdownThreads;
         private readonly System.Timers.Timer m_FrameTimer = new System.Timers.Timer(1 / 10.0);
 
+        private int m_ScriptEventCounter;
+
+        public void IncrementScriptEventCounter()
+        {
+            Interlocked.Increment(ref m_ScriptEventCounter);
+        }
+
+        public int ScriptEventCounter => m_ScriptEventCounter;
+
         public class ScriptThreadContext
         {
             public ScriptInstance CurrentScriptInstance;
