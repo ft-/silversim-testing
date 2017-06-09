@@ -40,7 +40,6 @@ namespace SilverSim.Database.Memory.SimulationData
             return m_ScriptStateData.TryGetValue(regionID, out states) && states.TryGetValue(GenScriptStateKey(primID, itemID), out state);
         }
 
-        /* setting value to null will delete the entry */
         byte[] ISimulationDataScriptStateStorageInterface.this[UUID regionID, UUID primID, UUID itemID]
         {
             get
