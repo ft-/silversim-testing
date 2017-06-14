@@ -43,16 +43,10 @@ namespace SilverSim.Scene.Chat
             if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared > maxDistanceSquared &&
                 !listener.IsIgnorePosition)
             {
+                /* too far so no listening */
             }
-            else if (ev.TargetID.Equals(UUID.Zero))
-            {
-                listener.Send(ev);
-            }
-            else if (listener.GetUUID().Equals(ev.TargetID))
-            {
-                listener.Send(ev);
-            }
-            else if (getowner != null && getowner() == ev.TargetID)
+            else if (ev.TargetID == UUID.Zero || ev.TargetID == listener.GetUUID() ||
+                (getowner != null && getowner() == ev.TargetID))
             {
                 listener.Send(ev);
             }
@@ -115,7 +109,7 @@ namespace SilverSim.Scene.Chat
                 {
                     /* ignore in the rare case that an object is part died */
                 }
-        });
+            });
         }
     }
 }
