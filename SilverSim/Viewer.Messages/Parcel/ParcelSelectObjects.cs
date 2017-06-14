@@ -56,5 +56,18 @@ namespace SilverSim.Viewer.Messages.Parcel
 
             return m;
         }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteInt32(LocalID);
+            p.WriteUInt32(ReturnType);
+            p.WriteUInt8((byte)ReturnIDs.Count);
+            foreach(UUID id in ReturnIDs)
+            {
+                p.WriteUUID(id);
+            }
+        }
     }
 }

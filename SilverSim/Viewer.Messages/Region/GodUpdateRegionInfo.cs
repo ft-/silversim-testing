@@ -54,5 +54,19 @@ namespace SilverSim.Viewer.Messages.Region
             RedirectGridX = p.ReadInt32(),
             RedirectGridY = p.ReadInt32()
         };
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteStringLen8(SimName);
+            p.WriteUInt32(EstateID);
+            p.WriteUInt32(ParentEstateID);
+            p.WriteUInt32(RegionFlags);
+            p.WriteFloat((float)BillableFactor);
+            p.WriteInt32(PricePerMeter);
+            p.WriteInt32(RedirectGridX);
+            p.WriteInt32(RedirectGridY);
+        }
     }
 }

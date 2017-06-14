@@ -783,6 +783,10 @@ namespace SilverSim.Scene.Types.Scene
 
             using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
+#if DEBUG
+                m_Log.DebugFormat("ObjectFlagUpdate localid={0}", req.ObjectLocalID);
+#endif
+
                 grp.IsPhantom = req.IsPhantom;
                 grp.IsTempOnRez = req.IsTemporary;
                 grp.IsPhysics = req.UsePhysics;

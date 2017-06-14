@@ -22,7 +22,6 @@
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
-using System.Linq;
 
 namespace SilverSim.Viewer.Messages
 {
@@ -205,7 +204,7 @@ namespace SilverSim.Viewer.Messages
             throw new NotSupportedException();
         }
 
-        public virtual Types.IValue SerializeEQG()
+        public virtual IValue SerializeEQG()
         {
             throw new NotSupportedException();
         }
