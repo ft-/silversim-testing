@@ -38,6 +38,8 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 
             public abstract Func<UUID> GetUUID { get; }
 
+            public abstract Func<UUID> GetOwner { get; }
+
             public virtual bool IsIgnorePosition => false;
 
             public abstract void Send(ListenEvent ev);
@@ -53,16 +55,25 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 
         public abstract void Send(ListenEvent ev);
 
-        public abstract Listener AddListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> action);
+        public Listener AddListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> action) =>
+            AddListen(channel, name, id, message, getuuid, getpos, null, action);
+
+        public abstract Listener AddListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Func<UUID> getowner, Action<ListenEvent> action);
 
         public abstract Listener AddAgentListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send);
 
         public const Int32 ListenRegexName = 1;
         public const Int32 ListenRegexMessage = 2;
 
-        public abstract Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> action);
+        public Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> action) =>
+            AddListenRegex(channel, name, id, message, regexBitfield, getuuid, getpos, null, action);
 
-        public abstract Listener AddRegionListener(int channel, string name, UUID id, string message, Func<UUID> getuuid, Action<ListenEvent> send);
+        public abstract Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, Func<UUID> getuuid, Func<Vector3> getpos, Func<UUID> getowner, Action<ListenEvent> action);
+
+        public Listener AddRegionListener(int channel, string name, UUID id, string message, Func<UUID> getuuid, Action<ListenEvent> send) =>
+            AddRegionListener(channel, name, id, message, getuuid, null, send);
+
+        public abstract Listener AddRegionListener(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<UUID> getowner, Action<ListenEvent> send);
 
         /* only to be used for SimCircuit */
         public abstract Listener AddChatPassListener(Action<ListenEvent> send);

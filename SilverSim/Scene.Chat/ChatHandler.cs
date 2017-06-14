@@ -91,9 +91,9 @@ namespace SilverSim.Scene.Chat
         #endregion
 
         #region Register Listeners
-        public override Listener AddListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send)
+        public override Listener AddListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Func<UUID> getowner, Action<ListenEvent> send)
         {
-            var li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, send, false);
+            var li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, getowner, send, false);
 
             ChannelInfo ci = m_Channels.GetOrAddIfNotExists(channel, () =>
             {
@@ -113,7 +113,7 @@ namespace SilverSim.Scene.Chat
 
         public override Listener AddAgentListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send)
         {
-            var li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, send, true);
+            var li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, getuuid, send, true);
 
             ChannelInfo ci = m_Channels.GetOrAddIfNotExists(channel, () =>
             {
@@ -131,9 +131,9 @@ namespace SilverSim.Scene.Chat
             return li;
         }
 
-        public override Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send)
+        public override Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, Func<UUID> getuuid, Func<Vector3> getpos, Func<UUID> getowner, Action<ListenEvent> send)
         {
-            var li = new RegexListenerInfo(this, channel, name, id, message, regexBitfield, getuuid, getpos, send);
+            var li = new RegexListenerInfo(this, channel, name, id, message, regexBitfield, getuuid, getpos, getowner, send);
 
             ChannelInfo ci = m_Channels.GetOrAddIfNotExists(channel, () =>
             {
@@ -151,9 +151,9 @@ namespace SilverSim.Scene.Chat
             return li;
         }
 
-        public override Listener AddRegionListener(int channel, string name, UUID id, string message, Func<UUID> getuuid, Action<ListenEvent> send)
+        public override Listener AddRegionListener(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<UUID> getowner, Action<ListenEvent> send)
         {
-            var li = new RegionListenerInfo(this, channel, name, id, message, getuuid, send);
+            var li = new RegionListenerInfo(this, channel, name, id, message, getuuid, getowner, send);
 
             ChannelInfo ci = m_Channels.GetOrAddIfNotExists(channel, () =>
             {
@@ -176,7 +176,7 @@ namespace SilverSim.Scene.Chat
 
         public override Listener AddChatPassListener(Action<ListenEvent> send)
         {
-            var li = new RegionListenerInfo(this, 0, string.Empty, UUID.Zero, string.Empty, GetPassListenerUUID, send);
+            var li = new RegionListenerInfo(this, 0, string.Empty, UUID.Zero, string.Empty, GetPassListenerUUID, null, send);
             m_ChatPass.Add(li);
             return li;
         }

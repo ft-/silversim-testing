@@ -23,6 +23,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Chat
 {
@@ -36,6 +37,27 @@ namespace SilverSim.Scene.Chat
             m_Handler = handler;
         }
 
+        private void SendToListener(ChatServiceInterface.Listener listener, ListenEvent ev, double maxDistanceSquared)
+        {
+            Func<UUID> getowner = listener.GetOwner;
+            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared > maxDistanceSquared &&
+                !listener.IsIgnorePosition)
+            {
+            }
+            else if (ev.TargetID.Equals(UUID.Zero))
+            {
+                listener.Send(ev);
+            }
+            else if (listener.GetUUID().Equals(ev.TargetID))
+            {
+                listener.Send(ev);
+            }
+            else if (getowner != null && getowner() == ev.TargetID)
+            {
+                listener.Send(ev);
+            }
+        }
+
         public void Send(ListenEvent ev)
         {
             double sayDistanceSquared = m_Handler.SayDistance * m_Handler.SayDistance;
@@ -44,90 +66,56 @@ namespace SilverSim.Scene.Chat
 
             Listeners.ForEach((ChatServiceInterface.Listener listener) =>
             {
-                switch (ev.Type)
+                try
                 {
-                    case ListenEvent.ChatType.Region:
-                    case ListenEvent.ChatType.DebugChannel:
-                    case ListenEvent.ChatType.Broadcast:
-                        listener.Send(ev);
-                        break;
+                    switch (ev.Type)
+                    {
+                        case ListenEvent.ChatType.Region:
+                        case ListenEvent.ChatType.DebugChannel:
+                        case ListenEvent.ChatType.Broadcast:
+                            listener.Send(ev);
+                            break;
 
-                    case ListenEvent.ChatType.Say:
-                        if (ev.TargetID.Equals(UUID.Zero))
-                        {
-                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= sayDistanceSquared ||
-                                listener.IsIgnorePosition)
+                        case ListenEvent.ChatType.Say:
+                            SendToListener(listener, ev, sayDistanceSquared);
+                            break;
+
+                        case ListenEvent.ChatType.Shout:
+                            SendToListener(listener, ev, shoutDistanceSquared);
+                            break;
+
+                        case ListenEvent.ChatType.Whisper:
+                            SendToListener(listener, ev, whisperDistanceSquared);
+                            break;
+
+                        case ListenEvent.ChatType.OwnerSay:
+                            if (listener.GetUUID().Equals(ev.TargetID))
                             {
                                 listener.Send(ev);
                             }
-                        }
-                        else if (listener.GetUUID().Equals(ev.TargetID))
-                        {
-                            listener.Send(ev);
-                        }
-                        break;
+                            break;
 
-                    case ListenEvent.ChatType.Shout:
-                        if (ev.TargetID.Equals(UUID.Zero))
-                        {
-                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= shoutDistanceSquared ||
-                                listener.IsIgnorePosition)
+                        case ListenEvent.ChatType.StartTyping:
+                        case ListenEvent.ChatType.StopTyping:
+                            if (!listener.IsAgent)
                             {
-                                listener.Send(ev);
+                                /* listener is not an agent, so no typing messages */
                             }
-                        }
-                        else if (listener.GetUUID().Equals(ev.TargetID))
-                        {
-                            listener.Send(ev);
-                        }
-                        break;
-
-                    case ListenEvent.ChatType.Whisper:
-                        if (ev.TargetID.Equals(UUID.Zero))
-                        {
-                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= whisperDistanceSquared ||
-                                listener.IsIgnorePosition)
+                            else
                             {
-                                listener.Send(ev);
+                                SendToListener(listener, ev, sayDistanceSquared);
                             }
-                        }
-                        else if (listener.GetUUID().Equals(ev.TargetID))
-                        {
-                            listener.Send(ev);
-                        }
-                        break;
+                            break;
 
-                    case ListenEvent.ChatType.OwnerSay:
-                        if (listener.GetUUID().Equals(ev.TargetID))
-                        {
-                            listener.Send(ev);
-                        }
-                        break;
-
-                    case ListenEvent.ChatType.StartTyping:
-                    case ListenEvent.ChatType.StopTyping:
-                        if (!listener.IsAgent)
-                        {
-                            /* listener is not an agent, so no typing messages */
-                        }
-                        else if (ev.TargetID.Equals(UUID.Zero))
-                        {
-                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= sayDistanceSquared ||
-                                listener.IsIgnorePosition)
-                            {
-                                listener.Send(ev);
-                            }
-                        }
-                        else if (listener.GetUUID().Equals(ev.TargetID))
-                        {
-                            listener.Send(ev);
-                        }
-                        break;
-
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
-            });
+                catch
+                {
+                    /* ignore in the rare case that an object is part died */
+                }
+        });
         }
     }
 }

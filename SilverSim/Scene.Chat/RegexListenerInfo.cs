@@ -56,6 +56,7 @@ namespace SilverSim.Scene.Chat
             Int32 regexBitfield,
             Func<UUID> getuuid,
             Func<Vector3> getpos,
+            Func<UUID> getowner,
             Action<ListenEvent> send)
         {
             m_RegexBitfield = regexBitfield;
@@ -89,6 +90,7 @@ namespace SilverSim.Scene.Chat
             }
             GetUUID = getuuid;
             GetPosition = getpos;
+            GetOwner = getowner;
             m_Send = send;
         }
 
@@ -113,6 +115,8 @@ namespace SilverSim.Scene.Chat
         public override Func<Vector3> GetPosition { get; }
 
         public override Func<UUID> GetUUID { get; }
+
+        public override Func<UUID> GetOwner { get; }
 
         public override void Send(ListenEvent ev)
         {

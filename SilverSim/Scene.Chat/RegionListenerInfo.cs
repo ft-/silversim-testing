@@ -38,8 +38,9 @@ namespace SilverSim.Scene.Chat
             UUID id,
             string message,
             Func<UUID> getuuid,
+            Func<UUID> getowner,
             Action<ListenEvent> send)
-            : base(handler, channel, name, id, message, getuuid, GetPositionFunc, send, false)
+            : base(handler, channel, name, id, message, getuuid, GetPositionFunc, getowner, send, false)
         {
         }
     }
