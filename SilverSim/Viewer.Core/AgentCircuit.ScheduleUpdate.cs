@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
 using System;
@@ -174,81 +175,85 @@ namespace SilverSim.Viewer.Core
                 {
                     Array.Reverse(b);
                 }
-                var flags = (Types.Primitive.PrimitiveFlags)BitConverter.ToUInt32(b, 0);
+                var flags = (PrimitiveFlags)BitConverter.ToUInt32(b, 0);
 
+                if(SelectedObjects.Contains(kvp.Key.Part.ID))
+                {
+                    flags |= PrimitiveFlags.CreateSelected;
+                }
                 if(kvp.Key.Part.ObjectGroup.IsGroupOwned)
                 {
-                    flags |= Types.Primitive.PrimitiveFlags.ObjectGroupOwned;
+                    flags |= PrimitiveFlags.ObjectGroupOwned;
                 }
                 if(0 != (kvp.Key.Part.ObjectGroup.VehicleFlags & SilverSim.Scene.Types.Physics.Vehicle.VehicleFlags.CameraDecoupled))
                 {
-                    flags |= Types.Primitive.PrimitiveFlags.CameraDecoupled;
+                    flags |= PrimitiveFlags.CameraDecoupled;
                 }
                 if (kvp.Key.Part.Owner.EqualsGrid(Agent.Owner) && !kvp.Key.Part.ObjectGroup.IsGroupOwned)
                 {
-                    flags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                    flags |= PrimitiveFlags.ObjectYouOwner;
                     if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Move) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectMove;
+                        flags |= PrimitiveFlags.ObjectMove;
                     }
                     if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Transfer) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectTransfer;
+                        flags |= PrimitiveFlags.ObjectTransfer;
                     }
                     if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Modify) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectModify | Types.Primitive.PrimitiveFlags.ObjectOwnerModify;
+                        flags |= PrimitiveFlags.ObjectModify | Types.Primitive.PrimitiveFlags.ObjectOwnerModify;
                     }
                     if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Copy) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectCopy;
+                        flags |= PrimitiveFlags.ObjectCopy;
                     }
                 }
                 else
                 {
-                    flags &= ~Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                    flags &= ~PrimitiveFlags.ObjectYouOwner;
                     if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Move) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectMove;
+                        flags |= PrimitiveFlags.ObjectMove;
                     }
                     if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Transfer) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectTransfer;
+                        flags |= PrimitiveFlags.ObjectTransfer;
                     }
                     if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Modify) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectModify;
+                        flags |= PrimitiveFlags.ObjectModify;
                     }
                     if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Copy) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectCopy;
+                        flags |= PrimitiveFlags.ObjectCopy;
                     }
 
                     if(Agent.Group.Equals(kvp.Key.Part.Group))
                     {
                         if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Move) != 0)
                         {
-                            flags |= Types.Primitive.PrimitiveFlags.ObjectMove;
+                            flags |= PrimitiveFlags.ObjectMove;
                         }
                         if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Transfer) != 0)
                         {
-                            flags |= Types.Primitive.PrimitiveFlags.ObjectTransfer;
+                            flags |= PrimitiveFlags.ObjectTransfer;
                         }
                         if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Modify) != 0)
                         {
-                            flags |= Types.Primitive.PrimitiveFlags.ObjectModify;
+                            flags |= PrimitiveFlags.ObjectModify;
                         }
                         if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Copy) != 0)
                         {
-                            flags |= Types.Primitive.PrimitiveFlags.ObjectCopy;
+                            flags |= PrimitiveFlags.ObjectCopy;
                         }
                     }
                 }
-                flags |= Types.Primitive.PrimitiveFlags.ObjectAnyOwner;
+                flags |= PrimitiveFlags.ObjectAnyOwner;
 
                 if(SelectedObjects.Count != 0 && SelectedObjects.Contains(kvp.Key.Part.ID))
                 {
-                    flags |= Types.Primitive.PrimitiveFlags.CreateSelected;
+                    flags |= PrimitiveFlags.CreateSelected;
                 }
 
                 b = BitConverter.GetBytes((UInt32)flags);
