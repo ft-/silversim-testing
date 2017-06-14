@@ -191,7 +191,8 @@ namespace SilverSim.Main.Common.CmdIO
                     if (args[0] == "help")
                     {
                         var commands = new StringBuilder(m_Command + " command list:\n");
-                        foreach(string cmd in m_Dict.Keys)
+                        SortedDictionary<string, Action<List<string>, TTY, UUID>> sorted = new SortedDictionary<string, Action<List<string>, TTY, UUID>>(m_Dict);
+                        foreach(string cmd in sorted.Keys)
                         {
                             commands.AppendFormat("{0} {1}\n", m_Command, cmd);
                         }
@@ -241,7 +242,8 @@ namespace SilverSim.Main.Common.CmdIO
                 if (args.Count == 1)
                 {
                     var commands = new StringBuilder("Command list:\n");
-                    foreach (string cmd in Commands.Keys)
+                    SortedDictionary<string, Action<List<string>, TTY, UUID>> sorted = new SortedDictionary<string, Action<List<string>, TTY, UUID>>(Commands);
+                    foreach (string cmd in sorted.Keys)
                     {
                         commands.AppendFormat("{0}\n", cmd);
                     }

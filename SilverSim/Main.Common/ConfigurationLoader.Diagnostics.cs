@@ -206,14 +206,18 @@ namespace SilverSim.Main.Common
             else
             {
                 Process p = Process.GetCurrentProcess();
-                StringBuilder sb = new StringBuilder();
                 FormattedListBuilder b = new FormattedListBuilder();
                 const long MB_DIV = 1048576;
 
-                sb.AppendFormat("Heap allocated to simulator : {0} MB\n", GC.GetTotalMemory(false) / MB_DIV);
-                sb.AppendFormat("Private process memory: {0} MB\n", p.PrivateMemorySize64 / MB_DIV);
+                b.AddColumn("", 20);
+                b.AddColumn("Current (MB)", 15);
+                b.AddColumn("Peak (MB)", 15);
+                b.AddHeader();
+                b.AddSeparator();
+                b.AddData("GC Heap", (GC.GetTotalMemory(false) + MB_DIV - 1) / MB_DIV, "");
+                b.AddData("Process memory", (p.WorkingSet64 + MB_DIV - 1) / MB_DIV, (p.PeakWorkingSet64 + MB_DIV - 1) / MB_DIV);
 
-                io.WriteFormatted(sb.ToString());
+                io.WriteFormatted(b.ToString());
             }
         }
 
