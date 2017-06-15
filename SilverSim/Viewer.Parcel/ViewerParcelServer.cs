@@ -106,6 +106,23 @@ namespace SilverSim.Viewer.Parcel
 
         private void SendParcelInfo(AgentCircuit circuit, GridVector location, string simname, ParcelMetaInfo pinfo)
         {
+            byte parcelFlags = 0;
+            if(pinfo.Access <= RegionAccess.PG)
+            {
+                parcelFlags = 0;
+            }
+            else if(pinfo.Access <= RegionAccess.Mature)
+            {
+                parcelFlags = 1;
+            }
+            else if(pinfo.Access <= RegionAccess.Adult)
+            {
+                parcelFlags = 2;
+            }
+            if((pinfo.Flags & ParcelFlags.ForSale) != 0)
+            {
+                parcelFlags |= (1 << 7);
+            }
             var reply = new ParcelInfoReply()
             {
                 AgentID = circuit.AgentID,
@@ -115,7 +132,7 @@ namespace SilverSim.Viewer.Parcel
                 Description = pinfo.Description,
                 ActualArea = pinfo.ActualArea,
                 BillableArea = pinfo.BillableArea,
-                Flags = (byte)pinfo.Flags,
+                Flags = parcelFlags,
                 SimName = simname,
                 SnapshotID = UUID.Zero,
                 Dwell = pinfo.Dwell,
