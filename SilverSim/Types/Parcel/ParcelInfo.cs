@@ -176,6 +176,27 @@ namespace SilverSim.Types.Parcel
         internal int m_BitmapWidth;
         internal int m_BitmapHeight;
 
+        public Vector3 FindLocationOnParcel()
+        {
+            Vector3 aabbMin = AABBMin;
+            Vector3 aabbMax = AABBMax;
+
+            for(int pos = (int)aabbMin.X; pos <= (int)aabbMin.X; ++pos)
+            {
+                if(LandBitmap[pos, (int)aabbMin.Y])
+                {
+                    return new Vector3(pos, aabbMin.Y, 0);
+                }
+                if (LandBitmap[pos, (int)aabbMax.Y])
+                {
+                    return new Vector3(pos, aabbMax.Y, 0);
+                }
+            }
+
+            /* since AABB is min-max and is triggered by coord bounds, there is one point on parcel which makes us normally not reach here */
+            return aabbMin;
+        }
+
         public class ParcelDataLandBitmap
         {
             private readonly byte[,] m_LandBitmap;

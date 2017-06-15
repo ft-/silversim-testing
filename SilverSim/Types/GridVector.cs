@@ -81,7 +81,33 @@ namespace SilverSim.Types
 
         public static Vector3 operator -(GridVector a, GridVector b) => new Vector3((double)a.X - (double)b.X, (double)a.Y - (double)b.Y, 0f);
         public static implicit operator Vector3(GridVector v) => new Vector3(v.X / 256f, v.Y / 256f, 0f);
+
+        public static bool operator ==(GridVector a, GridVector b) => a.X == b.X && a.Y == b.Y;
+        public static bool operator !=(GridVector a, GridVector b) => a.X != b.X || a.Y != b.Y;
+
+        public override bool Equals(object o)
+        {
+            return (o is GridVector) ? this == (GridVector)o : false;
+        }
+
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() ^ Y.GetHashCode();
+        }
+
         #endregion
+
+        public GridVector(byte[] data, int offset)
+        {
+            X = data[offset];
+            X = (X << 8) | data[offset + 1];
+            X = (X << 8) | data[offset + 2];
+            X = (X << 8) | data[offset + 3];
+            Y = data[offset + 4];
+            Y = (Y << 8) | data[offset + 5];
+            Y = (Y << 8) | data[offset + 6];
+            Y = (Y << 8) | data[offset + 7];
+        }
 
         #region Properties
         public byte[] AsBytes

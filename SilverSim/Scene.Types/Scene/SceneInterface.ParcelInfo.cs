@@ -199,24 +199,28 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            if(Parcels.TryGetValue(req.ParcelID, out pinfo))
+            if (req.ParcelID.Location == GetRegionInfo().Location)
             {
-                var reply = new ParcelInfoReply()
+                /* local region */
+                if (Parcels.TryGetValue(req.ParcelID.RegionPos, out pinfo))
                 {
-                    AgentID = req.AgentID,
-                    OwnerID = pinfo.Owner.ID,
-                    Name = pinfo.Name,
-                    Description = pinfo.Description,
-                    ActualArea = pinfo.ActualArea,
-                    BillableArea = pinfo.BillableArea,
-                    Flags = (byte)pinfo.Flags,
-                    SimName = Name,
-                    SnapshotID = UUID.Zero,
-                    Dwell = pinfo.Dwell,
-                    SalePrice = pinfo.SalePrice,
-                    AuctionID = pinfo.AuctionID
-                };
-                Agents[req.AgentID].SendMessageAlways(reply, ID);
+                    var reply = new ParcelInfoReply()
+                    {
+                        AgentID = req.AgentID,
+                        OwnerID = pinfo.Owner.ID,
+                        Name = pinfo.Name,
+                        Description = pinfo.Description,
+                        ActualArea = pinfo.ActualArea,
+                        BillableArea = pinfo.BillableArea,
+                        Flags = (byte)pinfo.Flags,
+                        SimName = Name,
+                        SnapshotID = UUID.Zero,
+                        Dwell = pinfo.Dwell,
+                        SalePrice = pinfo.SalePrice,
+                        AuctionID = pinfo.AuctionID
+                    };
+                    Agents[req.AgentID].SendMessageAlways(reply, ID);
+                }
             }
         }
 
@@ -669,7 +673,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     AgentID = req.AgentID,
                     LocalID = req.LocalID,
-                    ParcelID = pInfo.ID,
+                    ParcelID = new ParcelID(GetRegionInfo().Location, pInfo.FindLocationOnParcel()),
                     Dwell = 0
                 };
                 agent.SendMessageAlways(reply, ID);

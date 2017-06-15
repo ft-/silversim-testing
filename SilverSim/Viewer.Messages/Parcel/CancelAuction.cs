@@ -28,16 +28,16 @@ namespace SilverSim.Viewer.Messages.Parcel
     [NotTrusted]
     public class CancelAuction : Message
     {
-        public UUID ParcelID;
+        public ParcelID ParcelID;
 
         public static Message Decode(UDPPacket p) => new CancelAuction()
         {
-            ParcelID = p.ReadUUID()
+            ParcelID = new ParcelID(p.ReadBytes(16), 0)
         };
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteUUID(ParcelID);
+            p.WriteBytes(ParcelID.GetBytes());
         }
     }
 }

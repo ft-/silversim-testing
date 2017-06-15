@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public int Category;
         public string Name;
         public string Description;
-        public UUID ParcelID;
+        public ParcelID ParcelID;
         public int ParentEstate;
         public UUID SnapshotID;
         public Vector3 PosGlobal;
@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Messages.Profile
             Category = p.ReadInt32(),
             Name = p.ReadStringLen8(),
             Description = p.ReadStringLen16(),
-            ParcelID = p.ReadUUID(),
+            ParcelID = new ParcelID(p.ReadBytes(16), 0),
             ParentEstate = p.ReadInt32(),
             SnapshotID = p.ReadUUID(),
             PosGlobal = p.ReadVector3d(),
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteInt32(Category);
             p.WriteStringLen8(Name);
             p.WriteStringLen16(Description);
-            p.WriteUUID(ParcelID);
+            p.WriteBytes(ParcelID.GetBytes());
             p.WriteInt32(ParentEstate);
             p.WriteUUID(SnapshotID);
             p.WriteVector3d(PosGlobal);

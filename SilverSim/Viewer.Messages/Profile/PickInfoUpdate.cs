@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID PickID;
         public UUID CreatorID;
         public bool TopPick;
-        public UUID ParcelID;
+        public ParcelID ParcelID;
         public string Name;
         public string Description;
         public UUID SnapshotID;
@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Messages.Profile
             PickID = p.ReadUUID(),
             CreatorID = p.ReadUUID(),
             TopPick = p.ReadBoolean(),
-            ParcelID = p.ReadUUID(),
+            ParcelID = new ParcelID(p.ReadBytes(16), 0),
             Name = p.ReadStringLen8(),
             Description = p.ReadStringLen16(),
             SnapshotID = p.ReadUUID(),
@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteUUID(PickID);
             p.WriteUUID(CreatorID);
             p.WriteBoolean(TopPick);
-            p.WriteUUID(ParcelID);
+            p.WriteBytes(ParcelID.GetBytes());
             p.WriteStringLen8(Name);
             p.WriteStringLen16(Description);
             p.WriteUUID(SnapshotID);

@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Parcel
     {
         public UUID AgentID;
 
-        public UUID ParcelID;
+        public ParcelID ParcelID;
         public UUID OwnerID;
         public string Name;
         public string Description;
@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
-            p.WriteUUID(ParcelID);
+            p.WriteBytes(ParcelID.GetBytes());
             p.WriteUUID(OwnerID);
             p.WriteStringLen8(Name);
             p.WriteStringLen8(Description);
@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public static Message Decode(UDPPacket p) => new ParcelInfoReply()
         {
             AgentID = p.ReadUUID(),
-            ParcelID = p.ReadUUID(),
+            ParcelID = new ParcelID(p.ReadBytes(16), 0),
             OwnerID = p.ReadUUID(),
             Name = p.ReadStringLen8(),
             Description = p.ReadStringLen8(),

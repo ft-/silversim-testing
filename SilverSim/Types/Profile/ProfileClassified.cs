@@ -30,7 +30,7 @@ namespace SilverSim.Types.Profile
         public int Category;
         public string Name;
         public string Description;
-        public UUID ParcelID;
+        public ParcelID ParcelID;
         public string ParcelName;
         public int ParentEstate;
         public UUID SnapshotID;

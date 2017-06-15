@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Search
         
         public struct QueryReplyData
         {
-            public UUID ParcelID;
+            public ParcelID ParcelID;
             public string Name;
             public bool ForSale;
             public bool Auction;
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Search
             p.WriteUInt8((byte)QueryReplies.Count);
             foreach(var d in QueryReplies)
             {
-                p.WriteUUID(d.ParcelID);
+                p.WriteBytes(d.ParcelID.GetBytes());
                 p.WriteStringLen8(d.Name);
                 p.WriteBoolean(d.ForSale);
                 p.WriteBoolean(d.Auction);
@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Messages.Search
             {
                 m.QueryReplies.Add(new QueryReplyData()
                 {
-                    ParcelID = p.ReadUUID(),
+                    ParcelID = new ParcelID(p.ReadBytes(16), 0),
                     Name = p.ReadStringLen8(),
                     ForSale = p.ReadBoolean(),
                     Auction = p.ReadBoolean(),
