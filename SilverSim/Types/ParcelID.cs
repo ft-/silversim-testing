@@ -23,6 +23,9 @@ using System;
 
 namespace SilverSim.Types
 {
+    /** <summary>ParcelID fake variant to be used in profile and other places where we need to define inter-region parcel data</summary>
+     * We do not have a centralized parcel storage here.
+     */
     public struct ParcelID
     {
         public GridVector Location;
