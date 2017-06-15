@@ -1171,33 +1171,35 @@ namespace SilverSim.Scene.Types.Object
             lock(m_Lock)
             {
                 rebuildBoundingBox = m_BoundingBox == null;
-                box = m_BoundingBox.Value;
-            }
-            if (rebuildBoundingBox)
-            {
-                box = new BoundingBox();
-                var min = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
-                var max = new Vector3(double.MinValue, double.MinValue, double.MinValue);
-                foreach(var p in ValuesByKey1)
+                if (!rebuildBoundingBox)
                 {
-                    BoundingBox inner;
-                    p.GetBoundingBox(out inner);
-                    inner.CenterOffset = p.LocalPosition;
-                    inner.Size *= p.LocalRotation;
-                    inner.Size = inner.Size.ComponentMax(-inner.Size);
-                    max = max.ComponentMax(p.LocalPosition + inner.CenterOffset + inner.Size / 2);
-                    min = min.ComponentMin(p.LocalPosition + inner.CenterOffset - inner.Size / 2);
+                    box = m_BoundingBox.Value;
+                    return;
                 }
+            }
 
-                box.CenterOffset = max + min;
-                box.Size = max - min;
+            box = new BoundingBox();
+            var min = new Vector3(double.MaxValue, double.MaxValue, double.MaxValue);
+            var max = new Vector3(double.MinValue, double.MinValue, double.MinValue);
+            foreach(var p in ValuesByKey1)
+            {
+                BoundingBox inner;
+                p.GetBoundingBox(out inner);
+                inner.CenterOffset = p.LocalPosition;
+                inner.Size *= p.LocalRotation;
+                inner.Size = inner.Size.ComponentMax(-inner.Size);
+                max = max.ComponentMax(p.LocalPosition + inner.CenterOffset + inner.Size / 2);
+                min = min.ComponentMin(p.LocalPosition + inner.CenterOffset - inner.Size / 2);
+            }
 
-                lock (m_Lock)
+            box.CenterOffset = max + min;
+            box.Size = max - min;
+
+            lock (m_Lock)
+            {
+                if (m_BoundingBox == null)
                 {
-                    if (m_BoundingBox == null)
-                    {
-                        m_BoundingBox = box;
-                    }
+                    m_BoundingBox = box;
                 }
             }
         }
