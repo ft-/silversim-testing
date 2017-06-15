@@ -66,8 +66,8 @@ namespace SilverSim.Grid.Login
     [ServerParam("AboutPage", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
     [ServerParam("WelcomePage", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
     [ServerParam("RegisterPage", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly)]
-    [ServerParam("GridNick", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly, DefaultValue = "")]
-    [ServerParam("GridName", ParameterType = typeof(Uri), Type = ServerParamType.GlobalOnly, DefaultValue = "")]
+    [ServerParam("GridNick", ParameterType = typeof(string), Type = ServerParamType.GlobalOnly, DefaultValue = "")]
+    [ServerParam("GridName", ParameterType = typeof(string), Type = ServerParamType.GlobalOnly, DefaultValue = "")]
     [ServerParam("AllowMultiplePresences", ParameterType = typeof(bool), Type = ServerParamType.GlobalOnly, DefaultValue = false)]
     [ServerParam("MaxAgentGroups", ParameterType = typeof(uint), Type = ServerParamType.GlobalOnly, DefaultValue = 42)]
     public class XmlRpcLoginHandler : IPlugin, IServerParamListener
