@@ -637,7 +637,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     AgentID = req.AgentID,
                     LocalID = req.LocalID,
-                    ParcelID = new ParcelID(GetRegionInfo().Location, pInfo.FindLocationOnParcel()),
+                    ParcelID = new ParcelID(GetRegionInfo().Location, pInfo.ParcelBasePosition),
                     Dwell = pInfo.Dwell
                 };
                 agent.SendMessageAlways(reply, ID);

@@ -104,13 +104,13 @@ namespace SilverSim.Viewer.Parcel
             }
         }
 
-        private void SendParcelInfo(AgentCircuit circuit, GridVector location, string simname, ParcelInfo pinfo)
+        private void SendParcelInfo(AgentCircuit circuit, GridVector location, string simname, ParcelMetaInfo pinfo)
         {
             var reply = new ParcelInfoReply()
             {
                 AgentID = circuit.AgentID,
                 OwnerID = pinfo.Owner.ID,
-                ParcelID = new ParcelID(location, pinfo.FindLocationOnParcel()),
+                ParcelID = new ParcelID(location, pinfo.ParcelBasePosition),
                 Name = pinfo.Name,
                 Description = pinfo.Description,
                 ActualArea = pinfo.ActualArea,
@@ -144,6 +144,7 @@ namespace SilverSim.Viewer.Parcel
             }
 
             ParcelInfo pinfo;
+            ParcelMetaInfo minfo;
             GridVector location = scene.GetRegionInfo().Location;
             RegionInfo regionInfo;
             if (req.ParcelID.Location == location)
@@ -161,9 +162,9 @@ namespace SilverSim.Viewer.Parcel
                 {
                     HandleParcelInfoOnLocal(circuit, req.ParcelID.Location, remoteSceneLocal, req);
                 }
-                else if(scene.GridService.RemoteParcelService.TryGetRequestRemoteParcel(regionInfo.ServerURI, req.ParcelID, out pinfo))
+                else if(scene.GridService.RemoteParcelService.TryGetRequestRemoteParcel(regionInfo.ServerURI, req.ParcelID, out minfo))
                 {
-                    SendParcelInfo(circuit, location, regionInfo.Name, pinfo);
+                    SendParcelInfo(circuit, location, regionInfo.Name, minfo);
                 }
             }
         }

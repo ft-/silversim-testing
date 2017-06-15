@@ -26,6 +26,6 @@ namespace SilverSim.ServiceInterfaces.Parcel
 {
     public interface IRemoteParcelServiceInterface
     {
-        bool TryGetRequestRemoteParcel(string remoteurl, ParcelID parcelid, out ParcelInfo parcelInfo);
+        bool TryGetRequestRemoteParcel(string remoteurl, ParcelID parcelid, out ParcelMetaInfo parcelInfo);
     }
 }

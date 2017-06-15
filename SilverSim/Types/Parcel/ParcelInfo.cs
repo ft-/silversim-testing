@@ -115,7 +115,7 @@ namespace SilverSim.Types.Parcel
         Any = 0xFF
     }
 
-    public class ParcelInfo
+    public class ParcelMetaInfo
     {
         public int Area;
         public uint AuctionID;
@@ -170,31 +170,43 @@ namespace SilverSim.Types.Parcel
         public bool GroupAvatarSounds = true;
         public bool IsPrivate;
 
+        public virtual Vector3 ParcelBasePosition { get; set; }
+    }
+
+    public class ParcelInfo : ParcelMetaInfo
+    {
         internal byte[,] m_LandBitmap;
         internal ReaderWriterLock m_LandBitmapRwLock = new ReaderWriterLock();
         /* Bitmap is per 4m * 4m */
         internal int m_BitmapWidth;
         internal int m_BitmapHeight;
 
-        public Vector3 FindLocationOnParcel()
+        public override Vector3 ParcelBasePosition
         {
-            Vector3 aabbMin = AABBMin;
-            Vector3 aabbMax = AABBMax;
-
-            for(int pos = (int)aabbMin.X; pos <= (int)aabbMin.X; ++pos)
+            get
             {
-                if(LandBitmap[pos, (int)aabbMin.Y])
-                {
-                    return new Vector3(pos, aabbMin.Y, 0);
-                }
-                if (LandBitmap[pos, (int)aabbMax.Y])
-                {
-                    return new Vector3(pos, aabbMax.Y, 0);
-                }
-            }
+                Vector3 aabbMin = AABBMin;
+                Vector3 aabbMax = AABBMax;
 
-            /* since AABB is min-max and is triggered by coord bounds, there is one point on parcel which makes us normally not reach here */
-            return aabbMin;
+                for (int pos = (int)aabbMin.X; pos <= (int)aabbMin.X; ++pos)
+                {
+                    if (LandBitmap[pos, (int)aabbMin.Y])
+                    {
+                        return new Vector3(pos, aabbMin.Y, 0);
+                    }
+                    if (LandBitmap[pos, (int)aabbMax.Y])
+                    {
+                        return new Vector3(pos, aabbMax.Y, 0);
+                    }
+                }
+
+                /* since AABB is min-max and is triggered by coord bounds, there is one point on parcel which makes us normally not reach here */
+                return aabbMin;
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
         }
 
         public class ParcelDataLandBitmap
