@@ -132,7 +132,7 @@ namespace SilverSim.Types.Primitive
                 bytes = newBytes;
                 pos = 0;
             }
-            return BitConverter.ToSingle(bytes, 0);
+            return BitConverter.ToSingle(bytes, pos);
         }
 
         private static float TEOffsetFloat(byte[] bytes, int pos)
@@ -412,6 +412,16 @@ namespace SilverSim.Types.Primitive
             (byte)(255 - color.A_AsByte)
         };
 
+        private static byte[] FloatToBytes(float f)
+        {
+            byte[] b = BitConverter.GetBytes(f);
+            if(!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(b);
+            }
+            return b;
+        }
+
         public byte[] GetBytes()
         {
             if (DefaultTexture == null)
@@ -582,7 +592,7 @@ namespace SilverSim.Types.Primitive
                         if (repeatus[i] != UInt32.MaxValue)
                         {
                             binWriter.Write(GetFaceBitfieldBytes(repeatus[i]));
-                            binWriter.Write(m_FaceTextures[i].RepeatU);
+                            binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatU));
                         }
                     }
                     binWriter.Write((byte)0);
@@ -595,7 +605,7 @@ namespace SilverSim.Types.Primitive
                         if (repeatvs[i] != UInt32.MaxValue)
                         {
                             binWriter.Write(GetFaceBitfieldBytes(repeatvs[i]));
-                            binWriter.Write(m_FaceTextures[i].RepeatV);
+                            binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatV));
                         }
                     }
                     binWriter.Write((byte)0);
