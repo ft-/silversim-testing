@@ -781,29 +781,25 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
-            {
 #if DEBUG
-                m_Log.DebugFormat("ObjectFlagUpdate localid={0}", req.ObjectLocalID);
+            m_Log.DebugFormat("ObjectFlagUpdate localid={0} isphantom={1} istemporary={2} usephysics={3}", req.ObjectLocalID, req.IsPhantom, req.IsTemporary, req.UsePhysics);
 #endif
 
-                grp.IsPhantom = req.IsPhantom;
-                grp.IsTempOnRez = req.IsTemporary;
-                grp.IsPhysics = req.UsePhysics;
-                if(!req.IsTemporary && grp.IsTemporary)
-                {
-                    grp.IsTemporary = false;
-                }
-                if(req.ExtraPhysics.Count != 0)
-                {
-                    ObjectFlagUpdate.ExtraPhysicsData d = req.ExtraPhysics[0];
-                    part.PhysicsShapeType = d.PhysicsShapeType;
-                    part.PhysicsDensity = d.Density;
-                    part.PhysicsFriction = d.Friction;
-                    part.PhysicsRestitution = d.Restitution;
-                    part.PhysicsGravityMultiplier = d.GravityMultiplier;
-                }
-                propHandler.Send(part);
+            grp.IsPhantom = req.IsPhantom;
+            grp.IsTempOnRez = req.IsTemporary;
+            grp.IsPhysics = req.UsePhysics;
+            if(!req.IsTemporary && grp.IsTemporary)
+            {
+                grp.IsTemporary = false;
+            }
+            if(req.ExtraPhysics.Count != 0)
+            {
+                ObjectFlagUpdate.ExtraPhysicsData d = req.ExtraPhysics[0];
+                part.PhysicsShapeType = d.PhysicsShapeType;
+                part.PhysicsDensity = d.Density;
+                part.PhysicsFriction = d.Friction;
+                part.PhysicsRestitution = d.Restitution;
+                part.PhysicsGravityMultiplier = d.GravityMultiplier;
             }
         }
 
@@ -823,27 +819,23 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            foreach (ObjectMaterial.Data d in req.ObjectData)
             {
-                foreach (ObjectMaterial.Data d in req.ObjectData)
-                {
 #if DEBUG
-                    m_Log.DebugFormat("ObjectMaterial localid={0}", d.ObjectLocalID);
+                m_Log.DebugFormat("ObjectMaterial localid={0}", d.ObjectLocalID);
 #endif
 
-                    ObjectPart prim;
-                    if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
-                    {
-                        continue;
-                    }
-
-                    if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
-                    {
-                        continue;
-                    }
-                    prim.Material = d.Material;
-                    propHandler.Send(prim);
+                ObjectPart prim;
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
+                {
+                    continue;
                 }
+
+                if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+                prim.Material = d.Material;
             }
         }
 
