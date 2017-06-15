@@ -104,28 +104,33 @@ namespace SilverSim.Viewer.Parcel
             }
         }
 
+        private void SendParcelInfo(AgentCircuit circuit, GridVector location, string simname, ParcelInfo pinfo)
+        {
+            var reply = new ParcelInfoReply()
+            {
+                AgentID = circuit.AgentID,
+                OwnerID = pinfo.Owner.ID,
+                ParcelID = new ParcelID(location, pinfo.FindLocationOnParcel()),
+                Name = pinfo.Name,
+                Description = pinfo.Description,
+                ActualArea = pinfo.ActualArea,
+                BillableArea = pinfo.BillableArea,
+                Flags = (byte)pinfo.Flags,
+                SimName = simname,
+                SnapshotID = UUID.Zero,
+                Dwell = pinfo.Dwell,
+                SalePrice = pinfo.SalePrice,
+                AuctionID = pinfo.AuctionID
+            };
+            circuit.SendMessage(reply);
+        }
+
         private void HandleParcelInfoOnLocal(AgentCircuit circuit, GridVector location, SceneInterface scene, ParcelInfoRequest req)
         {
             ParcelInfo pinfo;
             if (scene.Parcels.TryGetValue(req.ParcelID.RegionPos, out pinfo))
             {
-                var reply = new ParcelInfoReply()
-                {
-                    AgentID = req.AgentID,
-                    OwnerID = pinfo.Owner.ID,
-                    ParcelID = new ParcelID(location, pinfo.FindLocationOnParcel()),
-                    Name = pinfo.Name,
-                    Description = pinfo.Description,
-                    ActualArea = pinfo.ActualArea,
-                    BillableArea = pinfo.BillableArea,
-                    Flags = (byte)pinfo.Flags,
-                    SimName = scene.Name,
-                    SnapshotID = UUID.Zero,
-                    Dwell = pinfo.Dwell,
-                    SalePrice = pinfo.SalePrice,
-                    AuctionID = pinfo.AuctionID
-                };
-                circuit.SendMessage(reply);
+                SendParcelInfo(circuit, location, scene.Name, pinfo);
             }
         }
 
@@ -155,6 +160,10 @@ namespace SilverSim.Viewer.Parcel
                 if(m_Scenes.TryGetValue(regionInfo.ID, out remoteSceneLocal))
                 {
                     HandleParcelInfoOnLocal(circuit, req.ParcelID.Location, remoteSceneLocal, req);
+                }
+                else if(scene.GridService.RemoteParcelService.TryGetRequestRemoteParcel(regionInfo.ServerURI, req.ParcelID, out pinfo))
+                {
+                    SendParcelInfo(circuit, location, regionInfo.Name, pinfo);
                 }
             }
         }

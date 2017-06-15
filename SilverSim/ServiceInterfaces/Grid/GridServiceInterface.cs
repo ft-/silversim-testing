@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.Parcel;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
@@ -156,5 +157,7 @@ namespace SilverSim.ServiceInterfaces.Grid
 
         public abstract List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString);
         #endregion
+
+        public virtual RemoteParcelServiceInterface RemoteParcelService => new NoRemoteParcelService();
     }
 }
