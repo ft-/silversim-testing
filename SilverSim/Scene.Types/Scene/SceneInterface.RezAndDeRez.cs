@@ -133,7 +133,7 @@ namespace SilverSim.Scene.Types.Scene
                 pos = rezparams.RayEnd;
                 LocationInfo info = GetLocationInfoProvider().At(pos);
                 pos.Z = info.GroundHeight;
-                if(pos.Z < info.WaterHeight)
+                if(pos.Z < info.WaterHeight && rezparams.RayStart.Z >= info.WaterHeight)
                 {
                     pos.Z = info.WaterHeight;
                 }
