@@ -38,6 +38,10 @@ using log4net;
 using SilverSim.Types.Grid;
 using SilverSim.Scene.Management.Scene;
 using System.ComponentModel;
+using SilverSim.Main.Common.HttpServer;
+using System.Net;
+using SilverSim.Types.StructuredData.Llsd;
+using System.IO;
 
 namespace SilverSim.Viewer.Parcel
 {
@@ -182,6 +186,109 @@ namespace SilverSim.Viewer.Parcel
                 else if(scene.GridService.RemoteParcelService.TryGetRequestRemoteParcel(regionInfo.ServerURI, req.ParcelID, out minfo))
                 {
                     SendParcelInfo(circuit, location, regionInfo.Name, minfo);
+                }
+            }
+        }
+
+        [CapabilityHandler("RemoteParcelRequest")]
+        public void HandleRemoteParcelRequest(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
+        {
+            if (req.CallerIP != circuit.RemoteIP)
+            {
+                req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (req.Method != "POST")
+            {
+                req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            Map reqmap;
+            try
+            {
+                reqmap = LlsdXml.Deserialize(req.Body) as Map;
+            }
+            catch
+            {
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            if(reqmap == null)
+            {
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            AnArray locationArray;
+            IValue iv_target;
+            ParcelID parcelid = new ParcelID();
+            if(reqmap.TryGetValue("location", out locationArray))
+            {
+                uint x = locationArray[0].AsUInt;
+                uint y = locationArray[1].AsUInt;
+
+                if(reqmap.TryGetValue("region_handle", out iv_target))
+                {
+                    byte[] regHandleBytes = (BinaryData)iv_target;
+                    GridVector v = new GridVector(regHandleBytes, 0);
+                    RegionInfo rInfo;
+
+                    if(v == scene.GridPosition)
+                    {
+                        parcelid = new ParcelID(v, new Vector3(x, y, 0));
+                    }
+                    else if(scene.GridService.TryGetValue(scene.ScopeID, v, out rInfo))
+                    {
+                        /* shift coordinate to actual region begin */
+                        Vector3 offset = (Vector3)v - rInfo.Location;
+                        offset.X += x;
+                        offset.Y += y;
+                        /* ensure that the position is inside region */
+                        if(offset.X > rInfo.Size.X)
+                        {
+                            offset.X = rInfo.Size.X;
+                        }
+                        if (offset.Y > rInfo.Size.Y)
+                        {
+                            offset.Y = rInfo.Size.Y;
+                        }
+                        parcelid = new ParcelID(rInfo.Location, offset);
+                    }
+                }
+                else if(reqmap.TryGetValue("region_id", out iv_target))
+                {
+                    SceneInterface remoteSceneLocal;
+                    RegionInfo rInfo;
+                    if(m_Scenes.TryGetValue(iv_target.AsUUID, out remoteSceneLocal))
+                    {
+                        parcelid = new ParcelID(remoteSceneLocal.GridPosition, new Vector3(x, y, 0));
+                    }
+                    else if(scene.GridService.TryGetValue(iv_target.AsUUID, out rInfo))
+                    {
+                        parcelid = new ParcelID(rInfo.Location, new Vector3(x, y, 0));
+                    }
+                }
+            }
+
+            Map resmap = new Map
+            {
+                ["parcel_id"] = new UUID(parcelid.GetBytes(), 0)
+            };
+
+            using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resmap, s);
                 }
             }
         }
