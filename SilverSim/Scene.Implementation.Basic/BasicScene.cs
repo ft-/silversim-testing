@@ -494,7 +494,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
             else
             {
-                PhysicsScene = new DummyPhysicsScene(ID);
+                PhysicsScene = new DummyPhysicsScene(this);
                 LoginControl.Ready(ReadyFlags.PhysicsTerrain);
             }
             Environment.Start();

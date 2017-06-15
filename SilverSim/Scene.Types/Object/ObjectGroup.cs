@@ -1182,6 +1182,9 @@ namespace SilverSim.Scene.Types.Object
                 {
                     BoundingBox inner;
                     p.GetBoundingBox(out inner);
+                    inner.CenterOffset = p.LocalPosition;
+                    inner.Size *= p.LocalRotation;
+                    inner.Size = inner.Size.ComponentMax(-inner.Size);
                     max = max.ComponentMax(p.LocalPosition + inner.CenterOffset + inner.Size / 2);
                     min = min.ComponentMin(p.LocalPosition + inner.CenterOffset - inner.Size / 2);
                 }
