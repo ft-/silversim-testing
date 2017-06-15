@@ -25,7 +25,7 @@ using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.Groups.Common
+namespace SilverSim.Groups.Common.Permissions
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupInvitesInterface
     {

@@ -25,7 +25,7 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 
-namespace SilverSim.Groups.Common
+namespace SilverSim.Groups.Common.Permissions
 {
     [PluginName("DefaultPermissions")]
     public sealed partial class DefaultPermissionsGroupsService : GroupsServiceInterface, IPlugin
