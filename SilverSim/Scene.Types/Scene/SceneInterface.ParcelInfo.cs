@@ -199,6 +199,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
+            GridVector location = GetRegionInfo().Location;
             if (req.ParcelID.Location == GetRegionInfo().Location)
             {
                 /* local region */
@@ -208,6 +209,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         AgentID = req.AgentID,
                         OwnerID = pinfo.Owner.ID,
+                        ParcelID = new ParcelID(location, pinfo.FindLocationOnParcel()),
                         Name = pinfo.Name,
                         Description = pinfo.Description,
                         ActualArea = pinfo.ActualArea,
