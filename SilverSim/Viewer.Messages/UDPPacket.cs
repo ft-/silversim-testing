@@ -289,11 +289,12 @@ namespace SilverSim.Viewer.Messages
         {
             if(zleCount != 0)
             {
-                WriteUInt8(0);
-                WriteUInt8(zleCount);
+                var buf = new byte[] { 0, zleCount };
+                Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataPos += 2;
+                DataLength = DataPos;
                 zleCount = 0;
             }
-            DataLength = DataPos;
         }
 
         #region Receive Packet
