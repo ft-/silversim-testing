@@ -358,6 +358,12 @@ namespace SilverSim.Scene.Types.Physics
         { 
             foreach(ObjectGroup grp in m_Scene.ObjectGroups)
             {
+                if(grp.IsAttached)
+                {
+                    /* ignore attachments */
+                    continue;
+                }
+
                 /* flag checks are cheap so do those first */
                 if(((flags & RayTestHitFlags.NonPhantom) != 0 && !grp.IsPhantom) ||
                     ((flags & RayTestHitFlags.Phantom) != 0 && grp.IsPhantom) ||
