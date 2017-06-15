@@ -158,6 +158,6 @@ namespace SilverSim.ServiceInterfaces.Grid
         public abstract List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString);
         #endregion
 
-        public virtual RemoteParcelServiceInterface RemoteParcelService => new NoRemoteParcelService();
+        public virtual IRemoteParcelServiceInterface RemoteParcelService => new NoRemoteParcelService();
     }
 }

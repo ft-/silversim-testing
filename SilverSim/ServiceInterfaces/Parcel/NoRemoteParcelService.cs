@@ -24,9 +24,9 @@ using SilverSim.Types.Parcel;
 
 namespace SilverSim.ServiceInterfaces.Parcel
 {
-    internal sealed class NoRemoteParcelService : RemoteParcelServiceInterface
+    internal sealed class NoRemoteParcelService : IRemoteParcelServiceInterface
     {
-        public override bool TryGetRequestRemoteParcel(string remoteurl, ParcelID parcelid, out ParcelInfo parcelInfo)
+        public bool TryGetRequestRemoteParcel(string remoteurl, ParcelID parcelid, out ParcelInfo parcelInfo)
         {
             parcelInfo = default(ParcelInfo);
             return false;
