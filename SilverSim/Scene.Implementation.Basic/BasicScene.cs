@@ -1235,6 +1235,11 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             m_SimulationDataStorage.RegionSettings[ID] = RegionSettings;
 
+            foreach (ParcelInfo pinfo in m_Parcels.Values)
+            {
+                pinfo.Access = Access;
+            }
+
             foreach (IAgent agent in Agents)
             {
                 SendRegionInfo(agent);

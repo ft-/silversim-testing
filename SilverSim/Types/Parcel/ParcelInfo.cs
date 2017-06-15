@@ -22,6 +22,7 @@
 #pragma warning disable RCS1154
 #pragma warning disable RCS1029
 
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -171,6 +172,8 @@ namespace SilverSim.Types.Parcel
         public bool IsPrivate;
 
         public virtual Vector3 ParcelBasePosition { get; set; }
+
+        public RegionAccess Access = RegionAccess.Adult;
     }
 
     public class ParcelInfo : ParcelMetaInfo
