@@ -344,6 +344,12 @@ namespace SilverSim.Scene.Types.Object
                 }
                 set
                 {
+                    if(value.Length == 0)
+                    {
+                        /* zero-length comes from migration */
+                        IsProjecting = false;
+                        return;
+                    }
                     if(value.Length != 41)
                     {
                         throw new ArgumentException("Array length must be 41.");
