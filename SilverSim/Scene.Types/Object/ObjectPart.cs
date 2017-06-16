@@ -1859,7 +1859,7 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteUUID("LastOwnerID", ObjectGroup.LastOwner.ID);
                     }
                     writer.WriteNamedValue("BaseMask", (uint)BaseMask);
-                    if(XmlSerializationOptions.None != (options & XmlSerializationOptions.AdjustForNextOwner))
+                    if(XmlSerializationOptions.None == (options & XmlSerializationOptions.AdjustForNextOwner))
                     {
                         writer.WriteNamedValue("OwnerMask", (uint)OwnerMask);
                     }
