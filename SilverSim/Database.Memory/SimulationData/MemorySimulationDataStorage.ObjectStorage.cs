@@ -126,7 +126,7 @@ namespace SilverSim.Database.Memory.SimulationData
             };
             objpart.PointLight = new ObjectPart.PointLightParam()
             {
-                Serialization = (BinaryData)map["LightData"]
+                DbSerialization = (BinaryData)map["LightData"]
             };
 
             objpart.Text = new ObjectPart.TextParam()
@@ -136,7 +136,7 @@ namespace SilverSim.Database.Memory.SimulationData
 
             objpart.Flexible = new ObjectPart.FlexibleParam()
             {
-                Serialization = (BinaryData)map["FlexibleData"]
+                DbSerialization = (BinaryData)map["FlexibleData"]
             };
 
             objpart.Sound = new ObjectPart.SoundParam()

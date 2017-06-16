@@ -137,7 +137,7 @@ namespace SilverSim.Scene.Types.Object
             public Vector3 Force = Vector3.Zero;
             #endregion
 
-            public byte[] Serialization
+            public byte[] DbSerialization
             {
                 get
                 {
@@ -206,7 +206,7 @@ namespace SilverSim.Scene.Types.Object
             public double Falloff;
             #endregion
 
-            public byte[] Serialization
+            public byte[] DbSerialization
             {
                 get
                 {
@@ -272,7 +272,7 @@ namespace SilverSim.Scene.Types.Object
             public double ProjectionAmbience;
             #endregion
 
-            public byte[] Serialization
+            public byte[] DbSerialization
             {
                 get
                 {
