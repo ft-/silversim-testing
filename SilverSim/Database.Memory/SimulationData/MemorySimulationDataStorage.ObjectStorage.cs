@@ -124,32 +124,36 @@ namespace SilverSim.Database.Memory.SimulationData
 
                 AngularVelocity = map["AngularVelocity"].AsVector3
             };
-            objpart.PointLight = new ObjectPart.PointLightParam()
+            objpart.PointLight = new ObjectPart.PointLightParam
             {
                 DbSerialization = (BinaryData)map["LightData"]
             };
+            objpart.Projection = new ObjectPart.ProjectionParam
+            {
+                DbSerialization = (BinaryData)map["ProjectionData"]
+            };
 
-            objpart.Text = new ObjectPart.TextParam()
+            objpart.Text = new ObjectPart.TextParam
             {
                 Serialization = (BinaryData)map["HoverTextData"]
             };
 
-            objpart.Flexible = new ObjectPart.FlexibleParam()
+            objpart.Flexible = new ObjectPart.FlexibleParam
             {
                 DbSerialization = (BinaryData)map["FlexibleData"]
             };
 
-            objpart.Sound = new ObjectPart.SoundParam()
+            objpart.Sound = new ObjectPart.SoundParam
             {
                 Serialization = (BinaryData)map["LoopedSoundData"]
             };
 
-            objpart.CollisionSound = new ObjectPart.CollisionSoundParam()
+            objpart.CollisionSound = new ObjectPart.CollisionSoundParam
             {
                 Serialization = (BinaryData)map["ImpactSoundData"]
             };
 
-            objpart.Shape = new ObjectPart.PrimitiveShape()
+            objpart.Shape = new ObjectPart.PrimitiveShape
             {
                 Serialization = (BinaryData)map["PrimitiveShapeData"]
             };

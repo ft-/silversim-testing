@@ -302,6 +302,7 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "Flags", (int)objpart.Flags },
                     { "AngularVelocity", objpart.AngularVelocity },
                     { "LightData", new BinaryData(objpart.PointLight.DbSerialization) },
+                    { "ProjectionData", new BinaryData(objpart.Projection.DbSerialization) },
                     { "HoverTextData", new BinaryData(objpart.Text.Serialization) },
                     { "FlexibleData", new BinaryData(objpart.Flexible.DbSerialization) },
                     { "LoopedSoundData", new BinaryData(objpart.Sound.Serialization) },
