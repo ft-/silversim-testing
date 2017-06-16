@@ -93,17 +93,17 @@ namespace SilverSim.Scene.Types.Object
                                 Quaternion newRootRot = linkpart.GlobalRotation;
                                 offsetRot = linkpart.LocalRotation;
                                 offsetPos = linkpart.LocalPosition / offsetRot;
-                                newLinkSet.Add(LINK_ROOT, linkpart.ID, linkpart);
-                                linkpart.ObjectGroup = newLinkSet;
                                 linkpart.LocalPosition = newRootPos;
                                 linkpart.LocalRotation = newRootRot;
+                                newLinkSet.Add(LINK_ROOT, linkpart.ID, linkpart);
+                                linkpart.ObjectGroup = newLinkSet;
                             }
                             else
                             {
-                                newLinkSet.AddLink(linkpart);
-                                linkpart.ObjectGroup = newLinkSet;
                                 linkpart.LocalPosition += offsetPos;
                                 linkpart.LocalRotation /= offsetRot;
+                                newLinkSet.AddLink(linkpart);
+                                linkpart.ObjectGroup = newLinkSet;
                             }
                             Remove(linkpart.ID);
                         }
@@ -114,6 +114,7 @@ namespace SilverSim.Scene.Types.Object
 
                     if (newLinkSet.Count != 0)
                     {
+                        newLinkSet.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                         unlinkedPrims.Add(newLinkSet);
                     }
                 }

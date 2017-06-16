@@ -68,8 +68,11 @@ namespace SilverSim.Scene.Types.Scene
                         foreach (ObjectGroup newGrp in newGrps)
                         {
                             AddObjectGroupOnly(newGrp);
-                            newGrp.RootPart.Inventory.ResumeScripts();
-                            newGrp.RootPart.TriggerOnUpdate(UpdateChangedFlags.Link);
+                            foreach (ObjectPart newPart in newGrp.ValuesByKey1)
+                            {
+                                newPart.Inventory.ResumeScripts();
+                                newPart.TriggerOnUpdate(UpdateChangedFlags.Link);
+                            }
                         }
                     }
                 }
