@@ -21,13 +21,150 @@
 
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectGroup
     {
+        public void AddLink(ObjectPart part)
+        {
+            lock(m_LinkUnlinkLock)
+            {
+                part.ObjectGroup = this;
+                Add(Count + 1, part.ID, part);
+            }
+        }
+
         private readonly object m_LinkUnlinkLock = new object();
-        public bool TryUnlink(UUID primID, out ObjectPart part)
+
+        public bool TryUnlink(List<UUID> uuids, List<ObjectGroup> unlinkedPrims)
+        {
+            lock(m_LinkUnlinkLock)
+            {
+                if(Count == 1)
+                {
+                    return false;
+                }
+
+                bool rootPrimRemoved = false;
+                Dictionary<UUID, Vector3> newChildPos = new Dictionary<UUID, Vector3>();
+                Dictionary<UUID, Quaternion> newChildRot = new Dictionary<UUID, Quaternion>();
+
+                foreach(UUID id in uuids)
+                {
+                    ObjectPart part;
+                    if(TryGetValue(id, out part))
+                    {
+                        /* is any of those our root prim? */
+                        if(part == RootPart)
+                        {
+                            rootPrimRemoved = true;
+                        }
+                        newChildPos[part.ID] = part.GlobalPosition;
+                        newChildRot[part.ID] = part.GlobalRotation;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                SortedDictionary<int, int> reorderLinkSet = new SortedDictionary<int, int>();
+                int newlink = LINK_ROOT;
+                if (rootPrimRemoved)
+                {
+                    Vector3 rootPos = RootPart.GlobalPosition;
+                    Quaternion rootRot = RootPart.GlobalRotation;
+                    Vector3 offsetPos = Vector3.Zero; 
+                    Quaternion offsetRot = Quaternion.Identity;
+                    ObjectGroup newLinkSet = new ObjectGroup(this);
+
+                    /* we are extracting the remaining linkset into new ObjectGroup */
+                    for (int i = LINK_ROOT; i <= Count; ++i)
+                    {
+                        ObjectPart linkpart = this[i];
+                        linkpart.Inventory.SuspendScripts();
+                        if (!uuids.Contains(linkpart.ID))
+                        {
+                            if (newlink == 1)
+                            {
+                                Vector3 newRootPos = linkpart.GlobalPosition;
+                                Quaternion newRootRot = linkpart.GlobalRotation;
+                                offsetRot = linkpart.LocalRotation;
+                                offsetPos = linkpart.LocalPosition / offsetRot;
+                                newLinkSet.Add(LINK_ROOT, linkpart.ID, linkpart);
+                                linkpart.ObjectGroup = newLinkSet;
+                                linkpart.LocalPosition = newRootPos;
+                                linkpart.LocalRotation = newRootRot;
+                            }
+                            else
+                            {
+                                newLinkSet.AddLink(linkpart);
+                                linkpart.ObjectGroup = newLinkSet;
+                                linkpart.LocalPosition += offsetPos;
+                                linkpart.LocalRotation /= offsetRot;
+                            }
+                            Remove(linkpart.ID);
+                        }
+                    }
+
+                    /* root prim always remains in original group */
+                    uuids.Remove(RootPart.ID);
+
+                    if (newLinkSet.Count != 0)
+                    {
+                        unlinkedPrims.Add(newLinkSet);
+                    }
+                }
+
+                newlink = LINK_ROOT + 1;
+                for (int i = LINK_ROOT + 1; i <= Count; ++i)
+                {
+                    ObjectPart linkpart = this[i];
+                    if(!uuids.Contains(linkpart.ID))
+                    {
+                        if (i != newlink)
+                        {
+                            reorderLinkSet.Add(i, newlink);
+                        }
+                        ++newlink;
+                    }
+                }
+
+                /* remove child prims */
+                foreach(UUID id in uuids)
+                {
+                    ObjectPart part;
+                    if(Remove(id, out part))
+                    {
+                        ObjectGroup newGrp = new ObjectGroup(this);
+                        newGrp.Add(LINK_ROOT, part.ID, part);
+                        part.ObjectGroup = newGrp;
+                        part.LocalPosition = newChildPos[id];
+                        part.LocalRotation = newChildRot[id];
+                        newGrp.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
+                        unlinkedPrims.Add(newGrp);
+                    }
+                }
+
+                foreach(KeyValuePair<int, int> kvp in reorderLinkSet)
+                {
+                    ChangeKey(kvp.Value, kvp.Key);
+                    
+                }
+
+                foreach(ObjectPart part in ValuesByKey1)
+                {
+                    part.TriggerOnUpdate(UpdateChangedFlags.Link);
+                    part.Inventory.ResumeScripts();
+                }
+
+                return true;
+            }
+        }
+
+        private bool TryUnlink(UUID primID, out ObjectPart part)
         {
             part = null;
             lock(m_LinkUnlinkLock)
@@ -41,20 +178,33 @@ namespace SilverSim.Scene.Types.Object
 
                     if (part.LinkNumber == LINK_ROOT)
                     {
+#if DEBUG
+                        m_Log.DebugFormat("Unlinking root prim {0} from object", primID);
+#endif
+                        return TryUnlinkRoot(out part);
                     }
                     else
                     {
                         /* separate single prim */
+                        int linkno = part.LinkNumber;
                         Vector3 rootPos = part.GlobalPosition;
                         Quaternion rootRot = part.GlobalRotation;
+#if DEBUG
+                        m_Log.DebugFormat("Unlinking child prim {0} (link {3}) from object (New location {1} / {2})", primID, rootPos, rootRot, linkno);
+#endif
                         part.Inventory.SuspendScripts();
                         if (!Remove(primID))
                         {
                             part.Inventory.ResumeScripts();
                             return false;
                         }
-                        part.Position = rootPos;
-                        part.Rotation = rootRot;
+                        part.LocalPosition = rootPos;
+                        part.LocalRotation = rootRot;
+
+                        for(++linkno; linkno <= Count; ++linkno)
+                        {
+                            ChangeKey(linkno - 1, linkno);
+                        }
 
                         PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                         return true;
@@ -64,53 +214,68 @@ namespace SilverSim.Scene.Types.Object
             return false;
         }
 
-        public bool TryUnlink(UUID primID, out ObjectGroup newGrp)
+        private bool TryUnlink(UUID primID, out ObjectGroup newGrp)
         {
             ObjectPart part;
             newGrp = null;
             if(TryUnlink(primID, out part))
             {
-                newGrp = new ObjectGroup();
+                newGrp = new ObjectGroup(this);
                 newGrp.Add(LINK_ROOT, part.ID, part);
+                part.ObjectGroup = newGrp;
                 newGrp.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                 return true;
             }
             return false;
         }
 
-        public bool TryUnlinkRoot(out ObjectPart part, bool sendEvent = true)
+        private bool TryUnlinkRoot(out ObjectPart part, bool sendEvent = true)
         {
             part = null;
             int primCount = Count;
+            part = this[LINK_ROOT];
             var rootPos = part.GlobalPosition;
             var rootRot = part.GlobalRotation;
             ObjectPart newRoot;
             if (!TryGetValue(2, out newRoot))
             {
+                part = null;
                 return false;
             }
             var offsetPos = newRoot.Position;
             var offsetRot = newRoot.Rotation;
+            foreach(var linkpart in ValuesByKey1)
+            {
+                linkpart.Inventory.SuspendScripts();
+            }
             part.Inventory.SuspendScripts();
             part.ObjectGroup.StopKeyframedMotion();
-            if (!Remove(LINK_ROOT))
+            if (!Remove(part.ID))
             {
-                part.Inventory.ResumeScripts();
+                foreach (var linkpart in ValuesByKey1)
+                {
+                    linkpart.Inventory.ResumeScripts();
+                }
+                part = null;
                 return false;
             }
 
-            newRoot.Position += rootPos;
-            newRoot.Rotation *= rootRot;
+            newRoot.LocalPosition += rootPos;
+            newRoot.LocalRotation *= rootRot;
+            ChangeKey(LINK_ROOT, 2);
             int i;
-            for (i = 2; i < primCount; ++i)
+            for (i = 3; i < primCount; ++i)
             {
                 ChangeKey(i - 1, i);
-                if (i > 2)
-                {
-                    var linkPart = this[i - 1];
-                    linkPart.Position -= offsetPos;
-                    linkPart.Rotation /= offsetRot;
-                }
+                var linkPart = this[i - 1];
+                linkPart.Position -= offsetPos;
+                linkPart.Rotation /= offsetRot;
+            }
+
+            foreach (var linkpart in ValuesByKey1)
+            {
+                linkpart.Inventory.ResumeScripts();
+                linkpart.TriggerOnUpdate(UpdateChangedFlags.Link);
             }
 
             if (sendEvent)

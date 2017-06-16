@@ -851,6 +851,17 @@ namespace SilverSim.Scene.Implementation.Basic
         internal int m_PrimitiveCount;
         internal int m_AgentCount;
 
+        public override void AddObjectGroupOnly(IObject obj)
+        {
+            var objgroup = obj as ObjectGroup;
+            if (objgroup != null)
+            {
+                objgroup.Scene = this;
+                m_Objects.Add(objgroup.ID, objgroup);
+                Interlocked.Increment(ref m_ObjectCount);
+            }
+        }
+
         public override void Add(IObject obj)
         {
             var objgroup = obj as ObjectGroup;

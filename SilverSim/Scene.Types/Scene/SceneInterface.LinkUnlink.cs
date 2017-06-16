@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System.Collections.Generic;
 
@@ -30,21 +31,46 @@ namespace SilverSim.Scene.Types.Scene
         public void UnlinkObjects(List<UUID> primids)
         {
             ObjectPart part;
-            foreach (var primid in primids)
-            {
-                if (Primitives.TryGetValue(primid, out part))
-                {
-                    var grp = part.ObjectGroup;
-                    if(grp == null)
-                    {
-                        continue;
-                    }
+            var unlinkPrimsets = new Dictionary<UUID, List<UUID>>();
 
-                    ObjectGroup newGrp;
-                    if(grp.TryUnlink(primid, out newGrp))
+            foreach(UUID primid in primids.ToArray()) /* make copy first */
+            {
+                if(!Primitives.TryGetValue(primid, out part))
+                {
+                    primids.Remove(primid);
+                }
+                else
+                {
+                    ObjectGroup grp = part.ObjectGroup;
+                    if (grp != null && !grp.IsAttached) /* never unlink attachments */
                     {
-                        Add(newGrp);
-                        newGrp.RootPart.Inventory.ResumeScripts();
+                        List<UUID> unlinkPrims;
+                        UUID grpID = grp.ID;
+                        if(!unlinkPrimsets.TryGetValue(grpID, out unlinkPrims))
+                        {
+                            unlinkPrims = new List<UUID>();
+                            unlinkPrimsets.Add(grpID, unlinkPrims);
+                        }
+                        unlinkPrims.Add(part.ID);
+                    }
+                }
+            }
+
+            foreach(KeyValuePair<UUID, List<UUID>> kvp in unlinkPrimsets)
+            {
+                var newGrps = new List<ObjectGroup>();
+                ObjectGroup grp;
+                if (Primitives.TryGetValue(kvp.Key, out part))
+                {
+                    grp = part.ObjectGroup;
+                    if (grp != null && grp.TryUnlink(kvp.Value, newGrps))
+                    {
+                        foreach (ObjectGroup newGrp in newGrps)
+                        {
+                            AddObjectGroupOnly(newGrp);
+                            newGrp.RootPart.Inventory.ResumeScripts();
+                            newGrp.RootPart.TriggerOnUpdate(UpdateChangedFlags.Link);
+                        }
                     }
                 }
             }
@@ -96,13 +122,17 @@ namespace SilverSim.Scene.Types.Scene
                 foreach (var part in srcGrp.Values)
                 {
                     srcGrp.Remove(part.ID);
-                    part.ObjectGroup = targetGrp;
-                    targetGrp.Add(targetGrp.Count + 1, part.ID, part);
+                    targetGrp.AddLink(part);
                     part.LocalPosition = newChildPos[part.ID];
                     part.LocalRotation = newChildRot[part.ID];
                     part.UpdateData(ObjectPart.UpdateDataFlags.All);
                     part.Inventory.ResumeScripts();
                 }
+            }
+
+            foreach(var part in targetGrp.Values)
+            {
+                part.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
             }
         }
     }

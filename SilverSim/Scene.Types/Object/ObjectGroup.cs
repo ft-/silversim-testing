@@ -133,6 +133,18 @@ namespace SilverSim.Scene.Types.Object
             AgentSitting = new AgentSittingInterface(this);
             IsChanged = false;
         }
+
+        public ObjectGroup(ObjectGroup former)
+        {
+            AgentSitting = new AgentSittingInterface(this);
+
+            m_IsGroupOwned = former.m_IsGroupOwned;
+            m_IsIncludedInSearch = former.m_IsIncludedInSearch;
+            m_Group = former.m_Group;
+            m_Owner = former.m_Owner;
+            m_LastOwner = former.m_LastOwner;
+            IsChanged = false;
+        }
         #endregion
 
         public PathfindingType PathfindingType
