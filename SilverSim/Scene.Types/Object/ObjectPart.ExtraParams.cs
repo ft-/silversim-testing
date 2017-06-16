@@ -137,6 +137,24 @@ namespace SilverSim.Scene.Types.Object
             public Vector3 Force = Vector3.Zero;
             #endregion
 
+            public static FlexibleParam FromUdpDataBlock(byte[] value)
+            {
+                if(value.Length < 16)
+                {
+                    return new FlexibleParam();
+                }
+
+                return new FlexibleParam()
+                {
+                    Softness = ((value[0] & 0x80) >> 6) | ((value[1] & 0x80) >> 7),
+                    Tension = (value[0] & 0x7F) / 10.0f,
+                    Friction = (value[1] & 0x7F) / 10.0f,
+                    Gravity = (value[2] / 10.0f) - 10.0f,
+                    Wind = value[3] / 10.0f,
+                    Force = new Vector3(value, 4)
+                };
+            }
+
             public byte[] DbSerialization
             {
                 get
@@ -206,6 +224,24 @@ namespace SilverSim.Scene.Types.Object
             public double Falloff;
             #endregion
 
+            public static PointLightParam FromUdpDataBlock(byte[] value)
+            {
+                if (value.Length < 16)
+                {
+                    return new PointLightParam();
+                }
+
+                return new PointLightParam()
+                {
+                    IsLight = true,
+                    LightColor = new Color { R_AsByte = value[0], G_AsByte = value[1], B_AsByte = value[2] },
+                    Intensity = value[3] / 255f,
+                    Radius = LEBytes2Float(value, 4),
+                    Cutoff = LEBytes2Float(value, 8),
+                    Falloff = LEBytes2Float(value, 12)
+                };
+            }
+
             public byte[] DbSerialization
             {
                 get
@@ -272,6 +308,22 @@ namespace SilverSim.Scene.Types.Object
             public double ProjectionAmbience;
             #endregion
 
+            public static ProjectionParam FromUdpDataBlock(byte[] value)
+            {
+                if (value.Length < 28)
+                {
+                    return new ProjectionParam();
+                }
+                return new ProjectionParam()
+                {
+                    IsProjecting = true,
+                    ProjectionTextureID = new UUID(value, 0),
+                    ProjectionFOV = LEBytes2Float(value, 16),
+                    ProjectionFocus = LEBytes2Float(value, 20),
+                    ProjectionAmbience = LEBytes2Float(value, 24)
+                };
+            }
+
             public byte[] DbSerialization
             {
                 get
@@ -320,7 +372,7 @@ namespace SilverSim.Scene.Types.Object
 
         private readonly ProjectionParam m_Projection = new ProjectionParam();
 
-        private void Float2LEBytes(float v, byte[] b, int offset)
+        private static void Float2LEBytes(float v, byte[] b, int offset)
         {
             var i = BitConverter.GetBytes(v);
             if (!BitConverter.IsLittleEndian)
@@ -330,7 +382,7 @@ namespace SilverSim.Scene.Types.Object
             Buffer.BlockCopy(i, 0, b, offset, 4);
         }
 
-        private float LEBytes2Float(byte[] b, int offset)
+        private static float LEBytes2Float(byte[] b, int offset)
         {
             if (!BitConverter.IsLittleEndian)
             {

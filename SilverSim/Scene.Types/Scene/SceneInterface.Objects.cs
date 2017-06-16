@@ -842,6 +842,11 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectExtraParams)]
         public void HandleObjectExtraParams(Message m)
         {
+            const ushort FlexiEP = 0x10;
+            const ushort LightEP = 0x20;
+            const ushort SculptEP = 0x30;
+            const ushort ProjectionEP = 0x40;
+
             var req = (ObjectExtraParams)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
@@ -868,6 +873,60 @@ namespace SilverSim.Scene.Types.Scene
                 if(!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
                 {
                     continue;
+                }
+
+                switch(data.ParamType)
+                {
+                    case FlexiEP:
+                        if(!data.ParamInUse)
+                        {
+                            ObjectPart.FlexibleParam flexi = part.Flexible;
+                            flexi.IsFlexible = false;
+                            part.Flexible = flexi;
+                        }
+                        else
+                        {
+                            part.Flexible = ObjectPart.FlexibleParam.FromUdpDataBlock(data.ParamData);
+                        }
+                        break;
+
+                    case LightEP:
+                        if(!data.ParamInUse)
+                        {
+                            ObjectPart.PointLightParam light = part.PointLight;
+                            light.IsLight = false;
+                            part.PointLight = light;
+                        }
+                        else
+                        {
+                            part.PointLight = ObjectPart.PointLightParam.FromUdpDataBlock(data.ParamData);
+                        }
+                        break;
+
+                    case SculptEP:
+                        if(data.ParamInUse && data.ParamData.Length >= 17)
+                        {
+                            byte[] param = data.ParamData;
+                            ObjectPart.PrimitiveShape shape = part.Shape;
+                            shape.SculptMap = new UUID(param, 0);
+                            shape.IsSculptInverted = (param[16] & 0x40) != 0;
+                            shape.IsSculptMirrored = (param[16] & 0x80) != 0;
+                            part.Shape = shape;
+                        }
+                        break;
+
+                    case ProjectionEP:
+                        if(!data.ParamInUse)
+                        {
+                            ObjectPart.ProjectionParam proj = part.Projection;
+                            proj.IsProjecting = false;
+                            part.Projection = proj;
+                        }
+                        else
+                        {
+                            part.Projection = ObjectPart.ProjectionParam.FromUdpDataBlock(data.ParamData);
+                        }
+                        break;
                 }
             }
         }
