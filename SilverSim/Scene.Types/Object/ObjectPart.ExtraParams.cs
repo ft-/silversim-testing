@@ -718,6 +718,8 @@ namespace SilverSim.Scene.Types.Object
                     i += 4;
                     Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
                 }
+
+                m_ExtraParamsBytes = updatebytes;
             }
             finally
             {
