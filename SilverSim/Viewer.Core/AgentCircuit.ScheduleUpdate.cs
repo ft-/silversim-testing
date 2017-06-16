@@ -165,9 +165,9 @@ namespace SilverSim.Viewer.Core
             full_packet.WriteUInt16(65535); /* dilation */
             full_packet.WriteUInt8((byte)full_packet_data.Count);
 
-            int offset = full_packet.DataPos;
             foreach (var kvp in full_packet_data)
             {
+                int offset = full_packet.DataPos;
                 full_packet.WriteBytes(kvp.Value);
                 var b = new byte[4];
                 Buffer.BlockCopy(full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, b, 0, 4);
