@@ -251,11 +251,6 @@ namespace SilverSim.Viewer.Core
                 }
                 flags |= PrimitiveFlags.ObjectAnyOwner;
 
-                if(SelectedObjects.Count != 0 && SelectedObjects.Contains(kvp.Key.Part.ID))
-                {
-                    flags |= PrimitiveFlags.CreateSelected;
-                }
-
                 b = BitConverter.GetBytes((UInt32)flags);
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -476,7 +471,9 @@ namespace SilverSim.Viewer.Core
                                     }
                                     else
                                     {
-                                        if (nonphys_full_packet_data != null && fullUpdate.Length + nonphys_full_packet_data_length > 1400)
+                                        bool foundobject = false;
+send_nonphys_packet:
+                                        if (nonphys_full_packet_data != null && (fullUpdate.Length + nonphys_full_packet_data_length > 1400 || foundobject))
                                         {
                                             var full_packet = GetTxObjectPoolPacket();
                                             if (full_packet == null)
@@ -494,6 +491,17 @@ namespace SilverSim.Viewer.Core
                                         {
                                             nonphys_full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
                                             nonphys_full_packet_data_length = 0;
+                                        }
+                                        else
+                                        {
+                                            foreach (KeyValuePair<ObjectUpdateInfo, byte[]> kvp in nonphys_full_packet_data)
+                                            {
+                                                if(kvp.Key.LocalID == ui.LocalID)
+                                                {
+                                                    foundobject = true;
+                                                    goto send_nonphys_packet;
+                                                }
+                                            }
                                         }
 
                                         nonphys_full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));

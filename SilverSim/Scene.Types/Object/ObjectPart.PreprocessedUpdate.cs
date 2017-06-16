@@ -284,6 +284,14 @@ namespace SilverSim.Scene.Types.Object
                     {
                         primUpdateFlags |= (uint)PrimitiveFlags.Physics;
                     }
+                    if(objectGroup.IsPhantom)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.Phantom;
+                    }
+                    if(IsVolumeDetect)
+                    {
+                        primUpdateFlags |= (uint)PrimitiveFlags.VolumeDetect;
+                    }
                     if (IsScripted)
                     {
                         primUpdateFlags |= (uint)PrimitiveFlags.Scripted;
