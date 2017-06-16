@@ -285,7 +285,19 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                io.WriteFormatted("Threads: {0}", Process.GetCurrentProcess().Threads.Count);
+                int maxWorkerThreads;
+                int maxCompletionThreads;
+                int availWorkerThreads;
+                int availCompletionThreads;
+                ThreadPool.GetMaxThreads(out maxWorkerThreads, out maxCompletionThreads);
+                ThreadPool.GetAvailableThreads(out availWorkerThreads, out availCompletionThreads);
+
+                io.WriteFormatted("Threads: {0}\n\nSystem Threadpool:\nActive worker threads: {1} of {2}\nActive completion port threads: {3} of {4}",
+                    Process.GetCurrentProcess().Threads.Count, 
+                    maxWorkerThreads - availWorkerThreads, 
+                    maxWorkerThreads, 
+                    maxCompletionThreads - availCompletionThreads, 
+                    maxCompletionThreads);
             }
         }
 
