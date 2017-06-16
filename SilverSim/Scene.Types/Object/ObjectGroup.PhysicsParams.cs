@@ -74,7 +74,10 @@ namespace SilverSim.Scene.Types.Object
                 {
                     foreach (ObjectPart part in Values)
                     {
-                        part.IsPhantom = value;
+                        if (part.IsPhantom != value)
+                        {
+                            part.IsPhantom = value;
+                        }
                     }
                 }
             }
@@ -90,7 +93,10 @@ namespace SilverSim.Scene.Types.Object
                 {
                     foreach (ObjectPart part in Values)
                     {
-                        part.IsPhysics = value;
+                        if (part.IsPhysics != value)
+                        {
+                            part.IsPhysics = value;
+                        }
                     }
                 }
             }
@@ -106,7 +112,10 @@ namespace SilverSim.Scene.Types.Object
                 {
                     foreach (ObjectPart part in Values)
                     {
-                        part.IsVolumeDetect = value;
+                        if (part.IsVolumeDetect != value)
+                        {
+                            part.IsVolumeDetect = value;
+                        }
                     }
                 }
             }

@@ -540,6 +540,10 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (m_Lock)
                 {
+                    if(m_IsTemporary == value)
+                    {
+                        return;
+                    }
                     m_IsTemporary = value;
                 }
                 IsChanged = m_IsChangedEnabled;
@@ -553,9 +557,13 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsTempOnRez = value;
                 lock (m_Lock)
                 {
+                    if(m_IsTempOnRez == value)
+                    {
+                        return;
+                    }
+                    m_IsTempOnRez = value;
                     m_IsTemporary = m_IsTemporary && m_IsTempOnRez;
                 }
                 IsChanged = m_IsChangedEnabled;
