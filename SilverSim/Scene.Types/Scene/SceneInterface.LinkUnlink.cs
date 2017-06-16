@@ -82,18 +82,27 @@ namespace SilverSim.Scene.Types.Scene
             for(int groupidx = 1; groupidx < groups.Count; ++groupidx)
             {
                 var srcGrp = groups[groupidx];
+                UUID formerObjGrpID = srcGrp.ID;
+                RemoveObjectGroupOnly(formerObjGrpID);
+                Dictionary<UUID, Vector3> newChildPos = new Dictionary<UUID, Vector3>();
+                Dictionary<UUID, Quaternion> newChildRot = new Dictionary<UUID, Quaternion>();
                 foreach(var part in srcGrp.Values)
                 {
                     part.Inventory.SuspendScripts();
-                    var newChildPos = part.GlobalPosition - newRootPos;
-                    var newChildRot = part.GlobalRotation / newRootRot;
+                    newChildPos.Add(part.ID, part.GlobalPosition - newRootPos);
+                    newChildRot.Add(part.ID, part.GlobalRotation / newRootRot);
+                }
+
+                foreach (var part in srcGrp.Values)
+                {
                     srcGrp.Remove(part.ID);
-                    part.Position = newChildPos;
-                    part.Rotation = newChildRot;
+                    part.ObjectGroup = targetGrp;
                     targetGrp.Add(targetGrp.Count + 1, part.ID, part);
+                    part.LocalPosition = newChildPos[part.ID];
+                    part.LocalRotation = newChildRot[part.ID];
+                    part.UpdateData(ObjectPart.UpdateDataFlags.All);
                     part.Inventory.ResumeScripts();
                 }
-                Remove(srcGrp);
             }
         }
     }

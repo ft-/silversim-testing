@@ -1064,6 +1064,16 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        public override bool RemoveObjectGroupOnly(UUID objID)
+        {
+            if (m_Objects.Remove(objID))
+            {
+                Interlocked.Decrement(ref m_ObjectCount);
+                return true;
+            }
+            return false;
+        }
+
         public override bool Remove(IObject obj, ScriptInstance instance = null)
         {
             if(!m_Objects.ContainsValue(obj))
@@ -1080,8 +1090,11 @@ namespace SilverSim.Scene.Implementation.Basic
                     objpart.SendKillObject();
                     RemoveLocalID(objpart);
                 }
-                Interlocked.Decrement(ref m_ObjectCount);
-                m_Objects.Remove(objgroup.ID);
+                
+                if(m_Objects.Remove(objgroup.ID))
+                {
+                    Interlocked.Decrement(ref m_ObjectCount);
+                }
             }
             else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
