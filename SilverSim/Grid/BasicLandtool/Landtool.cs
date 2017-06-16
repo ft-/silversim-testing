@@ -22,17 +22,20 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.XmlRpc;
 using System.ComponentModel;
+using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Grid.BasicLandtool
 {
     [Description("Basic Landtool")]
     [PluginName("BasicLandtool")]
-    public class Landtool : IPlugin
+    public class Landtool : IPlugin, IGridInfoServiceInterface
     {
         private readonly string m_PresenceServiceName;
         private PresenceServiceInterface m_PresenceService;
@@ -41,6 +44,11 @@ namespace SilverSim.Grid.BasicLandtool
         public Landtool(IConfig ownSection)
         {
             m_PresenceServiceName = ownSection.GetString("PresenceService", "PresenceService");
+        }
+
+        public void GetGridInfo(Dictionary<string, string> dict)
+        {
+            dict["economy"] = m_HttpServer.ServerURI;
         }
 
         public void Startup(ConfigurationLoader loader)

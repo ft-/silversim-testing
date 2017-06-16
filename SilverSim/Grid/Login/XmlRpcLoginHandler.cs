@@ -115,6 +115,7 @@ namespace SilverSim.Grid.Login
         private string m_HomeUri;
         private string m_GatekeeperUri;
         private List<IServiceURLsGetInterface> m_ServiceURLsGetters = new List<IServiceURLsGetInterface>();
+        private List<IGridInfoServiceInterface> m_GridInfoGetters = new List<IGridInfoServiceInterface>();
 
         public XmlRpcLoginHandler(IConfig ownSection)
         {
@@ -133,6 +134,7 @@ namespace SilverSim.Grid.Login
         public void Startup(ConfigurationLoader loader)
         {
             m_ServiceURLsGetters = loader.GetServicesByValue<IServiceURLsGetInterface>();
+            m_GridInfoGetters = loader.GetServicesByValue<IGridInfoServiceInterface>();
             m_HomeUri = loader.HomeURI;
             m_XmlRpcServer = loader.XmlRpcServer;
             m_GatekeeperUri = loader.GatekeeperURI;
@@ -173,32 +175,37 @@ namespace SilverSim.Grid.Login
 
         private Dictionary<string, string> CollectGridInfo()
         {
-            var list = new Dictionary<string, string>
+            var list = new Dictionary<string, string>();
+
+            foreach(IGridInfoServiceInterface getter in m_GridInfoGetters)
             {
-                ["platform"] = "SilverSim"
-            };
+                getter.GetGridInfo(list);
+            }
+
+            list["platform"] = "SilverSim";
+
             if (m_HttpsServer != null && !m_AllowLoginViaHttpWhenHttpsIsConfigured)
             {
-                list.Add("login", m_HttpsServer.ServerURI);
+                list["login"] = m_HttpsServer.ServerURI;
             }
             else
             {
-                list.Add("login", m_HttpServer.ServerURI);
+                list["login"] = m_HttpServer.ServerURI;
             }
             if (m_AboutPage != null)
             {
-                list.Add("about", m_AboutPage.ToString());
+                list["about"] = m_AboutPage.ToString();
             }
             if (m_RegisterPage != null)
             {
-                list.Add("register", m_RegisterPage.ToString());
+                list["register"] = m_RegisterPage.ToString();
             }
             if (m_WelcomePage != null)
             {
-                list.Add("welcome", m_WelcomePage.ToString());
+                list["welcome"] = m_WelcomePage.ToString();
             }
-            list.Add("gridnick", m_GridNick);
-            list.Add("gridname", m_GridName);
+            list["gridnick"] = m_GridNick;
+            list["gridname"] = m_GridName;
             return list;
         }
 
