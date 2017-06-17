@@ -9,6 +9,7 @@
 		<dependency name="SilverSim.Viewer.Map"/>
 		<dependency name="SilverSim.Viewer.Messages"/>
 		<dependency name="SilverSim.Viewer.OfflineIM"/>
+		<dependency name="SilverSim.Viewer.Parcel"/>
 		<dependency name="SilverSim.Viewer.Profile"/>
 		<dependency name="SilverSim.Viewer.Search"/>
 		<dependency name="SilverSim.Viewer.Teleport"/>
