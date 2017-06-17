@@ -134,6 +134,7 @@ namespace SilverSim.Types.Asset.Format
                 {
                     reflist.Add(SpecMap);
                 }
+                reflist.Remove(UUID.Zero);
                 return reflist;
             }
         }

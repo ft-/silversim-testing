@@ -33,6 +33,8 @@ namespace SilverSim.Types.Asset.Format
         {
             var reflist = new List<UUID>();
             GetReferences(data.InputStream, string.Empty, reflist);
+            reflist.Remove(UUID.Zero);
+            reflist.Remove(data.ID);
             return reflist;
         }
 

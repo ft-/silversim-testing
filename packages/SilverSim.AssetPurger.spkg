@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.AssetPurger</name>
+	<default-configuration>
+		<source>SilverSim.AssetPurger:PackageConfig.ini</source>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.AssetPurger:DefaultEnabled.ini</source>
+		<use-if-started-as>simulator</use-if-started-as>
+		<use-if-started-as>bare</use-if-started-as>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.AssetPurger.dll"/>
+	</files>
+</package>

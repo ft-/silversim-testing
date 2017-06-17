@@ -19,17 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
-using System.Collections.Generic;
+using System.Reflection;
 
-namespace SilverSim.ServiceInterfaces.Purge
-{
-    public interface IAssetPurgeServiceInterface
-    {
-        void MarkAssetAsUsed(List<UUID> assetIDs);
-
-        long PurgeUnusedAssets(); /* returns number of purged assets */
-
-        List<UUID> GetUnprocessedAssets();
-    }
-}
+[assembly: AssemblyTitle("Asset Purger")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]

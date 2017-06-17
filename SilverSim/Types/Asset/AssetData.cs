@@ -38,20 +38,29 @@ namespace SilverSim.Types.Asset
         {
             get
             {
+                List<UUID> refs;
                 switch(Type)
                 {
                     case AssetType.Bodypart:
                     case AssetType.Clothing:
-                        return new Format.Wearable(this).References;
+                        refs = new Format.Wearable(this).References;
+                        refs.Remove(ID);
+                        return refs;
 
                     case AssetType.Gesture:
-                        return new Format.Gesture(this).References;
+                        refs = new Format.Gesture(this).References;
+                        refs.Remove(ID);
+                        return refs;
 
                     case AssetType.Material:
-                        return new Format.Material(this).References;
+                        refs = new Format.Material(this).References;
+                        refs.Remove(ID);
+                        return refs;
 
                     case AssetType.Notecard:
-                        return new Format.Notecard(this).References;
+                        refs = new Format.Notecard(this).References;
+                        refs.Remove(ID);
+                        return refs;
 
                     case AssetType.Object:
                         return Format.ObjectReferenceDecoder.GetReferences(this);

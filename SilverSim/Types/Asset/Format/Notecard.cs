@@ -147,6 +147,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                     }
                 }
+                reflist.Remove(UUID.Zero);
                 return reflist;
             }
         }

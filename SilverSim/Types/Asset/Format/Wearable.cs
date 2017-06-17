@@ -299,6 +299,7 @@ namespace SilverSim.Types.Asset.Format
                         refs.Add(tex);
                     }
                 }
+                refs.Remove(UUID.Zero);
                 return refs;
             }
         }
