@@ -48,6 +48,7 @@ using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.PortControl;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
@@ -350,6 +351,8 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
             FeaturesTable[typeof(NeighborServiceInterface)] = "Neighbor Signaling Service";
             FeaturesTable[typeof(FriendsServiceInterface)] = "Friends Service";
+            FeaturesTable[typeof(IAssetReferenceInfoServiceInterface)] = "Asset referencing information";
+            FeaturesTable[typeof(IAssetPurgeServiceInterface)] = "Asset purging service";
 
             FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
             FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";

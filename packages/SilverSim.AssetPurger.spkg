@@ -10,6 +10,12 @@
 		<use-if-started-as>bare</use-if-started-as>
 		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.AssetPurger:Simulator.ini</source>
+		<use-if-started-as>simulator</use-if-started-as>
+		<use-if-started-as>bare</use-if-started-as>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.AssetPurger.dll"/>
 	</files>
