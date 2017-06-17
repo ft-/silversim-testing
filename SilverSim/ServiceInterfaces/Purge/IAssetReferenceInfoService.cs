@@ -26,6 +26,6 @@ namespace SilverSim.ServiceInterfaces.Purge
 {
     public interface IAssetReferenceInfoServiceInterface
     {
-        void MarkAssetsAsUsed(Action<UUID> action);
+        void EnumerateUsedAssets(Action<UUID> action);
     }
 }
