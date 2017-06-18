@@ -107,7 +107,7 @@ namespace SilverSim.Viewer.Core
                             break;
 
                         case MessageType.CreateInventoryItem:
-                            FetchInventoryThread_CreateInventoryItem((Messages.Inventory.CreateInventoryItem)m);
+                            FetchInventoryThread_CreateInventoryItem((CreateInventoryItem)m);
                             break;
 
                         case MessageType.CreateInventoryFolder:
@@ -1163,7 +1163,7 @@ namespace SilverSim.Viewer.Core
             return asset.ID;
         }
 
-        private void FetchInventoryThread_CreateInventoryItem(Messages.Inventory.CreateInventoryItem req)
+        private void FetchInventoryThread_CreateInventoryItem(CreateInventoryItem req)
         {
             if (req.SessionID != SessionID || req.AgentID != AgentID)
             {
