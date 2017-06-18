@@ -22,6 +22,7 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.KeyframedMotion;
+using SilverSim.Scene.Types.KeyframedMotion.Serialization;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
@@ -1276,7 +1277,16 @@ namespace SilverSim.Scene.Types.Object
             }
             writer.WriteEndElement();
 
-#warning KeyframeMotion Base64
+            if((options & XmlSerializationOptions.WriteKeyframeMotion) != 0)
+            {
+                KeyframedMotion.KeyframedMotion kfm = KeyframedMotion;
+                if (kfm != null)
+                {
+                    writer.WriteStartElement("KeyframeMotion");
+                    writer.WriteValue(Convert.ToBase64String(KfOpenSim.Serialize(kfm, Position, Rotation)));
+                    writer.WriteEndElement();
+                }
+            }
 
             bool haveScriptState = false;
             foreach(ObjectPart p in parts)
@@ -1494,7 +1504,10 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, bool inRootPart = false)
+        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options) =>
+            FromXml(reader, currentOwner, false, options);
+
+        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, bool inRootPart = false, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             var group = new ObjectGroup();
             ObjectPart rootPart = null;
@@ -1567,7 +1580,26 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "KeyframeMotion":
-                                reader.ReadToEndElement();
+                                if(isEmptyElement)
+                                {
+                                    break;
+                                }
+                                if ((options & XmlDeserializationOptions.ReadKeyframeMotion) != 0)
+                                {
+                                    byte[] keyframe_data = Convert.FromBase64String(reader.ReadElementValueAsString());
+                                    try
+                                    {
+                                        group.KeyframedMotion = KfOpenSim.Deserialize(keyframe_data);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        m_Log.Warn("Failed to parse KeyframeMotion", e);
+                                    }
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             default:

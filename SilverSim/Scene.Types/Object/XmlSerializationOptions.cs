@@ -24,11 +24,19 @@ using System;
 namespace SilverSim.Scene.Types.Object
 {
     [Flags]
+    public enum XmlDeserializationOptions
+    {
+        None = 0,
+        ReadKeyframeMotion = 8,
+    }
+
+    [Flags]
     public enum XmlSerializationOptions
     {
         None = 0,
         WriteOwnerInfo = 1,
         AdjustForNextOwner = 2,
-        WriteXml2 = 4
+        WriteXml2 = 4,
+        WriteKeyframeMotion = 8,
     }
 }

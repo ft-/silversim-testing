@@ -22,6 +22,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
@@ -86,7 +87,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static List<ObjectGroup> FromAsset(AssetData data, UUI currentOwner)
+        public static List<ObjectGroup> FromAsset(AssetData data, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             if(data.Type != AssetType.Object)
             {
@@ -95,19 +96,19 @@ namespace SilverSim.Scene.Types.Object
 
             using (var xmlstream = data.InputStream)
             {
-                return FromXml(xmlstream, currentOwner);
+                return FromXml(xmlstream, currentOwner, options);
             }
         }
 
-        public static List<ObjectGroup> FromXml(Stream xmlstream, UUI currentOwner)
+        public static List<ObjectGroup> FromXml(Stream xmlstream, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             using (var reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
             {
-                return FromXml(reader, currentOwner);
+                return FromXml(reader, currentOwner, options);
             }
         }
 
-        private static List<ObjectGroup> FromXml(XmlTextReader reader, UUI currentOwner)
+        private static List<ObjectGroup> FromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             for(;;)
             {
@@ -121,10 +122,10 @@ namespace SilverSim.Scene.Types.Object
                     switch(reader.Name)
                     {
                         case "SceneObjectGroup":
-                            return FromXmlSingleObject(reader, currentOwner);
+                            return FromXmlSingleObject(reader, currentOwner, options);
 
                         case "CoalescedObject":
-                            return FromXmlCoalescedObject(reader, currentOwner);
+                            return FromXmlCoalescedObject(reader, currentOwner, options);
 
                         default:
                             throw new InvalidObjectXmlException();
@@ -133,12 +134,12 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static List<ObjectGroup> FromXmlSingleObject(XmlTextReader reader, UUI currentOwner) => new List<ObjectGroup>
+        private static List<ObjectGroup> FromXmlSingleObject(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None) => new List<ObjectGroup>
         {
-            ObjectGroup.FromXml(reader, currentOwner)
+            ObjectGroup.FromXml(reader, currentOwner, options)
         };
 
-        private static List<ObjectGroup> FromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner)
+        private static List<ObjectGroup> FromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             var list = new List<ObjectGroup>();
             for(;;)
@@ -183,7 +184,7 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     while (reader.MoveToNextAttribute());
                                 }
-                                var grp = FromXmlSingleWithinCoalescedObject(reader, currentOwner);
+                                var grp = FromXmlSingleWithinCoalescedObject(reader, currentOwner, options);
                                 grp.Position = sogpos;
                                 list.Add(grp);
                                 break;
@@ -207,7 +208,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static ObjectGroup FromXmlSingleWithinCoalescedObject(XmlTextReader reader, UUI currentOwner)
+        private static ObjectGroup FromXmlSingleWithinCoalescedObject(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             ObjectGroup grp = null;
             for (; ; )
@@ -227,7 +228,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                grp = ObjectGroup.FromXml(reader, currentOwner);
+                                grp = ObjectGroup.FromXml(reader, currentOwner, options);
                                 break;
 
                             case "RootPart":
