@@ -1521,11 +1521,13 @@ namespace SilverSim.Scene.Types.Object
                         Quaternion q = ParamsHelper.GetRotation(enumerator, "PRIM_SIT_TARGET");
                         if(sitenabled)
                         {
+                            IsSitTargetActive = true;
                             SitTargetOffset = offset;
                             SitTargetOrientation = q;
                         }
                         else
                         {
+                            IsSitTargetActive = false;
                             SitTargetOffset = Vector3.Zero;
                             SitTargetOrientation = Quaternion.Identity;
                         }

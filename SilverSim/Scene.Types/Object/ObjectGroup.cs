@@ -1100,8 +1100,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         foreach (ObjectPart part in m_Group.ValuesByKey1)
                         {
-                            if ((!part.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
-                                !part.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon)) &&
+                            if (part.IsSitTargetActive &&
                                 !m_Group.m_SittingAgents.ContainsKey(part) && (!part.IsScriptedSitOnly))
                             {
                                 /* select prim */
@@ -1121,8 +1120,7 @@ namespace SilverSim.Scene.Types.Object
                         sitOnTarget = m_Group.RootPart;
                     }
                 }
-                if (!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
-                    !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
+                if (sitOnTarget.IsSitTargetActive)
                 {
                     sitPosition = sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET;
                     sitRotation = sitOnTarget.SitTargetOrientation;

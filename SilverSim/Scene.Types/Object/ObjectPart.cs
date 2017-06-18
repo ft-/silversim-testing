@@ -83,6 +83,7 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_Size = new Vector3(0.5, 0.5, 0.5);
         private string m_SitText = string.Empty;
         private string m_TouchText = string.Empty;
+        private bool m_IsSitTargetActive;
         private Vector3 m_SitTargetOffset = Vector3.Zero;
         private Quaternion m_SitTargetOrientation = Quaternion.Identity;
         private bool m_IsAllowedDrop;
@@ -981,6 +982,26 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool IsSitTargetActive
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_IsSitTargetActive;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_IsSitTargetActive = value;
+                }
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
         public Vector3 SitTargetOffset
         {
             get
@@ -997,7 +1018,7 @@ namespace SilverSim.Scene.Types.Object
                     m_SitTargetOffset = value;
                 }
                 IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate( 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -1822,6 +1843,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteEndElement();
 
                     writer.WriteNamedValue("Scale", Size);
+                    writer.WriteNamedValue("SitTargetActive", IsSitTargetActive);
                     writer.WriteNamedValue("SitTargetOrientation", SitTargetOrientation);
                     writer.WriteNamedValue("SitTargetPosition", SitTargetOffset);
                     writer.WriteNamedValue("SitTargetPositionLL", SitTargetOffset);
@@ -2352,6 +2374,7 @@ namespace SilverSim.Scene.Types.Object
             bool IsPassTouches = false;
             bool IsPassTouchesAlways = true;
             bool IsVolumeDetect = false;
+            bool isSitTargetActiveFound = false;
 
             if(reader.IsEmptyElement)
             {
@@ -2578,12 +2601,25 @@ namespace SilverSim.Scene.Types.Object
                                 part.Size = reader.ReadElementChildsAsVector3();
                                 break;
 
+                            case "SitTargetActive":
+                                part.IsSitTargetActive = reader.ReadElementValueAsBoolean();
+                                isSitTargetActiveFound = true;
+                                break;
+
                             case "SitTargetOrientation":
                                 part.SitTargetOrientation = reader.ReadElementChildsAsQuaternion();
+                                if(!part.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon) && !isSitTargetActiveFound)
+                                {
+                                    part.IsSitTargetActive = true;
+                                }
                                 break;
 
                             case "SitTargetPosition":
                                 part.SitTargetOffset = reader.ReadElementChildsAsVector3();
+                                if(!part.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) && !isSitTargetActiveFound)
+                                {
+                                    part.IsSitTargetActive = true;
+                                }
                                 break;
 
                             case "ParentID":
