@@ -1174,7 +1174,14 @@ namespace SilverSim.Viewer.Core
             try
             {
                 /* check availability for folder first before doing anything else */
-                folder = Agent.InventoryService.Folder[AgentID, req.FolderID];
+                if (req.FolderID == UUID.Zero)
+                {
+                    folder = Agent.InventoryService.Folder[AgentID, req.AssetType];
+                }
+                else
+                {
+                    folder = Agent.InventoryService.Folder[AgentID, req.FolderID];
+                }
             }
             catch
 #if DEBUG
@@ -1198,6 +1205,11 @@ namespace SilverSim.Viewer.Core
                 Creator = Agent.Owner,
                 ParentFolderID = folder.ID
             };
+
+            if(item.AssetType == AssetType.Clothing || item.AssetType == AssetType.Bodypart)
+            {
+                item.Flags = (InventoryFlags)(byte)req.WearableType;
+            }
             item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
             item.SaleInfo.Price = 0;
             item.SaleInfo.PermMask = InventoryPermissionsMask.All;
