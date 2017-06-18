@@ -792,7 +792,7 @@ namespace SilverSim.Main.Cmd.Region
                     "size <x>,<y> - region size\n" +
                     "productname <regiontype>\n" +
                     "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
-                    "estate <name> - sets region owner to estate owner\n" +
+                    "estate <name>\n" +
                     "externalhostname <hostname>\n" +
                     "access pg|mature|adult\n" +
                     "staticmaptile <uuid>\n" +
@@ -814,6 +814,7 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 EstateInfo selectedEstate = null;
+                bool ownerSet = false;
                 rInfo = new RegionInfo()
                 {
                     Name = args[2],
@@ -918,6 +919,7 @@ namespace SilverSim.Main.Cmd.Region
                                 io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
                                 return;
                             }
+                            ownerSet = true;
                             break;
 
                         case "status":
@@ -963,29 +965,36 @@ namespace SilverSim.Main.Cmd.Region
                             return;
                     }
                 }
-                rInfo.ServerURI = string.Empty;
-                m_RegionStorage.RegisterRegion(rInfo);
 
-                if (selectedEstate != null)
-                {
-                    m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
-                    io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", rInfo.Name, selectedEstate.Name, selectedEstate.Owner.FullName);
-                }
-                else
+                if(selectedEstate == null)
                 {
                     List<EstateInfo> allEstates = m_EstateService.All;
                     var ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(rInfo.Owner) select estate);
                     if (ownerEstates.Count != 0)
                     {
-                        m_EstateService.RegionMap[rInfo.ID] = ownerEstates[0].ID;
-                        io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", rInfo.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                        selectedEstate = ownerEstates[0];
                     }
                     else if (allEstates.Count != 0)
                     {
-                        m_EstateService.RegionMap[rInfo.ID] = allEstates[0].ID;
-                        io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", rInfo.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                        selectedEstate = allEstates[0];
                     }
                 }
+
+                if(selectedEstate == null)
+                {
+                    io.Write("No estates available");
+                    return;
+                }
+
+                rInfo.ServerURI = string.Empty;
+                if(!ownerSet)
+                {
+                    rInfo.Owner = ResolveName(selectedEstate.Owner);
+                }
+                m_RegionStorage.RegisterRegion(rInfo);
+
+                m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
+                io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", rInfo.Name, selectedEstate.Name, ResolveName(selectedEstate.Owner).FullName);
             }
         }
 
