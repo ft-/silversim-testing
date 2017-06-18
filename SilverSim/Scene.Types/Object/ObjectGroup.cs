@@ -276,8 +276,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(m_KeyframeMotionUpdateLock)
                 {
-                    m_KeyframedMotion.Stop();
-                    m_KeyframedMotion.Dispose();
+                    if (m_KeyframedMotion != null)
+                    {
+                        m_KeyframedMotion.Stop();
+                        m_KeyframedMotion.Dispose();
+                    }
                     m_KeyframedMotion = null;
                 }
                 if (value != null)

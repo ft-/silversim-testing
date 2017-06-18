@@ -273,7 +273,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion.Serialization
                 kf.CurrentFrame = oskf.m_keyframes.Length - oskf.m_frames.Count;
             }
 
-            return null;
+            return kf;
         }
 
         private static byte[] Serialize(this OsKeyframeMotion oskf)
@@ -342,7 +342,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion.Serialization
                 oskf.m_basePosition = (OsVector3)kf[0].TargetPosition;
                 oskf.m_baseRotation = (OsQuaternion)kf[0].TargetRotation;
 
-                for(int i = 0; i <= kf.CurrentFrame; ++i)
+                for(int i = kf.CurrentFrame; i >= 0; --i)
                 {
                     OsKeyframeMotion.Keyframe osf = oskf.m_keyframes[i];
                     osf.StartPosition = startPos;
@@ -359,17 +359,14 @@ namespace SilverSim.Scene.Types.KeyframedMotion.Serialization
                 oskf.m_basePosition = (OsVector3)kf[kf.Count - 1].TargetPosition;
                 oskf.m_baseRotation = (OsQuaternion)kf[kf.Count - 1].TargetRotation;
 
-                for (int i = oskf.m_keyframes.Length; i-- >= kf.CurrentFrame;)
+                for (int i = kf.CurrentFrame; i <  oskf.m_keyframes.Length; ++i)
                 {
-                    if (i >= 0)
-                    {
-                        OsKeyframeMotion.Keyframe osf = oskf.m_keyframes[i];
-                        osf.StartPosition = startPos;
-                        osf.StartRotation = startRot;
-                        startPos = osf.Position.GetValueOrDefault();
-                        startRot = osf.Rotation.GetValueOrDefault();
-                        oskf.m_frames.Add(osf);
-                    }
+                    OsKeyframeMotion.Keyframe osf = oskf.m_keyframes[i];
+                    osf.StartPosition = startPos;
+                    osf.StartRotation = startRot;
+                    startPos = osf.Position.GetValueOrDefault();
+                    startRot = osf.Rotation.GetValueOrDefault();
+                    oskf.m_frames.Add(osf);
                 }
             }
 

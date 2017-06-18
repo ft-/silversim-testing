@@ -129,7 +129,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         private void KeyframeTimer(object o, ElapsedEventArgs args)
         {
             var scene = ObjectGroup.Scene;
-            if(!scene.IsKeyframedMotionEnabled)
+            if(scene == null || !scene.IsKeyframedMotionEnabled)
             {
                 return;
             }
