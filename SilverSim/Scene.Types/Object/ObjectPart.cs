@@ -2296,6 +2296,26 @@ namespace SilverSim.Scene.Types.Object
                                 part.m_Media = PrimitiveMedia.FromXml(reader);
                                 break;
 
+                            case "PhysicsShapeType":
+                                {
+                                    string t = reader.ReadElementValueAsString();
+                                    switch(t)
+                                    {
+                                        case "Prim":
+                                            part.PhysicsShapeType = PrimitivePhysicsShapeType.Prim;
+                                            break;
+
+                                        case "None":
+                                            part.PhysicsShapeType = PrimitivePhysicsShapeType.None;
+                                            break;
+
+                                        case "ConvexHull":
+                                            part.PhysicsShapeType = PrimitivePhysicsShapeType.Convex;
+                                            break;
+                                    }
+                                }
+                                break;
+
                             default:
                                 reader.ReadToEndElement();
                                 break;
