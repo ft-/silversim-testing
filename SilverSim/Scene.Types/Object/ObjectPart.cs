@@ -1912,6 +1912,73 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
+        private static void PayPriceFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
+        {
+            int paypriceidx = 0;
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if(reader.Name == "int")
+                        {
+                            int payprice = reader.ReadElementValueAsInt();
+                            switch(paypriceidx++)
+                            {
+                                case 0:
+                                    if(rootGroup != null)
+                                    {
+                                        rootGroup.PayPrice0 = payprice;
+                                    }
+                                    break;
+                                case 1:
+                                    if (rootGroup != null)
+                                    {
+                                        rootGroup.PayPrice1 = payprice;
+                                    }
+                                    break;
+                                case 2:
+                                    if (rootGroup != null)
+                                    {
+                                        rootGroup.PayPrice2 = payprice;
+                                    }
+                                    break;
+                                case 3:
+                                    if (rootGroup != null)
+                                    {
+                                        rootGroup.PayPrice3 = payprice;
+                                    }
+                                    break;
+                                case 4:
+                                    if (rootGroup != null)
+                                    {
+                                        rootGroup.PayPrice4 = payprice;
+                                    }
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            reader.ReadToEndElement();
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != "PayPrice")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+                }
+            }
+            throw new InvalidObjectXmlException();
+        }
+
         private static void ShapeFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
         {
             var shape = new PrimitiveShape();
@@ -2307,6 +2374,10 @@ namespace SilverSim.Scene.Types.Object
                         }
                         switch (reader.Name)
                         {
+                            case "PayPrice":
+                                PayPriceFromXml(part, rootGroup, reader);
+                                break;
+
                             case "AllowedDrop":
                                 part.IsAllowedDrop = reader.ReadElementValueAsBoolean();
                                 break;
@@ -2638,6 +2709,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "AttachedPos":
+                            case "SavedAttachmentPos":
                                 if (rootGroup != null)
                                 {
                                     rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
@@ -2646,6 +2718,10 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     reader.ReadToEndElement();
                                 }
+                                break;
+
+                            case "SavedAttachmentPoint":
+                                rootGroup.AttachPoint = (AttachmentPoint)reader.ReadElementValueAsInt();
                                 break;
 
                             case "TextureAnimation":
@@ -2777,6 +2853,51 @@ namespace SilverSim.Scene.Types.Object
                             case "UpdateFlag":
                             case "SitTargetOrientationLL":
                             case "SitTargetPositionLL":
+                                reader.ReadToEndElement();
+                                break;
+
+                            case "SoundID":
+                            case "Sound":
+                                {
+                                    SoundParam sp = part.Sound;
+                                    sp.SoundID = reader.ReadContentAsUUID();
+                                    part.Sound = sp;
+                                }
+                                break;
+
+                            case "SoundGain":
+                                {
+                                    SoundParam sp = part.Sound;
+                                    sp.Gain = reader.ReadElementValueAsFloat();
+                                    part.Sound = sp;
+                                }
+                                break;
+
+                            case "SoundFlags":
+                                {
+                                    SoundParam sp = part.Sound;
+                                    sp.Flags = (PrimitiveSoundFlags)reader.ReadElementValueAsInt();
+                                    part.Sound = sp;
+                                }
+                                break;
+
+                            case "SoundRadius":
+                                {
+                                    SoundParam sp = part.Sound;
+                                    sp.Radius = reader.ReadElementValueAsFloat();
+                                    part.Sound = sp;
+                                }
+                                break;
+
+                            case "SoundQueueing":
+                                part.IsSoundQueueing = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "Force":
+                                reader.ReadToEndElement();
+                                break;
+
+                            case "Torque":
                                 reader.ReadToEndElement();
                                 break;
 
