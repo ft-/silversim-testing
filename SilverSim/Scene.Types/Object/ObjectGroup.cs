@@ -1567,7 +1567,9 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "KeyframeMotion":
-                                /* this should only be serialized when doing OAR and sim state save */
+                                reader.ReadToEndElement();
+                                break;
+
                             default:
                                 reader.ReadToEndElement();
                                 break;
