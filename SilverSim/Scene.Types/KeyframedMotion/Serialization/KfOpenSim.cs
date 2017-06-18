@@ -294,6 +294,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion.Serialization
             oskf.m_running = kf.IsRunning;
             oskf.m_iterations = kf.IsRunningReverse ? 1 : 0;
             oskf.m_data = 0;
+            oskf.m_serializedPosition = (OsVector3)curPos;
             if((kf.Flags & KeyframedMotion.DataFlags.Translation) != 0)
             {
                 oskf.m_data |= OsKeyframeMotion.DataFormat.Translation;
