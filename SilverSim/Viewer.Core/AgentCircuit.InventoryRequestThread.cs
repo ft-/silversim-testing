@@ -1066,7 +1066,7 @@ namespace SilverSim.Viewer.Core
 
                 if (UUID.Zero != req.TransactionID)
                 {
-                    //AgentTransactionsModule.HandleItemUpdateFromTransaction(remoteClient, transactionID, item);
+                    Agent.SetAssetUploadAsUpdateInventoryItem(req.TransactionID, item, Scene.ID, d.CallbackID);
                 }
                 else
                 {
@@ -1169,47 +1169,48 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            if (req.TransactionID == UUID.Zero)
+            InventoryFolder folder;
+            InventoryItem item;
+            try
             {
-                InventoryFolder folder;
-                InventoryItem item;
-                try
-                {
-                    /* check availability for folder first before doing anything else */
-                    folder = Agent.InventoryService.Folder[AgentID, req.FolderID];
-                }
-                catch
+                /* check availability for folder first before doing anything else */
+                folder = Agent.InventoryService.Folder[AgentID, req.FolderID];
+            }
+            catch
 #if DEBUG
                 (Exception e)
 #endif
-                {
+            {
 #if DEBUG
-                    m_Log.DebugFormat("Failed to create inventory: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
+                m_Log.DebugFormat("Failed to create inventory: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
 #endif
-                    SendMessage(new AlertMessage("ALERT: CantCreateInventory"));
-                    return;
-                }
+                SendMessage(new AlertMessage("ALERT: CantCreateInventory"));
+                return;
+            }
 
-                item = new InventoryItem()
-                {
-                    InventoryType = req.InvType,
-                    AssetType = req.AssetType,
-                    Description = req.Description,
-                    Name = req.Name,
-                    Owner = Agent.Owner,
-                    Creator = Agent.Owner
-                };
-                item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
-                item.SaleInfo.Price = 0;
-                item.SaleInfo.PermMask = InventoryPermissionsMask.All;
-                item.ParentFolderID = folder.ID;
+            item = new InventoryItem()
+            {
+                InventoryType = req.InvType,
+                AssetType = req.AssetType,
+                Description = req.Description,
+                Name = req.Name,
+                Owner = Agent.Owner,
+                Creator = Agent.Owner,
+                ParentFolderID = folder.ID
+            };
+            item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
+            item.SaleInfo.Price = 0;
+            item.SaleInfo.PermMask = InventoryPermissionsMask.All;
 
-                item.Permissions.Base = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
-                item.Permissions.Current = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
-                item.Permissions.Group = InventoryPermissionsMask.None;
-                item.Permissions.EveryOne = InventoryPermissionsMask.None;
-                item.Permissions.NextOwner = req.NextOwnerMask;
+            item.Permissions.Base = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
+            item.Permissions.Current = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
+            item.Permissions.Group = InventoryPermissionsMask.None;
+            item.Permissions.EveryOne = InventoryPermissionsMask.None;
+            item.Permissions.NextOwner = req.NextOwnerMask;
 
+
+            if (req.TransactionID == UUID.Zero)
+            {
                 try
                 {
                     switch (item.InventoryType)
@@ -1239,7 +1240,7 @@ namespace SilverSim.Viewer.Core
                             break;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     SendMessage(new AlertMessage("ALERT: CantCreateInventory"));
                     m_Log.ErrorFormat("Failed to create asset for type {0}: {1}: {2}\n{3}", item.InventoryType.ToString(), e.GetType().FullName, e.Message, e.StackTrace);
@@ -1256,7 +1257,7 @@ namespace SilverSim.Viewer.Core
                 {
                     Agent.InventoryService.Item.Add(item);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     SendMessage(new AlertMessage(item.InventoryType == InventoryType.Landmark ?
                         "ALERT: CantCreateLandmark" :
@@ -1265,6 +1266,10 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
                 SendMessage(new UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
+            }
+            else
+            {
+                Agent.SetAssetUploadAsCreateInventoryItem(req.TransactionID, item, Scene.ID, req.CallbackID);
             }
         }
         #endregion

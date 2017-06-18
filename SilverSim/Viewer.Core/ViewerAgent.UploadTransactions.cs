@@ -23,15 +23,19 @@
 #pragma warning disable RCS1029
 
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Inventory;
 using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Viewer.Messages.Transfer;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace SilverSim.Viewer.Core
 {
@@ -103,11 +107,21 @@ namespace SilverSim.Viewer.Core
 
             public virtual void OnCompletion()
             {
+                var e = OnCompletionEvent;
+                if(e != null)
+                {
+                    foreach(Action<UUID> d in e.GetInvocationList())
+                    {
+                        d(AssetID);
+                    }
+                }
             }
 
             public virtual void OnAbort()
             {
             }
+
+            public event Action<UUID> OnCompletionEvent;
         }
 
         internal RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction> m_AssetTransactions = new RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction>();
@@ -145,6 +159,58 @@ namespace SilverSim.Viewer.Core
             }
 
             return data;
+        }
+        #endregion
+
+        #region Setup inventory uploads
+        private sealed class CreateInventoryItemHandler
+        {
+            public UUID TransactionID;
+            public InventoryItem Item;
+            public ViewerAgent Agent;
+            public UUID SceneID;
+            public UInt32 CallbackID;
+
+            public void OnCompletion(UUID assetid)
+            {
+                Item.AssetID = assetid;
+                Agent.InventoryService.Item.Add(Item);
+                Agent.SendMessageAlways(new UpdateCreateInventoryItem(Agent.ID, true, TransactionID, Item, CallbackID), SceneID);
+            }
+        }
+
+        internal void SetAssetUploadAsCreateInventoryItem(UUID transactionID, InventoryItem item, UUID sceneID, UInt32 callbackID)
+        {
+            AssetUploadTransaction transaction;
+            if(m_AssetTransactions.TryGetValue(transactionID, out transaction))
+            {
+                transaction.OnCompletionEvent += new CreateInventoryItemHandler { SceneID = sceneID, Agent = this, CallbackID = callbackID, TransactionID = transactionID, Item = item }.OnCompletion;
+            }
+        }
+
+        private sealed class UpdateInventoryItemHandler
+        {
+            public UUID TransactionID;
+            public InventoryItem Item;
+            public ViewerAgent Agent;
+            public UUID SceneID;
+            public UInt32 CallbackID;
+
+            public void OnCompletion(UUID assetid)
+            {
+                Item.AssetID = assetid;
+                Agent.InventoryService.Item.Update(Item);
+                Agent.SendMessageAlways(new UpdateCreateInventoryItem(Agent.ID, true, TransactionID, Item, CallbackID), SceneID);
+            }
+        }
+
+        internal void SetAssetUploadAsUpdateInventoryItem(UUID transactionID, InventoryItem item, UUID sceneID, UInt32 callbackID)
+        {
+            AssetUploadTransaction transaction;
+            if (m_AssetTransactions.TryGetValue(transactionID, out transaction))
+            {
+                transaction.OnCompletionEvent += new UpdateInventoryItemHandler { SceneID = sceneID, Agent = this, CallbackID = callbackID, TransactionID = transactionID, Item = item }.OnCompletion;
+            }
         }
         #endregion
 
@@ -190,6 +256,16 @@ namespace SilverSim.Viewer.Core
                 transaction.XferID = XferID;
             }
 
+            UUID vfileID;
+            /* what a crazy work-around in the protocol */
+            byte[] md5input = new byte[32];
+            req.TransactionID.ToBytes(md5input, 0);
+            m_SecureSessionID.ToBytes(md5input, 16);
+            using (MD5 md5 = MD5.Create())
+            {
+                vfileID = new UUID(md5.ComputeHash(md5input), 0);
+            }
+
             transaction.AssetID = UUID.Random;
             transaction.AssetType = req.AssetType;
             transaction.IsTemporary = req.IsTemporary;
@@ -206,7 +282,7 @@ namespace SilverSim.Viewer.Core
                 {
                     ID = transaction.XferID,
                     VFileType = (short)transaction.AssetType,
-                    VFileID = transaction.AssetID,
+                    VFileID = vfileID,
                     FilePath = 0,
                     Filename = string.Empty
                 };
