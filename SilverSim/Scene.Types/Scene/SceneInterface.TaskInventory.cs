@@ -245,6 +245,27 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        private sealed class UpdateTaskInventoryItemHandler
+        {
+            public SceneInterface Scene;
+            public IAgent Agent;
+            public ObjectPart Part;
+            public UUID ItemID;
+
+            public void OnCompletion(UUID assetid)
+            {
+                ObjectPartInventoryItem item;
+                if(Part.Inventory.TryGetValue(ItemID, out item))
+                {
+                    item.AssetID = assetid;
+
+                    Interlocked.Increment(ref Part.Inventory.InventorySerial);
+                    Part.SendObjectUpdate();
+                    Scene.SendObjectPropertiesToAgent(Agent, Part);
+                }
+            }
+        }
+
         private void UpdateTaskInventoryItem(UpdateTaskInventory req, IAgent agent, ObjectPart part)
         {
             ObjectPartInventoryItem item;
@@ -269,6 +290,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
 
                 /* asset upload follows */
+                agent.SetAssetUploadAsCompletionAction(req.TransactionID, new UpdateTaskInventoryItemHandler { Agent = agent, ItemID = req.ItemID, Part = part, Scene = this }.OnCompletion);
             }
             else
             {

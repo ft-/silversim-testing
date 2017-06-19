@@ -1126,5 +1126,10 @@ namespace SilverSim.Scene.Agent
                 }
             }
         }
+
+        public virtual void SetAssetUploadAsCompletionAction(UUID transactionID, Action<UUID> action)
+        {
+            /* intentionally left empty */
+        }
     }
 }

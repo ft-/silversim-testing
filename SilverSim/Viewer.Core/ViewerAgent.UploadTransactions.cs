@@ -204,6 +204,15 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        public override void SetAssetUploadAsCompletionAction(UUID transactionID, Action<UUID> action)
+        {
+            AssetUploadTransaction transaction;
+            if (m_AssetTransactions.TryGetValue(transactionID, out transaction))
+            {
+                transaction.OnCompletionEvent += action;
+            }
+        }
+
         internal void SetAssetUploadAsUpdateInventoryItem(UUID transactionID, InventoryItem item, UUID sceneID, UInt32 callbackID)
         {
             AssetUploadTransaction transaction;
