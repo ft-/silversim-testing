@@ -232,6 +232,6 @@ namespace SilverSim.Scene.Types.Agent
         /* this is SSB */
         void RebakeAppearance(Action<string> logOutput = null);
 
-        void SetAssetUploadAsCompletionAction(UUID transactionID, Action<UUID> action);
+        void SetAssetUploadAsCompletionAction(UUID transactionID, UUID sceneID, Action<UUID> action);
     }
 }

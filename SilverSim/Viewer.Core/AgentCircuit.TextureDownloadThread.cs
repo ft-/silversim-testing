@@ -188,7 +188,7 @@ namespace SilverSim.Viewer.Core
                         if (imageRequest.Packet == 0)
                         {
                             res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
-                            uint numpackets = 1 + ((uint)asset.Data.Length - IMAGE_FIRST_PACKET_SIZE + IMAGE_PACKET_SIZE - 1) / IMAGE_PACKET_SIZE;
+                            uint numpackets = ((uint)asset.Data.Length - IMAGE_FIRST_PACKET_SIZE + IMAGE_PACKET_SIZE - 1) / IMAGE_PACKET_SIZE;
                             res.Packets = (ushort)numpackets;
 
                             Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);

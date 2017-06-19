@@ -290,7 +290,8 @@ namespace SilverSim.Scene.Types.Scene
                 }
 
                 /* asset upload follows */
-                agent.SetAssetUploadAsCompletionAction(req.TransactionID, new UpdateTaskInventoryItemHandler { Agent = agent, ItemID = req.ItemID, Part = part, Scene = this }.OnCompletion);
+                agent.SetAssetUploadAsCompletionAction(req.TransactionID, req.CircuitSceneID, 
+                    new UpdateTaskInventoryItemHandler { Agent = agent, ItemID = req.ItemID, Part = part, Scene = this }.OnCompletion);
             }
             else
             {
