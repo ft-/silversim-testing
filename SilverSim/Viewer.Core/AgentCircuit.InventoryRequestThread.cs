@@ -374,13 +374,13 @@ namespace SilverSim.Viewer.Core
                     tp.Data = new byte[MAX_PACKET_SIZE];
                     Buffer.BlockCopy(asset.Data, assetOffset, tp.Data, 0, MAX_PACKET_SIZE);
                     assetOffset += MAX_PACKET_SIZE;
-                    tp.Status = 0;
+                    tp.Status = TransferPacket.StatusCode.Success;
                 }
                 else
                 {
                     tp.Data = new byte[asset.Data.Length - assetOffset];
                     Buffer.BlockCopy(asset.Data, assetOffset, tp.Data, 0, asset.Data.Length - assetOffset);
-                    tp.Status = 1;
+                    tp.Status = TransferPacket.StatusCode.Done;
                     assetOffset = asset.Data.Length;
                 }
                 SendMessage(tp);

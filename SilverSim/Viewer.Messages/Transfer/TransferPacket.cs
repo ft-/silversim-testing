@@ -32,15 +32,26 @@ namespace SilverSim.Viewer.Messages.Transfer
         public UUID TransferID;
         public Int32 ChannelType;
         public Int32 Packet;
-        public Int32 Status;
+        public StatusCode Status;
         public byte[] Data = new byte[0];
+
+        public enum StatusCode
+        {
+            Success = 0,
+            Done = 1,
+            Skip = 2,
+            Abort = 3,
+            Error = -1,
+            UnknownSource = -2,
+            InsufficientPermissions = -3
+        }
 
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(TransferID);
             p.WriteInt32(ChannelType);
             p.WriteInt32(Packet);
-            p.WriteInt32(Status);
+            p.WriteInt32((int)Status);
             p.WriteUInt16((ushort)Data.Length);
             p.WriteBytes(Data);
         }
@@ -50,7 +61,7 @@ namespace SilverSim.Viewer.Messages.Transfer
             TransferID = p.ReadUUID(),
             ChannelType = p.ReadInt32(),
             Packet = p.ReadInt32(),
-            Status = p.ReadInt32(),
+            Status = (StatusCode)p.ReadInt32(),
             Data = p.ReadBytes(p.ReadUInt16())
         };
     }

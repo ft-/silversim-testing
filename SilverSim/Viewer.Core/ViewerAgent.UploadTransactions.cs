@@ -384,7 +384,7 @@ namespace SilverSim.Viewer.Core
                 vfileID = new UUID(md5.ComputeHash(md5input), 0);
             }
 
-            transaction.AssetID = UUID.Random;
+            transaction.AssetID = vfileID;
             transaction.AssetType = req.AssetType;
             transaction.IsTemporary = req.IsTemporary;
             transaction.IsLocal = req.StoreLocal;
