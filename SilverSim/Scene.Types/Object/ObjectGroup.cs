@@ -22,7 +22,6 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.KeyframedMotion;
-using SilverSim.Scene.Types.KeyframedMotion.Serialization;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
