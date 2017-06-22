@@ -1280,17 +1280,6 @@ namespace SilverSim.Scene.Types.Object
             }
             writer.WriteEndElement();
 
-            if((options & XmlSerializationOptions.WriteKeyframeMotion) != 0)
-            {
-                KeyframedMotion.KeyframedMotion kfm = KeyframedMotion;
-                if (kfm != null)
-                {
-                    writer.WriteStartElement("KeyframeMotion");
-                    writer.WriteValue(Convert.ToBase64String(KfOpenSim.Serialize(kfm, Position, Rotation)));
-                    writer.WriteEndElement();
-                }
-            }
-
             bool haveScriptState = false;
             foreach(ObjectPart p in parts)
             {
@@ -1587,22 +1576,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     break;
                                 }
-                                if ((options & XmlDeserializationOptions.ReadKeyframeMotion) != 0)
-                                {
-                                    byte[] keyframe_data = Convert.FromBase64String(reader.ReadElementValueAsString());
-                                    try
-                                    {
-                                        group.KeyframedMotion = KfOpenSim.Deserialize(keyframe_data);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        m_Log.Warn("Failed to parse KeyframeMotion", e);
-                                    }
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
-                                }
+                                reader.ReadToEndElement();
                                 break;
 
                             default:
