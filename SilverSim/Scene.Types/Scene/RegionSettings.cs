@@ -69,6 +69,7 @@ namespace SilverSim.Scene.Types.Scene
             TerrainLowerLimit = src.TerrainLowerLimit;
             Sandbox = src.Sandbox;
             TelehubObject = src.TelehubObject;
+            MaxBasePrims = src.MaxBasePrims;
         }
 
         public bool BlockTerraform;
@@ -91,6 +92,7 @@ namespace SilverSim.Scene.Types.Scene
         public bool ResetHomeOnTeleport;
         public bool AllowLandmark;
         public bool AllowDirectTeleport;
+        public int MaxBasePrims = 45000;
 
         private UUID m_TerrainTexture1 = TextureConstant.DefaultTerrainTexture1;
         public UUID TerrainTexture1
@@ -160,6 +162,8 @@ namespace SilverSim.Scene.Types.Scene
         public bool Sandbox;
 
         public UUID TelehubObject = UUID.Zero;
+
+        public int MaxTotalPrims => (int)(MaxBasePrims * ObjectBonus);
 
         public RegionOptionFlags AsFlags
         {

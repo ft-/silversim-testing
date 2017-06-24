@@ -65,6 +65,14 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void TriggerParcelUpdate(ParcelInfo pInfo);
 
+        public int CalcMaxTotalParcelPrims(ParcelInfo p)
+        {
+            int regionTotal = RegionSettings.MaxTotalPrims;
+            long regionArea = (long)SizeX * SizeY;
+            long parcelPrims = p.Area * regionTotal / regionArea;
+            return (int)(p.ParcelPrimBonus * parcelPrims);
+        }
+
         private ParcelOverlayType GetParcelLayerByte(int x, int y, UUI agentID)
         {
             ParcelInfo pi;
