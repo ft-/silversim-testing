@@ -201,6 +201,11 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.IsVolumeDetect = map["IsVolumeDetect"].AsBoolean;
             objpart.IsPhantom = map["IsPhantom"].AsBoolean;
             objpart.IsPhysics = map["IsPhysics"].AsBoolean;
+            objpart.IsSandbox = map["IsSandbox"].AsBoolean;
+            objpart.IsBlockGrab = map["IsBlockGrab"].AsBoolean;
+            objpart.IsDieAtEdge = map["IsDieAtEdge"].AsBoolean;
+            objpart.IsReturnAtEdge = map["IsReturnAtEdge"].AsBoolean;
+            objpart.IsBlockGrabObject = map["IsBlockGrabObject"].AsBoolean;
 
             return objpart;
         }

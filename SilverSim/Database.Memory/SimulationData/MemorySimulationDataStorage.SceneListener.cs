@@ -343,6 +343,11 @@ namespace SilverSim.Database.Memory.SimulationData
                 data.Add("IsVolumeDetect", objpart.IsVolumeDetect);
                 data.Add("IsPhantom", objpart.IsPhantom);
                 data.Add("IsPhysics", objpart.IsPhysics);
+                data.Add("IsSandbox", objpart.IsSandbox);
+                data.Add("IsBlockGrab", objpart.IsBlockGrab);
+                data.Add("IsDieAtEdge", objpart.IsDieAtEdge);
+                data.Add("IsReturnAtEdge", objpart.IsReturnAtEdge);
+                data.Add("IsBlockGrabObject", objpart.IsBlockGrabObject);
 
                 return data;
             }
