@@ -206,6 +206,7 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.IsDieAtEdge = map["IsDieAtEdge"].AsBoolean;
             objpart.IsReturnAtEdge = map["IsReturnAtEdge"].AsBoolean;
             objpart.IsBlockGrabObject = map["IsBlockGrabObject"].AsBoolean;
+            objpart.SandboxOrigin = map["SandboxOrigin"].AsVector3;
 
             return objpart;
         }

@@ -348,6 +348,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 data.Add("IsDieAtEdge", objpart.IsDieAtEdge);
                 data.Add("IsReturnAtEdge", objpart.IsReturnAtEdge);
                 data.Add("IsBlockGrabObject", objpart.IsBlockGrabObject);
+                data.Add("SandboxOrigin", objpart.SandboxOrigin);
 
                 return data;
             }
