@@ -153,17 +153,18 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            if(grp.IsPhysics)
+            if ((part.Flags & PrimitiveFlags.Touch) != 0)
+            {
+                /* has touch event, so block it */
+                return;
+            }
+
+            if (grp.IsPhysics)
             {
                 /* TODO: implement logic for physical input */
             }
             else
             {
-                if((part.Flags & PrimitiveFlags.Touch) != 0)
-                {
-                    /* has touch event, so block it */
-                    return;
-                }
                 grp.GlobalPosition += newpos;
             }
         }
