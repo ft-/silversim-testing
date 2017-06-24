@@ -48,6 +48,29 @@ namespace SilverSim.Scene.Types.Object
     }
 
     [Serializable]
+    public class HitSandboxLimitException : Exception
+    {
+        public HitSandboxLimitException()
+        {
+        }
+
+        public HitSandboxLimitException(string message)
+            : base(message)
+        {
+        }
+
+        protected HitSandboxLimitException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public HitSandboxLimitException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+    }
+
+    [Serializable]
     public class ObjectDeserializationFailedDueKeyException : Exception
     {
         public ObjectDeserializationFailedDueKeyException()

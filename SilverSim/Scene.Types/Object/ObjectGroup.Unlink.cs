@@ -95,6 +95,7 @@ namespace SilverSim.Scene.Types.Object
                                 offsetPos = linkpart.LocalPosition / offsetRot;
                                 linkpart.LocalPosition = newRootPos;
                                 linkpart.LocalRotation = newRootRot;
+                                linkpart.IsSandbox = false;
                                 newLinkSet.Add(LINK_ROOT, linkpart.ID, linkpart);
                                 linkpart.ObjectGroup = newLinkSet;
                             }
@@ -144,6 +145,7 @@ namespace SilverSim.Scene.Types.Object
                         part.ObjectGroup = newGrp;
                         part.LocalPosition = newChildPos[id];
                         part.LocalRotation = newChildRot[id];
+                        part.IsSandbox = false;
                         newGrp.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                         unlinkedPrims.Add(newGrp);
                     }
@@ -152,7 +154,6 @@ namespace SilverSim.Scene.Types.Object
                 foreach(KeyValuePair<int, int> kvp in reorderLinkSet)
                 {
                     ChangeKey(kvp.Value, kvp.Key);
-                    
                 }
 
                 foreach(ObjectPart part in ValuesByKey1)

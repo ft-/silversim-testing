@@ -19,11 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -41,7 +37,31 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsSandbox = value;
+                lock (m_DataLock)
+                {
+                    m_IsSandbox = value;
+                    m_SandboxOrigin = LocalPosition;
+                }
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(UpdateChangedFlags.None);
+            }
+        }
+
+        public Vector3 SandboxOrigin
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_SandboxOrigin;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_SandboxOrigin = value;
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.None);
             }

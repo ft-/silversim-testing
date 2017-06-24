@@ -76,6 +76,7 @@ namespace SilverSim.Scene.Types.Object
         private string m_Name = string.Empty;
         private string m_Description = string.Empty;
         private Vector3 m_LocalPosition = Vector3.Zero;
+        private Vector3 m_SandboxOrigin = Vector3.Zero;
         private Quaternion m_LocalRotation = Quaternion.Identity;
         private Vector3 m_Slice = new Vector3(0, 1, 0);
         private PrimitivePhysicsShapeType m_PhysicsShapeType;
@@ -1289,6 +1290,26 @@ namespace SilverSim.Scene.Types.Object
         public bool IsInScene(SceneInterface scene) => true;
 
         #region Position Properties
+        private bool HasHitSandboxLimit(Vector3 newPos)
+        {
+            if((newPos - m_SandboxOrigin).Length > 10)
+            {
+                return true;
+            }
+
+            if(newPos.X < 0 || newPos.Y < 0)
+            {
+                return true;
+            }
+            SceneInterface scene = ObjectGroup?.Scene;
+            if(scene == null)
+            {
+                return true;
+            }
+
+            return scene.SizeX <= newPos.X || scene.SizeY <= newPos.Y;
+        }
+
         public Vector3 Position
         {
             get
@@ -1302,6 +1323,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(m_DataLock)
                 {
+                    if(m_IsSandbox && 
+                        ObjectGroup != null && ObjectGroup.RootPart == this &&
+                        HasHitSandboxLimit(value))
+                    {
+                        goto hitsandboxlimit;
+                    }
                     m_LocalPosition = value;
                 }
                 lock(m_UpdateDataLock)
@@ -1311,6 +1338,14 @@ namespace SilverSim.Scene.Types.Object
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
+                return;
+
+                hitsandboxlimit:
+                if (IsPhysics)
+                {
+                    IsPhysics = false;
+                }
+                throw new HitSandboxLimitException();
             }
         }
 
@@ -1331,9 +1366,16 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(m_DataLock)
                 {
-                    if (ObjectGroup != null && ObjectGroup.RootPart != this)
+                    if (ObjectGroup != null)
                     {
-                        value -= ObjectGroup.RootPart.GlobalPosition;
+                        if (ObjectGroup.RootPart != this)
+                        {
+                            value -= ObjectGroup.RootPart.GlobalPosition;
+                        }
+                        else if(m_IsSandbox && (value - m_SandboxOrigin).Length > 10)
+                        {
+                            goto hitsandboxlimit;
+                        }
                     }
                     m_LocalPosition = value;
                 }
@@ -1345,6 +1387,14 @@ namespace SilverSim.Scene.Types.Object
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
+                return;
+
+                hitsandboxlimit:
+                if (IsPhysics)
+                {
+                    IsPhysics = false;
+                }
+                throw new HitSandboxLimitException();
             }
         }
 
@@ -1361,6 +1411,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (m_DataLock)
                 {
+                    if (m_IsSandbox &&
+                        ObjectGroup != null && ObjectGroup.RootPart == this &&
+                        HasHitSandboxLimit(value))
+                    {
+                        goto hitsandboxlimit;
+                    }
                     m_LocalPosition = value;
                 }
                 lock (m_UpdateDataLock)
@@ -1371,6 +1427,14 @@ namespace SilverSim.Scene.Types.Object
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
+                return;
+
+                hitsandboxlimit:
+                if (IsPhysics)
+                {
+                    IsPhysics = false;
+                }
+                throw new HitSandboxLimitException();
             }
         }
         #endregion
