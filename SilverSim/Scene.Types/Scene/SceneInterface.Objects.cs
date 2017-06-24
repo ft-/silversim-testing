@@ -174,6 +174,10 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+            else if((grp.RootPart.Flags & PrimitiveFlags.Touch) != 0 && part.PassTouchMode != PassEventMode.Never)
+            {
+                return;
+            }
             else if (grp.IsBlockGrabObject)
             {
                 return;
