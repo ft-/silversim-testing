@@ -118,9 +118,10 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             Object.ObjectGroup objgrp = part.ObjectGroup;
-            if(objgrp != null && CanMove(agent, objgrp, req.GrabPosition))
+            if(objgrp != null && (part.Flags & PrimitiveFlags.Touch) == 0)
             {
-                GrabMovement(objgrp, part, req.GrabPosition);
+                /* only allow when no touch event is active */
+                GrabMovement(agent, objgrp, part, req.GrabPosition);
             }
 
             var detectdata = new DetectInfo();
@@ -142,20 +143,22 @@ namespace SilverSim.Scene.Types.Scene
             part.PostTouchEvent(e);
         }
 
-        private void GrabMovement(Object.ObjectGroup grp, ObjectPart part, Vector3 newpos)
+        private void GrabMovement(IAgent agent, Object.ObjectGroup grp, ObjectPart part, Vector3 newpos)
         {
-            if(part.IsBlockGrab && grp.RootPart == part)
+            if(grp.IsAttached)
             {
                 return;
             }
-            else if(part.IsBlockGrabObject)
+            else if(grp.IsBlockGrab && grp.RootPart == part)
             {
                 return;
             }
-
-            if ((part.Flags & PrimitiveFlags.Touch) != 0)
+            else if(grp.IsBlockGrabObject)
             {
-                /* has touch event, so block it */
+                return;
+            }
+            else if (!CanMove(agent, grp, grp.GlobalPosition))
+            {
                 return;
             }
 
