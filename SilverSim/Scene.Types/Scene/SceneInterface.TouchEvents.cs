@@ -168,7 +168,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
-                grp.GlobalPosition += newpos;
+                grp.GlobalPosition = newpos;
             }
         }
 

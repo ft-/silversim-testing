@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
 using System;
@@ -142,6 +143,54 @@ namespace SilverSim.Scene.Types.Scene
 #if DEBUG
             m_Log.DebugFormat("ObjectSpinUpdate localid={0}", req.ObjectID);
 #endif
+
+            ObjectPart part;
+            if (!Primitives.TryGetValue(req.ObjectID, out part))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            Object.ObjectGroup objgrp = part.ObjectGroup;
+            if (objgrp != null && (part.Flags & PrimitiveFlags.Touch) == 0)
+            {
+                /* only allow when no touch event is active */
+                GrabMovement(agent, objgrp, part, req.Rotation);
+            }
+        }
+
+        private void GrabMovement(IAgent agent, Object.ObjectGroup grp, ObjectPart part, Quaternion newrot)
+        {
+            if (grp.IsAttached)
+            {
+                return;
+            }
+            else if (grp.IsBlockGrab && grp.RootPart == part)
+            {
+                return;
+            }
+            else if (grp.IsBlockGrabObject)
+            {
+                return;
+            }
+            else if (!CanMove(agent, grp, grp.GlobalPosition))
+            {
+                return;
+            }
+
+            if (grp.IsPhysics)
+            {
+                /* TODO: implement logic for physical input */
+            }
+            else
+            {
+                grp.GlobalRotation = newrot;
+            }
         }
 
         [PacketHandler(MessageType.ObjectSpinStop)]
