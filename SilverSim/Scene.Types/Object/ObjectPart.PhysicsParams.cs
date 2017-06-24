@@ -178,12 +178,21 @@ namespace SilverSim.Scene.Types.Object
                 var scene = group.Scene;
                 if (scene != null && scene.ID == value.SceneID)
                 {
-                    Position = value.Position;
-                    Rotation = value.Rotation;
-                    Velocity = value.Velocity;
-                    AngularVelocity = value.AngularVelocity;
-                    Acceleration = value.Acceleration;
-                    AngularAcceleration = value.AngularAcceleration;
+                    try
+                    {
+                        Position = value.Position;
+                        Rotation = value.Rotation;
+                        Velocity = value.Velocity;
+                        AngularVelocity = value.AngularVelocity;
+                        Acceleration = value.Acceleration;
+                        AngularAcceleration = value.AngularAcceleration;
+                    }
+                    catch(HitSandboxLimitException)
+                    {
+                        AngularVelocity = Vector3.Zero;
+                        Acceleration = Vector3.Zero;
+                        AngularAcceleration = Vector3.Zero;
+                    }
                 }
             }
         }
