@@ -24,6 +24,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -35,11 +36,12 @@ namespace SilverSim.Database.Memory.UserAccounts
     public sealed class MemoryUserAccountService : UserAccountServiceInterface, IPlugin
     {
         private readonly RwLockedDictionary<UUID, UserAccount> m_Data = new RwLockedDictionary<UUID, UserAccount>();
+        private Uri m_HomeURI;
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)
         {
-            /* nothing to do */
+            m_HomeURI = new Uri(loader.HomeURI);
         }
         #endregion
 
@@ -189,13 +191,14 @@ namespace SilverSim.Database.Memory.UserAccounts
         public override void Add(UserAccount userAccount)
         {
             var uac = new UserAccount(userAccount);
-            uac.IsLocalToGrid = true;
+            uac.Principal.HomeURI = m_HomeURI;
             m_Data.Add(userAccount.Principal.ID, uac);
         }
 
         public override void Update(UserAccount userAccount)
         {
             var uac = new UserAccount(userAccount);
+            uac.Principal.HomeURI = m_HomeURI;
             uac.IsLocalToGrid = true;
             m_Data[userAccount.Principal.ID] = uac;
         }
