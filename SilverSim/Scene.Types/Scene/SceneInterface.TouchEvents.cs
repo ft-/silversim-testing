@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
 using System.Collections.Generic;
@@ -116,6 +117,12 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
+            Object.ObjectGroup objgrp = part.ObjectGroup;
+            if(objgrp != null && CanMove(agent, objgrp, req.GrabPosition))
+            {
+                GrabMovement(objgrp, part, req.GrabPosition);
+            }
+
             var detectdata = new DetectInfo();
             AddDetectAgentData(agent, detectdata);
             detectdata.GrabOffset = req.GrabPosition;
@@ -133,6 +140,32 @@ namespace SilverSim.Scene.Types.Scene
             e.Detected.Add(detectdata);
 
             part.PostTouchEvent(e);
+        }
+
+        private void GrabMovement(Object.ObjectGroup grp, ObjectPart part, Vector3 newpos)
+        {
+            if(part.IsBlockGrab && grp.RootPart == part)
+            {
+                return;
+            }
+            else if(part.IsBlockGrabObject)
+            {
+                return;
+            }
+
+            if(grp.IsPhysics)
+            {
+                /* TODO: implement logic for physical input */
+            }
+            else
+            {
+                if((part.Flags & PrimitiveFlags.Touch) != 0)
+                {
+                    /* has touch event, so block it */
+                    return;
+                }
+                grp.GlobalPosition += newpos;
+            }
         }
 
         [PacketHandler(MessageType.ObjectDeGrab)]
