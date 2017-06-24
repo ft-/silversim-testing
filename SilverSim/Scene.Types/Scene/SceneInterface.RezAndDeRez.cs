@@ -170,8 +170,103 @@ namespace SilverSim.Scene.Types.Scene
             return group.LocalID;
         }
 
+        public List<UUID> ReturnObjects(UUI returningAgent, List<UUID> objectids)
+        {
+            List<UUID> returned = new List<UUID>();
+
+            foreach (UUID objectid in objectids)
+            {
+                ObjectGroup grp;
+                if (!ObjectGroups.TryGetValue(objectid, out grp))
+                {
+                    if (!CanReturn(returningAgent, grp, grp.Position))
+                    {
+                        continue;
+                    }
+
+                    var copyItems = new Dictionary<UUI, List<InventoryItem>>();
+                    UUID assetID;
+                    bool changePermissions = false;
+                    UUI targetAgent = grp.Owner;
+
+                    assetID = grp.OriginalAssetID;
+                    if (UUID.Zero == assetID)
+                    {
+                        AssetData asset = grp.Asset(XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.WriteXml2);
+                        asset.ID = UUID.Random;
+                        AssetService.Store(asset);
+                        grp.OriginalAssetID = asset.ID;
+                        assetID = asset.ID;
+                    }
+                    if (!copyItems.ContainsKey(targetAgent))
+                    {
+                        copyItems.Add(targetAgent, new List<InventoryItem>());
+                    }
+                    var newitem = new InventoryItem()
+                    {
+                        AssetID = assetID,
+                        AssetType = AssetType.Object,
+                        InventoryType = InventoryType.Object,
+                        Name = grp.Name,
+                        Description = grp.Description,
+                        LastOwner = grp.Owner,
+                        Owner = targetAgent,
+                        Creator = grp.RootPart.Creator,
+                        CreationDate = grp.RootPart.CreationDate
+                    };
+                    newitem.Permissions.Base = changePermissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
+                    newitem.Permissions.Current = newitem.Permissions.Base;
+                    newitem.Permissions.Group = InventoryPermissionsMask.None;
+                    newitem.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
+                    newitem.Permissions.EveryOne = InventoryPermissionsMask.None;
+                    copyItems[grp.Owner].Add(newitem);
+
+                    foreach (KeyValuePair<UUI, List<InventoryItem>> kvp in copyItems)
+                    {
+                        var assetIDs = new List<UUID>();
+                        IAgent toAgent;
+                        foreach (InventoryItem item in kvp.Value)
+                        {
+                            if (!assetIDs.Contains(item.AssetID))
+                            {
+                                assetIDs.Add(item.AssetID);
+                            }
+                        }
+                        if (Agents.TryGetValue(kvp.Key.ID, out toAgent))
+                        {
+                            new ObjectTransferItem(toAgent,
+                                this,
+                                assetIDs,
+                                kvp.Value,
+                                AssetType.LostAndFoundFolder).QueueWorkItem();
+                        }
+                        else
+                        {
+                            InventoryServiceInterface agentInventoryService;
+                            AssetServiceInterface agentAssetService;
+                            if (TryGetServices(kvp.Key, out agentInventoryService, out agentAssetService))
+                            {
+                                new ObjectTransferItem(agentInventoryService,
+                                    agentAssetService,
+                                    kvp.Key,
+                                    this,
+                                    assetIDs,
+                                    kvp.Value,
+                                    AssetType.LostAndFoundFolder).QueueWorkItem();
+                            }
+                        }
+                    }
+
+                    grp.Scene.Remove(grp);
+                    returned.Add(objectid);
+                }
+            }
+
+            return returned;
+        }
+
         [PacketHandler(MessageType.DeRezObject)]
-        internal void HandleDeRezObject(Message m)
+        public void HandleDeRezObject(Message m)
         {
             Viewer.Messages.Object.DeRezAck ackres;
             var req = (Viewer.Messages.Object.DeRezObject)m;
@@ -314,68 +409,65 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             var copyItems = new Dictionary<UUI, List<InventoryItem>>();
-            if (req.Destination != DeRezAction.ReturnToOwner)
+            foreach (ObjectGroup grp in objectgroups)
             {
-                foreach (ObjectGroup grp in objectgroups)
+                UUID assetID;
+                bool changePermissions = false;
+                UUI targetAgent;
+                switch (req.Destination)
                 {
-                    UUID assetID;
-                    bool changePermissions = false;
-                    UUI targetAgent;
-                    switch (req.Destination)
-                    {
-                        case DeRezAction.ReturnToOwner:
-                            targetAgent = grp.Owner;
-                            break;
+                    case DeRezAction.ReturnToOwner:
+                        targetAgent = grp.Owner;
+                        break;
 
-                        default:
-                            targetAgent = agent.Owner;
-                            break;
-                    }
-
-                    if (!targetAgent.EqualsGrid(agent.Owner))
-                    {
-                        assetID = grp.NextOwnerAssetID;
-                        if (assetID == UUID.Zero)
-                        {
-                            assetID = AssetService.GenerateNextOwnerAssets(grp);
-                        }
-                        changePermissions = true;
-                    }
-                    else
-                    {
-                        assetID = grp.OriginalAssetID;
-                        if(UUID.Zero == assetID)
-                        {
-                            AssetData asset = grp.Asset(XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.WriteXml2);
-                            asset.ID = UUID.Random;
-                            AssetService.Store(asset);
-                            grp.OriginalAssetID = asset.ID;
-                            assetID = asset.ID;
-                        }
-                    }
-                    if(!copyItems.ContainsKey(targetAgent))
-                    {
-                        copyItems.Add(targetAgent, new List<InventoryItem>());
-                    }
-                    var item = new InventoryItem()
-                    {
-                        AssetID = assetID,
-                        AssetType = AssetType.Object,
-                        InventoryType = InventoryType.Object,
-                        Name = grp.Name,
-                        Description = grp.Description,
-                        LastOwner = grp.Owner,
-                        Owner = targetAgent,
-                        Creator = grp.RootPart.Creator,
-                        CreationDate = grp.RootPart.CreationDate
-                    };
-                    item.Permissions.Base = changePermissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
-                    item.Permissions.Current = item.Permissions.Base;
-                    item.Permissions.Group = InventoryPermissionsMask.None;
-                    item.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
-                    item.Permissions.EveryOne = InventoryPermissionsMask.None;
-                    copyItems[grp.Owner].Add(item);
+                    default:
+                        targetAgent = agent.Owner;
+                        break;
                 }
+
+                if (!targetAgent.EqualsGrid(agent.Owner))
+                {
+                    assetID = grp.NextOwnerAssetID;
+                    if (assetID == UUID.Zero)
+                    {
+                        assetID = AssetService.GenerateNextOwnerAssets(grp);
+                    }
+                    changePermissions = true;
+                }
+                else
+                {
+                    assetID = grp.OriginalAssetID;
+                    if(UUID.Zero == assetID)
+                    {
+                        AssetData asset = grp.Asset(XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.WriteXml2);
+                        asset.ID = UUID.Random;
+                        AssetService.Store(asset);
+                        grp.OriginalAssetID = asset.ID;
+                        assetID = asset.ID;
+                    }
+                }
+                if(!copyItems.ContainsKey(targetAgent))
+                {
+                    copyItems.Add(targetAgent, new List<InventoryItem>());
+                }
+                var item = new InventoryItem()
+                {
+                    AssetID = assetID,
+                    AssetType = AssetType.Object,
+                    InventoryType = InventoryType.Object,
+                    Name = grp.Name,
+                    Description = grp.Description,
+                    LastOwner = grp.Owner,
+                    Owner = targetAgent,
+                    Creator = grp.RootPart.Creator,
+                    CreationDate = grp.RootPart.CreationDate
+                };
+                item.Permissions.Base = changePermissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
+                item.Permissions.Current = item.Permissions.Base;
+                item.Permissions.Group = InventoryPermissionsMask.None;
+                item.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
+                item.Permissions.EveryOne = InventoryPermissionsMask.None;
+                copyItems[grp.Owner].Add(item);
             }
 
             foreach(KeyValuePair<UUI, List<InventoryItem>> kvp in copyItems)
@@ -391,7 +483,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 if(Agents.TryGetValue(kvp.Key.ID, out toAgent))
                 {
-                    new ObjectTransferItem(agent,
+                    new ObjectTransferItem(toAgent,
                         this,
                         assetIDs,
                         kvp.Value,

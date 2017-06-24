@@ -684,9 +684,11 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanReturn(IAgent agent, ObjectGroup group, Vector3 location)
+        public bool CanReturn(IAgent agent, ObjectGroup group, Vector3 location) =>
+            CanReturn(agent.Owner, group, location);
+
+        public bool CanReturn(UUI agentOwner, ObjectGroup group, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
             UUI groupOwner = group.Owner;
             if (IsPossibleGod(agentOwner))
             {
@@ -717,9 +719,9 @@ namespace SilverSim.Scene.Types.Scene
 
 #warning Add Friends Rights to CanReturn?
 
-            if (HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupSet) ||
+            if (HasGroupPower(agentOwner, group.Group, GroupPowers.ReturnGroupSet) ||
                 (group.IsGroupOwned &&
-                HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupOwned)))
+                HasGroupPower(agentOwner, group.Group, GroupPowers.ReturnGroupOwned)))
             {
                 return true;
             }
@@ -732,7 +734,7 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                if (!pinfo.Group.Equals(group.Group) && HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.ReturnNonGroup))
+                if (!pinfo.Group.Equals(group.Group) && HasGroupPower(agentOwner, pinfo.Group, GroupPowers.ReturnNonGroup))
                 {
                     return true;
                 }
