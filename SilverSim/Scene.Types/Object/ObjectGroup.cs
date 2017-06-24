@@ -154,6 +154,111 @@ namespace SilverSim.Scene.Types.Object
             set { RootPart.PathfindingType = value; }
         }
 
+        public bool IsSandbox
+        {
+            get
+            {
+                return RootPart.IsSandbox;
+            }
+            set
+            {
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        if (part.IsSandbox != value)
+                        {
+                            part.IsSandbox = value;
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool IsBlockGrab
+        {
+            get
+            {
+                return RootPart.IsBlockGrab;
+            }
+            set
+            {
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        if (part.IsBlockGrab != value)
+                        {
+                            part.IsBlockGrab = value;
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool IsDieAtEdge
+        {
+            get
+            {
+                return RootPart.IsDieAtEdge;
+            }
+            set
+            {
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        if (part.IsDieAtEdge != value)
+                        {
+                            part.IsDieAtEdge = value;
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool IsReturnAtEdge
+        {
+            get
+            {
+                return RootPart.IsReturnAtEdge;
+            }
+            set
+            {
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        if (part.IsReturnAtEdge != value)
+                        {
+                            part.IsReturnAtEdge = value;
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool IsBlockGrabObject
+        {
+            get
+            {
+                return RootPart.IsBlockGrabObject;
+            }
+            set
+            {
+                lock (m_PhysicsLinksetUpdateLock)
+                {
+                    foreach (ObjectPart part in Values)
+                    {
+                        if (part.IsBlockGrabObject != value)
+                        {
+                            part.IsBlockGrabObject = value;
+                        }
+                    }
+                }
+            }
+        }
+
         /* UUID references to PartID and Vector3 is the attaching force */
         public RwLockedDictionary<UUID, Vector3> AttachedForces = new RwLockedDictionary<UUID, Vector3>();
 
