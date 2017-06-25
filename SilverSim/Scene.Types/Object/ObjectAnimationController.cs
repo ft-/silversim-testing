@@ -23,7 +23,6 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.Object;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Object
