@@ -251,11 +251,11 @@ namespace SilverSim.Scene.Types.Agent
                     if (m_ActiveAnimations[i].AnimID == animid)
                     {
                         m_ActiveAnimations.RemoveAt(i);
-                        SendAnimations();
                         break;
                     }
                 }
             }
+            SendAnimations();
         }
 
         public List<UUID> GetPlayingAnimations()
