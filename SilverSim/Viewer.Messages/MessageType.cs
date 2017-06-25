@@ -500,6 +500,7 @@ namespace SilverSim.Viewer.Messages
         Error = Low | 423,
         ObjectIncludeInSearch = Low | 424,
         RezRestoreToWorld = Low | 425,
-        LinkInventoryItem = Low | 426
+        LinkInventoryItem = Low | 426,
+        ObjectAnimation = High | 30
     }
 }
