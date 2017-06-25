@@ -26,7 +26,7 @@ namespace SilverSim.Scene.Types.Pathfinding
     [Flags]
     public enum PathfindingOptions
     {
-        None,
+        None = 0,
         UseStaticOnly = 1,
         AvoidDynamicObstacles = 2,
         AvoidCharacters = 4
