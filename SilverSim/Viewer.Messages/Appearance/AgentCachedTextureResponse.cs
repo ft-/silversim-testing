@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Appearance
