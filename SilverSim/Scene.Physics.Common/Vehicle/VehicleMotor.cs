@@ -131,6 +131,9 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             if (Math.Abs(hoverHeight) > double.Epsilon)
             {
+                /* The definition does not include negative hover height.
+                 * But since we are allowing negative terain height, it makes an useful feature.
+                 */
                 hoverForce = (hoverHeight - pos.Z) * m_Params[VehicleFloatParamId.HoverEfficiency] * m_Params.OneByHoverTimescale * dt;
                 if ((m_Params.Flags & VehicleFlags.HoverUpOnly) != 0 && hoverForce < 0)
                 {
