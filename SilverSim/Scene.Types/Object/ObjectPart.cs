@@ -158,6 +158,8 @@ namespace SilverSim.Scene.Types.Object
             #endregion
         }
 
+        public readonly ObjectAnimationController AnimationController;
+
         #region Constructor
         public ObjectPart()
         {
@@ -174,6 +176,7 @@ namespace SilverSim.Scene.Types.Object
             Inventory.OnChange += OnInventoryChange;
             m_TextureEntryBytes = m_TextureEntry.GetBytes();
             UpdateInfo = new ObjectUpdateInfo(this);
+            AnimationController = new ObjectAnimationController(this);
         }
         #endregion
 
