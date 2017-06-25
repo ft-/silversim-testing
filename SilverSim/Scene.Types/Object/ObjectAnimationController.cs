@@ -101,7 +101,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void StopAnimation(UUID animid, UUID objectid)
+        public void StopAnimation(UUID animid)
         {
             lock (m_Lock)
             {
