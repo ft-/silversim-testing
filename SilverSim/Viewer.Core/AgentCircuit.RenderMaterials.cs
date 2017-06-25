@@ -98,7 +98,10 @@ namespace SilverSim.Viewer.Core
                     using (var ms = new MemoryStream((BinaryData)reqmap["Zipped"]))
                     {
                         var skipheader = new byte[2];
-                        ms.Read(skipheader, 0, 2);
+                        if(ms.Read(skipheader, 0, 2) != 2)
+                        {
+                            throw new InvalidDataException("Missing header in materials data");
+                        }
                         using (var gz = new DeflateStream(ms, CompressionMode.Decompress))
                         {
                             var inp = LlsdBinary.Deserialize(gz);
