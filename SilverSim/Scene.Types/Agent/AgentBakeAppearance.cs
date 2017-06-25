@@ -254,6 +254,7 @@ namespace SilverSim.Scene.Types.Agent
             }
 
             agent.Wearables.All = wearables;
+            agent.Appearance.Serial = currentOutfit.Version;
 
             logOutput?.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
 
@@ -452,9 +453,10 @@ namespace SilverSim.Scene.Types.Agent
                                             continue;
                                         }
                                         AssetData textureData;
-                                        if (!assetService.TryGetValue(textureID, out textureData))
+                                        if (!assetService.TryGetValue(textureID, out textureData) &&
+                                            !sceneAssetService.TryGetValue(textureID, out textureData))
                                         {
-                                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to be retrieved", inventoryItem.AssetID, agent.Owner.FullName, agent.Owner.ID);
+                                            string info = string.Format("Asset {0} referenced by {1} for agent {2} ({3}) failed to be retrieved", textureID,inventoryItem.AssetID, agent.Owner.FullName, agent.Owner.ID);
                                             m_BakeLog.ErrorFormat(info);
                                             throw new BakingErrorException(info);
                                         }

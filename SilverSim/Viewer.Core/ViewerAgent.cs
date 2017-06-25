@@ -317,6 +317,19 @@ namespace SilverSim.Viewer.Core
             set;
         }
 
+        protected override AssetServiceInterface SceneAssetService
+        {
+            get
+            {
+                AgentCircuit circuit;
+                if(Circuits.TryGetValue(m_CurrentSceneID, out circuit))
+                {
+                    return circuit.Scene.AssetService;
+                }
+                return AssetService;
+            }
+        }
+
         public override AssetServiceInterface AssetService => m_AssetService;
 
         public override InventoryServiceInterface InventoryService => m_InventoryService;

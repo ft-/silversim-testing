@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
@@ -80,7 +81,7 @@ namespace SilverSim.Scene.Agent
         private byte[] m_VisualParams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
         private readonly AppearanceInfo.AvatarTextureData m_TextureHashes = new AppearanceInfo.AvatarTextureData();
         private readonly AppearanceInfo.AvatarTextureData m_Textures = new AppearanceInfo.AvatarTextureData();
-        public UInt32 Serial = 1;
+        public int Serial = 1;
         public const int MaxVisualParams = 260;
         protected const int NUM_AVATAR_TEXTURES = 21;
 
@@ -111,7 +112,8 @@ namespace SilverSim.Scene.Agent
             };
             var e = new AvatarAppearance.AppearanceDataEntry()
             {
-                AppearanceVersion = 1
+                AppearanceVersion = 1,
+                CofVersion = (int)Appearance.Serial
             };
             appearance.AppearanceData.Add(e);
             return appearance;
@@ -273,9 +275,11 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        protected virtual AssetServiceInterface SceneAssetService => AssetService;
+
         public void RebakeAppearance(Action<string> logOutput = null)
         {
-            AgentBakeAppearance.LoadAppearanceFromCurrentOutfit(this, AssetService, true, logOutput);
+            AgentBakeAppearance.LoadAppearanceFromCurrentOutfit(this, SceneAssetService, true, logOutput);
             InvokeOnAppearanceUpdate();
         }
 

@@ -133,10 +133,10 @@ namespace SilverSim.ServiceInterfaces.Avatar
             }
 
             string val;
-            uint uintval;
-            if (items.TryGetValue("Serial", out val) && uint.TryParse(val, out uintval))
+            int serial;
+            if (items.TryGetValue("Serial", out val) && int.TryParse(val, out serial))
             {
-                aInfo.Serial = uintval;
+                aInfo.Serial = serial;
             }
             double realval;
             if(items.TryGetValue("AvatarHeight", out val) && double.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out realval))

@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Appearance
     {
         public UUID AgentID;
         public UUID SessionID;
-        public UInt32 SerialNum;
+        public int SerialNum;
 
         public struct WearableDataEntry
         {
@@ -48,7 +48,7 @@ namespace SilverSim.Viewer.Messages.Appearance
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
-            p.WriteUInt32(SerialNum);
+            p.WriteInt32(SerialNum);
             p.WriteUInt8((byte)WearableData.Count);
             foreach (WearableDataEntry d in WearableData)
             {
@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Messages.Appearance
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
-                SerialNum = p.ReadUInt32()
+                SerialNum = p.ReadInt32()
             };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
