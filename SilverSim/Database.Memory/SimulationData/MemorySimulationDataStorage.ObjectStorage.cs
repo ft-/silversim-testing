@@ -133,6 +133,11 @@ namespace SilverSim.Database.Memory.SimulationData
                 DbSerialization = (BinaryData)map["ProjectionData"]
             };
 
+            objpart.ExtendedMesh = new ObjectPart.ExtendedMeshParams
+            {
+                DbSerialization = (BinaryData)map["ExtendedMeshData"]
+            };
+
             objpart.Text = new ObjectPart.TextParam
             {
                 Serialization = (BinaryData)map["HoverTextData"]

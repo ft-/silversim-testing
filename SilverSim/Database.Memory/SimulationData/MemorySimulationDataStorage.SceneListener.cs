@@ -307,6 +307,7 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "FlexibleData", new BinaryData(objpart.Flexible.DbSerialization) },
                     { "LoopedSoundData", new BinaryData(objpart.Sound.Serialization) },
                     { "ImpactSoundData", new BinaryData(objpart.CollisionSound.Serialization) },
+                    { "ExtendedMeshData", new BinaryData(objpart.ExtendedMesh.DbSerialization) },
                     { "PrimitiveShapeData", new BinaryData(objpart.Shape.Serialization) },
                     { "ParticleSystem", new BinaryData(objpart.ParticleSystemBytes) },
                     { "TextureEntryBytes", new BinaryData(objpart.TextureEntryBytes) },

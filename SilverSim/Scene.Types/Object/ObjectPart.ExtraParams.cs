@@ -378,6 +378,81 @@ namespace SilverSim.Scene.Types.Object
 
         private readonly ProjectionParam m_Projection = new ProjectionParam();
 
+        public class ExtendedMeshParams
+        {
+            [Flags]
+            public enum MeshFlags : uint
+            {
+                None = 0,
+                AnimatedMeshEnabled = 1
+            }
+
+            #region Fields
+            public MeshFlags Flags = MeshFlags.None;
+            #endregion
+
+            public static ExtendedMeshParams FromUdpDataBlock(byte[] value)
+            {
+                if (value.Length < 4)
+                {
+                    return new ExtendedMeshParams();
+                }
+                ExtendedMeshParams p = new ExtendedMeshParams();
+                if(!BitConverter.IsLittleEndian)
+                {
+                    byte[] b = new byte[4];
+                    Buffer.BlockCopy(value, 0, b, 0, 4);
+                    Array.Reverse(b);
+                    p.Flags = (MeshFlags)BitConverter.ToUInt32(b, 0);
+                }
+                else
+                {
+                    p.Flags = (MeshFlags)BitConverter.ToUInt32(value, 0);
+                }
+                return p;
+            }
+
+            public byte[] DbSerialization
+            {
+                get
+                {
+                    var serialized = new byte[4];
+                    Buffer.BlockCopy(BitConverter.GetBytes((uint)Flags), 0, serialized, 0, 4);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(serialized, 0, 4);
+                    }
+                    return serialized;
+                }
+                set
+                {
+                    if(value.Length == 0)
+                    {
+                        /* zero-length comes from migration */
+                        Flags = MeshFlags.None;
+                        return;
+                    }
+                    if (value.Length != 4)
+                    {
+                        throw new ArgumentException("Array length must be 4.");
+                    }
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 0, 4);
+                    }
+
+                    Flags = (MeshFlags)BitConverter.ToUInt32(value, 0);
+
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 0, 4);
+                    }
+                }
+            }
+        }
+
+        private readonly ExtendedMeshParams m_ExtendedMesh = new ExtendedMeshParams();
+
         private static void Float2LEBytes(float v, byte[] b, int offset)
         {
             var i = BitConverter.GetBytes(v);
@@ -402,6 +477,13 @@ namespace SilverSim.Scene.Types.Object
                 return BitConverter.ToSingle(b, offset);
             }
         }
+
+        private const ushort FlexiEP = 0x10;
+        private const ushort LightEP = 0x20;
+        private const ushort SculptEP = 0x30;
+        private const ushort ProjectionEP = 0x40;
+        private const ushort MeshEP = 0x60;
+        private const ushort ExtendedMeshEP = 0x70;
 
         public byte[] ExtraParamsBytes
         {
@@ -428,6 +510,7 @@ namespace SilverSim.Scene.Types.Object
                     var light = new PointLightParam();
                     var proj = new ProjectionParam();
                     var flexi = new FlexibleParam();
+                    var emesh = new ExtendedMeshParams();
 
                     flexi.IsFlexible = false;
                     proj.IsProjecting = false;
@@ -451,11 +534,6 @@ namespace SilverSim.Scene.Types.Object
                     }
                     else
                     {
-                        const ushort FlexiEP = 0x10;
-                        const ushort LightEP = 0x20;
-                        const ushort SculptEP = 0x30;
-                        const ushort ProjectionEP = 0x40;
-
                         int paramCount = value[0];
                         int pos = 1;
                         for (int paramIdx = 0; paramIdx < paramCount; ++paramIdx)
@@ -538,6 +616,23 @@ namespace SilverSim.Scene.Types.Object
                                     pos += 4;
                                     break;
 
+                                case ExtendedMeshEP:
+                                    if(len < 4)
+                                    {
+                                        break;
+                                    }
+                                    if(!BitConverter.IsLittleEndian)
+                                    {
+                                        byte[] b = new byte[4];
+                                        Buffer.BlockCopy(value, pos, b, 0, 4);
+                                        emesh.Flags = (ExtendedMeshParams.MeshFlags)BitConverter.ToUInt32(b, 0);
+                                    }
+                                    else
+                                    {
+                                        emesh.Flags = (ExtendedMeshParams.MeshFlags)BitConverter.ToUInt32(value, pos);
+                                    }
+                                    break;
+
                                 default:
                                     break;
                             }
@@ -547,6 +642,7 @@ namespace SilverSim.Scene.Types.Object
                     Projection = proj;
                     PointLight = light;
                     Flexible = flexi;
+                    ExtendedMesh = emesh;
 
                     if (!isSculpt)
                     {
@@ -589,11 +685,6 @@ namespace SilverSim.Scene.Types.Object
 
         private void UpdateExtraParams()
         {
-            const ushort FlexiEP = 0x10;
-            const ushort LightEP = 0x20;
-            const ushort SculptEP = 0x30;
-            const ushort ProjectionEP = 0x40;
-
             m_ExtraParamsLock.AcquireWriterLock(-1);
             try
             {
@@ -605,6 +696,7 @@ namespace SilverSim.Scene.Types.Object
                 var light = PointLight;
                 var proj = Projection;
                 var shape = Shape;
+                var emesh = ExtendedMesh;
                 if (flexi.IsFlexible)
                 {
                     ++extraParamsNum;
@@ -630,6 +722,13 @@ namespace SilverSim.Scene.Types.Object
                 {
                     ++extraParamsNum;
                     totalBytesLength += 28;
+                    totalBytesLength += 2 + 4;
+                }
+
+                if (emesh.Flags != ExtendedMeshParams.MeshFlags.None)
+                {
+                    ++extraParamsNum;
+                    totalBytesLength += 4;
                     totalBytesLength += 2 + 4;
                 }
 
@@ -719,6 +818,20 @@ namespace SilverSim.Scene.Types.Object
                     Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
                 }
 
+                if(emesh.Flags != ExtendedMeshParams.MeshFlags.None)
+                {
+                    updatebytes[i++] = (ExtendedMeshEP % 256);
+                    updatebytes[i++] = (ExtendedMeshEP / 256);
+                    updatebytes[i++] = 4;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = (byte)(((uint)emesh.Flags) & 0xFF);
+                    updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 8) & 0xFF);
+                    updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 16) & 0xFF);
+                    updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 24) & 0xFF);
+                }
+
                 m_ExtraParamsBytes = updatebytes;
             }
             finally
@@ -727,6 +840,28 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public ExtendedMeshParams ExtendedMesh
+        {
+            get
+            {
+                var res = new ExtendedMeshParams();
+                lock(m_ExtendedMesh)
+                {
+                    res.Flags = m_ExtendedMesh.Flags;
+                }
+                return res;
+            }
+            set
+            {
+                lock(m_ExtendedMesh)
+                {
+                    m_ExtendedMesh.Flags = value.Flags;
+                }
+                UpdateExtraParams();
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(UpdateChangedFlags.Shape);
+            }
+        }
 
         public FlexibleParam Flexible
         {
