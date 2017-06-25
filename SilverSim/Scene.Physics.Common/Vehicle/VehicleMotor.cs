@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Physics.Common.Vehicle
 {
@@ -128,8 +129,15 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 hoverHeight = waterHeight;
             }
 
-            hoverForce = (hoverHeight - pos.Z) * m_Params[VehicleFloatParamId.HoverEfficiency] * m_Params.OneByHoverTimescale * dt;
-            if((m_Params.Flags & VehicleFlags.HoverUpOnly) != 0 && hoverForce < 0)
+            if (Math.Abs(hoverHeight) > double.Epsilon)
+            {
+                hoverForce = (hoverHeight - pos.Z) * m_Params[VehicleFloatParamId.HoverEfficiency] * m_Params.OneByHoverTimescale * dt;
+                if ((m_Params.Flags & VehicleFlags.HoverUpOnly) != 0 && hoverForce < 0)
+                {
+                    hoverForce = 0;
+                }
+            }
+            else
             {
                 hoverForce = 0;
             }
