@@ -46,6 +46,13 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public List<AppearanceDataEntry> AppearanceData = new List<AppearanceDataEntry>();
 
+        public struct AppearanceHoverEntry
+        {
+            public Vector3 HoverHeight;
+        }
+
+        public List<AppearanceHoverEntry> AppearanceHover = new List<AppearanceHoverEntry>();
+
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(Sender);
@@ -69,6 +76,14 @@ namespace SilverSim.Viewer.Messages.Appearance
                 p.WriteInt32(d.CofVersion);
                 p.WriteUInt32(d.Flags);
             }
+            if (AppearanceHover.Count != 0)
+            {
+                p.WriteUInt8((byte)AppearanceHover.Count);
+                foreach (AppearanceHoverEntry d in AppearanceHover)
+                {
+                    p.WriteVector3f(d.HoverHeight);
+                }
+            }
         }
 
         public static Message Decode(UDPPacket p)
@@ -83,11 +98,19 @@ namespace SilverSim.Viewer.Messages.Appearance
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                m.AppearanceData.Add(new AppearanceDataEntry()
+                m.AppearanceData.Add(new AppearanceDataEntry
                 {
                     AppearanceVersion = p.ReadUInt8(),
                     CofVersion = p.ReadInt32(),
                     Flags = p.ReadUInt32()
+                });
+            }
+            n = p.ReadUInt8(0);
+            for(uint i = 0; i < n; ++i)
+            {
+                m.AppearanceHover.Add(new AppearanceHoverEntry
+                {
+                    HoverHeight = p.ReadVector3f()
                 });
             }
             return m;

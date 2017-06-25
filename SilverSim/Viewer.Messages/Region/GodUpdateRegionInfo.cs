@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Region
 {
@@ -41,7 +42,28 @@ namespace SilverSim.Viewer.Messages.Region
         public Int32 RedirectGridX;
         public Int32 RedirectGridY;
 
-        public static Message Decode(UDPPacket p) => new GodUpdateRegionInfo()
+        public List<UInt64> RegionFlagsExtended = new List<UInt64>();
+
+        private static List<UInt64> ReadRegionFlagsExtended(UDPPacket p)
+        {
+            List<UInt64> res = new List<ulong>();
+            uint n;
+            try
+            {
+                n = p.ReadUInt8();
+            }
+            catch
+            {
+                n = 0;
+            }
+            while(n--!=0)
+            {
+                res.Add(p.ReadUInt64());
+            }
+            return res;
+        }
+
+        public static Message Decode(UDPPacket p) => new GodUpdateRegionInfo
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),
@@ -52,7 +74,8 @@ namespace SilverSim.Viewer.Messages.Region
             BillableFactor = p.ReadFloat(),
             PricePerMeter = p.ReadInt32(),
             RedirectGridX = p.ReadInt32(),
-            RedirectGridY = p.ReadInt32()
+            RedirectGridY = p.ReadInt32(),
+            RegionFlagsExtended = ReadRegionFlagsExtended(p)
         };
 
         public override void Serialize(UDPPacket p)
@@ -67,6 +90,11 @@ namespace SilverSim.Viewer.Messages.Region
             p.WriteInt32(PricePerMeter);
             p.WriteInt32(RedirectGridX);
             p.WriteInt32(RedirectGridY);
+            p.WriteUInt8((byte)RegionFlagsExtended.Count);
+            foreach(ulong d in RegionFlagsExtended)
+            {
+                p.WriteUInt64(d);
+            }
         }
     }
 }

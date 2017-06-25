@@ -30,7 +30,6 @@ using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages.Appearance;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace SilverSim.Scene.Agent
@@ -112,8 +111,8 @@ namespace SilverSim.Scene.Agent
             };
             var e = new AvatarAppearance.AppearanceDataEntry()
             {
-                AppearanceVersion = 1,
-                CofVersion = (int)Appearance.Serial
+                AppearanceVersion = 0,
+                CofVersion = Appearance.Serial
             };
             appearance.AppearanceData.Add(e);
             return appearance;

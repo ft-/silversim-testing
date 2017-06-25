@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace SilverSim.Viewer.Messages
@@ -44,6 +45,29 @@ namespace SilverSim.Viewer.Messages
 
         public Message.QueueOutType OutQueue = Message.QueueOutType.Low;
         public Message AckMessage; /* only used by Circuit */
+
+        [Serializable]
+        public class EndOfPacketException : Exception
+        {
+            public EndOfPacketException() : base("End of packet")
+            {
+            }
+
+            public EndOfPacketException(string message)
+                : base(message)
+            {
+            }
+
+            public EndOfPacketException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+            }
+
+            protected EndOfPacketException(SerializationInfo info, StreamingContext context) 
+                : base(info, context)
+            {
+            }
+        }
 
         public UInt32 SequenceNumber
         {
@@ -331,15 +355,22 @@ namespace SilverSim.Viewer.Messages
         }
         #endregion
 
-        private byte[] ReadZeroEncoded(int length)
+        private bool TryReadZeroEncoded(byte[] outbuf)
         {
-            byte[] outbuf = new byte[length];
-            for (int i = 0; i < length; ++i)
+            for (int i = 0; i < outbuf.Length; ++i)
             {
                 if (zleCount == 0)
                 {
+                    if (DataPos >= DataLength)
+                    {
+                        return false;
+                    }
                     if (Data[DataPos] == 0)
                     {
+                        if (DataPos >= DataLength)
+                        {
+                            return false;
+                        }
                         zleCount = Data[++DataPos];
                         outbuf[i] = 0;
                         zleCount--;
@@ -356,6 +387,16 @@ namespace SilverSim.Viewer.Messages
                     --zleCount;
                     outbuf[i] = 0;
                 }
+            }
+            return true;
+        }
+
+        private byte[] ReadZeroEncoded(int length)
+        {
+            byte[] outbuf = new byte[length];
+            if(!TryReadZeroEncoded(outbuf))
+            {
+                throw new EndOfPacketException();
             }
             return outbuf;
         }
@@ -421,7 +462,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToUInt64(buf, 0);
             }
-            else if (!BitConverter.IsLittleEndian)
+
+            if (DataPos + 8 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[8];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 8);
@@ -495,7 +542,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToInt64(buf, 0);
             }
-            else if (!BitConverter.IsLittleEndian)
+
+            if (DataPos + 8 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[8];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 8);
@@ -545,7 +598,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToUInt32(buf, 0);
             }
-            else if (!BitConverter.IsLittleEndian)
+
+            if (DataPos + 4 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[4];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 4);
@@ -597,7 +656,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToInt32(buf, 0);
             }
-            else if (!BitConverter.IsLittleEndian)
+
+            if (DataPos + 4 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[4];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 4);
@@ -647,7 +712,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToUInt16(buf, 0);
             }
-            else if (!BitConverter.IsLittleEndian)
+
+            if (DataPos + 2 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[2];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 2);
@@ -686,6 +757,35 @@ namespace SilverSim.Viewer.Messages
         #endregion
 
         #region Int16
+
+        public Int16 ReadInt16(Int16 defvalue)
+        {
+            byte[] buf = new byte[2];
+            if (IsZeroEncoded)
+            {
+                if(!TryReadZeroEncoded(buf))
+                {
+                    return defvalue;
+                }
+            }
+            else
+            {
+                if(DataPos + 2 > DataLength)
+                {
+                    DataPos = DataLength;
+                    return defvalue;
+                }
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 2);
+                DataPos += 2;
+            }
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(buf);
+            }
+            return BitConverter.ToInt16(buf, 0);
+        }
+
         public Int16 ReadInt16()
         {
             if (IsZeroEncoded)
@@ -697,7 +797,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToInt16(buf, 0);
             }
-            else if (!BitConverter.IsLittleEndian)
+
+            if (DataPos + 2 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[2];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 2);
@@ -737,6 +843,19 @@ namespace SilverSim.Viewer.Messages
 
         #region UInt8
 
+        public byte ReadUInt8(byte defvalue)
+        {
+            if(IsZeroEncoded)
+            {
+                byte[] buf = new byte[1];
+                return TryReadZeroEncoded(buf) ? buf[0] : defvalue;
+            }
+            else
+            {
+                return DataPos + 1 > DataLength ? Data[DataPos++] : defvalue;
+            }
+        }
+
         public byte ReadUInt8()
         {
             if (IsZeroEncoded)
@@ -744,6 +863,12 @@ namespace SilverSim.Viewer.Messages
                 byte[] buf = ReadZeroEncoded(1);
                 return buf[0];
             }
+
+            if (DataPos + 1 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
             byte val = Data[DataPos];
             DataPos++;
             return val;
@@ -775,6 +900,12 @@ namespace SilverSim.Viewer.Messages
                 byte[] buf = ReadZeroEncoded(1);
                 return (sbyte)buf[0];
             }
+
+            if (DataPos + 1 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
             sbyte val = (sbyte)Data[DataPos];
             DataPos++;
             return val;
@@ -809,7 +940,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToDouble(buf, 0);
             }
-            else if(!BitConverter.IsLittleEndian)
+
+            if (DataPos + 8 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[8];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 8);
@@ -859,7 +996,13 @@ namespace SilverSim.Viewer.Messages
                 }
                 return BitConverter.ToSingle(buf, 0);
             }
-            else if(!BitConverter.IsLittleEndian)
+
+            if (DataPos + 4 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
+            if (!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[4];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 4);
@@ -978,6 +1121,26 @@ namespace SilverSim.Viewer.Messages
         #endregion
 
         #region UUID
+        public UUID ReadUUID(UUID defvalue)
+        {
+            if(IsZeroEncoded)
+            {
+                byte[] buf = new byte[16];
+                return TryReadZeroEncoded(buf) ? new UUID(buf, 0) : defvalue;
+            }
+            else if(DataPos + 16 > DataLength)
+            {
+                DataPos = DataLength;
+                return defvalue;
+            }
+            else
+            {
+                UUID res = new UUID(Data, DataPos);
+                DataPos += 16;
+                return res;
+            }
+        }
+
         public UUID ReadUUID()
         {
             if (IsZeroEncoded)
@@ -985,6 +1148,12 @@ namespace SilverSim.Viewer.Messages
                 byte[] buf = ReadZeroEncoded(16);
                 return new UUID(buf, 0);
             }
+
+            if (DataPos + 16 > DataLength)
+            {
+                throw new EndOfPacketException();
+            }
+
             DataPos += 16;
             return new UUID(Data, DataPos - 16);
         }
@@ -1006,7 +1175,7 @@ namespace SilverSim.Viewer.Messages
         }
         #endregion
 
-        #region UUID
+        #region Byte arrays
         public byte[] ReadBytes(int length)
         {
             if(length == 0)
@@ -1017,13 +1186,16 @@ namespace SilverSim.Viewer.Messages
             {
                 return ReadZeroEncoded(length);
             }
-            else
+
+            if (DataPos + length > DataLength)
             {
-                byte[] buf = new byte[length];
-                Buffer.BlockCopy(Data, DataPos, buf, 0, length);
-                DataPos += length;
-                return buf;
+                throw new EndOfPacketException();
             }
+
+            byte[] buf = new byte[length];
+            Buffer.BlockCopy(Data, DataPos, buf, 0, length);
+            DataPos += length;
+            return buf;
         }
 
         public void WriteBytes(byte[] buf)

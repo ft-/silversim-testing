@@ -45,25 +45,14 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteUUID(ExperienceID);
         }
 
-        public static Message Decode(UDPPacket p)
+        public static Message Decode(UDPPacket p) => new ScriptQuestion
         {
-            var m = new ScriptQuestion()
-            {
-                TaskID = p.ReadUUID(),
-                ItemID = p.ReadUUID(),
-                ObjectName = p.ReadStringLen8(),
-                ObjectOwner = p.ReadStringLen8(),
-                Questions = (ScriptPermissions)p.ReadUInt32()
-            };
-            try
-            {
-                m.ExperienceID = p.ReadUUID();
-            }
-            catch
-            {
-                m.ExperienceID = UUID.Zero;
-            }
-            return m;
-        }
+            TaskID = p.ReadUUID(),
+            ItemID = p.ReadUUID(),
+            ObjectName = p.ReadStringLen8(),
+            ObjectOwner = p.ReadStringLen8(),
+            Questions = (ScriptPermissions)p.ReadUInt32(),
+            ExperienceID = p.ReadUUID(UUID.Zero)
+        };
     }
 }
