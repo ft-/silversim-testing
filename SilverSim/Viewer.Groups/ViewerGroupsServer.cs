@@ -26,7 +26,6 @@
 using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
@@ -35,7 +34,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.IM;
-using SilverSim.Types.Inventory;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
@@ -45,7 +43,6 @@ using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -85,23 +82,14 @@ namespace SilverSim.Viewer.Groups
         [PacketHandler(MessageType.GroupRoleUpdate)]
         [IMMessageHandler(GridInstantMessageDialog.GroupInvitationAccept)]
         [IMMessageHandler(GridInstantMessageDialog.GroupInvitationDecline)]
-        [IMMessageHandler(GridInstantMessageDialog.GroupNotice)]
-        [IMMessageHandler(GridInstantMessageDialog.GroupNoticeInventoryAccepted)]
-        [IMMessageHandler(GridInstantMessageDialog.SessionGroupStart)]
-        [IMMessageHandler(GridInstantMessageDialog.SessionSend)]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
         private readonly BlockingQueue<KeyValuePair<UUID, SceneInterface>> AgentGroupDataUpdateQueue = new BlockingQueue<KeyValuePair<UUID, SceneInterface>>();
-
-        private readonly BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
-        private IMRouter m_IMRouter;
 
         private bool m_ShutdownGroups;
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_IMRouter = loader.IMRouter;
             ThreadManager.CreateThread(HandlerThread).Start();
-            ThreadManager.CreateThread(IMThread).Start();
             ThreadManager.CreateThread(AgentGroupDataUpdateQueueThread).Start();
         }
 
@@ -175,62 +163,6 @@ namespace SilverSim.Viewer.Groups
                     continue;
                 }
                 SendAgentGroupDataUpdate(agent, req.Value, groupsService, null);
-            }
-        }
-
-        public void IMThread()
-        {
-            Thread.CurrentThread.Name = "Groups IM Thread";
-
-            while(!m_ShutdownGroups)
-            {
-                KeyValuePair<SceneInterface, GridInstantMessage> req;
-                try
-                {
-                    req = IMGroupNoticeQueue.Dequeue(1000);
-                }
-                catch
-                {
-                    continue;
-                }
-
-                var groupsService = req.Key.GroupsService;
-
-                if(groupsService == null)
-                {
-                    continue;
-                }
-
-                var gim = req.Value;
-                List<GroupMember> gmems;
-                try
-                {
-                    gmems = groupsService.Members[gim.FromAgent, gim.FromGroup];
-                }
-                catch
-                {
-                    continue;
-                }
-
-                foreach(var gmem in gmems)
-                {
-                    if(gim.Dialog == GridInstantMessageDialog.GroupNotice &&
-                        (!gmem.IsAcceptNotices ||
-                            0 == (GetGroupPowers(gmem.Principal, groupsService, gim.FromGroup) & GroupPowers.ReceiveNotices)))
-                    {
-                        continue;
-                    }
-
-                    GridInstantMessage ngim = gim.Clone();
-                    try
-                    {
-                        m_IMRouter.SendSync(ngim);
-                    }
-                    catch
-                    {
-                        /* just ignore in case something bad happens */
-                    }
-                }
             }
         }
 
@@ -372,13 +304,6 @@ namespace SilverSim.Viewer.Groups
                                     case GridInstantMessageDialog.GroupInvitationDecline:
                                         break;
 
-                                    case GridInstantMessageDialog.GroupNotice:
-                                        HandleGroupNotice(req.Key.Agent, scene, im);
-                                        break;
-
-                                    case GridInstantMessageDialog.GroupNoticeInventoryAccepted:
-                                        break;
-
                                     default:
                                         break;
                                 }
@@ -450,88 +375,7 @@ namespace SilverSim.Viewer.Groups
         }
         #endregion
 
-        #region Group Notice
-        private void HandleGroupNotice(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
-        {
-            /* no validation needed with IM, that is already done in circuit */
-            var groupsService = scene.GroupsService;
-
-            if(groupsService == null)
-            {
-                return;
-            }
-
-            UGI group;
-            try
-            {
-                group = groupsService.Groups[agent.Owner, m.ToAgentID];
-            }
-            catch
-            {
-                return;
-            }
-
-            if((GetGroupPowers(agent.Owner, groupsService, group) & GroupPowers.SendNotices) == 0)
-            {
-                return;
-            }
-
-            InventoryItem item = null;
-
-            if(m.BinaryBucket.Length >= 1 && m.BinaryBucket[0] > 0)
-            {
-                try
-                {
-                    var iv = LlsdXml.Deserialize(new MemoryStream(m.BinaryBucket));
-                    if(iv is Map)
-                    {
-                        var binBuck = (Map)iv;
-                        var itemID = binBuck["item_id"].AsUUID;
-                        var ownerID = binBuck["owner_id"].AsUUID;
-                        item = agent.InventoryService.Item[ownerID, itemID];
-                    }
-                }
-                catch
-                {
-                    /* do not expose exceptions to caller */
-                }
-            }
-
-            var gn = new GroupNotice()
-            {
-                ID = UUID.Random,
-                Group = group,
-                FromName = agent.Owner.FullName
-            };
-            var submsg = m.Message.Split(new char[] {'|'}, 2);
-            gn.Subject = submsg.Length > 1 ? submsg[0] : string.Empty;
-            gn.Message = submsg.Length > 1 ? submsg[1] : submsg[0];
-            gn.HasAttachment = item != null;
-            gn.AttachmentType = item != null ? item.AssetType : Types.Asset.AssetType.Unknown;
-            gn.AttachmentName = item != null ? item.Name : string.Empty;
-            gn.AttachmentItemID = item != null ? item.ID : UUID.Zero;
-            gn.AttachmentOwner = item !=  null ? item.Owner : UUI.Unknown;
-
-            var gim = new GridInstantMessage()
-            {
-                FromAgent = agent.Owner,
-                Dialog = GridInstantMessageDialog.GroupNotice,
-                IsFromGroup = true,
-                Message = m.Message,
-                IMSessionID = gn.ID,
-                BinaryBucket = m.BinaryBucket
-            };
-            try
-            {
-                groupsService.Notices.Add(agent.Owner, gn);
-                IMGroupNoticeQueue.Enqueue(new KeyValuePair<SceneInterface, GridInstantMessage>(scene, gim));
-            }
-            catch
-            {
-                /* do not expose exceptions to caller */
-            }
-        }
-
+        #region Group notices
         private void HandleGroupNoticesListRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (GroupNoticesListRequest)m;
