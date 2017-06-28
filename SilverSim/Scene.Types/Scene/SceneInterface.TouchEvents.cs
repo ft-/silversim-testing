@@ -32,7 +32,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        private void AddDetectAgentData(IAgent agent, DetectInfo detectdata)
+        private void AddDetectAgentData(IAgent agent, ref DetectInfo detectdata)
         {
             detectdata.Key = agent.ID;
             detectdata.Group = agent.Group;
@@ -72,7 +72,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             var detectdata = new DetectInfo();
-            AddDetectAgentData(agent, detectdata);
+            AddDetectAgentData(agent, ref detectdata);
             detectdata.GrabOffset = req.GrabOffset;
             detectdata.LinkNumber = part.LinkNumber;
             if (req.ObjectData.Count > 0)
@@ -125,7 +125,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             var detectdata = new DetectInfo();
-            AddDetectAgentData(agent, detectdata);
+            AddDetectAgentData(agent, ref detectdata);
             detectdata.GrabOffset = req.GrabPosition;
             detectdata.LinkNumber = part.LinkNumber;
             if (req.ObjectData.Count > 0)
@@ -204,7 +204,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             var detectdata = new DetectInfo();
-            AddDetectAgentData(agent, detectdata);
+            AddDetectAgentData(agent, ref detectdata);
             detectdata.GrabOffset = Vector3.Zero;
             detectdata.LinkNumber = part.LinkNumber;
             if (req.ObjectData.Count > 0)
