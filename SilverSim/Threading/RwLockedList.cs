@@ -46,273 +46,83 @@ namespace SilverSim.Threading
             m_List = new List<T>(capacity);
         }
 
-        public int Count
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_List.Count;
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public int Count => m_RwLock.AcquireReaderLock(() => m_List.Count);
 
-        public void Clear()
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_List.Clear();
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public void Clear() => m_RwLock.AcquireWriterLock(() => m_List.Clear());
 
-        public IList<T> GetAndClear()
+        public IList<T> GetAndClear() => m_RwLock.AcquireWriterLock(() =>
         {
-            IList<T> res;
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                res = new List<T>(m_List);
-                m_List.Clear();
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
+            IList<T> res = new List<T>(m_List);
+            m_List.Clear();
             return res;
-        }
+        });
 
-        public bool Contains(T value)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_List.Contains(value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public bool Contains(T value) => m_RwLock.AcquireReaderLock(() => m_List.Contains(value));
 
         public bool IsReadOnly => false;
 
-        public bool Remove(T value)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                return m_List.Remove(value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public bool Remove(T value) => m_RwLock.AcquireWriterLock(() => m_List.Remove(value));
 
-        public int IndexOf(T value)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_List.IndexOf(value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public int IndexOf(T value) => m_RwLock.AcquireReaderLock(() => m_List.IndexOf(value));
 
-        public void RemoveAt(int index)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_List.RemoveAt(index);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public void RemoveAt(int index) => m_RwLock.AcquireWriterLock(() => m_List.RemoveAt(index));
 
         public delegate bool RemoveMatchDelegate(T val);
 
-        public T RemoveMatch(RemoveMatchDelegate del)
+        public T RemoveMatch(RemoveMatchDelegate del) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            foreach (T val in m_List)
             {
-                foreach(T val in m_List)
+                if (del(val))
                 {
-                    if(del(val))
-                    {
-                        m_List.Remove(val);
-                        return val;
-                    }
+                    m_List.Remove(val);
+                    return val;
                 }
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
             return default(T);
-        }
+        });
 
         public T this[int index]
         {
             get
             {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_List[index];
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
+                return m_RwLock.AcquireReaderLock(() => m_List[index]);
             }
             set
             {
-                m_RwLock.AcquireWriterLock(-1);
-                try
+                m_RwLock.AcquireWriterLock(() =>
                 {
                     m_List[index] = value;
-                }
-                finally
-                {
-                    m_RwLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 
-        public void Add(T value)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_List.Add(value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public void Add(T value) => m_RwLock.AcquireWriterLock(() => m_List.Add(value));
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                m_List.CopyTo(array, arrayIndex);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public void CopyTo(T[] array, int arrayIndex) => m_RwLock.AcquireReaderLock(() => m_List.CopyTo(array, arrayIndex));
 
-        public void Insert(int index, T value)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_List.Insert(index, value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public void Insert(int index, T value) => m_RwLock.AcquireWriterLock(() => m_List.Insert(index, value));
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return (new List<T>(m_List)).GetEnumerator();
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public IEnumerator<T> GetEnumerator() => m_RwLock.AcquireReaderLock(() => (new List<T>(m_List)).GetEnumerator());
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        /* support for non-copy enumeration */
-        public void ForEach(Action<T> action)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                foreach (T val in m_List)
-                {
-                    action(val);
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
 
         [Serializable]
         public class ValueAlreadyExistsException : Exception
         {
         }
 
-        public void AddIfNotExists(T val)
+        public void AddIfNotExists(T val) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            if (m_List.Contains(val))
             {
-                if(m_List.Contains(val))
-                {
-                    throw new ValueAlreadyExistsException();
-                }
-                m_List.Add(val);
+                throw new ValueAlreadyExistsException();
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+            m_List.Add(val);
+        });
 
-        public List<T> FindAll(Predicate<T> match)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_List.FindAll(match);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public List<T> FindAll(Predicate<T> match) => m_RwLock.AcquireReaderLock(() => m_List.FindAll(match));
 
-        public T Find(Predicate<T> match)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_List.Find(match);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public T Find(Predicate<T> match) => m_RwLock.AcquireReaderLock(() => m_List.Find(match));
     }
 }

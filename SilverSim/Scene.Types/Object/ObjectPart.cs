@@ -958,13 +958,13 @@ namespace SilverSim.Scene.Types.Object
                 {
                     try
                     {
-                        grp.ForEach((KeyValuePair<int, ObjectPart> kvp) =>
+                        foreach(KeyValuePair<int, ObjectPart> kvp in grp.Key1ValuePairs)
                         {
                             if (kvp.Value == this)
                             {
                                 throw new ReturnValueException<int>(kvp.Key);
                             }
-                        });
+                        }
                     }
                     catch(ReturnValueException<int> e)
                     {
@@ -1698,7 +1698,10 @@ namespace SilverSim.Scene.Types.Object
         #region Script Events
         public void PostEvent(IScriptEvent ev)
         {
-            Inventory.ForEach((ObjectPartInventoryItem item) => item.ScriptInstance?.PostEvent(ev));
+            foreach (ObjectPartInventoryItem item in Inventory.Values)
+            {
+                item.ScriptInstance?.PostEvent(ev);
+            }
         }
         #endregion
 

@@ -535,7 +535,7 @@ namespace SilverSim.Scene.Types.Object
             writer.WriteNamedValue("InventorySerial", InventorySerial);
             writer.WriteStartElement("TaskInventory");
             {
-                ForEach((ObjectPartInventoryItem item) =>
+                foreach(ObjectPartInventoryItem item in Values)
                 {
                     writer.WriteStartElement("TaskInventoryItem");
                     {
@@ -589,7 +589,7 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("OwnerChanged", (options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None);
                     }
                     writer.WriteEndElement();
-                });
+                }
             }
             writer.WriteEndElement();
         }

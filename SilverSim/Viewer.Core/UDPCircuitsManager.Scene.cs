@@ -27,11 +27,11 @@ namespace SilverSim.Viewer.Core
     {
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {
-            m_Circuits.ForEach((Circuit circ) =>
+            foreach(Circuit circ in m_Circuits.Values)
             {
                 var acirc = circ as AgentCircuit;
                 acirc?.ScheduleUpdate(info);
-            });
+            }
         }
     }
 }

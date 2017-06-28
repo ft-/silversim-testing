@@ -53,8 +53,10 @@ namespace SilverSim.Scene.Npc
         public void DetachAllAttachments()
         {
             var detachList = new List<DetachEntry>();
-            m_AttachmentsList.ForEach((KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp) =>
-                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value)));
+            foreach (KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp in m_AttachmentsList.Key1ValuePairs)
+            {
+                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value));
+            }
             foreach (DetachEntry entry in detachList)
             {
                 DetachAttachment(entry);

@@ -118,10 +118,16 @@ namespace SilverSim.WebIF.Admin
                 }
 
                 var plaintext_conns = new List<HttpWebSocket>();
-                m_LogPlainReceivers.ForEach((HttpWebSocket sock) => plaintext_conns.Add(sock));
+                foreach (HttpWebSocket sock in m_LogPlainReceivers)
+                {
+                    plaintext_conns.Add(sock);
+                }
 
                 var html_conns = new List<HttpWebSocket>();
-                m_LogHtmlReceivers.ForEach((HttpWebSocket sock) => html_conns.Add(sock));
+                foreach (HttpWebSocket sock in m_LogHtmlReceivers)
+                {
+                    html_conns.Add(sock);
+                }
 
                 string colorbegin = string.Empty;
                 string colorend = string.Empty;

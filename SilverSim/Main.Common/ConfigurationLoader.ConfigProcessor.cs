@@ -325,13 +325,13 @@ namespace SilverSim.Main.Common
         private Dictionary<string, T> GetServices<T>()
         {
             var result = new Dictionary<string, T>();
-            PluginInstances.ForEach((KeyValuePair<string, IPlugin> p) =>
+            foreach(KeyValuePair<string, IPlugin> p in PluginInstances)
             {
                 if (typeof(T).IsAssignableFrom(p.Value.GetType()))
                 {
                     result.Add(p.Key, (T)p.Value);
                 }
-            });
+            }
             return result;
         }
 

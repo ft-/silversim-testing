@@ -67,340 +67,143 @@ namespace SilverSim.Threading
             m_Dictionary_K2 = new Dictionary<TKey2, TKey1>(capacity);
         }
 
-        public void Add(TKey1 key1, TKey2 key2)
+        public void Add(TKey1 key1, TKey2 key2) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            if (m_Dictionary_K1.ContainsKey(key1))
             {
-                if (m_Dictionary_K1.ContainsKey(key1))
+                if (!m_Dictionary_K2.ContainsKey(key2))
                 {
-                    if (!m_Dictionary_K2.ContainsKey(key2))
-                    {
-                        throw new ArgumentException("key1 exists in the dictionary but not key2");
-                    }
+                    throw new ArgumentException("key1 exists in the dictionary but not key2");
                 }
-                else if (m_Dictionary_K2.ContainsKey(key2) &&
-                    !m_Dictionary_K1.ContainsKey(key1))
-                {
-                    throw new ArgumentException("key2 exists in the dictionary but not key1");
-                }
-
-                m_Dictionary_K1[key1] = key2;
-                m_Dictionary_K2[key2] = key1;
             }
-            finally
+            else if (m_Dictionary_K2.ContainsKey(key2) &&
+                !m_Dictionary_K1.ContainsKey(key1))
             {
-                m_RwLock.ReleaseWriterLock();
+                throw new ArgumentException("key2 exists in the dictionary but not key1");
             }
-        }
 
-        public bool Remove(TKey1 key1, TKey2 key2)
+            m_Dictionary_K1[key1] = key2;
+            m_Dictionary_K2[key2] = key1;
+        });
+
+        public bool Remove(TKey1 key1, TKey2 key2) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            TKey2 kvp;
+            if (m_Dictionary_K1.TryGetValue(key1, out kvp))
             {
-                TKey2 kvp;
-                if (m_Dictionary_K1.TryGetValue(key1, out kvp))
-                {
-                    if (!kvp.Equals(key2))
-                    {
-                        return false;
-                    }
-                }
-                else
+                if (!kvp.Equals(key2))
                 {
                     return false;
                 }
+            }
+            else
+            {
+                return false;
+            }
+            m_Dictionary_K1.Remove(key1);
+            m_Dictionary_K2.Remove(key2);
+            return true;
+        });
+
+        public bool Remove(TKey1 key1) => m_RwLock.AcquireWriterLock(() =>
+        {
+            TKey2 kvp;
+            if (m_Dictionary_K1.TryGetValue(key1, out kvp))
+            {
                 m_Dictionary_K1.Remove(key1);
+                m_Dictionary_K2.Remove(kvp);
+                return true;
+            }
+            return false;
+        });
+
+        public bool Remove(TKey2 key2) => m_RwLock.AcquireWriterLock(() =>
+        {
+            TKey1 kvp;
+            if (m_Dictionary_K2.TryGetValue(key2, out kvp))
+            {
+                m_Dictionary_K1.Remove(kvp);
                 m_Dictionary_K2.Remove(key2);
                 return true;
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
-
-        public bool Remove(TKey1 key1)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                TKey2 kvp;
-                if (m_Dictionary_K1.TryGetValue(key1, out kvp))
-                {
-                    m_Dictionary_K1.Remove(key1);
-                    m_Dictionary_K2.Remove(kvp);
-                    return true;
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
             return false;
-        }
+        });
 
-        public bool Remove(TKey2 key2)
+        public void Clear() => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                TKey1 kvp;
-                if (m_Dictionary_K2.TryGetValue(key2, out kvp))
-                {
-                    m_Dictionary_K1.Remove(kvp);
-                    m_Dictionary_K2.Remove(key2);
-                    return true;
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-            return false;
-        }
+            m_Dictionary_K1.Clear();
+            m_Dictionary_K2.Clear();
+        });
 
-        public void Clear()
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_Dictionary_K1.Clear();
-                m_Dictionary_K2.Clear();
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public int Count => m_RwLock.AcquireReaderLock(() => m_Dictionary_K1.Count);
 
-        public int Count
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_Dictionary_K1.Count;
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public bool ContainsKey(TKey1 key) => m_RwLock.AcquireReaderLock(() => m_Dictionary_K1.ContainsKey(key));
 
-        public bool ContainsKey(TKey1 key)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_Dictionary_K1.ContainsKey(key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        public bool ContainsKey(TKey2 key)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_Dictionary_K2.ContainsKey(key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public bool ContainsKey(TKey2 key) => m_RwLock.AcquireReaderLock(() => m_Dictionary_K2.ContainsKey(key));
 
         public bool TryGetValue(TKey1 key, out TKey2 value)
         {
-            value = default(TKey2);
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_Dictionary_K1.TryGetValue(key, out value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
+            TKey2 k = default(TKey2);
+            bool s = m_RwLock.AcquireReaderLock(() => m_Dictionary_K1.TryGetValue(key, out k));
+            value = k;
+            return s;
         }
 
         public bool TryGetValue(TKey2 key, out TKey1 value)
         {
-            value = default(TKey1);
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_Dictionary_K2.TryGetValue(key, out value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
+            TKey1 k = default(TKey1);
+            bool s = m_RwLock.AcquireReaderLock(() => m_Dictionary_K2.TryGetValue(key, out k));
+            value = k;
+            return s;
         }
 
-        public TKey2 this[TKey1 key]
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_Dictionary_K1[key];
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public TKey2 this[TKey1 key] => m_RwLock.AcquireReaderLock(() => m_Dictionary_K1[key]);
 
-        public TKey1 this[TKey2 key]
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_Dictionary_K2[key];
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public TKey1 this[TKey2 key] => m_RwLock.AcquireReaderLock(() => m_Dictionary_K2[key]);
 
         public void CopyTo(out Dictionary<TKey1, TKey2> result)
         {
-            result = new Dictionary<TKey1, TKey2>();
-
-            m_RwLock.AcquireReaderLock(-1);
-            try
+            result = m_RwLock.AcquireReaderLock(() =>
             {
+                var r = new Dictionary<TKey1, TKey2>();
                 foreach (var kvp in m_Dictionary_K1)
                 {
-                    result.Add(kvp.Key, kvp.Value);
+                    r.Add(kvp.Key, kvp.Value);
                 }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
+                return r;
+            });
         }
 
-        public void ChangeKey(TKey1 newKey, TKey1 oldKey)
+        public void ChangeKey(TKey1 newKey, TKey1 oldKey) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            if (m_Dictionary_K1.ContainsKey(newKey))
             {
-                if (m_Dictionary_K1.ContainsKey(newKey))
-                {
-                    throw new ChangeKeyFailedException("New key already exists: " + newKey.ToString());
-                }
-                var kvp = m_Dictionary_K1[oldKey];
-                m_Dictionary_K1.Remove(oldKey);
-
-                /* re-adjust dictionaries */
-                m_Dictionary_K2[kvp] = newKey;
-                m_Dictionary_K1[newKey] = kvp;
+                throw new ChangeKeyFailedException("New key already exists: " + newKey.ToString());
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+            var kvp = m_Dictionary_K1[oldKey];
+            m_Dictionary_K1.Remove(oldKey);
 
-        public void ChangeKey(TKey2 newKey, TKey2 oldKey)
+            /* re-adjust dictionaries */
+            m_Dictionary_K2[kvp] = newKey;
+            m_Dictionary_K1[newKey] = kvp;
+        });
+
+        public void ChangeKey(TKey2 newKey, TKey2 oldKey) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            if (m_Dictionary_K2.ContainsKey(newKey))
             {
-                if (m_Dictionary_K2.ContainsKey(newKey))
-                {
-                    throw new ChangeKeyFailedException("New key already exists: " + newKey.ToString());
-                }
-                TKey1 kvp = m_Dictionary_K2[oldKey];
-                m_Dictionary_K2.Remove(oldKey);
+                throw new ChangeKeyFailedException("New key already exists: " + newKey.ToString());
+            }
+            TKey1 kvp = m_Dictionary_K2[oldKey];
+            m_Dictionary_K2.Remove(oldKey);
 
-                /* re-adjust dictionaries */
-                m_Dictionary_K1[kvp] = newKey;
-                m_Dictionary_K2[newKey] = kvp;
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+            /* re-adjust dictionaries */
+            m_Dictionary_K1[kvp] = newKey;
+            m_Dictionary_K2[newKey] = kvp;
+        });
 
-        public void ForEach(Action<TKey1> d)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                foreach (var kvp in m_Dictionary_K1.Keys)
-                {
-                    d(kvp);
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+        public List<TKey1> Keys1 => m_RwLock.AcquireReaderLock(() => new List<TKey1>(m_Dictionary_K1.Keys));
 
-        public void ForEach(Action<TKey2> d)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                foreach (var kvp in m_Dictionary_K2.Keys)
-                {
-                    d(kvp);
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        public List<TKey1> Keys1
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return new List<TKey1>(m_Dictionary_K1.Keys);
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
-
-        public List<TKey2> Keys2
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return new List<TKey2>(m_Dictionary_K2.Keys);
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public List<TKey2> Keys2 => m_RwLock.AcquireReaderLock(() => new List<TKey2>(m_Dictionary_K2.Keys));
     }
 }

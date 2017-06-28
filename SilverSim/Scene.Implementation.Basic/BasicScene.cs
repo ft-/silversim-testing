@@ -91,13 +91,13 @@ namespace SilverSim.Scene.Implementation.Basic
             public void ForEach(Vector3 pos, double maxdistance, Action<IObject> d)
             {
                 double maxDistanceSquared = maxdistance * maxdistance;
-                m_Scene.m_Objects.ForEach((IObject obj) =>
+                foreach(IObject obj in m_Scene.Objects)
                 {
                     if ((obj.GlobalPosition - pos).LengthSquared <= maxDistanceSquared && obj.IsInScene(m_Scene))
                     {
                         d(obj);
                     }
-                });
+                }
             }
 
             public IEnumerator<IObject> GetEnumerator() => m_Scene.m_Objects.Values.GetEnumerator();

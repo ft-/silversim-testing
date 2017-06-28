@@ -33,13 +33,13 @@ namespace SilverSim.Types.Asset.Format
             {
                 try
                 {
-                    ForEach((NotecardInventoryItem item) =>
+                    foreach(NotecardInventoryItem item in Values)
                     {
                         if (item.ExtCharIndex == extCharIndex)
                         {
                             throw new ReturnValueException<NotecardInventoryItem>(item);
                         }
-                    });
+                    }
                 }
                 catch(ReturnValueException<NotecardInventoryItem> e)
                 {

@@ -30,7 +30,10 @@ namespace SilverSim.Viewer.Core
     {
         protected override void SendAnimations(AvatarAnimation m)
         {
-            Circuits.ForEach((AgentCircuit c) => c.Scene.SendAgentAnimToAllAgents(m));
+            foreach (AgentCircuit c in Circuits.Values)
+            {
+                c.Scene.SendAgentAnimToAllAgents(m);
+            }
         }
 
         [PacketHandler(MessageType.AgentAnimation)]

@@ -86,412 +86,163 @@ namespace SilverSim.Threading
         }
 
         public bool IsReadOnly => false;
-        public int Count
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_Dictionary.Count;
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public int Count => m_RwLock.AcquireReaderLock(() => m_Dictionary.Count);
 
         public TValue this[TKey key]
         {
             get
             {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_Dictionary[key];
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
+                return m_RwLock.AcquireReaderLock(() => m_Dictionary[key]);
             }
             set
             {
-                m_RwLock.AcquireWriterLock(-1);
-                try
+                m_RwLock.AcquireWriterLock(() =>
                 {
                     m_Dictionary[key] = value;
-                }
-                finally
-                {
-                    m_RwLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 
         public delegate TValue CreateValueDelegate();
-        public TValue AddIfNotExists(TKey key, CreateValueDelegate del)
+        public TValue AddIfNotExists(TKey key, CreateValueDelegate del) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            if (m_Dictionary.ContainsKey(key))
             {
-                if(m_Dictionary.ContainsKey(key))
-                {
-                    throw new KeyAlreadyExistsException("Key \"" + key.ToString() + "\" already exists");
-                }
-                TValue res = del();
-                m_Dictionary.Add(key, res);
-                return res;
+                throw new KeyAlreadyExistsException("Key \"" + key.ToString() + "\" already exists");
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+            TValue res = del();
+            m_Dictionary.Add(key, res);
+            return res;
+        });
 
-        public TValue GetOrAddIfNotExists(TKey key, CreateValueDelegate del)
+        public TValue GetOrAddIfNotExists(TKey key, CreateValueDelegate del) => m_RwLock.AcquireReaderLock(() =>
         {
-            m_RwLock.AcquireReaderLock(-1);
             try
             {
                 return m_Dictionary[key];
             }
-            catch(KeyNotFoundException)
+            catch (KeyNotFoundException)
             {
-                LockCookie lc = m_RwLock.UpgradeToWriterLock(-1);
-                try
+                return m_RwLock.UpgradeToWriterLock(() =>
                 {
-                    if(m_Dictionary.ContainsKey(key))
+                    if (m_Dictionary.ContainsKey(key))
                     {
                         return m_Dictionary[key];
                     }
                     return m_Dictionary[key] = del();
-                }
-                finally
+                });
+            }
+        });
+
+        public void Add(TKey key, TValue value) => m_RwLock.AcquireWriterLock(() =>
+        {
+            m_Dictionary.Add(key, value);
+        });
+
+        public void Add(KeyValuePair<TKey, TValue> kvp) => m_RwLock.AcquireWriterLock(() =>
+        {
+            m_Dictionary.Add(kvp.Key, kvp.Value);
+        });
+
+        public void Clear() => m_RwLock.AcquireWriterLock(() => m_Dictionary.Clear());
+
+        public bool Contains(KeyValuePair<TKey, TValue> kvp) => m_RwLock.AcquireReaderLock(() => m_Dictionary.ContainsKey(kvp.Key));
+
+        public bool Contains(TKey key, TValue value) => m_RwLock.AcquireReaderLock(() => m_Dictionary.ContainsKey(key));
+
+        public bool ContainsKey(TKey key) => m_RwLock.AcquireReaderLock(() => m_Dictionary.ContainsKey(key));
+
+        public bool ContainsValue(TValue value) => m_RwLock.AcquireReaderLock(() =>
+        {
+            foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+            {
+                if (kvp.Value.Equals(value))
                 {
-                    m_RwLock.DowngradeFromWriterLock(ref lc);
+                    return true;
                 }
             }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+            return false;
+        });
 
-        public void Add(TKey key, TValue value)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_Dictionary.Add(key, value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public bool Remove(KeyValuePair<TKey, TValue> kvp) => m_RwLock.AcquireWriterLock(() => m_Dictionary.Remove(kvp.Key));
 
-        public void Add(KeyValuePair<TKey, TValue> kvp)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_Dictionary.Add(kvp.Key, kvp.Value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
-
-        public void Clear()
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_Dictionary.Clear();
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
-
-        public bool Contains(KeyValuePair<TKey, TValue> kvp)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_Dictionary.ContainsKey(kvp.Key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        public bool Contains(TKey key, TValue value)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_Dictionary.ContainsKey(key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        public bool ContainsKey(TKey key)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return m_Dictionary.ContainsKey(key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        public bool ContainsValue(TValue value)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                foreach(KeyValuePair<TKey, TValue> kvp in m_Dictionary)
-                {
-                    if(kvp.Value.Equals(value))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        public bool Remove(KeyValuePair<TKey, TValue> kvp)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                return m_Dictionary.Remove(kvp.Key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
-
-        public bool Remove(TKey key)
-        {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                return m_Dictionary.Remove(key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        public bool Remove(TKey key) => m_RwLock.AcquireWriterLock(() => m_Dictionary.Remove(key));
 
         public bool Remove(TKey key, out TValue val)
         {
-            val = default(TValue);
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            TValue v = default(TValue);
+            bool s = m_RwLock.AcquireWriterLock(() =>
             {
                 if (m_Dictionary.ContainsKey(key))
                 {
-                    val = m_Dictionary[key];
+                    v = m_Dictionary[key];
                 }
                 return m_Dictionary.Remove(key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
+            });
+            val = v;
+            return s;
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            m_RwLock.AcquireReaderLock(-1);
-            try
+            TValue v = default(TValue);
+            bool s = m_RwLock.AcquireReaderLock(() =>
             {
-                return m_Dictionary.TryGetValue(key, out value);
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
+                return m_Dictionary.TryGetValue(key, out v);
+            });
+            value = v;
+            return s;
         }
 
-        public ICollection<TKey> Keys
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return new List<TKey>(m_Dictionary.Keys);
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public ICollection<TKey> Keys => m_RwLock.AcquireReaderLock(() => new List<TKey>(m_Dictionary.Keys));
 
-        public ICollection<TValue> Values
-        {
-            get
-            {
-                m_RwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return new List<TValue>(m_Dictionary.Values);
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public ICollection<TValue> Values => m_RwLock.AcquireReaderLock(() => new List<TValue>(m_Dictionary.Values));
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array,
             int arrayIndex)
         {
-            m_RwLock.AcquireReaderLock(-1);
-            try
+            m_RwLock.AcquireReaderLock(() =>
             {
-                foreach(KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
                 {
                     array[arrayIndex++] = kvp;
                 }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
+            });
         }
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => m_RwLock.AcquireReaderLock(() =>
         {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                return (new Dictionary<TKey, TValue>(m_Dictionary)).GetEnumerator();
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+            return (new Dictionary<TKey, TValue>(m_Dictionary)).GetEnumerator();
+        });
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
 
-        /* support for non-copy enumeration */
-        public void ForEach(Action<KeyValuePair<TKey, TValue>> action)
+        public TKey[] GetKeyStrings() => m_RwLock.AcquireReaderLock(() =>
         {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
-                {
-                    action(kvp);
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        /* support for non-copy enumeration */
-        public void ForEach(Action<TKey> action)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
-                {
-                    action(kvp.Key);
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        /* support for non-copy enumeration */
-        public void ForEach(Action<TValue> action)
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
-                {
-                    action(kvp.Value);
-                }
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
-
-        public TKey[] GetKeyStrings()
-        {
-            m_RwLock.AcquireReaderLock(-1);
-            try
-            {
-                TKey[] __keys = new TKey[m_Dictionary.Count];
-                m_Dictionary.Keys.CopyTo(__keys, 0);
-                return __keys;
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
-        }
+            TKey[] __keys = new TKey[m_Dictionary.Count];
+            m_Dictionary.Keys.CopyTo(__keys, 0);
+            return __keys;
+        });
 
         public delegate bool CheckIfRemove(TValue value);
 
-        public bool RemoveIf(TKey key, CheckIfRemove del)
+        public bool RemoveIf(TKey key, CheckIfRemove del) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            if (m_Dictionary.ContainsKey(key) &&
+                !del(m_Dictionary[key]))
             {
-                if (m_Dictionary.ContainsKey(key) &&
-                    !del(m_Dictionary[key]))
-                {
-                    return false;
-                }
-                return m_Dictionary.Remove(key);
+                return false;
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+            return m_Dictionary.Remove(key);
+        });
 
         public bool RemoveIf(TKey key, CheckIfRemove del, out KeyValuePair<TKey, TValue> kvp)
         {
-            kvp = default(KeyValuePair<TKey, TValue>);
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            var k = default(KeyValuePair<TKey, TValue>);
+            bool s = m_RwLock.AcquireWriterLock(() =>
             {
                 if (m_Dictionary.ContainsKey(key))
                 {
@@ -500,24 +251,21 @@ namespace SilverSim.Threading
                     {
                         return false;
                     }
-                    kvp = new KeyValuePair<TKey, TValue>(key, val);
+                    k = new KeyValuePair<TKey, TValue>(key, val);
                 }
                 return m_Dictionary.Remove(key);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
+            });
+            kvp = k;
+            return s;
         }
 
         public delegate bool FindIfRemove(TKey key, TValue value);
         public bool FindRemoveIf(FindIfRemove del, out KeyValuePair<TKey, TValue> kvpout)
         {
-            kvpout = default(KeyValuePair<TKey, TValue>);
-            m_RwLock.AcquireReaderLock(-1);
-            try
+            var kout = default(KeyValuePair<TKey, TValue>);
+            bool s = m_RwLock.AcquireReaderLock(() =>
             {
-                foreach(KeyValuePair<TKey, TValue> kvp in m_Dictionary)
+                foreach (KeyValuePair<TKey, TValue> kvp in m_Dictionary)
                 {
                     if (!del(kvp.Key, kvp.Value))
                     {
@@ -526,10 +274,10 @@ namespace SilverSim.Threading
                     LockCookie lc = m_RwLock.UpgradeToWriterLock(-1);
                     try
                     {
-                        if(m_Dictionary.ContainsKey(kvp.Key))
+                        if (m_Dictionary.ContainsKey(kvp.Key))
                         {
                             m_Dictionary.Remove(kvp.Key);
-                            kvpout = kvp;
+                            kout = kvp;
                             return true;
                         }
                     }
@@ -539,79 +287,45 @@ namespace SilverSim.Threading
                     }
                 }
                 return false;
-            }
-            finally
-            {
-                m_RwLock.ReleaseReaderLock();
-            }
+            });
+            kvpout = kout;
+            return s;
         }
 
-        public void Remove(IEnumerable<TKey> keys)
+        public void Remove(IEnumerable<TKey> keys) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            foreach (TKey key in keys)
             {
-                foreach(TKey key in keys)
-                {
-                    m_Dictionary.Remove(key);
-                }
+                m_Dictionary.Remove(key);
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        });
 
-        public void Replace(IDictionary<TKey, TValue> dictionary)
+        public void Replace(IDictionary<TKey, TValue> dictionary) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
-            {
-                m_Dictionary = new Dictionary<TKey,TValue>(dictionary);
-            }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+            m_Dictionary = new Dictionary<TKey, TValue>(dictionary);
+        });
 
         public delegate bool CheckReplaceDelegate(TValue value);
 
-        public bool AddOrReplaceValueIf(TKey key, TValue value, CheckReplaceDelegate del)
+        public bool AddOrReplaceValueIf(TKey key, TValue value, CheckReplaceDelegate del) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            TValue checkval;
+            if (m_Dictionary.TryGetValue(key, out checkval) &&
+                !del(checkval))
             {
-                TValue checkval;
-                if(m_Dictionary.TryGetValue(key, out checkval) &&
-                    !del(checkval))
-                {
-                    return false;
-                }
-                m_Dictionary[key] = value;
-                return true;
+                return false;
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+            m_Dictionary[key] = value;
+            return true;
+        });
 
-        public void AddRange(IEnumerable<KeyValuePair<TKey, TValue>> items)
+        public void AddRange(IEnumerable<KeyValuePair<TKey, TValue>> items) => m_RwLock.AcquireWriterLock(() =>
         {
-            m_RwLock.AcquireWriterLock(-1);
-            try
+            foreach (KeyValuePair<TKey, TValue> kvp in items)
             {
-                foreach(KeyValuePair<TKey, TValue> kvp in items)
-                {
-                    m_Dictionary.Add(kvp.Key, kvp.Value);
-                }
+                m_Dictionary.Add(kvp.Key, kvp.Value);
             }
-            finally
-            {
-                m_RwLock.ReleaseWriterLock();
-            }
-        }
+        });
     }
 
     public class RwLockedDictionaryAutoAdd<TKey, TValue> : RwLockedDictionary<TKey, TValue>
@@ -656,39 +370,25 @@ namespace SilverSim.Threading
         {
             get
             {
-                m_RwLock.AcquireReaderLock(-1);
-                try
+                return m_RwLock.AcquireReaderLock(() =>
                 {
-                    return m_Dictionary[key];
-                }
-                catch(KeyNotFoundException)
-                {
-                    LockCookie lc = m_RwLock.UpgradeToWriterLock(-1);
+
                     try
                     {
-                        return m_Dictionary[key] = m_AutoAddDelegate();
+                        return m_Dictionary[key];
                     }
-                    finally
+                    catch (KeyNotFoundException)
                     {
-                        m_RwLock.DowngradeFromWriterLock(ref lc);
+                        return m_RwLock.UpgradeToWriterLock(() => m_Dictionary[key] = m_AutoAddDelegate());
                     }
-                }
-                finally
-                {
-                    m_RwLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
-                m_RwLock.AcquireWriterLock(-1);
-                try
+                m_RwLock.AcquireWriterLock(() =>
                 {
                     m_Dictionary[key] = value;
-                }
-                finally
-                {
-                    m_RwLock.ReleaseWriterLock();
-                }
+                });
             }
         }
     }

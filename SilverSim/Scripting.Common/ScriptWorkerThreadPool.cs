@@ -195,7 +195,7 @@ namespace SilverSim.Scripting.Common
 
         public void AbortScript(ScriptInstance script)
         {
-            m_Threads.ForEach((ScriptThreadContext tc) =>
+            foreach(ScriptThreadContext tc in m_Threads)
             {
                 lock (tc)
                 {
@@ -209,7 +209,7 @@ namespace SilverSim.Scripting.Common
                         }
                     }
                 }
-            });
+            }
         }
 
         public void Sleep(int milliseconds)

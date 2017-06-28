@@ -136,14 +136,17 @@ namespace SilverSim.Scene.Types.Scene
             if(Objects.TryGetValue(req.ObjectID, out iobj))
             {
                 var o = iobj as ObjectGroup;
-                o?.ForEach((ObjectPart p) =>
+                if (o != null)
                 {
-                    p.Inventory.ForEach((ObjectPartInventoryItem i) =>
+                    foreach(ObjectPart p in o.Values)
                     {
-                        Script.ScriptInstance instance = i.ScriptInstance;
-                        instance?.RevokePermissions(req.AgentID, req.ObjectPermissions);
-                    });
-                });
+                        foreach(ObjectPartInventoryItem i in p.Inventory.Values)
+                        {
+                            Script.ScriptInstance instance = i.ScriptInstance;
+                            instance?.RevokePermissions(req.AgentID, req.ObjectPermissions);
+                        }
+                    }
+                }
             }
         }
     }

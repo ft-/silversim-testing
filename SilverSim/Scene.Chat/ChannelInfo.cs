@@ -58,7 +58,7 @@ namespace SilverSim.Scene.Chat
             double shoutDistanceSquared = m_Handler.ShoutDistance * m_Handler.ShoutDistance;
             double whisperDistanceSquared = m_Handler.WhisperDistance * m_Handler.WhisperDistance;
 
-            Listeners.ForEach((ChatServiceInterface.Listener listener) =>
+            foreach(ChatServiceInterface.Listener listener in Listeners)
             {
                 try
                 {
@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Chat
                 {
                     /* ignore in the rare case that an object is part died */
                 }
-            });
+            }
         }
     }
 }

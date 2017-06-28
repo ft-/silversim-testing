@@ -1032,45 +1032,45 @@ namespace SilverSim.Scene.Types.Object
                                     enumerator.GoToMarkPosition();
                                     obj.SetPrimitiveParams(enumerator);
                                 }
-                                m_SittingAgents.ForEach((IAgent agent) =>
+                                foreach(IAgent agent in m_SittingAgents.Keys1)
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
-                                });
+                                }
                                 break;
 
                             case LINK_ALL_CHILDREN:
                                 enumerator.MarkPosition();
-                                ForEach((KeyValuePair<int, ObjectPart> kvp) =>
+                                foreach(KeyValuePair<int, ObjectPart> kvp in Key1ValuePairs)
                                 {
                                     if (kvp.Key != LINK_ROOT)
                                     {
                                         enumerator.GoToMarkPosition();
                                         kvp.Value.SetPrimitiveParams(enumerator);
                                     }
-                                });
-                                m_SittingAgents.ForEach((IAgent agent) =>
+                                }
+                                foreach(IAgent agent in m_SittingAgents.Keys1)
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
-                                });
+                                }
                                 break;
 
                             case LINK_ALL_OTHERS:
                                 enumerator.MarkPosition();
-                                ForEach((KeyValuePair<int, ObjectPart> kvp) =>
+                                foreach(KeyValuePair<int, ObjectPart> kvp in Key1ValuePairs)
                                 {
                                     if (kvp.Key != linkThis)
                                     {
                                         enumerator.GoToMarkPosition();
                                         kvp.Value.SetPrimitiveParams(enumerator);
                                     }
-                                });
-                                m_SittingAgents.ForEach((IAgent agent) =>
+                                }
+                                foreach(IAgent agent in m_SittingAgents.Keys1)
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
-                                });
+                                }
                                 break;
 
                             default:
@@ -1287,7 +1287,10 @@ namespace SilverSim.Scene.Types.Object
         #region Script Events
         public void PostEvent(IScriptEvent ev)
         {
-            ForEach((ObjectPart item) => item.PostEvent(ev));
+            foreach (ObjectPart item in Values)
+            {
+                item.PostEvent(ev);
+            }
         }
         #endregion
 
