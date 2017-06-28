@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public UInt32 ObjectLocalID;
+        public UUID ObjectID = UUID.Zero;
         public Vector3 GrabOffsetInitial = Vector3.Zero;
         public Vector3 GrabPosition = Vector3.Zero;
         public UInt32 TimeSinceLast;
@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Messages.Object
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
-                ObjectLocalID = p.ReadUInt32(),
+                ObjectID = p.ReadUUID(),
                 GrabOffsetInitial = p.ReadVector3f(),
                 GrabPosition = p.ReadVector3f(),
                 TimeSinceLast = p.ReadUInt32()
@@ -80,7 +80,7 @@ namespace SilverSim.Viewer.Messages.Object
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
-            p.WriteUInt32(ObjectLocalID);
+            p.WriteUUID(ObjectID);
             p.WriteVector3f(GrabOffsetInitial);
             p.WriteVector3f(GrabPosition);
             p.WriteUInt32(TimeSinceLast);

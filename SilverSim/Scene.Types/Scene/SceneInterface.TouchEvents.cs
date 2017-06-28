@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Types.Scene
                 Type = TouchEvent.TouchType.Continuous
             };
             ObjectPart part;
-            if (!Primitives.TryGetValue(req.ObjectLocalID, out part))
+            if (!Primitives.TryGetValue(req.ObjectID, out part))
             {
                 return;
             }
