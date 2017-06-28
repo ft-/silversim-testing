@@ -220,7 +220,7 @@ namespace SilverSim.Threading
         {
             get
             {
-                m_RwLock.AcquireWriterLock(-1);
+                m_RwLock.AcquireReaderLock(-1);
                 try
                 {
                     return new List<TKey1>(m_Dictionary_K1.Keys);
@@ -236,7 +236,7 @@ namespace SilverSim.Threading
         {
             get
             {
-                m_RwLock.AcquireWriterLock(-1);
+                m_RwLock.AcquireReaderLock(-1);
                 try
                 {
                     return new List<TKey2>(m_Dictionary_K2.Keys);
