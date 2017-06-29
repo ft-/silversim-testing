@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Xml;
 
 namespace SilverSim.Types.Agent
 {
@@ -262,6 +263,7 @@ namespace SilverSim.Types.Agent
             {
                 using (var writer = ms.UTF8XmlTextWriter())
                 {
+                    writer.Formatting = Formatting.Indented;
                     writer.WriteStartElement("llsd");
                     {
                         writer.WriteStartElement("map");
