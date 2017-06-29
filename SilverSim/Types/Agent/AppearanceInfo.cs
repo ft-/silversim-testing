@@ -84,7 +84,7 @@ namespace SilverSim.Types.Agent
                 {
                     if (texIndex < 0 || texIndex >= TextureCount)
                     {
-                        throw new KeyNotFoundException();
+                        return;
                     }
                     m_RwLock.AcquireWriterLock(() =>
                     {

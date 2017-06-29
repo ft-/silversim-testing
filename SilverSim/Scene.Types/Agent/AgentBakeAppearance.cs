@@ -725,6 +725,7 @@ namespace SilverSim.Scene.Types.Agent
             BakeImage srcimg;
             var data = new AssetData()
             {
+                ID = UUID.RandomFixedFirst(0xFFFFFFFF),
                 Type = AssetType.Texture,
                 Local = true,
                 Temporary = true,
@@ -898,8 +899,17 @@ namespace SilverSim.Scene.Types.Agent
 
         public static object Owner { get; }
 
-        private static void CoreBakeLogic(this IAgent agent, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
+        private static void CoreBakeLogic(this AppearanceInfo.AvatarTextureData agentTextures, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
         {
+            foreach (OutfitItem item in bakeStatus.OutfitItems.Values)
+            {
+                foreach(KeyValuePair<AvatarTextureIndex, UUID> tex in item.WearableData.Textures)
+                {
+                    agentTextures[(int)tex.Key] = tex.Value;
+                }
+            }
+
+
             var bakeHead = BakeTexture(bakeStatus, BakeType.Head);
             var bakeUpperBody = BakeTexture(bakeStatus, BakeType.UpperBody);
             var bakeLowerBody = BakeTexture(bakeStatus, BakeType.LowerBody);
@@ -932,12 +942,17 @@ namespace SilverSim.Scene.Types.Agent
                 sceneAssetService.Store(bakeSkirt);
             }
 
-            agent.Textures[(int)AvatarTextureIndex.EyesBaked] = bakeEyes.ID;
-            agent.Textures[(int)AvatarTextureIndex.HeadBaked] = bakeHead.ID;
-            agent.Textures[(int)AvatarTextureIndex.UpperBaked] = bakeUpperBody.ID;
-            agent.Textures[(int)AvatarTextureIndex.LowerBaked] = bakeLowerBody.ID;
-            agent.Textures[(int)AvatarTextureIndex.HairBaked] = bakeHair.ID;
-            agent.Textures[(int)AvatarTextureIndex.Skirt] = bakeSkirt != null ? bakeSkirt.ID : UUID.Zero;
+            agentTextures[(int)AvatarTextureIndex.EyesBaked] = bakeEyes.ID;
+            agentTextures[(int)AvatarTextureIndex.HeadBaked] = bakeHead.ID;
+            agentTextures[(int)AvatarTextureIndex.UpperBaked] = bakeUpperBody.ID;
+            agentTextures[(int)AvatarTextureIndex.LowerBaked] = bakeLowerBody.ID;
+            agentTextures[(int)AvatarTextureIndex.HairBaked] = bakeHair.ID;
+            agentTextures[(int)AvatarTextureIndex.Skirt] = bakeSkirt != null ? bakeSkirt.ID : UUID.Zero;
+        }
+
+        private static void CoreBakeLogic(this IAgent agent, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
+        {
+            CoreBakeLogic(agent.TextureHashes, bakeStatus, sceneAssetService);
         }
 
         #endregion

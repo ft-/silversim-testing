@@ -38,6 +38,7 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.Parcel;
@@ -131,6 +132,7 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.AddGetCommand("waterheight", GetWaterheightCmd);
             loader.CommandRegistry.AddSetCommand("waterheight", SetWaterheightCmd);
             loader.CommandRegistry.Commands.Add("rebake", RebakeCmd);
+            loader.CommandRegistry.AddShowCommand("appearance", ShowAppearanceCmd);
             loader.CommandRegistry.AddEnableCommand("script", EnableScriptCmd);
             loader.CommandRegistry.AddDisableCommand("script", DisableScriptCmd);
             loader.CommandRegistry.AddEnableCommand("scripts", EnableScriptsCmd);
@@ -1296,6 +1298,62 @@ namespace SilverSim.Main.Cmd.Region
                 if (agentid.FullName.ToLower() == (args[2] + " " + args[3]).ToLower())
                 {
                     agent.SendAlertMessage(msg, scene.ID);
+                    agentFound = true;
+                }
+            }
+
+            if (!agentFound)
+            {
+                io.WriteFormatted("Agent {0} {1} not found.", args[2], args[3]);
+            }
+        }
+
+        private void ShowAppearanceCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help" || args.Count < 4)
+            {
+                io.Write("show appearance <firstname> <lastname>");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("show appearance needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            bool agentFound = false;
+            foreach (IAgent agent in scene.RootAgents)
+            {
+                UUI agentid = agent.Owner;
+                if (agentid.FullName.ToLower() == (args[2] + " " + args[3]).ToLower())
+                {
+                    FormattedListBuilder lb = new FormattedListBuilder();
+                    lb.AddColumn("Entry", 30);
+                    lb.AddColumn("Texture ID", 40);
+                    lb.AddHeader();
+                    lb.AddSeparator();
+                    AppearanceInfo.AvatarTextureData textures = agent.Textures;
+                    foreach(AvatarTextureIndex texId in typeof(AvatarTextureIndex).GetEnumValues())
+                    {
+                        lb.AddData(texId.ToString(), textures[(int)texId].ToString());
+                    }
+                    io.Write(lb.ToString());
                     agentFound = true;
                 }
             }

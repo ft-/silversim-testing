@@ -146,13 +146,13 @@ namespace SilverSim.Scene.Types.Agent
         AppearanceInfo.AvatarTextureData Textures
         {
             get;
-            set; /* must not replace data and not the internal reference */
+            set; /* must replace data and not the internal reference */
         }
 
         AppearanceInfo.AvatarTextureData TextureHashes
         {
             get;
-            set; /* must not replace data and not the internal reference */
+            set; /* must replace data and not the internal reference */
         }
 
         AssetServiceInterface AssetService { get; }
