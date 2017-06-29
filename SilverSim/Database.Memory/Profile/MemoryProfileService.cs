@@ -22,6 +22,7 @@
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.Threading;
 using SilverSim.Types;
 using System.ComponentModel;
 
@@ -49,15 +50,7 @@ namespace SilverSim.Database.Memory.Profile
             {
                 notes.Remove(accountID);
             }
-            m_PropertiesLock.AcquireReaderLock(-1);
-            try
-            {
-                m_Properties.Remove(accountID);
-            }
-            finally
-            {
-                m_PropertiesLock.ReleaseReaderLock();
-            }
+            m_PropertiesLock.AcquireReaderLock(() => m_Properties.Remove(accountID));
         }
 
         public void Startup(ConfigurationLoader loader)

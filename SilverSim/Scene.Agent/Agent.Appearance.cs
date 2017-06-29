@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
@@ -158,31 +159,25 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                m_VisualParamsLock.AcquireReaderLock(-1);
-                try
+                return m_VisualParamsLock.AcquireReaderLock(() =>
                 {
                     var res = new byte[m_VisualParams.Length];
                     Buffer.BlockCopy(m_VisualParams, 0, res, 0, m_VisualParams.Length);
                     return res;
-                }
-                finally
-                {
-                    m_VisualParamsLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
                 bool updated = false;
-                m_VisualParamsLock.AcquireWriterLock(-1);
-                try
+                m_VisualParamsLock.AcquireWriterLock(() =>
                 {
                     int VisualParamCount = MaxVisualParams < value.Length ? MaxVisualParams : value.Length;
-                    if(VisualParamCount == m_VisualParams.Length)
+                    if (VisualParamCount == m_VisualParams.Length)
                     {
                         int i;
-                        for(i = 0; i < m_VisualParams.Length; ++i)
+                        for (i = 0; i < m_VisualParams.Length; ++i)
                         {
-                            if(m_VisualParams[i] != value[i])
+                            if (m_VisualParams[i] != value[i])
                             {
                                 updated = true;
                             }
@@ -194,11 +189,7 @@ namespace SilverSim.Scene.Agent
                     }
                     m_VisualParams = new byte[VisualParamCount];
                     Buffer.BlockCopy(value, 0, m_VisualParams, 0, VisualParamCount);
-                }
-                finally
-                {
-                    m_VisualParamsLock.ReleaseWriterLock();
-                }
+                });
 
                 if (updated)
                 {

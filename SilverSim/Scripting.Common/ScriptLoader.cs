@@ -38,30 +38,22 @@ namespace SilverSim.Scripting.Common
         private static readonly RwLockedDictionary<UUID, IScriptAssembly> m_LoadedAssemblies = new RwLockedDictionary<UUID, IScriptAssembly>();
         private static readonly RwLockedDictionary<UUID, RwLockedList<ScriptInstance>> m_LoadedInstances = new RwLockedDictionary<UUID, RwLockedList<ScriptInstance>>();
 
-        public static void Remove(UUID assetID, ScriptInstance instance)
+        public static void Remove(UUID assetID, ScriptInstance instance) => m_CompilerLock.AcquireWriterLock(() =>
         {
-            m_CompilerLock.AcquireWriterLock(-1);
-            try
-            {
-                if(m_LoadedInstances.RemoveIf(assetID, (RwLockedList<ScriptInstance> list) =>
+            if (m_LoadedInstances.RemoveIf(assetID, (RwLockedList<ScriptInstance> list) =>
                 {
                     list.Remove(instance);
                     return list.Count == 0;
                 }))
+            {
+                m_LoadedAssemblies.Remove(assetID);
+                AppDomain appDom;
+                if (m_LoadedDomains.Remove(assetID, out appDom))
                 {
-                    m_LoadedAssemblies.Remove(assetID);
-                    AppDomain appDom;
-                    if (m_LoadedDomains.Remove(assetID, out appDom))
-                    {
-                        AppDomain.Unload(appDom);
-                    }
+                    AppDomain.Unload(appDom);
                 }
             }
-            finally
-            {
-                m_CompilerLock.ReleaseWriterLock();
-            }
-        }
+        });
 
         internal static void RegisterAppDomain(UUID assetID, AppDomain appDom)
         {
@@ -70,9 +62,7 @@ namespace SilverSim.Scripting.Common
 
         public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data, CultureInfo currentCulture, byte[] serializedState = null)
         {
-            ScriptInstance instance;
-            m_CompilerLock.AcquireReaderLock(-1);
-            try
+            return m_CompilerLock.AcquireReaderLock(() =>
             {
                 var assembly = m_LoadedAssemblies.GetOrAddIfNotExists(data.ID, () =>
                 {
@@ -82,18 +72,14 @@ namespace SilverSim.Scripting.Common
                     }
                 });
                 m_LoadedAssemblies[data.ID] = assembly;
-                instance = assembly.Instantiate(part, item, serializedState);
-                if(!m_LoadedInstances.ContainsKey(data.ID))
+                ScriptInstance instance = assembly.Instantiate(part, item, serializedState);
+                if (!m_LoadedInstances.ContainsKey(data.ID))
                 {
                     m_LoadedInstances.Add(data.ID, new RwLockedList<ScriptInstance>());
                 }
                 m_LoadedInstances[data.ID].Add(instance);
-            }
-            finally
-            {
-                m_CompilerLock.ReleaseReaderLock();
-            }
-            return instance;
+                return instance;
+            });
         }
 
         public static void SyntaxCheck(UUI user, AssetData data, CultureInfo currentCulture)

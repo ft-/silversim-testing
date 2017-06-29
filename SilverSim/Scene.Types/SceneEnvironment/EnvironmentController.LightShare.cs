@@ -232,8 +232,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             bool windlightUpdated = false;
             m_OverrideLightSharePerAgent.Clear();
-            m_LightShareLock.AcquireWriterLock(-1);
-            try
+            m_LightShareLock.AcquireWriterLock(() =>
             {
                 if (!m_WeatherConfig.EnableLightShareControl)
                 {
@@ -241,11 +240,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     windlightUpdated = true;
                     m_ImmediateSunUpdate = true;
                 }
-            }
-            finally
-            {
-                m_LightShareLock.ReleaseWriterLock();
-            }
+            });
 
             if (windlightUpdated)
             {
@@ -253,43 +248,23 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
-        public bool IsWindLightValid
-        {
-            get
-            {
-                m_LightShareLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_WindlightValid;
-                }
-                finally
-                {
-                    m_LightShareLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public bool IsWindLightValid => m_LightShareLock.AcquireReaderLock(() => m_WindlightValid);
 
         public WindlightSkyData SkyData
         {
             get
             {
-                m_LightShareLock.AcquireReaderLock(-1);
-                try
+                return m_LightShareLock.AcquireReaderLock(() =>
                 {
                     return m_WindlightValid ?
                         m_SkyWindlight :
                         WindlightSkyData.Defaults;
-                }
-                finally
-                {
-                    m_LightShareLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
                 bool windlightUpdated = false;
-                m_LightShareLock.AcquireWriterLock(-1);
-                try
+                m_LightShareLock.AcquireWriterLock(() =>
                 {
                     if (!m_WeatherConfig.EnableLightShareControl)
                     {
@@ -298,11 +273,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                         m_WindlightValid = true;
                         m_ImmediateSunUpdate = true;
                     }
-                }
-                finally
-                {
-                    m_LightShareLock.ReleaseWriterLock();
-                }
+                });
                 if (windlightUpdated)
                 {
                     UpdateWindlightProfileToClients();
@@ -314,23 +285,17 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             get
             {
-                m_LightShareLock.AcquireReaderLock(-1);
-                try
+                return m_LightShareLock.AcquireReaderLock(() =>
                 {
                     return m_WindlightValid ?
                         m_WaterWindlight :
                         WindlightWaterData.Defaults;
-                }
-                finally
-                {
-                    m_LightShareLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
                 bool windlightUpdated = false;
-                m_LightShareLock.AcquireWriterLock(-1);
-                try
+                m_LightShareLock.AcquireWriterLock(() =>
                 {
                     if (!m_WeatherConfig.EnableLightShareControl)
                     {
@@ -338,11 +303,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                         windlightUpdated = true;
                         m_WindlightValid = true;
                     }
-                }
-                finally
-                {
-                    m_LightShareLock.ReleaseWriterLock();
-                }
+                });
                 if (windlightUpdated)
                 {
                     UpdateWindlightProfileToClients();

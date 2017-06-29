@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
@@ -42,66 +43,46 @@ namespace SilverSim.Scene.Types.Scene
         {
             get
             {
-                m_MaterialsRwLock.AcquireReaderLock(-1);
-                try
+                return m_MaterialsRwLock.AcquireReaderLock(() =>
                 {
                     var outb = new byte[m_MaterialsData.Length];
                     Buffer.BlockCopy(m_MaterialsData, 0, outb, 0, m_MaterialsData.Length);
                     return outb;
-                }
-                finally
-                {
-                    m_MaterialsRwLock.ReleaseReaderLock();
-                }
+                });
             }
         }
 
         public void AddMaterial(Material mat)
         {
-            m_MaterialsRwLock.AcquireWriterLock(-1);
-            try
+            m_MaterialsRwLock.AcquireWriterLock(() =>
             {
                 m_Materials.Add(mat.MaterialID, mat);
                 UpdateMaterials();
-            }
-            finally
-            {
-                m_MaterialsRwLock.ReleaseWriterLock();
-            }
+            });
         }
 
         public Material GetMaterial(UUID matid)
         {
-            Material mat;
-            m_MaterialsRwLock.AcquireReaderLock(-1);
-            try
+            Material mat = null;
+            if(m_MaterialsRwLock.AcquireReaderLock(() => m_Materials.TryGetValue(matid, out mat)))
             {
-                if (m_Materials.TryGetValue(matid, out mat))
-                {
-                    return mat;
-                }
-            }
-            finally
-            {
-                m_MaterialsRwLock.ReleaseReaderLock();
+                return mat;
             }
 
             /* fetch from asset */
             mat = new Material(AssetService[matid]);
-            m_MaterialsRwLock.AcquireWriterLock(-1);
-            try
+            m_MaterialsRwLock.AcquireWriterLock(() =>
             {
-                m_Materials.Add(mat.MaterialID, new Material(mat));
+                try
+                {
+                    m_Materials.Add(mat.MaterialID, new Material(mat));
+                }
+                catch
+                {
+                    /* ignore this */
+                }
                 UpdateMaterials();
-            }
-            catch
-            {
-                /* ignore this */
-            }
-            finally
-            {
-                m_MaterialsRwLock.ReleaseWriterLock();
-            }
+            });
             return mat;
         }
 
@@ -115,8 +96,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void AddMaterials(List<Material> mats)
         {
-            m_MaterialsRwLock.AcquireWriterLock(-1);
-            try
+            m_MaterialsRwLock.AcquireWriterLock(() =>
             {
                 foreach (Material mat in mats)
                 {
@@ -130,27 +110,18 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
                 UpdateMaterials();
-            }
-            finally
-            {
-                m_MaterialsRwLock.ReleaseWriterLock();
-            }
+            });
         }
 
         public void RemoveMaterial(Material mat)
         {
-            m_MaterialsRwLock.AcquireWriterLock(-1);
-            try
+            m_MaterialsRwLock.AcquireWriterLock(() =>
             {
                 if (m_Materials.Remove(mat.MaterialID))
                 {
                     UpdateMaterials();
                 }
-            }
-            finally
-            {
-                m_MaterialsRwLock.ReleaseWriterLock();
-            }
+            });
         }
 
         /* Collect legacy materials and push them to materials */

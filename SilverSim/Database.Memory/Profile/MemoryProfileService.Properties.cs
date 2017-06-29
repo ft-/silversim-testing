@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System.Collections.Generic;
@@ -35,11 +36,10 @@ namespace SilverSim.Database.Memory.Profile
         {
             set
             {
-                m_PropertiesLock.AcquireWriterLock(-1);
-                try
+                m_PropertiesLock.AcquireWriterLock(() =>
                 {
                     ProfileProperties props;
-                    if(!m_Properties.TryGetValue(user.ID, out props))
+                    if (!m_Properties.TryGetValue(user.ID, out props))
                     {
                         props = value;
                         props.User = user;
@@ -65,36 +65,21 @@ namespace SilverSim.Database.Memory.Profile
                     }
 
                     m_Properties[user.ID] = props;
-                }
-                finally
-                {
-                    m_PropertiesLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 
-        ProfileProperties IPropertiesInterface.this[UUI user]
+        ProfileProperties IPropertiesInterface.this[UUI user] => m_PropertiesLock.AcquireReaderLock(() =>
         {
-            get
+            ProfileProperties props;
+            if (!m_Properties.TryGetValue(user.ID, out props))
             {
-                m_PropertiesLock.AcquireReaderLock(-1);
-                try
+                props = new ProfileProperties()
                 {
-                    ProfileProperties props;
-                    if (!m_Properties.TryGetValue(user.ID, out props))
-                    {
-                        props = new ProfileProperties()
-                        {
-                            User = user
-                        };
-                    }
-                    return props;
-                }
-                finally
-                {
-                    m_PropertiesLock.ReleaseReaderLock();
-                }
+                    User = user
+                };
             }
-        }
+            return props;
+        });
     }
 }

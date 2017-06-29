@@ -43,8 +43,7 @@ namespace SilverSim.Types.Agent
             {
                 get
                 {
-                    m_RwLock.AcquireReaderLock(-1);
-                    try
+                    return m_RwLock.AcquireReaderLock(() =>
                     {
                         var textures = new UUID[TextureCount];
                         for (int i = 0; i < TextureCount; ++i)
@@ -52,11 +51,7 @@ namespace SilverSim.Types.Agent
                             textures[i] = new UUID(m_AvatarTextures[i]);
                         }
                         return textures;
-                    }
-                    finally
-                    {
-                        m_RwLock.ReleaseReaderLock();
-                    }
+                    });
                 }
                 set
                 {
@@ -64,18 +59,13 @@ namespace SilverSim.Types.Agent
                     {
                         throw new ArgumentException("Invalid number of elements");
                     }
-                    m_RwLock.AcquireWriterLock(-1);
-                    try
+                    m_RwLock.AcquireWriterLock(() =>
                     {
                         for (int i = 0; i < TextureCount; ++i)
                         {
                             m_AvatarTextures[i] = new UUID(value[i]);
                         }
-                    }
-                    finally
-                    {
-                        m_RwLock.ReleaseWriterLock();
-                    }
+                    });
                 }
             }
 
@@ -87,15 +77,7 @@ namespace SilverSim.Types.Agent
                     {
                         throw new KeyNotFoundException();
                     }
-                    m_RwLock.AcquireReaderLock(-1);
-                    try
-                    {
-                        return m_AvatarTextures[texIndex];
-                    }
-                    finally
-                    {
-                        m_RwLock.ReleaseReaderLock();
-                    }
+                    return m_RwLock.AcquireReaderLock(() => m_AvatarTextures[texIndex]);
                 }
 
                 set
@@ -104,15 +86,10 @@ namespace SilverSim.Types.Agent
                     {
                         throw new KeyNotFoundException();
                     }
-                    m_RwLock.AcquireWriterLock(-1);
-                    try
+                    m_RwLock.AcquireWriterLock(() =>
                     {
                         m_AvatarTextures[texIndex] = value;
-                    }
-                    finally
-                    {
-                        m_RwLock.ReleaseWriterLock();
-                    }
+                    });
                 }
             }
         }
@@ -142,31 +119,21 @@ namespace SilverSim.Types.Agent
         {
             get
             {
-                m_VisualParamsLock.AcquireReaderLock(-1);
-                try
+                return m_VisualParamsLock.AcquireReaderLock(() =>
                 {
                     var res = new byte[m_VisualParams.Length];
                     Buffer.BlockCopy(m_VisualParams, 0, res, 0, m_VisualParams.Length);
                     return res;
-                }
-                finally
-                {
-                    m_VisualParamsLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
-                m_VisualParamsLock.AcquireWriterLock(-1);
-                try
+                m_VisualParamsLock.AcquireWriterLock(() =>
                 {
                     int VisualParamCount = MaxVisualParams < value.Length ? MaxVisualParams : value.Length;
                     m_VisualParams = new byte[VisualParamCount];
                     Buffer.BlockCopy(value, 0, m_VisualParams, 0, VisualParamCount);
-                }
-                finally
-                {
-                    m_VisualParamsLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 

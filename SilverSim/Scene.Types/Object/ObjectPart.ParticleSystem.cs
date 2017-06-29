@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using SilverSim.Types.Primitive;
 using System;
 using System.Threading;
@@ -34,34 +35,24 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                m_ParticleSystemLock.AcquireReaderLock(-1);
-                try
+                return m_ParticleSystemLock.AcquireReaderLock(() =>
                 {
                     if (m_ParticleSystem.Length == 0)
                     {
                         return null;
                     }
                     return new ParticleSystem(m_ParticleSystem, 0);
-                }
-                finally
-                {
-                    m_ParticleSystemLock.ReleaseReaderLock();
-                }
+                });
             }
 
             set
             {
-                m_ParticleSystemLock.AcquireWriterLock(-1);
-                try
+                m_ParticleSystemLock.AcquireWriterLock(() =>
                 {
                     m_ParticleSystem = (value == null) ?
                         new byte[0] :
                         value.GetBytes();
-                }
-                finally
-                {
-                    m_ParticleSystemLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 
@@ -69,23 +60,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                m_ParticleSystemLock.AcquireReaderLock(-1);
-                try
+                return m_ParticleSystemLock.AcquireReaderLock(() =>
                 {
                     var o = new byte[m_ParticleSystem.Length];
                     Buffer.BlockCopy(m_ParticleSystem, 0, o, 0, m_ParticleSystem.Length);
                     return o;
-                }
-                finally
-                {
-                    m_ParticleSystemLock.ReleaseReaderLock();
-                }
+                });
             }
 
             set
             {
-                m_ParticleSystemLock.AcquireWriterLock(-1);
-                try
+                m_ParticleSystemLock.AcquireWriterLock(() =>
                 {
                     if (value == null)
                     {
@@ -96,11 +81,7 @@ namespace SilverSim.Scene.Types.Object
                         m_ParticleSystem = new byte[value.Length];
                         Buffer.BlockCopy(value, 0, m_ParticleSystem, 0, value.Length);
                     }
-                }
-                finally
-                {
-                    m_ParticleSystemLock.ReleaseWriterLock();
-                }
+                });
             }
         }
     }

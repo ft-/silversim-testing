@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
@@ -56,22 +57,17 @@ namespace SilverSim.Types.Agent
         {
             get
             {
-                m_WearablesUpdateLock.AcquireReaderLock(-1);
-                try
+                return m_WearablesUpdateLock.AcquireReaderLock(() =>
                 {
                     /* do not give access to our internal data via references */
                     List<WearableInfo> s = m_Wearables[type];
                     var l = new List<WearableInfo>();
-                    foreach(var i in s)
+                    foreach (var i in s)
                     {
                         l.Add(i);
                     }
                     return l;
-                }
-                finally
-                {
-                    m_WearablesUpdateLock.ReleaseReaderLock();
-                }
+                });
             }
 
             set
@@ -90,15 +86,10 @@ namespace SilverSim.Types.Agent
                 {
                     throw new ArgumentException("Too many elements in list");
                 }
-                m_WearablesUpdateLock.AcquireWriterLock(-1);
-                try
+                m_WearablesUpdateLock.AcquireWriterLock(() =>
                 {
                     m_Wearables[type] = nl;
-                }
-                finally
-                {
-                    m_WearablesUpdateLock.ReleaseWriterLock();
-                }
+                });
             }
         }
         #endregion
@@ -112,26 +103,17 @@ namespace SilverSim.Types.Agent
                 {
                     throw new KeyNotFoundException();
                 }
-                m_WearablesUpdateLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_Wearables[type][(int)index];
-                }
-                finally
-                {
-                    m_WearablesUpdateLock.ReleaseReaderLock();
-                }
+                return m_WearablesUpdateLock.AcquireReaderLock(() => m_Wearables[type][(int)index]);
             }
 
             set
             {
-                m_WearablesUpdateLock.AcquireWriterLock(-1);
-                try
+                m_WearablesUpdateLock.AcquireWriterLock(() =>
                 {
                     var wearableList = m_Wearables[type];
                     if (wearableList.Count <= index)
                     {
-                        if(index >= 5)
+                        if (index >= 5)
                         {
                             throw new KeyNotFoundException();
                         }
@@ -141,11 +123,7 @@ namespace SilverSim.Types.Agent
                     {
                         wearableList[(int)index] = value;
                     }
-                }
-                finally
-                {
-                    m_WearablesUpdateLock.ReleaseWriterLock();
-                }
+                });
             }
         }
         #endregion
@@ -157,27 +135,21 @@ namespace SilverSim.Types.Agent
         {
             get
             {
-                m_WearablesUpdateLock.AcquireReaderLock(-1);
-                try
+                return m_WearablesUpdateLock.AcquireReaderLock(() =>
                 {
                     var od = new Dictionary<WearableType, List<WearableInfo>>();
-                    foreach(var kvp in m_Wearables)
+                    foreach (var kvp in m_Wearables)
                     {
                         od.Add(kvp.Key, new List<WearableInfo>(kvp.Value));
                     }
                     return od;
-                }
-                finally
-                {
-                    m_WearablesUpdateLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
-                m_WearablesUpdateLock.AcquireWriterLock(-1);
-                try
+                m_WearablesUpdateLock.AcquireWriterLock(() =>
                 {
-                    foreach(var lwi in m_Wearables.Values)
+                    foreach (var lwi in m_Wearables.Values)
                     {
                         lwi.Clear();
                     }
@@ -189,11 +161,7 @@ namespace SilverSim.Types.Agent
                             m_Wearables[kvp.Key] = new List<WearableInfo>(kvp.Value);
                         }
                     }
-                }
-                finally
-                {
-                    m_WearablesUpdateLock.ReleaseWriterLock();
-                }
+                });
             }
         }
         #endregion

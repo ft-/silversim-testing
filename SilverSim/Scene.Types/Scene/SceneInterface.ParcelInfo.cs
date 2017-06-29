@@ -118,8 +118,7 @@ namespace SilverSim.Scene.Types.Scene
         public void SendAllParcelOverlaysTo(IAgent agent)
         {
             var c = new byte[SizeX * SizeY / PARCEL_BLOCK_SIZE / PARCEL_BLOCK_SIZE];
-            m_ParcelLayerRwLock.AcquireReaderLock(-1);
-            try
+            m_ParcelLayerRwLock.AcquireReaderLock(() =>
             {
                 int bytePos = 0;
                 UUI agentID = agent.Owner;
@@ -130,11 +129,7 @@ namespace SilverSim.Scene.Types.Scene
                         c[bytePos++] = (byte)GetParcelLayerByte(x, y, agentID);
                     }
                 }
-            }
-            finally
-            {
-                m_ParcelLayerRwLock.ReleaseReaderLock();
-            }
+            });
 
             int sequenceID = 0;
             int offset;
@@ -158,8 +153,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             lock(m_ParcelOverlayUpdateLock)
             {
-                m_ParcelLayerRwLock.AcquireReaderLock(-1);
-                try
+                m_ParcelLayerRwLock.AcquireReaderLock(() =>
                 {
                     int sequenceID = 0;
                     int totalLen = (int)(SizeX / PARCEL_BLOCK_SIZE * SizeY / PARCEL_BLOCK_SIZE);
@@ -188,11 +182,7 @@ namespace SilverSim.Scene.Types.Scene
                             m_ParcelLayerDirty[offset / 1024] = false;
                         }
                     }
-                }
-                finally
-                {
-                    m_ParcelLayerRwLock.ReleaseReaderLock();
-                }
+                });
             }
         }
 

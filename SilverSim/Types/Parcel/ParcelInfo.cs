@@ -22,6 +22,7 @@
 #pragma warning disable RCS1154
 #pragma warning disable RCS1029
 
+using SilverSim.Threading;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
@@ -232,55 +233,41 @@ namespace SilverSim.Types.Parcel
             }
 
             /** <summary>Do not use this to merge with an active parcel data</summary> */
-            public void Merge(ParcelDataLandBitmap bitmap)
+            public void Merge(ParcelDataLandBitmap bitmap) => m_LandBitmapRwLock.AcquireWriterLock(() =>
             {
-                try
+                if (bitmap.m_LandBitmap.Length == m_LandBitmap.Length)
                 {
-                    m_LandBitmapRwLock.AcquireWriterLock(-1);
-                    if (bitmap.m_LandBitmap.Length == m_LandBitmap.Length)
+                    for (int y = 0; y < BitmapHeight; ++y)
                     {
-                        for (int y = 0; y < BitmapHeight; ++y)
+                        for (int x = 0; x < BitmapWidth; ++x)
                         {
-                            for (int x = 0; x < BitmapWidth; ++x)
-                            {
-                                m_LandBitmap[y, x] |= bitmap.m_LandBitmap[y, x];
-                            }
+                            m_LandBitmap[y, x] |= bitmap.m_LandBitmap[y, x];
                         }
-                        DetermineAABB();
                     }
-                    else
-                    {
-                        throw new ArgumentException("Parcel Bitmap size does not match");
-                    }
+                    DetermineAABB();
                 }
-                finally
+                else
                 {
-                    m_LandBitmapRwLock.ReleaseWriterLock();
+                    throw new ArgumentException("Parcel Bitmap size does not match");
                 }
-            }
+            });
 
             public byte[] Data
             {
                 get
                 {
-                    m_LandBitmapRwLock.AcquireReaderLock(-1);
-                    try
+                    return m_LandBitmapRwLock.AcquireReaderLock(() =>
                     {
                         var b = new byte[m_LandBitmap.Length];
                         Buffer.BlockCopy(m_LandBitmap, 0, b, 0, m_LandBitmap.Length);
                         return b;
-                    }
-                    finally
-                    {
-                        m_LandBitmapRwLock.ReleaseReaderLock();
-                    }
+                    });
                 }
 
                 set
                 {
-                    try
+                    m_LandBitmapRwLock.AcquireWriterLock(() =>
                     {
-                        m_LandBitmapRwLock.AcquireWriterLock(-1);
                         if (value.Length == m_LandBitmap.Length)
                         {
                             Buffer.BlockCopy(value, 0, m_LandBitmap, 0, m_LandBitmap.Length);
@@ -290,11 +277,7 @@ namespace SilverSim.Types.Parcel
                         {
                             throw new ArgumentException("Parcel Bitmap size does not match");
                         }
-                    }
-                    finally
-                    {
-                        m_LandBitmapRwLock.ReleaseWriterLock();
-                    }
+                    });
                 }
             }
 
@@ -304,9 +287,8 @@ namespace SilverSim.Types.Parcel
 
                 set
                 {
-                    try
+                    m_LandBitmapRwLock.AcquireWriterLock(() =>
                     {
-                        m_LandBitmapRwLock.AcquireWriterLock(-1);
                         if (value.Length == m_LandBitmap.Length)
                         {
                             Buffer.BlockCopy(value, 0, m_LandBitmap, 0, m_LandBitmap.Length);
@@ -315,11 +297,7 @@ namespace SilverSim.Types.Parcel
                         {
                             throw new ArgumentException("Parcel Bitmap size does not match");
                         }
-                    }
-                    finally
-                    {
-                        m_LandBitmapRwLock.ReleaseWriterLock();
-                    }
+                    });
                 }
             }
 
@@ -380,8 +358,7 @@ namespace SilverSim.Types.Parcel
                 {
                     if (x < BitmapWidth && y < BitmapHeight)
                     {
-                        m_LandBitmapRwLock.AcquireWriterLock(-1);
-                        try
+                        m_LandBitmapRwLock.AcquireWriterLock(() =>
                         {
                             byte b = m_LandBitmap[y, x / BitmapWidth];
                             if (value)
@@ -397,11 +374,7 @@ namespace SilverSim.Types.Parcel
                             {
                                 DetermineAABB();
                             }
-                        }
-                        finally
-                        {
-                            m_LandBitmapRwLock.ReleaseWriterLock();
-                        }
+                        });
                     }
                     else
                     {

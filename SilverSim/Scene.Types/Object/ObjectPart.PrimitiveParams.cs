@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Script;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
@@ -917,63 +918,43 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHAMODE")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Normal:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_NORMAL")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Normal, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Specular:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Specular, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Texture:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Text:
@@ -986,33 +967,23 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Color:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_COLOR")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Color, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.BumpShiny, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.PointLight:
@@ -1027,18 +998,13 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.FullBright:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_FULLBRIGHT")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Flexible:
@@ -1055,33 +1021,23 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.TexGen:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Glow:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_GLOW")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Omega:
@@ -1094,18 +1050,13 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Alpha:
-                    m_TextureEntryLock.AcquireReaderLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireReaderLock(() =>
                     {
                         foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_COLOR")))
                         {
                             GetTexPrimitiveParams(face, PrimitiveParamsType.Alpha, paramList);
                         }
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseReaderLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.AllowUnsit:
@@ -1248,8 +1199,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHAMODE"));
                         enumerator.MarkPosition();
@@ -1261,16 +1211,11 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Texture;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Normal:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_NORMAL"));
                         enumerator.MarkPosition();
@@ -1282,16 +1227,11 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Texture;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Specular:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR"));
                         enumerator.MarkPosition();
@@ -1303,16 +1243,11 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Texture;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Texture:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE"));
                         enumerator.MarkPosition();
@@ -1324,11 +1259,7 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Texture;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Text:
@@ -1345,8 +1276,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Color:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE"));
                         enumerator.MarkPosition();
@@ -1358,16 +1288,11 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Color;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Alpha:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA"));
                         enumerator.MarkPosition();
@@ -1379,16 +1304,11 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Color;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY"));
                         enumerator.MarkPosition();
@@ -1399,11 +1319,7 @@ namespace SilverSim.Scene.Types.Object
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Texture;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.PointLight:
@@ -1420,8 +1336,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.FullBright:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_FULLBRIGHT"));
                         enumerator.MarkPosition();
@@ -1432,11 +1347,7 @@ namespace SilverSim.Scene.Types.Object
                         }
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Color;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Flexible:
@@ -1454,8 +1365,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.TexGen:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN"));
                         enumerator.MarkPosition();
@@ -1467,16 +1377,11 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Texture;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Glow:
-                    m_TextureEntryLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_GLOW"));
                         enumerator.MarkPosition();
@@ -1488,11 +1393,7 @@ namespace SilverSim.Scene.Types.Object
                         m_TextureEntryBytes = m_TextureEntry.GetBytes();
                         flags |= UpdateChangedFlags.Color;
                         isUpdated = true;
-                    }
-                    finally
-                    {
-                        m_TextureEntryLock.ReleaseWriterLock();
-                    }
+                    });
                     break;
 
                 case PrimitiveParamsType.Omega:

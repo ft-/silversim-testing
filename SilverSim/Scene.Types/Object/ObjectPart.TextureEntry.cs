@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using SilverSim.Types.Primitive;
 using System;
 using System.Threading;
@@ -114,31 +115,18 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                m_TextureEntryLock.AcquireReaderLock(-1);
-                try
-                {
-                    return new TextureEntry(m_TextureEntryBytes);
-                }
-                finally
-                {
-                    m_TextureEntryLock.ReleaseReaderLock();
-                }
+                return m_TextureEntryLock.AcquireReaderLock(() => new TextureEntry(m_TextureEntryBytes));
             }
             set
             {
                 UpdateChangedFlags flags = 0;
                 var copy = new TextureEntry(value.GetBytes());
-                m_TextureEntryLock.AcquireWriterLock(-1);
-                try
+                m_TextureEntryLock.AcquireWriterLock(() =>
                 {
                     flags = ChangedTexParams(m_TextureEntry, copy);
                     m_TextureEntry = copy;
                     m_TextureEntryBytes = value.GetBytes();
-                }
-                finally
-                {
-                    m_TextureEntryLock.ReleaseWriterLock();
-                }
+                });
                 TriggerOnUpdate(flags);
             }
         }
@@ -147,34 +135,25 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                m_TextureEntryLock.AcquireReaderLock(-1);
-                try
+                return m_TextureEntryLock.AcquireReaderLock(() =>
                 {
                     var b = new byte[m_TextureEntryBytes.Length];
                     Buffer.BlockCopy(m_TextureEntryBytes, 0, b, 0, m_TextureEntryBytes.Length);
                     return b;
-                }
-                finally
-                {
-                    m_TextureEntryLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
-                UpdateChangedFlags flags;
-                m_TextureEntryLock.AcquireWriterLock(-1);
-                try
+
+                UpdateChangedFlags flags = m_TextureEntryLock.AcquireWriterLock(() =>
                 {
                     TextureEntry newTex;
                     m_TextureEntryBytes = value;
                     newTex = new TextureEntry(value);
-                    flags = ChangedTexParams(m_TextureEntry, newTex);
+                    UpdateChangedFlags flag = ChangedTexParams(m_TextureEntry, newTex);
                     m_TextureEntry = newTex;
-                }
-                finally
-                {
-                    m_TextureEntryLock.ReleaseWriterLock();
-                }
+                    return flag;
+                });
                 TriggerOnUpdate(flags);
             }
         }
@@ -183,41 +162,23 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                m_TextureAnimationLock.AcquireReaderLock(-1);
-                try
-                {
-                    return new TextureAnimationEntry(m_TextureAnimationBytes, 0);
-                }
-                finally
-                {
-                    m_TextureAnimationLock.ReleaseReaderLock();
-                }
+                return m_TextureAnimationLock.AcquireReaderLock(() => new TextureAnimationEntry(m_TextureAnimationBytes, 0));
             }
             set
             {
                 if (value == null || (value.Flags & TextureAnimationEntry.TextureAnimMode.ANIM_ON) == 0)
                 {
-                    m_TextureAnimationLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureAnimationLock.AcquireWriterLock(() =>
                     {
                         m_TextureAnimationBytes = new byte[0];
-                    }
-                    finally
-                    {
-                        m_TextureAnimationLock.ReleaseWriterLock();
-                    }
+                    });
                 }
                 else
                 {
-                    m_TextureAnimationLock.AcquireWriterLock(-1);
-                    try
+                    m_TextureAnimationLock.AcquireWriterLock(() =>
                     {
                         m_TextureAnimationBytes = value.GetBytes();
-                    }
-                    finally
-                    {
-                        m_TextureAnimationLock.ReleaseWriterLock();
-                    }
+                    });
                 }
                 TriggerOnUpdate(0);
             }
@@ -227,29 +188,19 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                m_TextureAnimationLock.AcquireReaderLock(-1);
-                try
+                return m_TextureAnimationLock.AcquireReaderLock(() =>
                 {
                     var b = new byte[m_TextureAnimationBytes.Length];
                     Buffer.BlockCopy(m_TextureEntryBytes, 0, b, 0, m_TextureAnimationBytes.Length);
                     return b;
-                }
-                finally
-                {
-                    m_TextureAnimationLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
-                m_TextureAnimationLock.AcquireWriterLock(-1);
-                try
+                m_TextureAnimationLock.AcquireWriterLock(() =>
                 {
                     m_TextureAnimationBytes = value;
-                }
-                finally
-                {
-                    m_TextureAnimationLock.ReleaseWriterLock();
-                }
+                });
                 TriggerOnUpdate(0);
             }
         }

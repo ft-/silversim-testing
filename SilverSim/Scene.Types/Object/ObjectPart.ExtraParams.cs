@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Primitive;
@@ -489,22 +490,16 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                m_ExtraParamsLock.AcquireReaderLock(-1);
-                try
+                return m_ExtraParamsLock.AcquireReaderLock(() =>
                 {
                     var b = new byte[m_ExtraParamsBytes.Length];
                     Buffer.BlockCopy(m_ExtraParamsBytes, 0, b, 0, m_ExtraParamsBytes.Length);
                     return b;
-                }
-                finally
-                {
-                    m_ExtraParamsLock.ReleaseReaderLock();
-                }
+                });
             }
             set
             {
-                m_ExtraParamsLock.AcquireWriterLock(-1);
-                try
+                m_ExtraParamsLock.AcquireWriterLock(() =>
                 {
                     m_ExtraParamsBytes = value;
                     var light = new PointLightParam();
@@ -617,11 +612,11 @@ namespace SilverSim.Scene.Types.Object
                                     break;
 
                                 case ExtendedMeshEP:
-                                    if(len < 4)
+                                    if (len < 4)
                                     {
                                         break;
                                     }
-                                    if(!BitConverter.IsLittleEndian)
+                                    if (!BitConverter.IsLittleEndian)
                                     {
                                         byte[] b = new byte[4];
                                         Buffer.BlockCopy(value, pos, b, 0, 4);
@@ -655,11 +650,7 @@ namespace SilverSim.Scene.Types.Object
                             }
                         }
                     }
-                }
-                finally
-                {
-                    m_ExtraParamsLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 
@@ -683,162 +674,154 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private void UpdateExtraParams()
+        private void UpdateExtraParams() => m_ExtraParamsLock.AcquireWriterLock(() =>
         {
-            m_ExtraParamsLock.AcquireWriterLock(-1);
-            try
+            int i = 0;
+            uint totalBytesLength = 1;
+            uint extraParamsNum = 0;
+
+            var flexi = Flexible;
+            var light = PointLight;
+            var proj = Projection;
+            var shape = Shape;
+            var emesh = ExtendedMesh;
+            if (flexi.IsFlexible)
             {
-                int i = 0;
-                uint totalBytesLength = 1;
-                uint extraParamsNum = 0;
-
-                var flexi = Flexible;
-                var light = PointLight;
-                var proj = Projection;
-                var shape = Shape;
-                var emesh = ExtendedMesh;
-                if (flexi.IsFlexible)
-                {
-                    ++extraParamsNum;
-                    totalBytesLength += 16;
-                    totalBytesLength += 2 + 4;
-                }
-
-                if (shape.Type == PrimitiveShapeType.Sculpt)
-                {
-                    ++extraParamsNum;
-                    totalBytesLength += 17;
-                    totalBytesLength += 2 + 4;
-                }
-
-                if (light.IsLight)
-                {
-                    ++extraParamsNum;
-                    totalBytesLength += 16;
-                    totalBytesLength += 2 + 4;
-                }
-
-                if (proj.IsProjecting)
-                {
-                    ++extraParamsNum;
-                    totalBytesLength += 28;
-                    totalBytesLength += 2 + 4;
-                }
-
-                if (emesh.Flags != ExtendedMeshParams.MeshFlags.None)
-                {
-                    ++extraParamsNum;
-                    totalBytesLength += 4;
-                    totalBytesLength += 2 + 4;
-                }
-
-                var updatebytes = new byte[totalBytesLength];
-                updatebytes[i++] = (byte)extraParamsNum;
-
-                if (flexi.IsFlexible)
-                {
-                    updatebytes[i++] = FlexiEP % 256;
-                    updatebytes[i++] = FlexiEP / 256;
-
-                    updatebytes[i++] = 16;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-
-                    updatebytes[i++] = (byte)((byte)((byte)(flexi.Tension * 10.01f) & 0x7F) | (byte)((flexi.Softness & 2) << 6));
-                    updatebytes[i++] = (byte)((byte)((byte)(flexi.Friction * 10.01f) & 0x7F) | (byte)((flexi.Softness & 1) << 7));
-                    updatebytes[i++] = (byte)((flexi.Gravity + 10.0f) * 10.01f);
-                    updatebytes[i++] = (byte)(flexi.Wind * 10.01f);
-                    flexi.Force.ToBytes(updatebytes, i);
-                    i += 16;
-                }
-
-                if (shape.Type == PrimitiveShapeType.Sculpt)
-                {
-                    updatebytes[i++] = SculptEP % 256;
-                    updatebytes[i++] = SculptEP / 256;
-                    updatebytes[i++] = 17;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    shape.SculptMap.ToBytes(updatebytes, i);
-                    i += 16;
-                    updatebytes[i++] = (byte)shape.SculptType;
-                }
-
-                if (light.IsLight &&
-                    (!m_IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint)) &&
-                    (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
-                {
-                    updatebytes[i++] = LightEP % 256;
-                    updatebytes[i++] = LightEP / 256;
-                    updatebytes[i++] = 16;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 3);
-                    
-                    double intensity = light.Intensity;
-                    if (intensity > m_FacelightLimitIntensity && 
-                        (ObjectGroup.AttachPoint == AttachmentPoint.LeftHand ||
-                        ObjectGroup.AttachPoint == AttachmentPoint.RightHand))
-                    {
-                        intensity = m_FacelightLimitIntensity;
-                    }
-                    else if (intensity > m_AttachmentLightLimitIntensity &&
-                        !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint))
-                    {
-                        intensity = m_AttachmentLightLimitIntensity;
-                    }
-
-                    updatebytes[i + 3] = (byte)(intensity * 255f);
-                    i += 4;
-                    Float2LEBytes((float)light.Radius, updatebytes, i);
-                    i += 4;
-                    Float2LEBytes((float)light.Cutoff, updatebytes, i);
-                    i += 4;
-                    Float2LEBytes((float)light.Falloff, updatebytes, i);
-                    i += 4;
-                }
-
-                if (proj.IsProjecting)
-                {
-                    updatebytes[i++] = (ProjectionEP % 256);
-                    updatebytes[i++] = (ProjectionEP / 256);
-                    updatebytes[i++] = 28;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    proj.ProjectionTextureID.ToBytes(updatebytes, i);
-                    i += 16;
-                    Float2LEBytes((float)proj.ProjectionFOV, updatebytes, i);
-                    i += 4;
-                    Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
-                    i += 4;
-                    Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
-                }
-
-                if(emesh.Flags != ExtendedMeshParams.MeshFlags.None)
-                {
-                    updatebytes[i++] = (ExtendedMeshEP % 256);
-                    updatebytes[i++] = (ExtendedMeshEP / 256);
-                    updatebytes[i++] = 4;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = 0;
-                    updatebytes[i++] = (byte)(((uint)emesh.Flags) & 0xFF);
-                    updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 8) & 0xFF);
-                    updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 16) & 0xFF);
-                    updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 24) & 0xFF);
-                }
-
-                m_ExtraParamsBytes = updatebytes;
+                ++extraParamsNum;
+                totalBytesLength += 16;
+                totalBytesLength += 2 + 4;
             }
-            finally
+
+            if (shape.Type == PrimitiveShapeType.Sculpt)
             {
-                m_ExtraParamsLock.ReleaseWriterLock();
+                ++extraParamsNum;
+                totalBytesLength += 17;
+                totalBytesLength += 2 + 4;
             }
-        }
+
+            if (light.IsLight)
+            {
+                ++extraParamsNum;
+                totalBytesLength += 16;
+                totalBytesLength += 2 + 4;
+            }
+
+            if (proj.IsProjecting)
+            {
+                ++extraParamsNum;
+                totalBytesLength += 28;
+                totalBytesLength += 2 + 4;
+            }
+
+            if (emesh.Flags != ExtendedMeshParams.MeshFlags.None)
+            {
+                ++extraParamsNum;
+                totalBytesLength += 4;
+                totalBytesLength += 2 + 4;
+            }
+
+            var updatebytes = new byte[totalBytesLength];
+            updatebytes[i++] = (byte)extraParamsNum;
+
+            if (flexi.IsFlexible)
+            {
+                updatebytes[i++] = FlexiEP % 256;
+                updatebytes[i++] = FlexiEP / 256;
+
+                updatebytes[i++] = 16;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+
+                updatebytes[i++] = (byte)((byte)((byte)(flexi.Tension * 10.01f) & 0x7F) | (byte)((flexi.Softness & 2) << 6));
+                updatebytes[i++] = (byte)((byte)((byte)(flexi.Friction * 10.01f) & 0x7F) | (byte)((flexi.Softness & 1) << 7));
+                updatebytes[i++] = (byte)((flexi.Gravity + 10.0f) * 10.01f);
+                updatebytes[i++] = (byte)(flexi.Wind * 10.01f);
+                flexi.Force.ToBytes(updatebytes, i);
+                i += 16;
+            }
+
+            if (shape.Type == PrimitiveShapeType.Sculpt)
+            {
+                updatebytes[i++] = SculptEP % 256;
+                updatebytes[i++] = SculptEP / 256;
+                updatebytes[i++] = 17;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                shape.SculptMap.ToBytes(updatebytes, i);
+                i += 16;
+                updatebytes[i++] = (byte)shape.SculptType;
+            }
+
+            if (light.IsLight &&
+                (!m_IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint)) &&
+                (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
+            {
+                updatebytes[i++] = LightEP % 256;
+                updatebytes[i++] = LightEP / 256;
+                updatebytes[i++] = 16;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 3);
+
+                double intensity = light.Intensity;
+                if (intensity > m_FacelightLimitIntensity &&
+                    (ObjectGroup.AttachPoint == AttachmentPoint.LeftHand ||
+                    ObjectGroup.AttachPoint == AttachmentPoint.RightHand))
+                {
+                    intensity = m_FacelightLimitIntensity;
+                }
+                else if (intensity > m_AttachmentLightLimitIntensity &&
+                    !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint))
+                {
+                    intensity = m_AttachmentLightLimitIntensity;
+                }
+
+                updatebytes[i + 3] = (byte)(intensity * 255f);
+                i += 4;
+                Float2LEBytes((float)light.Radius, updatebytes, i);
+                i += 4;
+                Float2LEBytes((float)light.Cutoff, updatebytes, i);
+                i += 4;
+                Float2LEBytes((float)light.Falloff, updatebytes, i);
+                i += 4;
+            }
+
+            if (proj.IsProjecting)
+            {
+                updatebytes[i++] = (ProjectionEP % 256);
+                updatebytes[i++] = (ProjectionEP / 256);
+                updatebytes[i++] = 28;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                proj.ProjectionTextureID.ToBytes(updatebytes, i);
+                i += 16;
+                Float2LEBytes((float)proj.ProjectionFOV, updatebytes, i);
+                i += 4;
+                Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
+                i += 4;
+                Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
+            }
+
+            if (emesh.Flags != ExtendedMeshParams.MeshFlags.None)
+            {
+                updatebytes[i++] = (ExtendedMeshEP % 256);
+                updatebytes[i++] = (ExtendedMeshEP / 256);
+                updatebytes[i++] = 4;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = 0;
+                updatebytes[i++] = (byte)(((uint)emesh.Flags) & 0xFF);
+                updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 8) & 0xFF);
+                updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 16) & 0xFF);
+                updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 24) & 0xFF);
+            }
+
+            m_ExtraParamsBytes = updatebytes;
+        });
 
         public ExtendedMeshParams ExtendedMesh
         {

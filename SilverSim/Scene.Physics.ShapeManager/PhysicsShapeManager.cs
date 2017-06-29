@@ -192,15 +192,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         {
             if (0 == Interlocked.Decrement(ref shape.UseCount))
             {
-                m_Lock.AcquireWriterLock(-1);
-                try
-                {
-                    m_ConvexShapesBySculptMesh.RemoveIf(id, (PhysicsConvexShape s) => s.UseCount == 0);
-                }
-                finally
-                {
-                    m_Lock.ReleaseWriterLock();
-                }
+                m_Lock.AcquireWriterLock(() => m_ConvexShapesBySculptMesh.RemoveIf(id, (PhysicsConvexShape s) => s.UseCount == 0));
             }
         }
 
@@ -208,15 +200,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         {
             if (0 == Interlocked.Decrement(ref shape.UseCount))
             {
-                m_Lock.AcquireWriterLock(-1);
-                try
-                {
-                    m_ConvexShapesByPrimShape.RemoveIf(primshape, (PhysicsConvexShape s) => s.UseCount == 0);
-                }
-                finally
-                {
-                    m_Lock.ReleaseWriterLock();
-                }
+                m_Lock.AcquireWriterLock(() => m_ConvexShapesByPrimShape.RemoveIf(primshape, (PhysicsConvexShape s) => s.UseCount == 0));
             }
         }
 
@@ -297,19 +281,21 @@ namespace SilverSim.Scene.Physics.ShapeManager
         private bool TryGetConvexShapeFromMesh(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
             PhysicsConvexShape physicshape;
+            PhysicsShapeReference physicshaperes = null;
             UUID meshId = shape.SculptMap;
-            m_Lock.AcquireReaderLock(-1);
-            try
+            bool s = m_Lock.AcquireReaderLock(() =>
             {
                 if (m_ConvexShapesBySculptMesh.TryGetValue(meshId, out physicshape))
                 {
-                    physicshaperef = new PhysicsShapeMeshReference(meshId, this, physicshape);
+                    physicshaperes = new PhysicsShapeMeshReference(meshId, this, physicshape);
                     return true;
                 }
-            }
-            finally
+                return false;
+            });
+            if(s)
             {
-                m_Lock.ReleaseReaderLock();
+                physicshaperef = physicshaperes;
+                return true;
             }
 
             if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(meshId, out physicshape))
@@ -319,8 +305,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 m_SimulationStorage.PhysicsConvexShapes[meshId] = physicshape;
             }
 
-            m_Lock.AcquireReaderLock(-1);
-            try
+            /* we only lock out the decrement use count here */
+            physicshaperef = m_Lock.AcquireReaderLock(() =>
             {
                 try
                 {
@@ -330,12 +316,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 {
                     physicshape = m_ConvexShapesBySculptMesh[meshId];
                 }
-                physicshaperef = new PhysicsShapeMeshReference(meshId, this, physicshape);
-            }
-            finally
-            {
-                m_Lock.ReleaseReaderLock();
-            }
+                return new PhysicsShapeMeshReference(meshId, this, physicshape);
+            });
 
             return true;
         }
@@ -343,18 +325,20 @@ namespace SilverSim.Scene.Physics.ShapeManager
         private bool TryGetConvexShapeFromPrim(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
             PhysicsConvexShape physicshape;
-            m_Lock.AcquireReaderLock(-1);
-            try
+            PhysicsShapeReference physicshaperes = null;
+            bool s = m_Lock.AcquireReaderLock(() =>
             {
                 if (m_ConvexShapesByPrimShape.TryGetValue(shape, out physicshape))
                 {
-                    physicshaperef = new PhysicsShapePrimShapeReference(shape, this, physicshape);
+                    physicshaperes = new PhysicsShapePrimShapeReference(shape, this, physicshape);
                     return true;
                 }
-            }
-            finally
+                return false;
+            });
+            if(s)
             {
-                m_Lock.ReleaseReaderLock();
+                physicshaperef = physicshaperes;
+                return true;
             }
 
             if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(shape, out physicshape))
@@ -364,8 +348,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 m_SimulationStorage.PhysicsConvexShapes[shape] = physicshape;
             }
 
-            m_Lock.AcquireReaderLock(-1);
-            try
+            /* we only lock out the decrement use count here */
+            physicshaperef = m_Lock.AcquireReaderLock(() =>
             {
                 try
                 {
@@ -375,12 +359,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 {
                     physicshape = m_ConvexShapesByPrimShape[shape];
                 }
-                physicshaperef = new PhysicsShapePrimShapeReference(shape, this, physicshape);
-            }
-            finally
-            {
-                m_Lock.ReleaseReaderLock();
-            }
+                return new PhysicsShapePrimShapeReference(shape, this, physicshape);
+            });
 
             return true;
         }

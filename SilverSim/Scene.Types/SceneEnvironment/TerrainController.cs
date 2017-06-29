@@ -52,27 +52,14 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             get
             {
-                m_TerrainRwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_LowerLimit;
-                }
-                finally
-                {
-                    m_TerrainRwLock.ReleaseReaderLock();
-                }
+                return m_TerrainRwLock.AcquireReaderLock(() => m_LowerLimit);
             }
             set
             {
-                m_TerrainRwLock.AcquireWriterLock(-1);
-                try
+                m_TerrainRwLock.AcquireWriterLock(() =>
                 {
                     m_LowerLimit = value;
-                }
-                finally
-                {
-                    m_TerrainRwLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 
@@ -80,27 +67,14 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             get
             {
-                m_TerrainRwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_RaiseLimit;
-                }
-                finally
-                {
-                    m_TerrainRwLock.ReleaseReaderLock();
-                }
+                return m_TerrainRwLock.AcquireReaderLock(() => m_RaiseLimit);
             }
             set
             {
-                m_TerrainRwLock.AcquireWriterLock(-1);
-                try
+                m_TerrainRwLock.AcquireWriterLock(() =>
                 {
                     m_RaiseLimit = value;
-                }
-                finally
-                {
-                    m_TerrainRwLock.ReleaseWriterLock();
-                }
+                });
             }
         }
 
@@ -180,58 +154,50 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             return sorted.Values;
         }
 */
-        private List<LayerData> CompileTerrainData(IAgent agent)
+        private List<LayerData> CompileTerrainData(IAgent agent) => m_TerrainRwLock.AcquireReaderLock(() =>
         {
-            m_TerrainRwLock.AcquireReaderLock(-1);
-            try
-            {
-                int y;
-                int x;
-                var mlist = new List<LayerData>();
-                var dirtyPatches = new List<LayerPatch>();
-                RwLockedDictionary<uint, uint> agentSceneSerials = agent.TransmittedTerrainSerials[m_Scene.ID];
+            int y;
+            int x;
+            var mlist = new List<LayerData>();
+            var dirtyPatches = new List<LayerPatch>();
+            RwLockedDictionary<uint, uint> agentSceneSerials = agent.TransmittedTerrainSerials[m_Scene.ID];
 
-                for (y = 0; y < m_Scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
+            for (y = 0; y < m_Scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
+            {
+                for (x = 0; x < m_Scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                 {
-                    for (x = 0; x < m_Scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
+                    LayerPatch patch = m_TerrainPatches[y, x];
+                    uint serial;
+                    if (agentSceneSerials.TryGetValue(patch.ExtendedPatchID, out serial))
                     {
-                        LayerPatch patch = m_TerrainPatches[y, x];
-                        uint serial;
-                        if (agentSceneSerials.TryGetValue(patch.ExtendedPatchID, out serial))
+                        if (serial != patch.Serial)
                         {
-                            if (serial != patch.Serial)
-                            {
-                                agentSceneSerials[patch.ExtendedPatchID] = serial;
-                                dirtyPatches.Add(m_TerrainPatches[y, x]);
-                            }
-                        }
-                        else
-                        {
+                            agentSceneSerials[patch.ExtendedPatchID] = serial;
                             dirtyPatches.Add(m_TerrainPatches[y, x]);
                         }
                     }
+                    else
+                    {
+                        dirtyPatches.Add(m_TerrainPatches[y, x]);
+                    }
                 }
-                var layerType = LayerData.LayerDataType.Land;
+            }
+            var layerType = LayerData.LayerDataType.Land;
 
-                if (BASE_REGION_SIZE < m_Scene.SizeX || BASE_REGION_SIZE < m_Scene.SizeY)
-                {
-                    layerType = LayerData.LayerDataType.LandExtended;
-                }
-                int offset = 0;
-                while (offset < dirtyPatches.Count)
-                {
-                    int remaining = dirtyPatches.Count - offset;
-                    int actualused = 0;
-                    mlist.Add(LayerCompressor.ToLayerMessage(dirtyPatches, layerType, offset, remaining, out actualused));
-                    offset += actualused;
-                }
-                return mlist;
-            }
-            finally
+            if (BASE_REGION_SIZE < m_Scene.SizeX || BASE_REGION_SIZE < m_Scene.SizeY)
             {
-                m_TerrainRwLock.ReleaseReaderLock();
+                layerType = LayerData.LayerDataType.LandExtended;
             }
-        }
+            int offset = 0;
+            while (offset < dirtyPatches.Count)
+            {
+                int remaining = dirtyPatches.Count - offset;
+                int actualused = 0;
+                mlist.Add(LayerCompressor.ToLayerMessage(dirtyPatches, layerType, offset, remaining, out actualused));
+                offset += actualused;
+            }
+            return mlist;
+        });
 
         public void UpdateTerrainDataToSingleClient(IAgent agent)
         {
@@ -329,24 +295,12 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     throw new KeyNotFoundException();
                 }
 
-                m_TerrainRwLock.AcquireWriterLock(-1);
-                try
+                m_TerrainRwLock.AcquireWriterLock(() =>
                 {
                     lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                     lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
                     lp.IncrementSerial();
-                }
-#if DEBUG
-                catch (Exception e)
-                {
-                    m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
-                    throw;
-                }
-#endif
-                finally
-                {
-                    m_TerrainRwLock.ReleaseWriterLock();
-                }
+                });
                 if (lp != null)
                 {
                     lp.Dirty = true;
@@ -398,8 +352,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 throw new KeyNotFoundException();
             }
 
-            m_TerrainRwLock.AcquireWriterLock(-1);
-            try
+            return m_TerrainRwLock.AcquireWriterLock(() =>
             {
                 LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                 float val = lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] + (float)change;
@@ -413,18 +366,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 }
                 lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = val;
                 return lp;
-            }
-#if DEBUG
-            catch (Exception e)
-            {
-                m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
-                throw;
-            }
-#endif
-            finally
-            {
-                m_TerrainRwLock.ReleaseWriterLock();
-            }
+            });
         }
 
         public LayerPatch BlendTerrain(uint x, uint y, double newval, double mix /* 0. orig only , 1. new only */)
@@ -434,35 +376,23 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 throw new KeyNotFoundException();
             }
 
-            m_TerrainRwLock.AcquireWriterLock(-1);
-            try
+            return m_TerrainRwLock.AcquireWriterLock(() =>
             {
                 var lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                 float val =
                     (float)(lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] * (1 - mix)) +
                     (float)(newval * mix);
-                if(val < LowerLimit)
+                if (val < LowerLimit)
                 {
                     val = LowerLimit;
                 }
-                else if(val > RaiseLimit)
+                else if (val > RaiseLimit)
                 {
                     val = RaiseLimit;
                 }
                 lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = val;
                 return lp;
-            }
-#if DEBUG
-            catch (Exception e)
-            {
-                m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
-                throw;
-            }
-#endif
-            finally
-            {
-                m_TerrainRwLock.ReleaseWriterLock();
-            }
+            });
         }
 
         public double this[Vector3 pos]

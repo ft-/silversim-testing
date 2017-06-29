@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using System.Collections.Generic;
@@ -34,114 +35,48 @@ namespace SilverSim.Scene.Types.Agent
         private readonly Dictionary<UUID, AttachmentPoint> m_AttachedTo = new Dictionary<UUID,AttachmentPoint>();
         private readonly Dictionary<AttachmentPoint, Dictionary<UUID, ObjectGroup>> m_AttachmentsPerPoint = new Dictionary<AttachmentPoint,Dictionary<UUID,ObjectGroup>>();
 
-        public ObjectGroup this[UUID id]
-        {
-            get
-            {
-                m_AttachmentsRwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_AllAttachments[id];
-                }
-                finally
-                {
-                    m_AttachmentsRwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public ObjectGroup this[UUID id] => m_AttachmentsRwLock.AcquireReaderLock(() => m_AllAttachments[id]);
 
-        public List<ObjectGroup> this[AttachmentPoint ap]
+        public List<ObjectGroup> this[AttachmentPoint ap] => m_AttachmentsRwLock.AcquireReaderLock(() =>
         {
-            get
+            Dictionary<UUID, ObjectGroup> aplist;
+            if (m_AttachmentsPerPoint.TryGetValue(ap, out aplist))
             {
-                m_AttachmentsRwLock.AcquireReaderLock(-1);
-                try
-                {
-                    Dictionary<UUID, ObjectGroup> aplist;
-                    if(m_AttachmentsPerPoint.TryGetValue(ap, out aplist))
-                    {
-                        return new List<ObjectGroup>(aplist.Values);
-                    }
-                    return new List<ObjectGroup>();
-                }
-                finally
-                {
-                    m_AttachmentsRwLock.ReleaseReaderLock();
-                }
+                return new List<ObjectGroup>(aplist.Values);
             }
-        }
+            return new List<ObjectGroup>();
+        });
 
-        public void Add(AttachmentPoint ap, ObjectGroup sog)
+        public void Add(AttachmentPoint ap, ObjectGroup sog) => m_AttachmentsRwLock.AcquireWriterLock(() =>
         {
-            m_AttachmentsRwLock.AcquireWriterLock(-1);
+            m_AllAttachments.Add(sog.ID, sog);
+            if (!m_AttachmentsPerPoint.ContainsKey(ap))
+            {
+                m_AttachmentsPerPoint.Add(ap, new Dictionary<UUID, ObjectGroup>());
+            }
+            m_AttachmentsPerPoint[ap].Add(sog.ID, sog);
+            m_AttachedTo[sog.ID] = ap;
+        });
+
+        public bool Remove(UUID sogid) => m_AttachmentsRwLock.AcquireWriterLock(() =>
+        {
             try
             {
-                m_AllAttachments.Add(sog.ID, sog);
-                if(!m_AttachmentsPerPoint.ContainsKey(ap))
-                {
-                    m_AttachmentsPerPoint.Add(ap, new Dictionary<UUID,ObjectGroup>());
-                }
-                m_AttachmentsPerPoint[ap].Add(sog.ID, sog);
-                m_AttachedTo[sog.ID] = ap;
-            }
-            finally
-            {
-                m_AttachmentsRwLock.ReleaseWriterLock();
-            }
-        }
-
-        public bool Remove(UUID sogid)
-        {
-            m_AttachmentsRwLock.AcquireWriterLock(-1);
-            try
-            {
-                AttachmentPoint ap  = m_AttachedTo[sogid];
+                AttachmentPoint ap = m_AttachedTo[sogid];
                 m_AttachmentsPerPoint[ap].Remove(sogid);
                 bool ret = m_AllAttachments.Remove(sogid);
                 m_AttachedTo.Remove(sogid);
                 return ret;
             }
-            catch(KeyNotFoundException)
+            catch (KeyNotFoundException)
             {
                 return false;
             }
-            finally
-            {
-                m_AttachmentsRwLock.ReleaseWriterLock();
-            }
-        }
+        });
 
-        public List<ObjectGroup> All
-        {
-            get
-            {
-                m_AttachmentsRwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return new List<ObjectGroup>(m_AllAttachments.Values);
-                }
-                finally
-                {
-                    m_AttachmentsRwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public List<ObjectGroup> All => m_AttachmentsRwLock.AcquireReaderLock(() => new List<ObjectGroup>(m_AllAttachments.Values));
 
-        public int Count
-        {
-            get
-            {
-                m_AttachmentsRwLock.AcquireReaderLock(-1);
-                try
-                {
-                    return m_AllAttachments.Count;
-                }
-                finally
-                {
-                    m_AttachmentsRwLock.ReleaseReaderLock();
-                }
-            }
-        }
+        public int Count => m_AttachmentsRwLock.AcquireReaderLock(() => m_AllAttachments.Count);
 
         public int AvailableSlots
         {
@@ -156,24 +91,16 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public List<ObjectGroup> RemoveAll()
+        public List<ObjectGroup> RemoveAll() => m_AttachmentsRwLock.AcquireWriterLock(() =>
         {
-            m_AttachmentsRwLock.AcquireWriterLock(-1);
-            try
+            var attachments = new List<ObjectGroup>(m_AllAttachments.Values);
+            foreach (var dict in m_AttachmentsPerPoint.Values)
             {
-                var attachments = new List<ObjectGroup>(m_AllAttachments.Values);
-                foreach(var dict in m_AttachmentsPerPoint.Values)
-                {
-                    dict.Clear();
-                }
-                attachments.Clear();
-                m_AllAttachments.Clear();
-                return attachments;
+                dict.Clear();
             }
-            finally
-            {
-                m_AttachmentsRwLock.ReleaseWriterLock();
-            }
-        }
+            attachments.Clear();
+            m_AllAttachments.Clear();
+            return attachments;
+        });
     }
 }
