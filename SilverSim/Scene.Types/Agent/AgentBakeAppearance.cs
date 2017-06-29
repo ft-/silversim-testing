@@ -952,7 +952,7 @@ namespace SilverSim.Scene.Types.Agent
 
         private static void CoreBakeLogic(this IAgent agent, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
         {
-            CoreBakeLogic(agent.TextureHashes, bakeStatus, sceneAssetService);
+            CoreBakeLogic(agent.Textures, bakeStatus, sceneAssetService);
         }
 
         #endregion
