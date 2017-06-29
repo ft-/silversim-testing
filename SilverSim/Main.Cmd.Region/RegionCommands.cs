@@ -1349,9 +1349,9 @@ namespace SilverSim.Main.Cmd.Region
                     lb.AddHeader();
                     lb.AddSeparator();
                     AppearanceInfo.AvatarTextureData textures = agent.Textures;
-                    foreach(AvatarTextureIndex texId in typeof(AvatarTextureIndex).GetEnumValues())
+                    for (uint texId = 0; texId < (uint)AppearanceInfo.AvatarTextureData.TextureCount; ++texId)
                     {
-                        lb.AddData(texId.ToString(), textures[(int)texId].ToString());
+                        lb.AddData(((AvatarTextureIndex)texId).ToString(), textures[(int)texId].ToString());
                     }
                     io.Write(lb.ToString());
                     agentFound = true;
