@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Types.Object
         {
             AssetID = asset.ID;
             AssetType = asset.Type;
-            Creator = asset.Creator;
+            Creator = new UUI(asset.Creator);
             Name = asset.Name;
             Flags = 0;
             ID = UUID.Random;
@@ -89,7 +89,8 @@ namespace SilverSim.Scene.Types.Object
                     InventoryType = InventoryType.Unknown;
                     break;
             }
-            Owner = asset.Creator;
+            Owner = new UUI(asset.Creator);
+            LastOwner = new UUI(asset.Creator);
             Permissions.Base = InventoryPermissionsMask.Every;
             Permissions.Current = InventoryPermissionsMask.Every;
             Permissions.EveryOne = InventoryPermissionsMask.None;
