@@ -44,6 +44,18 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public void ScheduleUpdate(ObjectInventoryUpdateInfo objinfo)
+        {
+            foreach (IAgent a in Agents)
+            {
+                a.ScheduleUpdate(objinfo, ID);
+            }
+            foreach (ISceneListener l in SceneListeners)
+            {
+                l.ScheduleUpdate(objinfo, ID);
+            }
+        }
+
         private Message AgentToObjectUpdate(IAgent agent)
         {
             Viewer.Messages.Object.UnreliableObjectUpdate m;

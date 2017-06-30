@@ -174,6 +174,7 @@ namespace SilverSim.Scene.Types.Object
             IsChanged = false;
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;
+            Inventory.OnInventoryUpdate += OnInventoryUpdate;
             m_TextureEntryBytes = m_TextureEntry.GetBytes();
             UpdateInfo = new ObjectUpdateInfo(this);
             AnimationController = new ObjectAnimationController(this);
@@ -194,6 +195,7 @@ namespace SilverSim.Scene.Types.Object
             IsChanged = false;
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;
+            Inventory.OnInventoryUpdate += OnInventoryUpdate;
             m_TextureEntryBytes = m_TextureEntry.GetBytes();
             UpdateInfo = new ObjectUpdateInfo(this);
             AnimationController = new ObjectAnimationController(this);
@@ -340,6 +342,16 @@ namespace SilverSim.Scene.Types.Object
         }
 
         public ObjectUpdateInfo UpdateInfo { get; }
+
+        private void OnInventoryUpdate(ObjectInventoryUpdateInfo info)
+        {
+            var grp = ObjectGroup;
+            if (grp != null)
+            {
+                var scene = grp.Scene;
+                scene?.ScheduleUpdate(info);
+            }
+        }
 
         private void OnInventoryChange(ObjectPartInventory.ChangeAction action, UUID primID, UUID itemID)
         {

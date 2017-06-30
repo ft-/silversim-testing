@@ -27,7 +27,6 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Script;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Xml;
 
@@ -44,6 +43,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         public event Action<ChangeAction /* change */, UUID /* primID */, UUID /* itemID */> OnChange;
+        public event Action<ObjectInventoryUpdateInfo> OnInventoryUpdate;
 
         public int InventorySerial = 1;
 
@@ -192,6 +192,7 @@ namespace SilverSim.Scene.Types.Object
             base.Add(key1, key2, item);
             Interlocked.Increment(ref InventorySerial);
 
+            OnInventoryUpdate?.Invoke(item.UpdateInfo);
             OnChange?.Invoke(ChangeAction.Add, PartID, item.ID);
         }
 
@@ -203,6 +204,7 @@ namespace SilverSim.Scene.Types.Object
                 item.AssetID = assetID;
                 Interlocked.Increment(ref InventorySerial);
 
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
                 OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
             }
         }
@@ -215,6 +217,7 @@ namespace SilverSim.Scene.Types.Object
                 item.NextOwnerAssetID = assetID;
                 Interlocked.Increment(ref InventorySerial);
 
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
                 OnChange?.Invoke(ChangeAction.NextOwnerAssetID, PartID, item.ID);
             }
         }
@@ -230,6 +233,7 @@ namespace SilverSim.Scene.Types.Object
             }
             Interlocked.Increment(ref InventorySerial);
 
+            OnInventoryUpdate?.Invoke(item.UpdateInfo);
             OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
         }
 
@@ -251,6 +255,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 Interlocked.Increment(ref InventorySerial);
 
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
                 OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
             }
             return renamed;
@@ -274,6 +279,9 @@ namespace SilverSim.Scene.Types.Object
             }
             script?.Remove();
             Interlocked.Increment(ref InventorySerial);
+            oldItem.UpdateInfo.SetRemovedItem();
+            OnInventoryUpdate?.Invoke(oldItem.UpdateInfo);
+            OnInventoryUpdate?.Invoke(newItem.UpdateInfo);
             OnChange?.Invoke(ChangeAction.Add, PartID, newItem.ID);
         }
 
@@ -285,6 +293,8 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
+                item.UpdateInfo.SetRemovedItem();
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
                 OnChange?.Invoke(ChangeAction.Remove, PartID, key1);
                 return true;
             }
@@ -299,6 +309,8 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
+                item.UpdateInfo.SetRemovedItem();
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
                 OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
                 return true;
             }
@@ -312,6 +324,8 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
+                item.UpdateInfo.SetRemovedItem();
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
                 OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
                 return true;
             }
@@ -325,6 +339,8 @@ namespace SilverSim.Scene.Types.Object
                 ScriptInstance script = item.RemoveScriptInstance;
                 script?.Remove();
                 Interlocked.Increment(ref InventorySerial);
+                item.UpdateInfo.SetRemovedItem();
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
                 OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
                 return true;
             }
@@ -333,14 +349,7 @@ namespace SilverSim.Scene.Types.Object
 
         public new bool Remove(UUID key1, string key2)
         {
-            if (base.Remove(key1, key2))
-            {
-#warning check this for Script removal
-                Interlocked.Increment(ref InventorySerial);
-                OnChange?.Invoke(ChangeAction.Remove, PartID, key1);
-                return true;
-            }
-            return false;
+            throw new NotSupportedException("ObjectPartInventory.Remove(UUID, string)");
         }
         #endregion
 
