@@ -29,13 +29,17 @@ namespace SilverSim.Scene.Types.Object
 {
     public class ObjectPartInventoryItem : InventoryItem
     {
+        public ObjectInventoryUpdateInfo UpdateInfo { get; }
+
         #region Constructors
         public ObjectPartInventoryItem()
         {
+            UpdateInfo = new ObjectInventoryUpdateInfo(this);
         }
 
         public ObjectPartInventoryItem(AssetData asset)
         {
+            UpdateInfo = new ObjectInventoryUpdateInfo(this);
             AssetID = asset.ID;
             AssetType = asset.Type;
             Creator = new UUI(asset.Creator);
@@ -100,6 +104,7 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectPartInventoryItem(InventoryItem item)
         {
+            UpdateInfo = new ObjectInventoryUpdateInfo(this);
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
             CreationDate = item.CreationDate;

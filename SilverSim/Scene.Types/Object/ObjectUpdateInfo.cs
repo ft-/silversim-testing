@@ -21,7 +21,7 @@
 
 namespace SilverSim.Scene.Types.Object
 {
-    public class ObjectUpdateInfo
+    public class ObjectUpdateInfo : IObjectUpdateInfo
     {
         private bool m_Killed;
         public uint LocalID;

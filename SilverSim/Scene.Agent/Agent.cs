@@ -1046,6 +1046,10 @@ namespace SilverSim.Scene.Agent
         public abstract void KickUser(string msg);
         public abstract void KickUser(string msg, Action<bool> callbackDelegate);
         public abstract void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
+        public void ScheduleUpdate(ObjectInventoryUpdateInfo info, UUID fromSceneID)
+        {
+            /* intentionally left empty */
+        }
         #endregion
 
         private Vector4 m_CollisionPlane = new Vector4(0, 0, 1, -1);
