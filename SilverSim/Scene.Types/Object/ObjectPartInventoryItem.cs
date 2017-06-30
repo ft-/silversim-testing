@@ -37,15 +37,19 @@ namespace SilverSim.Scene.Types.Object
             UpdateInfo = new ObjectInventoryUpdateInfo(this);
         }
 
+        public ObjectPartInventoryItem(UUID id)
+            : base(id)
+        {
+
+        }
+
         public ObjectPartInventoryItem(AssetData asset)
         {
-            UpdateInfo = new ObjectInventoryUpdateInfo(this);
             AssetID = asset.ID;
             AssetType = asset.Type;
             Creator = new UUI(asset.Creator);
             Name = asset.Name;
             Flags = 0;
-            ID = UUID.Random;
             switch(AssetType)
             {
                 case AssetType.Animation:
@@ -100,11 +104,12 @@ namespace SilverSim.Scene.Types.Object
             Permissions.EveryOne = InventoryPermissionsMask.None;
             Permissions.Group = InventoryPermissionsMask.None;
             Permissions.NextOwner = InventoryPermissionsMask.Every;
+            UpdateInfo = new ObjectInventoryUpdateInfo(this);
         }
 
         public ObjectPartInventoryItem(InventoryItem item)
+            : base(item.ID)
         {
-            UpdateInfo = new ObjectInventoryUpdateInfo(this);
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
             CreationDate = item.CreationDate;
@@ -113,7 +118,6 @@ namespace SilverSim.Scene.Types.Object
             Flags = item.Flags;
             Group = new UGI(item.Group);
             IsGroupOwned = item.IsGroupOwned;
-            ID = new UUID(item.ID);
             InventoryType = item.InventoryType;
             LastOwner = new UUI(item.LastOwner);
             Name = item.Name;
@@ -121,6 +125,28 @@ namespace SilverSim.Scene.Types.Object
             ParentFolderID = new UUID(item.ParentFolderID);
             Permissions = item.Permissions;
             SaleInfo = item.SaleInfo;
+            UpdateInfo = new ObjectInventoryUpdateInfo(this);
+        }
+
+        public ObjectPartInventoryItem(UUID id, InventoryItem item)
+            : base(id)
+        {
+            AssetID = new UUID(item.AssetID);
+            AssetType = item.AssetType;
+            CreationDate = item.CreationDate;
+            Creator = new UUI(item.Creator);
+            Description = item.Description;
+            Flags = item.Flags;
+            Group = new UGI(item.Group);
+            IsGroupOwned = item.IsGroupOwned;
+            InventoryType = item.InventoryType;
+            LastOwner = new UUI(item.LastOwner);
+            Name = item.Name;
+            Owner = new UUI(item.Owner);
+            ParentFolderID = new UUID(item.ParentFolderID);
+            Permissions = item.Permissions;
+            SaleInfo = item.SaleInfo;
+            UpdateInfo = new ObjectInventoryUpdateInfo(this);
         }
         #endregion
 
@@ -221,6 +247,12 @@ namespace SilverSim.Scene.Types.Object
                     m_ScriptInstance.Remove();
                 }
             }
+        }
+
+        public override void SetNewID(UUID id)
+        {
+            ID = id;
+            UpdateInfo.UpdateIDs();
         }
     }
 }

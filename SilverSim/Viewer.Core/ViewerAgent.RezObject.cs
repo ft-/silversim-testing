@@ -39,20 +39,6 @@ namespace SilverSim.Viewer.Core
                 : base(scene, targetpos, assetid, source, rezzingagent, rezparams, itemOwnerPermissions)
             {
             }
-
-            public override void PostProcessObjectGroups(List<ObjectGroup> grps)
-            {
-                foreach (var grp in grps)
-                {
-                    foreach (var part in grp.Values)
-                    {
-                        var oldID = part.ID;
-                        var newID = UUID.Random;
-                        part.ID = newID;
-                        grp.ChangeKey(newID, oldID);
-                    }
-                }
-            }
         }
 
         [PacketHandler(MessageType.RezObject)]

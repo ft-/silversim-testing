@@ -41,8 +41,6 @@ namespace SilverSim.Scene.Types.Transfer
         private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
         private readonly SceneInterface.RezObjectParams m_RezParams;
 
-        public abstract void PostProcessObjectGroups(List<ObjectGroup> grp);
-
         protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
@@ -83,17 +81,6 @@ namespace SilverSim.Scene.Types.Transfer
             catch(Exception e)
             {
                 m_Log.Error(string.Format("Unable to decode asset {0} to rez", data.ID), e);
-                SendAlertMessage("ALERT: RezAttemptFailed");
-                return;
-            }
-
-            try
-            {
-                PostProcessObjectGroups(objgroups);
-            }
-            catch(Exception e)
-            {
-                m_Log.Error(string.Format("Unable to post process objects {0} ({1})", m_Scene.Name, m_Scene.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");
                 return;
             }

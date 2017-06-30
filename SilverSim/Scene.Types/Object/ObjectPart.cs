@@ -177,6 +177,28 @@ namespace SilverSim.Scene.Types.Object
             m_TextureEntryBytes = m_TextureEntry.GetBytes();
             UpdateInfo = new ObjectUpdateInfo(this);
             AnimationController = new ObjectAnimationController(this);
+
+            ID = UUID.Random;
+        }
+
+        public ObjectPart(UUID id)
+        {
+            m_Permissions.Base = InventoryPermissionsMask.All;
+            m_Permissions.Current = InventoryPermissionsMask.All;
+            m_Permissions.Group = InventoryPermissionsMask.None;
+            m_Permissions.EveryOne = InventoryPermissionsMask.None;
+            m_Permissions.NextOwner = InventoryPermissionsMask.All;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
+
+            ObjectGroup = null;
+            IsChanged = false;
+            Inventory = new ObjectPartInventory();
+            Inventory.OnChange += OnInventoryChange;
+            m_TextureEntryBytes = m_TextureEntry.GetBytes();
+            UpdateInfo = new ObjectUpdateInfo(this);
+            AnimationController = new ObjectAnimationController(this);
+
+            ID = id;
         }
         #endregion
 
@@ -1249,11 +1271,12 @@ namespace SilverSim.Scene.Types.Object
                     return m_ID;
                 }
             }
-            set
+            private set
             {
                 lock(m_DataLock)
                 {
                     m_ID = value;
+                    UpdateInfo.ID = value;
                     Inventory.PartID = value;
                 }
                 lock(m_UpdateDataLock)
@@ -2452,7 +2475,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
+        public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner, XmlDeserializationOptions options)
         {
             var part = new ObjectPart()
             {
@@ -2533,11 +2556,18 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "TaskInventory":
-                                part.Inventory.FillFromXml(reader, currentOwner);
+                                part.Inventory.FillFromXml(reader, currentOwner, options);
                                 break;
 
                             case "UUID":
-                                part.ID = reader.ReadContentAsUUID();
+                                if ((options & XmlDeserializationOptions.RestoreIDs) != 0)
+                                {
+                                    part.ID = reader.ReadContentAsUUID();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "LocalId":

@@ -159,10 +159,9 @@ namespace SilverSim.Scene.Npc
                 int layer = 0;
                 foreach (AgentWearables.WearableInfo wInfo in kvp.Value)
                 {
-                    var item = new InventoryItem()
+                    var item = new InventoryItem(wInfo.ItemID)
                     {
                         AssetID = wInfo.AssetID,
-                        ID = wInfo.ItemID,
                         LastOwner = Owner,
                         Owner = Owner,
                         Creator = UUI.Unknown,
@@ -187,7 +186,6 @@ namespace SilverSim.Scene.Npc
 
                     item = new InventoryItem()
                     {
-                        ID = UUID.Random,
                         LastOwner = Owner,
                         Owner = Owner,
                         Creator = Owner,
@@ -213,10 +211,9 @@ namespace SilverSim.Scene.Npc
             {
                 foreach (KeyValuePair<UUID, UUID> kvpInner in kvp.Value)
                 {
-                    var item = new InventoryItem()
+                    var item = new InventoryItem(kvpInner.Key)
                     {
                         AssetID = kvpInner.Value,
-                        ID = kvpInner.Key,
                         LastOwner = Owner,
                         Owner = Owner,
                         Creator = UUI.Unknown,
@@ -312,9 +309,6 @@ namespace SilverSim.Scene.Npc
                 {
                     return;
                 }
-                UUID oldID = part.ID;
-                part.ID = UUID.Random;
-                grp.ChangeKey(part.ID, oldID);
             }
 
             AttachmentPoint attachAt = grp.AttachPoint;

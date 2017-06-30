@@ -1419,7 +1419,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        private static ObjectPart ParseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        private static ObjectPart ParseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner, XmlDeserializationOptions options)
         {
             ObjectPart otherPart = null;
             if (reader.IsEmptyElement)
@@ -1450,7 +1450,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                otherPart = ObjectPart.FromXml(reader, null, currentOwner);
+                                otherPart = ObjectPart.FromXml(reader, null, currentOwner, options);
                                 break;
 
                             default:
@@ -1472,7 +1472,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        private static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner, XmlDeserializationOptions options)
         {
             ObjectPart part;
             var links = new SortedDictionary<int, ObjectPart>();
@@ -1501,7 +1501,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                part = ParseOtherPart(reader, group, currentOwner);
+                                part = ParseOtherPart(reader, group, currentOwner, options);
                                 links.Add(part.LoadedLinkNumber, part);
                                 break;
 
@@ -1510,7 +1510,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                part = ObjectPart.FromXml(reader, null, currentOwner);
+                                part = ObjectPart.FromXml(reader, null, currentOwner, options);
                                 try
                                 {
                                     part.LoadedLinkNumber = links.Count + 2;
@@ -1545,7 +1545,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static ObjectPart ParseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        private static ObjectPart ParseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner, XmlDeserializationOptions options)
         {
             ObjectPart rootPart = null;
             if(reader.IsEmptyElement)
@@ -1580,7 +1580,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                rootPart = ObjectPart.FromXml(reader, group, currentOwner);
+                                rootPart = ObjectPart.FromXml(reader, group, currentOwner, options);
                                 group.Add(LINK_ROOT, rootPart.ID, rootPart);
                                 break;
 
@@ -1642,7 +1642,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                rootPart = ParseRootPart(reader, group, currentOwner);
+                                rootPart = ParseRootPart(reader, group, currentOwner, options);
                                 break;
 
                             case "SceneObjectPart":
@@ -1658,7 +1658,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                rootPart = ObjectPart.FromXml(reader, group, currentOwner);
+                                rootPart = ObjectPart.FromXml(reader, group, currentOwner, options);
                                 group.Add(LINK_ROOT, rootPart.ID, rootPart);
                                 break;
 
@@ -1667,7 +1667,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     break;
                                 }
-                                FromXmlOtherParts(reader, group, currentOwner);
+                                FromXmlOtherParts(reader, group, currentOwner, options);
                                 break;
 
                             case "GroupScriptStates":

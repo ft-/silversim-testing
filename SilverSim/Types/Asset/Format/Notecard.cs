@@ -311,7 +311,7 @@ namespace SilverSim.Types.Asset.Format
                 var data = line.Split(new char[] {' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
                 if(data[0] == "item_id")
                 {
-                    item.ID = data[1];
+                    item.SetNewID(data[1]);
                 }
                 else if(data[0] == "parent_id")
                 {

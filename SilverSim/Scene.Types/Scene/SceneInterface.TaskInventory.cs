@@ -207,10 +207,7 @@ namespace SilverSim.Scene.Types.Scene
                 agentItem.AssetType == req.AssetType &&
                 agentItem.InventoryType == req.InvType)
             {
-                var item = new ObjectPartInventoryItem(agentItem)
-                {
-                    ID = UUID.Random
-                };
+                var item = new ObjectPartInventoryItem(UUID.Random, agentItem);
                 AdjustPermissionsAccordingly(agent, part.Owner, item);
                 item.LastOwner = item.Owner;
                 item.Owner = part.Owner;
@@ -358,10 +355,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            var newItem = new InventoryItem(item)
-            {
-                ID = UUID.Random
-            };
+            var newItem = new InventoryItem(item);
             if (item.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Copy))
             {
                 /* permissions okay */

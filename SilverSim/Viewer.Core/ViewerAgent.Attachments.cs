@@ -254,9 +254,6 @@ namespace SilverSim.Viewer.Core
                         SendAlertMessage("ALERT: WhyAreYouTryingToWearShrubbery");
                         return;
                     }
-                    var oldID = part.ID;
-                    part.ID = UUID.Random;
-                    grp.ChangeKey(part.ID, oldID);
                 }
 
                 var attachAt = m_AttachPoint & AttachmentPoint.PositionMask;

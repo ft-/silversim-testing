@@ -21,7 +21,7 @@
 
 namespace SilverSim.Scene.Types.Object
 {
-    public interface IObjectUpdateInfo
+    public interface IUpdateInfo
     {
     }
 }

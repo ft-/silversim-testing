@@ -47,10 +47,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             var rezparams = new RezObjectParams();
             var group = new Object.ObjectGroup();
-            var part = new ObjectPart()
-            {
-                ID = UUID.Random
-            };
+            var part = new ObjectPart();
             group.Add(1, part.ID, part);
             group.Name = "Primitive";
             IAgent agent = Agents[p.AgentID];

@@ -57,7 +57,6 @@ namespace SilverSim.Viewer.Core.Capabilities
             var transaction = UUID.Random;
             var item = new InventoryItem()
             {
-                ID = UUID.Random,
                 Description = reqmap["description"].ToString(),
                 Name = reqmap["name"].ToString(),
                 ParentFolderID = reqmap["folder_id"].AsUUID,

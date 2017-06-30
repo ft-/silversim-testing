@@ -19,11 +19,13 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.LayerData;
+using System;
 using System.Threading;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
@@ -54,8 +56,15 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
         public abstract class SceneListener : ISceneListener
         {
+            protected static readonly ILog m_Log = LogManager.GetLogger("STORAGE SCENE LISTENER");
             protected bool m_StopStorageThread;
-            protected readonly BlockingQueue<ObjectUpdateInfo> m_StorageMainRequestQueue = new BlockingQueue<ObjectUpdateInfo>();
+            protected readonly BlockingQueue<IUpdateInfo> m_StorageMainRequestQueue = new BlockingQueue<IUpdateInfo>();
+            protected readonly UUID m_RegionID;
+
+            protected SceneListener(UUID regionID)
+            {
+                m_RegionID = regionID;
+            }
 
             public void StopStorageThread()
             {
@@ -67,9 +76,99 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                 ThreadManager.CreateThread(StorageMainThread).Start();
             }
 
-            protected abstract void StorageMainThread();
+            protected abstract void OnUpdate(ObjectInventoryUpdateInfo info);
+            protected abstract void OnUpdate(ObjectUpdateInfo info);
+            protected abstract void OnIdle();
+
+            protected virtual void OnStart()
+            {
+
+            }
+
+            protected virtual void OnStop()
+            {
+
+            }
+
+            protected virtual bool HasPendingData
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            private void StorageMainThread()
+            {
+                Thread.CurrentThread.Name = "Storage Main Thread: " + m_RegionID.ToString();
+                OnStart();
+
+                while (!m_StopStorageThread || m_StorageMainRequestQueue.Count != 0 || HasPendingData)
+                {
+                    IUpdateInfo req;
+                    try
+                    {
+                        req = m_StorageMainRequestQueue.Dequeue(1000);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            OnIdle();
+                        }
+                        catch(Exception e)
+                        {
+                            m_Log.Error("Exception encountered at OnIdle", e);
+                        }
+                        continue;
+                    }
+
+                    ObjectUpdateInfo oInfo = req as ObjectUpdateInfo;
+                    if (oInfo != null)
+                    {
+                        try
+                        {
+                            OnUpdate(oInfo);
+                        }
+                        catch(Exception e)
+                        {
+                            m_Log.Error("Inventory item storage encountered exception at " + m_RegionID.ToString(), e);
+                        }
+                        continue;
+                    }
+
+                    ObjectInventoryUpdateInfo iInfo = req as ObjectInventoryUpdateInfo;
+                    if (iInfo != null)
+                    {
+                        try
+                        {
+                            OnUpdate(iInfo);
+                        }
+                        catch(Exception e)
+                        {
+                            m_Log.Error("Inventory storage encountered exception at " + m_RegionID.ToString(), e);
+                        }
+                    }
+                }
+
+                try
+                {
+                    OnIdle();
+                }
+                catch(Exception e)
+                {
+                    m_Log.Error("OnIdle threw an exception after leaving loop", e);
+                }
+
+                OnStop();
+            }
 
             public void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
+            {
+                m_StorageMainRequestQueue.Enqueue(info);
+            }
+
+            public void ScheduleUpdate(ObjectInventoryUpdateInfo info, UUID fromSceneID)
             {
                 m_StorageMainRequestQueue.Enqueue(info);
             }

@@ -19,17 +19,21 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
+
 namespace SilverSim.Scene.Types.Object
 {
-    public class ObjectUpdateInfo : IObjectUpdateInfo
+    public class ObjectUpdateInfo : IUpdateInfo
     {
         private bool m_Killed;
         public uint LocalID;
         public ObjectPart Part { get; }
+        public UUID ID { get; internal set; }
 
         public ObjectUpdateInfo(ObjectPart part)
         {
             Part = part;
+            ID = part.ID;
             LocalID = part.LocalID;
         }
 

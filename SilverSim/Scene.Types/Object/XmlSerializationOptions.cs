@@ -28,6 +28,7 @@ namespace SilverSim.Scene.Types.Object
     {
         None = 0,
         ReadKeyframeMotion = 8,
+        RestoreIDs = 16
     }
 
     [Flags]

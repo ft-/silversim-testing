@@ -19,21 +19,33 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
+
 namespace SilverSim.Scene.Types.Object
 {
-    public class ObjectInventoryUpdateInfo : IObjectUpdateInfo
+    public class ObjectInventoryUpdateInfo : IUpdateInfo
     {
         public bool IsRemoved { get; private set; }
         public ObjectPartInventoryItem Item { get; }
+        public UUID PartID { get; private set; }
+        public UUID ItemID { get; private set; }
 
         public ObjectInventoryUpdateInfo(ObjectPartInventoryItem item)
         {
             Item = item;
+            PartID = item.ParentFolderID;
+            ItemID = item.ID;
         }
 
         public void SetRemovedItem()
         {
             IsRemoved = true;
+        }
+
+        public void UpdateIDs()
+        {
+            PartID = Item.ParentFolderID;
+            ItemID = Item.ID;
         }
     }
 }

@@ -27,8 +27,13 @@ namespace SilverSim.Types.Inventory
     public class InventoryItem
     {
         #region Inventory Data
-        public UUID ID = UUID.Zero;
+        public UUID ID { get; protected set; }
         public UUID ParentFolderID = UUID.Zero;
+
+        public virtual void SetNewID(UUID id)
+        {
+            ID = id;
+        }
 
         private string m_Name = string.Empty;
         public string Name

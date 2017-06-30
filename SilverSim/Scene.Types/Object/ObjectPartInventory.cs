@@ -180,6 +180,8 @@ namespace SilverSim.Scene.Types.Object
                     }
                     item.Name = name;
                 }
+                item.ParentFolderID = PartID;
+                item.UpdateInfo.UpdateIDs();
                 Add(item.ID, item.Name, item);
             }
         }
@@ -266,7 +268,7 @@ namespace SilverSim.Scene.Types.Object
                 Remove(name);
                 if(ContainsKey(newItem.ID))
                 {
-                    newItem.ID = UUID.Random;
+                    newItem.SetNewID(UUID.Random);
                 }
                 Add(newItem, false);
             }
@@ -343,7 +345,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner)
+        private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options)
         {
             var item = new ObjectPartInventoryItem()
             {
@@ -414,7 +416,14 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "ItemID":
-                                item.ID = reader.ReadContentAsUUID();
+                                if ((options & XmlDeserializationOptions.RestoreIDs) != 0)
+                                {
+                                    item.SetNewID(reader.ReadContentAsUUID());
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "LastOwnerID":
@@ -473,7 +482,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void FillFromXml(XmlTextReader reader, UUI currentOwner)
+        public void FillFromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options)
         {
             var part = new ObjectPart()
             {
@@ -501,7 +510,7 @@ namespace SilverSim.Scene.Types.Object
                         switch(reader.Name)
                         {
                             case "TaskInventoryItem":
-                                Add(FromXML(reader, currentOwner), false);
+                                Add(FromXML(reader, currentOwner, options), false);
                                 break;
 
                             default:

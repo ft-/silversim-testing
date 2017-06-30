@@ -410,7 +410,7 @@ namespace SilverSim.Viewer.Core
                         /* skip item */
                         continue;
                     }
-                    item.ID = UUID.Random;
+                    item.SetNewID(UUID.Random);
                     if (reqd.NewName.Length != 0)
                     {
                         item.Name = reqd.NewName;

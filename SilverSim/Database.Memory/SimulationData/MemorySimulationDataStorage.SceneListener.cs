@@ -23,10 +23,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
@@ -34,189 +31,53 @@ namespace SilverSim.Database.Memory.SimulationData
     {
         public class MemorySceneListener : SceneListener
         {
-            private readonly UUID m_RegionID;
-            internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Objects;
-            internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> m_Primitives;
-            internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>> m_PrimItems;
+            internal readonly RwLockedDictionary<UUID, Map> m_Objects;
+            internal readonly RwLockedDictionary<UUID, Map> m_Primitives;
+            internal readonly RwLockedDictionary<string, Map> m_PrimItems;
 
             public MemorySceneListener(
                 RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> objects,
                 RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Map>> primitives,
                 RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, Map>> primitems,
                 UUID regionID)
+                : base(regionID)
             {
-                m_Objects = objects;
-                m_Primitives = primitives;
-                m_PrimItems = primitems;
-                m_RegionID = regionID;
+                m_Objects = objects[regionID];
+                m_Primitives = primitives[regionID];
+                m_PrimItems = primitems[regionID];
             }
 
-            protected override void StorageMainThread()
+            protected override void OnUpdate(ObjectInventoryUpdateInfo info)
             {
-                Thread.CurrentThread.Name = "Storage Main Thread: " + m_RegionID.ToString();
+                string key = GenItemKey(info.PartID, info.ItemID);
 
-                var knownSerialNumbers = new C5.TreeDictionary<uint, int>();
-                var knownInventorySerialNumbers = new C5.TreeDictionary<uint, int>();
-                var knownInventories = new C5.TreeDictionary<uint, List<UUID>>();
-
-                int m_ProcessedPrims = 0;
-
-                while (!m_StopStorageThread || m_StorageMainRequestQueue.Count != 0)
+                if(info.IsRemoved)
                 {
-                    ObjectUpdateInfo req;
-                    try
-                    {
-                        req = m_StorageMainRequestQueue.Dequeue(1000);
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-
-                    int serialNumber = req.SerialNumber;
-                    int knownSerial;
-                    int knownInventorySerial;
-                    bool updatePrim = false;
-                    bool updateInventory = false;
-                    if (req.IsKilled)
-                    {
-                        /* has to be processed */
-                        string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
-                        string partID = req.Part.ID.ToString();
-                        RwLockedDictionary<UUID, Map> primitiveList;
-                        RwLockedDictionary<string, Map> primItemList;
-                        if (m_Primitives.TryGetValue(sceneID, out primitiveList))
-                        {
-                            primitiveList.Remove(partID);
-                        }
-
-                        if (m_PrimItems.TryGetValue(sceneID, out primItemList))
-                        {
-                            var deleteItems = new List<string>(from id in primItemList.Keys where id.StartsWith(partID) select id);
-                            foreach (string id in deleteItems)
-                            {
-                                m_PrimItems.Remove(id);
-                            }
-                        }
-                        knownSerialNumbers.Remove(req.LocalID);
-                        if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
-                        {
-                            RwLockedDictionary<UUID, Map> objectList;
-                            if (m_Objects.TryGetValue(sceneID, out objectList))
-                            {
-                                objectList.Remove(partID);
-                            }
-                        }
-                    }
-                    else if (knownSerialNumbers.Contains(req.LocalID))
-                    {
-                        knownSerial = knownSerialNumbers[req.LocalID];
-                        if (req.Part.ObjectGroup.IsAttached || req.Part.ObjectGroup.IsTemporary)
-                        {
-                            string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
-                            string partID = req.Part.ID.ToString();
-                            m_Primitives[sceneID].Remove(partID);
-
-                            RwLockedDictionary<string, Map> primItemList;
-                            if (m_PrimItems.TryGetValue(sceneID, out primItemList))
-                            {
-                                var deleteKeys = new List<string>(from id in primItemList.Keys where id.StartsWith(partID) select id);
-                                foreach (string key in deleteKeys)
-                                {
-                                    primItemList.Remove(key);
-                                }
-                            }
-                            if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
-                            {
-                                m_Objects[sceneID].Remove(partID);
-                            }
-                        }
-                        else
-                        {
-                            if (knownSerial != serialNumber && !req.Part.ObjectGroup.IsAttached && !req.Part.ObjectGroup.IsTemporary)
-                            {
-                                /* prim update */
-                                updatePrim = true;
-                                updateInventory = true;
-                            }
-
-                            if (knownInventorySerialNumbers.Contains(req.LocalID))
-                            {
-                                knownInventorySerial = knownSerialNumbers[req.LocalID];
-                                /* inventory update */
-                                updateInventory = knownInventorySerial != req.Part.Inventory.InventorySerial;
-                            }
-                        }
-                    }
-                    else if (req.Part.ObjectGroup.IsAttached || req.Part.ObjectGroup.IsTemporary)
-                    {
-                        /* ignore it */
-                        continue;
-                    }
-                    else
-                    {
-                        updatePrim = true;
-                        updateInventory = true;
-                    }
-
-                    int newPrimInventorySerial = req.Part.Inventory.InventorySerial;
-
-                    int count = Interlocked.Increment(ref m_ProcessedPrims);
-                    if (count % 100 == 0)
-                    {
-                        m_Log.DebugFormat("Processed {0} prims", count);
-                    }
-
-                    if (updatePrim)
-                    {
-                        var primData = GenerateUpdateObjectPart(req.Part);
-                        var grp = req.Part.ObjectGroup;
-                        primData.Add("RegionID", grp.Scene.ID);
-                        m_Primitives[grp.Scene.ID][req.Part.ID] = primData;
-                        knownSerialNumbers[req.LocalID] = req.SerialNumber;
-
-                        m_Objects[grp.Scene.ID][grp.ID] = GenerateUpdateObjectGroup(grp);
-                    }
-
-                    if (updateInventory)
-                    {
-                        var items = new Dictionary<UUID, ObjectPartInventoryItem>();
-                        foreach (var item in req.Part.Inventory.ValuesByKey1)
-                        {
-                            items.Add(item.ID, item);
-                        }
-
-                        if (knownInventories.Contains(req.Part.LocalID))
-                        {
-                            string partID = req.Part.ID.ToString();
-                            foreach (var itemID in knownInventories[req.Part.LocalID])
-                            {
-                                if (!items.ContainsKey(itemID))
-                                {
-                                    m_PrimItems[req.Part.ObjectGroup.Scene.ID].Remove(GenItemKey(partID, itemID.ToString()));
-                                }
-                            }
-
-                            foreach (var kvp in items)
-                            {
-                                var data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
-                                data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
-                                m_PrimItems[req.Part.ObjectGroup.Scene.ID][GenItemKey(req.Part.ID, kvp.Key)] = data;
-                            }
-                        }
-                        else
-                        {
-                            foreach (var kvp in items)
-                            {
-                                var data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
-                                data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
-                                m_PrimItems[req.Part.ObjectGroup.Scene.ID][GenItemKey(req.Part.ID, kvp.Key)] = data;
-                            }
-                        }
-                        knownInventories[req.Part.LocalID] = new List<UUID>(items.Keys);
-                        knownInventorySerialNumbers[req.Part.LocalID] = newPrimInventorySerial;
-                    }
+                    m_PrimItems.Remove(key);
                 }
+                else
+                {
+                    m_PrimItems[key] = GenerateUpdateObjectPartInventoryItem(info.PartID, info.Item);
+                }
+            }
+
+            protected override void OnUpdate(ObjectUpdateInfo info)
+            {
+                if (info.IsKilled)
+                {
+                    m_Primitives.Remove(info.ID);
+                }
+                else
+                {
+                    m_Objects.Remove(info.ID);
+                    m_Primitives[info.ID] = GenerateUpdateObjectPart(info.Part);
+                    m_Objects[info.ID] = GenerateUpdateObjectGroup(info.Part.ObjectGroup);
+                }
+            }
+
+            protected override void OnIdle()
+            {
+                /* intentionally left empty */
             }
 
             private Map GenerateUpdateObjectPartInventoryItem(UUID primID, ObjectPartInventoryItem item)
@@ -256,7 +117,6 @@ namespace SilverSim.Database.Memory.SimulationData
             private Map GenerateUpdateObjectGroup(ObjectGroup objgroup) => new Map
             {
                 { "ID", objgroup.ID },
-                { "RegionID", objgroup.Scene.ID },
                 { "IsTempOnRez", objgroup.IsTempOnRez },
                 { "Owner", objgroup.Owner.ToString() },
                 { "LastOwner", objgroup.LastOwner.ToString() },

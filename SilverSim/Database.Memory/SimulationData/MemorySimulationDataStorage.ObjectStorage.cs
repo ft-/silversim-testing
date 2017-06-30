@@ -95,9 +95,8 @@ namespace SilverSim.Database.Memory.SimulationData
 
         private ObjectPart ObjectPartFromMap(Map map)
         {
-            var objpart = new ObjectPart()
+            var objpart = new ObjectPart(map["ID"].AsUUID)
             {
-                ID = map["ID"].AsUUID,
                 LoadedLinkNumber = map["LinkNumber"].AsInt,
                 Position = map["Position"].AsVector3,
                 Rotation = map["Rotation"].AsQuaternion,
@@ -218,7 +217,7 @@ namespace SilverSim.Database.Memory.SimulationData
 
         private ObjectPartInventoryItem ObjectPartInventoryItemFromMap(Map map)
         {
-            var item = new ObjectPartInventoryItem()
+            var item = new ObjectPartInventoryItem(map["InventoryID"].AsUUID)
             {
                 AssetID = map["AssetID"].AsUUID,
                 AssetType = (AssetType)map["AssetType"].AsInt,
@@ -228,7 +227,6 @@ namespace SilverSim.Database.Memory.SimulationData
                 Flags = (InventoryFlags)map["Flags"].AsUInt,
                 Group = new UGI(map["Group"].ToString()),
                 IsGroupOwned = map["GroupOwned"].AsBoolean,
-                ID = map["InventoryID"].AsUUID,
                 InventoryType = (InventoryType)map["InventoryType"].AsInt,
                 LastOwner = new UUI(map["LastOwner"].ToString()),
                 Name = map["Name"].ToString(),

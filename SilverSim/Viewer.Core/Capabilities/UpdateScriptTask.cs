@@ -111,7 +111,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 data.Creator = item.Creator;
                 data.Name = item.Name;
-                item.ID = kvp.Value.ItemID;
+                item.SetNewID(kvp.Value.ItemID);
 
                 try
                 {

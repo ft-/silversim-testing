@@ -27,5 +27,6 @@ namespace SilverSim.Scene.Types.Scene
     public interface ISceneListener
     {
         void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
+        void ScheduleUpdate(ObjectInventoryUpdateInfo info, UUID fromSceneID);
     }
 }
