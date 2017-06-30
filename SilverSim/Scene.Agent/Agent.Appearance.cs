@@ -128,7 +128,7 @@ namespace SilverSim.Scene.Agent
                 te.DefaultTexture.TextureID = textures[0];
                 for (int i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
                 {
-                    if (UUID.Zero != textures[i])
+                    if (te.DefaultTexture.TextureID != textures[i])
                     {
                         te[(uint)i].TextureID = textures[i];
                     }

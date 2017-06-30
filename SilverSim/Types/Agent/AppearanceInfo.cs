@@ -36,6 +36,8 @@ namespace SilverSim.Types.Agent
         public class AvatarTextureData
         {
             public readonly static int TextureCount = 21;
+            public static readonly UUID DefaultAvatarTextureID = new UUID("c228d1cf-4b5d-4ba8-84f4-899a0796aa97");
+
             private readonly UUID[] m_AvatarTextures = new UUID[TextureCount];
             private readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 

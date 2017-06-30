@@ -901,6 +901,10 @@ namespace SilverSim.Scene.Types.Agent
 
         private static void CoreBakeLogic(this AppearanceInfo.AvatarTextureData agentTextures, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
         {
+            for(int idx = 0; idx < AppearanceInfo.AvatarTextureData.TextureCount; ++idx)
+            {
+                agentTextures[idx] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+            }
             foreach (OutfitItem item in bakeStatus.OutfitItems.Values)
             {
                 foreach(KeyValuePair<AvatarTextureIndex, UUID> tex in item.WearableData.Textures)
