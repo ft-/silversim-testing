@@ -31,9 +31,14 @@ namespace SilverSim.Types.Asset.Format
         {
         }
 
+        public NotecardInventoryItem(UUID id)
+        {
+            ID = id;
+        }
+
         public NotecardInventoryItem(InventoryItem item)
         {
-            AssetID = new UUID(item.AssetID);
+            AssetID = item.AssetID;
             AssetType = item.AssetType;
             CreationDate = item.CreationDate;
             Creator = new UUI(item.Creator);
@@ -41,12 +46,11 @@ namespace SilverSim.Types.Asset.Format
             Flags = item.Flags;
             Group = new UGI(item.Group);
             IsGroupOwned = item.IsGroupOwned;
-            ID = new UUID(item.ID);
             InventoryType = item.InventoryType;
             LastOwner = new UUI(item.LastOwner);
             Name = item.Name;
             Owner = new UUI(item.Owner);
-            ParentFolderID = new UUID(item.ParentFolderID);
+            ParentFolderID = item.ParentFolderID;
             Permissions = item.Permissions;
             SaleInfo = item.SaleInfo;
         }
