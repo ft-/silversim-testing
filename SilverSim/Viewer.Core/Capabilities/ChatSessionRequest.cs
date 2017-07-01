@@ -36,13 +36,14 @@ namespace SilverSim.Viewer.Core.Capabilities
         private readonly AgentCircuit m_Circuit;
         private readonly string m_RemoteIP;
 
-        public readonly RwLockedDictionary<string, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map>> ChatSessionRequestMethodHandlers = new RwLockedDictionary<string, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map>>();
+        private readonly RwLockedDictionary<string, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map>> ChatSessionRequestMethodHandlers;
 
-        public ChatSessionRequest(ViewerAgent agent, AgentCircuit circuit, string remoteIP)
+        public ChatSessionRequest(ViewerAgent agent, AgentCircuit circuit, string remoteIP, RwLockedDictionary<string, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map>> handlers)
         {
             m_Agent = agent;
             m_Circuit = circuit;
             m_RemoteIP = remoteIP;
+            ChatSessionRequestMethodHandlers = handlers;
         }
 
         public string CapabilityName => "ChatSessionRequest";

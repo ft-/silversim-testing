@@ -23,6 +23,7 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scripting.Common;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Core.Capabilities;
@@ -38,13 +39,11 @@ namespace SilverSim.Viewer.Core
     {
         private ChatSessionRequest ChatSessionRequestCapability { get; set; }
 
+        private readonly RwLockedDictionary<string, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map>> ChatSessionRequestMethodHandlers = new RwLockedDictionary<string, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map>>();
+
         public void SetChatSessionRequestMethod(string method, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map> del)
         {
-            ChatSessionRequest csr = ChatSessionRequestCapability;
-            if (csr != null)
-            {
-                csr.ChatSessionRequestMethodHandlers[method] = del;
-            }
+            ChatSessionRequestMethodHandlers[method] = del;
         }
 
         #region Capabilities registration
@@ -305,7 +304,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            ChatSessionRequestCapability = new ChatSessionRequest(Agent, this, RemoteIP);
+            ChatSessionRequestCapability = new ChatSessionRequest(Agent, this, RemoteIP, ChatSessionRequestMethodHandlers);
             try
             {
                 /* The LSLCompiler is the only one that has this method */
