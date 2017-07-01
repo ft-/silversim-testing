@@ -61,6 +61,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             protected readonly BlockingQueue<IUpdateInfo> m_StorageMainRequestQueue = new BlockingQueue<IUpdateInfo>();
             protected readonly UUID m_RegionID;
 
+            public UUID RegionID => m_RegionID;
+
             protected SceneListener(UUID regionID)
             {
                 m_RegionID = regionID;
