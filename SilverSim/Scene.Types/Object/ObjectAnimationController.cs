@@ -53,6 +53,43 @@ namespace SilverSim.Scene.Types.Object
             m_NextAnimSeqNumber = 1;
         }
 
+        private ObjectAnimation GetMessage()
+        {
+            var m = new ObjectAnimation()
+            {
+                Sender = m_Part.ID
+            };
+            lock (m_Lock)
+            {
+                foreach (var ai in m_ActiveAnimations)
+                {
+                    m.AnimationList.Add(new ObjectAnimation.AnimationData(ai.AnimID, ai.AnimSeq));
+                }
+            }
+            return m;
+        }
+
+        public void SendAnimationsToAgent(IAgent agent)
+        {
+            ObjectGroup grp = m_Part.ObjectGroup;
+            if (grp == null)
+            {
+                return;
+            }
+            SceneInterface scene = grp.Scene;
+            if (scene == null)
+            {
+                return;
+            }
+
+            if ((m_Part.ExtendedMesh.Flags & ObjectPart.ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) == 0)
+            {
+                return;
+            }
+
+            agent.SendMessageAlways(GetMessage(), scene.ID);
+        }
+
         public void SendAnimations()
         {
             ObjectGroup grp = m_Part.ObjectGroup;
@@ -66,17 +103,12 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            var m = new ObjectAnimation()
+            if((m_Part.ExtendedMesh.Flags & ObjectPart.ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) == 0)
             {
-                Sender = m_Part.ID
-            };
-            lock (m_Lock)
-            {
-                foreach (var ai in m_ActiveAnimations)
-                {
-                    m.AnimationList.Add(new ObjectAnimation.AnimationData(ai.AnimID, ai.AnimSeq));
-                }
+                return;
             }
+
+            ObjectAnimation m = GetMessage();
 
             foreach(IAgent agent in scene.Agents)
             {
