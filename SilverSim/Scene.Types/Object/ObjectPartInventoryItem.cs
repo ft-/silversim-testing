@@ -40,7 +40,7 @@ namespace SilverSim.Scene.Types.Object
         public ObjectPartInventoryItem(UUID id)
             : base(id)
         {
-
+            UpdateInfo = new ObjectInventoryUpdateInfo(this);
         }
 
         public ObjectPartInventoryItem(AssetData asset)
@@ -252,7 +252,7 @@ namespace SilverSim.Scene.Types.Object
         public override void SetNewID(UUID id)
         {
             ID = id;
-            UpdateInfo.UpdateIDs();
+            UpdateInfo?.UpdateIDs();
         }
     }
 }
