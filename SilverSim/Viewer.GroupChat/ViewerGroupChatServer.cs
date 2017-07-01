@@ -22,6 +22,7 @@
 using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
@@ -43,7 +44,7 @@ namespace SilverSim.Viewer.GroupChat
 {
     [Description("Viewer GroupChat Handler")]
     [PluginName("ViewerGroupChatServer")]
-    public class ViewerGroupChatServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
+    public class ViewerGroupChatServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown, ITriggerOnRootAgentActions
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL GROUPCHAT");
 
@@ -261,6 +262,26 @@ namespace SilverSim.Viewer.GroupChat
             }
         }
         #endregion
+
+        public void TriggerOnRootAgent(UUID agentid, SceneInterface scene)
+        {
+            IAgent agent;
+            if (!scene.Agents.TryGetValue(agentid, out agent))
+            {
+                return;
+            }
+
+            ViewerAgent vagent = agent as ViewerAgent;
+            if(vagent == null)
+            {
+                return;
+            }
+            AgentCircuit circuit;
+            if(vagent.Circuits.TryGetValue(scene.ID, out circuit))
+            {
+                /* TODO: add required setup code */
+            }
+        }
 
         #region Utility
         private GroupPowers GetGroupPowers(UUI agent, GroupsServiceInterface groupsService, UGI group)

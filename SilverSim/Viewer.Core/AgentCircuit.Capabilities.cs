@@ -38,6 +38,15 @@ namespace SilverSim.Viewer.Core
     {
         private ChatSessionRequest ChatSessionRequestCapability { get; set; }
 
+        public void SetChatSessionRequestMethod(string method, Func<ViewerAgent, AgentCircuit, HttpRequest, Map, Map> del)
+        {
+            ChatSessionRequest csr = ChatSessionRequestCapability;
+            if (csr != null)
+            {
+                csr.ChatSessionRequestMethodHandlers[method] = del;
+            }
+        }
+
         #region Capabilities registration
         public void AddCapability(string type, UUID id, Action<HttpRequest> del)
         {
