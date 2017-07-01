@@ -128,7 +128,14 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
                     if (nummessagespending > 2000)
                     {
-                        OnIdle();
+                        try
+                        {
+                            OnIdle();
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.Error("Exception encountered at OnIdle", e);
+                        }
                     }
 
                     ObjectUpdateInfo oInfo = req as ObjectUpdateInfo;
