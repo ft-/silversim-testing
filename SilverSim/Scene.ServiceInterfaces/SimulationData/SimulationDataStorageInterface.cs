@@ -104,6 +104,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             {
                 Thread.CurrentThread.Name = "Storage Main Thread: " + m_RegionID.ToString();
                 OnStart();
+                int nummessagespending = 0;
 
                 while (!m_StopStorageThread || m_StorageMainRequestQueue.Count != 0 || HasPendingData)
                 {
@@ -125,12 +126,18 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                         continue;
                     }
 
+                    if (nummessagespending > 2000)
+                    {
+                        OnIdle();
+                    }
+
                     ObjectUpdateInfo oInfo = req as ObjectUpdateInfo;
                     if (oInfo != null)
                     {
                         try
                         {
                             OnUpdate(oInfo);
+                            ++nummessagespending;
                         }
                         catch(Exception e)
                         {
@@ -145,6 +152,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                         try
                         {
                             OnUpdate(iInfo);
+                            ++nummessagespending;
                         }
                         catch(Exception e)
                         {
