@@ -81,7 +81,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 int counttris = 0;
                 foreach(var hull in Hulls)
                 {
-                    counthulls += 2;
+                    counthulls += 1;
                     countverts += hull.Vertices.Count;
                     counttris += hull.Triangles.Count;
                 }
@@ -148,6 +148,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                         hull.Triangles.Add(LEBytesToInt32(value, byteOffset));
                         byteOffset += 4;
                     }
+                    Hulls.Add(hull);
                 }
             }
         }
