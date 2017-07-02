@@ -21,6 +21,7 @@
 
 using log4net;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
@@ -58,6 +59,8 @@ namespace SilverSim.Viewer.GroupChat
 
         private readonly BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
         private IMRouter m_IMRouter;
+
+        private readonly RwLockedDictionary<UUID, RwLockedDictionary<UUID, UUI>> ActiveSessions = new RwLockedDictionary<UUID, RwLockedDictionary<UUID, UUI>>();
 
         private bool m_ShutdownGroupChat;
 
@@ -163,6 +166,22 @@ namespace SilverSim.Viewer.GroupChat
                                     case GridInstantMessageDialog.GroupNoticeInventoryAccepted:
                                         break;
 
+                                    case GridInstantMessageDialog.SessionGroupStart:
+                                        HandleSessionGroupStart(req.Key.Agent, scene, im);
+                                        break;
+
+                                    case GridInstantMessageDialog.SessionSend:
+                                        HandleSessionSend(req.Key.Agent, scene, im);
+                                        break;
+
+                                    case GridInstantMessageDialog.SessionDrop:
+                                        HandleSessionDrop(req.Key.Agent, scene, im);
+                                        break;
+
+                                    case GridInstantMessageDialog.SessionAdd:
+                                        HandleSessionAdd(req.Key.Agent, scene, im);
+                                        break;
+
                                     default:
                                         break;
                                 }
@@ -178,6 +197,25 @@ namespace SilverSim.Viewer.GroupChat
                     m_Log.Debug("Unexpected exception " + e.Message, e);
                 }
             }
+        }
+
+        private void HandleSessionGroupStart(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
+        {
+
+        }
+
+        private void HandleSessionSend(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
+        {
+        }
+
+        private void HandleSessionDrop(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
+        {
+
+        }
+
+        private void HandleSessionAdd(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
+        {
+
         }
 
         #region Group Notice
@@ -279,8 +317,37 @@ namespace SilverSim.Viewer.GroupChat
             AgentCircuit circuit;
             if(vagent.Circuits.TryGetValue(scene.ID, out circuit))
             {
-                /* TODO: add required setup code */
+                circuit.SetChatSessionRequestMethod("start conference", StartConference);
+                circuit.SetChatSessionRequestMethod("invite", Invite);
             }
+        }
+
+        private Map StartConference(ViewerAgent agent, AgentCircuit circuit, HttpRequest req, Map reqdata)
+        {
+            /*
+             * <llsd>
+             * <map>
+             * <key>method</key><string>start conference</string>
+             * <key>session-id</key><uuid></uuid>
+             * <key>params</key><array><uuid></uuid></array>
+             * </map>
+             * </llsd>
+             */
+            return new Map();
+        }
+
+        private Map Invite(ViewerAgent agent, AgentCircuit circuit, HttpRequest req, Map reqdata)
+        {
+            /*
+             * <llsd>
+             * <map>
+             * <key>method</key><string>invite</string>
+             * <key>session-id</key><uuid></uuid>
+             * <key>params</key><array><uuid></uuid></array>
+             * </map>
+             * </llsd>
+             */
+            return new Map();
         }
 
         #region Utility
