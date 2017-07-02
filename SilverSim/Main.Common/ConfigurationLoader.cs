@@ -548,6 +548,7 @@ namespace SilverSim.Main.Common
             configSource.AddSwitch("Startup", "config", "c");
             configSource.AddSwitch("Startup", "dumpconfig");
             configSource.AddSwitch("Startup", "skipregions");
+            configSource.AddSwitch("Startup", "datadir", "d");
             IConfig startup = configSource.Configs["Startup"];
             mode = startup.GetString("mode", "simulator");
             string dumpResultingIniName = startup.GetString("dumpconfig", string.Empty);
@@ -599,7 +600,15 @@ namespace SilverSim.Main.Common
             defaultsIniName = modeConfig.GetString("DefaultsIniName", string.Empty);
             string defaultLogConfigName = modeConfig.GetString("DefaultLogConfig", "default.log.config");
 
+            CoreUpdater.Instance.LoadInstalledPackageDescriptions();
+
+            string DefaultDataPath = Path.GetFullPath(Path.Combine(InstallationBinPath, startup.GetString("defaultconfigdir", "../data")));
+
             string mainConfig = startup.GetString("config", defaultConfigName);
+            if(!string.IsNullOrEmpty(mainConfig))
+            {
+                mainConfig = Path.GetFullPath(Path.Combine(DefaultDataPath, mainConfig));
+            }
 
             if (defaultsIniName.Length != 0)
             {
@@ -613,9 +622,6 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            CoreUpdater.Instance.LoadInstalledPackageDescriptions();
-
-            string DefaultDataPath = Path.Combine(InstallationBinPath, "../data");
             foreach(string defaultCfg in CoreUpdater.Instance.GetDefaultConfigurationFiles(mode))
             {
                 if(defaultCfg.Contains(':'))

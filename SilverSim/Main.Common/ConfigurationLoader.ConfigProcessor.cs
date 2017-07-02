@@ -267,7 +267,7 @@ namespace SilverSim.Main.Common
         {
             Uri configUri;
             if (Uri.TryCreate(file, UriKind.Absolute,
-                    out configUri))
+                    out configUri) && configUri.Scheme != "file")
             {
                 m_Sources.Enqueue(new CFG_NiniXmlUriSource(file));
             }
@@ -748,7 +748,7 @@ namespace SilverSim.Main.Common
                 try
                 {
 #if DEBUG
-                    System.Console.WriteLine("Processing config {0}", source.Name);
+                    System.Console.WriteLine("Processing config \"{0}\"", source.Name);
 #endif
                     importedInfo.Set("Imported-" + source.Name, true);
                     Config.Merge(source.ConfigSource);
