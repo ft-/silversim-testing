@@ -548,7 +548,7 @@ namespace SilverSim.Main.Common
             configSource.AddSwitch("Startup", "config", "c");
             configSource.AddSwitch("Startup", "dumpconfig");
             configSource.AddSwitch("Startup", "skipregions");
-            configSource.AddSwitch("Startup", "datadir", "d");
+            configSource.AddSwitch("Startup", "configdir", "d");
             IConfig startup = configSource.Configs["Startup"];
             mode = startup.GetString("mode", "simulator");
             string dumpResultingIniName = startup.GetString("dumpconfig", string.Empty);
