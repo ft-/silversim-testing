@@ -32,7 +32,7 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        public class PrimitiveShape : IEquatable<PrimitiveShape>
+        public class PrimitiveShape : IEquatable<PrimitiveShape>, IComparable<PrimitiveShape>
         {
             #region Constructor
             public PrimitiveShape()
@@ -763,6 +763,25 @@ namespace SilverSim.Scene.Types.Object
             public override int GetHashCode()
             {
                 return Serialization.GetHashCode();
+            }
+
+            public int CompareTo(PrimitiveShape other)
+            {
+                byte[] a = Serialization;
+                byte[] b = other.Serialization;
+                if(a.Length != b.Length)
+                {
+                    return a.Length - b.Length;
+                }
+
+                for(int i = 0; i < a.Length; ++i)
+                {
+                    if(a[i] != b[i])
+                    {
+                        return a[i].CompareTo(b[i]);
+                    }
+                }
+                return 0;
             }
         }
 
