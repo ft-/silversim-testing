@@ -51,6 +51,46 @@ namespace SilverSim.Threading
             }
         }
 
+        [Serializable]
+        public class DuplicateKey1Exception : ArgumentException
+        {
+            public DuplicateKey1Exception()
+            {
+            }
+
+            public DuplicateKey1Exception(string message) : base(message)
+            {
+            }
+
+            public DuplicateKey1Exception(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected DuplicateKey1Exception(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+            }
+        }
+
+        [Serializable]
+        public class DuplicateKey2Exception : ArgumentException
+        {
+            public DuplicateKey2Exception()
+            {
+            }
+
+            public DuplicateKey2Exception(string message) : base(message)
+            {
+            }
+
+            public DuplicateKey2Exception(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected DuplicateKey2Exception(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+            }
+        }
+
         private readonly Dictionary<TKey1, KeyValuePair<TKey2, TValue>> m_Dictionary_K1;
         private readonly Dictionary<TKey2, KeyValuePair<TKey1, TValue>> m_Dictionary_K2;
         private readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
@@ -71,15 +111,11 @@ namespace SilverSim.Threading
         {
             if (m_Dictionary_K1.ContainsKey(key1))
             {
-                if (!m_Dictionary_K2.ContainsKey(key2))
-                {
-                    throw new ArgumentException("key1 exists in the dictionary but not key2");
-                }
+                throw new DuplicateKey1Exception(string.Format("Key pair \"{0}\",\"{1}\" is duplicated on key 1", key1.ToString(), key2.ToString()));
             }
-            else if (m_Dictionary_K2.ContainsKey(key2) &&
-                !m_Dictionary_K1.ContainsKey(key1))
+            if (m_Dictionary_K2.ContainsKey(key2))
             {
-                throw new ArgumentException("key2 exists in the dictionary but not key1");
+                throw new DuplicateKey2Exception(string.Format("Key pair \"{0}\",\"{1}\" is duplicated on key 2", key1.ToString(), key2.ToString()));
             }
 
             m_Dictionary_K1[key1] = new KeyValuePair<TKey2, TValue>(key2, value);

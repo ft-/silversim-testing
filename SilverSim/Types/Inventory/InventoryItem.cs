@@ -161,7 +161,7 @@ namespace SilverSim.Types.Inventory
             Flags = item.Flags;
             Group = new UGI(item.Group);
             IsGroupOwned = item.IsGroupOwned;
-            ID = new UUID(item.ID);
+            ID = item.ID;
             InventoryType = item.InventoryType;
             LastOwner = new UUI(item.LastOwner);
             Name = item.Name;
