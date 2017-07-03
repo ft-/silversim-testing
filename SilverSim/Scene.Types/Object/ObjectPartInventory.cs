@@ -354,8 +354,9 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options)
+        private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options, out UUID origid)
         {
+            origid = UUID.Zero;
             var item = new ObjectPartInventoryItem()
             {
                 Owner = currentOwner
@@ -425,13 +426,10 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "ItemID":
+                                origid = reader.ReadContentAsUUID();
                                 if ((options & XmlDeserializationOptions.RestoreIDs) != 0)
                                 {
-                                    item.SetNewID(reader.ReadContentAsUUID());
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
+                                    item.SetNewID(origid);
                                 }
                                 break;
 
@@ -519,7 +517,16 @@ namespace SilverSim.Scene.Types.Object
                         switch(reader.Name)
                         {
                             case "TaskInventoryItem":
-                                Add(FromXML(reader, currentOwner, options), false);
+                                UUID origid;
+                                ObjectPartInventoryItem item = FromXML(reader, currentOwner, options, out origid);
+                                try
+                                {
+                                    Add(item, false);
+                                }
+                                catch
+                                {
+                                    throw new InvalidObjectXmlException(string.Format("Duplicate task inventory name {0} ({1})", item.Name, origid));
+                                }
                                 break;
 
                             default:
