@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;

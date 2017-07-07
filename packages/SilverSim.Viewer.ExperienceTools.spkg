@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Viewer.ExperienceTools</name>
+	<skip-delivery>true</skip-delivery>
+	<files>
+		<file name="bin/plugins/SilverSim.Viewer.ExperienceTools.dll"/>
+	</files>
+</package>
