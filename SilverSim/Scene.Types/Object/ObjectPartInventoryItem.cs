@@ -50,7 +50,7 @@ namespace SilverSim.Scene.Types.Object
             Creator = new UUI(asset.Creator);
             Name = asset.Name;
             Flags = 0;
-            switch(AssetType)
+            switch (AssetType)
             {
                 case AssetType.Animation:
                     InventoryType = InventoryType.Animation;
@@ -151,6 +151,28 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Perms Granting
+        public UUID m_ExperienceID = UUID.Zero;
+
+        public UUID ExperienceID
+        {
+            get
+            {
+                UUID id;
+                lock(m_PermsGranterLock)
+                {
+                    id = m_ExperienceID;
+                }
+                return id;
+            }
+            set
+            {
+                lock(m_PermsGranterLock)
+                {
+                    m_ExperienceID = value;
+                }
+            }
+        }
+
         public class PermsGranterInfo
         {
             public UUI PermsGranter = UUI.Unknown;

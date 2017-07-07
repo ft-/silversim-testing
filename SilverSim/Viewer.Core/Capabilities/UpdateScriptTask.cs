@@ -111,6 +111,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 data.Creator = item.Creator;
                 data.Name = item.Name;
+                item.ExperienceID = kvp.Value.ExperienceID;
                 item.SetNewID(kvp.Value.ItemID);
 
                 try
