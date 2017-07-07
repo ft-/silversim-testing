@@ -465,6 +465,10 @@ namespace SilverSim.Scene.Types.Object
                                 ownerChanged = reader.ReadElementValueAsBoolean();
                                 break;
 
+                            case "ExperienceID":
+                                item.ExperienceID = reader.ReadContentAsUUID();
+                                break;
+
                             case "OwnerID": /* Do not trust this ever! */
                             default:
                                 reader.ReadToEndElement();
@@ -612,6 +616,11 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("PermsMask", (uint)grantinfo.PermsMask);
                         writer.WriteNamedValue("Type", (int)item.AssetType);
                         writer.WriteNamedValue("OwnerChanged", (options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None);
+                        UUID experienceID = item.ExperienceID;
+                        if(experienceID != UUID.Zero)
+                        {
+                            writer.WriteNamedValue("ExperienceID", experienceID);
+                        }
                     }
                     writer.WriteEndElement();
                 }
