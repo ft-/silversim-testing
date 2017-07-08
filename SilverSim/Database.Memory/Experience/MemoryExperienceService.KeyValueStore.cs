@@ -74,5 +74,12 @@ namespace SilverSim.Database.Memory.Experience
 
             return changed;
         }
+
+        List<string> IExperienceKeyInterface.GetKeys(UUID experienceID)
+        {
+            RwLockedDictionary<string, string> exp;
+
+            return m_KeyValues.TryGetValue(experienceID, out exp) ? new List<string>(exp.Keys) : new List<string>();
+        }
     }
 }
