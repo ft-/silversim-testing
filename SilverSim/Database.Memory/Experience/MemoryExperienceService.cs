@@ -32,13 +32,17 @@ namespace SilverSim.Database.Memory.Experience
 {
     [Description("Memory Experience Backend")]
     [PluginName("Experience")]
-    public sealed partial class MemoryExperienceService : ExperienceServiceInterface
+    public sealed partial class MemoryExperienceService : ExperienceServiceInterface, IPlugin
     {
         private readonly RwLockedDictionary<UUID, ExperienceInfo> m_Experiences = new RwLockedDictionary<UUID, ExperienceInfo>();
 
         public override IExperiencePermissionsInterface Permissions => this;
         public override IExperienceAdminInterface Admins => this;
         public override IExperienceKeyInterface KeyValueStore => this;
+
+        public void Startup(ConfigurationLoader loader)
+        {
+        }
 
         public override ExperienceInfo this[UUID experienceID]
         {
