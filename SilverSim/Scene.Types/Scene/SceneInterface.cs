@@ -41,6 +41,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Economy;
 using SilverSim.Types.Estate;
+using SilverSim.Types.Experience;
 using SilverSim.Types.Grid;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages.Agent;
@@ -99,6 +100,15 @@ namespace SilverSim.Scene.Types.Scene
         bool Remove(UUID regionID, UUID parcelID, UUID experienceID);
     }
 
+    public interface IRegionExperienceList
+    {
+        RegionExperienceInfo this[UUID regionID, UUID experienceID] { get; }
+        bool TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info);
+        List<RegionExperienceInfo> this[UUID regionID] { get; }
+        void Store(RegionExperienceInfo info);
+        bool Remove(UUID regionID, UUID experienceID);
+    }
+
     public interface ISceneParcels : IEnumerable<ParcelInfo>
     {
         ParcelInfo this[UUID id] { get; }
@@ -152,6 +162,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract ISceneAgents Agents { get; }
         public abstract ISceneAgents RootAgents { get; }
         public abstract ISceneParcels Parcels { get; }
+        public abstract IRegionExperienceList RegionExperiences { get; }
         public abstract List<ObjectUpdateInfo> UpdateInfos { get; }
         public event Action<SceneInterface> OnRemove;
         public AssetServiceInterface TemporaryAssetService { get; protected set; }

@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
@@ -31,7 +32,7 @@ namespace SilverSim.Database.Memory.SimulationData
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, RegionExperienceInfo>> m_Experiences = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, RegionExperienceInfo>>(() => new RwLockedDictionary<UUID, RegionExperienceInfo>());
 
-        List<RegionExperienceInfo> ISimulationDataRegionExperiencesStorageInterface.this[UUID regionID]
+        List<RegionExperienceInfo> IRegionExperienceList.this[UUID regionID]
         {
             get
             {
@@ -48,7 +49,7 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        RegionExperienceInfo ISimulationDataRegionExperiencesStorageInterface.this[UUID regionID, UUID experienceID]
+        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UUID experienceID]
         {
             get
             {
@@ -61,7 +62,7 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        bool ISimulationDataRegionExperiencesStorageInterface.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
+        bool IRegionExperienceList.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
         {
             RwLockedDictionary<UUID, RegionExperienceInfo> exp;
             RegionExperienceInfo i_info;
@@ -74,12 +75,12 @@ namespace SilverSim.Database.Memory.SimulationData
             return false;
         }
 
-        void ISimulationDataRegionExperiencesStorageInterface.Store(RegionExperienceInfo info)
+        void IRegionExperienceList.Store(RegionExperienceInfo info)
         {
             m_Experiences[info.RegionID][info.ExperienceID] = new RegionExperienceInfo(info);
         }
 
-        bool ISimulationDataRegionExperiencesStorageInterface.Remove(UUID regionID, UUID experienceID)
+        bool IRegionExperienceList.Remove(UUID regionID, UUID experienceID)
         {
             RwLockedDictionary<UUID, RegionExperienceInfo> exp;
             return m_Experiences.TryGetValue(regionID, out exp) && exp.Remove(experienceID);

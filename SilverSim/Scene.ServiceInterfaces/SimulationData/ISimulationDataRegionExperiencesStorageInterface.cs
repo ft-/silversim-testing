@@ -19,19 +19,13 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
-using SilverSim.Types.Experience;
-using System.Collections.Generic;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
-    public interface ISimulationDataRegionExperiencesStorageInterface
+    public interface ISimulationDataRegionExperiencesStorageInterface : IRegionExperienceList
     {
-        RegionExperienceInfo this[UUID regionID, UUID experienceID] { get; }
-        bool TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info);
-        List<RegionExperienceInfo> this[UUID regionID] { get; }
-        void Store(RegionExperienceInfo info);
-        bool Remove(UUID regionID, UUID experienceID);
         void RemoveRegion(UUID regionID);
     }
 }
