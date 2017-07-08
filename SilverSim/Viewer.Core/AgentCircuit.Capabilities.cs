@@ -255,6 +255,11 @@ namespace SilverSim.Viewer.Core
         {
             if (IsLocalHost(capConfig, capabilityType))
             {
+                if(Scene.ExperienceService == null && Attribute.GetCustomAttribute(del.GetType(), typeof(RequiresExperienceSupportAttribute)) != null)
+                {
+                    /* skip if experiences are disabled on region and capability requires support for it */
+                    return;
+                }
                 AddCapability(capabilityType, seedID, new ExtenderCapabilityCaller(Agent, this, del).HttpRequestHandler);
             }
         }

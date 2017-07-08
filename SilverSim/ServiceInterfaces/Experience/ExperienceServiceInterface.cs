@@ -35,6 +35,7 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         public abstract List<UUID> GetGroupExperiences(UGI group);
         public abstract List<UUID> GetCreatorExperiences(UUI creator);
+        public abstract List<UUID> GetOwnerExperiences(UUI owner);
         public abstract List<UUID> FindExperienceByName(string query);
         public abstract List<ExperienceInfo> FindExperienceInfoByName(string query);
 
@@ -56,14 +57,5 @@ namespace SilverSim.ServiceInterfaces.Experience
         }
 
         public abstract IExperienceAdminInterface Admins { get; }
-
-        public interface IExperienceKeyInterface
-        {
-            string this[UUID experienceID, string key] { get; set; }
-            bool TryGetValue(UUID experienceID, string key, out string val);
-            bool Remove(UUID experienceID, string key);
-        }
-
-        public abstract IExperienceKeyInterface KeyValueStore { get; }
     }
 }

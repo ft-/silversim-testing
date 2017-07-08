@@ -23,6 +23,7 @@ using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
@@ -48,6 +49,7 @@ namespace SilverSim.Viewer.ExperienceTools
         }
 
         [CapabilityHandler("GetMetadata")]
+        [RequiresExperienceSupport]
         public void HandleGetMetadataCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
         {
             if (req.CallerIP != circuit.RemoteIP)
@@ -151,6 +153,7 @@ namespace SilverSim.Viewer.ExperienceTools
          * </llsd>
          */
         [CapabilityHandler("GetExperiences")]
+        [RequiresExperienceSupport]
         public void HandleGetExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -178,6 +181,53 @@ namespace SilverSim.Viewer.ExperienceTools
          * POST:
          * with empty <llsd> - response identical
          */
+        [CapabilityHandler("AgentExperiences")]
+        [RequiresExperienceSupport]
+        public void HandleAgentExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            List<UUID> experienceids = experienceService.GetOwnerExperiences(agent.Owner);
+            var ids = new AnArray();
+            foreach (UUID id in experienceids)
+            {
+                ids.Add(id);
+            }
+            Map resdata = new Map()
+            {
+                ["experience_ids"] = ids
+            };
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, o);
+                }
+            }
+        }
 
         /* FindExperienceByName
          * GET ?page=" << mCurrentPage << "&page_size=30&query=" << LLURI::escape(text)
@@ -194,6 +244,7 @@ namespace SilverSim.Viewer.ExperienceTools
          * </llsd>
          */
         [CapabilityHandler("FindExperienceByName")]
+        [RequiresExperienceSupport]
         public void HandleFindExperienceByNameCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -228,7 +279,21 @@ namespace SilverSim.Viewer.ExperienceTools
 
             string query = o.ToString();
 
-            List<ExperienceInfo> experienceinfos = circuit.Scene.ExperienceService.FindExperienceInfoByName(query);
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            List<ExperienceInfo> experienceinfos = experienceService.FindExperienceInfoByName(query);
 
             Map resdata = new Map();
             AnArray result = new AnArray();
@@ -266,6 +331,7 @@ namespace SilverSim.Viewer.ExperienceTools
          * </llsd>
          */
         [CapabilityHandler("GetExperienceInfo")]
+        [RequiresExperienceSupport]
         public void HandleGetExperienceInfoCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -319,7 +385,20 @@ namespace SilverSim.Viewer.ExperienceTools
                 }
             }
 
-            ExperienceServiceInterface experienceService = circuit.Scene.ExperienceService;
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if(experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
             foreach (UUID id in uuids)
             {
                 ExperienceInfo info;
@@ -355,6 +434,7 @@ namespace SilverSim.Viewer.ExperienceTools
          */
 
         [CapabilityHandler("GetAdminExperiences")]
+        [RequiresExperienceSupport]
         public void HandleGetAdminExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -368,7 +448,21 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            List<UUID> experienceids = circuit.Scene.ExperienceService.Admins[agent.Owner];
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            List<UUID> experienceids = experienceService.Admins[agent.Owner];
             var ids = new AnArray();
             foreach (UUID id in experienceids)
             {
@@ -397,6 +491,7 @@ namespace SilverSim.Viewer.ExperienceTools
          * </llsd>
          */
         [CapabilityHandler("GetCreatorExperiences")]
+        [RequiresExperienceSupport]
         public void HandleGetCreatorExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -410,7 +505,21 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            List<UUID> experienceids = circuit.Scene.ExperienceService.GetCreatorExperiences(agent.Owner);
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            List<UUID> experienceids = experienceService.GetCreatorExperiences(agent.Owner);
             var ids = new AnArray();
             foreach (UUID id in experienceids)
             {
@@ -476,6 +585,7 @@ namespace SilverSim.Viewer.ExperienceTools
          */
 
         [CapabilityHandler("ExperiencePreferences")]
+        [RequiresExperienceSupport]
         public void HandleExperiencePerferencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -517,7 +627,20 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            ExperienceServiceInterface experienceService = circuit.Scene.ExperienceService;
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
             foreach(KeyValuePair<string, IValue> kvp in reqdata)
             {
                 Map entry = kvp.Value as Map;
@@ -551,7 +674,21 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            circuit.Scene.ExperienceService.Permissions.Remove(id, agent.Owner);
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            experienceService.Permissions.Remove(id, agent.Owner);
         }
 
         /* GroupExperiences 
@@ -564,6 +701,7 @@ namespace SilverSim.Viewer.ExperienceTools
          * </llsd>
          */
         [CapabilityHandler("GroupExperiences")]
+        [RequiresExperienceSupport]
         public void HandleGroupExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -577,7 +715,21 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            List<UUID> experienceids = circuit.Scene.ExperienceService.GetGroupExperiences(agent.Group);
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            List<UUID> experienceids = experienceService.GetGroupExperiences(agent.Group);
             var ids = new AnArray();
             foreach (UUID id in experienceids)
             {
@@ -642,6 +794,7 @@ namespace SilverSim.Viewer.ExperienceTools
          * </llsd>
          */
         [CapabilityHandler("IsExperienceAdmin")]
+        [RequiresExperienceSupport]
         public void HandleIsExperienceAdminCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)
@@ -658,7 +811,21 @@ namespace SilverSim.Viewer.ExperienceTools
             Dictionary<string, object> reqdata = REST.ParseRESTFromRawUrl(httpreq.RawUrl);
             UUID experienceid = UUID.Parse((string)reqdata["experience_id"]);
 
-            bool isadmin = circuit.Scene.ExperienceService.Admins[experienceid, agent.Owner];
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            bool isadmin = experienceService.Admins[experienceid, agent.Owner];
             Map resdata = new Map();
             resdata.Add("status", isadmin);
             using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
@@ -700,6 +867,7 @@ namespace SilverSim.Viewer.ExperienceTools
          * response is identical to GET
          */
         [CapabilityHandler("RegionExperiences")]
+        [RequiresExperienceSupport]
         public void HandleRegionExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
             if (httpreq.CallerIP != circuit.RemoteIP)

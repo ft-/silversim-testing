@@ -38,7 +38,6 @@ namespace SilverSim.Database.Memory.Experience
 
         public override IExperiencePermissionsInterface Permissions => this;
         public override IExperienceAdminInterface Admins => this;
-        public override IExperienceKeyInterface KeyValueStore => this;
 
         public override ExperienceInfo this[UUID experienceID]
         {
@@ -97,6 +96,19 @@ namespace SilverSim.Database.Memory.Experience
             return res;
         }
 
+        public override List<UUID> GetOwnerExperiences(UUI creator)
+        {
+            List<UUID> res = new List<UUID>();
+            foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
+            {
+                if (kvp.Value.Owner.Equals(creator))
+                {
+                    res.Add(kvp.Key);
+                }
+            }
+            return res;
+        }
+
         public override List<UUID> GetGroupExperiences(UGI group)
         {
             List<UUID> res = new List<UUID>();
@@ -119,7 +131,6 @@ namespace SilverSim.Database.Memory.Experience
 
             bool f = m_Experiences.Remove(id);
             m_Perms.Remove(id);
-            m_KeyValues.Remove(id);
             m_Admins.Remove(id);
             return f;
         }

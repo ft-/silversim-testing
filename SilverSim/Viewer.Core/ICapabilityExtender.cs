@@ -37,6 +37,11 @@ namespace SilverSim.Viewer.Core
         // public delegate void CapabilityDelegate(ViewerAgent agent, AgentCircuit circuit, HttpRequest req);
     }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class RequiresExperienceSupportAttribute : Attribute
+    {
+    }
+
     public interface ICapabilityExtender : IProtocolExtender
     {
     }
