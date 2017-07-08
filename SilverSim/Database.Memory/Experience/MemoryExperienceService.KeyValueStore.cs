@@ -49,19 +49,27 @@ namespace SilverSim.Database.Memory.Experience
             m_KeyValues[experienceID].Add(key, value);
         }
 
-        bool IExperienceKeyInterface.Store(UUID experienceID, string key, string value)
+        void IExperienceKeyInterface.Store(UUID experienceID, string key, string value)
+        {
+            RwLockedDictionary<string, string> exp = m_KeyValues[experienceID];
+            lock (m_UpdateLock)
+            {
+                exp[key] = value;
+            }
+        }
+
+        bool IExperienceKeyInterface.StoreOnlyIfEqualOrig(UUID experienceID, string key, string value, string orig_value)
         {
             bool changed;
-            RwLockedDictionary<string, string> exp;
-            if(!m_KeyValues.TryGetValue(experienceID, out exp))
-            {
-                throw new KeyNotFoundException();
-            }
+            RwLockedDictionary<string, string> exp = m_KeyValues[experienceID];
             lock (m_UpdateLock)
             {
                 string ov;
-                changed = !exp.TryGetValue(key, out ov) || ov != value;
-                exp[key] = value;
+                changed = exp.TryGetValue(key, out ov) && ov == orig_value;
+                if (changed)
+                {
+                    exp[key] = value;
+                }
             }
 
             return changed;

@@ -63,7 +63,8 @@ namespace SilverSim.ServiceInterfaces.Experience
             bool TryGetValue(UUID experienceID, string key, out string val);
             bool Remove(UUID experienceID, string key);
             void Add(UUID experienceID, string key, string value);
-            bool Store(UUID experienceID, string key, string value);
+            void Store(UUID experienceID, string key, string value);
+            bool StoreOnlyIfEqualOrig(UUID experienceID, string key, string value, string orig_value);
         }
 
         public abstract IExperienceKeyInterface KeyValueStore { get; }
