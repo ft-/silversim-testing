@@ -23,7 +23,7 @@ using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
-    public struct ExperiencePermissionsDeniedEvent
+    public struct ExperiencePermissionsDeniedEvent : IScriptEvent
     {
         public UUI AgentId;
         public int Reason;
