@@ -93,7 +93,8 @@ namespace SilverSim.Scene.Types.Scene
 
     public interface IParcelExperienceList
     {
-        bool this[UUID regionID, UUID parcelID, UUID experienceID] { get; }
+        ParcelExperienceEntry this[UUID regionID, UUID parcelID, UUID experienceID] { get; }
+        bool TryGetValue(UUID regionID, UUID parcelID, UUID experienceID, out ParcelExperienceEntry entry);
         List<ParcelExperienceEntry> this[UUID regionID, UUID parcelID] { get; }
         void Store(ParcelExperienceEntry entry);
         bool Remove(UUID regionID, UUID parcelID);
@@ -127,8 +128,7 @@ namespace SilverSim.Scene.Types.Scene
         IParcelAccessList WhiteList { get; }
         IParcelAccessList BlackList { get; }
 
-        IParcelExperienceList AllowedExperiences { get; }
-        IParcelExperienceList BlockedExperiences { get; }
+        IParcelExperienceList Experiences { get; }
     }
 
     public abstract partial class SceneInterface : IServerParamListener

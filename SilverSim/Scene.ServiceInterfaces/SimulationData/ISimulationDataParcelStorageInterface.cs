@@ -31,9 +31,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
         ISimulationDataParcelAccessListStorageInterface BlackList { get; }
 
-        ISimulationDataParcelExperienceListStorageInterface AllowedExperiences { get; }
-
-        ISimulationDataParcelExperienceListStorageInterface BlockedExperiences { get; }
+        ISimulationDataParcelExperienceListStorageInterface Experiences { get; }
 
         ParcelInfo this[UUID regionID, UUID parcelID] { get; }
         List<UUID> ParcelsInRegion(UUID key);

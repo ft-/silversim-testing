@@ -26,16 +26,17 @@ using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using SilverSim.Threading;
 using System.Linq;
+using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
-    public sealed class ParcelExperienceListStorage : ISimulationDataParcelExperienceListStorageInterface
+    public sealed partial class MemorySimulationDataStorage : ISimulationDataParcelExperienceListStorageInterface
     {
         private readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, ParcelExperienceEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, ParcelExperienceEntry>>(() => new RwLockedDictionary<UUID, ParcelExperienceEntry>());
 
         private string GenParcelAccessListKey(UUID regionID, UUID parcelID) => regionID.ToString() + ":" + parcelID.ToString();
 
-        public List<ParcelExperienceEntry> this[UUID regionID, UUID parcelID]
+        List<ParcelExperienceEntry> IParcelExperienceList.this[UUID regionID, UUID parcelID]
         {
             get
             {
@@ -46,25 +47,43 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        public bool this[UUID regionID, UUID parcelID, UUID experienceID]
+        ParcelExperienceEntry IParcelExperienceList.this[UUID regionID, UUID parcelID, UUID experienceID]
         {
             get
             {
                 RwLockedDictionary<UUID, ParcelExperienceEntry> list;
-                return m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list) && list.ContainsKey(experienceID);
+                ParcelExperienceEntry ret;
+                if(!m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list) || !list.TryGetValue(experienceID, out ret))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return new ParcelExperienceEntry(ret);
             }
         }
 
-        public bool Remove(UUID regionID, UUID parcelID) => 
+        bool IParcelExperienceList.TryGetValue(UUID regionID, UUID parcelID, UUID experienceID, out ParcelExperienceEntry entry)
+        {
+            RwLockedDictionary<UUID, ParcelExperienceEntry> list;
+            ParcelExperienceEntry ret;
+            if (m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list) && list.TryGetValue(experienceID, out ret))
+            {
+                entry = new ParcelExperienceEntry(ret);
+                return true;
+            }
+            entry = default(ParcelExperienceEntry);
+            return false;
+        }
+
+        bool IParcelExperienceList.Remove(UUID regionID, UUID parcelID) => 
             m_Data.Remove(GenParcelAccessListKey(regionID, parcelID));
 
-        public bool Remove(UUID regionID, UUID parcelID, UUID experienceID)
+        bool IParcelExperienceList.Remove(UUID regionID, UUID parcelID, UUID experienceID)
         {
             RwLockedDictionary<UUID, ParcelExperienceEntry> list;
             return m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list) && list.Remove(experienceID);
         }
 
-        public bool RemoveAllFromRegion(UUID regionID)
+        bool ISimulationDataParcelExperienceListStorageInterface.RemoveAllFromRegion(UUID regionID)
         {
             bool found = false;
             foreach (var key in new List<string>(from key in m_Data.Keys where key.StartsWith(regionID.ToString()) select key))

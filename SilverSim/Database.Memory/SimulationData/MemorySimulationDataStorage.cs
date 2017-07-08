@@ -75,8 +75,7 @@ namespace SilverSim.Database.Memory.SimulationData
             Spawnpoints.Remove(regionID);
             EnvironmentSettings.Remove(regionID);
             RemoveAllObjectsInRegion(regionID);
-            Parcels.AllowedExperiences.RemoveAllFromRegion(regionID);
-            Parcels.BlockedExperiences.RemoveAllFromRegion(regionID);
+            Parcels.Experiences.RemoveAllFromRegion(regionID);
         }
     }
     #endregion

@@ -143,9 +143,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
             public IParcelAccessList BlackList => m_Scene.m_SimulationDataStorage.Parcels.BlackList;
 
-            public IParcelExperienceList AllowedExperiences => m_Scene.m_SimulationDataStorage.Parcels.AllowedExperiences;
-
-            public IParcelExperienceList BlockedExperiences => m_Scene.m_SimulationDataStorage.Parcels.BlockedExperiences;
+            public IParcelExperienceList Experiences => m_Scene.m_SimulationDataStorage.Parcels.Experiences;
 
             public ParcelInfo this[UUID id] => m_Scene.m_Parcels[id];
 
