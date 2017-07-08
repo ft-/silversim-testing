@@ -38,6 +38,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override IExperiencePermissionsInterface Permissions => this;
         public override IExperienceAdminInterface Admins => this;
+        public override IExperienceKeyInterface KeyValueStore => this;
 
         public override ExperienceInfo this[UUID experienceID]
         {
@@ -131,6 +132,7 @@ namespace SilverSim.Database.Memory.Experience
 
             bool f = m_Experiences.Remove(id);
             m_Perms.Remove(id);
+            m_KeyValues.Remove(id);
             m_Admins.Remove(id);
             return f;
         }
