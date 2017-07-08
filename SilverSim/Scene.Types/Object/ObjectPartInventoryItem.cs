@@ -151,7 +151,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Perms Granting
-        public UUID m_ExperienceID = UUID.Zero;
+        private UUID m_ExperienceID = UUID.Zero;
 
         public UUID ExperienceID
         {
