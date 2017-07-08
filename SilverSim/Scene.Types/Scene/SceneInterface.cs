@@ -31,6 +31,7 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -154,6 +155,7 @@ namespace SilverSim.Scene.Types.Scene
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
         public EstateServiceInterface EstateService { get; protected set; }
+        public ExperienceServiceInterface ExperienceService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
         private readonly NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }

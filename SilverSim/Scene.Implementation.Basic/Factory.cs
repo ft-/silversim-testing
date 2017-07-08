@@ -34,6 +34,7 @@ using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
@@ -66,6 +67,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private readonly string m_NeighborServiceName;
         private readonly string m_WindModelFactoryName;
         private readonly string m_PathfindingServiceFactoryName;
+        private readonly string m_ExperienceServiceName;
         private readonly List<string> m_AvatarNameServiceNames = new List<string>();
 
         internal GroupsNameServiceInterface GroupsNameService { get; private set; }
@@ -88,6 +90,7 @@ namespace SilverSim.Scene.Implementation.Basic
         internal List<IPortControlServiceInterface> PortControlServices { get; private set; }
         internal IWindModelFactory WindModelFactory { get; private set; }
         internal IPathfindingServiceFactory PathfindingServiceFactory { get; private set; }
+        internal ExperienceServiceInterface ExperienceService { get; private set; }
 
         internal List<IUserAgentServicePlugin> UserAgentServicePlugins { get; private set; }
         internal List<IAssetServicePlugin> AssetServicePlugins { get; private set; }
@@ -109,6 +112,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_NeighborServiceName = ownConfig.GetString("NeighborService", "NeighborService");
             m_WindModelFactoryName = ownConfig.GetString("WindPlugin", string.Empty);
             m_PathfindingServiceFactoryName = ownConfig.GetString("PathfindingPlugin", string.Empty);
+            m_ExperienceServiceName = ownConfig.GetString("ExperienceService", string.Empty);
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
             if (!string.IsNullOrEmpty(avatarNameServices))
             {
@@ -159,6 +163,10 @@ namespace SilverSim.Scene.Implementation.Basic
             if (m_NeighborServiceName.Length != 0)
             {
                 NeighborService = loader.GetService<NeighborServiceInterface>(m_NeighborServiceName);
+            }
+            if(m_ExperienceServiceName.Length != 0)
+            {
+                ExperienceService = loader.GetService<ExperienceServiceInterface>(m_ExperienceServiceName);
             }
             AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);

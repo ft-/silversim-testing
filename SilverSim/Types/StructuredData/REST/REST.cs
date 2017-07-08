@@ -29,13 +29,27 @@ namespace SilverSim.Types.StructuredData.REST
     {
         public static Dictionary<string, object> ParseREST(Stream input)
         {
-            var result = new Dictionary<string, object>();
-
             string body;
             using (var sr = new StreamReader(input))
             {
-                 body = sr.ReadToEnd().Trim();
+                body = sr.ReadToEnd().Trim();
             }
+            return ParseRESTFromString(body);
+        }
+
+        public static Dictionary<string, object> ParseRESTFromRawUrl(string url)
+        {
+            string[] parts = url.Split(new char[] { '?' }, 2);
+            if(parts.Length < 2)
+            {
+                return new Dictionary<string, object>();
+            }
+            return ParseRESTFromString(parts[1]);
+        }
+
+        public static Dictionary<string, object> ParseRESTFromString(string body)
+        {
+            var result = new Dictionary<string, object>();
             var queryterms = body.Split('&');
 
             if (queryterms.Length == 0)

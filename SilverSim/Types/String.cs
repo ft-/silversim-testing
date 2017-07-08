@@ -105,6 +105,8 @@ namespace SilverSim.Types
         public static explicit operator double(AString v) => double.Parse(v.m_Value.Trim(), CultureInfo.InvariantCulture);
 
         public static explicit operator Vector3(AString v) => new Vector3((double)v);
+
+        public static explicit operator AString(string s) => new AString(s);
         #endregion Operators
 
         public static AString Format(string format, object arg0) => new AString(string.Format(format, arg0));

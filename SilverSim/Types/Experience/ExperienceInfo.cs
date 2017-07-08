@@ -19,22 +19,81 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
+using SilverSim.Types.Grid;
 using SilverSim.Types.Script;
+using SilverSim.Types.StructuredData.Llsd;
+using System;
+using System.IO;
 
 namespace SilverSim.Types.Experience
 {
-    public struct ExperiencePermissionsInfo
+    [Flags]
+    public enum ExperiencePropertyFlags
     {
-        public UUID ID;
-        public UUI Agent;
-
-        public ScriptPermissions Permissions;
+        None = 0,
+        Invalid = 1 << 0,
+        Privileged = 1 << 3,
+        Grid = 1 << 4,
+        Private = 1 << 5,
+        Disabled = 1 << 6,
+        Suspended = 1 << 7
     }
 
-    public struct ExperienceInfo
+    public class ExperienceInfo
     {
-        public UUID ID;
-        public string Name;
+        public UUID ID = UUID.Zero;
+        public string Name = string.Empty;
+        public string Description = string.Empty;
+        public ExperiencePropertyFlags Properties = ExperiencePropertyFlags.None;
+        public UUI Creator = UUI.Unknown;
+        public UGI Group = UGI.Unknown;
+        public RegionAccess Maturity;
+        public string Marketplace = string.Empty;
+        public UUID LogoID = UUID.Zero;
+        public string SlUrl = string.Empty;
+
+        public string ExtendedMetadata
+        {
+            get
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    LlsdXml.Serialize(new Map
+                    {
+                        ["marketplace"] = (AString)Marketplace,
+                        ["logo"] = LogoID
+                    }, ms);
+                    return ms.ToArray().FromUTF8Bytes();
+                }
+            }
+            set
+            {
+                using (MemoryStream ms = new MemoryStream(value.ToUTF8Bytes()))
+                {
+                    IValue iv;
+                    Map m = (Map)LlsdXml.Deserialize(ms);
+                    Marketplace = m.TryGetValue("marketplace", out iv) ? iv.ToString() : string.Empty;
+                    m.TryGetValue("logo", out LogoID);
+                }
+            }
+        }
+
+        public ExperienceInfo()
+        {
+        }
+
+        public ExperienceInfo(ExperienceInfo info)
+        {
+            ID = info.ID;
+            Name = info.Name;
+            Description = info.Description;
+            Properties = info.Properties;
+            Creator = new UUI(info.Creator);
+            Group = new UGI(info.Group);
+            Maturity = info.Maturity;
+            Marketplace = info.Marketplace;
+            LogoID = info.LogoID;
+            SlUrl = info.SlUrl;
+        }
     }
 }

@@ -413,6 +413,7 @@ namespace SilverSim.Scene.Implementation.Basic
             PersistentAssetService = sceneParams.AssetService;
             TemporaryAssetService = sceneParams.AssetCacheService;
             GridService = sceneParams.GridService;
+            ExperienceService = sceneParams.ExperienceService;
             EstateService = sceneParams.EstateService;
             /* next line is there to break the circular dependencies */
             TryGetScene = m_Scenes.TryGetValue;

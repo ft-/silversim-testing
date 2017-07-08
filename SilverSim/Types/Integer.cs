@@ -88,6 +88,8 @@ namespace SilverSim.Types
         public static bool operator >=(Integer a, Integer b) => a.m_Value >= b.m_Value;
 
         public override int GetHashCode() => m_Value;
+
+        public static explicit operator Integer(int v) => new Integer(v);
         #endregion Operators
 
         public static Integer Parse(string v)

@@ -21,33 +21,49 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Experience;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Experience
 {
     public abstract class ExperienceServiceInterface
     {
-        public interface IExperienceInterface
-        {
-            ExperienceInfo this[UUID experienceID] { get; set; }
-            bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo);
-        }
+        public abstract ExperienceInfo this[UUID experienceID] { get; }
+        public abstract bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo);
+        public abstract void Add(ExperienceInfo info);
+        public abstract void Update(UUI requestingAgent, ExperienceInfo info);
+        public abstract bool Remove(UUI requestingAgent, UUID id);
 
-        public abstract IExperienceInterface Experiences { get; }
+        public abstract List<UUID> GetGroupExperiences(UGI group);
+        public abstract List<UUID> GetCreatorExperiences(UUI creator);
+        public abstract List<UUID> FindExperienceByName(string query);
+        public abstract List<ExperienceInfo> FindExperienceInfoByName(string query);
 
         public interface IExperiencePermissionsInterface
         {
-            ExperiencePermissionsInfo this[UUID experienceID, UUI agent] { get; set; }
-            bool TryGetValue(UUID experienceID, UUI agent, out ExperiencePermissionsInfo expPermInfo);
+            bool this[UUID experienceID, UUI agent] { get; set; }
+            bool TryGetValue(UUID experienceID, UUI agent, out bool allowed);
+            bool Remove(UUID experienceID, UUI agent);
+            Dictionary<UUID, bool> this[UUI agent] { get; }
         }
 
-        public abstract IExperiencePermissionsInterface ExperiencePermissions { get; }
+        public abstract IExperiencePermissionsInterface Permissions { get; }
+
+        public interface IExperienceAdminInterface
+        {
+            bool this[UUID experienceID, UUI agent] { get; set; }
+            bool TryGetValue(UUID experienceID, UUI agent, out bool allowed);
+            List<UUID> this[UUI agent] { get; }
+        }
+
+        public abstract IExperienceAdminInterface Admins { get; }
 
         public interface IExperienceKeyInterface
         {
             string this[UUID experienceID, string key] { get; set; }
             bool TryGetValue(UUID experienceID, string key, out string val);
+            bool Remove(UUID experienceID, string key);
         }
 
-        public abstract IExperienceKeyInterface Keys { get; }
+        public abstract IExperienceKeyInterface KeyValueStore { get; }
     }
 }

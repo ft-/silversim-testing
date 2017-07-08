@@ -39,6 +39,7 @@ using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
@@ -353,6 +354,7 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(FriendsServiceInterface)] = "Friends Service";
             FeaturesTable[typeof(IAssetReferenceInfoServiceInterface)] = "Asset referencing information";
             FeaturesTable[typeof(IAssetPurgeServiceInterface)] = "Asset purging service";
+            FeaturesTable[typeof(ExperienceServiceInterface)] = "Experience Service";
 
             FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
             FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";

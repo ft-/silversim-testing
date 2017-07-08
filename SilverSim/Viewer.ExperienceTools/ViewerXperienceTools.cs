@@ -23,11 +23,16 @@ using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.Types;
+using SilverSim.Types.Experience;
 using SilverSim.Types.StructuredData.Llsd;
+using SilverSim.Types.StructuredData.REST;
 using SilverSim.Viewer.Core;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.ExperienceTools
@@ -89,7 +94,7 @@ namespace SilverSim.Viewer.ExperienceTools
             Map res = new Map();
             ObjectPart part;
             ObjectPartInventoryItem item;
-            if(scene.Primitives.TryGetValue(objectid, out part) &&
+            if (scene.Primitives.TryGetValue(objectid, out part) &&
                 part.Inventory.TryGetValue(itemid, out item))
             {
                 UUID id = item.ExperienceID;
@@ -105,17 +110,678 @@ namespace SilverSim.Viewer.ExperienceTools
             }
         }
 
-        /* GetExperiences */
-        /* AgentExperiences */
-        /* FindExperienceByName */
-        /* GetExperienceInfo */
-        /* GetAdminExperiences */
-        /* GetCreatorExperiences */
-        /* ExperiencePreferences */
-        /* GroupExperiences */
-        /* UpdateExperience */
-        /* IsExperienceAdmin */
-        /* IsExperienceContributor */
-        /* RegionExperiences */
+        private void GetExperiencesResponse(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
+        {
+            Dictionary<UUID, bool> result = circuit.Scene.ExperienceService.Permissions[agent.Owner];
+            var resdata = new Map();
+            var allowed = new AnArray();
+            var blocked = new AnArray();
+            resdata.Add("experiences", allowed);
+            resdata.Add("blocked", blocked);
+
+            foreach (KeyValuePair<UUID, bool> kvp in result)
+            {
+                if (kvp.Value)
+                {
+                    allowed.Add(kvp.Key);
+                }
+                else
+                {
+                    blocked.Add(kvp.Key);
+                }
+            }
+
+            using (var res = req.BeginResponse())
+            {
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, s);
+                }
+            }
+        }
+
+        /* GetExperiences - GET
+         * <llsd>
+         *   <map>
+         *     <key>experiences</key>
+         *     <array><uuid>xxx</uuid></array>
+         *     <key>blocked</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         */
+        [CapabilityHandler("GetExperiences")]
+        public void HandleGetExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            GetExperiencesResponse(agent, circuit, httpreq);
+        }
+
+        /* AgentExperiences 
+         * GET:
+         * <llsd>
+         *   <map>
+         *     <key>experience_ids</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         * POST:
+         * with empty <llsd> - response identical
+         */
+
+        /* FindExperienceByName
+         * GET ?page=" << mCurrentPage << "&page_size=30&query=" << LLURI::escape(text)
+         * 
+         * <llsd>
+         *   <map>
+         *     <key>experience_keys</key>
+         *     <array>
+         *       <map>
+         *         ExperienceInfo
+         *       </map>
+         *     </array>
+         *   </map>
+         * </llsd>
+         */
+        [CapabilityHandler("FindExperienceByName")]
+        public void HandleFindExperienceByNameCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            Dictionary<string, object> reqdata = REST.ParseRESTFromRawUrl(httpreq.RawUrl);
+            int currentpage;
+            int pagesize;
+
+            object o;
+            if(!reqdata.TryGetValue("page", out o) || int.TryParse(o.ToString(), out currentpage))
+            {
+                currentpage = 1;
+            }
+            if (!reqdata.TryGetValue("page_size", out o) || int.TryParse(o.ToString(), out pagesize))
+            {
+                pagesize = 30;
+            }
+            if(!reqdata.TryGetValue("query", out o))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            string query = o.ToString();
+
+            List<ExperienceInfo> experienceinfos = circuit.Scene.ExperienceService.FindExperienceInfoByName(query);
+
+            Map resdata = new Map();
+            AnArray result = new AnArray();
+            resdata.Add("experience_keys", result);
+            foreach(ExperienceInfo info in experienceinfos)
+            {
+                result.Add(info.ToMap());
+            }
+
+            using (var res = httpreq.BeginResponse())
+            {
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, s);
+                }
+            }
+        }
+
+        /* GetExperienceInfo 
+         * GET url  id?public_id=<id>&public_id=<id>
+         * 
+         * <llsd>
+         *   <map>
+         *     <key>experience_keys</key>
+         *     <array>
+         *        <map>
+         *          ExperienceInfo
+         *        </map>
+         *     </array>
+         *     <key>error_ids</key>
+         *     <array>
+         *       <uuid>xxx</uuid>
+         *     </array>
+         *   </map>
+         * </llsd>
+         */
+        [CapabilityHandler("GetExperienceInfo")]
+        public void HandleGetExperienceInfoCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            var parts = httpreq.RawUrl.Split('?');
+            if (parts.Length < 2)
+            {
+                m_Log.WarnFormat("Invalid GetExperienceInfo request: {0}", httpreq.RawUrl);
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                return;
+            }
+
+            var reqs = parts[1].Split('&');
+            var uuids = new List<UUID>();
+
+            Map resdata = new Map();
+            AnArray infos = new AnArray();
+            var baduuids = new AnArray();
+            resdata.Add("error_ids", baduuids);
+            resdata.Add("experience_keys", infos);
+
+            foreach (var req in reqs)
+            {
+                var p = req.Split('=');
+                if (p.Length == 2)
+                {
+                    if (p[0] == "public_id")
+                    {
+                        try
+                        {
+                            UUID uuid = p[1];
+                            if (!uuids.Contains(uuid))
+                            {
+                                uuids.Add(uuid);
+                            }
+                        }
+                        catch
+                        {
+                            baduuids.Add(p[1]);
+                        }
+                    }
+                }
+            }
+
+            ExperienceServiceInterface experienceService = circuit.Scene.ExperienceService;
+            foreach (UUID id in uuids)
+            {
+                ExperienceInfo info;
+                try
+                {
+                    info = experienceService[id];
+                }
+                catch
+                {
+                    baduuids.Add(id);
+                    continue;
+                }
+                infos.Add(info.ToMap());
+            }
+
+            using (var res = httpreq.BeginResponse())
+            {
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, s);
+                }
+            }
+        }
+
+        /* GetAdminExperiences 
+         * GET:
+         * <llsd>
+         *   <map>
+         *     <key>experience_ids</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         */
+
+        [CapabilityHandler("GetAdminExperiences")]
+        public void HandleGetAdminExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            List<UUID> experienceids = circuit.Scene.ExperienceService.Admins[agent.Owner];
+            var ids = new AnArray();
+            foreach (UUID id in experienceids)
+            {
+                ids.Add(id);
+            }
+            Map resdata = new Map()
+            {
+                ["experience_ids"] = ids
+            };
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, o);
+                }
+            }
+        }
+
+        /* GetCreatorExperiences 
+         * GET:
+         * <llsd>
+         *   <map>
+         *     <key>experience_ids</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         */
+        [CapabilityHandler("GetCreatorExperiences")]
+        public void HandleGetCreatorExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            List<UUID> experienceids = circuit.Scene.ExperienceService.GetCreatorExperiences(agent.Owner);
+            var ids = new AnArray();
+            foreach (UUID id in experienceids)
+            {
+                ids.Add(id);
+            }
+            Map resdata = new Map()
+            {
+                ["experience_ids"] = ids
+            };
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, o);
+                }
+            }
+        }
+
+        /* ExperiencePreferences 
+         * PUT:
+         * <llsd>
+         *   <map>
+         *     <key>__uuid__</key>
+         *     <map>
+         *       <key>permission</key>
+         *       <string>Allow</string>
+         *     </map>
+         *   </map>
+         * </llsd>
+         * 
+         * <llsd>
+         *   <map>
+         *     <key>__uuid__</key>
+         *     <map>
+         *       <key>permission</key>
+         *       <string>Block</string>
+         *     </map>
+         *   </map>
+         * </llsd>
+         * 
+         * response:
+         * <llsd>
+         *   <map>
+         *     <key>experiences</key>
+         *     <array><uuid>xxx</uuid></array>
+         *     <key>blocked</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         * 
+         * DELETE ?<experience_id>
+         * 
+         * response:
+         * <llsd>
+         *   <map>
+         *     <key>experiences</key>
+         *     <array><uuid>xxx</uuid></array>
+         *     <key>blocked</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         * 
+         */
+
+        [CapabilityHandler("ExperiencePreferences")]
+        public void HandleExperiencePerferencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+
+            switch(httpreq.Method)
+            {
+                case "PUT":
+                    HandleExperiencePreferencesPut(agent, circuit, httpreq);
+                    break;
+
+                case "DELETE":
+                    HandleExperiencePreferencesDelete(agent, circuit, httpreq);
+                    break;
+
+                default:
+                    httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                    return;
+            }
+
+            GetExperiencesResponse(agent, circuit, httpreq);
+        }
+
+        private void HandleExperiencePreferencesPut(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            Map reqdata;
+
+            using (Stream input = httpreq.Body)
+            {
+                reqdata = LlsdXml.Deserialize(input) as Map;
+            }
+
+            if(reqdata == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = circuit.Scene.ExperienceService;
+            foreach(KeyValuePair<string, IValue> kvp in reqdata)
+            {
+                Map entry = kvp.Value as Map;
+                IValue iv;
+                UUID experienceid;
+                if(!UUID.TryParse(kvp.Key, out experienceid) || entry == null || !entry.TryGetValue("permissions", out iv))
+                {
+                    continue;
+                }
+
+                switch(iv.ToString())
+                {
+                    case "Allow":
+                        experienceService.Permissions[experienceid, agent.Owner] = true;
+                        break;
+
+                    case "Block":
+                        experienceService.Permissions[experienceid, agent.Owner] = false;
+                        break;
+                }
+            }
+        }
+
+        private void HandleExperiencePreferencesDelete(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            string[] parts = httpreq.RawUrl.Split('?');
+            UUID id;
+            if(parts.Length < 2 || !UUID.TryParse(parts[1], out id))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            circuit.Scene.ExperienceService.Permissions.Remove(id, agent.Owner);
+        }
+
+        /* GroupExperiences 
+         * GET:
+         * <llsd>
+         *   <map>
+         *     <key>experience_ids</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         */
+        [CapabilityHandler("GroupExperiences")]
+        public void HandleGroupExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            List<UUID> experienceids = circuit.Scene.ExperienceService.GetGroupExperiences(agent.Group);
+            var ids = new AnArray();
+            foreach (UUID id in experienceids)
+            {
+                ids.Add(id);
+            }
+            Map resdata = new Map()
+            {
+                ["experience_ids"] = ids
+            };
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, o);
+                }
+            }
+        }
+
+        /* UpdateExperience
+         * POST
+         * <llsd>
+         *   <map>
+         *     <key>public_id</key><uuid></uuid>
+         *     <key>group_id</key><uuid></uuid>
+         *     <key>name</key><string></string>
+         *     <key>properties</key><xx/>
+         *     <key>description</key><string></string>
+         *     <key>maturity</key><integer></integer>
+         *     <key>extended_metadata</key><xx/>
+         *     <key>slurl</key><url></url>
+         *   </map>
+         * </llsd>
+         * 
+         * response on error:
+         * <llsd>
+         *   <map>
+         *     <key>removed</key>
+         *     <array>
+         *       <map>
+         *         <key>error-tag</key><string></string>
+         *       </map>
+         *     </array>
+         *   </map>
+         * </llsd>
+         * 
+         * response on success:
+         * <llsd>
+         *   <map>
+         *     <key>experience_keys</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         */
+        /* IsExperienceAdmin 
+         * GET ?experience_id=<experienceid>
+         * 
+         * <llsd>
+         *   <map>
+         *     <key>status</key>
+         *     <boolean></boolean>
+         *   </map>
+         * </llsd>
+         */
+        [CapabilityHandler("IsExperienceAdmin")]
+        public void HandleIsExperienceAdminCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            Dictionary<string, object> reqdata = REST.ParseRESTFromRawUrl(httpreq.RawUrl);
+            UUID experienceid = UUID.Parse((string)reqdata["experience_id"]);
+
+            bool isadmin = circuit.Scene.ExperienceService.Admins[experienceid, agent.Owner];
+            Map resdata = new Map();
+            resdata.Add("status", isadmin);
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, o);
+                }
+            }
+        }
+
+        /* IsExperienceContributor - purpose unknown */
+
+        /* RegionExperiences
+         * GET:
+         * <llsd>
+         *   <map>
+         *     <key>allowed</key>
+         *     <array><uuid>xxx</uuid></array>
+         *     <key>blocked</key>
+         *     <array><uuid>xxx</uuid></array>
+         *     <key>trusted</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         * 
+         * POST:
+         * <llsd>
+         *   <map>
+         *     <key>allowed</key>
+         *     <array><uuid>xxx</uuid></array>
+         *     <key>blocked</key>
+         *     <array><uuid>xxx</uuid></array>
+         *     <key>trusted</key>
+         *     <array><uuid>xxx</uuid></array>
+         *   </map>
+         * </llsd>
+         * 
+         * response is identical to GET
+         */
+        [CapabilityHandler("RegionExperiences")]
+        public void HandleRegionExperiencesCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            switch(httpreq.Method)
+            {
+                case "GET":
+                    HandleRegionExperiencesGet(agent, circuit, httpreq);
+                    break;
+
+                case "POST":
+                    HandleRegionExperiencesPost(agent, circuit, httpreq);
+                    break;
+
+                default:
+                    httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                    return;
+            }
+        }
+
+        private void HandleRegionExperiencesGet(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            List<UUID> allowed = new List<UUID>();
+            List<UUID> blocked = new List<UUID>();
+            List<UUID> trusted = new List<UUID>();
+
+            Map resdata = new Map();
+            AnArray array = new AnArray();
+            foreach(UUID id in allowed)
+            {
+                array.Add(id);
+            }
+            resdata.Add("allowed", array);
+            array = new AnArray();
+            foreach (UUID id in blocked)
+            {
+                array.Add(id);
+            }
+            resdata.Add("blocked", array);
+            array = new AnArray();
+            foreach (UUID id in trusted)
+            {
+                array.Add(id);
+            }
+            resdata.Add("trusted", array);
+
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, o);
+                }
+            }
+        }
+
+        private void HandleRegionExperiencesPost(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            Map reqmap;
+
+            using (Stream s = httpreq.Body)
+            {
+                reqmap = LlsdXml.Deserialize(s) as Map;
+            }
+
+            if(reqmap == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            /* process map */
+
+            HandleRegionExperiencesGet(agent, circuit, httpreq);
+        }
+
+        /* EstateOwnerMessage - estateexperiencedelta
+         * param[0] => agentid
+         * param[1] => flags
+         * param[2] => experience_id
+         */
     }
 }
