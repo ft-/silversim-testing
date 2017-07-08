@@ -28,24 +28,8 @@ namespace SilverSim.Database.Memory.Experience
 {
     public sealed partial class MemoryExperienceService : ExperienceServiceInterface.IExperienceKeyInterface
     {
+        private readonly object m_UpdateLock = new object();
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_KeyValues = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(() => new RwLockedDictionary<string, string>());
-
-        string IExperienceKeyInterface.this[UUID experienceID, string key]
-        {
-            get
-            {
-                string ret;
-                if(!KeyValueStore.TryGetValue(experienceID, key, out ret))
-                {
-                    throw new KeyNotFoundException(key);
-                }
-                return ret;
-            }
-            set
-            {
-                m_KeyValues[experienceID][key] = value;
-            }
-        }
 
         bool IExperienceKeyInterface.Remove(UUID experienceID, string key)
         {
@@ -59,5 +43,28 @@ namespace SilverSim.Database.Memory.Experience
             val = string.Empty;
             return m_KeyValues.TryGetValue(experienceID, out exp) && exp.TryGetValue(key, out val);
         }
+
+        void IExperienceKeyInterface.Add(UUID experienceID, string key, string value)
+        {
+            m_KeyValues[experienceID].Add(key, value);
+        }
+
+        void IExperienceKeyInterface.Update(UUID experienceID, string key, string value)
+        {
+            RwLockedDictionary<string, string> exp;
+            if(!m_KeyValues.TryGetValue(experienceID, out exp))
+            {
+                throw new KeyNotFoundException();
+            }
+            lock (m_UpdateLock)
+            {
+                if(!exp.ContainsKey(key))
+                {
+                    throw new KeyNotFoundException();
+                }
+                exp[key] = value;
+            }
+        }
+
     }
 }

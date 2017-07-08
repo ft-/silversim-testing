@@ -60,9 +60,10 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         public interface IExperienceKeyInterface
         {
-            string this[UUID experienceID, string key] { get; set; }
             bool TryGetValue(UUID experienceID, string key, out string val);
             bool Remove(UUID experienceID, string key);
+            void Add(UUID experienceID, string key, string value);
+            void Update(UUID experienceID, string key, string value);
         }
 
         public abstract IExperienceKeyInterface KeyValueStore { get; }
