@@ -90,6 +90,15 @@ namespace SilverSim.Scene.Types.Scene
         bool Remove(UUID regionID, UUID parcelID, UUI accessor);
     }
 
+    public interface IParcelExperienceList
+    {
+        bool this[UUID regionID, UUID parcelID, UUID experienceID] { get; }
+        List<ParcelExperienceEntry> this[UUID regionID, UUID parcelID] { get; }
+        void Store(ParcelExperienceEntry entry);
+        bool Remove(UUID regionID, UUID parcelID);
+        bool Remove(UUID regionID, UUID parcelID, UUID experienceID);
+    }
+
     public interface ISceneParcels : IEnumerable<ParcelInfo>
     {
         ParcelInfo this[UUID id] { get; }
@@ -107,6 +116,9 @@ namespace SilverSim.Scene.Types.Scene
 
         IParcelAccessList WhiteList { get; }
         IParcelAccessList BlackList { get; }
+
+        IParcelExperienceList AllowedExperiences { get; }
+        IParcelExperienceList BlockedExperiences { get; }
     }
 
     public abstract partial class SceneInterface : IServerParamListener

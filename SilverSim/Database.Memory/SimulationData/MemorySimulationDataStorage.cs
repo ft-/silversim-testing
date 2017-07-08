@@ -60,6 +60,8 @@ namespace SilverSim.Database.Memory.SimulationData
         public override ISimulationDataTerrainStorageInterface Terrains => this;
 
         public override ISimulationDataRegionSettingsStorageInterface RegionSettings => this;
+
+        public override ISimulationDataRegionExperiencesStorageInterface RegionExperiences => this;
         #endregion
 
         public override void RemoveRegion(UUID regionID)
@@ -73,6 +75,8 @@ namespace SilverSim.Database.Memory.SimulationData
             Spawnpoints.Remove(regionID);
             EnvironmentSettings.Remove(regionID);
             RemoveAllObjectsInRegion(regionID);
+            Parcels.AllowedExperiences.RemoveAllFromRegion(regionID);
+            Parcels.BlockedExperiences.RemoveAllFromRegion(regionID);
         }
     }
     #endregion

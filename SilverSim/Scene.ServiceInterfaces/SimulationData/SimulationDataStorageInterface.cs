@@ -52,6 +52,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
         public abstract ISimulationDataEnvSettingsStorageInterface EnvironmentSettings { get; }
 
+        public abstract ISimulationDataRegionExperiencesStorageInterface RegionExperiences { get; }
+
         public abstract void RemoveRegion(UUID regionID);
 
         public abstract class SceneListener : ISceneListener

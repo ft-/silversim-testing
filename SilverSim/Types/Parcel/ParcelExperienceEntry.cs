@@ -19,27 +19,23 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
-using SilverSim.Types.Parcel;
-using System.Collections.Generic;
-
-namespace SilverSim.Scene.ServiceInterfaces.SimulationData
+namespace SilverSim.Types.Parcel
 {
-    public interface ISimulationDataParcelStorageInterface
+    public class ParcelExperienceEntry
     {
-        ISimulationDataParcelAccessListStorageInterface WhiteList { get; }
+        public UUID RegionID;
+        public UUID ParcelID;
+        public UUID ExperienceID;
 
-        ISimulationDataParcelAccessListStorageInterface BlackList { get; }
+        public ParcelExperienceEntry()
+        {
+        }
 
-        ISimulationDataParcelExperienceListStorageInterface AllowedExperiences { get; }
-
-        ISimulationDataParcelExperienceListStorageInterface BlockedExperiences { get; }
-
-        ParcelInfo this[UUID regionID, UUID parcelID] { get; }
-        List<UUID> ParcelsInRegion(UUID key);
-
-        void Store(UUID regionID, ParcelInfo parcel);
-
-        bool Remove(UUID regionID, UUID parcelID);
+        public ParcelExperienceEntry(ParcelExperienceEntry src)
+        {
+            RegionID = src.RegionID;
+            ParcelID = src.ParcelID;
+            ExperienceID = src.ExperienceID;
+        }
     }
 }

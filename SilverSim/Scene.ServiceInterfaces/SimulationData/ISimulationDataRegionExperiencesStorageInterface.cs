@@ -20,26 +20,18 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using SilverSim.Types.Parcel;
+using SilverSim.Types.Experience;
 using System.Collections.Generic;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
-    public interface ISimulationDataParcelStorageInterface
+    public interface ISimulationDataRegionExperiencesStorageInterface
     {
-        ISimulationDataParcelAccessListStorageInterface WhiteList { get; }
-
-        ISimulationDataParcelAccessListStorageInterface BlackList { get; }
-
-        ISimulationDataParcelExperienceListStorageInterface AllowedExperiences { get; }
-
-        ISimulationDataParcelExperienceListStorageInterface BlockedExperiences { get; }
-
-        ParcelInfo this[UUID regionID, UUID parcelID] { get; }
-        List<UUID> ParcelsInRegion(UUID key);
-
-        void Store(UUID regionID, ParcelInfo parcel);
-
-        bool Remove(UUID regionID, UUID parcelID);
+        RegionExperienceInfo this[UUID regionID, UUID experienceID] { get; }
+        bool TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info);
+        List<RegionExperienceInfo> this[UUID regionID] { get; }
+        void Store(RegionExperienceInfo info);
+        bool Remove(UUID regionID, UUID experienceID);
+        void RemoveRegion(UUID regionID);
     }
 }
