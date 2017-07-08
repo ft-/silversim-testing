@@ -81,5 +81,13 @@ namespace SilverSim.Database.Memory.Experience
 
             return m_KeyValues.TryGetValue(experienceID, out exp) ? new List<string>(exp.Keys) : new List<string>();
         }
+
+        bool IExperienceKeyInterface.GetDatasize(UUID experienceID, out int used, out int quota)
+        {
+            used = 0;
+            quota = 0;
+
+            return true;
+        }
     }
 }
