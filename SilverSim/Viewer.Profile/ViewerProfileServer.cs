@@ -150,7 +150,7 @@ namespace SilverSim.Viewer.Profile
                 }
 
                 Message m = req.Value;
-                SceneInterface scene = req.Key.Scene;
+                SceneInterface scene = req.Key?.Scene;
                 if(scene == null)
                 {
                     continue;

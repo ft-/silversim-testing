@@ -183,7 +183,7 @@ namespace SilverSim.Viewer.Groups
                 }
 
                 Message m = req.Value;
-                var scene = req.Key.Scene;
+                SceneInterface scene = req.Key?.Scene;
                 if (scene == null)
                 {
                     continue;

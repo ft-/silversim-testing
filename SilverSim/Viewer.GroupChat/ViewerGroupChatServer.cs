@@ -87,7 +87,7 @@ namespace SilverSim.Viewer.GroupChat
                     continue;
                 }
 
-                var groupsService = req.Key.GroupsService;
+                var groupsService = req.Key?.GroupsService;
 
                 if (groupsService == null)
                 {

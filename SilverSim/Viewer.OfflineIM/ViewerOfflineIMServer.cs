@@ -64,6 +64,11 @@ namespace SilverSim.Viewer.OfflineIM
 
                 Message m = req.Value;
 
+                if(req.Key == null)
+                {
+                    continue;
+                }
+
                 RetrieveInstantMessages imreq = (RetrieveInstantMessages)m;
                 if(imreq.SessionID != imreq.CircuitSessionID ||
                     imreq.AgentID != imreq.CircuitAgentID)

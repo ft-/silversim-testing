@@ -66,6 +66,11 @@ namespace SilverSim.Viewer.Economy
                     continue;
                 }
 
+                if(req.Key == null)
+                {
+                    continue;
+                }
+
                 var m = req.Value;
 
                 try

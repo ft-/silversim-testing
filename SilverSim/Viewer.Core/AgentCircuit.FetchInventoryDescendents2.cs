@@ -125,7 +125,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            using (var res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse("application/llsd+xml"))
             {
                 using (var text = res.GetOutputStream().UTF8XmlTextWriter())
                 {

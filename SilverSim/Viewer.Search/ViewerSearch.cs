@@ -78,6 +78,11 @@ namespace SilverSim.Viewer.Search
                     continue;
                 }
 
+                if(req.Key == null)
+                {
+                    continue;
+                }
+
                 Message m = req.Value;
 
                 try

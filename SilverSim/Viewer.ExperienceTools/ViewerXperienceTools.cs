@@ -133,7 +133,7 @@ namespace SilverSim.Viewer.ExperienceTools
                 }
             }
 
-            using (var res = req.BeginResponse())
+            using (var res = req.BeginResponse("application/llsd+xml"))
             {
                 using (Stream s = res.GetOutputStream())
                 {
@@ -190,7 +190,8 @@ namespace SilverSim.Viewer.ExperienceTools
                 httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;
             }
-            if (httpreq.Method != "GET")
+
+            if (httpreq.Method != "GET" && httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
@@ -210,6 +211,18 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
+            if (httpreq.Method == "POST")
+            {
+                ExperienceInfo info = new ExperienceInfo
+                {
+                    ID = UUID.Random,
+                    Name = "New Experience",
+                    Owner = agent.Owner,
+                    Creator = agent.Owner,
+                };
+                experienceService.Add(info);
+            }
+
             List<UUID> experienceids = experienceService.GetOwnerExperiences(agent.Owner);
             var ids = new AnArray();
             foreach (UUID id in experienceids)
@@ -218,7 +231,8 @@ namespace SilverSim.Viewer.ExperienceTools
             }
             Map resdata = new Map()
             {
-                ["experience_ids"] = ids
+                ["experience_ids"] = ids,
+                ["purchase"] = new ABoolean(true)
             };
             using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
             {
@@ -303,7 +317,7 @@ namespace SilverSim.Viewer.ExperienceTools
                 result.Add(info.ToMap());
             }
 
-            using (var res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse("application/llsd+xml"))
             {
                 using (Stream s = res.GetOutputStream())
                 {
@@ -414,7 +428,7 @@ namespace SilverSim.Viewer.ExperienceTools
                 infos.Add(info.ToMap());
             }
 
-            using (var res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse("application/llsd+xml"))
             {
                 using (Stream s = res.GetOutputStream())
                 {

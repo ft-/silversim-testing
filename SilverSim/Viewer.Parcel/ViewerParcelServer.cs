@@ -86,7 +86,7 @@ namespace SilverSim.Viewer.Parcel
                 }
 
                 Message m = req.Value;
-                SceneInterface scene = req.Key.Scene;
+                SceneInterface scene = req.Key?.Scene;
                 if (scene == null)
                 {
                     continue;
