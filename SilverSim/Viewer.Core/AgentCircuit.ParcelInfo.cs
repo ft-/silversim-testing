@@ -160,8 +160,14 @@ namespace SilverSim.Viewer.Core
                         blockedexp.Add(entry.ExperienceID);
                     }
                 }
-                SendParcelAccessList(req.LocalID, ParcelAccessList.AllowExperience, allowedexp);
-                SendParcelAccessList(req.LocalID, ParcelAccessList.BlockExperience, blockedexp);
+                if ((req.Flags & ParcelAccessList.AllowExperience) != 0)
+                {
+                    SendParcelAccessList(req.LocalID, ParcelAccessList.AllowExperience, allowedexp);
+                }
+                if ((req.Flags & ParcelAccessList.BlockExperience) != 0)
+                {
+                    SendParcelAccessList(req.LocalID, ParcelAccessList.BlockExperience, blockedexp);
+                }
             }
         }
 
