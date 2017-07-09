@@ -110,6 +110,14 @@ namespace SilverSim.Scene.Types.Scene
         bool Remove(UUID regionID, UUID experienceID);
     }
 
+    public interface IRegionTrustedExperienceList
+    {
+        bool this[UUID regionID, UUID experienceID] { get; set; }
+        bool TryGetValue(UUID regionID, UUID experienceID, out bool trusted);
+        List<UUID> this[UUID regionID] { get; }
+        bool Remove(UUID regionID, UUID experienceID);
+    }
+
     public interface ISceneParcels : IEnumerable<ParcelInfo>
     {
         ParcelInfo this[UUID id] { get; }
@@ -163,6 +171,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract ISceneAgents RootAgents { get; }
         public abstract ISceneParcels Parcels { get; }
         public abstract IRegionExperienceList RegionExperiences { get; }
+        public abstract IRegionTrustedExperienceList RegionTrustedExperiences { get; }
         public abstract List<ObjectUpdateInfo> UpdateInfos { get; }
         public event Action<SceneInterface> OnRemove;
         public AssetServiceInterface TemporaryAssetService { get; protected set; }

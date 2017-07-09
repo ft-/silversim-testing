@@ -24,6 +24,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
 using System.ComponentModel;
+using System;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
@@ -62,6 +63,8 @@ namespace SilverSim.Database.Memory.SimulationData
         public override ISimulationDataRegionSettingsStorageInterface RegionSettings => this;
 
         public override ISimulationDataRegionExperiencesStorageInterface RegionExperiences => this;
+
+        public override ISimulationDataRegionTrustedExperiencesStorageInterface TrustedExperiences => this;
         #endregion
 
         public override void RemoveRegion(UUID regionID)
@@ -76,6 +79,8 @@ namespace SilverSim.Database.Memory.SimulationData
             EnvironmentSettings.Remove(regionID);
             RemoveAllObjectsInRegion(regionID);
             Parcels.Experiences.RemoveAllFromRegion(regionID);
+            RegionExperiences.RemoveRegion(regionID);
+            TrustedExperiences.RemoveRegion(regionID);
         }
     }
     #endregion

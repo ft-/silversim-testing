@@ -648,6 +648,8 @@ namespace SilverSim.Scene.Implementation.Basic
         public override IUDPCircuitsManager UDPServer => m_UDPServer;
 
         public override IRegionExperienceList RegionExperiences => m_SimulationDataStorage.RegionExperiences;
+
+        public override IRegionTrustedExperienceList RegionTrustedExperiences => m_SimulationDataStorage.TrustedExperiences;
         #endregion
 
         public override void RelocateRegion(GridVector location)

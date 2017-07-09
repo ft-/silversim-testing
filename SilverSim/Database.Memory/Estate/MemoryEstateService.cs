@@ -130,6 +130,10 @@ namespace SilverSim.Database.Memory.Estate
         public override IEstateGroupsServiceInterface EstateGroup => this;
 
         public override IEstateRegionMapServiceInterface RegionMap => this;
+
+        public override IEstateExperienceServiceInterface Experiences => this;
+
+        public override IEstateTrustedExperienceServiceInterface TrustedExperiences => this;
     }
     #endregion
 }

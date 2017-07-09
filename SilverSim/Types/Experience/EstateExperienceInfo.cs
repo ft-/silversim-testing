@@ -21,19 +21,19 @@
 
 namespace SilverSim.Types.Experience
 {
-    public class RegionExperienceInfo
+    public class EstateExperienceInfo
     {
-        public UUID RegionID;
+        public uint EstateID;
         public UUID ExperienceID;
         public bool IsAllowed;
 
-        public RegionExperienceInfo()
+        public EstateExperienceInfo()
         {
         }
 
-        public RegionExperienceInfo(RegionExperienceInfo info)
+        public EstateExperienceInfo(EstateExperienceInfo info)
         {
-            RegionID = info.RegionID;
+            EstateID = info.EstateID;
             ExperienceID = info.ExperienceID;
             IsAllowed = info.IsAllowed;
         }

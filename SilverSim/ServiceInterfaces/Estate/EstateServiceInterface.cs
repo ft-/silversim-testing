@@ -47,5 +47,7 @@ namespace SilverSim.ServiceInterfaces.Estate
         public abstract IEstateBanServiceInterface EstateBans { get; }
         public abstract IEstateGroupsServiceInterface EstateGroup { get; }
         public abstract IEstateRegionMapServiceInterface RegionMap { get; }
+        public abstract IEstateExperienceServiceInterface Experiences { get; }
+        public abstract IEstateTrustedExperienceServiceInterface TrustedExperiences { get; }
     }
 }

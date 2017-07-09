@@ -610,6 +610,9 @@ namespace SilverSim.Viewer.ExperienceTools
 
             switch(httpreq.Method)
             {
+                case "GET":
+                    break;
+
                 case "PUT":
                     HandleExperiencePreferencesPut(agent, circuit, httpreq);
                     break;

@@ -19,23 +19,18 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-namespace SilverSim.Types.Experience
+using SilverSim.Types;
+using SilverSim.Types.Experience;
+using System.Collections.Generic;
+
+namespace SilverSim.ServiceInterfaces.Estate
 {
-    public class RegionExperienceInfo
+    public interface IEstateExperienceServiceInterface
     {
-        public UUID RegionID;
-        public UUID ExperienceID;
-        public bool IsAllowed;
-
-        public RegionExperienceInfo()
-        {
-        }
-
-        public RegionExperienceInfo(RegionExperienceInfo info)
-        {
-            RegionID = info.RegionID;
-            ExperienceID = info.ExperienceID;
-            IsAllowed = info.IsAllowed;
-        }
+        EstateExperienceInfo this[uint estateID, UUID experienceID] { get; }
+        bool TryGetValue(uint estateID, UUID experienceID, out EstateExperienceInfo info);
+        List<EstateExperienceInfo> this[uint estateID] { get; }
+        void Store(EstateExperienceInfo info);
+        bool Remove(uint estateID, UUID experienceID);
     }
 }
