@@ -24,6 +24,7 @@ using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
@@ -912,7 +913,27 @@ namespace SilverSim.Viewer.ExperienceTools
         {
             List<UUID> allowed = new List<UUID>();
             List<UUID> blocked = new List<UUID>();
-            List<UUID> trusted = new List<UUID>();
+
+            SceneInterface scene = circuit.Scene;
+            if(scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.InternalServerError, "Internal server error");
+                return;
+            }
+            EstateServiceInterface estateService = scene.EstateService;
+
+            foreach(EstateExperienceInfo info in estateService.Experiences[scene.ParentEstateID])
+            {
+                if(info.IsAllowed)
+                {
+                    allowed.Add(info.ExperienceID);
+                }
+                else
+                {
+                    blocked.Add(info.ExperienceID);
+                }
+            }
+            List<UUID> trusted = estateService.TrustedExperiences[scene.ParentEstateID];
 
             Map resdata = new Map();
             AnArray array = new AnArray();
