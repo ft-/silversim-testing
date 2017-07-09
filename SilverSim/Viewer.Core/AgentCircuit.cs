@@ -728,8 +728,8 @@ namespace SilverSim.Viewer.Core
             GatekeeperURI = gatekeeperURI;
 
             /* the following two capabilities are mandatory */
-            AddCapability("SEED", regionSeedID, RegionSeedHandler);
             AddCapability("EventQueueGet", regionSeedID, Cap_EventQueueGet);
+            AddCapability("SEED", regionSeedID, RegionSeedHandler);
 
             SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
             Scene = server.Scene;
@@ -1046,7 +1046,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region Thread control logic
-        private bool m_EventQueueEnabled;
+        private bool m_EventQueueEnabled = true;
 
         protected override void StartSpecificThreads()
         {
