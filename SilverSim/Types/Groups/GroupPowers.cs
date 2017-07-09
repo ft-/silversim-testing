@@ -154,6 +154,11 @@ namespace SilverSim.Types.Groups
         /// <summary>Can vote on group proposals</summary>
         VoteOnProposal = 1UL << 45,
 
+        ExperienceAdmin = 1UL << 49,
+        ExperienceCreator = 1UL << 50,
+
+        GroupBanAccess = 1UL << 51,
+
         /// <summary>Default powers for Everyone</summary>
         DefaultEveryonePowers = AllowSetHome | Accountable | JoinChat | AllowVoiceChat | ReceiveNotices | StartProposal | VoteOnProposal,
         /// <summary>Default powers for Owner</summary>

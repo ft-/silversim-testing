@@ -81,6 +81,49 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        private void SendParcelAccessList(int localID, ParcelAccessList listType, List<UUID> list)
+        {
+            var rep = new ParcelAccessListReply();
+            int sequenceno = 1;
+            if (list.Count == 0)
+            {
+                rep.AgentID = AgentID;
+                rep.LocalID = localID;
+                rep.Flags = listType;
+                rep.SequenceID = sequenceno++;
+                rep.AccessList.Add(new ParcelAccessListReply.Data());
+                SendMessage(rep);
+                return;
+            }
+            else
+            {
+                rep.AgentID = AgentID;
+                rep.LocalID = localID;
+                rep.Flags = listType;
+                rep.SequenceID = sequenceno++;
+
+                foreach (var pae in list)
+                {
+                    if (rep.AccessList.Count == P_MAX_ENTRIES)
+                    {
+                        SendMessage(rep);
+                        rep.AgentID = AgentID;
+                        rep.LocalID = localID;
+                        rep.Flags = listType;
+                        rep.SequenceID = sequenceno++;
+                    }
+                    var pad = new ParcelAccessListReply.Data()
+                    {
+                        Flags = listType,
+                        ID = pae
+                    };
+                    rep.AccessList.Add(pad);
+                }
+
+                SendMessage(rep);
+            }
+        }
+
         [PacketHandler(MessageType.ParcelAccessListRequest)]
         public void HandleParcelAccessListRequest(Message m)
         {
@@ -104,6 +147,21 @@ namespace SilverSim.Viewer.Core
                 {
                     SendParcelAccessList(req.LocalID, ParcelAccessList.Ban, Scene.Parcels.BlackList[Scene.ID, pInfo.ID]);
                 }
+                var allowedexp = new List<UUID>();
+                var blockedexp = new List<UUID>();
+                foreach (ParcelExperienceEntry entry in Scene.Parcels.Experiences[Scene.ID, pInfo.ID])
+                {
+                    if(entry.IsAllowed)
+                    {
+                        allowedexp.Add(entry.ExperienceID);
+                    }
+                    else
+                    {
+                        blockedexp.Add(entry.ExperienceID);
+                    }
+                }
+                SendParcelAccessList(req.LocalID, ParcelAccessList.AllowExperience, allowedexp);
+                SendParcelAccessList(req.LocalID, ParcelAccessList.BlockExperience, blockedexp);
             }
         }
 
