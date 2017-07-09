@@ -923,21 +923,25 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                     {
                         writer.WriteStartElement("fault");
                         {
-                            writer.WriteStartElement("struct");
+                            writer.WriteStartElement("value");
                             {
-                                writer.WriteStartElement("member");
+                                writer.WriteStartElement("struct");
                                 {
-                                    writer.WriteNamedValue("name", "faultCode");
-                                    writer.WriteStartElement("value");
-                                    writer.WriteNamedValue("int", FaultCode);
+                                    writer.WriteStartElement("member");
+                                    {
+                                        writer.WriteNamedValue("name", "faultCode");
+                                        writer.WriteStartElement("value");
+                                        writer.WriteNamedValue("int", FaultCode);
+                                        writer.WriteEndElement();
+                                    }
                                     writer.WriteEndElement();
-                                }
-                                writer.WriteEndElement();
-                                writer.WriteStartElement("member");
-                                {
-                                    writer.WriteNamedValue("name", "faultString");
-                                    writer.WriteStartElement("value");
-                                    writer.WriteNamedValue("string", FaultString);
+                                    writer.WriteStartElement("member");
+                                    {
+                                        writer.WriteNamedValue("name", "faultString");
+                                        writer.WriteStartElement("value");
+                                        writer.WriteNamedValue("string", FaultString);
+                                        writer.WriteEndElement();
+                                    }
                                     writer.WriteEndElement();
                                 }
                                 writer.WriteEndElement();
