@@ -63,10 +63,15 @@ namespace SilverSim.Main.Common.Caps
                 }
             }
 
-            string[] parts = httpreq.RawUrl.Substring(1).Split('/');
+            /* prevent ? being taken as uuid part */
+            string[] outerparts = httpreq.RawUrl.Split('?');
+            string[] parts = outerparts[0].Substring(1).Split('/');
 
             if(parts.Length < 3)
             {
+#if DEBUG
+                m_Log.DebugFormat("Capability not found: Url invalid: {0}", httpreq.RawUrl);
+#endif
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
@@ -74,6 +79,9 @@ namespace SilverSim.Main.Common.Caps
             UUID capsUUID;
             if(!UUID.TryParse(parts[2], out capsUUID))
             {
+#if DEBUG
+                m_Log.DebugFormat("Capability not found: UUID invalid: {0} in {1}", parts[2], httpreq.RawUrl);
+#endif
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
@@ -81,6 +89,9 @@ namespace SilverSim.Main.Common.Caps
             RwLockedDictionary<UUID, Action<HttpRequest>> dict;
             if (!Caps.TryGetValue(parts[1], out dict) || !dict.TryGetValue(capsUUID, out del))
             {
+#if DEBUG
+                m_Log.DebugFormat("Capability not found: {0} for {1} in {2}", capsUUID, parts[1], httpreq.RawUrl);
+#endif
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
