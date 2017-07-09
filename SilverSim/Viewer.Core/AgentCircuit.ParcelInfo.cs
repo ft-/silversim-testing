@@ -24,11 +24,12 @@
 
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Types.Experience;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.Viewer.Core
 {
@@ -179,6 +180,14 @@ namespace SilverSim.Viewer.Core
         private UUID m_ParcelBanListTransaction = UUID.Zero;
         private readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelBanListSegments = new Dictionary<int, ParcelAccessListUpdate>();
 
+        private readonly object m_ParcelAllowExperienceListLock = new object();
+        private UUID m_ParcelAllowExperienceListTransaction = UUID.Zero;
+        private readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelAllowExperienceListSegments = new Dictionary<int, ParcelAccessListUpdate>();
+
+        private readonly object m_ParcelBlockExperienceListLock = new object();
+        private UUID m_ParcelBlockExperienceListTransaction = UUID.Zero;
+        private readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelBlockExperienceListSegments = new Dictionary<int, ParcelAccessListUpdate>();
+
         private void ParcelAccessListUpdateManage(UUID parcelID, Dictionary<UUID, ParcelAccessListUpdate.Data> entries, IParcelAccessList accessList)
         {
             foreach (var listed in accessList[Scene.ID, parcelID])
@@ -200,6 +209,33 @@ namespace SilverSim.Viewer.Core
                         ParcelID = parcelID
                     };
                     accessList.Store(pae);
+                }
+            }
+        }
+
+        private void ParcelAccessListUpdateManage(UUID parcelID, Dictionary<UUID, ParcelAccessListUpdate.Data> entries, IParcelExperienceList list, bool setallow)
+        {
+            IEnumerable<ParcelExperienceEntry> reslist = from entry in list[Scene.ID, parcelID] where (entry.IsAllowed && setallow) || (!entry.IsAllowed && !setallow) select entry;
+            foreach (var listed in reslist)
+            {
+                if (!entries.ContainsKey(listed.ExperienceID))
+                {
+                    list.Remove(Scene.ID, parcelID, listed.ExperienceID);
+                }
+            }
+            foreach (var upd in entries.Values)
+            {
+                ExperienceInfo expInfo;
+                if (Scene.ExperienceService.TryGetValue(upd.ID, out expInfo))
+                {
+                    var pae = new ParcelExperienceEntry()
+                    {
+                        RegionID = Scene.ID,
+                        ExperienceID = upd.ID,
+                        IsAllowed = setallow,
+                        ParcelID = parcelID
+                    };
+                    list.Store(pae);
                 }
             }
         }
@@ -316,6 +352,104 @@ namespace SilverSim.Viewer.Core
                         }
 
                         ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.WhiteList);
+                    }
+                }
+
+                if (pInfo.Owner.EqualsGrid(Agent.Owner) &&
+                    req.Flags == ParcelAccessList.AllowExperience)
+                {
+                    lock (m_ParcelAllowExperienceListLock)
+                    {
+                        if (m_ParcelAllowExperienceListTransaction != req.TransactionID)
+                        {
+                            m_ParcelAllowExperienceListSegments.Clear();
+                            m_ParcelAllowExperienceListTransaction = req.TransactionID;
+                        }
+
+                        m_ParcelAllowExperienceListSegments[req.SequenceID] = req;
+                        if (req.Sections == 0)
+                        {
+                            ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.Experiences, true);
+                        }
+                        else if (m_ParcelAllowExperienceListSegments.Count == req.Sections)
+                        {
+                            var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelAllowExperienceListSegments);
+                            m_ParcelAllowExperienceListSegments.Clear();
+                            m_ParcelAllowExperienceListTransaction = UUID.Zero;
+                            bool isComplete = true;
+                            for (int i = 1; i < req.Sections; ++i)
+                            {
+                                if (!list.ContainsKey(i))
+                                {
+                                    isComplete = false;
+                                    break;
+                                }
+                            }
+                            if (!isComplete)
+                            {
+                                return;
+                            }
+
+                            var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                            foreach (var upd in list.Values)
+                            {
+                                foreach (var d in upd.AccessList)
+                                {
+                                    entries[d.ID] = d;
+                                }
+                            }
+
+                            ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.Experiences, true);
+                        }
+                    }
+                }
+
+                if (pInfo.Owner.EqualsGrid(Agent.Owner) &&
+                    req.Flags == ParcelAccessList.Ban)
+                {
+                    lock (m_ParcelBlockExperienceListLock)
+                    {
+                        if (m_ParcelBlockExperienceListTransaction != req.TransactionID)
+                        {
+                            m_ParcelBlockExperienceListSegments.Clear();
+                            m_ParcelBlockExperienceListTransaction = req.TransactionID;
+                        }
+
+                        m_ParcelBlockExperienceListSegments[req.SequenceID] = req;
+                        if (req.Sections == 0)
+                        {
+                            ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.Experiences, false);
+                        }
+                        else if (m_ParcelBlockExperienceListSegments.Count == req.Sections)
+                        {
+                            var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelBlockExperienceListSegments);
+                            m_ParcelBlockExperienceListSegments.Clear();
+                            m_ParcelBlockExperienceListTransaction = UUID.Zero;
+                            bool isComplete = true;
+                            for (int i = 1; i < req.Sections; ++i)
+                            {
+                                if (!list.ContainsKey(i))
+                                {
+                                    isComplete = false;
+                                    break;
+                                }
+                            }
+                            if (!isComplete)
+                            {
+                                return;
+                            }
+
+                            var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                            foreach (var upd in list.Values)
+                            {
+                                foreach (var d in upd.AccessList)
+                                {
+                                    entries[d.ID] = d;
+                                }
+                            }
+
+                            ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.Experiences, false);
+                        }
                     }
                 }
             }
