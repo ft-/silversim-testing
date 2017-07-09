@@ -76,7 +76,14 @@ namespace SilverSim.Database.Memory.Profile
             {
                 props = new ProfileProperties()
                 {
-                    User = user
+                    User = user,
+                    Partner = UUI.Unknown,
+                    WebUrl = string.Empty,
+                    WantToText = string.Empty,
+                    SkillsText = string.Empty,
+                    Language = string.Empty,
+                    AboutText = string.Empty,
+                    FirstLifeText = string.Empty
                 };
             }
             return props;
