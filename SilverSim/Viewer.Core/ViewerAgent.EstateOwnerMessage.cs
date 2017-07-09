@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
+using SilverSim.Types.Experience;
 using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
@@ -121,6 +122,15 @@ namespace SilverSim.Viewer.Core
                         return;
                     }
                     EstateOwner_EstateAccessDelta(circuit, req);
+                    break;
+
+                case "estateexperiencedelta":
+                    if (!circuit.Scene.IsEstateManager(Owner))
+                    {
+                        /* only EO and EM */
+                        return;
+                    }
+                    EstateOwner_EstateExperienceDelta(circuit, req);
                     break;
 
                 case "simulatormessage":
@@ -537,6 +547,122 @@ namespace SilverSim.Viewer.Core
                     }
                 }
             }
+        }
+
+        private void EstateOwner_EstateExperienceDelta(AgentCircuit circuit, EstateOwnerMessage req)
+        {
+            if (req.ParamList.Count < 3)
+            {
+                return;
+            }
+
+            var flags = (EstateExperienceDeltaFlags)int.Parse(req.ParamList[1].FromUTF8Bytes());
+            UUID experienceid = UUID.Parse(req.ParamList[2].FromUTF8Bytes());
+
+            var scene = circuit.Scene;
+            ExperienceInfo expInfo;
+
+            if ((scene.ExperienceService == null || !scene.ExperienceService.TryGetValue(experienceid, out expInfo)) &&
+                (flags & (EstateExperienceDeltaFlags.AddAllowed | EstateExperienceDeltaFlags.AddBlocked | EstateExperienceDeltaFlags.AddTrusted)) != 0)
+            {
+                circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateExperienceNotPossibleSinceExperienceNotKnown", "Changing estate experience not possible since experience not known"), scene.ID);
+                return;
+            }
+
+            EstateInfo estate;
+            uint estateID;
+            var allEstateIds = new List<uint>();
+            var estateService = circuit.Scene.EstateService;
+            if (estateService.RegionMap.TryGetValue(circuit.Scene.ID, out estateID) &&
+                estateService.TryGetValue(estateID, out estate))
+            {
+                if ((flags & EstateExperienceDeltaFlags.AllEstates) != 0)
+                {
+                    allEstateIds = estateService.EstateOwner[estate.Owner];
+                }
+                else
+                {
+                    allEstateIds.Add(estateID);
+                }
+            }
+
+            if (allEstateIds.Count == 0)
+            {
+                circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateExperienceNotPossibleSinceNoEstateFound", "Changing estate experience not possible since no estate found"), scene.ID);
+                return;
+            }
+
+            foreach (var selectedEstateId in allEstateIds)
+            {
+                if ((flags & EstateExperienceDeltaFlags.AddAllowed) != 0)
+                {
+                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = experienceid, IsAllowed = true });
+                }
+                if ((flags & EstateExperienceDeltaFlags.RemoveAllowed) != 0)
+                {
+                    estateService.Experiences.Remove(selectedEstateId, experienceid);
+                }
+                if ((flags & EstateExperienceDeltaFlags.AddBlocked) != 0)
+                {
+                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = experienceid, IsAllowed = false });
+                }
+                if ((flags & EstateExperienceDeltaFlags.RemoveBlocked) != 0)
+                {
+                    estateService.Experiences.Remove(selectedEstateId, experienceid);
+                }
+                if ((flags & EstateExperienceDeltaFlags.AddTrusted) != 0)
+                {
+                    estateService.TrustedExperiences[selectedEstateId, experienceid] = true;
+                }
+                if ((flags & EstateExperienceDeltaFlags.RemoveTrusted) != 0)
+                {
+                    estateService.TrustedExperiences.Remove(selectedEstateId, experienceid);
+                }
+            }
+
+            var m = new EstateOwnerMessage()
+            {
+                TransactionID = req.TransactionID,
+                Invoice = req.Invoice,
+                AgentID = Owner.ID,
+                SessionID = SessionID,
+                Method = "setexperience"
+            };
+
+            m.ParamList.Add(StringToBytes(estateID.ToString()));
+            m.ParamList.Add(StringToBytes("1"));
+
+            var allowed = new List<UUID>();
+            var blocked = new List<UUID>();
+            foreach (EstateExperienceInfo info in estateService.Experiences[scene.ParentEstateID])
+            {
+                if (info.IsAllowed)
+                {
+                    allowed.Add(info.ExperienceID);
+                }
+                else
+                {
+                    blocked.Add(info.ExperienceID);
+                }
+            }
+            List<UUID> trusted = estateService.TrustedExperiences[scene.ParentEstateID];
+
+            m.ParamList.Add(StringToBytes(blocked.Count.ToString()));
+            m.ParamList.Add(StringToBytes(trusted.Count.ToString()));
+            m.ParamList.Add(StringToBytes(allowed.Count.ToString()));
+            foreach(UUID id in blocked)
+            {
+                m.ParamList.Add(id.GetBytes());
+            }
+            foreach (UUID id in trusted)
+            {
+                m.ParamList.Add(id.GetBytes());
+            }
+            foreach (UUID id in allowed)
+            {
+                m.ParamList.Add(id.GetBytes());
+            }
+            SendMessageAlways(m, req.CircuitSceneID);
         }
 
         private void EstateOwner_EstateAccessDelta(AgentCircuit circuit, EstateOwnerMessage req)

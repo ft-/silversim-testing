@@ -42,7 +42,10 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteStringLen8(ObjectName);
             p.WriteStringLen8(ObjectOwner);
             p.WriteUInt32((uint)Questions);
-            p.WriteUUID(ExperienceID);
+            if (ExperienceID != UUID.Zero)
+            {
+                p.WriteUUID(ExperienceID);
+            }
         }
 
         public static Message Decode(UDPPacket p) => new ScriptQuestion

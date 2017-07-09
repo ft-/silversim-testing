@@ -983,11 +983,5 @@ namespace SilverSim.Viewer.ExperienceTools
 
             HandleRegionExperiencesGet(agent, circuit, httpreq);
         }
-
-        /* EstateOwnerMessage - estateexperiencedelta
-         * param[0] => agentid
-         * param[1] => flags
-         * param[2] => experience_id
-         */
     }
 }

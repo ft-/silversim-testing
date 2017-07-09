@@ -45,4 +45,16 @@ namespace SilverSim.Viewer.Messages.Generic
         AddManager = 1 << 8,
         RemoveManager = 1 << 9,
     }
+
+    [Flags]
+    public enum EstateExperienceDeltaFlags
+    {
+        AllEstates = 1 << 0,
+        AddTrusted = 1 << 2,
+        RemoveTrusted = 1 << 3,
+        AddAllowed = 1 << 4,
+        RemoveAllowed = 1 << 5,
+        AddBlocked = 1 << 6,
+        RemoveBlocked = 1 << 7
+    }
 }
