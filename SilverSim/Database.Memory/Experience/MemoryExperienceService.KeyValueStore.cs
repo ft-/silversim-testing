@@ -26,30 +26,30 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.Experience
 {
-    public sealed partial class MemoryExperienceService : ExperienceServiceInterface.IExperienceKeyInterface
+    public sealed partial class MemoryExperienceService : ExperienceServiceInterface.IExperienceKeyValueInterface
     {
         private readonly object m_UpdateLock = new object();
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_KeyValues = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(() => new RwLockedDictionary<string, string>());
 
-        bool IExperienceKeyInterface.Remove(UUID experienceID, string key)
+        bool IExperienceKeyValueInterface.Remove(UUID experienceID, string key)
         {
             RwLockedDictionary<string, string> exp;
             return m_KeyValues.TryGetValue(experienceID, out exp) && exp.Remove(key);
         }
 
-        bool IExperienceKeyInterface.TryGetValue(UUID experienceID, string key, out string val)
+        bool IExperienceKeyValueInterface.TryGetValue(UUID experienceID, string key, out string val)
         {
             RwLockedDictionary<string, string> exp;
             val = string.Empty;
             return m_KeyValues.TryGetValue(experienceID, out exp) && exp.TryGetValue(key, out val);
         }
 
-        void IExperienceKeyInterface.Add(UUID experienceID, string key, string value)
+        void IExperienceKeyValueInterface.Add(UUID experienceID, string key, string value)
         {
             m_KeyValues[experienceID].Add(key, value);
         }
 
-        void IExperienceKeyInterface.Store(UUID experienceID, string key, string value)
+        void IExperienceKeyValueInterface.Store(UUID experienceID, string key, string value)
         {
             RwLockedDictionary<string, string> exp = m_KeyValues[experienceID];
             lock (m_UpdateLock)
@@ -58,7 +58,7 @@ namespace SilverSim.Database.Memory.Experience
             }
         }
 
-        bool IExperienceKeyInterface.StoreOnlyIfEqualOrig(UUID experienceID, string key, string value, string orig_value)
+        bool IExperienceKeyValueInterface.StoreOnlyIfEqualOrig(UUID experienceID, string key, string value, string orig_value)
         {
             bool changed;
             RwLockedDictionary<string, string> exp = m_KeyValues[experienceID];
@@ -75,14 +75,14 @@ namespace SilverSim.Database.Memory.Experience
             return changed;
         }
 
-        List<string> IExperienceKeyInterface.GetKeys(UUID experienceID)
+        List<string> IExperienceKeyValueInterface.GetKeys(UUID experienceID)
         {
             RwLockedDictionary<string, string> exp;
 
             return m_KeyValues.TryGetValue(experienceID, out exp) ? new List<string>(exp.Keys) : new List<string>();
         }
 
-        bool IExperienceKeyInterface.GetDatasize(UUID experienceID, out int used, out int quota)
+        bool IExperienceKeyValueInterface.GetDatasize(UUID experienceID, out int used, out int quota)
         {
             used = 0;
             quota = 0;

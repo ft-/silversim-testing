@@ -58,7 +58,7 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         public abstract IExperienceAdminInterface Admins { get; }
 
-        public interface IExperienceKeyInterface
+        public interface IExperienceKeyValueInterface
         {
             bool TryGetValue(UUID experienceID, string key, out string val);
             bool Remove(UUID experienceID, string key);
@@ -69,6 +69,6 @@ namespace SilverSim.ServiceInterfaces.Experience
             bool GetDatasize(UUID experienceID, out int used, out int quota);
         }
 
-        public abstract IExperienceKeyInterface KeyValueStore { get; }
+        public abstract IExperienceKeyValueInterface KeyValueStore { get; }
     }
 }

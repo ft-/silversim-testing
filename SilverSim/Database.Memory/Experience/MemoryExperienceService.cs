@@ -38,7 +38,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override IExperiencePermissionsInterface Permissions => this;
         public override IExperienceAdminInterface Admins => this;
-        public override IExperienceKeyInterface KeyValueStore => this;
+        public override IExperienceKeyValueInterface KeyValueStore => this;
 
         public void Startup(ConfigurationLoader loader)
         {
