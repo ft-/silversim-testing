@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Core
             bool isPublic = reqmap["language_is_public"].AsBoolean;
             Agent.AgentLanguage = isPublic ? agentLanguage : string.Empty;
 
-            using (var res = httpreq.BeginResponse())
+            using (var res = httpreq.BeginResponse("application/llsd+xml"))
             {
                 using (var stream = res.GetOutputStream())
                 {

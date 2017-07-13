@@ -24,8 +24,8 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Inventory;
 using System;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core
@@ -37,6 +37,11 @@ namespace SilverSim.Viewer.Core
 
         protected override void SendViaEventQueueGet(Message m)
         {
+            BulkUpdateInventory bulkinv = m as BulkUpdateInventory;
+            if(bulkinv != null)
+            {
+                bulkinv.SessionID = SessionID;
+            }
             m_EventQueue.Enqueue(m);
         }
 

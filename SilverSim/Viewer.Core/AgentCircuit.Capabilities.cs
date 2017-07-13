@@ -190,6 +190,11 @@ namespace SilverSim.Viewer.Core
                 {
                     /* SEED capability has no additional handling */
                 }
+                else if(v.ToString() == "ObjectAnimation")
+                {
+                    /* triggers enable of objectanimation */
+                    m_EnableObjectAnimation = true;
+                }
                 else if(GetCustomCapsUri(v.ToString(), out capsUriStr))
                 {
                     capsUri[v.ToString()] = capsUriStr;

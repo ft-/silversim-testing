@@ -26,7 +26,6 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace SilverSim.Viewer.Core
@@ -35,6 +34,7 @@ namespace SilverSim.Viewer.Core
     {
         protected abstract void SendViaEventQueueGet(Message m);
         protected bool m_EnableObjectUpdates;
+        protected bool m_EnableObjectAnimation;
 
         [IgnoreMethod]
         public void SendMessage(Message m)
@@ -67,6 +67,13 @@ namespace SilverSim.Viewer.Core
                         else
                         {
                             m_Log.ErrorFormat("Type {0} misses EventQueueGet attribute", m.GetType().FullName);
+                        }
+                        break;
+
+                    case MessageType.ObjectAnimation:
+                        if(m_EnableObjectAnimation)
+                        {
+                            goto default;
                         }
                         break;
 

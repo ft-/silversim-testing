@@ -331,7 +331,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                     { "Description", item.Description },
                     { "CreationDate", (int)item.CreationDate },
                     { "CRC", EncodeU32ToBinary(item.Checksum) },
-                    { "CallbackID", 0 }
+                    { "CallbackID", EncodeU32ToBinary(item.CallbackID) }
                 });
             }
             llsd.Add("ItemData", itemDataArray);
