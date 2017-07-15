@@ -35,15 +35,8 @@ namespace SilverSim.Viewer.Core
         private readonly BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
         private int m_EventQueueEventId = 1;
 
-        protected override void SendViaEventQueueGet(Message m)
-        {
-            BulkUpdateInventory bulkinv = m as BulkUpdateInventory;
-            if(bulkinv != null)
-            {
-                bulkinv.SessionID = SessionID;
-            }
+        protected override void SendViaEventQueueGet(Message m) =>
             m_EventQueue.Enqueue(m);
-        }
 
         private void Cap_EventQueueGet(HttpRequest httpreq)
         {

@@ -20,11 +20,13 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.Viewer.Messages.Agent
 {
     [UDPMessage(MessageType.AgentDropGroup)]
     [Reliable]
+    [EventQueueGet("AgentDropGroup")]
     [Trusted]
     public class AgentDropGroup : Message
     {
@@ -42,5 +44,24 @@ namespace SilverSim.Viewer.Messages.Agent
             AgentID = p.ReadUUID(),
             GroupID = p.ReadUUID()
         };
+
+        public override IValue SerializeEQG()
+        {
+            var agentDataMap = new MapType
+            {
+                ["AgentID"] = AgentID,
+                ["GroupID"] = GroupID
+            };
+            var agentDataArray = new AnArray
+            {
+                agentDataMap
+            };
+            var body = new MapType
+            {
+                ["AgentData"] = agentDataArray
+            };
+
+            return body;
+        }
     }
 }

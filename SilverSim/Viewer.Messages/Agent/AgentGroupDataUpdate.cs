@@ -99,6 +99,7 @@ namespace SilverSim.Viewer.Messages.Agent
                 ["AgentData"] = agentDataArray
             };
             var groupDataArray = new AnArray();
+            var newGroupDataArray = new AnArray();
             foreach(GroupDataEntry e in GroupData)
             {
                 byte[] groupPowers = BitConverter.GetBytes((UInt64)e.GroupPowers);
@@ -108,7 +109,6 @@ namespace SilverSim.Viewer.Messages.Agent
                 }
                 groupDataArray.Add(new MapType
                 {
-                    { "ListInProfile", e.ListInProfile },
                     { "GroupID", e.GroupID },
                     { "GroupInsigniaID", e.GroupInsigniaID },
                     { "Contribution", e.Contribution },
@@ -116,8 +116,13 @@ namespace SilverSim.Viewer.Messages.Agent
                     { "GroupName", e.GroupName },
                     { "AcceptNotices", e.AcceptNotices }
                 });
+                newGroupDataArray.Add(new MapType
+                {
+                    { "ListInProfile", e.ListInProfile },
+                });
             }
             body.Add("GroupData", groupDataArray);
+            body.Add("NewGroupData", newGroupDataArray);
 
             return body;
         }

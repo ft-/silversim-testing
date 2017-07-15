@@ -35,7 +35,6 @@ namespace SilverSim.Viewer.Messages.Inventory
     public class BulkUpdateInventory : Message
     {
         public UUID AgentID;
-        public UUID SessionID; /* serialized in EQG */
         public UUID TransactionID;
 
         public struct FolderDataEntry
@@ -282,7 +281,6 @@ namespace SilverSim.Viewer.Messages.Inventory
                 new MapType
                 {
                     ["AgentID"] = AgentID,
-                    ["SessionID"] = SessionID,
                     ["TransactionID"] = TransactionID
                 }
             };
