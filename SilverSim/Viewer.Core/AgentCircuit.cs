@@ -727,11 +727,6 @@ namespace SilverSim.Viewer.Core
             m_CapsRedirector = capsredirector;
             GatekeeperURI = gatekeeperURI;
 
-            /* the following two capabilities are mandatory */
-            AddCapability("EventQueueGet", regionSeedID, Cap_EventQueueGet);
-            SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
-            AddCapability("SEED", regionSeedID, RegionSeedHandler);
-
             Scene = server.Scene;
 
             m_MessageRouting.Add(MessageType.CopyInventoryItem, m_InventoryRequestQueue.Enqueue);
@@ -781,6 +776,11 @@ namespace SilverSim.Viewer.Core
                     }
                 }
             }
+
+            /* the following two capabilities are mandatory */
+            AddCapability("EventQueueGet", regionSeedID, Cap_EventQueueGet);
+            SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
+            AddCapability("SEED", regionSeedID, RegionSeedHandler);
 
 #if DEBUG
             m_Log.DebugFormat("Registered {0} message handlers", m_MessageRouting.Count);
