@@ -703,8 +703,6 @@ namespace SilverSim.Scene.Types.Agent
 
         private static void ApplyTint(BakeImage bmp, SilverSim.Types.Color col)
         {
-            int x;
-            int y;
             byte[] argb = bmp.ArgbImage;
             for(int i = bmp.Width * bmp.Height * 4; i-- != 0;)
             {
