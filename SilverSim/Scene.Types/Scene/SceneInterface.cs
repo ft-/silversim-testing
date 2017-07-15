@@ -285,6 +285,9 @@ namespace SilverSim.Scene.Types.Scene
             CoarseLocationUpdate upd = null;
             UUID ownId = agent.ID;
             UUID trackId = agent.TracksAgentID;
+            /* var region scaling */
+            double scaleX = 256 / SizeX;
+            double scaleY = 256 / SizeY;
 
             foreach(KeyValuePair<UUID, Vector3> kvp in data)
             {
@@ -311,8 +314,8 @@ namespace SilverSim.Scene.Types.Scene
                 upd.AgentData.Add(new CoarseLocationUpdate.AgentDataEntry
                 {
                     AgentID = kvp.Key,
-                    X = (byte)kvp.Value.X.Clamp(0, 255),
-                    Y = (byte)kvp.Value.Y.Clamp(0, 255),
+                    X = (byte)(kvp.Value.X * scaleX).Clamp(0, 255),
+                    Y = (byte)(kvp.Value.Y * scaleY).Clamp(0, 255),
                     Z = (byte)(kvp.Value.Z / 4).Clamp(0, 255)
                 });
 
