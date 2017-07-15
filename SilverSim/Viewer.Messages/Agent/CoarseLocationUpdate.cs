@@ -22,10 +22,12 @@
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.Viewer.Messages.Agent
 {
     [UDPMessage(MessageType.CoarseLocationUpdate)]
+    [EventQueueGet("CoarseLocationUpdate")]
     [Trusted]
     public class CoarseLocationUpdate : Message
     {
@@ -84,6 +86,40 @@ namespace SilverSim.Viewer.Messages.Agent
             }
 
             return m;
+        }
+
+        public override IValue SerializeEQG()
+        {
+            var location = new AnArray();
+            var agentdata = new AnArray();
+            var index = new AnArray();
+            index.Add(new MapType
+            {
+                { "Prey", Prey },
+                { "You", You }
+            });
+
+            foreach (AgentDataEntry d in AgentData)
+            {
+                location.Add(new MapType
+                {
+                    { "X", d.X },
+                    { "Y", d.Y },
+                    { "Z", d.Z }
+                });
+
+                agentdata.Add(new MapType
+                {
+                    ["AgentID"] = d.AgentID
+                });
+            }
+
+            return new MapType
+            {
+                ["Index"] = index,
+                ["Location"] = location,
+                ["AgentData"] = agentdata
+            };
         }
     }
 }

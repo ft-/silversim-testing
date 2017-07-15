@@ -823,20 +823,6 @@ namespace SilverSim.Grid.Login
                 };
                 categorylist.Add(categorydata);
 
-                categorydata = new Map
-                {
-                    { "category_name", "Shopping" },
-                    { "category_id", 1 }
-                };
-                categorylist.Add(categorydata);
-
-                categorydata = new Map
-                {
-                    { "category_name", "Shopping" },
-                    { "category_id", 1 }
-                };
-                categorylist.Add(categorydata);
-
                 resStruct.Add("classified_categories", categorylist);
             }
 
