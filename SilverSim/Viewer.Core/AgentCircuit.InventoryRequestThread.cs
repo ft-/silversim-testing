@@ -1258,7 +1258,7 @@ namespace SilverSim.Viewer.Core
                     m_Log.ErrorFormat("Failed to create asset for type {0}: {1}: {2}\n{3}", item.InventoryType.ToString(), e.GetType().FullName, e.Message, e.StackTrace);
                     return;
                 }
-                if (UUID.Zero == item.AssetID)
+                if (UUID.Zero == item.AssetID && item.AssetType != AssetType.CallingCard)
                 {
                     SendMessage(new AlertMessage("ALERT: CantCreateInventory"));
                     m_Log.ErrorFormat("Failed to create asset for type {0}", item.InventoryType.ToString());

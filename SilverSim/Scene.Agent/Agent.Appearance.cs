@@ -112,7 +112,7 @@ namespace SilverSim.Scene.Agent
             };
             var e = new AvatarAppearance.AppearanceDataEntry()
             {
-                AppearanceVersion = 0,
+                AppearanceVersion = 1,
                 CofVersion = Appearance.Serial
             };
             appearance.AppearanceData.Add(e);

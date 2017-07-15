@@ -56,6 +56,7 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
+                m_Log.DebugFormat("Failed to register capability {0}", type);
                 m_RegisteredCapabilities.Remove(type);
                 throw;
             }

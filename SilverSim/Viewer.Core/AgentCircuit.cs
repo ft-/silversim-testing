@@ -729,9 +729,9 @@ namespace SilverSim.Viewer.Core
 
             /* the following two capabilities are mandatory */
             AddCapability("EventQueueGet", regionSeedID, Cap_EventQueueGet);
+            SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
             AddCapability("SEED", regionSeedID, RegionSeedHandler);
 
-            SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
             Scene = server.Scene;
 
             m_MessageRouting.Add(MessageType.CopyInventoryItem, m_InventoryRequestQueue.Enqueue);
