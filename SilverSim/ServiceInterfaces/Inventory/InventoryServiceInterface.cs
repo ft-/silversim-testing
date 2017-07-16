@@ -62,6 +62,37 @@ namespace SilverSim.ServiceInterfaces.Inventory
             throw new NotSupportedException("InventoryServiceInterface.GetInventorySkeleton");
         }
 
+        public bool IsParentFolderIdValid(UUID principalID, UUID parentFolderID) => IsParentFolderIdValid(principalID, parentFolderID, UUID.Zero);
+
+        public virtual bool IsParentFolderIdValid(UUID principalID, UUID parentFolderID, UUID expectedFolderID)
+        {
+            if(parentFolderID == UUID.Zero)
+            {
+                return !Folder.ContainsKey(principalID, AssetType.RootFolder);
+            }
+            else
+            {
+                InventoryFolder folder;
+                /* traverse to root folder and check that we never see the moved folder in that path */
+                while(Folder.TryGetValue(parentFolderID, out folder))
+                {
+                    if(folder.ID == expectedFolderID)
+                    {
+                        /* this folder would trigger a circular dependency */
+                        return false;
+                    }
+                    if(folder.ParentFolderID == UUID.Zero)
+                    {
+                        /* this is a good one, it ends at the root folder */
+                        return true;
+                    }
+                }
+
+                /* folder missing */
+                return false;
+            }
+        }
+
         public virtual void CheckInventory(UUID principalID)
         {
             InventoryFolder rootFolder;
