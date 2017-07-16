@@ -205,4 +205,27 @@ namespace SilverSim.ServiceInterfaces.Inventory
         {
         }
     }
+
+    [Serializable]
+    public class InvalidParentFolderIdException : Exception
+    {
+        public InvalidParentFolderIdException()
+        {
+        }
+
+        public InvalidParentFolderIdException(string message)
+            : base(message)
+        {
+        }
+
+        protected InvalidParentFolderIdException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public InvalidParentFolderIdException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+    }
 }
