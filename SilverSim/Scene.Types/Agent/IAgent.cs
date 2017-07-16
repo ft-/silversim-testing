@@ -210,6 +210,7 @@ namespace SilverSim.Scene.Types.Agent
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID);
         void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions);
+        bool WaitsForExperienceResponse(ObjectPart part, UUID itemID);
 
         void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on);
         void ReleaseControls(ScriptInstance instance);

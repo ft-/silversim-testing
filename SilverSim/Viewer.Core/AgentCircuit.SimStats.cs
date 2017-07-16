@@ -153,6 +153,7 @@ namespace SilverSim.Viewer.Core
             stats.PID = 0;
             stats.Stat = m_SimStatsData;
             SendMessage(stats);
+            CheckExperienceTimeouts();
         }
     }
 }

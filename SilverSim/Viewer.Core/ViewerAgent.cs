@@ -641,6 +641,15 @@ namespace SilverSim.Viewer.Core
             {
                 return permissions;
             }
+
+            AgentCircuit circuit;
+            if(experienceID != UUID.Zero && Circuits.TryGetValue(part.ObjectGroup.Scene.ID, out circuit))
+            {
+                if(!circuit.AddExperienceTimeout(part.ID, itemID))
+                {
+                    return ScriptPermissions.None;
+                }
+            }
             var m = new ScriptQuestion()
             {
                 ExperienceID = experienceID,
@@ -657,6 +666,21 @@ namespace SilverSim.Viewer.Core
         public override void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions)
         {
             RevokeAnimPermissions(sourceID, permissions);
+        }
+
+        public override bool WaitsForExperienceResponse(ObjectPart part, UUID itemID)
+        {
+            SceneInterface scene = part.ObjectGroup?.Scene;
+            if(scene == null)
+            {
+                return false;
+            }
+            AgentCircuit circuit;
+            if(!Circuits.TryGetValue(scene.ID, out circuit))
+            {
+                return false;
+            }
+            return circuit.WaitsForExperienceResponse(part.ID, itemID);
         }
 
         [PacketHandler(MessageType.RegionHandshakeReply)]

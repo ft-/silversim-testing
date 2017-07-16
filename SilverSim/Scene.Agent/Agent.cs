@@ -1035,6 +1035,7 @@ namespace SilverSim.Scene.Agent
         public abstract ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);
         public abstract ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID);
         public abstract void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions);
+        public abstract bool WaitsForExperienceResponse(ObjectPart part, UUID itemID);
         public abstract void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on);
         public abstract void ReleaseControls(ScriptInstance instance);
         public abstract bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags);

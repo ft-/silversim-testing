@@ -395,6 +395,11 @@ namespace SilverSim.Scene.Npc
             RevokeAnimPermissions(sourceID, permissions);
         }
 
+        public override bool WaitsForExperienceResponse(ObjectPart part, UUID itemID)
+        {
+            return true;
+        }
+
         private readonly RwLockedList<UUID> m_SelectedObjects = new RwLockedList<UUID>();
         public override RwLockedList<UUID> SelectedObjects(UUID scene) => m_SelectedObjects;
 

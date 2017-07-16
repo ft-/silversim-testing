@@ -28,7 +28,9 @@ using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -390,6 +392,70 @@ namespace SilverSim.Viewer.Core
             }
 
             throw new ArgumentException("Handler resolver error");
+        }
+
+        private readonly RwLockedDictionary<string, int> m_ExperienceTimeouts = new RwLockedDictionary<string, int>();
+
+        internal bool AddExperienceTimeout(UUID partID, UUID itemID)
+        {
+            string k = partID.ToString() + ";" + itemID.ToString();
+            try
+            {
+                m_ExperienceTimeouts.Add(k, Environment.TickCount + 30000);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void CheckExperienceTimeouts()
+        {
+            List<string> timedout = new List<string>();
+            foreach (KeyValuePair<string, int> kvp in m_ExperienceTimeouts)
+            {
+                int t = kvp.Value - Environment.TickCount;
+                if (t < 0)
+                {
+                    timedout.Add(kvp.Key);
+                }
+            }
+
+            foreach (string t in timedout)
+            {
+                if (m_ExperienceTimeouts.Remove(t))
+                {
+                    try
+                    {
+                        string[] parts = t.Split(';');
+                        UUID partID = new UUID(parts[0]);
+                        UUID itemID = new UUID(parts[1]);
+
+                        ObjectPart part;
+                        ObjectPartInventoryItem item;
+                        if (Scene.Primitives.TryGetValue(partID, out part) &&
+                            part.Inventory.TryGetValue(itemID, out item))
+                        {
+                            item.ScriptInstance?.PostEvent(new ExperiencePermissionsDeniedEvent
+                            {
+                                AgentId = Agent.Owner,
+                                Reason = 18 /* request perm timeout */
+                            });
+                        }
+                    }
+                    catch
+                    {
+                        /* intentionally ignore here */
+                    }
+                }
+            }
+        }
+
+        internal bool WaitsForExperienceResponse(UUID partID, UUID itemID)
+        {
+            string k = partID.ToString() + ";" + itemID.ToString();
+            return m_ExperienceTimeouts.Remove(k);
         }
 
         private void AddMessageRouting(object o)

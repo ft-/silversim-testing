@@ -125,35 +125,41 @@ namespace SilverSim.Scene.Types.Scene
                 if(req.Questions == ScriptPermissions.ExperienceGrantedPermissions)
                 {
                     /* allow response */
-                    try
+                    if (agent.WaitsForExperienceResponse(part, item.ID))
                     {
-                        experienceService.Permissions[item.ExperienceID, agent.Owner] = true;
+                        try
+                        {
+                            experienceService.Permissions[item.ExperienceID, agent.Owner] = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            m_Log.WarnFormat("Could not store experience accept: {0}", ex.Message);
+                        }
+                        instance.PostEvent(new ExperiencePermissionsEvent
+                        {
+                            PermissionsKey = agent.Owner
+                        });
                     }
-                    catch(Exception ex)
-                    {
-                        m_Log.WarnFormat("Could not store experience accept: {0}", ex.Message);
-                    }
-                    instance.PostEvent(new ExperiencePermissionsEvent
-                    {
-                        PermissionsKey = agent.Owner
-                    });
                 }
                 else if(req.Questions == ScriptPermissions.None)
                 {
                     /* deny response */
-                    try
+                    if (agent.WaitsForExperienceResponse(part, item.ID))
                     {
-                        experienceService.Permissions[item.ExperienceID, agent.Owner] = false;
+                        try
+                        {
+                            experienceService.Permissions[item.ExperienceID, agent.Owner] = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            m_Log.WarnFormat("Could not store experience denial: {0}", ex.Message);
+                        }
+                        instance.PostEvent(new ExperiencePermissionsDeniedEvent
+                        {
+                            AgentId = agent.Owner,
+                            Reason = 4
+                        });
                     }
-                    catch (Exception ex)
-                    {
-                        m_Log.WarnFormat("Could not store experience denial: {0}", ex.Message);
-                    }
-                    instance.PostEvent(new ExperiencePermissionsDeniedEvent
-                    {
-                        AgentId = agent.Owner,
-                        Reason = 4
-                    });
                 }
             }
 
