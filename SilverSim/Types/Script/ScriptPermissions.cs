@@ -43,6 +43,14 @@ namespace SilverSim.Types.Script
         SilentEstateManagement = 0x00004000,
         OverrideAnimations = 0x00008000,
         ReturnObjects = 0x00010000,
-        All = 0xFFFFFFFF
+        All = 0xFFFFFFFF,
+
+        ExperienceGrantedPermissions = 
+            Teleport | 
+            ControlCamera | 
+            TrackCamera | 
+            TriggerAnimation | 
+            TakeControls | 
+            Attach
     }
 }
