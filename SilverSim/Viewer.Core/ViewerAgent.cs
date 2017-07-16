@@ -625,7 +625,8 @@ namespace SilverSim.Viewer.Core
         public override ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID)
         {
             var autoGrant = ScriptPermissions.None;
-            if (SittingOnObject.ID == itemID || part.ObjectGroup.AttachPoint != Types.Agent.AttachmentPoint.NotAttached)
+            ObjectGroup sitOn = SittingOnObject;
+            if ((sitOn != null && sitOn.ID == itemID) || part.ObjectGroup.AttachPoint != Types.Agent.AttachmentPoint.NotAttached)
             {
                 autoGrant |= ScriptPermissions.ControlCamera;
                 autoGrant |= ScriptPermissions.TakeControls;
