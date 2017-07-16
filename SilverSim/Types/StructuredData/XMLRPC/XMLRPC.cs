@@ -791,7 +791,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             else if (t == typeof(Integer))
             {
                 w.WriteStartElement("value");
-                w.WriteNamedValue("int", iv.AsInt);
+                w.WriteNamedValue("i4", iv.AsInt);
                 w.WriteEndElement();
             }
             else if(t == typeof(Real))

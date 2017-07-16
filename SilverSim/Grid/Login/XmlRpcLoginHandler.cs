@@ -690,10 +690,10 @@ namespace SilverSim.Grid.Login
                 { "agent_access_max", "A" },
                 { "max-agent-groups", m_MaxAgentGroups },
                 { "seed_capability", seedCapsURI },
-                { "region_x", loginData.DestinationInfo.Location.X },
-                { "region_y", loginData.DestinationInfo.Location.Y },
-                { "region_size_x", loginData.DestinationInfo.Size.X },
-                { "region_size_y", loginData.DestinationInfo.Size.Y },
+                { "region_x", loginData.DestinationInfo.Location.X.ToString() },
+                { "region_y", loginData.DestinationInfo.Location.Y.ToString() },
+                { "region_size_x", loginData.DestinationInfo.Size.X.ToString() },
+                { "region_size_y", loginData.DestinationInfo.Size.Y.ToString() },
                 { "circuit_code", (int)loginData.CircuitInfo.CircuitCode }
             };
             var res = new XmlRpc.XmlRpcResponse()
@@ -741,7 +741,7 @@ namespace SilverSim.Grid.Login
             }
 
             resStruct.Add("first_name", loginData.Account.Principal.FirstName);
-            resStruct.Add("seconds_since_epoch", Date.GetUnixTime());
+            resStruct.Add("seconds_since_epoch", (int)Date.GetUnixTime());
 
             if(loginData.LoginOptions.Contains(Option_UiConfig))
             {
