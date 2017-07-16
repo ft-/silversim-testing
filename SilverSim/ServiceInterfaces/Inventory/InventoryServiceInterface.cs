@@ -73,8 +73,9 @@ namespace SilverSim.ServiceInterfaces.Inventory
             else
             {
                 InventoryFolder folder;
+                UUID checkFolderID = parentFolderID;
                 /* traverse to root folder and check that we never see the moved folder in that path */
-                while(Folder.TryGetValue(parentFolderID, out folder))
+                while(Folder.TryGetValue(checkFolderID, out folder))
                 {
                     if(folder.ID == expectedFolderID)
                     {
@@ -86,6 +87,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                         /* this is a good one, it ends at the root folder */
                         return true;
                     }
+                    checkFolderID = folder.ParentFolderID;
                 }
 
                 /* folder missing */
