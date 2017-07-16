@@ -354,102 +354,102 @@ namespace SilverSim.Viewer.Core
                         ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.WhiteList);
                     }
                 }
+            }
 
-                if (pInfo.Owner.EqualsGrid(Agent.Owner) &&
-                    req.Flags == ParcelAccessList.AllowExperience)
+            if (pInfo.Owner.EqualsGrid(Agent.Owner) &&
+                req.Flags == ParcelAccessList.AllowExperience)
+            {
+                lock (m_ParcelAllowExperienceListLock)
                 {
-                    lock (m_ParcelAllowExperienceListLock)
+                    if (m_ParcelAllowExperienceListTransaction != req.TransactionID)
                     {
-                        if (m_ParcelAllowExperienceListTransaction != req.TransactionID)
+                        m_ParcelAllowExperienceListSegments.Clear();
+                        m_ParcelAllowExperienceListTransaction = req.TransactionID;
+                    }
+
+                    m_ParcelAllowExperienceListSegments[req.SequenceID] = req;
+                    if (req.Sections == 0)
+                    {
+                        ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.Experiences, true);
+                    }
+                    else if (m_ParcelAllowExperienceListSegments.Count == req.Sections)
+                    {
+                        var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelAllowExperienceListSegments);
+                        m_ParcelAllowExperienceListSegments.Clear();
+                        m_ParcelAllowExperienceListTransaction = UUID.Zero;
+                        bool isComplete = true;
+                        for (int i = 1; i < req.Sections; ++i)
                         {
-                            m_ParcelAllowExperienceListSegments.Clear();
-                            m_ParcelAllowExperienceListTransaction = req.TransactionID;
+                            if (!list.ContainsKey(i))
+                            {
+                                isComplete = false;
+                                break;
+                            }
+                        }
+                        if (!isComplete)
+                        {
+                            return;
                         }
 
-                        m_ParcelAllowExperienceListSegments[req.SequenceID] = req;
-                        if (req.Sections == 0)
+                        var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                        foreach (var upd in list.Values)
                         {
-                            ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.Experiences, true);
+                            foreach (var d in upd.AccessList)
+                            {
+                                entries[d.ID] = d;
+                            }
                         }
-                        else if (m_ParcelAllowExperienceListSegments.Count == req.Sections)
-                        {
-                            var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelAllowExperienceListSegments);
-                            m_ParcelAllowExperienceListSegments.Clear();
-                            m_ParcelAllowExperienceListTransaction = UUID.Zero;
-                            bool isComplete = true;
-                            for (int i = 1; i < req.Sections; ++i)
-                            {
-                                if (!list.ContainsKey(i))
-                                {
-                                    isComplete = false;
-                                    break;
-                                }
-                            }
-                            if (!isComplete)
-                            {
-                                return;
-                            }
 
-                            var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
-                            foreach (var upd in list.Values)
-                            {
-                                foreach (var d in upd.AccessList)
-                                {
-                                    entries[d.ID] = d;
-                                }
-                            }
-
-                            ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.Experiences, true);
-                        }
+                        ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.Experiences, true);
                     }
                 }
+            }
 
-                if (pInfo.Owner.EqualsGrid(Agent.Owner) &&
-                    req.Flags == ParcelAccessList.Ban)
+            if (pInfo.Owner.EqualsGrid(Agent.Owner) &&
+                req.Flags == ParcelAccessList.BlockExperience)
+            {
+                lock (m_ParcelBlockExperienceListLock)
                 {
-                    lock (m_ParcelBlockExperienceListLock)
+                    if (m_ParcelBlockExperienceListTransaction != req.TransactionID)
                     {
-                        if (m_ParcelBlockExperienceListTransaction != req.TransactionID)
+                        m_ParcelBlockExperienceListSegments.Clear();
+                        m_ParcelBlockExperienceListTransaction = req.TransactionID;
+                    }
+
+                    m_ParcelBlockExperienceListSegments[req.SequenceID] = req;
+                    if (req.Sections == 0)
+                    {
+                        ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.Experiences, false);
+                    }
+                    else if (m_ParcelBlockExperienceListSegments.Count == req.Sections)
+                    {
+                        var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelBlockExperienceListSegments);
+                        m_ParcelBlockExperienceListSegments.Clear();
+                        m_ParcelBlockExperienceListTransaction = UUID.Zero;
+                        bool isComplete = true;
+                        for (int i = 1; i < req.Sections; ++i)
                         {
-                            m_ParcelBlockExperienceListSegments.Clear();
-                            m_ParcelBlockExperienceListTransaction = req.TransactionID;
+                            if (!list.ContainsKey(i))
+                            {
+                                isComplete = false;
+                                break;
+                            }
+                        }
+                        if (!isComplete)
+                        {
+                            return;
                         }
 
-                        m_ParcelBlockExperienceListSegments[req.SequenceID] = req;
-                        if (req.Sections == 0)
+                        var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                        foreach (var upd in list.Values)
                         {
-                            ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.Experiences, false);
+                            foreach (var d in upd.AccessList)
+                            {
+                                entries[d.ID] = d;
+                            }
                         }
-                        else if (m_ParcelBlockExperienceListSegments.Count == req.Sections)
-                        {
-                            var list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelBlockExperienceListSegments);
-                            m_ParcelBlockExperienceListSegments.Clear();
-                            m_ParcelBlockExperienceListTransaction = UUID.Zero;
-                            bool isComplete = true;
-                            for (int i = 1; i < req.Sections; ++i)
-                            {
-                                if (!list.ContainsKey(i))
-                                {
-                                    isComplete = false;
-                                    break;
-                                }
-                            }
-                            if (!isComplete)
-                            {
-                                return;
-                            }
 
-                            var entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
-                            foreach (var upd in list.Values)
-                            {
-                                foreach (var d in upd.AccessList)
-                                {
-                                    entries[d.ID] = d;
-                                }
-                            }
-
-                            ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.Experiences, false);
-                        }
+                        ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.Experiences, false);
                     }
                 }
             }
