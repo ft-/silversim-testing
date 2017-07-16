@@ -129,7 +129,7 @@ namespace SilverSim.Viewer.Core
             {
                 using (var text = res.GetOutputStream().UTF8XmlTextWriter())
                 {
-                    var badfolders = new List<UUID>();
+                    var badfolders = new Dictionary<UUID, string>();
                     text.WriteStartElement("llsd");
                     text.WriteStartElement("map");
                     var wroteheader = false;
@@ -243,12 +243,12 @@ namespace SilverSim.Viewer.Core
                             }
                             else
                             {
-                                badfolders.Add(folderid);
+                                badfolders.Add(folderid, "Not found");
                             }
                         }
                         else
                         {
-                            badfolders.Add(folderid);
+                            badfolders.Add(folderid, "Not found");
                         }
                     }
                     if (wroteheader)
@@ -259,9 +259,12 @@ namespace SilverSim.Viewer.Core
                     {
                         text.WriteNamedValue("key", "bad_folders");
                         text.WriteStartElement("array");
-                        foreach (var id in badfolders)
+                        foreach (KeyValuePair<UUID, string> id in badfolders)
                         {
-                            text.WriteNamedValue("uuid", id);
+                            text.WriteStartElement("map");
+                            text.WriteNamedValue("folder_id", id.Key);
+                            text.WriteNamedValue("error", id.Value);
+                            text.WriteEndElement();
                         }
                         text.WriteEndElement();
                     }
