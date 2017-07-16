@@ -467,12 +467,12 @@ namespace SilverSim.Viewer.Core
                 folder = new InventoryFolder()
                 {
                     ID = req.FolderID,
+                    ParentFolderID = req.ParentFolderID,
                     InventoryType = req.FolderType,
                     Name = req.FolderName,
-                    Owner = Agent.Owner
+                    Owner = Agent.Owner,
+                    Version = 1
                 };
-                folder.ParentFolderID = folder.ID;
-                folder.Version = 1;
                 Agent.InventoryService.Folder.Add(folder);
 
                 var res = new BulkUpdateInventory()
