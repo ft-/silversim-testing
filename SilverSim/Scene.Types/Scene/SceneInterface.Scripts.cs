@@ -22,9 +22,12 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.ServiceInterfaces.Experience;
+using SilverSim.Types;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Script;
+using System;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -103,8 +106,10 @@ namespace SilverSim.Scene.Types.Scene
             Script.ScriptInstance instance;
             ObjectPart part;
             ObjectPartInventoryItem item;
+            IAgent agent;
             if (!Primitives.TryGetValue(req.TaskID, out part) ||
-                !part.Inventory.TryGetValue(req.ItemID, out item))
+                !part.Inventory.TryGetValue(req.ItemID, out item) ||
+                !Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -114,10 +119,48 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
+            if(item.ExperienceID != UUID.Zero)
+            {
+                ExperienceServiceInterface experienceService = ExperienceService;
+                if(req.Questions == (ScriptPermissions.Teleport | ScriptPermissions.ControlCamera | ScriptPermissions.TrackCamera | ScriptPermissions.TriggerAnimation | ScriptPermissions.TakeControls))
+                {
+                    /* allow response */
+                    try
+                    {
+                        experienceService.Permissions[item.ExperienceID, agent.Owner] = true;
+                    }
+                    catch(Exception ex)
+                    {
+                        m_Log.WarnFormat("Could not store experience accept: {0}", ex.Message);
+                    }
+                    instance.PostEvent(new ExperiencePermissionsEvent
+                    {
+                        PermissionsKey = agent.Owner
+                    });
+                }
+                else if(req.Questions == ScriptPermissions.None)
+                {
+                    /* deny response */
+                    try
+                    {
+                        experienceService.Permissions[item.ExperienceID, agent.Owner] = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        m_Log.WarnFormat("Could not store experience denial: {0}", ex.Message);
+                    }
+                    instance.PostEvent(new ExperiencePermissionsDeniedEvent
+                    {
+                        AgentId = agent.Owner,
+                        Reason = 4
+                    });
+                }
+            }
+
             var e = new RuntimePermissionsEvent()
             {
                 PermissionsKey = req.CircuitAgentOwner,
-                Permissions = (ScriptPermissions)req.Questions
+                Permissions = req.Questions
             };
             instance.PostEvent(e);
         }

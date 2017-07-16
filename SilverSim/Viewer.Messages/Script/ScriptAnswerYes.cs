@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 
 namespace SilverSim.Viewer.Messages.Script
@@ -33,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID SessionID = UUID.Zero;
         public UUID TaskID = UUID.Zero;
         public UUID ItemID = UUID.Zero;
-        public UInt32 Questions;
+        public ScriptPermissions Questions;
 
         public static Message Decode(UDPPacket p) => new ScriptAnswerYes()
         {
@@ -41,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Script
             SessionID = p.ReadUUID(),
             TaskID = p.ReadUUID(),
             ItemID = p.ReadUUID(),
-            Questions = p.ReadUInt32()
+            Questions = (ScriptPermissions)p.ReadUInt32()
         };
 
         public override void Serialize(UDPPacket p)
@@ -50,7 +51,7 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteUUID(SessionID);
             p.WriteUUID(TaskID);
             p.WriteUUID(ItemID);
-            p.WriteUInt32(Questions);
+            p.WriteUInt32((uint)Questions);
         }
     }
 }
