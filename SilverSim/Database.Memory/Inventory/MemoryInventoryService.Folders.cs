@@ -211,6 +211,11 @@ namespace SilverSim.Database.Memory.Inventory
 
         void IInventoryFolderServiceInterface.Add(InventoryFolder folder)
         {
+            if (!IsParentFolderIdValid(folder.Owner.ID, folder.ParentFolderID))
+            {
+                throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", folder.ParentFolderID, folder.ID));
+            }
+
             m_Folders[folder.Owner.ID].Add(folder.ID, new InventoryFolder(folder));
 
             if (folder.ParentFolderID != UUID.Zero)
@@ -241,6 +246,12 @@ namespace SilverSim.Database.Memory.Inventory
             {
                 throw new ArgumentException("folderID != toFolderID");
             }
+
+            if (!IsParentFolderIdValid(principalID, toFolderID, folderID))
+            {
+                throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", toFolderID, folderID));
+            }
+
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
             InventoryFolder internFolder;
             if (m_Folders.TryGetValue(principalID, out folderSet) &&

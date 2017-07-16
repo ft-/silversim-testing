@@ -124,6 +124,11 @@ namespace SilverSim.Database.Memory.Inventory
 
         void IInventoryItemServiceInterface.Add(InventoryItem item)
         {
+            if (!IsParentFolderIdValid(item.Owner.ID, item.ParentFolderID))
+            {
+                throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for item {1}", item.ParentFolderID, item.ID));
+            }
+
             m_Items[item.Owner.ID].Add(item.ID, new InventoryItem(item));
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
@@ -169,6 +174,11 @@ namespace SilverSim.Database.Memory.Inventory
             if (m_Items.TryGetValue(principalID, out itemSet) &&
                 itemSet.TryGetValue(id, out item))
             {
+                if (!IsParentFolderIdValid(principalID, toFolderID))
+                {
+                    throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for item {1}", toFolderID, id));
+                }
+
                 var oldFolderID = item.ParentFolderID;
                 item.ParentFolderID = toFolderID;
                 IncrementVersion(principalID, oldFolderID);
