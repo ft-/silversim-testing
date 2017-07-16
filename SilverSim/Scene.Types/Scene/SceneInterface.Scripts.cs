@@ -122,7 +122,7 @@ namespace SilverSim.Scene.Types.Scene
             if(item.ExperienceID != UUID.Zero)
             {
                 ExperienceServiceInterface experienceService = ExperienceService;
-                if(req.Questions == (ScriptPermissions.Teleport | ScriptPermissions.ControlCamera | ScriptPermissions.TrackCamera | ScriptPermissions.TriggerAnimation | ScriptPermissions.TakeControls))
+                if(req.Questions == ScriptPermissions.ExperienceGrantedPermissions)
                 {
                     /* allow response */
                     try
