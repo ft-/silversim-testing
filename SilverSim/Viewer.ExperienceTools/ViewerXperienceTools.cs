@@ -28,6 +28,7 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
+using SilverSim.Types.Grid;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types.StructuredData.REST;
 using SilverSim.Viewer.Core;
@@ -664,7 +665,7 @@ namespace SilverSim.Viewer.ExperienceTools
                 Map entry = kvp.Value as Map;
                 IValue iv;
                 UUID experienceid;
-                if(!UUID.TryParse(kvp.Key, out experienceid) || entry == null || !entry.TryGetValue("permissions", out iv))
+                if(!UUID.TryParse(kvp.Key, out experienceid) || entry == null || !entry.TryGetValue("permission", out iv))
                 {
                     continue;
                 }
@@ -797,10 +798,150 @@ namespace SilverSim.Viewer.ExperienceTools
          * <llsd>
          *   <map>
          *     <key>experience_keys</key>
-         *     <array><uuid>xxx</uuid></array>
+         *     <array>
+         *          ExperienceInfo
+         *     </array>
          *   </map>
          * </llsd>
          */
+        [CapabilityHandler("UpdateExperience")]
+        [RequiresExperienceSupport]
+        public void HandleUpdateExperienceCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "POST")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            Map reqmap;
+
+            using (Stream s = httpreq.Body)
+            {
+                reqmap = LlsdXml.Deserialize(s) as Map;
+            }
+
+            if (reqmap == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                return;
+            }
+
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            UUID experienceid = reqmap["public_id"].AsUUID;
+
+            ExperienceInfo info;
+            Map resmap = new Map();
+            if (experienceService.TryGetValue(experienceid, out info))
+            {
+                IValue iv;
+                if(reqmap.TryGetValue("group_id", out iv))
+                {
+                    UUID id = iv.AsUUID;
+                    UGI ugi;
+                    if (id == UUID.Zero)
+                    {
+                        info.Group = UGI.Unknown;
+                    }
+                    else if(scene.GroupsNameService != null && scene.GroupsNameService.TryGetValue(id, out ugi))
+                    {
+                        info.Group = ugi;
+                    }
+                }
+
+                if(reqmap.TryGetValue("name", out iv))
+                {
+                    info.Name = iv.ToString();
+                }
+
+                if(reqmap.TryGetValue("description", out iv))
+                {
+                    info.Description = iv.ToString();
+                }
+
+                if(reqmap.TryGetValue("properties", out iv))
+                {
+                    info.Properties = (ExperiencePropertyFlags)iv.AsInt;
+                }
+
+                if(reqmap.TryGetValue("maturity", out iv))
+                {
+                    info.Maturity = (RegionAccess)iv.AsInt;
+                }
+
+                if(reqmap.TryGetValue("extended_metadata", out iv))
+                {
+                    info.ExtendedMetadata = iv.ToString();
+                }
+
+                if(reqmap.TryGetValue("slurl", out iv))
+                {
+                    info.SlUrl = iv.ToString();
+                }
+
+                try
+                {
+                    experienceService.Update(agent.Owner, info);
+                }
+                catch(Exception e)
+                {
+#if DEBUG
+                    m_Log.Debug("UpdateExperience capability", e);
+#endif
+                    resmap.Add("removed", new AnArray
+                    {
+                        new Map
+                        {
+                            { "error-tag", "Failed to update" }
+                        }
+                    });
+                }
+
+                if(!resmap.ContainsKey("removed"))
+                {
+                    var ids = new AnArray();
+                    ids.Add(info.ToMap());
+                    resmap.Add("experience_keys", ids);
+                }
+            }
+            else
+            {
+                resmap.Add("removed", new AnArray
+                {
+                    new Map
+                    {
+                        { "error-tag", "Not found" }
+                    }
+                });
+            }
+
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resmap, o);
+                }
+            }
+        }
+
         /* IsExperienceAdmin 
          * GET ?experience_id=<experienceid>
          * 
@@ -843,7 +984,13 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            bool isadmin = experienceService.Admins[experienceid, agent.Owner];
+            ExperienceInfo info;
+            bool isadmin = false;
+            if(experienceService.TryGetValue(experienceid, out info))
+            {
+                isadmin = info.Owner.EqualsGrid(agent.Owner) || experienceService.Admins[experienceid, agent.Owner];
+            }
+
             Map resdata = new Map();
             resdata.Add("status", isadmin);
             using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
