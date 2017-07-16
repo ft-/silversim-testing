@@ -1002,7 +1002,56 @@ namespace SilverSim.Viewer.ExperienceTools
             }
         }
 
-        /* IsExperienceContributor - purpose unknown */
+        /* IsExperienceContributor */
+        [CapabilityHandler("IsExperienceContributor")]
+        [RequiresExperienceSupport]
+        public void HandleIsExperienceContributorCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
+        {
+            if (httpreq.CallerIP != circuit.RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (httpreq.Method != "GET")
+            {
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            Dictionary<string, object> reqdata = REST.ParseRESTFromRawUrl(httpreq.RawUrl);
+            UUID experienceid = UUID.Parse((string)reqdata["experience_id"]);
+
+            SceneInterface scene = circuit.Scene;
+            if (scene == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceServiceInterface experienceService = scene.ExperienceService;
+            if (experienceService == null)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            ExperienceInfo info;
+            bool iscontributor = false;
+            if (experienceService.TryGetValue(experienceid, out info))
+            {
+                iscontributor = info.Owner.EqualsGrid(agent.Owner);
+            }
+
+            Map resdata = new Map();
+            resdata.Add("status", iscontributor);
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, o);
+                }
+            }
+        }
 
         /* RegionExperiences
          * GET:
