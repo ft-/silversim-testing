@@ -185,15 +185,12 @@ namespace SilverSim.Viewer.Core
                     };
                     if (asset.Data.Length > IMAGE_FIRST_PACKET_SIZE)
                     {
-                        if (imageRequest.Packet == 0)
-                        {
-                            res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
-                            uint numpackets = ((uint)asset.Data.Length - IMAGE_FIRST_PACKET_SIZE + IMAGE_PACKET_SIZE - 1) / IMAGE_PACKET_SIZE;
-                            res.Packets = (ushort)numpackets;
+                        res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
+                        uint numpackets = ((uint)asset.Data.Length - IMAGE_FIRST_PACKET_SIZE + IMAGE_PACKET_SIZE - 1) / IMAGE_PACKET_SIZE;
+                        res.Packets = (ushort)numpackets;
 
-                            Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);
-                            SendMessage(res);
-                        }
+                        Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);
+                        SendMessage(res);
 
                         int offset = IMAGE_FIRST_PACKET_SIZE;
                         ushort packetno = 0;
@@ -212,7 +209,7 @@ namespace SilverSim.Viewer.Core
                             offset += IMAGE_PACKET_SIZE;
                         }
                     }
-                    else if (imageRequest.Packet == 0)
+                    else
                     {
                         res.Data = asset.Data;
                         res.Packets = 1;

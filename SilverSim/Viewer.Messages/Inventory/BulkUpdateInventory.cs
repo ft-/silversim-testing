@@ -109,7 +109,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public void AddInventoryFolder(InventoryFolder folder)
         {
-            FolderData.Add(new FolderDataEntry()
+            FolderData.Add(new FolderDataEntry
             {
                 FolderID = folder.ID,
                 ParentID = folder.ParentFolderID,
@@ -120,7 +120,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public void AddInventoryItem(InventoryItem item, UInt32 callbackID)
         {
-            ItemData.Add(new ItemDataEntry()
+            ItemData.Add(new ItemDataEntry
             {
                 ItemID = item.ID,
                 CallbackID = callbackID,
