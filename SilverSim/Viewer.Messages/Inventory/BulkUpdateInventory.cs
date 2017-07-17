@@ -215,7 +215,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new BulkUpdateInventory()
+            var m = new BulkUpdateInventory
             {
                 AgentID = p.ReadUUID(),
                 TransactionID = p.ReadUUID()
@@ -223,7 +223,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.FolderData.Add(new FolderDataEntry()
+                m.FolderData.Add(new FolderDataEntry
                 {
                     FolderID = p.ReadUUID(),
                     ParentID = p.ReadUUID(),
@@ -235,7 +235,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.ItemData.Add(new ItemDataEntry()
+                m.ItemData.Add(new ItemDataEntry
                 {
                     ItemID = p.ReadUUID(),
                     CallbackID = p.ReadUInt32(),
