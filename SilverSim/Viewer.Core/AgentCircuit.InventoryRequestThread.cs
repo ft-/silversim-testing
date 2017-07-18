@@ -294,7 +294,6 @@ namespace SilverSim.Viewer.Core
                     try
                     {
                         /* let us try to store the asset locally */
-                        asset.Temporary = true;
                         Scene.AssetService.Store(asset);
                     }
                     catch (Exception e3)
