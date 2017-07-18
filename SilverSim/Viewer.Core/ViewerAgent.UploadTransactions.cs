@@ -452,7 +452,7 @@ namespace SilverSim.Viewer.Core
             try
             {
 #if DEBUG
-                m_Log.DebugFormat("Storing asset {0} for {1}", data.ID, Owner.FullName);
+                m_Log.DebugFormat("Storing asset {0} for {1} / Target={2}", data.ID, Owner.FullName, transaction.Target.ToString());
 #endif
                 if (transaction.Target == AssetUploadTransaction.TargetAsset.Agent)
                 {
@@ -463,8 +463,10 @@ namespace SilverSim.Viewer.Core
                     Circuits[fromSceneID].Scene.AssetService.Store(data);
                 }
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.ErrorFormat("Storing asset {0} for {1} failed {2}: {3}", data.ID, Owner.FullName, e.GetType().FullName, e.Message);
+
                 SendAlertMessage("Could not upload asset", fromSceneID);
                 success = false;
             }
