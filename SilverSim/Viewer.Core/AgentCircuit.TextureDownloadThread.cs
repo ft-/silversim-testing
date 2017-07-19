@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using SilverSim.Viewer.Messages.Image;
+using SilverSim.Viewer.Messages;
 
 namespace SilverSim.Viewer.Core
 {
@@ -38,8 +39,8 @@ namespace SilverSim.Viewer.Core
         private void TextureDownloadThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Texture Downloader for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
-            var bakedReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
-            var normalReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
+            var bakedReqs = new Queue<RequestImage.RequestImageEntry>();
+            var normalReqs = new Queue<RequestImage.RequestImageEntry>();
             var activeRequestImages = new HashSet<UUID>();
 #warning Implement Priority handling
 
@@ -185,28 +186,33 @@ namespace SilverSim.Viewer.Core
                     };
                     if (asset.Data.Length > IMAGE_FIRST_PACKET_SIZE)
                     {
+                        List<Message> messages = new List<Message>();
                         res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
-                        uint numpackets = ((uint)asset.Data.Length - IMAGE_FIRST_PACKET_SIZE + IMAGE_PACKET_SIZE - 1) / IMAGE_PACKET_SIZE + 1;
-                        res.Packets = (ushort)numpackets;
 
                         Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);
-                        SendMessage(res);
+                        messages.Add(res);
 
                         int offset = IMAGE_FIRST_PACKET_SIZE;
-                        ushort packetno = 0;
+                        ushort packetno = 1;
                         while(offset < asset.Data.Length)
                         {
                             var ip = new ImagePacket()
                             {
                                 ID = imageRequest.ImageID,
-                                Packet = ++packetno,
+                                Packet = packetno++,
                                 Data = (asset.Data.Length - offset > IMAGE_PACKET_SIZE) ?
                                 new byte[IMAGE_PACKET_SIZE] :
                                 new byte[asset.Data.Length - offset]
                             };
                             Buffer.BlockCopy(asset.Data, offset, ip.Data, 0, ip.Data.Length);
-                            SendMessage(ip);
+                            messages.Add(ip);
                             offset += IMAGE_PACKET_SIZE;
+                        }
+                        res.Packets = packetno;
+
+                        foreach(Message m in messages)
+                        {
+                            SendMessage(m);
                         }
                     }
                     else
