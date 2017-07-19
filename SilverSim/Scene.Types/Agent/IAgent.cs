@@ -143,6 +143,12 @@ namespace SilverSim.Scene.Types.Agent
 
         void SetDefaultAnimation(string anim_state);
 
+        int AppearanceSerial
+        {
+            get;
+            set;
+        }
+
         AppearanceInfo.AvatarTextureData Textures
         {
             get;

@@ -111,7 +111,7 @@ namespace SilverSim.Types.Agent
         public double AvatarHeight;
         public int Serial = 1;
 
-        public byte[] BakeIndices => new byte[] { 8, 9, 10, 11, 19, 20 };
+        public static byte[] BakeIndices => new byte[] { 8, 9, 10, 11, 19, 20 };
 
         public static readonly int MaxVisualParams = 255;
 

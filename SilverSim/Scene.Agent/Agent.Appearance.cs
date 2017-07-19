@@ -85,7 +85,21 @@ namespace SilverSim.Scene.Agent
         public const int MaxVisualParams = 260;
         protected const int NUM_AVATAR_TEXTURES = 21;
 
+        public static UUID IMG_DEFAULT_AVATAR => new UUID("c228d1cf-4b5d-4ba8-84f4-899a0796aa97");
+
         public Action<IAgent> OnAppearanceUpdate;
+
+        public int AppearanceSerial
+        {
+            get
+            {
+                return Serial;
+            }
+            set
+            {
+                Serial = value;
+            }
+        }
 
         protected void InvokeOnAppearanceUpdate()
         {
@@ -125,8 +139,8 @@ namespace SilverSim.Scene.Agent
             {
                 var te = new TextureEntry();
                 UUID[] textures = Textures.All;
-                te.DefaultTexture.TextureID = textures[0];
-                for (int i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
+                te.DefaultTexture.TextureID = IMG_DEFAULT_AVATAR;
+                foreach(int i in AppearanceInfo.BakeIndices)
                 {
                     if (te.DefaultTexture.TextureID != textures[i])
                     {

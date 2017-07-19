@@ -254,7 +254,7 @@ namespace SilverSim.Scene.Types.Agent
             }
 
             agent.Wearables.All = wearables;
-            agent.Appearance.Serial = currentOutfit.Version;
+            agent.AppearanceSerial = currentOutfit.Version;
 
             logOutput?.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
 
