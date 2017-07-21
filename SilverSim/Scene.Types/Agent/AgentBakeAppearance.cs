@@ -574,7 +574,7 @@ namespace SilverSim.Scene.Types.Agent
                     target[i] = Math.Min(target[i], source[i]);
 
                     /* skip RGB */
-                    i += 3;
+                    i -= 3;
                 }
 
                 bmp.Update();
