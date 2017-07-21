@@ -22,6 +22,7 @@
 using log4net;
 using OpenJp2.Net;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -171,32 +172,71 @@ namespace SilverSim.Scene.Types.Agent
             return (byte)Math.Floor((val - min) * 255 / (max - min));
         }
 
+        public sealed class AgentInfo
+        {
+            public readonly UUI Owner;
+            public UUID CurrentOutfitFolderID;
+            public readonly AssetServiceInterface AssetService;
+            public readonly InventoryServiceInterface InventoryService;
+            public InventoryFolderContent CurrentOutfit;
+
+            public AgentInfo(IAgent agent)
+            {
+                Owner = agent.Owner;
+                CurrentOutfitFolderID = agent.CurrentOutfitFolder;
+                AssetService = agent.AssetService;
+                InventoryService = agent.InventoryService;
+            }
+
+            public AgentInfo(UUI owner, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, UUID currentOutfitFolderID)
+            {
+                Owner = owner;
+                InventoryService = inventoryService;
+                AssetService = assetService;
+                CurrentOutfitFolderID = currentOutfitFolderID;
+            }
+        }
+
         public static void LoadAppearanceFromCurrentOutfit(this IAgent agent, AssetServiceInterface sceneAssetService, bool rebake = false, Action<string> logOutput = null)
         {
-            var agentOwner = agent.Owner;
-            var inventoryService = agent.InventoryService;
-            var assetService = agent.AssetService;
-
-            logOutput?.Invoke(string.Format("Baking agent {0}", agent.Owner.FullName));
             if (agent.CurrentOutfitFolder == UUID.Zero)
             {
-                var currentOutfitFolder = inventoryService.Folder[agentOwner.ID, AssetType.CurrentOutfitFolder];
+                var currentOutfitFolder = agent.InventoryService.Folder[agent.Owner.ID, AssetType.CurrentOutfitFolder];
                 agent.CurrentOutfitFolder = currentOutfitFolder.ID;
                 logOutput?.Invoke(string.Format("Retrieved current outfit folder for agent {0}", agent.Owner.FullName));
             }
 
-            var currentOutfit = inventoryService.Folder.Content[agentOwner.ID, agent.CurrentOutfitFolder];
-            if (currentOutfit.Version == agent.Appearance.Serial && !rebake)
+            AgentInfo agentInfo = new AgentInfo(agent);
+            agentInfo.CurrentOutfit = agent.InventoryService.Folder.Content[agent.Owner.ID, agent.CurrentOutfitFolder];
+            if (agentInfo.CurrentOutfit.Version == agent.Appearance.Serial && !rebake)
             {
                 logOutput?.Invoke(string.Format("No baking required for agent {0}", agent.Owner.FullName));
                 return;
+            }
+            agent.Appearance = LoadAppearanceFromCurrentOutfit(new AgentInfo(agent), sceneAssetService, logOutput);
+        }
+
+        public static AppearanceInfo LoadAppearanceFromCurrentOutfit(AgentInfo agentInfo, AssetServiceInterface sceneAssetService, Action<string> logOutput = null)
+        {
+            logOutput?.Invoke(string.Format("Baking agent {0}", agentInfo.Owner.FullName));
+
+            if (agentInfo.CurrentOutfitFolderID == UUID.Zero)
+            {
+                var currentOutfitFolder = agentInfo.InventoryService.Folder[agentInfo.Owner.ID, AssetType.CurrentOutfitFolder];
+                agentInfo.CurrentOutfitFolderID = currentOutfitFolder.ID;
+                logOutput?.Invoke(string.Format("Retrieved current outfit folder for agent {0}", agentInfo.Owner.FullName));
+            }
+
+            if (agentInfo.CurrentOutfit == null)
+            {
+                agentInfo.CurrentOutfit = agentInfo.InventoryService.Folder.Content[agentInfo.Owner.ID, agentInfo.CurrentOutfitFolderID];
             }
 
             /* the ordering of clothing layering is placed into the description of the link */
 
             var items = new List<InventoryItem>();
             var itemlinks = new List<UUID>();
-            foreach (var item in currentOutfit.Items)
+            foreach (var item in agentInfo.CurrentOutfit.Items)
             {
                 if (item.AssetType == AssetType.Link)
                 {
@@ -208,14 +248,14 @@ namespace SilverSim.Scene.Types.Agent
 
             var wearables = new Dictionary<WearableType, List<AgentWearables.WearableInfo>>();
 
-            var actualItems = inventoryService.Item[agentOwner.ID, itemlinks];
+            var actualItems = agentInfo.InventoryService.Item[agentInfo.Owner.ID, itemlinks];
             var actualItemsInDict = new Dictionary<UUID, InventoryItem>();
             foreach (var item in actualItems)
             {
                 actualItemsInDict.Add(item.ID, item);
             }
 
-            logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", agent.Owner.FullName));
+            logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", agentInfo.Owner.FullName));
 
             foreach (var linkItem in items)
             {
@@ -225,7 +265,7 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     AssetData outfitData;
                     Wearable wearableData;
-                    if (assetService.TryGetValue(actualItem.AssetID, out outfitData))
+                    if (agentInfo.AssetService.TryGetValue(actualItem.AssetID, out outfitData))
                     {
                         try
                         {
@@ -233,7 +273,7 @@ namespace SilverSim.Scene.Types.Agent
                         }
                         catch (Exception e)
                         {
-                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, agent.Owner.FullName, agent.Owner.ID);
+                            string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, agentInfo.Owner.FullName, agentInfo.Owner.ID);
                             m_BakeLog.ErrorFormat(info, e);
                             throw new BakingErrorException(info, e);
                         }
@@ -253,14 +293,15 @@ namespace SilverSim.Scene.Types.Agent
                 }
             }
 
-            agent.Wearables.All = wearables;
-            agent.AppearanceSerial = currentOutfit.Version;
+            logOutput?.Invoke(string.Format("Processing baking for agent {0}", agentInfo.Owner.FullName));
 
-            logOutput?.Invoke(string.Format("Processing baking for agent {0}", agent.Owner.FullName));
+            AppearanceInfo appearance = new AppearanceInfo();
+            appearance.Wearables.All = wearables;
+            appearance.Serial = agentInfo.CurrentOutfit.Version;
+            agentInfo.BakeAppearanceFromWearablesInfo(appearance, sceneAssetService, logOutput);
 
-            agent.BakeAppearanceFromWearablesInfo(sceneAssetService, logOutput);
-
-            logOutput?.Invoke(string.Format("Baking agent {0} completed", agent.Owner.FullName));
+            logOutput?.Invoke(string.Format("Baking agent {0} completed", agentInfo.Owner.FullName));
+            return appearance;
         }
         #endregion
 
@@ -372,14 +413,14 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public static void BakeAppearanceFromWearablesInfo(this IAgent agent, AssetServiceInterface sceneAssetService, Action<string> logOutput = null)
+        public static void BakeAppearanceFromWearablesInfo(this AgentInfo agent, AppearanceInfo appearance, AssetServiceInterface sceneAssetService, Action<string> logOutput = null)
         {
             var agentOwner = agent.Owner;
             var inventoryService = agent.InventoryService;
             var assetService = agent.AssetService;
             var visualParamInputs = new Dictionary<uint, double>();
 
-            Dictionary<WearableType, List<AgentWearables.WearableInfo>> wearables = agent.Wearables.All;
+            Dictionary<WearableType, List<AgentWearables.WearableInfo>> wearables = appearance.Wearables.All;
             using (var bakeStatus = new BakeStatus())
             {
                 var wearablesItemIds = new List<UUID>();
@@ -509,9 +550,9 @@ namespace SilverSim.Scene.Types.Agent
                     }
                     visualParams[p] = DoubleToByte(val, map.MinValue, map.MaxValue);
                 }
-                agent.VisualParams = visualParams;
+                appearance.VisualParams = visualParams;
 
-                agent.CoreBakeLogic(bakeStatus, sceneAssetService);
+                appearance.CoreBakeLogic(bakeStatus, sceneAssetService);
             }
         }
 
@@ -897,17 +938,17 @@ namespace SilverSim.Scene.Types.Agent
 
         public static object Owner { get; }
 
-        private static void CoreBakeLogic(this AppearanceInfo.AvatarTextureData agentTextures, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
+        private static void CoreBakeLogic(this AppearanceInfo appearance, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
         {
             for(int idx = 0; idx < AppearanceInfo.AvatarTextureData.TextureCount; ++idx)
             {
-                agentTextures[idx] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+                appearance.AvatarTextures[idx] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
             }
             foreach (OutfitItem item in bakeStatus.OutfitItems.Values)
             {
                 foreach(KeyValuePair<AvatarTextureIndex, UUID> tex in item.WearableData.Textures)
                 {
-                    agentTextures[(int)tex.Key] = tex.Value;
+                    appearance.AvatarTextures[(int)tex.Key] = tex.Value;
                 }
             }
 
@@ -944,17 +985,12 @@ namespace SilverSim.Scene.Types.Agent
                 sceneAssetService.Store(bakeSkirt);
             }
 
-            agentTextures[(int)AvatarTextureIndex.EyesBaked] = bakeEyes.ID;
-            agentTextures[(int)AvatarTextureIndex.HeadBaked] = bakeHead.ID;
-            agentTextures[(int)AvatarTextureIndex.UpperBaked] = bakeUpperBody.ID;
-            agentTextures[(int)AvatarTextureIndex.LowerBaked] = bakeLowerBody.ID;
-            agentTextures[(int)AvatarTextureIndex.HairBaked] = bakeHair.ID;
-            agentTextures[(int)AvatarTextureIndex.Skirt] = bakeSkirt != null ? bakeSkirt.ID : UUID.Zero;
-        }
-
-        private static void CoreBakeLogic(this IAgent agent, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
-        {
-            CoreBakeLogic(agent.Textures, bakeStatus, sceneAssetService);
+            appearance.AvatarTextures[(int)AvatarTextureIndex.EyesBaked] = bakeEyes.ID;
+            appearance.AvatarTextures[(int)AvatarTextureIndex.HeadBaked] = bakeHead.ID;
+            appearance.AvatarTextures[(int)AvatarTextureIndex.UpperBaked] = bakeUpperBody.ID;
+            appearance.AvatarTextures[(int)AvatarTextureIndex.LowerBaked] = bakeLowerBody.ID;
+            appearance.AvatarTextures[(int)AvatarTextureIndex.HairBaked] = bakeHair.ID;
+            appearance.AvatarTextures[(int)AvatarTextureIndex.Skirt] = bakeSkirt != null ? bakeSkirt.ID : UUID.Zero;
         }
 
         #endregion
