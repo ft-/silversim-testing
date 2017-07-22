@@ -43,6 +43,7 @@ namespace SilverSim.Scene.Types.Agent
     public static partial class AgentBakeAppearance
     {
         private static readonly ILog m_BakeLog = LogManager.GetLogger("AVATAR BAKING");
+        private static readonly UUID IMG_INVISIBLE = new UUID("3a367d1c-bef1-6d43-7595-e88c1e3aadb3");
 
         private enum BakeType
         {
@@ -68,15 +69,14 @@ namespace SilverSim.Scene.Types.Agent
         private class BakeStatus : IDisposable
         {
             public readonly Dictionary<UUID, OutfitItem> OutfitItems = new Dictionary<UUID, OutfitItem>();
-            public readonly Dictionary<UUID, BakeImage> Textures = new Dictionary<UUID, BakeImage>();
-            public readonly Dictionary<UUID, BakeImage> TexturesResized128 = new Dictionary<UUID, BakeImage>();
-            public readonly Dictionary<UUID, BakeImage> TexturesResized512 = new Dictionary<UUID, BakeImage>();
-            public UUID Layer0TextureID = UUID.Zero;
+            public readonly Dictionary<UUID, Image> Textures = new Dictionary<UUID, Image>();
+            public readonly Dictionary<UUID, Image> TexturesResized128 = new Dictionary<UUID, Image>();
+            public readonly Dictionary<UUID, Image> TexturesResized512 = new Dictionary<UUID, Image>();
 
-            public bool TryGetTexture(BakeType bakeType, UUID textureID, out BakeImage img)
+            public bool TryGetTexture(BakeType bakeType, UUID textureID, out Image img)
             {
                 int targetDimension;
-                Dictionary<UUID, BakeImage> resizeCache;
+                Dictionary<UUID, Image> resizeCache;
                 if (bakeType == BakeType.Eyes)
                 {
                     resizeCache = TexturesResized128;
@@ -98,7 +98,7 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     if (img.Width != targetDimension || img.Height != targetDimension)
                     {
-                        img = new BakeImage(img, targetDimension, targetDimension);
+                        img = new Bitmap(img, targetDimension, targetDimension);
                         resizeCache.Add(textureID, img);
                     }
                     return true;
@@ -305,113 +305,6 @@ namespace SilverSim.Scene.Types.Agent
         }
         #endregion
 
-        #region Actual Baking Code
-        private const int MAX_WEARABLES_PER_TYPE = 5;
-
-        public class BakeImage : IDisposable
-        {
-            private Bitmap m_Bitmap;
-            private byte[] m_ArgbImage;
-
-            public BakeImage(Stream s)
-            {
-                m_Bitmap = new Bitmap(s);
-            }
-
-            public BakeImage(int width, int height)
-            {
-                m_Bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            }
-
-            public BakeImage(BakeImage img, int newWidth, int newHeight)
-            {
-                m_Bitmap = new Bitmap(img.m_Bitmap, newWidth, newHeight);
-            }
-
-            public BakeImage(Image i)
-            {
-                m_Bitmap = new Bitmap(i);
-            }
-
-            public int Width => m_Bitmap.Width;
-            public int Height => m_Bitmap.Height;
-
-            public static implicit operator Bitmap(BakeImage img)
-            {
-                return img.m_Bitmap;
-            }
-
-            public byte[] ArgbImage
-            {
-                get
-                {
-                    Bitmap bmp = m_Bitmap;
-                    if(m_ArgbImage == null && (bmp.PixelFormat == PixelFormat.Format32bppArgb || bmp.PixelFormat == PixelFormat.Format24bppRgb))
-                    {
-                        BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
-                            ImageLockMode.ReadOnly,
-                            bmp.PixelFormat);
-                        if (bmp.PixelFormat == PixelFormat.Format32bppArgb)
-                        {
-                            int bytes = Math.Abs(bmpData.Stride) * bmpData.Height;
-                            m_ArgbImage = new byte[bytes];
-                            Marshal.Copy(bmpData.Scan0, m_ArgbImage, 0, bytes);
-                        }
-                        else
-                        {
-                            int actbytes = Math.Abs(bmpData.Stride) * bmp.Height;
-                            int finalbytes = bmpData.Width * bmpData.Height * 4;
-                            m_ArgbImage = new byte[finalbytes];
-                            Marshal.Copy(bmpData.Scan0, m_ArgbImage, 0, actbytes);
-
-                            /* make it argb format */
-                            for(int i = bmpData.Width * bmpData.Height; i-- != 0; )
-                            {
-                                int targetidx = i * 4;
-                                int sourceidx = i * 3;
-                                m_ArgbImage[targetidx + 3] = 255;
-                                m_ArgbImage[targetidx + 2] = m_ArgbImage[sourceidx + 2];
-                                m_ArgbImage[targetidx + 1] = m_ArgbImage[sourceidx + 1];
-                                m_ArgbImage[targetidx + 0] = m_ArgbImage[sourceidx + 0];
-                            }
-                        }
-                        bmp.UnlockBits(bmpData);
-                    }
-                    return m_ArgbImage;
-                }
-            }
-
-            public void Update()
-            {
-                if (m_Bitmap.PixelFormat == PixelFormat.Format32bppArgb)
-                {
-                    BitmapData bmpData = m_Bitmap.LockBits(new Rectangle(0, 0, m_Bitmap.Width, m_Bitmap.Height),
-                        ImageLockMode.ReadWrite,
-                        m_Bitmap.PixelFormat);
-                    Marshal.Copy(m_ArgbImage, 0, bmpData.Scan0, m_ArgbImage.Length);
-                    m_Bitmap.UnlockBits(bmpData);
-                }
-                else
-                {
-                    Bitmap bmp = m_Bitmap;
-
-                    /* make a new image with Argb format */
-                    m_Bitmap = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);
-
-                    BitmapData bmpData = m_Bitmap.LockBits(new Rectangle(0, 0, m_Bitmap.Width, m_Bitmap.Height),
-                        ImageLockMode.ReadWrite,
-                        bmp.PixelFormat);
-                    Marshal.Copy(m_ArgbImage, 0, bmpData.Scan0, m_ArgbImage.Length);
-                    m_Bitmap.UnlockBits(bmpData);
-                    bmp.Dispose();
-                }
-            }
-
-            public void Dispose()
-            {
-                m_Bitmap?.Dispose();
-            }
-        }
 
         public static void BakeAppearanceFromWearablesInfo(this AgentInfo agent, AppearanceInfo appearance, AssetServiceInterface sceneAssetService, Action<string> logOutput = null)
         {
@@ -475,12 +368,12 @@ namespace SilverSim.Scene.Types.Agent
                                     }
 
                                     /* load visual params */
-                                    foreach(var kvp in outfitItem.WearableData.Params)
+                                    foreach (var kvp in outfitItem.WearableData.Params)
                                     {
                                         visualParamInputs[kvp.Key] = kvp.Value;
                                     }
 
-                                    if(outfitItem.WearableData.Type == WearableType.Physics)
+                                    if (outfitItem.WearableData.Type == WearableType.Physics)
                                     {
                                         numberParams = 251;
                                     }
@@ -497,7 +390,7 @@ namespace SilverSim.Scene.Types.Agent
                                         if (!assetService.TryGetValue(textureID, out textureData) &&
                                             !sceneAssetService.TryGetValue(textureID, out textureData))
                                         {
-                                            string info = string.Format("Asset {0} referenced by {1} for agent {2} ({3}) failed to be retrieved", textureID,inventoryItem.AssetID, agent.Owner.FullName, agent.Owner.ID);
+                                            string info = string.Format("Asset {0} referenced by {1} for agent {2} ({3}) failed to be retrieved", textureID, inventoryItem.AssetID, agent.Owner.FullName, agent.Owner.ID);
                                             m_BakeLog.ErrorFormat(info);
                                             throw new BakingErrorException(info);
                                         }
@@ -511,10 +404,7 @@ namespace SilverSim.Scene.Types.Agent
 
                                         try
                                         {
-                                            using (Image img = CSJ2K.J2kImage.FromStream(textureData.InputStream))
-                                            {
-                                                bakeStatus.Textures.Add(textureData.ID, new BakeImage(img));
-                                            }
+                                            bakeStatus.Textures.Add(textureData.ID, CSJ2K.J2kImage.FromStream(textureData.InputStream));
                                         }
                                         catch (Exception e)
                                         {
@@ -523,24 +413,19 @@ namespace SilverSim.Scene.Types.Agent
                                             throw new BakingErrorException(info, e);
                                         }
                                     }
-
-                                    if (bakeStatus.Layer0TextureID == UUID.Zero &&
-                                        !outfitItem.WearableData.Textures.TryGetValue(AvatarTextureIndex.HeadBodypaint, out bakeStatus.Layer0TextureID))
-                                    {
-                                        bakeStatus.Layer0TextureID = UUID.Zero;
-                                    }
                                 }
                                 break;
 
                             default:
                                 break;
                         }
+                        bakeStatus.OutfitItems.Add(outfitItem.ActualItem.ID, outfitItem);
                     }
                 }
 
                 /* update visual params */
                 var visualParams = new byte[numberParams];
-                for(int p = 0; p < numberParams; ++p)
+                for (int p = 0; p < numberParams; ++p)
                 {
                     double val;
                     var map = m_VisualParamMapping[p];
@@ -555,490 +440,5 @@ namespace SilverSim.Scene.Types.Agent
                 appearance.CoreBakeLogic(bakeStatus, sceneAssetService);
             }
         }
-
-        private static void AddAlpha(BakeImage bmp, BakeImage inp)
-        {
-            byte[] target = bmp.ArgbImage;
-            byte[] source = inp.ArgbImage;
-            BakeImage bakeIntermediate = null;
-            if (bmp.Width != inp.Width || bmp.Height != inp.Height)
-            {
-                bakeIntermediate = new BakeImage(inp, bmp.Width, bmp.Height);
-                inp = bakeIntermediate;
-            }
-
-            try
-            {
-                for (int i = bmp.Width * bmp.Height * 4; i-- != 0;)
-                {
-                    target[i] = Math.Min(target[i], source[i]);
-
-                    /* skip RGB */
-                    i -= 3;
-                }
-
-                bmp.Update();
-            }
-            finally
-            {
-                bakeIntermediate?.Dispose();
-            }
-        }
-
-        private static void MultiplyLayerFromAlpha(BakeImage bmp, BakeImage inp)
-        {
-            byte[] target = bmp.ArgbImage;
-            byte[] source = inp.ArgbImage;
-            BakeImage bakeIntermediate = null;
-            if(bmp.Width != inp.Width || bmp.Height != inp.Height)
-            {
-                bakeIntermediate = new BakeImage(inp, bmp.Width, bmp.Height);
-                inp = bakeIntermediate;
-            }
-            try
-            {
-                for (int i = bmp.Width * bmp.Height * 4; i-- != 0;)
-                {
-                    /* skip A */
-                    --i;
-                    target[i] = (byte)(target[i] * source[i] / 255);
-                    --i;
-                    target[i] = (byte)(target[i] * source[i] / 255);
-                    --i;
-                    target[i] = (byte)(target[i] * source[i] / 255);
-                }
-
-                bmp.Update();
-            }
-            finally
-            {
-                bakeIntermediate?.Dispose();
-            }
-        }
-
-        private static System.Drawing.Color GetTint(Wearable w, BakeType bType)
-        {
-            var wColor = new SilverSim.Types.Color(1, 1, 1);
-            double val;
-            switch (w.Type)
-            {
-                case WearableType.Tattoo:
-                    if (w.Params.TryGetValue(1071, out val))
-                    {
-                        wColor.R = val.Clamp(0, 1);
-                    }
-                    if (w.Params.TryGetValue(1072, out val))
-                    {
-                        wColor.G = val.Clamp(0, 1);
-                    }
-                    if (w.Params.TryGetValue(1073, out val))
-                    {
-                        wColor.B = val.Clamp(0, 1);
-                    }
-                    switch (bType)
-                    {
-                        case BakeType.Head:
-                            if (w.Params.TryGetValue(1062, out val))
-                            {
-                                wColor.R = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(1063, out val))
-                            {
-                                wColor.G = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(1064, out val))
-                            {
-                                wColor.B = val.Clamp(0, 1);
-                            }
-                            break;
-                        case BakeType.UpperBody:
-                            if (w.Params.TryGetValue(1065, out val))
-                            {
-                                wColor.R = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(1066, out val))
-                            {
-                                wColor.G = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(1067, out val))
-                            {
-                                wColor.B = val.Clamp(0, 1);
-                            }
-                            break;
-                        case BakeType.LowerBody:
-                            if (w.Params.TryGetValue(1068, out val))
-                            {
-                                wColor.R = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(1069, out val))
-                            {
-                                wColor.G = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(1070, out val))
-                            {
-                                wColor.B = val.Clamp(0, 1);
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-                    break;
-
-                case WearableType.Jacket:
-                    if (w.Params.TryGetValue(834, out val))
-                    {
-                        wColor.R = val.Clamp(0, 1);
-                    }
-                    if (w.Params.TryGetValue(835, out val))
-                    {
-                        wColor.G = val.Clamp(0, 1);
-                    }
-                    if (w.Params.TryGetValue(836, out val))
-                    {
-                        wColor.B = val.Clamp(0, 1);
-                    }
-                    switch (bType)
-                    {
-                        case BakeType.UpperBody:
-                            if (w.Params.TryGetValue(831, out val))
-                            {
-                                wColor.R = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(832, out val))
-                            {
-                                wColor.G = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(833, out val))
-                            {
-                                wColor.B = val.Clamp(0, 1);
-                            }
-                            break;
-                        case BakeType.LowerBody:
-                            if (w.Params.TryGetValue(809, out val))
-                            {
-                                wColor.R = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(810, out val))
-                            {
-                                wColor.G = val.Clamp(0, 1);
-                            }
-                            if (w.Params.TryGetValue(811, out val))
-                            {
-                                wColor.B = val.Clamp(0, 1);
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-                    break;
-
-                default:
-                    wColor = w.GetTint();
-                    break;
-            }
-
-            return System.Drawing.Color.FromArgb(wColor.R_AsByte, wColor.G_AsByte, wColor.B_AsByte);
-        }
-
-        private static void ApplyTint(BakeImage bmp, SilverSim.Types.Color col)
-        {
-            byte[] argb = bmp.ArgbImage;
-            for(int i = bmp.Width * bmp.Height * 4; i-- != 0;)
-            {
-                /* skip A */
-                --i;
-                argb[i] = (byte)(argb[i] * col.R).Clamp(0, 255);
-                --i;
-                argb[i] = (byte)(argb[i] * col.G).Clamp(0, 255);
-                --i;
-                argb[i] = (byte)(argb[i] * col.B).Clamp(0, 255);
-            }
-            bmp.Update();
-        }
-
-        private static AssetData BakeTexture(BakeStatus status, BakeType bake)
-        {
-            int bakeDimensions = (bake == BakeType.Eyes) ? 128 : 512;
-            BakeImage srcimg;
-            var data = new AssetData()
-            {
-                ID = UUID.RandomFixedFirst(0xFFFFFFFF),
-                Type = AssetType.Texture,
-                Local = true,
-                Temporary = true,
-                Flags = AssetFlags.Collectable | AssetFlags.Rewritable
-            };
-            AvatarTextureIndex[] bakeProcessTable;
-            switch (bake)
-            {
-                case BakeType.Head:
-                    bakeProcessTable = IndexesForBakeHead;
-                    data.Name = "Baked Head Texture";
-                    break;
-
-                case BakeType.Eyes:
-                    bakeProcessTable = IndexesForBakeEyes;
-                    data.Name = "Baked Eyes Texture";
-                    break;
-
-                case BakeType.Hair:
-                    bakeProcessTable = IndexesForBakeHair;
-                    data.Name = "Baked Hair Texture";
-                    break;
-
-                case BakeType.LowerBody:
-                    bakeProcessTable = IndexesForBakeLowerBody;
-                    data.Name = "Baked Lower Body Texture";
-                    break;
-
-                case BakeType.UpperBody:
-                    bakeProcessTable = IndexesForBakeUpperBody;
-                    data.Name = "Baked Upper Body Texture";
-                    break;
-
-                case BakeType.Skirt:
-                    bakeProcessTable = IndexesForBakeSkirt;
-                    data.Name = "Baked Skirt Texture";
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(bake));
-            }
-
-            using (var bitmap = new BakeImage(bakeDimensions, bakeDimensions))
-            {
-                using (var gfx = Graphics.FromImage(bitmap))
-                {
-                    if (bake == BakeType.Eyes)
-                    {
-                        /* eyes have white base texture */
-                        using (var brush = new SolidBrush(System.Drawing.Color.White))
-                        {
-                            gfx.FillRectangle(brush, new Rectangle(0, 0, 128, 128));
-                        }
-                    }
-                    else if (status.Layer0TextureID != UUID.Zero &&
-                        status.TryGetTexture(bake, status.Layer0TextureID, out srcimg))
-                    {
-                        /* all others are inited from layer 0 */
-                        gfx.DrawImage(srcimg, 0, 0, 512, 512);
-                    }
-                    else
-                    {
-                        switch (bake)
-                        {
-                            case BakeType.Head:
-                                gfx.DrawImage(BaseBakes.HeadColor, 0, 0, 512, 512);
-                                AddAlpha(bitmap, BaseBakes.HeadAlpha);
-                                MultiplyLayerFromAlpha(bitmap, BaseBakes.HeadSkinGrain);
-                                break;
-
-                            case BakeType.UpperBody:
-                                gfx.DrawImage(BaseBakes.UpperBodyColor, 0, 0, 512, 512);
-                                break;
-
-                            case BakeType.LowerBody:
-                                gfx.DrawImage(BaseBakes.LowerBodyColor, 0, 0, 512, 512);
-                                break;
-
-                            default:
-                                break;
-                        }
-                    }
-
-                    /* alpha blending is enabled by changing the compositing mode of the graphics object */
-                    gfx.CompositingMode = CompositingMode.SourceOver;
-
-                    foreach (var texIndex in bakeProcessTable)
-                    {
-                        foreach (var item in status.OutfitItems.Values)
-                        {
-                            UUID texture;
-                            BakeImage img;
-                            if ((item.WearableData != null && item.WearableData.Textures.TryGetValue(texIndex, out texture)) &&
-                                status.TryGetTexture(bake, texture, out img))
-                            {
-                                switch (texIndex)
-                                {
-                                    case AvatarTextureIndex.HeadBodypaint:
-                                    case AvatarTextureIndex.UpperBodypaint:
-                                    case AvatarTextureIndex.LowerBodypaint:
-                                        /* no tinting here */
-                                        gfx.DrawImage(img, 0, 0, bakeDimensions, bakeDimensions);
-                                        AddAlpha(bitmap, img);
-                                        break;
-
-                                    default:
-                                        using (BakeImage img2 = new BakeImage(img))
-                                        {
-                                            gfx.DrawImage(img, 0, 0, bakeDimensions, bakeDimensions);
-                                            ApplyTint(img2, item.WearableData.GetTint());
-                                            AddAlpha(bitmap, img2);
-                                        }
-                                        break;
-                                }
-
-                            }
-                        }
-                    }
-                }
-
-                data.Data = J2cEncoder.Encode(bitmap, true);
-            }
-
-            return data;
-        }
-
-        private static readonly AvatarTextureIndex[] IndexesForBakeHead = new AvatarTextureIndex[]
-        {
-            AvatarTextureIndex.HeadAlpha,
-            AvatarTextureIndex.HeadBodypaint,
-            AvatarTextureIndex.HeadTattoo
-        };
-
-        private static readonly AvatarTextureIndex[] IndexesForBakeUpperBody = new AvatarTextureIndex[]
-        {
-            AvatarTextureIndex.UpperBodypaint,
-            AvatarTextureIndex.UpperGloves,
-            AvatarTextureIndex.UpperUndershirt,
-            AvatarTextureIndex.UpperShirt,
-            AvatarTextureIndex.UpperJacket,
-            AvatarTextureIndex.UpperAlpha
-        };
-
-        private static readonly AvatarTextureIndex[] IndexesForBakeLowerBody = new AvatarTextureIndex[]
-        {
-            AvatarTextureIndex.LowerBodypaint,
-            AvatarTextureIndex.LowerUnderpants,
-            AvatarTextureIndex.LowerSocks,
-            AvatarTextureIndex.LowerShoes,
-            AvatarTextureIndex.LowerPants,
-            AvatarTextureIndex.LowerJacket,
-            AvatarTextureIndex.LowerAlpha
-        };
-
-        private static readonly AvatarTextureIndex[] IndexesForBakeEyes = new AvatarTextureIndex[]
-        {
-            AvatarTextureIndex.EyesIris,
-            AvatarTextureIndex.EyesAlpha
-        };
-
-        private static readonly AvatarTextureIndex[] IndexesForBakeHair = new AvatarTextureIndex[]
-        {
-            AvatarTextureIndex.Hair,
-            AvatarTextureIndex.HairAlpha
-        };
-
-        private static readonly AvatarTextureIndex[] IndexesForBakeSkirt = new AvatarTextureIndex[]
-        {
-            AvatarTextureIndex.Skirt
-        };
-
-        public static object Owner { get; }
-
-        private static void CoreBakeLogic(this AppearanceInfo appearance, BakeStatus bakeStatus, AssetServiceInterface sceneAssetService)
-        {
-            for(int idx = 0; idx < AppearanceInfo.AvatarTextureData.TextureCount; ++idx)
-            {
-                appearance.AvatarTextures[idx] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
-            }
-            foreach (OutfitItem item in bakeStatus.OutfitItems.Values)
-            {
-                foreach(KeyValuePair<AvatarTextureIndex, UUID> tex in item.WearableData.Textures)
-                {
-                    appearance.AvatarTextures[(int)tex.Key] = tex.Value;
-                }
-            }
-
-
-            var bakeHead = BakeTexture(bakeStatus, BakeType.Head);
-            var bakeUpperBody = BakeTexture(bakeStatus, BakeType.UpperBody);
-            var bakeLowerBody = BakeTexture(bakeStatus, BakeType.LowerBody);
-            var bakeEyes = BakeTexture(bakeStatus, BakeType.Eyes);
-            var bakeHair = BakeTexture(bakeStatus, BakeType.Hair);
-            AssetData bakeSkirt = null;
-
-            var haveSkirt = false;
-            foreach (var item in bakeStatus.OutfitItems.Values)
-            {
-                if (item.WearableData?.Type == WearableType.Skirt)
-                {
-                    haveSkirt = true;
-                    break;
-                }
-            }
-
-            if (haveSkirt)
-            {
-                bakeSkirt = BakeTexture(bakeStatus, BakeType.Skirt);
-            }
-
-            sceneAssetService.Store(bakeEyes);
-            sceneAssetService.Store(bakeHead);
-            sceneAssetService.Store(bakeUpperBody);
-            sceneAssetService.Store(bakeLowerBody);
-            sceneAssetService.Store(bakeHair);
-            if (bakeSkirt != null)
-            {
-                sceneAssetService.Store(bakeSkirt);
-            }
-
-            appearance.AvatarTextures[(int)AvatarTextureIndex.EyesBaked] = bakeEyes.ID;
-            appearance.AvatarTextures[(int)AvatarTextureIndex.HeadBaked] = bakeHead.ID;
-            appearance.AvatarTextures[(int)AvatarTextureIndex.UpperBaked] = bakeUpperBody.ID;
-            appearance.AvatarTextures[(int)AvatarTextureIndex.LowerBaked] = bakeLowerBody.ID;
-            appearance.AvatarTextures[(int)AvatarTextureIndex.HairBaked] = bakeHair.ID;
-            appearance.AvatarTextures[(int)AvatarTextureIndex.Skirt] = bakeSkirt != null ? bakeSkirt.ID : UUID.Zero;
-        }
-
-        #endregion
-
-        #region Base Bake textures
-        private static class BaseBakes
-        {
-            public static readonly BakeImage HeadAlpha;
-            public static readonly BakeImage HeadColor;
-            public static readonly BakeImage HeadHair;
-            public static readonly BakeImage HeadSkinGrain;
-            public static readonly BakeImage LowerBodyColor;
-            public static readonly BakeImage UpperBodyColor;
-
-            static BaseBakes()
-            {
-                HeadAlpha = LoadResourceImage("head_alpha.tga.gz");
-                HeadColor = LoadResourceImage("head_color.tga.gz");
-                HeadHair = LoadResourceImage("head_hair.tga.gz");
-                HeadSkinGrain = LoadResourceImage("head_skingrain.tga.gz");
-                LowerBodyColor = LoadResourceImage("lowerbody_color.tga.gz");
-                UpperBodyColor = LoadResourceImage("upperbody_color.tga.gz");
-            }
-
-            private static BakeImage LoadResourceImage(string name)
-            {
-                var assembly = typeof(BaseBakes).Assembly;
-                using (var resource = assembly.GetManifestResourceStream(assembly.GetName().Name + ".Resources." + name))
-                {
-                    using (var gz = new GZipStream(resource, CompressionMode.Decompress))
-                    {
-                        using (var ms = new MemoryStream())
-                        {
-                            var buf = new byte[10240];
-                            int bytesRead;
-                            for (bytesRead = gz.Read(buf, 0, buf.Length);
-                                bytesRead > 0;
-                                bytesRead = gz.Read(buf, 0, buf.Length))
-                            {
-                                ms.Write(buf, 0, bytesRead);
-                            }
-                            ms.Seek(0, SeekOrigin.Begin);
-                            return new BakeImage(Paloma.TargaImage.LoadTargaImage(ms));
-                        }
-                    }
-                }
-            }
-        }
-        #endregion
     }
 }

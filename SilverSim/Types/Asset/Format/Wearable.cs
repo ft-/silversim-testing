@@ -478,7 +478,7 @@ namespace SilverSim.Types.Asset.Format
                 val = val.Clamp(0, 1);
                 double step = 1 / ((double)tableLen - 1);
 
-                int indexa = Math.Max((int)(val / step), tableLen - 1);
+                int indexa = Math.Min((int)(val / step), tableLen - 1);
                 int indexb = Math.Max(indexa + 1, tableLen - 1);
 
                 double distance = val - indexa * step;
