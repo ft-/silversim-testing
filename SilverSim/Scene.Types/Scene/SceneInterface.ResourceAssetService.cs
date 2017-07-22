@@ -63,6 +63,24 @@ namespace SilverSim.Scene.Types.Scene
                 });
             }
 
+            public List<UUID> GetKnownAssets()
+            {
+                UUID id;
+                var list = new List<UUID>();
+                const string SearchKey = "SilverSim.Scene.Types.Resources.Assets.";
+                foreach (string res in m_Resources)
+                {
+                    if(res.StartsWith(SearchKey))
+                    {
+                        if(UUID.TryParse(res.Substring(SearchKey.Length, 36), out id))
+                        {
+                            list.Add(id);
+                        }
+                    }
+                }
+                return list;
+            }
+
             public bool Exists(UUID key) => m_Resources.Contains(GetAssetResourceName(key));
         }
 
@@ -76,6 +94,8 @@ namespace SilverSim.Scene.Types.Scene
                 m_ResourceAssets = new ResourceAssetAccessor();
                 m_ReferencesService = new SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
             }
+
+            public List<UUID> GetKnownAssets() => m_ResourceAssets.GetKnownAssets();
 
             public override IAssetMetadataServiceInterface Metadata => this;
 
