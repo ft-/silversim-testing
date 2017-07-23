@@ -179,6 +179,7 @@ namespace SilverSim.Scene.Types.Agent
 
             AvatarTextureIndex[] bakeProcessTable;
             List<Image> alphaCompositeInputs = new List<Image>();
+            byte[] bump = null;
 
             switch (bake)
             {
@@ -186,6 +187,7 @@ namespace SilverSim.Scene.Types.Agent
                     alphaCompositeInputs.Add(BaseBakes.HeadAlpha);
                     bakeProcessTable = IndexesForBakeHead;
                     data.Name = "Baked Head Texture";
+                    bump = BaseBakes.HeadBump;
                     break;
 
                 case BakeType.Eyes:
@@ -201,11 +203,13 @@ namespace SilverSim.Scene.Types.Agent
                 case BakeType.LowerBody:
                     bakeProcessTable = IndexesForBakeLowerBody;
                     data.Name = "Baked Lower Body Texture";
+                    bump = BaseBakes.LowerBodyBump;
                     break;
 
                 case BakeType.UpperBody:
                     bakeProcessTable = IndexesForBakeUpperBody;
                     data.Name = "Baked Upper Body Texture";
+                    bump = BaseBakes.UpperBodyBump;
                     break;
 
                 case BakeType.Skirt:
@@ -234,16 +238,7 @@ namespace SilverSim.Scene.Types.Agent
                     else if(bake == BakeType.Hair)
                     {
                         gfx.CompositingMode = CompositingMode.SourceCopy;
-                        System.Drawing.Color skinColor = System.Drawing.Color.White;
-                        foreach (OutfitItem item in status.OutfitItems.Values)
-                        {
-                            if (item.WearableData.Type == WearableType.Skin)
-                            {
-                                skinColor = GetTint(item.WearableData, bake);
-                            }
-                        }
-                        skinColor = System.Drawing.Color.FromArgb(0, skinColor.R, skinColor.G, skinColor.B);
-                        using (var brush = new SolidBrush(skinColor))
+                        using (var brush = new SolidBrush(status.SkinColor.ToDrawingWithNewAlpha(0)))
                         {
                             gfx.FillRectangle(brush, bakeRectangle);
                         }
@@ -252,15 +247,7 @@ namespace SilverSim.Scene.Types.Agent
                     }
                     else
                     {
-                        System.Drawing.Color skinColor = System.Drawing.Color.White;
-                        foreach(OutfitItem item in status.OutfitItems.Values)
-                        {
-                            if(item.WearableData.Type == WearableType.Skin)
-                            {
-                                skinColor = GetTint(item.WearableData, bake);
-                            }
-                        }
-                        using (var brush = new SolidBrush(skinColor))
+                        using (var brush = new SolidBrush(status.SkinColor.ToDrawing()))
                         {
                             gfx.FillRectangle(brush, bakeRectangle);
                         }
@@ -363,7 +350,14 @@ namespace SilverSim.Scene.Types.Agent
                     bitmap.UnlockBits(bmpData);
                 }
 
-                data.Data = J2cEncoder.Encode(bitmap, true);
+                if (bump != null)
+                {
+                    data.Data = J2cEncoder.EncodeWithBump(bitmap, true, bump);
+                }
+                else
+                {
+                    data.Data = J2cEncoder.Encode(bitmap, true);
+                }
             }
 
             return data;
@@ -428,6 +422,25 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     appearance.AvatarTextures[(int)tex.Key] = tex.Value;
                 }
+
+                if(item.WearableData.Type == WearableType.Skin)
+                {
+                    double value;
+                    /* extract skin color data */
+                    bakeStatus.SkinColor = item.WearableData.GetTint();
+
+                    /* Rosy complextion */
+                    if (item.WearableData.Params.TryGetValue(116, out value))
+                    {
+                        bakeStatus.RosyComplexion.A = value.Clamp(0, 1);
+                    }
+
+                    /* Limp pinkness */
+                    if(item.WearableData.Params.TryGetValue(117, out value))
+                    {
+                        bakeStatus.LipPinkness.A = value.Clamp(0, 1) * 0.5;
+                    }
+                }
             }
 
 
@@ -486,6 +499,9 @@ namespace SilverSim.Scene.Types.Agent
             public static readonly Image LowerBodyColor;
             public static readonly Image UpperBodyColor;
             public static readonly Image HeadColorAndSkinGrain;
+            public static readonly byte[] HeadBump;
+            public static readonly byte[] UpperBodyBump;
+            public static readonly byte[] LowerBodyBump;
 
             static BaseBakes()
             {
@@ -495,6 +511,11 @@ namespace SilverSim.Scene.Types.Agent
                 HeadSkinGrain = LoadResourceImage("head_skingrain.png");
                 LowerBodyColor = LoadResourceImage("lowerbody_color.png");
                 UpperBodyColor = LoadResourceImage("upperbody_color.png");
+
+                HeadBump = LoadResourceBumpmap("bump_head_base.png");
+                UpperBodyBump = LoadResourceBumpmap("bump_upperbody_base.png");
+                LowerBodyBump = LoadResourceBumpmap("bump_lowerbody_base.png");
+
                 Bitmap bmp = new Bitmap(HeadColor);
                 BitmapData outLockBits = bmp.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
                 byte[] inData = new byte[512 * 512 * 4];
@@ -536,6 +557,34 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     return Image.FromStream(resource);
                 }
+            }
+
+            private static byte[] LoadResourceBumpmap(string name)
+            {
+                var assembly = typeof(BaseBakes).Assembly;
+                byte[] bumpmap;
+                using (var resource = assembly.GetManifestResourceStream(assembly.GetName().Name + ".Resources." + name))
+                {
+                    using (Image img = Image.FromStream(resource))
+                    {
+                        using (Bitmap bmp = new Bitmap(img))
+                        {
+                            BitmapData inLockBits = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                            bumpmap = new byte[bmp.Width * bmp.Height];
+                            byte[] pixeldata = new byte[bmp.Width * bmp.Height * 3];
+                            Marshal.Copy(inLockBits.Scan0, pixeldata, 0, bmp.Width * bmp.Height * 3);
+                            int inpos = 0;
+                            for(int i = 0; i < bmp.Width * bmp.Height; ++i)
+                            {
+                                bumpmap[i] = pixeldata[inpos];
+                                inpos += 3;
+                            }
+                            bmp.UnlockBits(inLockBits);
+                        }
+                    }
+                }
+
+                return bumpmap;
             }
         }
         #endregion

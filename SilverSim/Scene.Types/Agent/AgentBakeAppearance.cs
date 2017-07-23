@@ -66,6 +66,9 @@ namespace SilverSim.Scene.Types.Agent
             public readonly Dictionary<UUID, Image> Textures = new Dictionary<UUID, Image>();
             public readonly Dictionary<UUID, Image> TexturesResized128 = new Dictionary<UUID, Image>();
             public readonly Dictionary<UUID, Image> TexturesResized512 = new Dictionary<UUID, Image>();
+            public SilverSim.Types.Color SkinColor = SilverSim.Types.Color.FromRgb(0, 0, 0);
+            public ColorAlpha RosyComplexion = new ColorAlpha(198 / 255.0, 71 / 255.0, 71 / 255.0, 0);
+            public ColorAlpha LipPinkness = new ColorAlpha(220 / 255.0, 115 / 255.0, 115 / 255.0, 0);
 
             public bool TryGetTexture(BakeType bakeType, UUID textureID, out Image img)
             {

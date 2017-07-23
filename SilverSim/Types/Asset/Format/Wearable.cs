@@ -479,7 +479,7 @@ namespace SilverSim.Types.Asset.Format
                 double step = 1 / ((double)tableLen - 1);
 
                 int indexa = Math.Min((int)(val / step), tableLen - 1);
-                int indexb = Math.Max(indexa + 1, tableLen - 1);
+                int indexb = Math.Min(indexa + 1, tableLen - 1);
 
                 double distance = val - indexa * step;
 
@@ -530,10 +530,11 @@ namespace SilverSim.Types.Asset.Format
                     {
                         col = col.Lerp(new Color(218, 41, 37), val);
                     }
-                    if(Params.TryGetValue(111, out val))
+                    if (!Params.TryGetValue(111, out val))
                     {
-                        col += CalcColor(val, PigmentColors);
+                        val = 0.5;
                     }
+                    col += CalcColor(val, PigmentColors);
                     /*
             Params[108] = new VisualParam(108, "Rainbow Color", 0, "skin", String.Empty, "None", "Wild", 0f, 0f, 1f, false, null, null, new VisualColorParam(VisualColorOperation.Add, new Color4[] { new Color4(0, 0, 0, 255), new Color4(255, 0, 255, 255), new Color4(255, 0, 0, 255), new Color4(255, 255, 0, 255), new Color4(0, 255, 0, 255), new Color4(0, 255, 255, 255), new Color4(0, 0, 255, 255), new Color4(255, 0, 255, 255) }));
             Params[110] = new VisualParam(110, "Red Skin", 0, "skin", "Ruddiness", "Pale", "Ruddy", 0f, 0f, 0.1f, false, null, null, new VisualColorParam(VisualColorOperation.Blend, new Color4[] { new Color4(218, 41, 37, 255) }));

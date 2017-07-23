@@ -24,6 +24,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace OpenJp2.Net
 {
@@ -47,36 +48,139 @@ namespace OpenJp2.Net
         private static readonly object m_InitLock = new object();
         private static bool m_Inited;
 
-        public static byte[] Encode(Bitmap img, bool lossless)
+        public class J2cEncodingFailedException : Exception
         {
-            if(!m_Inited)
+            public J2cEncodingFailedException()
             {
-                lock(m_InitLock)
+            }
+
+            public J2cEncodingFailedException(string message) : base(message)
+            {
+            }
+
+            public J2cEncodingFailedException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected J2cEncodingFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+            }
+        }
+
+        private static void InitOpenJP2()
+        {
+            lock (m_InitLock)
+            {
+                if (!m_Inited)
                 {
-                    if(!m_Inited)
+                    /* preload necessary windows dll */
+                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                     {
-                        /* preload necessary windows dll */
-                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                        if (Environment.Is64BitProcess)
                         {
-                            if (Environment.Is64BitProcess)
+                            if (IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/64/openjp2.dll")))
                             {
-                                if(IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/64/openjp2.dll")))
-                                {
-                                    throw new FileNotFoundException("missing platform-libs/windows/64/openjp2.dll");
-                                }
-                            }
-                            else
-                            {
-                                if(IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/32/openjp2.dll")))
-                                {
-                                    throw new FileNotFoundException("missing platform-libs/windows/32/openjp2.dll");
-                                }
+                                throw new FileNotFoundException("missing platform-libs/windows/64/openjp2.dll");
                             }
                         }
-                        m_Inited = true;
+                        else
+                        {
+                            if (IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/32/openjp2.dll")))
+                            {
+                                throw new FileNotFoundException("missing platform-libs/windows/32/openjp2.dll");
+                            }
+                        }
+                    }
+                    m_Inited = true;
+                }
+            }
+        }
+
+        public static byte[] EncodeWithBump(Bitmap img, bool lossless, byte[] bumpdata)
+        {
+            if (!m_Inited)
+            {
+                InitOpenJP2();
+            }
+
+            int imgChannelWidth = img.Width * img.Height;
+            if(bumpdata.Length != imgChannelWidth)
+            {
+                throw new ArgumentException("bumpdata does not match channel byte size");
+            }
+            const int channels = 5;
+            byte[] datastream;
+            if (img.PixelFormat == PixelFormat.Format32bppArgb)
+            {
+                datastream = new byte[imgChannelWidth * channels];
+                int pixpos = 0;
+                int bumppos = 0;
+                for (int y = 0; y < img.Height; ++y)
+                {
+                    for (int x = 0; x < img.Width; ++x)
+                    {
+                        Color c = img.GetPixel(x, y);
+                        datastream[pixpos++] = c.R;
+                        datastream[pixpos++] = c.G;
+                        datastream[pixpos++] = c.B;
+                        datastream[pixpos++] = c.A;
+                        datastream[pixpos++] = bumpdata[bumppos++];
                     }
                 }
             }
+            else if (img.PixelFormat == PixelFormat.Format24bppRgb)
+            {
+                datastream = new byte[imgChannelWidth * channels];
+                int pixpos = 0;
+                int bumppos = 0;
+                for (int y = 0; y < img.Height; ++y)
+                {
+                    for (int x = 0; x < img.Width; ++x)
+                    {
+                        Color c = img.GetPixel(x, y);
+                        datastream[pixpos++] = c.R;
+                        datastream[pixpos++] = c.G;
+                        datastream[pixpos++] = c.B;
+                        datastream[pixpos++] = 255;
+                        datastream[pixpos++] = bumpdata[bumppos++];
+                    }
+                }
+            }
+            else
+            {
+                throw new J2cEncodingFailedException();
+            }
+
+            IntPtr nativePtr = J2cEncode(datastream, img.Width, img.Height, channels, lossless);
+            if (nativePtr == IntPtr.Zero)
+            {
+                throw new J2cEncodingFailedException();
+            }
+
+            byte[] j2cstream;
+            try
+            {
+                j2cstream = new byte[J2cEncodedGetLength(nativePtr)];
+                if (j2cstream.Length != J2cEncodedRead(nativePtr, j2cstream, j2cstream.Length))
+                {
+                    throw new J2cEncodingFailedException();
+                }
+            }
+            finally
+            {
+                J2cEncodedFree(nativePtr);
+            }
+
+            return j2cstream;
+        }
+
+        public static byte[] Encode(Bitmap img, bool lossless)
+        {
+            if (!m_Inited)
+            {
+                InitOpenJP2();
+            }
+
             int imgChannelWidth = img.Width * img.Height;
             int channels = 3;
             byte[] datastream;
@@ -115,13 +219,13 @@ namespace OpenJp2.Net
             }
             else
             {
-                throw new InvalidDataException();
+                throw new J2cEncodingFailedException();
             }
 
             IntPtr nativePtr = J2cEncode(datastream, img.Width, img.Height, channels, lossless);
             if(nativePtr == IntPtr.Zero)
             {
-                throw new InvalidDataException();
+                throw new J2cEncodingFailedException();
             }
 
             byte[] j2cstream;
@@ -130,7 +234,7 @@ namespace OpenJp2.Net
                 j2cstream = new byte[J2cEncodedGetLength(nativePtr)];
                 if(j2cstream.Length != J2cEncodedRead(nativePtr, j2cstream, j2cstream.Length))
                 {
-                    throw new InvalidDataException();
+                    throw new J2cEncodingFailedException();
                 }
             }
             finally

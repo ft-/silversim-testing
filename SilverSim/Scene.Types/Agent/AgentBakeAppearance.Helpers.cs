@@ -38,5 +38,15 @@ namespace SilverSim.Scene.Types.Agent
         {
             return System.Drawing.Color.FromArgb(color.R_AsByte, color.G_AsByte, color.B_AsByte);
         }
+
+        public static System.Drawing.Color ToDrawing(this SilverSim.Types.ColorAlpha color)
+        {
+            return System.Drawing.Color.FromArgb(color.A_AsByte, color.R_AsByte, color.G_AsByte, color.B_AsByte);
+        }
+
+        public static System.Drawing.Color ToDrawingWithNewAlpha(this SilverSim.Types.Color color, double newalpha)
+        {
+            return System.Drawing.Color.FromArgb((int)(newalpha * 255), color.R_AsByte, color.G_AsByte, color.B_AsByte);
+        }
     }
 }
