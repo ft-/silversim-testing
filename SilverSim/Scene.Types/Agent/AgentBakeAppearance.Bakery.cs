@@ -223,9 +223,6 @@ namespace SilverSim.Scene.Types.Agent
                 using (var gfx = Graphics.FromImage(bitmap))
                 {
 
-                    /* alpha blending is enabled by changing the compositing mode of the graphics object */
-                    gfx.CompositingMode = CompositingMode.SourceOver;
-
                     if (bake == BakeType.Eyes)
                     {
                         /* eyes have white base texture */
@@ -234,9 +231,36 @@ namespace SilverSim.Scene.Types.Agent
                             gfx.FillRectangle(brush, bakeRectangle);
                         }
                     }
+                    else if(bake == BakeType.Hair)
+                    {
+                        gfx.CompositingMode = CompositingMode.SourceCopy;
+                        System.Drawing.Color skinColor = System.Drawing.Color.White;
+                        foreach (OutfitItem item in status.OutfitItems.Values)
+                        {
+                            if (item.WearableData.Type == WearableType.Skin)
+                            {
+                                skinColor = GetTint(item.WearableData, bake);
+                            }
+                        }
+                        skinColor = System.Drawing.Color.FromArgb(0, skinColor.R, skinColor.G, skinColor.B);
+                        using (var brush = new SolidBrush(skinColor))
+                        {
+                            gfx.FillRectangle(brush, bakeRectangle);
+                        }
+                        /* alpha blending is enabled by changing the compositing mode of the graphics object */
+                        gfx.CompositingMode = CompositingMode.SourceOver;
+                    }
                     else
                     {
-                        using (var brush = new SolidBrush(status.SkinColor.ToDrawing()))
+                        System.Drawing.Color skinColor = System.Drawing.Color.White;
+                        foreach(OutfitItem item in status.OutfitItems.Values)
+                        {
+                            if(item.WearableData.Type == WearableType.Skin)
+                            {
+                                skinColor = GetTint(item.WearableData, bake);
+                            }
+                        }
+                        using (var brush = new SolidBrush(skinColor))
                         {
                             gfx.FillRectangle(brush, bakeRectangle);
                         }
@@ -403,10 +427,6 @@ namespace SilverSim.Scene.Types.Agent
                 foreach (KeyValuePair<AvatarTextureIndex, UUID> tex in item.WearableData.Textures)
                 {
                     appearance.AvatarTextures[(int)tex.Key] = tex.Value;
-                }
-                if(item.WearableData.Type == WearableType.Skin)
-                {
-                    bakeStatus.SkinColor = item.WearableData.GetTint();
                 }
             }
 
