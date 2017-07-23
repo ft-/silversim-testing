@@ -234,6 +234,8 @@ namespace SilverSim.Scene.Types.Agent
                         {
                             gfx.FillRectangle(brush, bakeRectangle);
                         }
+                        /* alpha blending */
+                        gfx.CompositingMode = CompositingMode.SourceOver;
                     }
                     else if(bake == BakeType.Hair)
                     {
@@ -242,7 +244,7 @@ namespace SilverSim.Scene.Types.Agent
                         {
                             gfx.FillRectangle(brush, bakeRectangle);
                         }
-                        /* alpha blending is enabled by changing the compositing mode of the graphics object */
+                        /* alpha blending */
                         gfx.CompositingMode = CompositingMode.SourceOver;
                     }
                     else
@@ -251,6 +253,8 @@ namespace SilverSim.Scene.Types.Agent
                         {
                             gfx.FillRectangle(brush, bakeRectangle);
                         }
+                        /* alpha blending */
+                        gfx.CompositingMode = CompositingMode.SourceOver;
 
                         Image baseBake;
                         switch (bake)

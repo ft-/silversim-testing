@@ -476,14 +476,15 @@ namespace SilverSim.Types.Asset.Format
             {
                 int tableLen = table.Length;
                 val = val.Clamp(0, 1);
-                double step = 1 / ((double)tableLen - 1);
+                int maxTableIndex = tableLen - 1;
+                double stpos = val * maxTableIndex;
 
-                int indexa = Math.Min((int)(val / step), tableLen - 1);
-                int indexb = Math.Min(indexa + 1, tableLen - 1);
+                int indexa = (int)Math.Floor(stpos);
+                int indexb = Math.Min(indexa + 1, maxTableIndex);
 
-                double distance = val - indexa * step;
+                double mix = stpos - indexa;
 
-                if(distance < Double.Epsilon || indexa == indexb)
+                if(mix < Double.Epsilon || indexa == indexb)
                 {
                     paramColor = table[indexa];
                 }
@@ -491,10 +492,9 @@ namespace SilverSim.Types.Asset.Format
                 {
                     Color ca = table[indexa];
                     Color cb = table[indexb];
-                    double mix = distance / step;
                     paramColor.R = ca.R.Lerp(cb.R, mix);
-                    paramColor.G = ca.R.Lerp(cb.G, mix);
-                    paramColor.B = ca.R.Lerp(cb.B, mix);
+                    paramColor.G = ca.G.Lerp(cb.G, mix);
+                    paramColor.B = ca.B.Lerp(cb.B, mix);
                 }
             }
 
