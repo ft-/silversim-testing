@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using log4net;
-using OpenJp2.Net;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
@@ -31,11 +30,6 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
-using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Agent
@@ -72,6 +66,7 @@ namespace SilverSim.Scene.Types.Agent
             public readonly Dictionary<UUID, Image> Textures = new Dictionary<UUID, Image>();
             public readonly Dictionary<UUID, Image> TexturesResized128 = new Dictionary<UUID, Image>();
             public readonly Dictionary<UUID, Image> TexturesResized512 = new Dictionary<UUID, Image>();
+            public SilverSim.Types.Color SkinColor = new SilverSim.Types.Color(1, 1, 1);
 
             public bool TryGetTexture(BakeType bakeType, UUID textureID, out Image img)
             {
@@ -381,7 +376,8 @@ namespace SilverSim.Scene.Types.Agent
                                     /* load textures beforehand and do not load unnecessarily */
                                     foreach (var textureID in outfitItem.WearableData.Textures.Values)
                                     {
-                                        if (bakeStatus.Textures.ContainsKey(textureID))
+                                        if (bakeStatus.Textures.ContainsKey(textureID) ||
+                                            textureID == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
                                         {
                                             /* skip we already got that one */
                                             continue;

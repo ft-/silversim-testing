@@ -50,7 +50,7 @@ namespace SilverSim.Types.Agent
                         var textures = new UUID[TextureCount];
                         for (int i = 0; i < TextureCount; ++i)
                         {
-                            textures[i] = new UUID(m_AvatarTextures[i]);
+                            textures[i] = m_AvatarTextures[i];
                         }
                         return textures;
                     });
@@ -65,7 +65,7 @@ namespace SilverSim.Types.Agent
                     {
                         for (int i = 0; i < TextureCount; ++i)
                         {
-                            m_AvatarTextures[i] = new UUID(value[i]);
+                            m_AvatarTextures[i] = value[i];
                         }
                     });
                 }

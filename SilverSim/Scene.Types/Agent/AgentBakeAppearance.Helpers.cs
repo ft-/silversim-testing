@@ -25,26 +25,18 @@ namespace SilverSim.Scene.Types.Agent
 {
     public static partial class AgentBakeAppearance
     {
-        private static void SetRedScaling(this ColorMatrix mat, double r_scaling)
-        {
-            mat.Matrix00 = (float)r_scaling;
-        }
-
-        private static void SetGreenScaling(this ColorMatrix mat, double g_scaling)
-        {
-            mat.Matrix11 = (float)g_scaling;
-        }
-
-        private static void SetBlueScaling(this ColorMatrix mat, double b_scaling)
-        {
-            mat.Matrix22 = (float)b_scaling;
-        }
-
         public static void ApplyTint(this ColorMatrix mat, SilverSim.Types.Color col)
         {
             mat.Matrix00 = (float)col.R;
             mat.Matrix11 = (float)col.G;
             mat.Matrix22 = (float)col.B;
+            mat.Matrix33 = 1;
+            mat.Matrix44 = 1;
+        }
+
+        public static System.Drawing.Color ToDrawing(this SilverSim.Types.Color color)
+        {
+            return System.Drawing.Color.FromArgb(color.R_AsByte, color.G_AsByte, color.B_AsByte);
         }
     }
 }

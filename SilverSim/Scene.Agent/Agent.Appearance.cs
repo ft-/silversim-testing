@@ -82,7 +82,7 @@ namespace SilverSim.Scene.Agent
         private readonly AppearanceInfo.AvatarTextureData m_TextureHashes = new AppearanceInfo.AvatarTextureData();
         private readonly AppearanceInfo.AvatarTextureData m_Textures = new AppearanceInfo.AvatarTextureData();
         public int Serial = 1;
-        public const int MaxVisualParams = 260;
+        public const int MaxVisualParams = 255;
         protected const int NUM_AVATAR_TEXTURES = 21;
 
         public static UUID IMG_DEFAULT_AVATAR => new UUID("c228d1cf-4b5d-4ba8-84f4-899a0796aa97");
@@ -140,7 +140,7 @@ namespace SilverSim.Scene.Agent
                 var te = new TextureEntry();
                 UUID[] textures = Textures.All;
                 te.DefaultTexture.TextureID = IMG_DEFAULT_AVATAR;
-                foreach(int i in AppearanceInfo.BakeIndices)
+                for(int i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
                 {
                     if (te.DefaultTexture.TextureID != textures[i])
                     {
@@ -185,7 +185,7 @@ namespace SilverSim.Scene.Agent
                 bool updated = false;
                 m_VisualParamsLock.AcquireWriterLock(() =>
                 {
-                    int VisualParamCount = MaxVisualParams < value.Length ? MaxVisualParams : value.Length;
+                    int VisualParamCount = Math.Min(MaxVisualParams, value.Length);
                     if (VisualParamCount == m_VisualParams.Length)
                     {
                         int i;

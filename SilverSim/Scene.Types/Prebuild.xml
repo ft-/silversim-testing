@@ -21,7 +21,6 @@
   <Reference name="System.Core"/>
   <Reference name="System.Xml"/>
   <Reference name="System.Drawing"/>
-  <Reference name="Paloma.TargaImage" localCopy="false"/>
   <Reference name="OpenJp2.Net" localCopy="false"/>
   <Reference name="CSJ2K" localCopy="false"/>
   <Reference name="SilverSim.Viewer.Messages" localCopy="false"/>

@@ -32,6 +32,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -39,68 +40,6 @@ namespace SilverSim.Scene.Types.Agent
     {
         #region Actual Baking Code
         private const int MAX_WEARABLES_PER_TYPE = 5;
-
-#if OLD_CODE
-        private static void AddAlpha(BakeImage bmp, BakeImage inp)
-        {
-            byte[] target = bmp.ArgbImage;
-            byte[] source = inp.ArgbImage;
-            BakeImage bakeIntermediate = null;
-            if (bmp.Width != inp.Width || bmp.Height != inp.Height)
-            {
-                bakeIntermediate = new BakeImage(inp, bmp.Width, bmp.Height);
-                inp = bakeIntermediate;
-            }
-
-            try
-            {
-                for (int i = bmp.Width * bmp.Height * 4; i-- != 0;)
-                {
-                    target[i] = Math.Min(target[i], source[i]);
-
-                    /* skip RGB */
-                    i -= 3;
-                }
-
-                bmp.Update();
-            }
-            finally
-            {
-                bakeIntermediate?.Dispose();
-            }
-        }
-
-        private static void MultiplyLayerFromAlpha(BakeImage bmp, BakeImage inp)
-        {
-            byte[] target = bmp.ArgbImage;
-            byte[] source = inp.ArgbImage;
-            BakeImage bakeIntermediate = null;
-            if (bmp.Width != inp.Width || bmp.Height != inp.Height)
-            {
-                bakeIntermediate = new BakeImage(inp, bmp.Width, bmp.Height);
-                inp = bakeIntermediate;
-            }
-            try
-            {
-                for (int i = bmp.Width * bmp.Height * 4; i-- != 0;)
-                {
-                    /* skip A */
-                    --i;
-                    target[i] = (byte)(target[i] * source[i] / 255);
-                    --i;
-                    target[i] = (byte)(target[i] * source[i] / 255);
-                    --i;
-                    target[i] = (byte)(target[i] * source[i] / 255);
-                }
-
-                bmp.Update();
-            }
-            finally
-            {
-                bakeIntermediate?.Dispose();
-            }
-        }
-#endif
 
         private static System.Drawing.Color GetTint(Wearable w, BakeType bType)
         {
@@ -239,10 +178,14 @@ namespace SilverSim.Scene.Types.Agent
                 Temporary = true,
                 Flags = AssetFlags.Collectable | AssetFlags.Rewritable
             };
+
             AvatarTextureIndex[] bakeProcessTable;
+            List<Image> alphaCompositeInputs = new List<Image>();
+
             switch (bake)
             {
                 case BakeType.Head:
+                    alphaCompositeInputs.Add(BaseBakes.HeadAlpha);
                     bakeProcessTable = IndexesForBakeHead;
                     data.Name = "Baked Head Texture";
                     break;
@@ -281,24 +224,31 @@ namespace SilverSim.Scene.Types.Agent
             {
                 using (var gfx = Graphics.FromImage(bitmap))
                 {
+
+                    /* alpha blending is enabled by changing the compositing mode of the graphics object */
+                    gfx.CompositingMode = CompositingMode.SourceOver;
+
                     if (bake == BakeType.Eyes)
                     {
                         /* eyes have white base texture */
                         using (var brush = new SolidBrush(System.Drawing.Color.White))
                         {
-                            gfx.FillRectangle(brush, new Rectangle(0, 0, 128, 128));
+                            gfx.FillRectangle(brush, bakeRectangle);
                         }
                     }
                     else
                     {
+                        using (var brush = new SolidBrush(status.SkinColor.ToDrawing()))
+                        {
+                            gfx.FillRectangle(brush, bakeRectangle);
+                        }
+
                         Image baseBake;
                         switch (bake)
                         {
                             case BakeType.Head:
-                                baseBake = BaseBakes.HeadColor;
+                                baseBake = BaseBakes.HeadColorAndSkinGrain;
                                 gfx.DrawImage(baseBake, bakeRectangle, 0, 0, baseBake.Width, baseBake.Height, GraphicsUnit.Pixel);
-                                //AddAlpha(bitmap, BaseBakes.HeadAlpha);
-                                //MultiplyLayerFromAlpha(bitmap, BaseBakes.HeadSkinGrain);
                                 break;
 
                             case BakeType.UpperBody:
@@ -316,9 +266,6 @@ namespace SilverSim.Scene.Types.Agent
                         }
                     }
 
-                    /* alpha blending is enabled by changing the compositing mode of the graphics object */
-                    gfx.CompositingMode = CompositingMode.SourceOver;
-
                     foreach (var texIndex in bakeProcessTable)
                     {
                         foreach (var item in status.OutfitItems.Values)
@@ -335,7 +282,14 @@ namespace SilverSim.Scene.Types.Agent
                                     case AvatarTextureIndex.LowerBodypaint:
                                         /* no tinting here */
                                         gfx.DrawImage(img, new Rectangle(0, 0, bakeDimensions, bakeDimensions), 0, 0, bakeDimensions, bakeDimensions, GraphicsUnit.Pixel);
-                                        //AddAlpha(bitmap, img);
+                                        break;
+
+                                    case AvatarTextureIndex.LowerAlpha:
+                                    case AvatarTextureIndex.UpperAlpha:
+                                    case AvatarTextureIndex.HeadAlpha:
+                                    case AvatarTextureIndex.HairAlpha:
+                                    case AvatarTextureIndex.EyesAlpha:
+                                        alphaCompositeInputs.Add(img);
                                         break;
 
                                     default:
@@ -346,13 +300,48 @@ namespace SilverSim.Scene.Types.Agent
                                             attrs.SetColorMatrix(mat);
                                             gfx.DrawImage(img, new Rectangle(0, 0, bakeDimensions, bakeDimensions), 0, 0, img.Width, img.Height, GraphicsUnit.Pixel, attrs);
                                         }
-                                        //AddAlpha(bitmap, img);
                                         break;
                                 }
 
                             }
                         }
                     }
+                }
+
+                /* Alpha baking */
+                if (alphaCompositeInputs.Count != 0)
+                {
+                    BitmapData bmpData = bitmap.LockBits(bakeRectangle, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                    int scanLineBytes = bakeDimensions * bakeDimensions * 4;
+                    byte[] dstBmpBytes = new byte[scanLineBytes];
+                    byte[] srcBmpBytes = new byte[scanLineBytes];
+                    Marshal.Copy(bmpData.Scan0, dstBmpBytes, 0, scanLineBytes);
+
+                    foreach (Image alphaimg in alphaCompositeInputs)
+                    {
+                        using (Bitmap resizedalphaimg = new Bitmap(alphaimg, bakeDimensions, bakeDimensions))
+                        {
+                            if (resizedalphaimg.PixelFormat == PixelFormat.Format32bppArgb)
+                            {
+                                BitmapData srcBmpData = resizedalphaimg.LockBits(bakeRectangle, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                                Marshal.Copy(srcBmpData.Scan0, srcBmpBytes, 0, scanLineBytes);
+
+                                for (int i = scanLineBytes; i-- != 0;)
+                                {
+                                    dstBmpBytes[i] = Math.Min(dstBmpBytes[i], srcBmpBytes[i]);
+
+                                    /* skip RGB */
+                                    i -= 3;
+                                }
+
+                                resizedalphaimg.UnlockBits(srcBmpData);
+                            }
+                        }
+                    }
+
+                    Marshal.Copy(dstBmpBytes, 0, bmpData.Scan0, scanLineBytes);
+
+                    bitmap.UnlockBits(bmpData);
                 }
 
                 data.Data = J2cEncoder.Encode(bitmap, true);
@@ -420,6 +409,10 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     appearance.AvatarTextures[(int)tex.Key] = tex.Value;
                 }
+                if(item.WearableData.Type == WearableType.Skin)
+                {
+                    bakeStatus.SkinColor = item.WearableData.GetTint();
+                }
             }
 
 
@@ -460,12 +453,15 @@ namespace SilverSim.Scene.Types.Agent
             appearance.AvatarTextures[(int)AvatarTextureIndex.UpperBaked] = bakeUpperBody.ID;
             appearance.AvatarTextures[(int)AvatarTextureIndex.LowerBaked] = bakeLowerBody.ID;
             appearance.AvatarTextures[(int)AvatarTextureIndex.HairBaked] = bakeHair.ID;
-            appearance.AvatarTextures[(int)AvatarTextureIndex.Skirt] = bakeSkirt != null ? bakeSkirt.ID : UUID.Zero;
+            if (bakeSkirt != null)
+            {
+                appearance.AvatarTextures[(int)AvatarTextureIndex.SkirtBaked] = bakeSkirt.ID;
+            }
         }
 
-#endregion
+        #endregion
 
-#region Base Bake textures
+        #region Base Bake textures
         private static class BaseBakes
         {
             public static readonly Image HeadAlpha;
@@ -474,15 +470,48 @@ namespace SilverSim.Scene.Types.Agent
             public static readonly Image HeadSkinGrain;
             public static readonly Image LowerBodyColor;
             public static readonly Image UpperBodyColor;
+            public static readonly Image HeadColorAndSkinGrain;
 
             static BaseBakes()
             {
-                HeadAlpha = LoadResourceImage("head_alpha.tga.gz");
-                HeadColor = LoadResourceImage("head_color.tga.gz");
-                HeadHair = LoadResourceImage("head_hair.tga.gz");
-                HeadSkinGrain = LoadResourceImage("head_skingrain.tga.gz");
-                LowerBodyColor = LoadResourceImage("lowerbody_color.tga.gz");
-                UpperBodyColor = LoadResourceImage("upperbody_color.tga.gz");
+                HeadAlpha = LoadResourceImage("head_alpha.png");
+                HeadColor = LoadResourceImage("head_color.png");
+                HeadHair = LoadResourceImage("head_hair.png");
+                HeadSkinGrain = LoadResourceImage("head_skingrain.png");
+                LowerBodyColor = LoadResourceImage("lowerbody_color.png");
+                UpperBodyColor = LoadResourceImage("upperbody_color.png");
+                Bitmap bmp = new Bitmap(HeadColor);
+                BitmapData outLockBits = bmp.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                byte[] inData = new byte[512 * 512 * 4];
+                byte[] outData = new byte[512 * 512 * 4];
+                byte[] alphaData = new byte[512 * 512 * 4];
+                using (Bitmap headAlpha = new Bitmap(HeadAlpha))
+                {
+                    BitmapData inLockBits = headAlpha.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                    Marshal.Copy(inLockBits.Scan0, alphaData, 0, 512 * 512 * 4);
+                    headAlpha.UnlockBits(inLockBits);
+                }
+                using (Bitmap headSkinGrain = new Bitmap(HeadSkinGrain))
+                {
+                    BitmapData inLockBits = headSkinGrain.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                    Marshal.Copy(inLockBits.Scan0, inData, 0, 512 * 512 * 4);
+                    headSkinGrain.UnlockBits(inLockBits);
+                }
+                Marshal.Copy(outLockBits.Scan0, outData, 0, 512 * 512 * 4);
+                for(int i = 512 * 512 * 4; i != 0;)
+                {
+                    byte alpha = inData[--i];
+                    outData[i] = Math.Min(outData[i], alphaData[i]);
+                    --i;
+                    outData[i] = (byte)((outData[i] * alpha) / 255);
+                    --i;
+                    outData[i] = (byte)((outData[i] * alpha) / 255);
+                    --i;
+                    outData[i] = (byte)((outData[i] * alpha) / 255);
+                }
+                Marshal.Copy(outData, 0, outLockBits.Scan0, 512 * 512 * 4);
+                bmp.UnlockBits(outLockBits);
+                HeadColorAndSkinGrain = bmp;
             }
 
             private static Image LoadResourceImage(string name)
@@ -490,25 +519,10 @@ namespace SilverSim.Scene.Types.Agent
                 var assembly = typeof(BaseBakes).Assembly;
                 using (var resource = assembly.GetManifestResourceStream(assembly.GetName().Name + ".Resources." + name))
                 {
-                    using (var gz = new GZipStream(resource, CompressionMode.Decompress))
-                    {
-                        using (var ms = new MemoryStream())
-                        {
-                            var buf = new byte[10240];
-                            int bytesRead;
-                            for (bytesRead = gz.Read(buf, 0, buf.Length);
-                                bytesRead > 0;
-                                bytesRead = gz.Read(buf, 0, buf.Length))
-                            {
-                                ms.Write(buf, 0, bytesRead);
-                            }
-                            ms.Seek(0, SeekOrigin.Begin);
-                            return Paloma.TargaImage.LoadTargaImage(ms);
-                        }
-                    }
+                    return Image.FromStream(resource);
                 }
             }
         }
-#endregion
+        #endregion
     }
 }
