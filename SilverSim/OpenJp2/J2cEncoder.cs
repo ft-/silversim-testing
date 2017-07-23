@@ -22,7 +22,6 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
@@ -30,9 +29,6 @@ namespace OpenJp2.Net
 {
     public static class J2cEncoder
     {
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr LoadLibrary(string dllToLoad);
-
         [DllImport("openjp2", EntryPoint = "j2c_encode")]
         private static extern IntPtr J2cEncode(byte[] rawdata, int imagewidth, int imageheight, int imagecomponents, bool lossless);
 
@@ -44,9 +40,6 @@ namespace OpenJp2.Net
 
         [DllImport("openjp2", EntryPoint = "j2c_encoded_free")]
         private static extern void J2cEncodedFree(IntPtr dataref);
-
-        private static readonly object m_InitLock = new object();
-        private static bool m_Inited;
 
         public class J2cEncodingFailedException : Exception
         {
@@ -67,40 +60,11 @@ namespace OpenJp2.Net
             }
         }
 
-        private static void InitOpenJP2()
-        {
-            lock (m_InitLock)
-            {
-                if (!m_Inited)
-                {
-                    /* preload necessary windows dll */
-                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                    {
-                        if (Environment.Is64BitProcess)
-                        {
-                            if (IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/64/openjp2.dll")))
-                            {
-                                throw new FileNotFoundException("missing platform-libs/windows/64/openjp2.dll");
-                            }
-                        }
-                        else
-                        {
-                            if (IntPtr.Zero == LoadLibrary(Path.GetFullPath("platform-libs/windows/32/openjp2.dll")))
-                            {
-                                throw new FileNotFoundException("missing platform-libs/windows/32/openjp2.dll");
-                            }
-                        }
-                    }
-                    m_Inited = true;
-                }
-            }
-        }
-
         public static byte[] EncodeWithBump(Bitmap img, bool lossless, byte[] bumpdata)
         {
-            if (!m_Inited)
+            if (!J2cInit.m_Inited)
             {
-                InitOpenJP2();
+                J2cInit.InitOpenJP2();
             }
 
             int imgChannelWidth = img.Width * img.Height;
@@ -176,9 +140,9 @@ namespace OpenJp2.Net
 
         public static byte[] Encode(Bitmap img, bool lossless)
         {
-            if (!m_Inited)
+            if (!J2cInit.m_Inited)
             {
-                InitOpenJP2();
+                J2cInit.InitOpenJP2();
             }
 
             int imgChannelWidth = img.Width * img.Height;

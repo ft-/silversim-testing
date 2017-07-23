@@ -187,7 +187,7 @@ namespace SilverSim.Scene.Types.Agent
                     alphaCompositeInputs.Add(BaseBakes.HeadAlpha);
                     bakeProcessTable = IndexesForBakeHead;
                     data.Name = "Baked Head Texture";
-                    bump = BaseBakes.HeadBump;
+                    bump = new byte[512 * 512];
                     break;
 
                 case BakeType.Eyes:
@@ -203,13 +203,13 @@ namespace SilverSim.Scene.Types.Agent
                 case BakeType.LowerBody:
                     bakeProcessTable = IndexesForBakeLowerBody;
                     data.Name = "Baked Lower Body Texture";
-                    bump = BaseBakes.LowerBodyBump;
+                    bump = new byte[512 * 512];
                     break;
 
                 case BakeType.UpperBody:
                     bakeProcessTable = IndexesForBakeUpperBody;
                     data.Name = "Baked Upper Body Texture";
-                    bump = BaseBakes.UpperBodyBump;
+                    bump = new byte[512 * 512];
                     break;
 
                 case BakeType.Skirt:
