@@ -30,8 +30,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
-using System.IO.Compression;
 using System.Runtime.InteropServices;
 
 namespace SilverSim.Scene.Types.Agent
@@ -321,21 +319,18 @@ namespace SilverSim.Scene.Types.Agent
                     {
                         using (Bitmap resizedalphaimg = new Bitmap(alphaimg, bakeDimensions, bakeDimensions))
                         {
-                            if (resizedalphaimg.PixelFormat == PixelFormat.Format32bppArgb)
+                            BitmapData srcBmpData = resizedalphaimg.LockBits(bakeRectangle, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                            Marshal.Copy(srcBmpData.Scan0, srcBmpBytes, 0, scanLineBytes);
+
+                            for (int i = scanLineBytes; i-- != 0;)
                             {
-                                BitmapData srcBmpData = resizedalphaimg.LockBits(bakeRectangle, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-                                Marshal.Copy(srcBmpData.Scan0, srcBmpBytes, 0, scanLineBytes);
+                                dstBmpBytes[i] = Math.Min(dstBmpBytes[i], srcBmpBytes[i]);
 
-                                for (int i = scanLineBytes; i-- != 0;)
-                                {
-                                    dstBmpBytes[i] = Math.Min(dstBmpBytes[i], srcBmpBytes[i]);
-
-                                    /* skip RGB */
-                                    i -= 3;
-                                }
-
-                                resizedalphaimg.UnlockBits(srcBmpData);
+                                /* skip RGB */
+                                i -= 3;
                             }
+
+                            resizedalphaimg.UnlockBits(srcBmpData);
                         }
                     }
 
