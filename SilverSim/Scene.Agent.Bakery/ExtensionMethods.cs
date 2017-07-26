@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts;
+using SilverSim.Scene.Agent.Bakery.SubBakers.Clothing;
 using SilverSim.Types.Asset.Format;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -33,11 +35,38 @@ namespace SilverSim.Scene.Agent.Bakery
         {
             switch(wearable.Type)
             {
-                case WearableType.Eyes: return new SubBakers.EyeSubBaker(wearable);
-                case WearableType.Skin: return new SubBakers.SkinSubBaker(wearable);
-                case WearableType.Tattoo: return new SubBakers.TattooSubBaker(wearable);
-                case WearableType.Alpha: return new SubBakers.AlphaSubBaker(wearable);
-                default: return null; /* intentionally returning null here */
+                case WearableType.Eyes:
+                    return new EyeSubBaker(wearable);
+                case WearableType.Skin:
+                    return new SkinSubBaker(wearable);
+                case WearableType.Hair:
+                    return new HairSubBaker(wearable);
+
+                case WearableType.Tattoo:
+                    return new TattooSubBaker(wearable);
+                case WearableType.Alpha:
+                    return new AlphaMaskSubBaker(wearable);
+                case WearableType.Shirt:
+                    return new ShirtSubBaker(wearable);
+                case WearableType.Jacket:
+                    return new JacketSubBaker(wearable);
+                case WearableType.Socks:
+                    return new SocksSubBaker(wearable);
+                case WearableType.Pants:
+                    return new PantsSubBaker(wearable);
+                case WearableType.Underpants:
+                    return new UnderpantsSubBaker(wearable);
+                case WearableType.Undershirt:
+                    return new UndershirtSubBaker(wearable);
+                case WearableType.Shoes:
+                    return new ShoesSubBaker(wearable);
+                case WearableType.Skirt:
+                    return new SkirtSubBaker(wearable);
+                case WearableType.Gloves:
+                    return new GlovesSubBaker(wearable);
+
+                default:
+                    return null; /* intentionally returning null here */
             }
         }
 

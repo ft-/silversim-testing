@@ -25,9 +25,9 @@ using System;
 using System.Drawing;
 using UUID = SilverSim.Types.UUID;
 
-namespace SilverSim.Scene.Agent.Bakery.SubBakers
+namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 {
-    public class AlphaSubBaker : AbstractSubBaker
+    public class AlphaMaskSubBaker : AbstractSubBaker
     {
         private Image m_HairBake;
         private Image m_HeadBake;
@@ -41,7 +41,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers
         private UUID m_LowerbodyTextureId;
         private UUID m_EyesTextureId;
 
-        public AlphaSubBaker(Wearable alpha)
+        public AlphaMaskSubBaker(Wearable alpha)
         {
             if(alpha.Type != WearableType.Alpha)
             {

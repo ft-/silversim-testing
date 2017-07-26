@@ -26,7 +26,7 @@ using System.Drawing.Drawing2D;
 using Color3 = SilverSim.Types.Color;
 using ColorAlpha = SilverSim.Types.ColorAlpha;
 
-namespace SilverSim.Scene.Agent.Bakery.SubBakers
+namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 {
     public sealed class SkinSubBaker : AbstractSubBaker
     {

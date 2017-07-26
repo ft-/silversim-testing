@@ -27,7 +27,7 @@ using Color3 = SilverSim.Types.Color;
 using ColorAlpha = SilverSim.Types.ColorAlpha;
 using UUID = SilverSim.Types.UUID;
 
-namespace SilverSim.Scene.Agent.Bakery.SubBakers
+namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 {
     public sealed class TattooSubBaker : AbstractSubBaker
     {
