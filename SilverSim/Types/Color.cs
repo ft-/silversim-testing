@@ -161,6 +161,11 @@ namespace SilverSim.Types
     {
         public double A;
 
+        public static ColorAlpha FromRgba(uint r, uint g, uint b, uint a)
+        {
+            return new ColorAlpha(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+        }
+
         #region Constructors
         public ColorAlpha()
         {
@@ -182,6 +187,12 @@ namespace SilverSim.Types
             : base(v)
         {
             A = alpha.Clamp(0f, 1f);
+        }
+
+        public ColorAlpha(Color v)
+            : base(v)
+        {
+            A = 1;
         }
 
         public ColorAlpha(ColorAlpha v)
