@@ -41,6 +41,8 @@ namespace SilverSim.Scene.Agent.Bakery
                     return new SkinSubBaker(wearable);
                 case WearableType.Hair:
                     return new HairSubBaker(wearable);
+                case WearableType.Shape:
+                    return new ShapeSubBaker(wearable);
 
                 case WearableType.Tattoo:
                     return new TattooSubBaker(wearable);
