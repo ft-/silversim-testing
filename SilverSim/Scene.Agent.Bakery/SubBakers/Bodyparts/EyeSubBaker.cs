@@ -52,6 +52,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             }
         }
 
+        public override bool IsBaked => EyeBake != null;
+
         public override WearableType Type => WearableType.Eyes;
 
         public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)

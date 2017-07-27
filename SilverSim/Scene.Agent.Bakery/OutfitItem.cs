@@ -20,48 +20,18 @@
 // exception statement from your version.
 
 using SilverSim.Types.Asset.Format;
-using System;
-using Color3 = SilverSim.Types.Color;
 
-namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
+namespace SilverSim.Scene.Agent.Bakery
 {
-    public sealed class UndershirtSubBaker : AbstractSubBaker
+    public class OutfitItem
     {
-        public UndershirtSubBaker(Wearable undershirt)
+        public int Ordinal;
+        public Wearable Wearable;
+
+        public OutfitItem(int ordinal, Wearable wearable)
         {
-            if(undershirt.Type != WearableType.Undershirt)
-            {
-                throw new ArgumentException(nameof(undershirt));
-            }
-        }
-
-        public override bool IsBaked => false;
-
-        public override WearableType Type => WearableType.Undershirt;
-
-        public override void Dispose()
-        {
-        }
-
-        private static Color3 GetUndershirtColor(Wearable undershirt)
-        {
-            var col = new Color3(1, 1, 1);
-            double val;
-
-            if (undershirt.Params.TryGetValue(821, out val))
-            {
-                col.R = val.LimitRange(0, 1);
-            }
-            if (undershirt.Params.TryGetValue(822, out val))
-            {
-                col.G = val.LimitRange(0, 1);
-            }
-            if (undershirt.Params.TryGetValue(823, out val))
-            {
-                col.B = val.LimitRange(0, 1);
-            }
-
-            return col;
+            Ordinal = ordinal;
+            Wearable = wearable;
         }
     }
 }

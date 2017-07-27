@@ -65,6 +65,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             }
         }
 
+        public override bool IsBaked => HeadBake != null && UpperBake != null && LowerBake != null;
+
         public override WearableType Type => WearableType.Tattoo;
 
         public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)

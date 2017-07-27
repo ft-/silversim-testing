@@ -70,6 +70,13 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             }
         }
 
+        public override bool IsBaked => 
+            (m_HairBake != null || m_HairTextureId == UUID.Zero) && 
+            (m_HeadBake != null || m_HeadTextureId == UUID.Zero) && 
+            (m_LowerbodyBake != null || m_LowerbodyTextureId == UUID.Zero) && 
+            (m_UpperbodyBake != null || m_UpperbodyTextureId == UUID.Zero) && 
+            (m_EyesBake != null || m_EyesTextureId == UUID.Zero);
+
         public override WearableType Type => throw new NotImplementedException();
 
         public override Image BakeAlphaMaskOutput(IBakeTextureInputCache cache, BakeTarget target)

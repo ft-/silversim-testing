@@ -47,6 +47,7 @@ namespace SilverSim.Scene.Agent.Bakery
         public static Image NailpolishAlpha { get; }
         public static Image InnershadowAlpha { get; }
         public static Image OutershadowAlpha { get; }
+        public static Image UndefinedTexture { get; }
 
         public static byte[] HeadBump { get; }
         public static byte[] UpperBodyBump { get; }
@@ -74,6 +75,15 @@ namespace SilverSim.Scene.Agent.Bakery
             HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
             UpperBodyBump = LoadResourceBumpmap("bump.bump_upperbody_base.png");
             LowerBodyBump = LoadResourceBumpmap("bump.bump_lowerbody_base.png");
+
+            UndefinedTexture = new Bitmap(512, 512, PixelFormat.Format24bppRgb);
+            using (Graphics gfx = Graphics.FromImage(UndefinedTexture))
+            {
+                using (var b = new SolidBrush(Color.LightGray))
+                {
+                    gfx.FillRectangle(b, new Rectangle(0, 0, 512, 512));
+                }
+            }
 
             {
                 Bitmap bmp = new Bitmap(HeadColor);

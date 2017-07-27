@@ -52,6 +52,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             m_HairColor = GetHairColor(hair);
         }
 
+        public override bool IsBaked => m_HairBake != null;
+
         public override WearableType Type => WearableType.Hair;
 
         public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)

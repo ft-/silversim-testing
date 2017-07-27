@@ -32,6 +32,11 @@ namespace SilverSim.Scene.Agent.Bakery
     public abstract class AbstractSubBaker : IDisposable
     {
         public abstract WearableType Type { get; }
+
+        public int Ordinal { get; set; }
+
+        public abstract bool IsBaked { get; }
+
         /*
          * may return null if bake does not output a bake image
          */

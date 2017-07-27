@@ -19,49 +19,46 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types.Asset.Format;
 using System;
-using Color3 = SilverSim.Types.Color;
+using System.Runtime.Serialization;
 
-namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
+namespace SilverSim.Scene.Agent.Bakery
 {
-    public sealed class UndershirtSubBaker : AbstractSubBaker
+    public class BakeErrorException : Exception
     {
-        public UndershirtSubBaker(Wearable undershirt)
-        {
-            if(undershirt.Type != WearableType.Undershirt)
-            {
-                throw new ArgumentException(nameof(undershirt));
-            }
-        }
-
-        public override bool IsBaked => false;
-
-        public override WearableType Type => WearableType.Undershirt;
-
-        public override void Dispose()
+        public BakeErrorException()
         {
         }
 
-        private static Color3 GetUndershirtColor(Wearable undershirt)
+        public BakeErrorException(string message) : base(message)
         {
-            var col = new Color3(1, 1, 1);
-            double val;
+        }
 
-            if (undershirt.Params.TryGetValue(821, out val))
-            {
-                col.R = val.LimitRange(0, 1);
-            }
-            if (undershirt.Params.TryGetValue(822, out val))
-            {
-                col.G = val.LimitRange(0, 1);
-            }
-            if (undershirt.Params.TryGetValue(823, out val))
-            {
-                col.B = val.LimitRange(0, 1);
-            }
+        public BakeErrorException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
 
-            return col;
+        protected BakeErrorException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
+    public class AlreadyBakedException : Exception
+    {
+        public AlreadyBakedException()
+        {
+        }
+
+        public AlreadyBakedException(string message) : base(message)
+        {
+        }
+
+        public AlreadyBakedException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected AlreadyBakedException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
     }
 }

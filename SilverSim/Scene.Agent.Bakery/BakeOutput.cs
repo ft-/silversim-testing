@@ -19,47 +19,18 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types.Asset.Format;
-using System;
-using Color3 = SilverSim.Types.Color;
+using SilverSim.Types.Asset;
 
-namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
+namespace SilverSim.Scene.Agent.Bakery
 {
-    public sealed class PantsSubBaker : AbstractSubBaker
+    public class BakeOutput
     {
-        public PantsSubBaker(Wearable pants)
-        {
-            if(pants.Type != WearableType.Pants)
-            {
-                throw new ArgumentException(nameof(pants));
-            }
-        }
-
-        public override bool IsBaked => false;
-
-        public override WearableType Type => WearableType.Pants;
-
-        public override void Dispose()
-        {
-        }
-
-        private static Color3 GetPantColor(Wearable pant)
-        {
-            var col = new Color3(1, 1, 1);
-            double val;
-            if (pant.Params.TryGetValue(806, out val))
-            {
-                col.R = val.LimitRange(0, 1);
-            }
-            if (pant.Params.TryGetValue(807, out val))
-            {
-                col.G = val.LimitRange(0, 1);
-            }
-            if (pant.Params.TryGetValue(808, out val))
-            {
-                col.B = val.LimitRange(0, 1);
-            }
-            return col;
-        }
+        public AssetData HairBake;
+        public AssetData HeadBake;
+        public AssetData UpperBake;
+        public AssetData LowerBake;
+        public AssetData EyeBake;
+        public AssetData SkirtBake;
+        public byte[] VisualParams;
     }
 }

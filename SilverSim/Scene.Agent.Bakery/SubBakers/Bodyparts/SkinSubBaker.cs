@@ -62,6 +62,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             m_NailpolishColor = GetNailPolishColor(skin);
         }
 
+        public override bool IsBaked => HeadBake != null && UpperBake != null && LowerBake != null;
+
         public override WearableType Type => WearableType.Skin;
 
         public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)

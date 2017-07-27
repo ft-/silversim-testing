@@ -35,6 +35,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             }
         }
 
+        public override bool IsBaked => false;
+
         public override WearableType Type => WearableType.Shirt;
 
         public override void Dispose()
