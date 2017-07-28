@@ -77,7 +77,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             (m_UpperbodyBake != null || m_UpperbodyTextureId == UUID.Zero) && 
             (m_EyesBake != null || m_EyesTextureId == UUID.Zero);
 
-        public override WearableType Type => throw new NotImplementedException();
+        public override WearableType Type => WearableType.Alpha;
 
         public override Image BakeAlphaMaskOutput(IBakeTextureInputCache cache, BakeTarget target)
         {
