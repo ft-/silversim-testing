@@ -140,7 +140,7 @@ namespace SilverSim.Scene.Agent.Bakery
             int n = targetDimension * targetDimension;
             int di = 0, si;
 
-            byte[] dstbump = new byte[n];
+            var dstbump = new byte[n];
             int srcDimension = 128;
             if(srcbump.Length == 512 * 512)
             {
@@ -184,11 +184,13 @@ namespace SilverSim.Scene.Agent.Bakery
 
         public BakeOutput Process(BakeCache cache, AssetServiceInterface assetSource)
         {
-            BakeOutput output = new BakeOutput();
+            var output = new BakeOutput();
             if(cache.IsBaked)
             {
                 throw new AlreadyBakedException();
             }
+
+            output.VisualParams = VisualParamsMapper.CreateVisualParams(cache.Wearables);
 
             foreach(Wearable wearable in cache.Wearables)
             {
@@ -220,8 +222,8 @@ namespace SilverSim.Scene.Agent.Bakery
                 }
             }
 
-            Targets Tgt = new Targets();
-            Dictionary<WearableType, List<AbstractSubBaker>> SourceBakers = new Dictionary<WearableType, List<AbstractSubBaker>>();
+            var Tgt = new Targets();
+            var SourceBakers = new Dictionary<WearableType, List<AbstractSubBaker>>();
             foreach(WearableType t in Enum.GetValues(typeof(WearableType)))
             {
                 SourceBakers.Add(t, new List<AbstractSubBaker>());
@@ -276,16 +278,31 @@ namespace SilverSim.Scene.Agent.Bakery
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Skirt].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.Skirt });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Skirt], new BakeTarget[] { BakeTarget.Skirt });
 
+                /* for alpha masks we have to get rid of the Graphics */
+                foreach (Graphics gfx in Tgt.Graphics.Values)
+                {
+                    gfx.Dispose();
+                }
+                Tgt.Graphics.Clear();
+
+                /* clean out alpha channel. the ones we used before are not necessary anymore */
+                foreach (KeyValuePair<BakeTarget, Bitmap> kvp in Tgt.Images)
+                {
+                    int byteSize = kvp.Value.Width * kvp.Value.Height * 4;
+                    BitmapData lockBits = kvp.Value.LockBits(Tgt.Rectangles[kvp.Key], ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                    var rawdata = new byte[byteSize];
+                    Marshal.Copy(lockBits.Scan0, rawdata, 0, byteSize);
+                    for(int bytePos = byteSize; bytePos-- != 0; bytePos -= 3)
+                    {
+                        rawdata[bytePos] = 255;
+                    }
+                    Marshal.Copy(rawdata, 0, lockBits.Scan0, byteSize);
+                    kvp.Value.UnlockBits(lockBits);
+                }
+
                 if (SourceBakers[WearableType.Alpha].Count != 0)
                 {
-                    /* for alpha masks we have to get rid of the Graphics */
-                    foreach (Graphics gfx in Tgt.Graphics.Values)
-                    {
-                        gfx.Dispose();
-                    }
-                    Tgt.Graphics.Clear();
-
-                    Dictionary<BakeTarget, byte[]> AlphaMaskBakes = new Dictionary<BakeTarget, byte[]>();
+                    var AlphaMaskBakes = new Dictionary<BakeTarget, byte[]>();
 
                     foreach(AbstractSubBaker baker in SourceBakers[WearableType.Alpha])
                     {
@@ -404,13 +421,43 @@ namespace SilverSim.Scene.Agent.Bakery
 
         private void DrawBumpMaps(Targets Tgt, IEnumerable<AbstractSubBaker> bakers, BakeTarget[] targets)
         {
+            foreach(BakeTarget target in targets)
+            {
+                foreach(AbstractSubBaker baker in bakers)
+                {
+                    byte[] tgtbump;
+                    if(!Tgt.Bumps.TryGetValue(target, out tgtbump))
+                    {
+                        tgtbump = target == BakeTarget.Eyes ? new byte[128 * 128] : new byte[512 * 512];
+                        Tgt.Bumps.Add(target, tgtbump);
+                    }
 
+                    byte[] bump = baker.BakeBumpOutput(this, target);
+                    if(bump != null)
+                    {
+                        ApplyBump(tgtbump, bump);
+                    }
+                }
+            }
+        }
+
+        private void ApplyBump(byte[] tgt, byte[] src)
+        {
+            if (tgt.Length != src.Length)
+            {
+                throw new ArgumentException(nameof(src));
+            }
+
+            for (int i = 0; i < tgt.Length; ++i)
+            {
+                tgt[i] = Math.Max(tgt[i], src[i]);
+            }
         }
 
         private byte[] GetRawData(Bitmap bmp)
         {
             int byteCount = bmp.Width * bmp.Height * 4;
-            byte[] rawdata = new byte[byteCount];
+            var rawdata = new byte[byteCount];
             BitmapData bmpLock = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             Marshal.Copy(bmpLock.Scan0, rawdata, 0, byteCount);
             bmp.UnlockBits(bmpLock);

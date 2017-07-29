@@ -33,7 +33,9 @@ namespace SilverSim.Scene.Agent.Bakery
     {
         public static AbstractSubBaker CreateSubBaker(this Wearable wearable)
         {
-            switch(wearable.Type)
+            VisualParamsMapper.CompleteParams(wearable.Params);
+
+            switch (wearable.Type)
             {
                 case WearableType.Eyes:
                     return new EyeSubBaker(wearable);

@@ -169,7 +169,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 
         private static Color3 GetSkinColor(Wearable skin)
         {
-            Color3 skinColor = new Color3(0, 0, 0);
+            var skinColor = new Color3(0, 0, 0);
 
             double val;
             if (skin.Params.TryGetValue(108, out val))
@@ -307,7 +307,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private static ColorAlpha GetOuterShadowColor(Wearable skin)
         {
             double value;
-            ColorAlpha color = (ColorAlpha)OuterShadowColors[0];
+            var color = (ColorAlpha)OuterShadowColors[0];
             if (!skin.Params.TryGetValue(708, out value))
             {
                 color = (ColorAlpha)CalcColor(value, OuterShadowColors);
@@ -353,7 +353,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private static ColorAlpha GetInnerShadowColor(Wearable skin)
         {
             double value;
-            ColorAlpha color = (ColorAlpha)InnerShadowColors[0];
+            var color = (ColorAlpha)InnerShadowColors[0];
             if (!skin.Params.TryGetValue(712, out value))
             {
                 color = (ColorAlpha)CalcColor(value, InnerShadowColors);
@@ -408,7 +408,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private static ColorAlpha GetNailPolishColor(Wearable skin)
         {
             double value;
-            ColorAlpha color = (ColorAlpha)NailPolishColors[0];
+            var color = (ColorAlpha)NailPolishColors[0];
             if (skin.Params.TryGetValue(715, out value))
             {
                 color = (ColorAlpha)CalcColor(value, NailPolishColors);

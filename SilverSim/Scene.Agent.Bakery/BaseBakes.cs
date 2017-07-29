@@ -38,6 +38,7 @@ namespace SilverSim.Scene.Agent.Bakery
         public static Image UpperBodyColorAndSkinGrain { get; }
         public static Image BodySkingrain { get; }
         public static Image HeadColorAndSkinGrain { get; }
+
         public static Image LipstickAlpha { get; }
         public static Image LipglossAlpha { get; }
         public static Image LipsMask { get; }
@@ -52,6 +53,16 @@ namespace SilverSim.Scene.Agent.Bakery
         public static byte[] HeadBump { get; }
         public static byte[] UpperBodyBump { get; }
         public static byte[] LowerBodyBump { get; }
+        public static byte[] JacketLengthUpperAlpha { get; }
+        public static byte[] JacketLengthLowerAlpha { get; }
+        public static byte[] JacketOpenUpperAlpha { get; }
+        public static byte[] JacketOpenLowerAlpha { get; }
+        public static byte[] ShirtBottomAlpha { get; }
+        public static byte[] ShirtCollarFrontAlpha { get; }
+        public static byte[] ShirtCollarBackAlpha { get; }
+        public static byte[] ShirtSleeveAlpha { get; }
+        public static byte[] GlovesLengthAlpha { get; }
+        public static byte[] GlovesFingersAlpha { get; }
 
         static BaseBakes()
         {
@@ -75,6 +86,14 @@ namespace SilverSim.Scene.Agent.Bakery
             HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
             UpperBodyBump = LoadResourceBumpmap("bump.bump_upperbody_base.png");
             LowerBodyBump = LoadResourceBumpmap("bump.bump_lowerbody_base.png");
+            JacketLengthUpperAlpha = LoadResourceBumpmap("jacket.jacket_length_upper_alpha.png"); ;
+            JacketLengthLowerAlpha = LoadResourceBumpmap("jacket.jacket_length_lower_alpha.png");
+            JacketOpenUpperAlpha = LoadResourceBumpmap("jacket.jacket_open_upper_alpha.png");
+            JacketOpenLowerAlpha = LoadResourceBumpmap("jacket.jacket_open_lower_alpha.png");
+            ShirtBottomAlpha = LoadResourceBumpmap("shirt.shirt_bottom_alpha.png");
+            ShirtCollarFrontAlpha = LoadResourceBumpmap("shirt.shirt_collar_alpha.png");
+            ShirtCollarBackAlpha = LoadResourceBumpmap("shirt.shirt_collar_back_alpha.png");
+            ShirtSleeveAlpha = LoadResourceBumpmap("shirt.shirt_sleeve_alpha.png");
 
             UndefinedTexture = new Bitmap(512, 512, PixelFormat.Format24bppRgb);
             using (Graphics gfx = Graphics.FromImage(UndefinedTexture))
@@ -86,18 +105,18 @@ namespace SilverSim.Scene.Agent.Bakery
             }
 
             {
-                Bitmap bmp = new Bitmap(HeadColor);
+                var bmp = new Bitmap(HeadColor);
                 BitmapData outLockBits = bmp.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-                byte[] inData = new byte[512 * 512 * 4];
-                byte[] outData = new byte[512 * 512 * 4];
-                byte[] alphaData = new byte[512 * 512 * 4];
-                using (Bitmap headAlpha = new Bitmap(HeadAlpha))
+                var inData = new byte[512 * 512 * 4];
+                var outData = new byte[512 * 512 * 4];
+                var alphaData = new byte[512 * 512 * 4];
+                using (var headAlpha = new Bitmap(HeadAlpha))
                 {
                     BitmapData inLockBits = headAlpha.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                     Marshal.Copy(inLockBits.Scan0, alphaData, 0, 512 * 512 * 4);
                     headAlpha.UnlockBits(inLockBits);
                 }
-                using (Bitmap headSkinGrain = new Bitmap(HeadSkinGrain))
+                using (var headSkinGrain = new Bitmap(HeadSkinGrain))
                 {
                     BitmapData inLockBits = headSkinGrain.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                     Marshal.Copy(inLockBits.Scan0, inData, 0, 512 * 512 * 4);
@@ -121,10 +140,10 @@ namespace SilverSim.Scene.Agent.Bakery
             }
 
             {
-                Bitmap bmp = new Bitmap(UpperBodyColor);
+                var bmp = new Bitmap(UpperBodyColor);
                 BitmapData outLockBits = bmp.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-                byte[] inData = new byte[512 * 512 * 4];
-                byte[] outData = new byte[512 * 512 * 4];
+                var inData = new byte[512 * 512 * 4];
+                var outData = new byte[512 * 512 * 4];
                 using (Bitmap skinGrain = new Bitmap(BodySkingrain))
                 {
                     BitmapData inLockBits = skinGrain.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
@@ -148,11 +167,11 @@ namespace SilverSim.Scene.Agent.Bakery
             }
 
             {
-                Bitmap bmp = new Bitmap(LowerBodyColor);
+                var bmp = new Bitmap(LowerBodyColor);
                 BitmapData outLockBits = bmp.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-                byte[] inData = new byte[512 * 512 * 4];
-                byte[] outData = new byte[512 * 512 * 4];
-                using (Bitmap skinGrain = new Bitmap(BodySkingrain))
+                var inData = new byte[512 * 512 * 4];
+                var outData = new byte[512 * 512 * 4];
+                using (var skinGrain = new Bitmap(BodySkingrain))
                 {
                     BitmapData inLockBits = skinGrain.LockBits(new Rectangle(0, 0, 512, 512), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                     Marshal.Copy(inLockBits.Scan0, inData, 0, 512 * 512 * 4);
@@ -192,11 +211,11 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 using (Image img = Image.FromStream(resource))
                 {
-                    using (Bitmap bmp = new Bitmap(img))
+                    using (var bmp = new Bitmap(img))
                     {
                         BitmapData inLockBits = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
                         bumpmap = new byte[bmp.Width * bmp.Height];
-                        byte[] pixeldata = new byte[bmp.Width * bmp.Height * 3];
+                        var pixeldata = new byte[bmp.Width * bmp.Height * 3];
                         Marshal.Copy(inLockBits.Scan0, pixeldata, 0, bmp.Width * bmp.Height * 3);
                         int inpos = 0;
                         for (int i = 0; i < bmp.Width * bmp.Height; ++i)

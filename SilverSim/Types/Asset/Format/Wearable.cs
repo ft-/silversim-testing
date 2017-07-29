@@ -286,6 +286,28 @@ namespace SilverSim.Types.Asset.Format
         }
         #endregion
 
+        public double GetMinParamOrDefault(double defvalue, params uint[] paramids)
+        {
+            double val = double.MaxValue;
+            bool found = false;
+            foreach (uint paramid in paramids)
+            {
+                double valin;
+                if (Params.TryGetValue(paramid, out valin))
+                {
+                    val = Math.Min(val, valin);
+                    found = true;
+                }
+            }
+            return found ? val : defvalue;
+        }
+
+        public double GetParamValueOrDefault(uint paramid, double defvalue)
+        {
+            double val;
+            return Params.TryGetValue(paramid, out val) ? val : defvalue;
+        }
+
         #region References
         public List<UUID> References
         {

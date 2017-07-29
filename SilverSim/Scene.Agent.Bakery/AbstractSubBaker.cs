@@ -26,6 +26,7 @@ using Image = System.Drawing.Image;
 using Bitmap = System.Drawing.Bitmap;
 using Rectangle = System.Drawing.Rectangle;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace SilverSim.Scene.Agent.Bakery
 {
@@ -150,6 +151,50 @@ namespace SilverSim.Scene.Agent.Bakery
             }
 
             return paramColor;
+        }
+
+        protected void BlendAlpha(byte[] img, byte[] graymap, double val)
+        {
+            if (graymap.Length * 4 != img.Length)
+            {
+                throw new ArgumentException(nameof(graymap));
+            }
+            int bitmapLength = img.Length;
+            var alphalevel = (byte)((1 - val) * 255);
+            int grayPos = 0;
+            int bitmapPos = 0;
+            while(bitmapPos < img.Length)
+            {
+                bitmapPos += 3;
+                img[bitmapPos] = Math.Min((byte)(graymap[grayPos] >= alphalevel ? 255 : 0), img[bitmapPos]);
+                bitmapPos += 4;
+                ++grayPos;
+                ++bitmapPos;
+            }
+        }
+
+        protected void InsideAlphaBlend(Bitmap bmp, Action<byte[]> del)
+        {
+            int rawdatalength = bmp.Width * bmp.Height * 4;
+            BitmapData bmpLock = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            var rawdata = new byte[rawdatalength];
+            Marshal.Copy(bmpLock.Scan0, rawdata, 0, rawdata.Length);
+            del(rawdata);
+            Marshal.Copy(rawdata, 0, bmpLock.Scan0, rawdata.Length);
+            bmp.UnlockBits(bmpLock);
+        }
+
+        protected void BlendBump(byte[] tgt, byte[] src, double val)
+        {
+            if(tgt.Length != src.Length)
+            {
+                throw new ArgumentException(nameof(src));
+            }
+
+            for(int i = 0; i < tgt.Length; ++i)
+            {
+                tgt[i] = Math.Max(tgt[i], (byte)(src[i] * val).LimitRange(0, 255));
+            }
         }
     }
 }
