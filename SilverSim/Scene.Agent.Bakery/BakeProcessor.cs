@@ -194,7 +194,7 @@ namespace SilverSim.Scene.Agent.Bakery
             m_BumpsResized512.Clear();
         }
 
-        public BakeOutput Process(BakeCache cache, AssetServiceInterface assetSource)
+        public BakeOutput Process(BakeCache cache, AssetServiceInterface assetSource, Action<string> logOutput = null)
         {
             var output = new BakeOutput();
             if(cache.IsBaked)
@@ -270,6 +270,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     Tgt.Graphics.Add(idx, gfx);
                 }
 
+                logOutput?.Invoke("Processing R,G,B and bump parts");
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Skin], SkinIndices);
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Tattoo], SkinIndices);
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Hair], new BakeTarget[] { BakeTarget.Hair });
@@ -297,6 +298,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 }
                 Tgt.Graphics.Clear();
 
+                logOutput?.Invoke("Processing alpha mask");
                 /* clean out alpha channel. the ones we used before are not necessary anymore */
                 foreach (KeyValuePair<BakeTarget, Bitmap> kvp in Tgt.Images)
                 {
@@ -360,6 +362,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     }
                 }
 
+                logOutput?.Invoke("Compressing bakes");
                 byte[] finalbump;
                 output.HairBake = new AssetData
                 {

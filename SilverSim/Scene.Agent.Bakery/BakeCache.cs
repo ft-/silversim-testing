@@ -242,19 +242,22 @@ namespace SilverSim.Scene.Agent.Bakery
                         }
                     }
                 }
+
+                logOutput?.Invoke(string.Format("Setting current outfit for baking agent {0}", principal.FullName));
                 SetCurrentOutfit(outfitItems);
             }
         }
         #endregion
 
-        public AppearanceInfo Bake(AssetServiceInterface destService)
+        public AppearanceInfo Bake(AssetServiceInterface destService, Action<string> logOutput = null)
         {
             BakeOutput bakes;
             using (var proc = new BakeProcessor())
             {
-                bakes = proc.Process(this, AssetService);
+                bakes = proc.Process(this, AssetService, logOutput);
             }
 
+            logOutput?.Invoke("Store assets");
             destService.Store(bakes.EyeBake);
             destService.Store(bakes.HeadBake);
             destService.Store(bakes.UpperBake);
