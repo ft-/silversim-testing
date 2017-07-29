@@ -119,7 +119,7 @@ namespace SilverSim.Scene.Agent.Bakery
             LipsMask = LoadResourceImage("skin.lips_mask.png");
             InnershadowAlpha = LoadResourceBumpmap("skin.eyeshadow_inner_alpha.png");
             OutershadowAlpha = LoadResourceBumpmap("skin.eyeshadow_outer_alpha.png");
-            BodySkingrain = LoadResourceImage("skin.body_singrain.png");
+            BodySkingrain = LoadResourceImage("skin.body_skingrain.png");
 
             m_HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
             m_UpperBodyBump = LoadResourceBumpmap("bump.bump_upperbody_base.png");
