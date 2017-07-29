@@ -44,6 +44,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private ColorAlpha m_InnershadowColor;
         private ColorAlpha m_EyelinerColor;
         private ColorAlpha m_NailpolishColor;
+        private double m_Innershadow;
+        private double m_Outershadow;
 
         public SkinSubBaker(Wearable skin)
         {
@@ -60,6 +62,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             m_InnershadowColor = GetInnerShadowColor(skin);
             m_EyelinerColor = GetEyelinerColor(skin);
             m_NailpolishColor = GetNailPolishColor(skin);
+            m_Innershadow = skin.GetParamValueOrDefault(709, 0);
+            m_Outershadow = skin.GetParamValueOrDefault(707, 0);
         }
 
         public override bool IsBaked => HeadBake != null && UpperBake != null && LowerBake != null;
@@ -89,6 +93,38 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     gfx.DrawTinted(bakeRectangle, BaseBakes.LipstickAlpha, m_LipstickColor);
                     gfx.DrawTinted(bakeRectangle, BaseBakes.EyelinerAlpha, m_EyelinerColor);
                     gfx.DrawTinted(bakeRectangle, BaseBakes.BlushAlpha, m_BlushColor);
+                    using (var innerShadow = CreateTargetBakeImage(target))
+                    {
+                        using (Graphics innergfx = Graphics.FromImage(innerShadow))
+                        {
+                            using (var b = new SolidBrush(Color.White))
+                            {
+                                innergfx.FillRectangle(b, bakeRectangle);
+                            }
+                        }
+
+                        InsideAlphaBlend(innerShadow, (rawdata) =>
+                        {
+                            BlendAlpha(rawdata, BaseBakes.InnershadowAlpha, m_Innershadow);
+                        });
+                        gfx.DrawTinted(bakeRectangle, innerShadow, m_InnershadowColor);
+                    }
+                    using (var outerShadow = CreateTargetBakeImage(target))
+                    {
+                        using (Graphics innergfx = Graphics.FromImage(outerShadow))
+                        {
+                            using (var b = new SolidBrush(Color.White))
+                            {
+                                innergfx.FillRectangle(b, bakeRectangle);
+                            }
+                        }
+
+                        InsideAlphaBlend(outerShadow, (rawdata) =>
+                        {
+                            BlendAlpha(rawdata, BaseBakes.InnershadowAlpha, m_Outershadow);
+                        });
+                        gfx.DrawTinted(bakeRectangle, outerShadow, m_InnershadowColor);
+                    }
                 }
 
                 return HeadBake;

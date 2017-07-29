@@ -46,8 +46,8 @@ namespace SilverSim.Scene.Agent.Bakery
         public static Image BlushAlpha { get; }
         public static Image RosyfaceAlpha { get; }
         public static Image NailpolishAlpha { get; }
-        public static Image InnershadowAlpha { get; }
-        public static Image OutershadowAlpha { get; }
+        public static byte[] InnershadowAlpha { get; }
+        public static byte[] OutershadowAlpha { get; }
         public static Image UndefinedTexture { get; }
 
         public static byte[] HeadBump { get; }
@@ -79,8 +79,8 @@ namespace SilverSim.Scene.Agent.Bakery
             LipglossAlpha = LoadResourceImage("skin.lipgloss_alpha.png");
             EyelinerAlpha = LoadResourceImage("skin.eyeliner_alpha.png");
             LipsMask = LoadResourceImage("skin.lips_mask.png");
-            InnershadowAlpha = LoadResourceImage("skin.eyeshadow_inner_alpha.png");
-            OutershadowAlpha = LoadResourceImage("skin.eyeshadow_outer_alpha.png");
+            InnershadowAlpha = LoadResourceBumpmap("skin.eyeshadow_inner_alpha.png");
+            OutershadowAlpha = LoadResourceBumpmap("skin.eyeshadow_outer_alpha.png");
             BodySkingrain = LoadResourceImage("skin.body_singrain.png");
 
             HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
