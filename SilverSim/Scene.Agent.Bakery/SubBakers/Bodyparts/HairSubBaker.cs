@@ -25,6 +25,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Color3 = SilverSim.Types.Color;
+using ColorAlpha = SilverSim.Types.ColorAlpha;
 using UUID = SilverSim.Types.UUID;
 
 namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
@@ -34,7 +35,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private Image m_HairBake;
 
         //parameters
-        private Color3 m_HairColor;
+        private ColorAlpha m_HairColor;
         private UUID m_HairTextureId;
 
         public HairSubBaker(Wearable hair)
@@ -46,7 +47,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 
             hair.Textures.TryGetValue(AvatarTextureIndex.Hair, out m_HairTextureId);
 
-            m_HairColor = GetHairColor(hair);
+            m_HairColor = (ColorAlpha)GetHairColor(hair);
         }
 
         public override bool IsBaked => m_HairBake != null;
@@ -146,7 +147,17 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             {
                 col += new Color3(val, val, val);
             }
-            return col;
+
+            ColorAlpha alphaCol = (ColorAlpha)col;
+            if(hair.Params.TryGetValue(751, out val))
+            {
+                alphaCol.A = 1 - (val);
+            }
+            else
+            {
+                alphaCol.A = 0.7;
+            }
+            return alphaCol;
         }
         #endregion
 

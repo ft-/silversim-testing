@@ -19,9 +19,14 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +35,13 @@ namespace SilverSim.Scene.Agent.Bakery
 {
     public class BakeCache : IDisposable
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("AGENT BAKING");
         private readonly object m_Lock = new object();
         public AssetServiceInterface AssetService { get; }
+        public UUID CurrentOutfitFolderID = UUID.Zero;
+        public int AppearanceSerial;
+        public readonly UUID[] AvatarTextures = new UUID[AppearanceInfo.AvatarTextureData.TextureCount];
+        public readonly Dictionary<WearableType, List<AgentWearables.WearableInfo>> AvatarWearables = new Dictionary<WearableType, List<AgentWearables.WearableInfo>>();
 
         public BakeCache(AssetServiceInterface assetService)
         {
@@ -68,7 +78,7 @@ namespace SilverSim.Scene.Agent.Bakery
             }
         }
         
-        public void SetCurrentOutfit(Dictionary<UUID, OutfitItem> outfititems, AssetServiceInterface assetService)
+        public void SetCurrentOutfit(Dictionary<UUID, OutfitItem> outfititems)
         {
             lock (m_Lock)
             {
@@ -98,6 +108,14 @@ namespace SilverSim.Scene.Agent.Bakery
                             subbaker.Ordinal = kvp.Value.Ordinal;
                             m_SubBakers.Add(kvp.Key, subbaker);
                         }
+                    }
+                }
+
+                foreach (OutfitItem item in outfititems.Values.OrderBy(item => item.Ordinal))
+                {
+                    foreach (KeyValuePair<AvatarTextureIndex, UUID> tex in item.Wearable.Textures)
+                    {
+                        AvatarTextures[(int)tex.Key] = tex.Value;
                     }
                 }
 
@@ -137,6 +155,135 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 sub.Dispose();
             }
+        }
+
+        #region Load from current outfit
+        private static int LinkDescriptionToInt(string desc)
+        {
+            int res = 0;
+            if (desc.StartsWith("@") && int.TryParse(desc.Substring(1), out res))
+            {
+                return res;
+            }
+            return 0;
+        }
+
+        public void LoadFromCurrentOutfit(UUI principal, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, Action<string> logOutput = null)
+        {
+            lock (m_Lock)
+            {
+                if (CurrentOutfitFolderID == UUID.Zero)
+                {
+                    InventoryFolder folder;
+                    if (!inventoryService.Folder.TryGetValue(principal.ID, AssetType.CurrentOutfitFolder, out folder))
+                    {
+                        throw new BakeErrorException("Outfit folder missing");
+                    }
+                }
+
+                InventoryFolderContent folderContent = inventoryService.Folder.Content[principal.ID, CurrentOutfitFolderID];
+                AppearanceSerial = folderContent.Version;
+
+                var items = new List<InventoryItem>();
+                var itemlinks = new List<UUID>();
+                foreach (var item in folderContent.Items)
+                {
+                    if (item.AssetType == AssetType.Link)
+                    {
+                        items.Add(item);
+                        itemlinks.Add(item.AssetID);
+                    }
+                }
+
+                var actualItems = inventoryService.Item[principal.ID, itemlinks];
+                var actualItemsInDict = new Dictionary<UUID, InventoryItem>();
+                foreach (var item in actualItems)
+                {
+                    actualItemsInDict.Add(item.ID, item);
+                }
+
+                var outfitItems = new Dictionary<UUID, OutfitItem>();
+
+                logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", principal.FullName));
+
+                AvatarWearables.Clear();
+
+                foreach (var linkItem in items)
+                {
+                    InventoryItem actualItem;
+                    if (actualItemsInDict.TryGetValue(linkItem.AssetID, out actualItem) &&
+                        (actualItem.AssetType == AssetType.Clothing || actualItem.AssetType == AssetType.Bodypart))
+                    {
+                        AssetData outfitData;
+                        Wearable wearableData;
+                        if (assetService.TryGetValue(actualItem.AssetID, out outfitData))
+                        {
+                            try
+                            {
+                                wearableData = new Wearable(outfitData);
+                            }
+                            catch (Exception e)
+                            {
+                                string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, principal.FullName, principal.ID);
+                                m_Log.ErrorFormat(info, e);
+                                throw new BakeErrorException(info, e);
+                            }
+
+                            var oitem = new OutfitItem(LinkDescriptionToInt(linkItem.Description), wearableData);
+                            outfitItems.Add(linkItem.AssetID, oitem);
+                            List<AgentWearables.WearableInfo> wearables;
+                            if (!AvatarWearables.TryGetValue(wearableData.Type, out wearables))
+                            {
+                                wearables = new List<AgentWearables.WearableInfo>();
+                                AvatarWearables.Add(wearableData.Type, wearables);
+                            }
+                            wearables.Add(new AgentWearables.WearableInfo(linkItem.AssetID, actualItem.AssetID));
+                        }
+                    }
+                }
+                SetCurrentOutfit(outfitItems);
+            }
+        }
+        #endregion
+
+        public AppearanceInfo Bake(AssetServiceInterface destService)
+        {
+            BakeOutput bakes;
+            var bakeCache = new BakeCache(AssetService);
+            using (var proc = new BakeProcessor())
+            {
+                bakes = proc.Process(bakeCache, AssetService);
+            }
+
+            destService.Store(bakes.EyeBake);
+            destService.Store(bakes.HeadBake);
+            destService.Store(bakes.UpperBake);
+            destService.Store(bakes.LowerBake);
+            destService.Store(bakes.HairBake);
+
+            AvatarTextures[(int)AvatarTextureIndex.EyesBaked] = bakes.EyeBake.ID;
+            AvatarTextures[(int)AvatarTextureIndex.HairBaked] = bakes.HairBake.ID;
+            AvatarTextures[(int)AvatarTextureIndex.UpperBaked] = bakes.UpperBake.ID;
+            AvatarTextures[(int)AvatarTextureIndex.LowerBaked] = bakes.LowerBake.ID;
+            AvatarTextures[(int)AvatarTextureIndex.HeadBaked] = bakes.HeadBake.ID;
+
+            if (bakes.SkirtBake != null)
+            {
+                destService.Store(bakes.SkirtBake);
+                AvatarTextures[(int)AvatarTextureIndex.SkirtBaked] = bakes.SkirtBake.ID;
+            }
+            else
+            {
+                AvatarTextures[(int)AvatarTextureIndex.SkirtBaked] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+            }
+
+            var info = new AppearanceInfo();
+            info.Serial = AppearanceSerial;
+            info.VisualParams = bakes.VisualParams;
+            info.AvatarTextures.All = AvatarTextures;
+            info.Wearables.All = AvatarWearables;
+            //info.AvatarHeight;
+            return info;
         }
     }
 }

@@ -98,6 +98,9 @@ namespace SilverSim.Scene.Agent.Bakery
         public static byte[] SkirtSlitFrontAlpha { get; }
         public static byte[] SkirtSlitLeftAlpha { get; }
         public static byte[] SkirtSlitRightAlpha { get; }
+        public static byte[] BodyFreckles { get; }
+        public static byte[] Freckles { get; }
+        public static byte[] UpperbodyFreckles { get; }
 
         static BaseBakes()
         {
@@ -139,6 +142,9 @@ namespace SilverSim.Scene.Agent.Bakery
             SkirtSlitFrontAlpha = LoadResourceBumpmap("skirt.skirt_slit_front_alpha.png");
             SkirtSlitLeftAlpha = LoadResourceBumpmap("skirt.skirt_slit_left_alpha.png");
             SkirtSlitRightAlpha = LoadResourceBumpmap("skirt.skirt_slit_right_alpha.png");
+            Freckles = LoadResourceBumpmap("freckles_alpha.png");
+            BodyFreckles = LoadResourceBumpmap("bodyfreckles_alpha.png");
+            UpperbodyFreckles = LoadResourceBumpmap("upperbodyfreckles_alpha.png");
 
             UndefinedTexture = new Bitmap(512, 512, PixelFormat.Format24bppRgb);
             using (Graphics gfx = Graphics.FromImage(UndefinedTexture))
