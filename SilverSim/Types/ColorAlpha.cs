@@ -22,66 +22,111 @@
 
 namespace SilverSim.Types
 {
-    public class Color
+    public class ColorAlpha
     {
         public double R;
         public double G;
         public double B;
-
-        #region Constructors
-        public Color()
-        {
-        }
+        public double A;
 
         public static Color FromRgb(uint r, uint g, uint b)
         {
             return new Color(r / 255.0, g / 255.0, b / 255.0);
         }
 
-        public Color(double r, double g, double b)
+        public static ColorAlpha FromRgba(uint r, uint g, uint b, uint a)
+        {
+            return new ColorAlpha(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+        }
+
+        #region Constructors
+        public ColorAlpha()
+        {
+        }
+
+        public ColorAlpha(double r, double g, double b, double alpha)
         {
             R = r.Clamp(0f, 1f);
             G = g.Clamp(0f, 1f);
             B = b.Clamp(0f, 1f);
+            A = alpha.Clamp(0f, 1f);
         }
 
-        public Color(Vector3 v)
+        public ColorAlpha(Vector3 v, double alpha)
         {
             R = v.X.Clamp(0f, 1f);
             G = v.Y.Clamp(0f, 1f);
             B = v.Z.Clamp(0f, 1f);
+            A = alpha.Clamp(0f, 1f);
         }
 
-        public Color(Color v)
+        public ColorAlpha(Color v, double alpha)
         {
             R = v.R;
             G = v.G;
             B = v.B;
+            A = alpha.Clamp(0f, 1f);
+        }
+
+        public ColorAlpha(Color v)
+        {
+            R = v.R;
+            G = v.G;
+            B = v.B;
+            A = 1;
+        }
+
+        public ColorAlpha(ColorAlpha v)
+        {
+            R = v.R;
+            G = v.G;
+            B = v.B;
+            A = v.A;
+        }
+
+        public ColorAlpha(byte[] b)
+        {
+            R = b[0] / 255f;
+            G = b[1] / 255f;
+            B = b[2] / 255f;
+            A = b[3] / 255f;
+        }
+
+        public ColorAlpha(byte[] b, int pos)
+        {
+            R = b[pos + 0] / 255f;
+            G = b[pos + 1] / 255f;
+            B = b[pos + 2] / 255f;
+            A = b[pos + 3] / 255f;
         }
         #endregion
 
         #region Operators
-        public static implicit operator Vector3(Color v) => new Vector3(v.R, v.G, v.B);
+        public static implicit operator Vector3(ColorAlpha v) => new Vector3(v.R, v.G, v.B);
 
-        public static Color operator +(Color a, Color b) => new Color(
+        public static ColorAlpha operator +(ColorAlpha a, ColorAlpha b) => new ColorAlpha(
                 (a.R + b.R).Clamp(0, 1),
                 (a.G + b.G).Clamp(0, 1),
-                (a.B + b.B).Clamp(0, 1));
+                (a.B + b.B).Clamp(0, 1),
+                (a.A + b.A).Clamp(0, 1));
 
-        public Color Lerp(Color b, double mix) => new Color(
+        public ColorAlpha Lerp(ColorAlpha b, double mix) => new ColorAlpha(
                 R.Lerp(b.R, mix),
                 G.Lerp(b.G, mix),
-                B.Lerp(b.B, mix));
+                B.Lerp(b.B, mix),
+                A.Lerp(b.A, mix));
 
-        public static Color operator *(Color a, Color b) => new Color(
+        public static ColorAlpha operator *(ColorAlpha a, ColorAlpha b) => new ColorAlpha(
                 (a.R * b.R).Clamp(0, 1),
                 (a.G * b.G).Clamp(0, 1),
-                (a.B * b.B).Clamp(0, 1));
+                (a.B * b.B).Clamp(0, 1),
+                (a.A * b.A).Clamp(0, 1));
 
-        public static Color operator *(Color a, double b) => new Color(
+        public static ColorAlpha operator *(ColorAlpha a, double b) => new ColorAlpha(
                 (a.R * b).Clamp(0, 1),
                 (a.G * b).Clamp(0, 1),
-                (a.B * b).Clamp(0, 1));
+                (a.B * b).Clamp(0, 1),
+                (a.A * b).Clamp(0, 1));
         #endregion
 
         #region Properties
@@ -153,7 +198,37 @@ namespace SilverSim.Types
             set { B = value / 255f; }
         }
 
-        public byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte };
+        public byte A_AsByte
+        {
+            get
+            {
+                if (A > 1)
+                {
+                    return 255;
+                }
+                else if (A < 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (byte)(A * 255);
+                }
+            }
+
+            set { A = value / 255f; }
+        }
+
+        public static explicit operator ColorAlpha(Color c) => new ColorAlpha(c);
+        public static implicit operator Color(ColorAlpha c) => new Color(c.R, c.G, c.B);
+
+        public byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte, A_AsByte };
         #endregion
+
+        /// <summary>A Color4 with zero RGB values and fully opaque (alpha 1.0)</summary>
+        public readonly static ColorAlpha Black = new ColorAlpha(0f, 0f, 0f, 1f);
+
+        /// <summary>A Color4 with full RGB values (1.0) and fully opaque (alpha 1.0)</summary>
+        public readonly static ColorAlpha White = new ColorAlpha(1f, 1f, 1f, 1f);
     }
 }

@@ -37,9 +37,15 @@ namespace SilverSim.Scene.Agent.Bakery
                 if(param.TryGetValue(m.ValueId, out val))
                 {
                     val = val.LimitRange(m.MinValue, m.MaxValue);
-                    foreach(uint targetid in m.OtherValues)
+                    if (m.OtherValues != null)
                     {
-                        param.Add(targetid, val);
+                        foreach (uint targetid in m.OtherValues)
+                        {
+                            if (!param.ContainsKey(targetid))
+                            {
+                                param.Add(targetid, val);
+                            }
+                        }
                     }
                 }
             }

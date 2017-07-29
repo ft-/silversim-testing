@@ -179,6 +179,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     {
                         throw new BakeErrorException("Outfit folder missing");
                     }
+                    CurrentOutfitFolderID = folder.ID;
                 }
 
                 InventoryFolderContent folderContent = inventoryService.Folder.Content[principal.ID, CurrentOutfitFolderID];
@@ -249,10 +250,9 @@ namespace SilverSim.Scene.Agent.Bakery
         public AppearanceInfo Bake(AssetServiceInterface destService)
         {
             BakeOutput bakes;
-            var bakeCache = new BakeCache(AssetService);
             using (var proc = new BakeProcessor())
             {
-                bakes = proc.Process(bakeCache, AssetService);
+                bakes = proc.Process(this, AssetService);
             }
 
             destService.Store(bakes.EyeBake);
