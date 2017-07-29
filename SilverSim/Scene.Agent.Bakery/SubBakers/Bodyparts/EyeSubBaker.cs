@@ -23,9 +23,7 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using Color3 = SilverSim.Types.Color;
-using ColorAlpha = SilverSim.Types.ColorAlpha;
 using UUID = SilverSim.Types.UUID;
 
 namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
@@ -46,10 +44,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             }
 
             m_EyeColor = GetEyeColor(eyes);
-            if(!eyes.Textures.TryGetValue(AvatarTextureIndex.EyesIris, out m_EyeTextureId))
-            {
-                m_EyeTextureId = UUID.Zero;
-            }
+            eyes.Textures.TryGetValue(AvatarTextureIndex.EyesIris, out m_EyeTextureId);
         }
 
         public override bool IsBaked => EyeBake != null;

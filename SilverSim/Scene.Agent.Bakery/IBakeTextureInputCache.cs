@@ -27,5 +27,6 @@ namespace SilverSim.Scene.Agent.Bakery
     public interface IBakeTextureInputCache
     {
         bool TryGetTexture(UUID texture, BakeTarget target, out Image image);
+        bool TryGetBump(UUID texture, BakeTarget target, out byte[] bump);
     }
 }

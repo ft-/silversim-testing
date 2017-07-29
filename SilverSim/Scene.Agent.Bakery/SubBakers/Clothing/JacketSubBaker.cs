@@ -19,15 +19,13 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Drawing;
 using Color3 = SilverSim.Types.Color;
 using ColorAlpha = SilverSim.Types.ColorAlpha;
 using UUID = SilverSim.Types.UUID;
-using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
-using SilverSim.Types.Agent;
 
 namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 {
@@ -85,21 +83,15 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_JacketUpperOpenBump = jacket.GetMinParamOrDefault(0, 1026, 1038);
             m_JacketLowerOpenBump = jacket.GetMinParamOrDefault(0, 1028, 1034);
 
-            if(!jacket.Textures.TryGetValue(AvatarTextureIndex.UpperJacket, out m_UpperTextureId))
-            {
-                m_UpperTextureId = UUID.Zero;
-            }
-
-            if (!jacket.Textures.TryGetValue(AvatarTextureIndex.LowerJacket, out m_UpperTextureId))
-            {
-                m_LowerTextureId = UUID.Zero;
-            }
+            jacket.Textures.TryGetValue(AvatarTextureIndex.UpperJacket, out m_UpperTextureId);
+            jacket.Textures.TryGetValue(AvatarTextureIndex.LowerJacket, out m_LowerTextureId);
         }
 
 
         public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)
         {
-            switch(target)
+            Image img;
+            switch (target)
             {
                 case BakeTarget.UpperBody:
                     if(m_UpperBake != null)
@@ -107,23 +99,9 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return m_UpperBake;
                     }
 
-                    m_UpperBake = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
-                    using (Graphics gfx = Graphics.FromImage(m_UpperBake))
-                    {
-                        gfx.CompositingMode = CompositingMode.SourceCopy;
-                        Image img;
-                        if(m_UpperTextureId != UUID.Zero && cache.TryGetTexture(m_UpperTextureId, target, out img))
-                        {
-                            gfx.DrawImage(img, GetTargetBakeDimensions(target));
-                        }
-                        else
-                        {
-                            using (var b = new SolidBrush(Color.White))
-                            {
-                                gfx.FillRectangle(b, GetTargetBakeDimensions(target));
-                            }
-                        }
-                    }
+                    m_UpperBake = cache.TryGetTexture(m_UpperTextureId, target, out img) ?
+                        new Bitmap(img) : CreateWhiteBakeImage(target);
+
                     InsideAlphaBlend(m_UpperBake, (rawdata) =>
                     {
                         BlendAlpha(rawdata, BaseBakes.JacketLengthUpperAlpha, m_JacketUpperLength);
@@ -140,23 +118,9 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return m_LowerBake;
                     }
 
-                    m_LowerBake = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
-                    using (Graphics gfx = Graphics.FromImage(m_UpperBake))
-                    {
-                        gfx.CompositingMode = CompositingMode.SourceCopy;
-                        Image img;
-                        if (m_LowerTextureId != UUID.Zero && cache.TryGetTexture(m_UpperTextureId, target, out img))
-                        {
-                            gfx.DrawImage(img, GetTargetBakeDimensions(target));
-                        }
-                        else
-                        {
-                            using (var b = new SolidBrush(Color.White))
-                            {
-                                gfx.FillRectangle(b, GetTargetBakeDimensions(target));
-                            }
-                        }
-                    }
+                    m_LowerBake = cache.TryGetTexture(m_LowerTextureId, target, out img) ?
+                        new Bitmap(img) : CreateWhiteBakeImage(target);
+
                     InsideAlphaBlend(m_UpperBake, (rawdata) =>
                     {
                         BlendAlpha(rawdata, BaseBakes.JacketLengthLowerAlpha, m_JacketLowerLength);
@@ -189,7 +153,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                 case BakeTarget.UpperBody:
                     if (m_UpperBump == null)
                     {
-                        m_UpperBump = new byte[512 * 512];
+                        if (!cache.TryGetBump(m_UpperTextureId, target, out m_UpperBump))
+                        {
+                            m_UpperBump = BaseBakes.UpperBodyBump;
+                        }
                         BlendBump(m_UpperBump, BaseBakes.JacketLengthUpperAlpha, m_JacketUpperLengthBump);
                         BlendBump(m_UpperBump, BaseBakes.JacketOpenUpperAlpha, m_JacketUpperOpenBump);
                         BlendBump(m_UpperBump, BaseBakes.ShirtSleeveAlpha, m_JacketSleeveLengthBump);
@@ -201,7 +168,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                 case BakeTarget.LowerBody:
                     if (m_LowerBump == null)
                     {
-                        m_LowerBump = new byte[512 * 512];
+                        if (!cache.TryGetBump(m_LowerTextureId, target, out m_LowerBump))
+                        {
+                            m_LowerBump = BaseBakes.LowerBodyBump;
+                        }
                         BlendBump(m_LowerBump, BaseBakes.JacketLengthLowerAlpha, m_JacketLowerLengthBump);
                         BlendBump(m_LowerBump, BaseBakes.JacketOpenUpperAlpha, m_JacketLowerOpenBump);
                     }

@@ -19,12 +19,14 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Color3 = SilverSim.Types.Color;
 using ColorAlpha = SilverSim.Types.ColorAlpha;
+using UUID = SilverSim.Types.UUID;
 
 namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 {
@@ -46,6 +48,9 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private ColorAlpha m_NailpolishColor;
         private double m_Innershadow;
         private double m_Outershadow;
+        private UUID m_HeadTextureId;
+        private UUID m_UpperTextureId;
+        private UUID m_LowerTextureId;
 
         public SkinSubBaker(Wearable skin)
         {
@@ -64,6 +69,9 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             m_NailpolishColor = GetNailPolishColor(skin);
             m_Innershadow = skin.GetParamValueOrDefault(709, 0);
             m_Outershadow = skin.GetParamValueOrDefault(707, 0);
+            skin.Textures.TryGetValue(AvatarTextureIndex.HeadBodypaint, out m_HeadTextureId);
+            skin.Textures.TryGetValue(AvatarTextureIndex.UpperBodypaint, out m_UpperTextureId);
+            skin.Textures.TryGetValue(AvatarTextureIndex.LowerBaked, out m_LowerTextureId);
         }
 
         public override bool IsBaked => HeadBake != null && UpperBake != null && LowerBake != null;
@@ -72,6 +80,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 
         public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)
         {
+            Image img;
             if(target == BakeTarget.Head)
             {
                 if(HeadBake != null)
@@ -88,6 +97,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     }
                     gfx.CompositingMode = CompositingMode.SourceOver;
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.HeadColorAndSkinGrain);
+                    if(cache.TryGetTexture(m_HeadTextureId, target, out img))
+                    {
+                        gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
+                    }
                     gfx.DrawTinted(bakeRectangle, BaseBakes.RosyfaceAlpha, m_RosyComplexionColor);
                     gfx.DrawTinted(bakeRectangle, BaseBakes.LipsMask, m_LipPinknessColor);
                     gfx.DrawTinted(bakeRectangle, BaseBakes.LipstickAlpha, m_LipstickColor);
@@ -144,6 +157,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                         gfx.FillRectangle(brush, bakeRectangle);
                     }
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.LowerBodyColorAndSkinGrain);
+                    if (cache.TryGetTexture(m_LowerTextureId, target, out img))
+                    {
+                        gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
+                    }
                 }
 
                 return LowerBake;
@@ -164,6 +181,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     }
 
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.UpperBodyColorAndSkinGrain);
+                    if (cache.TryGetTexture(m_UpperTextureId, target, out img))
+                    {
+                        gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
+                    }
                     gfx.DrawTinted(bakeRectangle, BaseBakes.NailpolishAlpha, m_NailpolishColor);
                 }
 

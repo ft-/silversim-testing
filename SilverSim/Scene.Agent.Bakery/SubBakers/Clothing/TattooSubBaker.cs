@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Drawing;
@@ -51,18 +52,9 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 
             m_TattooLowerColor = GetTattooLowerColor(tattoo);
             m_TattooUpperColor = GetTattooUpperColor(tattoo);
-            if (tattoo.Textures.TryGetValue(SilverSim.Types.Agent.AvatarTextureIndex.HeadBodypaint, out m_HeadBodypaintId))
-            {
-                m_HeadBodypaintId = UUID.Zero;
-            }
-            if (tattoo.Textures.TryGetValue(SilverSim.Types.Agent.AvatarTextureIndex.UpperBodypaint, out m_UpperBodypaintId))
-            {
-                m_UpperBodypaintId = UUID.Zero;
-            }
-            if (tattoo.Textures.TryGetValue(SilverSim.Types.Agent.AvatarTextureIndex.LowerBodypaint, out m_LowerBodypaintId))
-            {
-                m_LowerBodypaintId = UUID.Zero;
-            }
+            tattoo.Textures.TryGetValue(AvatarTextureIndex.HeadBodypaint, out m_HeadBodypaintId);
+            tattoo.Textures.TryGetValue(AvatarTextureIndex.UpperBodypaint, out m_UpperBodypaintId);
+            tattoo.Textures.TryGetValue(AvatarTextureIndex.LowerBodypaint, out m_LowerBodypaintId);
         }
 
         public override bool IsBaked => HeadBake != null && UpperBake != null && LowerBake != null;
@@ -81,7 +73,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return HeadBake;
                     }
 
-                    if (m_HeadBodypaintId != UUID.Zero && cache.TryGetTexture(m_HeadBodypaintId, target, out img))
+                    if (cache.TryGetTexture(m_HeadBodypaintId, target, out img))
                     {
                         HeadBake = new Bitmap(img);
                     }
@@ -105,7 +97,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return UpperBake;
                     }
 
-                    if (m_UpperBodypaintId != UUID.Zero && cache.TryGetTexture(m_UpperBodypaintId, target, out img))
+                    if (cache.TryGetTexture(m_UpperBodypaintId, target, out img))
                     {
                         UpperBake = new Bitmap(img);
                     }
@@ -129,7 +121,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return LowerBake;
                     }
 
-                    if (m_LowerBodypaintId != UUID.Zero && cache.TryGetTexture(m_LowerBodypaintId, target, out img))
+                    if (cache.TryGetTexture(m_LowerBodypaintId, target, out img))
                     {
                         LowerBake = new Bitmap(img);
                     }

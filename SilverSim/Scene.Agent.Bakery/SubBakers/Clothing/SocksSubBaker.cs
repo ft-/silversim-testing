@@ -19,28 +19,87 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
+using System.Drawing;
 using Color3 = SilverSim.Types.Color;
+using ColorAlpha = SilverSim.Types.ColorAlpha;
+using UUID = SilverSim.Types.UUID;
 
 namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 {
     public sealed class SocksSubBaker : AbstractSubBaker
     {
+        private Bitmap m_LowerBake;
+        private byte[] m_LowerBump;
+
+        private UUID m_TextureId;
+        private Color3 m_Color;
+        private double m_SocksLength;
+        private double m_SocksLengthBump;
+
         public SocksSubBaker(Wearable socks)
         {
             if(socks.Type != WearableType.Socks)
             {
                 throw new ArgumentException(nameof(socks));
             }
+
+            m_Color = GetSocksColor(socks);
+            m_SocksLength = socks.GetParamValueOrDefault(617, 0.35);
+            m_SocksLengthBump = socks.GetMinParamOrDefault(0.35, 1050, 1051);
+            socks.Textures.TryGetValue(AvatarTextureIndex.LowerSocks, out m_TextureId);
         }
 
         public override bool IsBaked => false;
 
         public override WearableType Type => WearableType.Socks;
 
+        public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)
+        {
+            if (target == BakeTarget.LowerBody)
+            {
+                if (m_LowerBake == null)
+                {
+                    Image img;
+
+                    m_LowerBake = m_TextureId != UUID.Zero && cache.TryGetTexture(m_TextureId, target, out img) ?
+                        new Bitmap(img) : CreateWhiteBakeImage(target);
+
+                    InsideAlphaBlend(m_LowerBake, (rawdata) =>
+                    {
+                        BlendAlpha(rawdata, BaseBakes.ShoeHeightAlpha, m_SocksLength);
+                    });
+                }
+
+                return m_LowerBake;
+            }
+            return null;
+        }
+
+        public override ColorAlpha BakeImageColor(BakeTarget target) => (ColorAlpha)m_Color;
+
+        public override byte[] BakeBumpOutput(IBakeTextureInputCache cache, BakeTarget target)
+        {
+            if(target == BakeTarget.LowerBody)
+            {
+                if(m_LowerBump == null)
+                {
+                    if (!cache.TryGetBump(m_TextureId, target, out m_LowerBump))
+                    {
+                        m_LowerBump = BaseBakes.LowerBodyBump;
+                    }
+                    BlendBump(m_LowerBump, BaseBakes.ShoeHeightAlpha, m_SocksLengthBump);
+                }
+                return m_LowerBump;
+            }
+            return null;
+        }
+
         public override void Dispose()
         {
+            m_LowerBake?.Dispose();
         }
 
         private static Color3 GetSocksColor(Wearable socks)

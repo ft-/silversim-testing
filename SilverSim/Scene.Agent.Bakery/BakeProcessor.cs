@@ -67,6 +67,12 @@ namespace SilverSim.Scene.Agent.Bakery
 
         public bool TryGetTexture(UUID textureID, BakeTarget bakeType, out Image img)
         {
+            if(textureID == UUID.Zero)
+            {
+                img = null;
+                return false;
+            }
+
             int targetDimension;
             Dictionary<UUID, Image> resizeCache;
             if (bakeType == BakeTarget.Eyes)
@@ -102,6 +108,12 @@ namespace SilverSim.Scene.Agent.Bakery
 
         public bool TryGetBump(UUID textureID, BakeTarget bakeType, out byte[] bump)
         {
+            if (textureID == UUID.Zero)
+            {
+                bump = null;
+                return false;
+            }
+
             int targetDimension;
             Dictionary<UUID, byte[]> resizeCache;
             if (bakeType == BakeTarget.Eyes)

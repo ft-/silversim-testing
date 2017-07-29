@@ -19,28 +19,93 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
+using System.Drawing;
 using Color3 = SilverSim.Types.Color;
+using ColorAlpha = SilverSim.Types.ColorAlpha;
+using UUID = SilverSim.Types.UUID;
 
 namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 {
     public sealed class PantsSubBaker : AbstractSubBaker
     {
+        private Bitmap m_PantsBake;
+        private byte[] m_PantsBump;
+        private UUID m_PantsTextureId;
+        private Color3 m_PantsColor;
+        private double m_Length;
+        private double m_Waist;
+        private double m_LengthBump;
+        private double m_WaistBump;
+        private double m_Displace;
+
         public PantsSubBaker(Wearable pants)
         {
             if(pants.Type != WearableType.Pants)
             {
                 throw new ArgumentException(nameof(pants));
             }
+
+            pants.Textures.TryGetValue(AvatarTextureIndex.LowerPants, out m_PantsTextureId);
+            m_PantsColor = GetPantColor(pants);
+            m_Length = pants.GetParamValueOrDefault(615, 0.8);
+            m_Waist = pants.GetParamValueOrDefault(614, 0.8);
+            m_LengthBump = pants.GetMinParamOrDefault(0, 1018, 1036);
+            m_WaistBump = pants.GetMinParamOrDefault(0, 1017, 1035);
+            m_Displace = pants.GetParamValueOrDefault(516, 0);
         }
 
-        public override bool IsBaked => false;
+        public override bool IsBaked => m_PantsBake != null && m_PantsBump != null;
 
         public override WearableType Type => WearableType.Pants;
 
+        public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)
+        {
+            if(target == BakeTarget.LowerBody)
+            {
+                if(m_PantsBake == null)
+                {
+                    Image img;
+                    m_PantsBake = cache.TryGetTexture(m_PantsTextureId, target, out img) ?
+                        new Bitmap(img) : CreateWhiteBakeImage(target);
+
+                    InsideAlphaBlend(m_PantsBake, (rawdata) =>
+                    {
+                        BlendAlpha(rawdata, BaseBakes.PantsLengthAlpha, m_Length);
+                        BlendAlpha(rawdata, BaseBakes.PantsWaistAlpha, m_Waist);
+                    });
+                }
+                return m_PantsBake;
+            }
+            return null;
+        }
+
+        public override ColorAlpha BakeImageColor(BakeTarget target) => (ColorAlpha)m_PantsColor;
+
+        public override byte[] BakeBumpOutput(IBakeTextureInputCache cache, BakeTarget target)
+        {
+            if(target == BakeTarget.LowerBody)
+            {
+                if(m_PantsBump == null)
+                {
+                    if (!cache.TryGetBump(m_PantsTextureId, target, out m_PantsBump))
+                    {
+                        m_PantsBump = BaseBakes.LowerBodyBump;
+                        MultiplyBump(m_PantsBump, m_Displace);
+                    }
+                    BlendBump(m_PantsBump, BaseBakes.PantsLengthAlpha, m_LengthBump);
+                    BlendBump(m_PantsBump, BaseBakes.PantsWaistAlpha, m_WaistBump);
+                }
+                return m_PantsBump;
+            }
+            return null;
+        }
+
         public override void Dispose()
         {
+            m_PantsBake?.Dispose();
         }
 
         private static Color3 GetPantColor(Wearable pant)

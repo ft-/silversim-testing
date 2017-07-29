@@ -23,7 +23,6 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Drawing;
-using System.Drawing.Imaging;
 using Color3 = SilverSim.Types.Color;
 using ColorAlpha = SilverSim.Types.ColorAlpha;
 using UUID = SilverSim.Types.UUID;
@@ -34,7 +33,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
     {
         private Bitmap m_BakeGloves;
         private byte[] m_BumpGloves;
-        private UUID m_GlovesTexturesId;
+        private UUID m_GlovesTextureId;
         private Color3 m_GlovesColor;
         private double m_GlovesLength;
         private double m_GlovesFingers;
@@ -52,10 +51,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_GlovesFingers = gloves.GetParamValueOrDefault(1060, 1);
             m_GlovesFingersBump = gloves.GetParamValueOrDefault(1061, 1);
             m_GlovesLengthBump = gloves.GetParamValueOrDefault(1059, 0.8);
-            if (!gloves.Textures.TryGetValue(AvatarTextureIndex.UpperGloves, out m_GlovesTexturesId))
-            {
-                m_GlovesTexturesId = UUID.Zero;
-            }
+            gloves.Textures.TryGetValue(AvatarTextureIndex.UpperGloves, out m_GlovesTextureId);
             m_GlovesColor = GetGlovesColor(gloves);
         }
 
@@ -74,21 +70,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 
                 Image img;
                 Rectangle bakeRect = GetTargetBakeDimensions(target);
-                if(cache.TryGetTexture(m_GlovesTexturesId, target, out img))
-                {
-                    m_BakeGloves = new Bitmap(img);
-                }
-                else
-                {
-                    m_BakeGloves = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
-                    using (Graphics gfx = Graphics.FromImage(m_BakeGloves))
-                    {
-                        using (var b = new SolidBrush(Color.White))
-                        {
-                            gfx.FillRectangle(b, GetTargetBakeDimensions(target));
-                        }
-                    }
-                }
+                m_BakeGloves = cache.TryGetTexture(m_GlovesTextureId, target, out img) ?
+                    new Bitmap(img) : CreateWhiteBakeImage(target);
 
                 InsideAlphaBlend(m_BakeGloves, (rawdata) =>
                 {
@@ -105,7 +88,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             {
                 if(m_BumpGloves == null)
                 {
-                    m_BumpGloves = new byte[512 * 512];
+                    if (!cache.TryGetBump(m_GlovesTextureId, target, out m_BumpGloves))
+                    {
+                        m_BumpGloves = BaseBakes.UpperBodyBump;
+                    }
                     BlendBump(m_BumpGloves, BaseBakes.GlovesFingersAlpha, m_GlovesFingersBump);
                     BlendBump(m_BumpGloves, BaseBakes.GlovesLengthAlpha, m_GlovesLengthBump);
                 }

@@ -50,9 +50,36 @@ namespace SilverSim.Scene.Agent.Bakery
         public static byte[] OutershadowAlpha { get; }
         public static Image UndefinedTexture { get; }
 
-        public static byte[] HeadBump { get; }
-        public static byte[] UpperBodyBump { get; }
-        public static byte[] LowerBodyBump { get; }
+        private static byte[] m_HeadBump;
+        private static byte[] m_UpperBodyBump;
+        private static byte[] m_LowerBodyBump;
+        public static byte[] HeadBump
+        {
+            get
+            {
+                byte[] ret = new byte[m_HeadBump.Length];
+                Buffer.BlockCopy(m_HeadBump, 0, ret, 0, ret.Length);
+                return ret;
+            }
+        }
+        public static byte[] UpperBodyBump
+        {
+            get
+            {
+                byte[] ret = new byte[m_UpperBodyBump.Length];
+                Buffer.BlockCopy(m_UpperBodyBump, 0, ret, 0, ret.Length);
+                return ret;
+            }
+        }
+        public static byte[] LowerBodyBump
+        {
+            get
+            {
+                byte[] ret = new byte[m_LowerBodyBump.Length];
+                Buffer.BlockCopy(m_LowerBodyBump, 0, ret, 0, ret.Length);
+                return ret;
+            }
+        }
         public static byte[] JacketLengthUpperAlpha { get; }
         public static byte[] JacketLengthLowerAlpha { get; }
         public static byte[] JacketOpenUpperAlpha { get; }
@@ -63,6 +90,14 @@ namespace SilverSim.Scene.Agent.Bakery
         public static byte[] ShirtSleeveAlpha { get; }
         public static byte[] GlovesLengthAlpha { get; }
         public static byte[] GlovesFingersAlpha { get; }
+        public static byte[] PantsWaistAlpha { get; }
+        public static byte[] PantsLengthAlpha { get; }
+        public static byte[] ShoeHeightAlpha { get; }
+        public static byte[] SkirtLengthAlpha { get; }
+        public static byte[] SkirtSlitBackAlpha { get; }
+        public static byte[] SkirtSlitFrontAlpha { get; }
+        public static byte[] SkirtSlitLeftAlpha { get; }
+        public static byte[] SkirtSlitRightAlpha { get; }
 
         static BaseBakes()
         {
@@ -83,9 +118,9 @@ namespace SilverSim.Scene.Agent.Bakery
             OutershadowAlpha = LoadResourceBumpmap("skin.eyeshadow_outer_alpha.png");
             BodySkingrain = LoadResourceImage("skin.body_singrain.png");
 
-            HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
-            UpperBodyBump = LoadResourceBumpmap("bump.bump_upperbody_base.png");
-            LowerBodyBump = LoadResourceBumpmap("bump.bump_lowerbody_base.png");
+            m_HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
+            m_UpperBodyBump = LoadResourceBumpmap("bump.bump_upperbody_base.png");
+            m_LowerBodyBump = LoadResourceBumpmap("bump.bump_lowerbody_base.png");
             JacketLengthUpperAlpha = LoadResourceBumpmap("jacket.jacket_length_upper_alpha.png"); ;
             JacketLengthLowerAlpha = LoadResourceBumpmap("jacket.jacket_length_lower_alpha.png");
             JacketOpenUpperAlpha = LoadResourceBumpmap("jacket.jacket_open_upper_alpha.png");
@@ -94,6 +129,16 @@ namespace SilverSim.Scene.Agent.Bakery
             ShirtCollarFrontAlpha = LoadResourceBumpmap("shirt.shirt_collar_alpha.png");
             ShirtCollarBackAlpha = LoadResourceBumpmap("shirt.shirt_collar_back_alpha.png");
             ShirtSleeveAlpha = LoadResourceBumpmap("shirt.shirt_sleeve_alpha.png");
+            GlovesLengthAlpha = LoadResourceBumpmap("gloves.glove_length_alpha.png");
+            GlovesFingersAlpha = LoadResourceBumpmap("gloves.gloves_fingers_alpha.png");
+            PantsLengthAlpha = LoadResourceBumpmap("pants.pants_length_alpha.png");
+            PantsWaistAlpha = LoadResourceBumpmap("pants.pants_waist_alpha.png");
+            ShoeHeightAlpha = LoadResourceBumpmap("shoes.shoe_height_alpha.png");
+            SkirtLengthAlpha = LoadResourceBumpmap("skirt.skirt_length_alpha.png");
+            SkirtSlitBackAlpha = LoadResourceBumpmap("skirt.skirt_slit_back_alpha.png");
+            SkirtSlitFrontAlpha = LoadResourceBumpmap("skirt.skirt_slit_front_alpha.png");
+            SkirtSlitLeftAlpha = LoadResourceBumpmap("skirt.skirt_slit_left_alpha.png");
+            SkirtSlitRightAlpha = LoadResourceBumpmap("skirt.skirt_slit_right_alpha.png");
 
             UndefinedTexture = new Bitmap(512, 512, PixelFormat.Format24bppRgb);
             using (Graphics gfx = Graphics.FromImage(UndefinedTexture))

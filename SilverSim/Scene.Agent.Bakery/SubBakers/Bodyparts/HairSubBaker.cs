@@ -44,10 +44,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                 throw new ArgumentException(nameof(hair));
             }
 
-            if(!hair.Textures.TryGetValue(AvatarTextureIndex.Hair, out m_HairTextureId))
-            {
-                m_HairTextureId = UUID.Zero;
-            }
+            hair.Textures.TryGetValue(AvatarTextureIndex.Hair, out m_HairTextureId);
 
             m_HairColor = GetHairColor(hair);
         }

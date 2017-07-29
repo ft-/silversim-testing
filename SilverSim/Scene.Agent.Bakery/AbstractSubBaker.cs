@@ -25,6 +25,8 @@ using System;
 using Image = System.Drawing.Image;
 using Bitmap = System.Drawing.Bitmap;
 using Rectangle = System.Drawing.Rectangle;
+using Graphics = System.Drawing.Graphics;
+using SolidBrush = System.Drawing.SolidBrush;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
@@ -64,6 +66,20 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 return new Bitmap(512, 512, PixelFormat.Format32bppArgb);
             }
+        }
+
+        protected static Bitmap CreateWhiteBakeImage(BakeTarget target)
+        {
+            int dimensions = target == BakeTarget.Eyes ? 128 : 512;
+            Bitmap bmp = new Bitmap(dimensions, dimensions, PixelFormat.Format32bppArgb);
+            using (Graphics gfx = Graphics.FromImage(bmp))
+            {
+                using (var b = new SolidBrush(System.Drawing.Color.White))
+                {
+                    gfx.FillRectangle(b, new Rectangle(0, 0, dimensions, dimensions));
+                }
+            }
+            return bmp;
         }
 
         protected static Rectangle GetTargetBakeDimensions(BakeTarget target)
@@ -167,9 +183,35 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 bitmapPos += 3;
                 img[bitmapPos] = Math.Min((byte)(graymap[grayPos] >= alphalevel ? 255 : 0), img[bitmapPos]);
-                bitmapPos += 4;
                 ++grayPos;
                 ++bitmapPos;
+            }
+        }
+
+        protected void MultiplyBump(byte[] img, double val)
+        {
+            uint v = (uint)(256 * val);
+            for(int i = 0; i < img.Length; ++i)
+            {
+                uint cal = img[i] * v;
+                cal >>= 8;
+                img[i] = (byte)cal;
+            }
+        }
+
+        protected void BlendBump(byte[] img, byte[] graymap, double val)
+        {
+            if (graymap.Length != img.Length)
+            {
+                throw new ArgumentException(nameof(graymap));
+            }
+            int bitmapLength = img.Length;
+            var alphalevel = (byte)((1 - val) * 255);
+            int blendPos = 0;
+            while (blendPos < img.Length)
+            {
+                img[blendPos] = Math.Min((byte)(graymap[blendPos] >= alphalevel ? 255 : 0), img[blendPos]);
+                ++blendPos;
             }
         }
 
@@ -182,19 +224,6 @@ namespace SilverSim.Scene.Agent.Bakery
             del(rawdata);
             Marshal.Copy(rawdata, 0, bmpLock.Scan0, rawdata.Length);
             bmp.UnlockBits(bmpLock);
-        }
-
-        protected void BlendBump(byte[] tgt, byte[] src, double val)
-        {
-            if(tgt.Length != src.Length)
-            {
-                throw new ArgumentException(nameof(src));
-            }
-
-            for(int i = 0; i < tgt.Length; ++i)
-            {
-                tgt[i] = Math.Max(tgt[i], (byte)(src[i] * val).LimitRange(0, 255));
-            }
         }
     }
 }

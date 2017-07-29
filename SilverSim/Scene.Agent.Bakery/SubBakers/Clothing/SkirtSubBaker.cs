@@ -19,28 +19,93 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using System;
+using System.Drawing;
 using Color3 = SilverSim.Types.Color;
+using ColorAlpha = SilverSim.Types.ColorAlpha;
+using UUID = SilverSim.Types.UUID;
 
 namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 {
     public sealed class SkirtSubBaker : AbstractSubBaker
     {
+        private Bitmap m_Bake;
+        private byte[] m_Bump;
+
+        private UUID m_TextureId;
+        private double m_SkirtLength;
+        private double m_SlitFront;
+        private double m_SlitBack;
+        private double m_SlitLeft;
+        private double m_SlitRight;
+        private Color3 m_Color;
+
         public SkirtSubBaker(Wearable skirt)
         {
             if(skirt.Type != WearableType.Skirt)
             {
                 throw new ArgumentException(nameof(skirt));
             }
+            m_Color = GetSkirtColor(skirt);
+            m_SkirtLength = skirt.GetParamValueOrDefault(858, 0.4);
+            m_SlitFront = skirt.GetParamValueOrDefault(859, 1);
+            m_SlitBack = skirt.GetParamValueOrDefault(860, 1);
+            m_SlitLeft = skirt.GetParamValueOrDefault(861, 1);
+            m_SlitRight = skirt.GetParamValueOrDefault(862, 1);
+            skirt.Textures.TryGetValue(AvatarTextureIndex.Skirt, out m_TextureId);
         }
 
-        public override bool IsBaked => false;
+        public override bool IsBaked => m_Bake != null && m_Bump != null;
 
         public override WearableType Type => WearableType.Skirt;
 
+        public override Image BakeImageOutput(IBakeTextureInputCache cache, BakeTarget target)
+        {
+            if(target == BakeTarget.Skirt)
+            {
+                if(m_Bake == null)
+                {
+                    Image img;
+                    m_Bake = cache.TryGetTexture(m_TextureId, target, out img) ?
+                        new Bitmap(img) : CreateWhiteBakeImage(target);
+
+                    InsideAlphaBlend(m_Bake, (rawdata) =>
+                    {
+                        BlendAlpha(rawdata, BaseBakes.SkirtLengthAlpha, m_SkirtLength);
+                        BlendAlpha(rawdata, BaseBakes.SkirtSlitBackAlpha, m_SlitBack);
+                        BlendAlpha(rawdata, BaseBakes.SkirtSlitFrontAlpha, m_SlitFront);
+                        BlendAlpha(rawdata, BaseBakes.SkirtSlitLeftAlpha, m_SlitLeft);
+                        BlendAlpha(rawdata, BaseBakes.SkirtSlitRightAlpha, m_SlitRight);
+                    });
+                }
+                return m_Bake;
+            }
+            return null;
+        }
+
+        public override ColorAlpha BakeImageColor(BakeTarget target) => (ColorAlpha)m_Color;
+
+        public override byte[] BakeBumpOutput(IBakeTextureInputCache cache, BakeTarget target)
+        {
+            if(target == BakeTarget.Skirt)
+            {
+                if(m_Bump == null)
+                {
+                    if(!cache.TryGetBump(m_TextureId, target, out m_Bump))
+                    {
+                        m_Bump = new byte[512 * 512];
+                    }
+                }
+                return m_Bump;
+            }
+            return null;
+        }
+
         public override void Dispose()
         {
+            m_Bake?.Dispose();
         }
 
         private static Color3 GetSkirtColor(Wearable skirt)

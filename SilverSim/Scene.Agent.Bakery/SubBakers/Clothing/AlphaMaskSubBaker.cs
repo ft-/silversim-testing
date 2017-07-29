@@ -48,26 +48,11 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                 throw new ArgumentException(nameof(alpha));
             }
 
-            if(!alpha.Textures.TryGetValue(AvatarTextureIndex.EyesAlpha, out m_EyesTextureId))
-            {
-                m_EyesTextureId = UUID.Zero;
-            }
-            if (!alpha.Textures.TryGetValue(AvatarTextureIndex.HairAlpha, out m_HairTextureId))
-            {
-                m_HairTextureId = UUID.Zero;
-            }
-            if (!alpha.Textures.TryGetValue(AvatarTextureIndex.LowerAlpha, out m_LowerbodyTextureId))
-            {
-                m_LowerbodyTextureId = UUID.Zero;
-            }
-            if (!alpha.Textures.TryGetValue(AvatarTextureIndex.UpperAlpha, out m_UpperbodyTextureId))
-            {
-                m_UpperbodyTextureId = UUID.Zero;
-            }
-            if (!alpha.Textures.TryGetValue(AvatarTextureIndex.HeadAlpha, out m_HeadTextureId))
-            {
-                m_HeadTextureId = UUID.Zero;
-            }
+            alpha.Textures.TryGetValue(AvatarTextureIndex.EyesAlpha, out m_EyesTextureId);
+            alpha.Textures.TryGetValue(AvatarTextureIndex.HairAlpha, out m_HairTextureId);
+            alpha.Textures.TryGetValue(AvatarTextureIndex.LowerAlpha, out m_LowerbodyTextureId);
+            alpha.Textures.TryGetValue(AvatarTextureIndex.UpperAlpha, out m_UpperbodyTextureId);
+            alpha.Textures.TryGetValue(AvatarTextureIndex.HeadAlpha, out m_HeadTextureId);
         }
 
         public override bool IsBaked => 
