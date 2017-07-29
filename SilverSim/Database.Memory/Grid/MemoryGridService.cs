@@ -310,16 +310,11 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max)
         {
-            var res = from region in m_Data.Values
-                                          where
-                                          ((region.Location.X >= min.X && region.Location.Y >= min.Y && region.Location.X <= max.X && region.Location.Y <= max.Y) ||
-                                          (region.Location.X + region.Size.X >= min.X && region.Location.Y + region.Size.Y >= min.Y && region.Location.X + region.Size.X <= max.X && region.Location.Y + region.Size.Y <= max.Y) ||
-                                          (region.Location.X >= min.X && region.Location.Y >= min.Y && region.Location.X + region.Size.X > min.Y && region.Location.Y + region.Size.Y > min.Y) ||
-                                          (region.Location.X >= max.X && region.Location.Y >= max.Y && region.Location.X + region.Size.X > max.X && region.Location.Y + region.Size.Y > max.Y)
-                                          )
-                                          &&
-             (scopeID == UUID.Zero || scopeID == region.ScopeID)
-                                          select new RegionInfo(region);
+            var res = from region in m_Data.Values where
+                                            (region.Location.X + region.Size.X >= min.X && region.Location.X <= max.X && 
+                                            region.Location.Y + region.Size.Y > min.Y && region.Location.Y <= max.Y) &&
+                                            (scopeID == UUID.Zero || scopeID == region.ScopeID)
+                                            select new RegionInfo(region);
 
             return new List<RegionInfo>(res);
         }
