@@ -85,6 +85,14 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 
             jacket.Textures.TryGetValue(AvatarTextureIndex.UpperJacket, out m_UpperTextureId);
             jacket.Textures.TryGetValue(AvatarTextureIndex.LowerJacket, out m_LowerTextureId);
+            if (m_UpperTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_UpperTextureId = UUID.Zero;
+            }
+            if (m_LowerTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_LowerTextureId = UUID.Zero;
+            }
         }
 
 

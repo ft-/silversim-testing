@@ -46,6 +46,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             }
 
             hair.Textures.TryGetValue(AvatarTextureIndex.Hair, out m_HairTextureId);
+            if (m_HairTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_HairTextureId = UUID.Zero;
+            }
 
             m_HairColor = (ColorAlpha)GetHairColor(hair);
         }

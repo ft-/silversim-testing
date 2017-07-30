@@ -49,6 +49,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_ShoeHeight = shoes.GetParamValueOrDefault(1052, 0.1);
             m_ShoeHeightBump = shoes.GetParamValueOrDefault(1055, 0.1);
             shoes.Textures.TryGetValue(AvatarTextureIndex.LowerShoes, out m_TextureId);
+            if (m_TextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_TextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => m_LowerBake != null && m_LowerBump != null;

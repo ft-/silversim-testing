@@ -53,6 +53,26 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             alpha.Textures.TryGetValue(AvatarTextureIndex.LowerAlpha, out m_LowerbodyTextureId);
             alpha.Textures.TryGetValue(AvatarTextureIndex.UpperAlpha, out m_UpperbodyTextureId);
             alpha.Textures.TryGetValue(AvatarTextureIndex.HeadAlpha, out m_HeadTextureId);
+            if (m_EyesTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_EyesTextureId = UUID.Zero;
+            }
+            if (m_HairTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_HairTextureId = UUID.Zero;
+            }
+            if (m_LowerbodyTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_LowerbodyTextureId = UUID.Zero;
+            }
+            if (m_UpperbodyTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_UpperbodyTextureId = UUID.Zero;
+            }
+            if (m_HeadTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_HeadTextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => 

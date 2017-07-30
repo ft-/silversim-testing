@@ -53,6 +53,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_PantsWaist = underpants.GetParamValueOrDefault(1056, 0.8);
             m_PantsWaistBump = underpants.GetParamValueOrDefault(1057, 0.8);
             underpants.Textures.TryGetValue(AvatarTextureIndex.LowerUnderpants, out m_TextureId);
+            if (m_TextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_TextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => m_LowerBake != null && m_LowerBump != null;

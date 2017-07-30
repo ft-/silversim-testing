@@ -61,6 +61,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_CollarBack = undershirt.GetParamValueOrDefault(1048, 0.8);
             m_CollarBackBump = undershirt.GetParamValueOrDefault(1049, 0.8);
             undershirt.Textures.TryGetValue(AvatarTextureIndex.UpperShirt, out m_TextureId);
+            if (m_TextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_TextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => m_UpperBake != null && m_UpperBump != null;

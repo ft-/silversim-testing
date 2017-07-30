@@ -45,6 +45,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 
             m_EyeColor = GetEyeColor(eyes);
             eyes.Textures.TryGetValue(AvatarTextureIndex.EyesIris, out m_EyeTextureId);
+            if (m_EyeTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_EyeTextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => EyeBake != null;

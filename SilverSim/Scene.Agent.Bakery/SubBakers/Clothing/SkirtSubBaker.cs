@@ -55,6 +55,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_SlitLeft = skirt.GetParamValueOrDefault(861, 1);
             m_SlitRight = skirt.GetParamValueOrDefault(862, 1);
             skirt.Textures.TryGetValue(AvatarTextureIndex.Skirt, out m_TextureId);
+            if (m_TextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_TextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => m_Bake != null && m_Bump != null;

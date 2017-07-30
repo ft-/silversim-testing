@@ -49,6 +49,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             }
 
             pants.Textures.TryGetValue(AvatarTextureIndex.LowerPants, out m_PantsTextureId);
+            if(m_PantsTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_PantsTextureId = UUID.Zero;
+            }
             m_PantsColor = GetPantColor(pants);
             m_Length = pants.GetParamValueOrDefault(615, 0.8);
             m_Waist = pants.GetParamValueOrDefault(614, 0.8);

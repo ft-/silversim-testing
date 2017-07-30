@@ -52,6 +52,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_GlovesFingersBump = gloves.GetParamValueOrDefault(1061, 1);
             m_GlovesLengthBump = gloves.GetParamValueOrDefault(1059, 0.8);
             gloves.Textures.TryGetValue(AvatarTextureIndex.UpperGloves, out m_GlovesTextureId);
+            if (m_GlovesTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_GlovesTextureId = UUID.Zero;
+            }
             m_GlovesColor = GetGlovesColor(gloves);
         }
 

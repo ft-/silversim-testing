@@ -39,9 +39,9 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         /* parameters */
         private Color3 m_TattooUpperColor;
         private Color3 m_TattooLowerColor;
-        private UUID m_HeadBodypaintId;
-        private UUID m_UpperBodypaintId;
-        private UUID m_LowerBodypaintId;
+        private UUID m_HeadTattooId;
+        private UUID m_UpperTattooId;
+        private UUID m_LowerTattooId;
 
         public TattooSubBaker(Wearable tattoo)
         {
@@ -52,9 +52,21 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
 
             m_TattooLowerColor = GetTattooLowerColor(tattoo);
             m_TattooUpperColor = GetTattooUpperColor(tattoo);
-            tattoo.Textures.TryGetValue(AvatarTextureIndex.HeadBodypaint, out m_HeadBodypaintId);
-            tattoo.Textures.TryGetValue(AvatarTextureIndex.UpperBodypaint, out m_UpperBodypaintId);
-            tattoo.Textures.TryGetValue(AvatarTextureIndex.LowerBodypaint, out m_LowerBodypaintId);
+            tattoo.Textures.TryGetValue(AvatarTextureIndex.HeadTattoo, out m_HeadTattooId);
+            tattoo.Textures.TryGetValue(AvatarTextureIndex.UpperTattoo, out m_UpperTattooId);
+            tattoo.Textures.TryGetValue(AvatarTextureIndex.LowerTattoo, out m_LowerTattooId);
+            if (m_HeadTattooId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_HeadTattooId = UUID.Zero;
+            }
+            if (m_UpperTattooId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_UpperTattooId = UUID.Zero;
+            }
+            if (m_LowerTattooId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_LowerTattooId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => HeadBake != null && UpperBake != null && LowerBake != null;
@@ -73,7 +85,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return HeadBake;
                     }
 
-                    if (cache.TryGetTexture(m_HeadBodypaintId, target, out img))
+                    if (cache.TryGetTexture(m_HeadTattooId, target, out img))
                     {
                         HeadBake = new Bitmap(img);
                     }
@@ -97,7 +109,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return UpperBake;
                     }
 
-                    if (cache.TryGetTexture(m_UpperBodypaintId, target, out img))
+                    if (cache.TryGetTexture(m_UpperTattooId, target, out img))
                     {
                         UpperBake = new Bitmap(img);
                     }
@@ -121,7 +133,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                         return LowerBake;
                     }
 
-                    if (cache.TryGetTexture(m_LowerBodypaintId, target, out img))
+                    if (cache.TryGetTexture(m_LowerTattooId, target, out img))
                     {
                         LowerBake = new Bitmap(img);
                     }

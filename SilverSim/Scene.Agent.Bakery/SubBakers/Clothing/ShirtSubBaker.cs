@@ -56,6 +56,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_ShirtColor = GetShirtColor(shirt);
 
             shirt.Textures.TryGetValue(AvatarTextureIndex.UpperShirt, out m_UpperTextureId);
+            if (m_UpperTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_UpperTextureId = UUID.Zero;
+            }
             m_SleeveLength = shirt.GetParamValueOrDefault(600, 0.7);
             m_BottomLength = shirt.GetParamValueOrDefault(601, 0.8);
             m_CollarFrontHeight = shirt.GetParamValueOrDefault(602, 0.8);

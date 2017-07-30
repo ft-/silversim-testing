@@ -50,6 +50,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
             m_SocksLength = socks.GetParamValueOrDefault(617, 0.35);
             m_SocksLengthBump = socks.GetMinParamOrDefault(0.35, 1050, 1051);
             socks.Textures.TryGetValue(AvatarTextureIndex.LowerSocks, out m_TextureId);
+            if (m_TextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_TextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => false;

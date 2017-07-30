@@ -72,6 +72,18 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             skin.Textures.TryGetValue(AvatarTextureIndex.HeadBodypaint, out m_HeadTextureId);
             skin.Textures.TryGetValue(AvatarTextureIndex.UpperBodypaint, out m_UpperTextureId);
             skin.Textures.TryGetValue(AvatarTextureIndex.LowerBaked, out m_LowerTextureId);
+            if (m_HeadTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_HeadTextureId = UUID.Zero;
+            }
+            if (m_UpperTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_UpperTextureId = UUID.Zero;
+            }
+            if (m_LowerTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
+            {
+                m_LowerTextureId = UUID.Zero;
+            }
         }
 
         public override bool IsBaked => HeadBake != null && UpperBake != null && LowerBake != null;
