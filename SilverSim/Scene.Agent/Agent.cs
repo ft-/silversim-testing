@@ -130,6 +130,7 @@ namespace SilverSim.Scene.Agent
             {
                 m_SittingOnObject = null;
             }
+            m_BakeCache?.Dispose();
         }
 
         public abstract ClientInfo Client { get; }

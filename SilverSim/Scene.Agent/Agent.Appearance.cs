@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Agent.Bakery;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Asset;
@@ -38,6 +39,7 @@ namespace SilverSim.Scene.Agent
     public partial class Agent
     {
         private readonly AgentWearables m_Wearables = new AgentWearables();
+        private BakeCache m_BakeCache;
 
         private Vector3 m_AvatarSize = new Vector3(0.45, 0.6, 1.9);
         public Vector3 Size
@@ -283,7 +285,14 @@ namespace SilverSim.Scene.Agent
 
         public void RebakeAppearance(Action<string> logOutput = null)
         {
-            AgentBakeAppearance.LoadAppearanceFromCurrentOutfit(this, SceneAssetService, true, logOutput);
+            lock(m_DataLock)
+            {
+                if(m_BakeCache == null)
+                {
+                    m_BakeCache = new BakeCache(AssetService);
+                }
+            }
+            Appearance = m_BakeCache.Bake(SceneAssetService, logOutput);
             InvokeOnAppearanceUpdate();
         }
 
