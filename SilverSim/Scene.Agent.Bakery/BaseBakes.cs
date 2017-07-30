@@ -46,8 +46,8 @@ namespace SilverSim.Scene.Agent.Bakery
         public static Image BlushAlpha { get; }
         public static Image RosyfaceAlpha { get; }
         public static Image NailpolishAlpha { get; }
-        public static byte[] InnershadowAlpha { get; }
-        public static byte[] OutershadowAlpha { get; }
+        public static Image InnershadowAlpha { get; }
+        public static Image OutershadowAlpha { get; }
         public static Image UndefinedTexture { get; }
 
         private static byte[] m_HeadBump;
@@ -117,8 +117,8 @@ namespace SilverSim.Scene.Agent.Bakery
             LipglossAlpha = LoadResourceImage("skin.lipgloss_alpha.png");
             EyelinerAlpha = LoadResourceImage("skin.eyeliner_alpha.png");
             LipsMask = LoadResourceImage("skin.lips_mask.png");
-            InnershadowAlpha = LoadResourceBumpmap("skin.eyeshadow_inner_alpha.png");
-            OutershadowAlpha = LoadResourceBumpmap("skin.eyeshadow_outer_alpha.png");
+            InnershadowAlpha = LoadResourceImage("skin.eyeshadow_inner_alpha.png");
+            OutershadowAlpha = LoadResourceImage("skin.eyeshadow_outer_alpha.png");
             BodySkingrain = LoadResourceImage("skin.body_skingrain.png");
 
             m_HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
@@ -176,7 +176,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 Marshal.Copy(outLockBits.Scan0, outData, 0, 512 * 512 * 4);
                 for (int i = 512 * 512 * 4; i != 0;)
                 {
-                    byte alpha = inData[--i];
+                    byte alpha = inData[--i - 1];
                     outData[i] = Math.Min(outData[i], alphaData[i]);
                     --i;
                     outData[i] = (byte)((outData[i] * alpha) / 255);

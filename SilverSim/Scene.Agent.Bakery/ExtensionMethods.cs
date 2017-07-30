@@ -117,6 +117,45 @@ namespace SilverSim.Scene.Agent.Bakery
             }
         }
 
+        public static void DrawColorKeyed(this Graphics gfx, Rectangle bakeRectangle, Image baseBake, ColorAlpha color)
+        {
+            using (var attrs = new ImageAttributes())
+            {
+                var mat = new ColorMatrix();
+                mat.Matrix00 = 0;
+                mat.Matrix11 = 0;
+                mat.Matrix22 = 0;
+                mat.Matrix33 = 0;
+                mat.Matrix40 = (float)color.R;
+                mat.Matrix41 = (float)color.G;
+                mat.Matrix42 = (float)color.B;
+                mat.Matrix43 = (float)color.A;
+                attrs.SetColorMatrix(mat);
+                attrs.SetColorKey(Color.FromArgb(0), Color.FromArgb(1, 1, 1));
+                gfx.DrawImage(baseBake, bakeRectangle, 0, 0, baseBake.Width, baseBake.Height, GraphicsUnit.Pixel, attrs);
+            }
+        }
+
+        public static void DrawColorKeyed(this Graphics gfx, Rectangle bakeRectangle, Image baseBake, ColorAlpha color, double val)
+        {
+            using (var attrs = new ImageAttributes())
+            {
+                var mat = new ColorMatrix();
+                mat.Matrix00 = 0;
+                mat.Matrix11 = 0;
+                mat.Matrix22 = 0;
+                mat.Matrix33 = 0;
+                mat.Matrix40 = (float)color.R;
+                mat.Matrix41 = (float)color.G;
+                mat.Matrix42 = (float)color.B;
+                mat.Matrix43 = (float)color.A;
+                int v = (int)(val * 255);
+                attrs.SetColorMatrix(mat);
+                attrs.SetColorKey(Color.FromArgb(0), Color.FromArgb(v, v, v));
+                gfx.DrawImage(baseBake, bakeRectangle, 0, 0, baseBake.Width, baseBake.Height, GraphicsUnit.Pixel, attrs);
+            }
+        }
+
         public static void ApplyTint(this ColorMatrix mat, Color3 col)
         {
             mat.Matrix00 *= (float)col.R;

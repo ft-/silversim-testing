@@ -113,43 +113,13 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     {
                         gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
                     }
-                    gfx.DrawTinted(bakeRectangle, BaseBakes.RosyfaceAlpha, m_RosyComplexionColor);
-                    gfx.DrawTinted(bakeRectangle, BaseBakes.LipsMask, m_LipPinknessColor);
-                    gfx.DrawTinted(bakeRectangle, BaseBakes.LipstickAlpha, m_LipstickColor);
-                    gfx.DrawTinted(bakeRectangle, BaseBakes.EyelinerAlpha, m_EyelinerColor);
-                    gfx.DrawTinted(bakeRectangle, BaseBakes.BlushAlpha, m_BlushColor);
-                    using (var innerShadow = CreateTargetBakeImage(target))
-                    {
-                        using (Graphics innergfx = Graphics.FromImage(innerShadow))
-                        {
-                            using (var b = new SolidBrush(Color.White))
-                            {
-                                innergfx.FillRectangle(b, bakeRectangle);
-                            }
-                        }
-
-                        InsideAlphaBlend(innerShadow, (rawdata) =>
-                        {
-                            BlendAlpha(rawdata, BaseBakes.InnershadowAlpha, m_Innershadow);
-                        });
-                        gfx.DrawTinted(bakeRectangle, innerShadow, m_InnershadowColor);
-                    }
-                    using (var outerShadow = CreateTargetBakeImage(target))
-                    {
-                        using (Graphics innergfx = Graphics.FromImage(outerShadow))
-                        {
-                            using (var b = new SolidBrush(Color.White))
-                            {
-                                innergfx.FillRectangle(b, bakeRectangle);
-                            }
-                        }
-
-                        InsideAlphaBlend(outerShadow, (rawdata) =>
-                        {
-                            BlendAlpha(rawdata, BaseBakes.InnershadowAlpha, m_Outershadow);
-                        });
-                        gfx.DrawTinted(bakeRectangle, outerShadow, m_InnershadowColor);
-                    }
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.RosyfaceAlpha, m_RosyComplexionColor);
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipsMask, m_LipPinknessColor);
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipstickAlpha, m_LipstickColor);
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.EyelinerAlpha, m_EyelinerColor);
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.BlushAlpha, m_BlushColor);
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.InnershadowAlpha, m_InnershadowColor, m_Innershadow);
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.OutershadowAlpha, m_OutershadowColor, m_Outershadow);
                 }
 
                 return HeadBake;
@@ -197,7 +167,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     {
                         gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
                     }
-                    gfx.DrawTinted(bakeRectangle, BaseBakes.NailpolishAlpha, m_NailpolishColor);
+                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.NailpolishAlpha, m_NailpolishColor);
                 }
 
                 return UpperBake;
@@ -215,7 +185,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             LowerBake?.Dispose();
         }
 
-        #region Skin parameters
+#region Skin parameters
         private static readonly Color3[] SkinColors =
         {
             Color3.FromRgb(0, 0, 0),
@@ -306,8 +276,14 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             {
                 value = 0.25;
             }
+            ColorAlpha color = CalcColor(value, LipstickColors);
+            if (!skin.Params.TryGetValue(701, out value))
+            {
+                value = 0;
+            }
+            color.A *= value * 0.2;
 
-            return CalcColor(value, LipstickColors);
+            return color;
         }
 
         private static readonly ColorAlpha[] BlushColors = new ColorAlpha[]
@@ -335,7 +311,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             {
                 value = 0;
             }
-            color.A *= value;
+            color.A *= value * 0.3;
 
             return color;
         }
@@ -385,7 +361,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             {
                 value = 0.6;
             }
-            color.A = value;
+            color.A = value * 0.05;
 
             return color;
         }
@@ -431,7 +407,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             {
                 value = 0.7;
             }
-            color.A = value;
+            color.A = value * 0.2;
 
             return color;
         }
@@ -457,6 +433,12 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             {
                 color = CalcColor(value, EyelinerColors);
             }
+
+            if(!skin.Params.TryGetValue(703, out value))
+            {
+                value = 0;
+            }
+            color.A *= value * 0.1;
 
             return color;
         }
@@ -491,7 +473,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 
             return color;
         }
-        #endregion
+#endregion
 
     }
 }
