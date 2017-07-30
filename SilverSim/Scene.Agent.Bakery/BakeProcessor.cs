@@ -37,12 +37,14 @@ namespace SilverSim.Scene.Agent.Bakery
 {
     public class BakeProcessor : IBakeTextureInputCache, IDisposable
     {
+        private readonly List<UUID> m_ProcessedAssetIDs = new List<UUID>();
         private readonly Dictionary<UUID, Image> m_Textures = new Dictionary<UUID, Image>();
         private readonly Dictionary<UUID, Image> m_TexturesResized128 = new Dictionary<UUID, Image>();
         private readonly Dictionary<UUID, Image> m_TexturesResized512 = new Dictionary<UUID, Image>();
         private readonly Dictionary<UUID, byte[]> m_Bumps = new Dictionary<UUID, byte[]>();
         private readonly Dictionary<UUID, byte[]> m_BumpsResized128 = new Dictionary<UUID, byte[]>();
         private readonly Dictionary<UUID, byte[]> m_BumpsResized512 = new Dictionary<UUID, byte[]>();
+        private AssetServiceInterface m_AssetService;
 
         private class Targets
         {
@@ -62,6 +64,34 @@ namespace SilverSim.Scene.Agent.Bakery
                 Rectangles.Add(BakeTarget.LowerBody, new Rectangle(0, 0, 512, 512));
                 Rectangles.Add(BakeTarget.Skirt, new Rectangle(0, 0, 512, 512));
                 Rectangles.Add(BakeTarget.UpperBody, new Rectangle(0, 0, 512, 512));
+            }
+        }
+
+        private void TryLoadTexture(UUID textureID)
+        {
+            AssetData data;
+            if(m_ProcessedAssetIDs.Contains(textureID))
+            {
+                return;
+            }
+            m_ProcessedAssetIDs.Add(textureID);
+            if (m_AssetService.TryGetValue(textureID, out data))
+            {
+                byte[] bump = null;
+                Image img;
+                try
+                {
+                    img = J2cDecoder.DecodeWithDump(data.Data, out bump);
+                }
+                catch
+                {
+                    img = new Bitmap(BaseBakes.UndefinedTexture);
+                }
+                m_Textures.Add(textureID, img);
+                if (bump != null)
+                {
+                    m_Bumps.Add(textureID, bump);
+                }
             }
         }
 
@@ -91,6 +121,8 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 return true;
             }
+
+            TryLoadTexture(textureID);
 
             if (m_Textures.TryGetValue(textureID, out img))
             {
@@ -132,6 +164,8 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 return true;
             }
+
+            TryLoadTexture(textureID);
 
             if (m_Bumps.TryGetValue(textureID, out bump))
             {
@@ -202,37 +236,9 @@ namespace SilverSim.Scene.Agent.Bakery
                 throw new AlreadyBakedException();
             }
 
-            output.VisualParams = VisualParamsMapper.CreateVisualParams(cache.Wearables);
+            m_AssetService = assetSource;
 
-            foreach(Wearable wearable in cache.Wearables)
-            {
-                foreach(KeyValuePair<AvatarTextureIndex, UUID> kvp in wearable.Textures)
-                {
-                    if(m_Textures.ContainsKey(kvp.Value))
-                    {
-                        continue;
-                    }
-                    AssetData data;
-                    if(assetSource.TryGetValue(kvp.Value, out data))
-                    {
-                        byte[] bump = null;
-                        Image img;
-                        try
-                        {
-                            img = J2cDecoder.DecodeWithDump(data.Data, out bump);
-                        }
-                        catch
-                        {
-                            img = new Bitmap(BaseBakes.UndefinedTexture);
-                        }
-                        m_Textures.Add(kvp.Value, img);
-                        if(bump != null)
-                        {
-                            m_Bumps.Add(kvp.Value, bump);
-                        }
-                    }
-                }
-            }
+            output.VisualParams = VisualParamsMapper.CreateVisualParams(cache.Wearables);
 
             var Tgt = new Targets();
             var SourceBakers = new Dictionary<WearableType, List<AbstractSubBaker>>();

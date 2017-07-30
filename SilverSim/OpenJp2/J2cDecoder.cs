@@ -86,10 +86,10 @@ namespace OpenJp2.Net
             int height;
             int channels;
             int channelwidth;
-            byte[] red;
-            byte[] green;
-            byte[] blue;
-            byte[] alpha = null;
+            int[] red;
+            int[] green;
+            int[] blue;
+            int[] alpha = null;
 
             {
                 /* shorten the j2c decode context variable visibility here */
@@ -112,35 +112,35 @@ namespace OpenJp2.Net
 
                     channelwidth = width * height;
 
-                    red = new byte[channelwidth];
-                    green = new byte[channelwidth];
-                    blue = new byte[channelwidth];
+                    red = new int[channelwidth];
                     alpha = null;
 
                     switch (channels)
                     {
                         case 1:
                             Marshal.Copy(J2cDecodedGetScan0(ptr, 0), red, 0, channelwidth);
-                            Marshal.Copy(J2cDecodedGetScan0(ptr, 0), green, 0, channelwidth);
-                            Marshal.Copy(J2cDecodedGetScan0(ptr, 0), blue, 0, channelwidth);
+                            green = red;
+                            blue = red;
                             break;
 
                         case 2:
                             Marshal.Copy(J2cDecodedGetScan0(ptr, 0), red, 0, channelwidth);
-                            Marshal.Copy(J2cDecodedGetScan0(ptr, 0), green, 0, channelwidth);
-                            Marshal.Copy(J2cDecodedGetScan0(ptr, 0), blue, 0, channelwidth);
-                            alpha = new byte[channelwidth];
+                            green = red;
+                            blue = red;
+                            alpha = new int[channelwidth];
                             Marshal.Copy(J2cDecodedGetScan0(ptr, 1), alpha, 0, channelwidth);
                             break;
 
                         case 3:
+                            green = new int[channelwidth];
+                            blue = new int[channelwidth];
                             Marshal.Copy(J2cDecodedGetScan0(ptr, 0), red, 0, channelwidth);
                             Marshal.Copy(J2cDecodedGetScan0(ptr, 1), green, 0, channelwidth);
                             Marshal.Copy(J2cDecodedGetScan0(ptr, 2), blue, 0, channelwidth);
                             break;
 
                         default:
-                            alpha = new byte[channelwidth];
+                            alpha = new int[channelwidth];
                             Marshal.Copy(J2cDecodedGetScan0(ptr, 3), alpha, 0, channelwidth);
                             goto case 3;
                     }
@@ -148,7 +148,12 @@ namespace OpenJp2.Net
                     if (channels > 4)
                     {
                         bump = new byte[channelwidth];
-                        Marshal.Copy(J2cDecodedGetScan0(ptr, 4), bump, 0, channelwidth);
+                        int[] ibump = new int[channelwidth];
+                        Marshal.Copy(J2cDecodedGetScan0(ptr, 4), ibump, 0, channelwidth);
+                        for(int i = 0; i < channelwidth; ++i)
+                        {
+                            bump[i] = (byte)ibump[i];
+                        }
                     }
                 }
                 finally
@@ -168,10 +173,10 @@ namespace OpenJp2.Net
                 imagedata = new byte[channelwidth * 4];
                 for(int i = 0; i < channelwidth; ++i)
                 {
-                    imagedata[destpos++] = blue[i];
-                    imagedata[destpos++] = green[i];
-                    imagedata[destpos++] = red[i];
-                    imagedata[destpos++] = alpha[i];
+                    imagedata[destpos++] = (byte)blue[i];
+                    imagedata[destpos++] = (byte)green[i];
+                    imagedata[destpos++] = (byte)red[i];
+                    imagedata[destpos++] = (byte)alpha[i];
                 }
             }
             else
@@ -180,9 +185,9 @@ namespace OpenJp2.Net
                 imagedata = new byte[channelwidth * 3];
                 for (int i = 0; i < channelwidth; ++i)
                 {
-                    imagedata[destpos++] = blue[i];
-                    imagedata[destpos++] = green[i];
-                    imagedata[destpos++] = red[i];
+                    imagedata[destpos++] = (byte)blue[i];
+                    imagedata[destpos++] = (byte)green[i];
+                    imagedata[destpos++] = (byte)red[i];
                 }
             }
 

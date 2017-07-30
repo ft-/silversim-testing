@@ -101,7 +101,8 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 var mat = new ColorMatrix();
                 mat.ApplyTint(color);
-                gfx.DrawImage(baseBake, bakeRectangle, 0, 0, baseBake.Width, baseBake.Height, GraphicsUnit.Pixel);
+                attrs.SetColorMatrix(mat);
+                gfx.DrawImage(baseBake, bakeRectangle, 0, 0, baseBake.Width, baseBake.Height, GraphicsUnit.Pixel, attrs);
             }
         }
 
@@ -111,7 +112,8 @@ namespace SilverSim.Scene.Agent.Bakery
             {
                 var mat = new ColorMatrix();
                 mat.ApplyTint(color);
-                gfx.DrawImage(baseBake, bakeRectangle, 0, 0, baseBake.Width, baseBake.Height, GraphicsUnit.Pixel);
+                attrs.SetColorMatrix(mat);
+                gfx.DrawImage(baseBake, bakeRectangle, 0, 0, baseBake.Width, baseBake.Height, GraphicsUnit.Pixel, attrs);
             }
         }
 
