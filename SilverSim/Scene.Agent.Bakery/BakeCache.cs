@@ -132,14 +132,16 @@ namespace SilverSim.Scene.Agent.Bakery
             get
             {
                 bool baked = true;
+                bool havesubbakers = false;
                 lock (m_Lock)
                 {
                     foreach(AbstractSubBaker subbaker in m_SubBakers.Values)
                     {
                         baked = baked && subbaker.IsBaked;
+                        havesubbakers = true;
                     }
                 }
-                return baked;
+                return baked && havesubbakers;
             }
         }
 
@@ -184,6 +186,9 @@ namespace SilverSim.Scene.Agent.Bakery
 
                 InventoryFolderContent folderContent = inventoryService.Folder.Content[principal.ID, CurrentOutfitFolderID];
                 AppearanceSerial = folderContent.Version;
+#if DEBUG
+                logOutput?.Invoke(string.Format("New appearance serial for {0} at {1}", principal.FullName.ToString(), AppearanceSerial));
+#endif
 
                 var items = new List<InventoryItem>();
                 var itemlinks = new List<UUID>();

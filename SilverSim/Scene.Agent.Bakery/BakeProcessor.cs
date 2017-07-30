@@ -373,6 +373,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 output.HairBake = new AssetData
                 {
                     ID = UUID.RandomFixedFirst(0xffffffff),
+                    Type = AssetType.Texture,
                     Temporary = true,
                     Data = Tgt.Bumps.TryGetValue(BakeTarget.Hair, out finalbump) ? 
                         J2cEncoder.EncodeWithBump(Tgt.Images[BakeTarget.Hair], true, finalbump) :
@@ -382,6 +383,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 output.HeadBake = new AssetData
                 {
                     ID = UUID.RandomFixedFirst(0xffffffff),
+                    Type = AssetType.Texture,
                     Temporary = true,
                     Data = J2cEncoder.EncodeWithBump(Tgt.Images[BakeTarget.Head], true, Tgt.Bumps[BakeTarget.Head]),
                     Name = "Bake Texture Head"
@@ -390,6 +392,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 output.UpperBake = new AssetData
                 {
                     ID = UUID.RandomFixedFirst(0xffffffff),
+                    Type = AssetType.Texture,
                     Temporary = true,
                     Data = J2cEncoder.EncodeWithBump(Tgt.Images[BakeTarget.UpperBody], true, Tgt.Bumps[BakeTarget.UpperBody]),
                     Name = "Bake Texture Upperbody"
@@ -398,6 +401,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 output.LowerBake = new AssetData
                 {
                     ID = UUID.RandomFixedFirst(0xffffffff),
+                    Type = AssetType.Texture,
                     Temporary = true,
                     Data = J2cEncoder.EncodeWithBump(Tgt.Images[BakeTarget.LowerBody], true, Tgt.Bumps[BakeTarget.LowerBody]),
                     Name = "Bake Texture Lowerbody"
@@ -406,6 +410,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 output.EyeBake = new AssetData
                 {
                     ID = UUID.RandomFixedFirst(0xffffffff),
+                    Type = AssetType.Texture,
                     Temporary = true,
                     Data = J2cEncoder.Encode(Tgt.Images[BakeTarget.Eyes], true),
                     Name = "Bake Texture Eyes"
@@ -417,6 +422,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     output.SkirtBake = new AssetData
                     {
                         ID = UUID.RandomFixedFirst(0xffffffff),
+                        Type = AssetType.Texture,
                         Temporary = true,
                         Data = Tgt.Bumps.TryGetValue(BakeTarget.Skirt, out finalbump) ?
                             J2cEncoder.EncodeWithBump(finalSkirt, true, finalbump) :

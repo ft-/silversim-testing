@@ -292,7 +292,24 @@ namespace SilverSim.Scene.Agent
                     m_BakeCache = new BakeCache(AssetService);
                 }
             }
-            Appearance = m_BakeCache.Bake(SceneAssetService, logOutput);
+
+            try
+            {
+                m_BakeCache.LoadFromCurrentOutfit(Owner, InventoryService, AssetService, logOutput);
+                Appearance = m_BakeCache.Bake(SceneAssetService, logOutput);
+#if DEBUG
+                logOutput?.Invoke(string.Format("Appearance for {0} at version {1}", Owner.FullName.ToString(), Appearance.Serial));
+#endif
+            }
+            catch(AlreadyBakedException)
+            {
+                /* ignore exception */
+            }
+            catch(Exception e)
+            {
+                m_Log.Error("Rebake appearance failed for " + Owner.FullName.ToString(), e);
+                return;
+            }
             InvokeOnAppearanceUpdate();
         }
 
