@@ -21,7 +21,6 @@
 
 using OpenJp2.Net;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using System;
@@ -238,7 +237,7 @@ namespace SilverSim.Scene.Agent.Bakery
 
             m_AssetService = assetSource;
 
-            output.VisualParams = VisualParamsMapper.CreateVisualParams(cache.Wearables);
+            output.VisualParams = VisualParamsMapper.CreateVisualParams(cache.Wearables, ref output.AvatarHeight);
 
             var Tgt = new Targets();
             var SourceBakers = new Dictionary<WearableType, List<AbstractSubBaker>>();

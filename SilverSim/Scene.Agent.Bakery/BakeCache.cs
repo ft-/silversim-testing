@@ -290,7 +290,7 @@ namespace SilverSim.Scene.Agent.Bakery
             info.VisualParams = bakes.VisualParams;
             info.AvatarTextures.All = AvatarTextures;
             info.Wearables.All = AvatarWearables;
-            //info.AvatarHeight;
+            info.AvatarHeight = bakes.AvatarHeight;
             return info;
         }
     }

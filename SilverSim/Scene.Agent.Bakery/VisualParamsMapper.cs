@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace SilverSim.Scene.Agent.Bakery
             }
         }
 
-        public static byte[] CreateVisualParams(IEnumerable<Wearable> wearables)
+        public static byte[] CreateVisualParams(IEnumerable<Wearable> wearables, ref double avatarHeight)
         {
             var visualParamInputs = new Dictionary<uint, double>();
             int numberParams = 218;
@@ -81,6 +82,35 @@ namespace SilverSim.Scene.Agent.Bakery
                 }
                 visualParams[p] = DoubleToByte(val, map.MinValue, map.MaxValue);
             }
+
+            double vpHeight;
+            double vpHeelHeight;
+            double vpPlatformHeight;
+            double vpHeadSize;
+            double vpLegLength;
+            double vpNeckLength;
+            double vpHipLength;
+
+            visualParamInputs.TryGetValue(33, out vpHeight);
+            visualParamInputs.TryGetValue(198, out vpHeelHeight);
+            visualParamInputs.TryGetValue(503, out vpPlatformHeight);
+            if(!visualParamInputs.TryGetValue(682, out vpHeadSize))
+            {
+                vpHeadSize = 0.5;
+            }
+            visualParamInputs.TryGetValue(692, out vpLegLength);
+            visualParamInputs.TryGetValue(756, out vpNeckLength);
+            visualParamInputs.TryGetValue(842, out vpHipLength);
+
+            /* algorithm has to be verified later but it at least provides a basis */
+            avatarHeight = 1.706 + 
+                (vpLegLength * 0.1918) +
+                (vpHipLength * 0.0375) +
+                (vpHeight * 0.12022) + 
+                (vpHeadSize * 0.01117) + 
+                (vpNeckLength * 0.038) +
+                (vpHeelHeight * .08) + 
+                (vpPlatformHeight * .07);
 
             return visualParams;
         }

@@ -32,5 +32,6 @@ namespace SilverSim.Scene.Agent.Bakery
         public AssetData EyeBake;
         public AssetData SkirtBake;
         public byte[] VisualParams;
+        public double AvatarHeight;
     }
 }
