@@ -208,6 +208,30 @@ namespace SilverSim.Scene.Types.Object
             set;
         }
 
+        double WalkableCoefficientA
+        {
+            get;
+            set;
+        }
+
+        double WalkableCoefficientB
+        {
+            get;
+            set;
+        }
+
+        double WalkableCoefficientC
+        {
+            get;
+            set;
+        }
+
+        double WalkableCoefficientD
+        {
+            get;
+            set;
+        }
+
         bool IsInScene(SceneInterface scene);
 
         byte[] TerseData

@@ -114,6 +114,30 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public double WalkableCoefficientA
+        {
+            get { return 0; }
+            set { /* setting intentionally ignored */ }
+        }
+
+        public double WalkableCoefficientB
+        {
+            get { return 0; }
+            set { /* setting intentionally ignored */ }
+        }
+
+        public double WalkableCoefficientC
+        {
+            get { return 0; }
+            set { /* setting intentionally ignored */ }
+        }
+
+        public double WalkableCoefficientD
+        {
+            get { return 0; }
+            set { /* setting intentionally ignored */ }
+        }
+
         protected Agent(UUID agentId, Uri homeURI)
         {
             Attachments = new AgentAttachments();

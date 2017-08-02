@@ -132,6 +132,63 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        private double m_WalkableCoefficientA = 1;
+        private double m_WalkableCoefficientB = 1;
+        private double m_WalkableCoefficientC = 1;
+        private double m_WalkableCoefficientD = 1;
+
+        public double WalkableCoefficientA
+        {
+            get
+            {
+                return m_WalkableCoefficientA;
+            }
+            set
+            {
+                m_WalkableCoefficientA = Math.Min(value, 0);
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
+
+        public double WalkableCoefficientB
+        {
+            get
+            {
+                return m_WalkableCoefficientB;
+            }
+            set
+            {
+                m_WalkableCoefficientB = Math.Min(value, 0);
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
+
+        public double WalkableCoefficientC
+        {
+            get
+            {
+                return m_WalkableCoefficientC;
+            }
+            set
+            {
+                m_WalkableCoefficientC = Math.Min(value, 0);
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
+
+        public double WalkableCoefficientD
+        {
+            get
+            {
+                return m_WalkableCoefficientD;
+            }
+            set
+            {
+                m_WalkableCoefficientD = Math.Min(value, 0);
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
+
         public uint m_PhysicsParameterUpdateSerial = 1;
 
         public uint PhysicsParameterUpdateSerial => m_PhysicsParameterUpdateSerial;
