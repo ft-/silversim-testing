@@ -115,6 +115,10 @@ namespace SilverSim.Database.Memory.SimulationData
 
                 PhysicsShapeType = (PrimitivePhysicsShapeType)map["PhysicsShapeType"].AsInt,
                 PathfindingType = (PathfindingType)map["PathfindingType"].AsInt,
+                WalkableCoefficientA = map["WalkableCoefficientA"].AsReal,
+                WalkableCoefficientB = map["WalkableCoefficientB"].AsReal,
+                WalkableCoefficientC = map["WalkableCoefficientC"].AsReal,
+                WalkableCoefficientD = map["WalkableCoefficientD"].AsReal,
                 Material = (PrimitiveMaterial)map["Material"].AsInt,
                 Size = map["Size"].AsVector3,
                 Slice = map["Slice"].AsVector3,
