@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Estate;
+using System;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -79,11 +80,71 @@ namespace SilverSim.Scene.Types.Scene
 
         public class WalkingCoefficients
         {
-            public double Avatar = 1;
-            public double A = 1;
-            public double B = 1;
-            public double C = 1;
-            public double D = 1;
+            private double m_Avatar = 1;
+            private double m_A = 1;
+            private double m_B = 1;
+            private double m_C = 1;
+            private double m_D = 1;
+
+            public double Avatar
+            {
+                get
+                {
+                    return m_Avatar;
+                }
+                set
+                {
+                    m_Avatar = Math.Min(0, value);
+                }
+            }
+
+            public double A
+            {
+                get
+                {
+                    return m_A;
+                }
+                set
+                {
+                    m_A = Math.Min(0, value);
+                }
+            }
+
+            public double B
+            {
+                get
+                {
+                    return m_B;
+                }
+                set
+                {
+                    m_B = Math.Min(0, value);
+                }
+            }
+
+            public double C
+            {
+                get
+                {
+                    return m_C;
+                }
+                set
+                {
+                    m_C = Math.Min(0, value);
+                }
+            }
+
+            public double D
+            {
+                get
+                {
+                    return m_D;
+                }
+                set
+                {
+                    m_D = Math.Min(0, value);
+                }
+            }
 
             public WalkingCoefficients()
             {
