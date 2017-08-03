@@ -87,7 +87,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public WalkingCoefficients()
             {
-
             }
 
             public WalkingCoefficients(WalkingCoefficients src)
