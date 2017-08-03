@@ -153,6 +153,7 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "SitTargetOrientation", objpart.SitTargetOrientation },
                     { "PhysicsShapeType", (int)objpart.PhysicsShapeType },
                     { "PathfindingType", (int)objpart.PathfindingType },
+                    { "WalkableCoefficientAvatar", objpart.WalkableCoefficientAvatar },
                     { "WalkableCoefficientA", objpart.WalkableCoefficientA },
                     { "WalkableCoefficientB", objpart.WalkableCoefficientB },
                     { "WalkableCoefficientC", objpart.WalkableCoefficientC },

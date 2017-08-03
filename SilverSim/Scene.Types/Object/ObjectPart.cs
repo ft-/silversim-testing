@@ -132,10 +132,24 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        private double m_WalkableCoefficientAvatar = 1;
         private double m_WalkableCoefficientA = 1;
         private double m_WalkableCoefficientB = 1;
         private double m_WalkableCoefficientC = 1;
         private double m_WalkableCoefficientD = 1;
+
+        public double WalkableCoefficientAvatar
+        {
+            get
+            {
+                return m_WalkableCoefficientAvatar;
+            }
+            set
+            {
+                m_WalkableCoefficientAvatar = Math.Min(value, 0);
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
+            }
+        }
 
         public double WalkableCoefficientA
         {

@@ -208,6 +208,12 @@ namespace SilverSim.Scene.Types.Object
             set;
         }
 
+        double WalkableCoefficientAvatar
+        {
+            get;
+            set;
+        }
+
         double WalkableCoefficientA
         {
             get;

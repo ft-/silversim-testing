@@ -35,5 +35,42 @@ namespace SilverSim.Scene.Types.Object
         {
             throw new NotImplementedException("StopMoveToTarget");
         }
+
+        public PathfindingType PathfindingType
+        {
+            get { return RootPart.PathfindingType; }
+
+            set { RootPart.PathfindingType = value; }
+        }
+
+        public double WalkableCoefficientAvatar
+        {
+            get { return RootPart.WalkableCoefficientAvatar; }
+            set { RootPart.WalkableCoefficientAvatar = value; }
+        }
+
+        public double WalkableCoefficientA
+        {
+            get { return RootPart.WalkableCoefficientA; }
+            set { RootPart.WalkableCoefficientA = value; }
+        }
+
+        public double WalkableCoefficientB
+        {
+            get { return RootPart.WalkableCoefficientB; }
+            set { RootPart.WalkableCoefficientB = value; }
+        }
+
+        public double WalkableCoefficientC
+        {
+            get { return RootPart.WalkableCoefficientC; }
+            set { RootPart.WalkableCoefficientC = value; }
+        }
+
+        public double WalkableCoefficientD
+        {
+            get { return RootPart.WalkableCoefficientD; }
+            set { RootPart.WalkableCoefficientD = value; }
+        }
     }
 }

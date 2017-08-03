@@ -114,6 +114,12 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public double WalkableCoefficientAvatar
+        {
+            get { return 0; }
+            set { /* setting intentionally ignored */ }
+        }
+
         public double WalkableCoefficientA
         {
             get { return 0; }
