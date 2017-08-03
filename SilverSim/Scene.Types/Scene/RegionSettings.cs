@@ -70,6 +70,34 @@ namespace SilverSim.Scene.Types.Scene
             Sandbox = src.Sandbox;
             TelehubObject = src.TelehubObject;
             MaxBasePrims = src.MaxBasePrims;
+            WalkableCoefficientsUnderwater = new WalkingCoefficients(src.WalkableCoefficientsUnderwater);
+            WalkableCoefficientsTerrain0 = new WalkingCoefficients(src.WalkableCoefficientsTerrain0);
+            WalkableCoefficientsTerrain1 = new WalkingCoefficients(src.WalkableCoefficientsTerrain1);
+            WalkableCoefficientsTerrain2 = new WalkingCoefficients(src.WalkableCoefficientsTerrain2);
+            WalkableCoefficientsTerrain3 = new WalkingCoefficients(src.WalkableCoefficientsTerrain3);
+        }
+
+        public class WalkingCoefficients
+        {
+            public double Avatar = 1;
+            public double A = 1;
+            public double B = 1;
+            public double C = 1;
+            public double D = 1;
+
+            public WalkingCoefficients()
+            {
+
+            }
+
+            public WalkingCoefficients(WalkingCoefficients src)
+            {
+                Avatar = src.Avatar;
+                A = src.A;
+                B = src.B;
+                C = src.C;
+                D = src.D;
+            }
         }
 
         public bool BlockTerraform;
@@ -93,6 +121,11 @@ namespace SilverSim.Scene.Types.Scene
         public bool AllowLandmark;
         public bool AllowDirectTeleport;
         public int MaxBasePrims = 45000;
+        public readonly WalkingCoefficients WalkableCoefficientsUnderwater = new WalkingCoefficients { Avatar = 0, A = 0, B = 0, C = 0, D = 0 };
+        public readonly WalkingCoefficients WalkableCoefficientsTerrain0 = new WalkingCoefficients();
+        public readonly WalkingCoefficients WalkableCoefficientsTerrain1 = new WalkingCoefficients();
+        public readonly WalkingCoefficients WalkableCoefficientsTerrain2 = new WalkingCoefficients();
+        public readonly WalkingCoefficients WalkableCoefficientsTerrain3 = new WalkingCoefficients();
 
         private UUID m_TerrainTexture1 = TextureConstant.DefaultTerrainTexture1;
         public UUID TerrainTexture1
