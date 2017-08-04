@@ -262,6 +262,15 @@ namespace SilverSim.Scene.Types.Scene
             short count = ReadShort(s);
             coeff = new WalkingCoefficients();
 
+            if(index == -1)
+            {
+                coeff.Avatar = 0;
+                coeff.A = 0;
+                coeff.B = 0;
+                coeff.C = 0;
+                coeff.D = 0;
+            }
+
             for(short i = 0; i < count; ++i)
             {
                 switch(i)
