@@ -2103,6 +2103,11 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("GravityModifier", (float)PhysicsGravityMultiplier);
                     writer.WriteNamedValue("AllowUnsit", AllowUnsit);
                     writer.WriteNamedValue("ScriptedSitOnly", IsScriptedSitOnly);
+                    writer.WriteNamedValue("WalkableCoefficientAvatar", WalkableCoefficientAvatar);
+                    writer.WriteNamedValue("WalkableCoefficientA", WalkableCoefficientA);
+                    writer.WriteNamedValue("WalkableCoefficientB", WalkableCoefficientB);
+                    writer.WriteNamedValue("WalkableCoefficientC", WalkableCoefficientC);
+                    writer.WriteNamedValue("WalkableCoefficientD", WalkableCoefficientD);
                 }
                 writer.WriteEndElement();
             }
@@ -3138,6 +3143,26 @@ namespace SilverSim.Scene.Types.Object
 
                             case "Torque":
                                 reader.ReadToEndElement();
+                                break;
+
+                            case "WalkableCoefficientAvatar":
+                                part.WalkableCoefficientAvatar = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "WalkableCoefficientA":
+                                part.WalkableCoefficientA = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "WalkableCoefficientB":
+                                part.WalkableCoefficientB = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "WalkableCoefficientC":
+                                part.WalkableCoefficientC = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "WalkableCoefficientD":
+                                part.WalkableCoefficientD = reader.ReadElementValueAsDouble();
                                 break;
 
                             default:
