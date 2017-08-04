@@ -22,6 +22,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using System;
+using System.IO;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -158,6 +159,15 @@ namespace SilverSim.Scene.Types.Scene
                 C = src.C;
                 D = src.D;
             }
+
+            public void CopyFrom(WalkingCoefficients src)
+            {
+                Avatar = src.Avatar;
+                A = src.A;
+                B = src.B;
+                C = src.C;
+                D = src.D;
+            }
         }
 
         public bool BlockTerraform;
@@ -186,6 +196,149 @@ namespace SilverSim.Scene.Types.Scene
         public readonly WalkingCoefficients WalkableCoefficientsTerrain1 = new WalkingCoefficients();
         public readonly WalkingCoefficients WalkableCoefficientsTerrain2 = new WalkingCoefficients();
         public readonly WalkingCoefficients WalkableCoefficientsTerrain3 = new WalkingCoefficients();
+
+        private static void WriteDouble(Stream s, double v)
+        {
+            byte[] d = BitConverter.GetBytes(v);
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(d);
+            }
+            s.Write(d, 0, d.Length);
+        }
+
+        private static double ReadDouble(Stream s)
+        {
+            byte[] d = new byte[8];
+            if (s.Read(d, 0, d.Length) != d.Length)
+            {
+                throw new EndOfStreamException();
+            }
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(d);
+            }
+            return BitConverter.ToDouble(d, 0);
+        }
+
+        private static void WriteShort(Stream s, short v)
+        {
+            byte[] d = BitConverter.GetBytes(v);
+            if(!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(d);
+            }
+            s.Write(d, 0, d.Length);
+        }
+
+        private static short ReadShort(Stream s)
+        {
+            byte[] d = new byte[2];
+            if(s.Read(d, 0, d.Length) != d.Length)
+            {
+                throw new EndOfStreamException();
+            }
+            if(!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(d);
+            }
+            return BitConverter.ToInt16(d, 0);
+        }
+
+        private static void WriteCoeffs(Stream s, short index, WalkingCoefficients coeff)
+        {
+            WriteShort(s, index);
+            WriteShort(s, 5);
+            WriteDouble(s, coeff.Avatar);
+            WriteDouble(s, coeff.A);
+            WriteDouble(s, coeff.B);
+            WriteDouble(s, coeff.C);
+            WriteDouble(s, coeff.D);
+        }
+
+        private static short ReadCoeffs(Stream s, out WalkingCoefficients coeff)
+        {
+            short index = ReadShort(s);
+            short count = ReadShort(s);
+            coeff = new WalkingCoefficients();
+
+            for(short i = 0; i < count; ++i)
+            {
+                switch(i)
+                {
+                    case 0:
+                        coeff.Avatar = ReadDouble(s);
+                        break;
+
+                    case 1:
+                        coeff.A = ReadDouble(s);
+                        break;
+
+                    case 2:
+                        coeff.B = ReadDouble(s);
+                        break;
+
+                    case 3:
+                        coeff.C = ReadDouble(s);
+                        break;
+
+                    case 4:
+                        coeff.D = ReadDouble(s);
+                        break;
+                }
+            }
+            return index;
+        }
+
+        public byte[] WalkableCoefficientsSerialization
+        {
+            get
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    WriteCoeffs(ms, -1, WalkableCoefficientsUnderwater);
+                    WriteCoeffs(ms, 0, WalkableCoefficientsTerrain0);
+                    WriteCoeffs(ms, 1, WalkableCoefficientsTerrain1);
+                    WriteCoeffs(ms, 2, WalkableCoefficientsTerrain2);
+                    WriteCoeffs(ms, 3, WalkableCoefficientsTerrain3);
+
+                    return ms.ToArray();
+                }
+            }
+
+            set
+            {
+                using (MemoryStream ms = new MemoryStream(value))
+                {
+                    WalkingCoefficients coeffs;
+                    while (ms.Length > ms.Position)
+                    {
+                        switch (ReadCoeffs(ms, out coeffs))
+                        {
+                            case -1:
+                                WalkableCoefficientsUnderwater.CopyFrom(coeffs);
+                                break;
+
+                            case 0:
+                                WalkableCoefficientsTerrain0.CopyFrom(coeffs);
+                                break;
+
+                            case 1:
+                                WalkableCoefficientsTerrain1.CopyFrom(coeffs);
+                                break;
+
+                            case 2:
+                                WalkableCoefficientsTerrain2.CopyFrom(coeffs);
+                                break;
+
+                            case 3:
+                                WalkableCoefficientsTerrain3.CopyFrom(coeffs);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
 
         private UUID m_TerrainTexture1 = TextureConstant.DefaultTerrainTexture1;
         public UUID TerrainTexture1
