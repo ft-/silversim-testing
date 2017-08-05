@@ -995,7 +995,7 @@ namespace SilverSim.Grid.Login
             {
                 { "reason", reason },
                 { "message", message },
-                { "login", false }
+                { "login", "false" }
             };
             return new XmlRpc.XmlRpcResponse()
             {
