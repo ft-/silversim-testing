@@ -172,11 +172,11 @@ namespace SilverSim.Viewer.Core
             server?.RemoveCircuit(this);
 
             Stop();
-            return;
         }
 
         private void TransmitThread(object param)
         {
+            Thread.CurrentThread.IsBackground = true;
             int lastAckTick = Environment.TickCount;
             int lastPingTick = Environment.TickCount;
             int lastSimStatsTick = Environment.TickCount;
