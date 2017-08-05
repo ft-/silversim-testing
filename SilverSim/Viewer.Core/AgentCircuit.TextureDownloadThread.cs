@@ -58,6 +58,11 @@ namespace SilverSim.Viewer.Core
 
                     foreach(var imageRequest in req.RequestImageList)
                     {
+                        if(imageRequest.DiscardLevel < 0)
+                        {
+                            /* skip discard level < 0 */
+                            continue;
+                        }
                         if (!activeRequestImages.Contains(imageRequest.ImageID))
                         {
                             activeRequestImages.Add(imageRequest.ImageID);
