@@ -270,6 +270,10 @@ namespace SilverSim.Scene.Agent
                     Wearables.All = aw;
                     VisualParams = value.VisualParams;
                     Serial = value.Serial;
+                    if(value.AvatarHeight < 0.5)
+                    {
+                        value.AvatarHeight = 0.5;
+                    }
                     m_AvatarSize = new Vector3(0.45, 0.6, value.AvatarHeight);
                     Textures.All = value.AvatarTextures.All;
                     //value.Attachments;
