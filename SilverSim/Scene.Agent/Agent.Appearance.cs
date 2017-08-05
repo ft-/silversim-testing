@@ -272,7 +272,7 @@ namespace SilverSim.Scene.Agent
                     Serial = value.Serial;
                     if(value.AvatarHeight < 0.5)
                     {
-                        value.AvatarHeight = 0.5;
+                        value.AvatarHeight = 1.9;
                     }
                     m_AvatarSize = new Vector3(0.45, 0.6, value.AvatarHeight);
                     Textures.All = value.AvatarTextures.All;
