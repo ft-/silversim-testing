@@ -72,9 +72,12 @@ namespace SilverSim.Viewer.Core
                 case AssetType.Clothing:
                 case AssetType.Landmark:
                 case AssetType.CallingCard:
+                case AssetType.Texture:
+                case AssetType.Mesh:
                     break;
 
                 default:
+                    m_Log.InfoFormat("ViewerAsset not enabled for {0}", assetType.ToString());
                     httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                     return;
             }
