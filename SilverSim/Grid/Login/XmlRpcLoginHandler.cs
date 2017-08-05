@@ -722,7 +722,9 @@ namespace SilverSim.Grid.Login
                     { "gendered", loginData.HaveAppearance ? "Y" : "N" },
                     { "daylight_savings", "N" }
                 };
-                resStruct.Add("login-flags", loginFlags);
+                var loginArray = new AnArray();
+                loginArray.Add(loginFlags);
+                resStruct.Add("login-flags", loginArray);
             }
 
             resStruct.Add("WelcomeMessage", m_WelcomeMessage);
@@ -749,7 +751,9 @@ namespace SilverSim.Grid.Login
                 {
                     { "allow_first_life", "Y" }
                 };
-                resStruct.Add("ui-config", uic);
+                var uic_array = new AnArray();
+                uic_array.Add(uic);
+                resStruct.Add("ui-config", uic_array);
             }
 
             if(loginData.LoginOptions.Contains(Option_EventCategories))
@@ -878,8 +882,8 @@ namespace SilverSim.Grid.Login
                 resStruct.Add("gestures", gestureArray);
             }
 
-            resStruct.Add("http_port", loginData.DestinationInfo.ServerHttpPort);
-            resStruct.Add("sim_port", loginData.DestinationInfo.ServerPort);
+            resStruct.Add("http_port", (int)loginData.DestinationInfo.ServerHttpPort);
+            resStruct.Add("sim_port", (int)loginData.DestinationInfo.ServerPort);
             resStruct.Add("start_location", loginData.DestinationInfo.StartLocation);
 
             if(loginData.HaveGridLibrary && loginData.LoginOptions.Contains(Option_InventoryLibOwner))
@@ -938,7 +942,9 @@ namespace SilverSim.Grid.Login
                 { "sun_texture_id", "cce0f112-878f-4586-a2e2-a8f104bba271" },
                 { "moon_texture_id", "ec4b9f0b-d008-45c6-96a4-01dd947ac621" }
             };
-            resStruct.Add("global-textures", globalTextureData);
+            var globalTextureArray = new AnArray();
+            globalTextureArray.Add(globalTextureData);
+            resStruct.Add("global-textures", globalTextureArray);
 
             resStruct.Add("login", "true");
             resStruct.Add("agent_access", "M");
