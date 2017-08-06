@@ -200,284 +200,286 @@ namespace SilverSim.Viewer.Core
             Message m;
             CancelTxThread cancelmsg;
 
-            while (true)
+            try
             {
-                foreach (var q in QueueList)
+                while (m_TxRunning)
                 {
-                    if (q.Count > 0)
+                    foreach (var q in QueueList)
                     {
-                        timeout = 0;
-                    }
-                }
-
-                qcount = m_TxQueue.Count + 1;
-                m = null;
-                cancelmsg = null;
-
-                while (qcount > 0)
-                {
-                    try
-                    {
-                        m = m_TxQueue.Dequeue(timeout);
-                    }
-                    catch
-                    {
-                        break;
-                    }
-                    timeout = 0;
-                    --qcount;
-                    cancelmsg = m as CancelTxThread;
-                    if (cancelmsg != null)
-                    {
-                        break;
-                    }
-
-                    if (m is AcksReceived)
-                    {
-                        /* nothing additional to do here with AcksReceived */
-                    }
-                    else if (m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
-                    {
-                        m.OutQueue = qroutidx;
-                        QueueList[(uint)m.OutQueue].Enqueue(m);
-                    }
-                    else if (m.Number == MessageType.LayerData)
-                    {
-                        var ld = (LayerData)m;
-                        switch (ld.LayerType)
+                        if (q.Count > 0)
                         {
-                            case LayerData.LayerDataType.Land:
-                            case LayerData.LayerDataType.LandExtended:
-                                m.OutQueue = Message.QueueOutType.LandLayerData;
-                                QueueList[(uint)m.OutQueue].Enqueue(m);
-                                break;
-
-                            case LayerData.LayerDataType.Wind:
-                            case LayerData.LayerDataType.WindExtended:
-                                m.OutQueue = Message.QueueOutType.WindLayerData;
-                                QueueList[(uint)m.OutQueue].Enqueue(m);
-                                break;
-
-                            default:
-                                m.OutQueue = Message.QueueOutType.GenericLayerData;
-                                QueueList[(uint)m.OutQueue].Enqueue(m);
-                                break;
+                            timeout = 0;
                         }
                     }
-                    else if (m.Number < MessageType.Medium)
-                    {
-                        m.OutQueue = Message.QueueOutType.High;
-                        HighPriorityQueue.Enqueue(m);
-                    }
-                    else if (m.Number < MessageType.Low)
-                    {
-                        m.OutQueue = Message.QueueOutType.Medium;
-                        MediumPriorityQueue.Enqueue(m);
-                    }
-                    else
-                    {
-                        m.OutQueue = Message.QueueOutType.Low;
-                        LowPriorityQueue.Enqueue(m);
-                    }
-                }
-                if (cancelmsg != null)
-                {
-                    break;
-                }
 
-                for (uint qidx = 0; qidx < (uint)Message.QueueOutType.NumQueues; ++qidx)
-                {
-                    QueueCount[qidx] = QueueList[qidx].Count;
-                }
+                    qcount = m_TxQueue.Count + 1;
+                    m = null;
+                    cancelmsg = null;
 
-                do
-                {
-                    /* make high packets pass low priority packets */
-                    for (int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
+                    while (qcount > 0)
                     {
-                        var q = QueueList[queueidx];
-                        if (q.Count == 0)
-                        {
-                            continue;
-                        }
-                        if (m_AckThrottlingCount[queueidx] > 100)
-                        {
-                            QueueCount[queueidx] = 0;
-                            continue;
-                        }
                         try
                         {
-                            m = q.Dequeue();
-                            if (QueueCount[queueidx] > 0)
-                            {
-                                --QueueCount[queueidx];
-                            }
+                            m = m_TxQueue.Dequeue(timeout);
                         }
                         catch
                         {
-                            QueueCount[queueidx] = 0;
-                            continue;
+                            break;
                         }
-                        if (m != null)
+                        timeout = 0;
+                        --qcount;
+                        cancelmsg = m as CancelTxThread;
+                        if (cancelmsg != null)
                         {
-                            try
-                            {
-                                var p = new UDPPacket()
-                                {
-                                    OutQueue = m.OutQueue,
-                                    IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag
-                                };
-                                p.WriteMessageNumber(m.Number);
-                                m.Serialize(p);
-                                p.Flush();
-                                p.IsReliable = m.IsReliable;
-                                p.AckMessage = p.IsReliable ? m : null;
-                                p.SequenceNumber = NextSequenceNumber;
-                                p.FinishZLE();
-                                int savedDataLength = p.DataLength;
-                                if (p.IsReliable)
-                                {
-                                    if (MAX_DATA_MTU > 1 + (uint)savedDataLength)
-                                    {
-                                        uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
-                                        var curacks = (uint)m_AckList.Count;
-                                        if (appendableAcks != 0 && curacks != 0)
-                                        {
-                                            p.HasAckFlag = true;
-                                            uint cnt = 0;
-                                            while (cnt < appendableAcks && cnt < curacks && cnt < 255)
-                                            {
-                                                p.WriteUInt32BE_NoZLE(m_AckList.Dequeue());
-                                                ++cnt;
-                                            }
-                                            p.WriteUInt8((byte)cnt);
-                                        }
-                                    }
+                            return;
+                        }
 
-                                    Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
-                                }
-                                Server.SendPacketTo(p, RemoteEndPoint);
-
-                                Interlocked.Increment(ref m_PacketsSent);
-                                p.EnqueuedAtTime = Environment.TickCount;
-                                p.TransferredAtTime = Environment.TickCount;
-                                if (m.IsReliable)
-                                {
-                                    p.IsResent = true;
-                                    lock (m_UnackedPacketsHash)
-                                    {
-                                        m_UnackedPacketsHash.Add(p.SequenceNumber, p);
-                                    }
-                                    lock (m_UnackedBytesLock)
-                                    {
-                                        m_UnackedBytes += p.DataLength;
-                                    }
-                                }
-                                if (m.Number == MessageType.LogoutReply)
-                                {
-                                    lock (m_LogoutReplyLock)
-                                    {
-                                        m_LogoutReplySeqNo = p.SequenceNumber;
-                                        m_LogoutReplySentAtTime = Environment.TickCount;
-                                        m_LogoutReplySent = true;
-                                    }
-                                }
-                                if(m.Number == MessageType.KickUser)
-                                {
-                                    m_KickUserSentAtTime = Environment.TickCount;
-                                    m_KickUserSent = true;
-                                }
-                            }
-                            catch (Exception e)
+                        if (m is AcksReceived)
+                        {
+                            /* nothing additional to do here with AcksReceived */
+                        }
+                        else if (m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
+                        {
+                            m.OutQueue = qroutidx;
+                            QueueList[(uint)m.OutQueue].Enqueue(m);
+                        }
+                        else if (m.Number == MessageType.LayerData)
+                        {
+                            var ld = (LayerData)m;
+                            switch (ld.LayerType)
                             {
-                                m_Log.DebugFormat("Failed to serialize message of type {0}: {1}\n{2}", m.TypeDescription, e.Message, e.StackTrace);
+                                case LayerData.LayerDataType.Land:
+                                case LayerData.LayerDataType.LandExtended:
+                                    m.OutQueue = Message.QueueOutType.LandLayerData;
+                                    QueueList[(uint)m.OutQueue].Enqueue(m);
+                                    break;
+
+                                case LayerData.LayerDataType.Wind:
+                                case LayerData.LayerDataType.WindExtended:
+                                    m.OutQueue = Message.QueueOutType.WindLayerData;
+                                    QueueList[(uint)m.OutQueue].Enqueue(m);
+                                    break;
+
+                                default:
+                                    m.OutQueue = Message.QueueOutType.GenericLayerData;
+                                    QueueList[(uint)m.OutQueue].Enqueue(m);
+                                    break;
                             }
                         }
-                    }
-
-                    qcount = 0;
-                    for (int queueidx = 0; queueidx < QueueCount.Length; ++queueidx)
-                    {
-                        qcount += QueueCount[queueidx];
-                    }
-                } while (qcount != 0);
-
-                if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
-                {
-                    LogMsgOnTimeout();
-                    TerminateCircuit();
-                    return;
-                }
-
-                if ((Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent) ||
-                    (Environment.TickCount - m_KickUserSentAtTime >= 10000 && m_KickUserSent))
-                {
-                    LogMsgLogoutReply();
-                    TerminateCircuit();
-                    return;
-                }
-
-                if (Environment.TickCount - lastSimStatsTick >= 1000)
-                {
-                    int deltatime = Environment.TickCount - lastSimStatsTick;
-                    lastSimStatsTick = Environment.TickCount;
-                    SendSimStats(deltatime);
-                }
-
-                if (Environment.TickCount - lastPingTick >= 5000 &&
-                    !m_PingSendTicks.ContainsKey(pingID))
-                {
-                    lastPingTick = Environment.TickCount;
-                    var p = new UDPPacket();
-                    p.WriteMessageNumber(MessageType.StartPingCheck);
-                    p.WriteUInt8(pingID++);
-                    m_PingSendTicks[pingID] = Environment.TickCount;
-                    p.WriteUInt32(0);
-                    try
-                    {
-                        Server.SendPacketTo(p, RemoteEndPoint);
-                        Interlocked.Increment(ref m_PacketsSent);
-                    }
-                    catch(ObjectDisposedException)
-                    {
-                        return;
-                    }
-                }
-
-                if (Environment.TickCount - lastAckTick >= 1000)
-                {
-                    lastAckTick = Environment.TickCount;
-                    /* check for acks to be send */
-                    int c = m_AckList.Count;
-                    while (c > 0)
-                    {
-                        var p = new UDPPacket();
-                        p.WriteMessageNumber(MessageType.PacketAck);
-                        if (c > 100)
+                        else if (m.Number < MessageType.Medium)
                         {
-                            p.WriteUInt8(100);
-                            for (int i = 0; i < 100; ++i)
-                            {
-                                p.WriteUInt32(m_AckList.Dequeue());
-                            }
-                            c -= 100;
+                            m.OutQueue = Message.QueueOutType.High;
+                            HighPriorityQueue.Enqueue(m);
+                        }
+                        else if (m.Number < MessageType.Low)
+                        {
+                            m.OutQueue = Message.QueueOutType.Medium;
+                            MediumPriorityQueue.Enqueue(m);
                         }
                         else
                         {
-                            p.WriteUInt8((byte)c);
-                            for (int i = 0; i < c; ++i)
-                            {
-                                p.WriteUInt32(m_AckList.Dequeue());
-                            }
-                            c = 0;
+                            m.OutQueue = Message.QueueOutType.Low;
+                            LowPriorityQueue.Enqueue(m);
                         }
-                        p.SequenceNumber = NextSequenceNumber;
-                        Server.SendPacketTo(p, RemoteEndPoint);
-                        Interlocked.Increment(ref m_PacketsSent);
+                    }
+
+                    for (uint qidx = 0; qidx < (uint)Message.QueueOutType.NumQueues; ++qidx)
+                    {
+                        QueueCount[qidx] = QueueList[qidx].Count;
+                    }
+
+                    do
+                    {
+                        /* make high packets pass low priority packets */
+                        for (int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
+                        {
+                            var q = QueueList[queueidx];
+                            if (q.Count == 0)
+                            {
+                                continue;
+                            }
+                            if (m_AckThrottlingCount[queueidx] > 100)
+                            {
+                                QueueCount[queueidx] = 0;
+                                continue;
+                            }
+                            try
+                            {
+                                m = q.Dequeue();
+                                if (QueueCount[queueidx] > 0)
+                                {
+                                    --QueueCount[queueidx];
+                                }
+                            }
+                            catch
+                            {
+                                QueueCount[queueidx] = 0;
+                                continue;
+                            }
+                            if (m != null)
+                            {
+                                try
+                                {
+                                    var p = new UDPPacket()
+                                    {
+                                        OutQueue = m.OutQueue,
+                                        IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag
+                                    };
+                                    p.WriteMessageNumber(m.Number);
+                                    m.Serialize(p);
+                                    p.Flush();
+                                    p.IsReliable = m.IsReliable;
+                                    p.AckMessage = p.IsReliable ? m : null;
+                                    p.SequenceNumber = NextSequenceNumber;
+                                    p.FinishZLE();
+                                    int savedDataLength = p.DataLength;
+                                    if (p.IsReliable)
+                                    {
+                                        if (MAX_DATA_MTU > 1 + (uint)savedDataLength)
+                                        {
+                                            uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
+                                            var curacks = (uint)m_AckList.Count;
+                                            if (appendableAcks != 0 && curacks != 0)
+                                            {
+                                                p.HasAckFlag = true;
+                                                uint cnt = 0;
+                                                while (cnt < appendableAcks && cnt < curacks && cnt < 255)
+                                                {
+                                                    p.WriteUInt32BE_NoZLE(m_AckList.Dequeue());
+                                                    ++cnt;
+                                                }
+                                                p.WriteUInt8((byte)cnt);
+                                            }
+                                        }
+
+                                        Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
+                                    }
+                                    Server.SendPacketTo(p, RemoteEndPoint);
+
+                                    Interlocked.Increment(ref m_PacketsSent);
+                                    p.EnqueuedAtTime = Environment.TickCount;
+                                    p.TransferredAtTime = Environment.TickCount;
+                                    if (m.IsReliable)
+                                    {
+                                        p.IsResent = true;
+                                        lock (m_UnackedPacketsHash)
+                                        {
+                                            m_UnackedPacketsHash.Add(p.SequenceNumber, p);
+                                        }
+                                        lock (m_UnackedBytesLock)
+                                        {
+                                            m_UnackedBytes += p.DataLength;
+                                        }
+                                    }
+                                    if (m.Number == MessageType.LogoutReply)
+                                    {
+                                        lock (m_LogoutReplyLock)
+                                        {
+                                            m_LogoutReplySeqNo = p.SequenceNumber;
+                                            m_LogoutReplySentAtTime = Environment.TickCount;
+                                            m_LogoutReplySent = true;
+                                        }
+                                    }
+                                    if (m.Number == MessageType.KickUser)
+                                    {
+                                        m_KickUserSentAtTime = Environment.TickCount;
+                                        m_KickUserSent = true;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    m_Log.DebugFormat("Failed to serialize message of type {0}: {1}\n{2}", m.TypeDescription, e.Message, e.StackTrace);
+                                }
+                            }
+                        }
+
+                        qcount = 0;
+                        for (int queueidx = 0; queueidx < QueueCount.Length; ++queueidx)
+                        {
+                            qcount += QueueCount[queueidx];
+                        }
+                    } while (qcount != 0);
+
+                    if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
+                    {
+                        LogMsgOnTimeout();
+                        TerminateCircuit();
+                        return;
+                    }
+
+                    if ((Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent) ||
+                        (Environment.TickCount - m_KickUserSentAtTime >= 10000 && m_KickUserSent))
+                    {
+                        LogMsgLogoutReply();
+                        TerminateCircuit();
+                        return;
+                    }
+
+                    if (Environment.TickCount - lastSimStatsTick >= 1000)
+                    {
+                        int deltatime = Environment.TickCount - lastSimStatsTick;
+                        lastSimStatsTick = Environment.TickCount;
+                        SendSimStats(deltatime);
+                    }
+
+                    if (Environment.TickCount - lastPingTick >= 5000 &&
+                        !m_PingSendTicks.ContainsKey(pingID))
+                    {
+                        lastPingTick = Environment.TickCount;
+                        var p = new UDPPacket();
+                        p.WriteMessageNumber(MessageType.StartPingCheck);
+                        p.WriteUInt8(pingID++);
+                        m_PingSendTicks[pingID] = Environment.TickCount;
+                        p.WriteUInt32(0);
+                        try
+                        {
+                            Server.SendPacketTo(p, RemoteEndPoint);
+                            Interlocked.Increment(ref m_PacketsSent);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            return;
+                        }
+                    }
+
+                    if (Environment.TickCount - lastAckTick >= 1000)
+                    {
+                        lastAckTick = Environment.TickCount;
+                        /* check for acks to be send */
+                        int c = m_AckList.Count;
+                        while (c > 0)
+                        {
+                            var p = new UDPPacket();
+                            p.WriteMessageNumber(MessageType.PacketAck);
+                            if (c > 100)
+                            {
+                                p.WriteUInt8(100);
+                                for (int i = 0; i < 100; ++i)
+                                {
+                                    p.WriteUInt32(m_AckList.Dequeue());
+                                }
+                                c -= 100;
+                            }
+                            else
+                            {
+                                p.WriteUInt8((byte)c);
+                                for (int i = 0; i < c; ++i)
+                                {
+                                    p.WriteUInt32(m_AckList.Dequeue());
+                                }
+                                c = 0;
+                            }
+                            p.SequenceNumber = NextSequenceNumber;
+                            Server.SendPacketTo(p, RemoteEndPoint);
+                            Interlocked.Increment(ref m_PacketsSent);
+                        }
                     }
                 }
             }
-            m_TxRunning = false;
+            finally
+            {
+                m_TxRunning = false;
+            }
         }
 
         protected abstract void LogMsgOnTimeout();

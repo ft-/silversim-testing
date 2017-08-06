@@ -100,6 +100,13 @@ namespace SilverSim.Viewer.Core
         }
 
         public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint, UDPPacket>();
+        public C5.TreeSet<uint> m_ResentDetectSet = new C5.TreeSet<uint>();
+        public struct ResendAge
+        {
+            public uint SeqNo;
+            public int TickCount;
+        }
+        public List<ResendAge> m_ResentAge = new List<ResendAge>();
 
         protected Circuit(
             UDPCircuitsManager server,
@@ -347,8 +354,42 @@ namespace SilverSim.Viewer.Core
                     break;
 
                 default:
-                    OnCircuitSpecificPacketReceived(mType, pck);
+                    bool isnewpacket = true;
+
+                    if (pck.IsReliable)
+                    {
+                        lock (m_ResentAge)
+                        {
+                            uint seqNo = pck.SequenceNumber;
+
+                            isnewpacket = !m_ResentDetectSet.Contains(seqNo) || !pck.IsResent;
+                            if (isnewpacket)
+                            {
+                                m_ResentAge.Add(new ResendAge { SeqNo = seqNo, TickCount = Environment.TickCount });
+                                m_ResentDetectSet.Add(seqNo);
+                            }
+                        }
+                    }
+
+                    if (isnewpacket)
+                    {
+                        OnCircuitSpecificPacketReceived(mType, pck);
+                    }
                     break;
+            }
+
+            lock (m_ResentAge)
+            {
+                if (m_ResentAge.Count > 0)
+                {
+                    ResendAge age = m_ResentAge[0];
+                    int actAge = Environment.TickCount - age.TickCount;
+                    if (actAge > 30000)
+                    {
+                        m_ResentDetectSet.Remove(age.SeqNo);
+                        m_ResentAge.RemoveAt(0);
+                    }
+                }
             }
         }
         #endregion
@@ -364,9 +405,9 @@ namespace SilverSim.Viewer.Core
             {
                 if (!m_TxRunning)
                 {
+                    m_TxRunning = true;
                     m_TxThread = ThreadManager.CreateThread(TransmitThread);
                     m_TxThread.Start(this);
-                    m_TxRunning = true;
                 }
                 StartSpecificThreads();
             }
