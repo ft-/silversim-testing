@@ -122,6 +122,31 @@ namespace SilverSim.Viewer.Core.Capabilities
             pInfo.LandingPosition = reqmap["user_location"].AsVector3;
             pInfo.LandingLookAt = reqmap["user_look_at"].AsVector3;
             pInfo.LandingType = (TeleportLandingType)reqmap["landing_type"].AsInt;
+            if(reqmap.ContainsKey("see_avs"))
+            {
+                pInfo.SeeAvatars = reqmap["see_avs"].AsBoolean;
+            }
+            if(reqmap.ContainsKey("group_av_sounds"))
+            {
+                pInfo.GroupAvatarSounds = reqmap["group_av_sounds"].AsBoolean;
+            }
+            if(reqmap.ContainsKey("any_av_sounds"))
+            {
+                pInfo.AnyAvatarSounds = reqmap["any_av_sounds"].AsBoolean;
+            }
+            if(reqmap.ContainsKey("obscure_media"))
+            {
+                pInfo.ObscureMedia = reqmap["obscure_media"].AsBoolean;
+            }
+            if(reqmap.ContainsKey("obscure_music"))
+            {
+                pInfo.ObscureMusic = reqmap["obscure_music"].AsBoolean;
+            }
+
+            //media_prevent_camera_zoom
+            //media_url_timeout
+            //media_allow_navigate
+            //media_current_url
 
             m_Scene.TriggerParcelUpdate(pInfo);
 
