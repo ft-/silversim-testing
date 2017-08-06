@@ -29,6 +29,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         None = 0,
         Access = 1,
         Ban = 2,
+        Renter = 4, /* Not used */
         AllowExperience = 8,
         BlockExperience = 16
     }
