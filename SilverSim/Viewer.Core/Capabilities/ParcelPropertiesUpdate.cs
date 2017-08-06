@@ -26,7 +26,6 @@ using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
