@@ -1108,7 +1108,14 @@ namespace SilverSim.Scene.Implementation.Basic
                         ScriptInstance removeinstance = item.ScriptInstance;
                         if (removeinstance != instance)
                         {
-                            removeinstance?.Remove();
+                            removeinstance = item.RemoveScriptInstance;
+                            if(removeinstance != null)
+                            {
+                                ScriptThreadPool.AbortScript(removeinstance);
+                                removeinstance.Abort();
+                                removeinstance.Remove();
+                                ScriptLoader.Remove(item.AssetID, removeinstance);
+                            }
                         }
                     }
                     m_Primitives.Remove(objpart.ID);
