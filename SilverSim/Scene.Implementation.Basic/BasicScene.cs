@@ -1103,6 +1103,14 @@ namespace SilverSim.Scene.Implementation.Basic
                 foreach (ObjectPart objpart in objgroup.Values)
                 {
                     Interlocked.Decrement(ref m_PrimitiveCount);
+                    foreach(ObjectPartInventoryItem item in objpart.Inventory.Values)
+                    {
+                        ScriptInstance removeinstance = item.ScriptInstance;
+                        if (removeinstance != instance)
+                        {
+                            removeinstance?.Remove();
+                        }
+                    }
                     m_Primitives.Remove(objpart.ID);
                     objpart.SendKillObject();
                     RemoveLocalID(objpart);
