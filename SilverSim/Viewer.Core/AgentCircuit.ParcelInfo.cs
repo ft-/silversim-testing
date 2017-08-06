@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Core
                 rep.LocalID = localID;
                 rep.Flags = listType;
                 rep.SequenceID = sequenceno++;
-                rep.AccessList.Add(new ParcelAccessListReply.Data());
+                rep.AccessList.Add(new ParcelAccessListReply.Data { Flags = listType });
                 SendMessage(rep);
                 return;
             }
@@ -70,7 +70,7 @@ namespace SilverSim.Viewer.Core
                         rep.Flags = listType;
                         rep.SequenceID = sequenceno++;
                     }
-                    var pad = new ParcelAccessListReply.Data()
+                    var pad = new ParcelAccessListReply.Data
                     {
                         Flags = listType,
                         ID = pae.Accessor.ID
