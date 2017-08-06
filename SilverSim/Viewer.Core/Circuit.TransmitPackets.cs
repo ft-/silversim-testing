@@ -174,6 +174,11 @@ namespace SilverSim.Viewer.Core
             Stop();
         }
 
+        private void TerminateCircuitAsyncRun(object o)
+        {
+            TerminateCircuit();
+        }
+
         private void TransmitThread(object param)
         {
             Thread.CurrentThread.IsBackground = true;
@@ -403,7 +408,8 @@ namespace SilverSim.Viewer.Core
                     if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
                     {
                         LogMsgOnTimeout();
-                        TerminateCircuit();
+                        /* do not do sync termination here */
+                        ThreadPool.QueueUserWorkItem(TerminateCircuitAsyncRun);
                         return;
                     }
 
@@ -411,7 +417,8 @@ namespace SilverSim.Viewer.Core
                         (Environment.TickCount - m_KickUserSentAtTime >= 10000 && m_KickUserSent))
                     {
                         LogMsgLogoutReply();
-                        TerminateCircuit();
+                        /* do not do sync termination here */
+                        ThreadPool.QueueUserWorkItem(TerminateCircuitAsyncRun);
                         return;
                     }
 
