@@ -204,7 +204,7 @@ namespace SilverSim.Viewer.Core
         private void FetchInventoryThread_TransferRequest(Message m)
         {
             UUID assetID;
-            bool denyLSLTextViaDirect = false;
+            bool denySpecificAssetsViaDirectAssetId = false;
             var req = (TransferRequest)m;
             if (req.SourceType == SourceType.SimInventoryItem)
             {
@@ -233,6 +233,11 @@ namespace SilverSim.Viewer.Core
                             return;
                         }
                     }
+                    else if(item.AssetType == AssetType.Object)
+                    {
+                        SendAssetNotFound(req);
+                        return;
+                    }
                     else if (item.AssetID != assetID)
                     {
                         m_Log.DebugFormat("Failed to request inventory asset (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
@@ -251,26 +256,38 @@ namespace SilverSim.Viewer.Core
                         return;
                     }
 
-                    if (item.AssetType == AssetType.LSLText)
+                    switch(item.AssetType)
                     {
-                        if(!item.CheckPermissions(Agent.Owner, Agent.Group, InventoryPermissionsMask.Modify))
-                        {
+                        case AssetType.Bodypart:
+                        case AssetType.Clothing:
+                        case AssetType.Gesture:
+                        case AssetType.LSLText:
+                            if(!item.CheckPermissions(Agent.Owner, Agent.Group, InventoryPermissionsMask.Modify))
+                            {
+                                SendAssetInsufficientPermissions(req);
+                                return;
+                            }
+                            break;
+
+                        case AssetType.Object:
                             SendAssetInsufficientPermissions(req);
                             return;
-                        }
-                    }
-                    else if (item.AssetID != assetID)
-                    {
-                        m_Log.DebugFormat("Failed to request sim inventory asset (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
-                        SendAssetNotFound(req);
-                        return;
+
+                        default:
+                            if (item.AssetID != assetID)
+                            {
+                                m_Log.DebugFormat("Failed to request sim inventory asset (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
+                                SendAssetNotFound(req);
+                                return;
+                            }
+                            break;
                     }
                 }
             }
             else if (req.SourceType == SourceType.Asset)
             {
                 assetID = new UUID(req.Params, 0);
-                denyLSLTextViaDirect = true;
+                denySpecificAssetsViaDirectAssetId = true;
             }
             else
             {
@@ -323,11 +340,20 @@ namespace SilverSim.Viewer.Core
             {
                 m_Log.DebugFormat("Starting to download asset {0} (TransferPacket)", assetID);
             }
-            if (denyLSLTextViaDirect && asset.Type == AssetType.LSLText)
+            if (denySpecificAssetsViaDirectAssetId)
             {
-                m_Log.DebugFormat("Failed to request (TransferRequest) for Agent {0}: Insufficient permissions", AgentID);
-                SendAssetInsufficientPermissions(req);
-                return;
+                switch(asset.Type)
+                {
+                    case AssetType.LSLText:
+                    case AssetType.Notecard:
+                    case AssetType.Gesture:
+                    case AssetType.Clothing:
+                    case AssetType.Bodypart:
+                    case AssetType.Object:
+                        m_Log.DebugFormat("Failed to request (TransferRequest) for Agent {0}: Insufficient permissions for {1}", AgentID, asset.Type.ToString());
+                        SendAssetInsufficientPermissions(req);
+                        return;
+                }
             }
 
             var ti = new TransferInfo()
