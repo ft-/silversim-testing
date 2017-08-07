@@ -258,9 +258,6 @@ namespace SilverSim.Viewer.Core
 
                     switch(item.AssetType)
                     {
-                        case AssetType.Bodypart:
-                        case AssetType.Clothing:
-                        case AssetType.Gesture:
                         case AssetType.LSLText:
                             if(!item.CheckPermissions(Agent.Owner, Agent.Group, InventoryPermissionsMask.Modify))
                             {
@@ -346,9 +343,6 @@ namespace SilverSim.Viewer.Core
                 {
                     case AssetType.LSLText:
                     case AssetType.Notecard:
-                    case AssetType.Gesture:
-                    case AssetType.Clothing:
-                    case AssetType.Bodypart:
                     case AssetType.Object:
                         m_Log.DebugFormat("Failed to request (TransferRequest) for Agent {0}: Insufficient permissions for {1}", AgentID, asset.Type.ToString());
                         SendAssetInsufficientPermissions(req);

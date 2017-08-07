@@ -66,11 +66,7 @@ namespace SilverSim.Viewer.Core
             {
                 case AssetType.Bodypart:
                 case AssetType.Clothing:
-                case AssetType.Notecard:
                 case AssetType.Gesture:
-#warning It does not seem to fit a security model. Eventually they check the user's inventory?
-                    break;
-
                 case AssetType.Animation:
                 case AssetType.Sound:
                 case AssetType.Landmark:
