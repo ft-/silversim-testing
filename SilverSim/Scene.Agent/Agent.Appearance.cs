@@ -142,8 +142,10 @@ namespace SilverSim.Scene.Agent
                 var te = new TextureEntry();
                 UUID[] textures = Textures.All;
                 te.DefaultTexture.TextureID = IMG_DEFAULT_AVATAR;
-                for(int i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
+                /* only add bakes */
+                foreach(AvatarTextureIndex idx in AppearanceInfo.BakeIndices)
                 {
+                    int i = (int)idx;
                     if (te.DefaultTexture.TextureID != textures[i])
                     {
                         te[(uint)i].TextureID = textures[i];
