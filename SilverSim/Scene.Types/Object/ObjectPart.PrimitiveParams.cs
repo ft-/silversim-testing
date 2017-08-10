@@ -427,7 +427,7 @@ namespace SilverSim.Scene.Types.Object
 
                     #region Path Rarams
                     d.PathBegin = (PathBegin * CutQuanta).Clamp(0f, 1f);
-                    d.PathEnd = ((100 - PathEnd) * CutQuanta).Clamp(0f, 1f);
+                    d.PathEnd = ((50000 - PathEnd) * CutQuanta).Clamp(0f, 1f);
                     d.PathScale = new Vector3(
                         ((200 - PathScaleX) * ScaleQuanta).Clamp(0f, 1f),
                         ((200 - PathScaleY) * ScaleQuanta).Clamp(0f, 1f),
