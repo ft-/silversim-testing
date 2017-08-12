@@ -306,6 +306,7 @@ namespace SilverSim.Scene.Npc
                     inventoryService.CheckInventory(npcInfo.Npc.ID);
                     presenceService.Store(npcInfo);
                     agent.CurrentScene = scene;
+                    agent.Position = position;
                     scene.Add(agent);
                 }
                 catch
@@ -328,6 +329,8 @@ namespace SilverSim.Scene.Npc
                 {
                     m_Log.WarnFormat("Failed to load NPC appearance {0} {1} ({2})", npcId.FirstName, npcId.LastName, npcId.ID.ToString());
                 }
+
+                scene.SendAgentObjectToAllAgents(agent);
                 return agent;
             }
 
