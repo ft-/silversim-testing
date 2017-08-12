@@ -740,7 +740,7 @@ namespace SilverSim.Scene.Types.Object
                 updatebytes[i++] = (byte)((flexi.Gravity + 10.0f) * 10.01f);
                 updatebytes[i++] = (byte)(flexi.Wind * 10.01f);
                 flexi.Force.ToBytes(updatebytes, i);
-                i += 16;
+                i += 12;
             }
 
             if (isSculpt)
