@@ -2512,6 +2512,11 @@ namespace SilverSim.Scene.Types.Object
                         {
                             rootGroup.AttachPoint = (AttachmentPoint)shape.State;
                         }
+                        /* fixup wrong parameters */
+                        if(shape.SculptMap == UUID.Zero && shape.SculptType != PrimitiveSculptType.None)
+                        {
+                            shape.SculptType = PrimitiveSculptType.None;
+                        }
                         part.Shape = shape;
                         return;
 
