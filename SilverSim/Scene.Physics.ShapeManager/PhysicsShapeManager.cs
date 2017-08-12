@@ -271,10 +271,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             else
             {
                 MeshLOD m = shape.ToMesh(m_AssetService);
-                m.DumpToBlenderRaw("../data/dumps/shape_in_" + Environment.TickCount.ToString() + ".raw");
                 m.Optimize();
-                m.DumpToBlenderRaw("../data/dumps/shape_out_" + Environment.TickCount.ToString() + ".raw");
-
                 convexShape = DecomposeConvex(m);
             }
 
