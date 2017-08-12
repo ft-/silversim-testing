@@ -522,8 +522,7 @@ namespace SilverSim.Scene.Types.Object
                         var shape = Shape;
                         if (shape.Type == PrimitiveShapeType.Sculpt)
                         {
-                            shape.Type = PrimitiveShapeType.Sphere;
-                            shape.SculptType = PrimitiveSculptType.Sphere;
+                            shape.SculptType = PrimitiveSculptType.None;
                             Shape = shape;
                         }
                     }
@@ -643,11 +642,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         lock (m_Shape)
                         {
-                            if (m_Shape.SculptType < PrimitiveSculptType.Sphere || m_Shape.SculptType > PrimitiveSculptType.Sphere)
-                            {
-                                m_Shape.SculptType = PrimitiveSculptType.Sphere;
-                                m_Shape.Type = PrimitiveShapeType.Sphere;
-                            }
+                            m_Shape.SculptType = PrimitiveSculptType.None;
                         }
                     }
                 });

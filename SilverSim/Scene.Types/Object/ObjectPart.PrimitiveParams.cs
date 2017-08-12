@@ -46,10 +46,8 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Fields
-            public PrimitiveShapeType Type; /* byte / 16 */
-
             public UUID SculptMap = UUID.Zero; /* 0 */
-            public PrimitiveSculptType SculptType = PrimitiveSculptType.Sphere; /* byte / 17 */
+            public PrimitiveSculptType SculptType = PrimitiveSculptType.None; /* byte / 17 */
             public bool IsSculptInverted; /* 18 */
             public bool IsSculptMirrored; /* 19 */
 
@@ -136,8 +134,11 @@ namespace SilverSim.Scene.Types.Object
                     }
 
                     SculptMap.FromBytes(value, 0);
-                    Type = (PrimitiveShapeType)value[16];
                     SculptType = (PrimitiveSculptType)value[17];
+                    if(SculptMap == UUID.Zero)
+                    {
+                        SculptType = PrimitiveSculptType.None;
+                    }
                     IsSculptInverted = value[18] != 0;
                     IsSculptMirrored = value[19] != 0;
                     PathBegin = BitConverter.ToUInt16(value, 20);
@@ -174,6 +175,63 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Properties
+            public PrimitiveShapeType Type
+            {
+                get
+                {
+                    if(SculptType != PrimitiveSculptType.None)
+                    {
+                        return PrimitiveShapeType.Sculpt;
+                    }
+
+                    PrimitiveProfileShape profileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask);
+                    PrimitiveExtrusion extrusion = (PrimitiveExtrusion)PathCurve;
+
+                    switch(profileShape)
+                    {
+                        case PrimitiveProfileShape.Square:
+                            if(extrusion == PrimitiveExtrusion.Curve1)
+                            {
+                                return PrimitiveShapeType.Tube;
+                            }
+                            break;
+
+                        case PrimitiveProfileShape.Circle:
+                            switch (extrusion)
+                            {
+                                case PrimitiveExtrusion.Straight:
+                                case PrimitiveExtrusion.Default:
+                                    return PrimitiveShapeType.Cylinder;
+
+                                case PrimitiveExtrusion.Curve1:
+                                    return PrimitiveShapeType.Torus;
+                            }
+                            break;
+
+                        case PrimitiveProfileShape.HalfCircle:
+                            if(extrusion == PrimitiveExtrusion.Curve1 || extrusion == PrimitiveExtrusion.Curve2)
+                            {
+                                return PrimitiveShapeType.Sphere;
+                            }
+                            break;
+
+                        case PrimitiveProfileShape.EquilateralTriangle:
+                            switch(extrusion)
+                            {
+                                case PrimitiveExtrusion.Straight:
+                                case PrimitiveExtrusion.Default:
+                                    return PrimitiveShapeType.Prism;
+
+                                case PrimitiveExtrusion.Curve1:
+                                    return PrimitiveShapeType.Ring;
+                            }
+                            break;
+                    }
+
+                    return PrimitiveShapeType.Box;
+                }
+            }
+
             public int NumberOfSides
             {
                 get
@@ -307,7 +365,6 @@ namespace SilverSim.Scene.Types.Object
 
             public void CopyFrom(PrimitiveShape shape)
             {
-                Type = shape.Type;
                 SculptMap = shape.SculptMap;
                 SculptType = shape.SculptType;
                 IsSculptInverted = shape.IsSculptInverted;
@@ -513,11 +570,10 @@ namespace SilverSim.Scene.Types.Object
 
             public static PrimitiveShape FromPrimitiveParams(AnArray.MarkEnumerator enumerator)
             {
-                var shape = new PrimitiveShape()
-                {
-                    Type = (PrimitiveShapeType)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE")
-                };
-                if (shape.Type == PrimitiveShapeType.Sculpt)
+                var shape = new PrimitiveShape();
+                var shapeType = (PrimitiveShapeType)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
+
+                if (shapeType == PrimitiveShapeType.Sculpt)
                 {
                     shape.SculptMap = ParamsHelper.GetKey(enumerator, "PRIM_TYPE");
                     int sculptFlags = ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
@@ -537,7 +593,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     var profileShape = PrimitiveProfileShape.Circle;
                     var extrusion = PrimitiveExtrusion.Straight;
-                    switch (shape.Type)
+                    switch (shapeType)
                     {
                         case PrimitiveShapeType.Box:
                             profileShape = PrimitiveProfileShape.Square;
@@ -627,7 +683,7 @@ namespace SilverSim.Scene.Types.Object
                     Vector3 holeSize;
                     Vector3 dimple;
 
-                    switch (shape.Type)
+                    switch (shapeType)
                     {
                         case PrimitiveShapeType.Box:
                         case PrimitiveShapeType.Cylinder:

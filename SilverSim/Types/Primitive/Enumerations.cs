@@ -197,10 +197,11 @@ namespace SilverSim.Types.Primitive
 
     public enum PrimitiveExtrusion : byte
     {
+        Default = 0,
         Straight = 16,
         Curve1 = 32,
         Curve2 = 48,
-        Flexible = 128
+        Flexible = 128,
     }
 
     public enum PrimitiveHoleShape : byte
