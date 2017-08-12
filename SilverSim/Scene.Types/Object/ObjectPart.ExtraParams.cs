@@ -680,35 +680,42 @@ namespace SilverSim.Scene.Types.Object
             var proj = Projection;
             var shape = Shape;
             var emesh = ExtendedMesh;
-            if (flexi.IsFlexible)
+            bool isFlexible = flexi.IsFlexible;
+            bool isSculpt = shape.Type == PrimitiveShapeType.Sculpt;
+            bool isLight = light.IsLight &&
+                (!m_IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint)) &&
+                (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand));
+            bool isProjecting = proj.IsProjecting;
+            ExtendedMeshParams.MeshFlags emeshFlags = emesh.Flags;
+            if (isFlexible)
             {
                 ++extraParamsNum;
                 totalBytesLength += 16;
                 totalBytesLength += 2 + 4;
             }
 
-            if (shape.Type == PrimitiveShapeType.Sculpt)
+            if (isSculpt)
             {
                 ++extraParamsNum;
                 totalBytesLength += 17;
                 totalBytesLength += 2 + 4;
             }
 
-            if (light.IsLight)
+            if (isLight)
             {
                 ++extraParamsNum;
                 totalBytesLength += 16;
                 totalBytesLength += 2 + 4;
             }
 
-            if (proj.IsProjecting)
+            if (isProjecting)
             {
                 ++extraParamsNum;
                 totalBytesLength += 28;
                 totalBytesLength += 2 + 4;
             }
 
-            if (emesh.Flags != ExtendedMeshParams.MeshFlags.None)
+            if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
             {
                 ++extraParamsNum;
                 totalBytesLength += 4;
@@ -718,7 +725,7 @@ namespace SilverSim.Scene.Types.Object
             var updatebytes = new byte[totalBytesLength];
             updatebytes[i++] = (byte)extraParamsNum;
 
-            if (flexi.IsFlexible)
+            if (isFlexible)
             {
                 updatebytes[i++] = FlexiEP % 256;
                 updatebytes[i++] = FlexiEP / 256;
@@ -736,7 +743,7 @@ namespace SilverSim.Scene.Types.Object
                 i += 16;
             }
 
-            if (shape.Type == PrimitiveShapeType.Sculpt)
+            if (isSculpt)
             {
                 updatebytes[i++] = SculptEP % 256;
                 updatebytes[i++] = SculptEP / 256;
@@ -749,9 +756,7 @@ namespace SilverSim.Scene.Types.Object
                 updatebytes[i++] = (byte)shape.SculptType;
             }
 
-            if (light.IsLight &&
-                (!m_IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint)) &&
-                (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
+            if (isLight)
             {
                 updatebytes[i++] = LightEP % 256;
                 updatebytes[i++] = LightEP / 256;
@@ -784,7 +789,7 @@ namespace SilverSim.Scene.Types.Object
                 i += 4;
             }
 
-            if (proj.IsProjecting)
+            if (isProjecting)
             {
                 updatebytes[i++] = (ProjectionEP % 256);
                 updatebytes[i++] = (ProjectionEP / 256);
@@ -801,7 +806,7 @@ namespace SilverSim.Scene.Types.Object
                 Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
             }
 
-            if (emesh.Flags != ExtendedMeshParams.MeshFlags.None)
+            if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
             {
                 updatebytes[i++] = (ExtendedMeshEP % 256);
                 updatebytes[i++] = (ExtendedMeshEP / 256);
@@ -809,10 +814,10 @@ namespace SilverSim.Scene.Types.Object
                 updatebytes[i++] = 0;
                 updatebytes[i++] = 0;
                 updatebytes[i++] = 0;
-                updatebytes[i++] = (byte)(((uint)emesh.Flags) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 8) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 16) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emesh.Flags) >> 24) & 0xFF);
+                updatebytes[i++] = (byte)(((uint)emeshFlags) & 0xFF);
+                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 8) & 0xFF);
+                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 16) & 0xFF);
+                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 24) & 0xFF);
             }
 
             m_ExtraParamsBytes = updatebytes;
