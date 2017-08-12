@@ -30,6 +30,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
+using System;
 using System.ComponentModel;
 using System.Threading;
 
@@ -270,7 +271,9 @@ namespace SilverSim.Scene.Physics.ShapeManager
             else
             {
                 MeshLOD m = shape.ToMesh(m_AssetService);
+                m.DumpToBlenderRaw("../data/dumps/shape_in_" + Environment.TickCount.ToString() + ".raw");
                 m.Optimize();
+                m.DumpToBlenderRaw("../data/dumps/shape_out_" + Environment.TickCount.ToString() + ".raw");
 
                 convexShape = DecomposeConvex(m);
             }
@@ -298,7 +301,9 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 return true;
             }
 
+#if !DEBUG
             if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(meshId, out physicshape))
+#endif
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
                 physicshape = ConvertToMesh(shape);
@@ -341,7 +346,9 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 return true;
             }
 
+#if !DEBUG
             if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(shape, out physicshape))
+#endif
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
                 physicshape = ConvertToMesh(shape);

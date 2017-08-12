@@ -383,19 +383,6 @@ namespace SilverSim.Scene.Types.Object
                 #endregion
             }
 
-            /** <summary>divides by 50000</summary> */
-            private readonly double CutQuanta = 0.00002f;
-            /** <summary>divides by 100</summary> */
-            private readonly double ScaleQuanta = 0.01f;
-            /** <summary>divides by 100</summary> */
-            private const double ShearQuanta = 0.01f;
-            /** <summary>divides by 100</summary> */
-            private const double TaperQuanta = 0.01f;
-            /** <summary>0.015f</summary> */
-            private const double RevQuanta = 0.015f;
-            /** <summary>divides by 50000</summary> */
-            private const double HollowQuanta = 0.00002f;
-
             public Decoded DecodedParams
             {
                 get
@@ -409,42 +396,51 @@ namespace SilverSim.Scene.Types.Object
                         IsSculptMirrored = IsSculptMirrored,
 
                         #region Profile Params
-                        ProfileBegin = (ProfileBegin * CutQuanta).Clamp(0f, 1f),
-                        ProfileEnd = (ProfileEnd * CutQuanta).Clamp(0f, 1f),
+                        ProfileBegin = (ProfileBegin/ 50000.0).Clamp(0f, 1f),
+                        ProfileEnd = (ProfileEnd / 50000.0).Clamp(0f, 1f),
                         IsOpen = ProfileBegin != 0 || ProfileEnd != 50000,
                         ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask),
                         HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask)
                         #endregion
                     };
 
+                    if(ProfileEnd == 50000)
+                    {
+                        d.ProfileEnd = 1;
+                    }
+
                     #region Profile Params
                     d.ProfileHollow = ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) &&
                         d.HoleShape == PrimitiveProfileHollowShape.Square) ?
-                        (ProfileHollow * HollowQuanta).Clamp(0f, 0.7f) :
-                        (ProfileHollow * HollowQuanta).Clamp(0f, 0.99f);
+                        (ProfileHollow / 50000.0).Clamp(0f, 0.7f) :
+                        (ProfileHollow / 50000.0).Clamp(0f, 0.99f);
                     d.IsHollow = ProfileHollow > 0;
                     #endregion
 
                     #region Path Rarams
-                    d.PathBegin = (PathBegin * CutQuanta).Clamp(0f, 1f);
-                    d.PathEnd = ((50000 - PathEnd) * CutQuanta).Clamp(0f, 1f);
+                    d.PathBegin = (PathBegin / 50000.0).Clamp(0f, 1f);
+                    d.PathEnd = ((50000 - PathEnd) / 50000.0).Clamp(0f, 1f);
+                    if(PathEnd == 0)
+                    {
+                        d.PathEnd = 1;
+                    }
                     d.PathScale = new Vector3(
-                        ((200 - PathScaleX) * ScaleQuanta).Clamp(0f, 1f),
-                        ((200 - PathScaleY) * ScaleQuanta).Clamp(0f, 1f),
+                        (0 - (PathScaleX / 100.0 - 1)).Clamp(0f, 1f),
+                        (0 - (PathScaleY / 100.0 - 1)).Clamp(0f, 1f),
                         0f);
                     d.TopShear = new Vector3(
-                        (PathShearX * ScaleQuanta - 0.5).Clamp(-0.5, 0.5),
-                        (PathShearY * ScaleQuanta - 0.5).Clamp(-0.5, 0.5),
+                        ((sbyte)PathShearX / 100.0).Clamp(-0.5, 0.5),
+                        ((sbyte)PathShearY / 100.0).Clamp(-0.5, 0.5),
                         0f);
-                    d.TwistBegin = (PathTwistBegin * ScaleQuanta).Clamp(-1f, 1f);
-                    d.TwistEnd = (PathTwist * ScaleQuanta).Clamp(-1f, 1f);
-                    d.RadiusOffset = PathRadiusOffset * ScaleQuanta;
+                    d.TwistBegin = (PathTwistBegin / 100.0).Clamp(-1f, 1f);
+                    d.TwistEnd = (PathTwist / 100.0).Clamp(-1f, 1f);
+                    d.RadiusOffset = PathRadiusOffset / 100.0;
                     d.Taper = new Vector3(
-                        (PathTaperX * TaperQuanta).Clamp(-1f, 1f),
-                        (PathTaperY * TaperQuanta).Clamp(-1f, 1f),
+                        (PathTaperX / 100.0).Clamp(-1f, 1f),
+                        (PathTaperY / 100.0).Clamp(-1f, 1f),
                         0f);
-                    d.Revolutions = (PathRevolutions * RevQuanta + 1f).Clamp(1f, 4f);
-                    d.Skew = (PathSkew * ScaleQuanta).Clamp(-1f, 1f);
+                    d.Revolutions = (PathRevolutions / 100.0 + 1f).Clamp(1f, 4f);
+                    d.Skew = (PathSkew / 100.0).Clamp(-1f, 1f);
                     #endregion
 
                     return d;
