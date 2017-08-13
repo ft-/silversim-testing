@@ -229,6 +229,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
         private PhysicsConvexShape ConvertToMesh(ObjectPart.PrimitiveShape shape)
         {
             PhysicsConvexShape convexShape = null;
+            bool hasHullList = false;
             if (shape.Type == PrimitiveShapeType.Sculpt && shape.SculptType == PrimitiveSculptType.Mesh)
             {
                 var m = new LLMesh(m_AssetService[shape.SculptMap]);
@@ -237,13 +238,14 @@ namespace SilverSim.Scene.Physics.ShapeManager
                     try
                     {
                         convexShape = m.GetConvexPhysics();
+                        hasHullList = convexShape.HasHullList;
                     }
                     catch
                     {
                         /* skip broken convex hulls */
                     }
                 }
-                if(convexShape?.HasHullList == false && m.HasLOD(LLMesh.LodLevel.Physics))
+                if(!hasHullList && m.HasLOD(LLMesh.LodLevel.Physics))
                 {
                     /* check for physics mesh before giving out the single hull */
                     MeshLOD lod = m.GetLOD(LLMesh.LodLevel.Physics);
