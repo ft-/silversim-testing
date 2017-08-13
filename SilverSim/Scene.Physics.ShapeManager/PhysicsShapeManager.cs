@@ -234,7 +234,14 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 var m = new LLMesh(m_AssetService[shape.SculptMap]);
                 if(m.HasConvexPhysics())
                 {
-                    convexShape = m.GetConvexPhysics();
+                    try
+                    {
+                        convexShape = m.GetConvexPhysics();
+                    }
+                    catch
+                    {
+                        /* skip broken convex hulls */
+                    }
                 }
                 if(convexShape?.HasHullList == false && m.HasLOD(LLMesh.LodLevel.Physics))
                 {
