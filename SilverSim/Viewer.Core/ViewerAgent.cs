@@ -62,6 +62,7 @@ using SilverSim.Viewer.Messages.User;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 
 namespace SilverSim.Viewer.Core
 {
@@ -908,24 +909,45 @@ namespace SilverSim.Viewer.Core
         public void HandleLogoutRequest(Message m)
         {
             var lr = (LogoutRequest)m;
+            ThreadPool.QueueUserWorkItem(ProcessLogoutWorkItem, lr);
+        }
+
+        private void ProcessLogoutWorkItem(object o)
+        {
+            var lr = (LogoutRequest)o;
             /* agent wants to logout */
             m_Log.InfoFormat("Agent {0} {1} ({0}) wants to logout", FirstName, LastName, ID);
             foreach (var c in Circuits.Values)
             {
                 SceneInterface scene = c.Scene;
-                if(scene == null)
+                if (scene == null)
                 {
                     continue;
                 }
+#if DEBUG
+                m_Log.DebugFormat("Removing agent {0}: Removing from scene {1}", ID, scene.ID);
+#endif
                 scene.Remove(this);
                 if (scene.ID != lr.CircuitSceneID)
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Removing agent {0}: Stop circuit {1}", ID, scene.ID);
+#endif
                     c.Stop();
+#if DEBUG
+                    m_Log.DebugFormat("Removing agent {0} from circuit list ({1})", ID, scene.ID);
+#endif
                     Circuits.Remove(scene.ID);
+#if DEBUG
+                    m_Log.DebugFormat("Removing agent {0} from scene {1}", ID, scene.ID);
+#endif
                     ((UDPCircuitsManager)scene.UDPServer).RemoveCircuit(c);
                 }
                 else
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Removing agent {0}: Sending logout reply for {1}", ID, scene.ID);
+#endif
                     var lrep = new LogoutReply()
                     {
                         AgentID = lr.AgentID,
@@ -934,6 +956,7 @@ namespace SilverSim.Viewer.Core
                     c.SendMessage(lrep);
                 }
             }
+            m_Log.InfoFormat("Agent {0} {1} ({0}) logout request processed", FirstName, LastName, ID);
         }
 
         [PacketHandler(MessageType.MuteListRequest)]
