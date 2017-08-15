@@ -217,7 +217,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsRotateXEnabled = value;
-                PhysicsActor.IsRotateXEnabled = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
@@ -230,7 +229,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsRotateYEnabled = value;
-                PhysicsActor.IsRotateYEnabled = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
@@ -243,7 +241,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsRotateZEnabled = value;
-                PhysicsActor.IsRotateZEnabled = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
@@ -256,7 +253,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsPhantom = value;
-                PhysicsActor.IsPhantom = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
@@ -281,7 +277,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsVolumeDetect = value;
-                PhysicsActor.IsVolumeDetect = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }

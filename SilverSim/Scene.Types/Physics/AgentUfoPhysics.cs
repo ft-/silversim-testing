@@ -144,26 +144,6 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsPhysicsActive { get; set; }
 
-        public bool IsPhantom
-        {
-            get { return true; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsVolumeDetect
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
         public bool ContributesToCollisionSurfaceAsChild
         {
             get { return true; }
@@ -185,37 +165,6 @@ namespace SilverSim.Scene.Types.Physics
                 /* intentionally left empty */
             }
         }
-
-        public bool IsRotateXEnabled
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsRotateYEnabled
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsRotateZEnabled
-        {
-            get { return true; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
         public double SpeedFactor { get; set; }
 
         public void GroundRepel(double height, bool water, double tau)

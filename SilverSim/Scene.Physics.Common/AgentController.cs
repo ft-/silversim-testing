@@ -87,23 +87,10 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
-        public bool IsPhantom
-        {
-            get { return false; }
-
-            set
-            {
-                /* nothing to do for agents */
-            }
-        }
 
         public double Mass => 2;
 
-        public abstract bool IsVolumeDetect { get; set; }
         public abstract bool IsAgentCollisionActive { get; set; }
-        public abstract bool IsRotateXEnabled { get; set; }
-        public abstract bool IsRotateYEnabled { get; set; }
-        public abstract bool IsRotateZEnabled { get; set; }
 
         private ControlFlags m_ControlFlags;
         public void SetControlFlags(ControlFlags flags)

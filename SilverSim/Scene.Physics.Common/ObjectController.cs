@@ -77,11 +77,6 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
-        public abstract bool IsPhantom { get; set; }
-        public abstract bool IsVolumeDetect { get; set; }
-        public abstract bool IsRotateXEnabled { get; set; }
-        public abstract bool IsRotateYEnabled { get; set; }
-        public abstract bool IsRotateZEnabled { get; set; }
 
         public bool IsAgentCollisionActive
         {
