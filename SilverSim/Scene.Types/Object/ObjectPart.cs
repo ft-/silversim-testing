@@ -95,6 +95,7 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_Velocity = Vector3.Zero;
         private UUI m_Creator = UUI.Unknown;
         private Date m_CreationDate = new Date();
+        private Date m_RezDate = new Date();
         private PrimitiveFlags m_PrimitiveFlags;
         private Map m_DynAttrMap = new Map();
         public bool IsScripted { get; private set; }
@@ -827,6 +828,26 @@ namespace SilverSim.Scene.Types.Object
                         Array.Reverse(b);
                     }
                     Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.NextOwnerMask, b.Length);
+                }
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Date RezDate
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return new Date(m_RezDate);
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_RezDate = new Date(value);
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);

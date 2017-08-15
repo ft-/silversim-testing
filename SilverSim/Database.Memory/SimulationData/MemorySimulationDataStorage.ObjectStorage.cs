@@ -108,6 +108,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 SitTargetOrientation = map["SitTargetOrientation"].AsQuaternion,
                 Creator = new UUI(map["Creator"].ToString()),
                 CreationDate = (Date)map["CreationDate"],
+                RezDate = (Date)map["RezDate"],
                 Flags = (PrimitiveFlags)map["Flags"].AsUInt,
 
                 CameraAtOffset = map["CameraAtOffset"].AsVector3,

@@ -164,6 +164,7 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "MediaURL", objpart.MediaURL },
                     { "Creator", objpart.Creator.ToString() },
                     { "CreationDate", objpart.CreationDate },
+                    { "RezDate", objpart.RezDate },
                     { "Flags", (int)objpart.Flags },
                     { "AngularVelocity", objpart.AngularVelocity },
                     { "LightData", new BinaryData(objpart.PointLight.DbSerialization) },
