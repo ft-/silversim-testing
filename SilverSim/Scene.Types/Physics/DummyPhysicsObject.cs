@@ -98,56 +98,6 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
-        public bool IsPhantom
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsVolumeDetect
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsRotateXEnabled
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsRotateYEnabled
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsRotateZEnabled
-        {
-            get { return false; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
         public void SetHoverHeight(double height, bool water, double tau)
         {
         }
