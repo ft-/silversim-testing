@@ -94,8 +94,8 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_AngularVelocity = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
         private UUI m_Creator = UUI.Unknown;
-        private Date m_CreationDate = new Date();
-        private Date m_RezDate = new Date();
+        private Date m_CreationDate = Date.Now;
+        private Date m_RezDate = Date.Now;
         private PrimitiveFlags m_PrimitiveFlags;
         private Map m_DynAttrMap = new Map();
         public bool IsScripted { get; private set; }
@@ -2046,7 +2046,11 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("SitTargetPositionLL", SitTargetOffset);
                     writer.WriteNamedValue("SitTargetOrientationLL", SitTargetOrientation);
                     writer.WriteNamedValue("ParentID", ObjectGroup.RootPart.ID);
-                    writer.WriteNamedValue("CreationDate", CreationDate.AsUInt);
+                    writer.WriteNamedValue("CreationDate", CreationDate.AsULong);
+                    if ((options & XmlSerializationOptions.WriteRezDate) != XmlSerializationOptions.None)
+                    {
+                        writer.WriteNamedValue("RezDate", RezDate.AsULong);
+                    }
                     writer.WriteNamedValue("Category", ObjectGroup.Category);
                     if (this == ObjectGroup.RootPart)
                     {
@@ -2862,6 +2866,10 @@ namespace SilverSim.Scene.Types.Object
 
                             case "CreationDate":
                                 part.CreationDate = Date.UnixTimeToDateTime(reader.ReadElementValueAsULong());
+                                break;
+
+                            case "RezDate":
+                                part.RezDate = Date.UnixTimeToDateTime(reader.ReadElementValueAsULong());
                                 break;
 
                             case "Category":

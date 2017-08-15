@@ -39,5 +39,6 @@ namespace SilverSim.Scene.Types.Object
         AdjustForNextOwner = 2,
         WriteXml2 = 4,
         WriteKeyframeMotion = 8,
+        WriteRezDate = 16
     }
 }
