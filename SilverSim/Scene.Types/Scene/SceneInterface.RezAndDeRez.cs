@@ -162,6 +162,10 @@ namespace SilverSim.Scene.Types.Scene
 
         public UInt32 RezObject(ObjectGroup group, RezObjectParams rezparams)
         {
+            foreach (ObjectPart part in group.Values)
+            {
+                part.RezDate = Date.Now;
+            }
             group.GlobalPosition = CalculateRezLocation(
                 rezparams,
                 group.Size);
