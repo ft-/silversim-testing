@@ -31,6 +31,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
@@ -143,6 +144,7 @@ namespace SilverSim.Scene.Npc
 
             loader.CommandRegistry.AddShowCommand("npcs", ShowNpcsCommand);
             loader.CommandRegistry.AddRemoveCommand("npc", RemoveNpcCommand);
+            loader.CommandRegistry.AddCreateCommand("npc", CreateNpcCommand);
         }
 
         private readonly RwLockedDictionary<UUID, SceneInterface> m_KnownScenes = new RwLockedDictionary<UUID, SceneInterface>();
@@ -439,6 +441,132 @@ namespace SilverSim.Scene.Npc
                 }
                 io.Write(sb.ToString());
             }
+        }
+
+        private void CreateNpcCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID ncid;
+            UGI group = UGI.Unknown;
+            UUI owner = UUI.Unknown;
+            if (args[0] == "help" || args.Count < 5 || !UUID.TryParse(args[4], out ncid))
+            {
+                io.Write("create npc <firstname> <lastname> <notecardid> [params...] - Remove NPC\n" +
+                    "    owner <owner>\n" + 
+                    "    group <group>\n" +
+                    "    position <position>\n" +
+                    "    notecard <assetid>\n" +
+                    "    persistent\n" +
+                    "    senseasagent");
+                return;
+            }
+            UUID sceneId;
+
+            if(limitedToScene != UUID.Zero)
+            {
+                sceneId = limitedToScene;
+            }
+            else if(io.SelectedScene == UUID.Zero)
+            {
+                io.Write("Please select a region first");
+                return;
+            }
+            else
+            {
+                sceneId = io.SelectedScene;
+            }
+
+            NpcOptions options = NpcOptions.None;
+            Vector3 position = new Vector3(128, 128, 23);
+
+            SceneInterface scene;
+            if (!m_KnownScenes.TryGetValue(sceneId, out scene))
+            {
+                io.Write("Scene not found");
+                return;
+            }
+
+            UUID groupid;
+
+            for (int argi = 4; argi < args.Count; ++argi)
+            {
+                switch(args[argi])
+                {
+                    case "owner":
+                        if (!scene.AvatarNameService.TranslateToUUI(args[argi + 1], out owner))
+                        {
+                            io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
+                            return;
+                        }
+                        break;
+
+                    case "group":
+                        if(scene.GroupsNameService == null)
+                        {
+                            io.WriteFormatted("Groups not enabled");
+                            return;
+                        }
+                        else if(++argi >= args.Count)
+                        {
+                            io.WriteFormatted("Missing group id");
+                            return;
+                        }
+                        else if(!UUID.TryParse(args[argi], out groupid))
+                        {
+                            io.WriteFormatted("Invalid group id {0}", args[argi]);
+                            return;
+                        }
+                        else if(!scene.GroupsNameService.TryGetValue(groupid, out group))
+                        {
+                            io.WriteFormatted("Invalid group id {0}", groupid);
+                            return;
+                        }
+                        break;
+
+                    case "position":
+                        if(++argi < args.Count)
+                        {
+                            if(!Vector3.TryParse(args[argi], out position))
+                            {
+                                position = new Vector3(128, 128, 23);
+                            }
+                        }
+                        break;
+
+                    case "persistent":
+                        options |= NpcOptions.Persistent;
+                        break;
+
+                    case "senseasagent":
+                        options |= NpcOptions.SenseAsAgent;
+                        break;
+                }
+            }
+
+            AssetData asset;
+            if(!scene.AssetService.TryGetValue(ncid, out asset))
+            {
+                io.Write("Notecard not found");
+                return;
+            }
+            if(asset.Type != AssetType.Notecard)
+            {
+                io.Write("Not a notecard");
+                return;
+            }
+
+            Notecard nc;
+            try
+            {
+                nc = new Notecard(asset);
+            }
+            catch
+            {
+                io.Write("Not a valid notecard");
+                return;
+            }
+
+            NpcAgent agent = CreateNpc(sceneId, owner, group, args[2], args[3], position, nc, options);
+            io.WriteFormatted("Npc {0} {1} ({2}) created", agent.FirstName, agent.LastMeasuredLatencyTickCount, agent.ID);
         }
 
         private void RemoveNpcCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
