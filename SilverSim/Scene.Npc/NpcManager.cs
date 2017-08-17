@@ -485,6 +485,8 @@ namespace SilverSim.Scene.Npc
                 return;
             }
 
+            owner = scene.Owner;
+
             UUID groupid;
 
             for (int argi = 4; argi < args.Count; ++argi)
@@ -566,7 +568,7 @@ namespace SilverSim.Scene.Npc
             }
 
             NpcAgent agent = CreateNpc(sceneId, owner, group, args[2], args[3], position, nc, options);
-            io.WriteFormatted("Npc {0} {1} ({2}) created", agent.FirstName, agent.LastMeasuredLatencyTickCount, agent.ID);
+            io.WriteFormatted("Npc {0} {1} ({2}) created", agent.FirstName, agent.LastName, agent.ID);
         }
 
         private void RemoveNpcCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
