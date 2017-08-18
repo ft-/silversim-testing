@@ -132,6 +132,7 @@ namespace SilverSim.Scene.Npc
             UUID bodypartsFolder = InventoryService.Folder[ID, AssetType.Bodypart].ID;
             UUID clothingFolder = InventoryService.Folder[ID, AssetType.Clothing].ID;
             UUID objectFolder = InventoryService.Folder[ID, AssetType.Object].ID;
+            UUID currentOutfitFolder = InventoryService.Folder[ID, AssetType.CurrentOutfitFolder].ID;
             var attachmentsToRez = new List<InventoryItem>();
 
             /* generate inventory entries for wearables */
@@ -168,7 +169,8 @@ namespace SilverSim.Scene.Npc
                         InventoryType = invType,
                         AssetType = assetType,
                         Flags = (InventoryFlags)(uint)kvp.Key,
-                        Name = wInfo.ItemID.ToString()
+                        Name = wInfo.ItemID.ToString(),
+                        ParentFolderID = targetFolder
                     };
                     item.Permissions.Base = InventoryPermissionsMask.None;
                     item.Permissions.Current = InventoryPermissionsMask.None;
@@ -191,11 +193,11 @@ namespace SilverSim.Scene.Npc
                         Creator = Owner,
                         InventoryType = invType,
                         AssetType = AssetType.Link,
-                        ParentFolderID = targetFolder,
+                        AssetID = wInfo.ItemID,
+                        ParentFolderID = currentOutfitFolder,
                         Name = wInfo.AssetID.ToString(),
                         Description = "@" + layer.ToString()
                     };
-                    item.AssetID = item.ID;
                     item.Permissions.Base = InventoryPermissionsMask.All;
                     item.Permissions.Current = InventoryPermissionsMask.All;
                     item.Permissions.EveryOne = InventoryPermissionsMask.None;

@@ -191,6 +191,7 @@ namespace SilverSim.Types.Agent
                     appearanceInfo.Attachments[ap][im["item"].AsUUID] = im["asset"].AsUUID;
                 }
 
+                AgentWearables wearabledata = new AgentWearables();
                 for(int i = 0; i < wearables.Count; ++i)
                 {
                     var wearablesAt = wearables[i] as AnArray;
@@ -210,11 +211,12 @@ namespace SilverSim.Types.Agent
                             ItemID = mw["item"].AsUUID,
                             AssetID = mw["asset"].AsUUID
                         };
-                        appearanceInfo.Wearables[(WearableType)i].Add(wi);
+                        wearabledata.Add((WearableType)i, wi);
                     }
                 }
+                appearanceInfo.Wearables = wearabledata;
 
-                for(int i = 0; i < textures.Count; ++i)
+                for (int i = 0; i < textures.Count; ++i)
                 {
                     appearanceInfo.AvatarTextures[i] = textures[i].AsUUID;
                 }

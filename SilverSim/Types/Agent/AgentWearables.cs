@@ -52,6 +52,18 @@ namespace SilverSim.Types.Agent
             }
         }
 
+        public void Add(WearableType type, WearableInfo w)
+        {
+            m_WearablesUpdateLock.AcquireWriterLock(() =>
+            {
+                if(m_Wearables[type].Count >= 5)
+                {
+                    throw new ArgumentException("Too many elements in list");
+                }
+                m_Wearables[type].Add(w);
+            });
+        }
+
         #region Wearable type accessor
         public List<WearableInfo> this[WearableType type]
         {
