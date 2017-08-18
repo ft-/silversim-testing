@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Names;
@@ -69,18 +70,35 @@ namespace SilverSim.Viewer.Core
 
             foreach (var id in req.UUIDNameBlock)
             {
-                try
+                IAgent agent;
+                if (Scene.Agents.TryGetValue(id, out agent) && agent.IsNpc)
                 {
-                    var d = new UUIDNameReply.Data();
-                    UUI nd = Scene.AvatarNameService[id];
-                    d.ID = nd.ID;
-                    d.FirstName = nd.FirstName;
-                    d.LastName = nd.LastName;
+                    UUI nd = agent.Owner;
+                    var d = new UUIDNameReply.Data
+                    {
+                        ID = nd.ID,
+                        FirstName = nd.FirstName,
+                        LastName = nd.LastName
+                    };
                     rep.UUIDNameBlock.Add(d);
                 }
-                catch
+                else
                 {
-                    /* TODO: eventually make up an AvatarName lookup based on ServiceURLs */
+                    try
+                    {
+                        UUI nd = Scene.AvatarNameService[id];
+                        var d = new UUIDNameReply.Data
+                        {
+                            ID = nd.ID,
+                            FirstName = nd.FirstName,
+                            LastName = nd.LastName
+                        };
+                        rep.UUIDNameBlock.Add(d);
+                    }
+                    catch
+                    {
+                        /* TODO: eventually make up an AvatarName lookup based on ServiceURLs */
+                    }
                 }
             }
             if (rep.UUIDNameBlock.Count != 0)

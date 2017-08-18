@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -110,14 +111,22 @@ namespace SilverSim.Viewer.Core
                     foreach (var id in uuids)
                     {
                         UUI nd;
-                        try
+                        IAgent otherAgent;
+                        if (Scene.Agents.TryGetValue(id, out otherAgent) && otherAgent.IsNpc)
                         {
-                            nd = Scene.AvatarNameService[id];
+                            nd = otherAgent.Owner;
                         }
-                        catch
+                        else
                         {
-                            baduuids.Add(id);
-                            continue;
+                            try
+                            {
+                                nd = Scene.AvatarNameService[id];
+                            }
+                            catch
+                            {
+                                baduuids.Add(id);
+                                continue;
+                            }
                         }
                         if (!haveAgents)
                         {
