@@ -183,6 +183,7 @@ namespace SilverSim.Scene.Npc
                                 Group = npcInfo.Group,
                                 CurrentScene = scene
                             };
+                            m_NpcAgents.Add(npcInfo.Npc.ID, agent);
                             scene.Add(agent);
                             agent.EnableListen();
                             try
