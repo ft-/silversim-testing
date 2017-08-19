@@ -303,7 +303,7 @@ namespace SilverSim.Scene.Npc
                         RegionID = sceneid,
                         Npc = agent.Owner,
                         Owner = agent.NpcOwner,
-                        Group = agent.Group
+                        Group = agent.Group,
                     };
                     inventoryService.CheckInventory(npcInfo.Npc.ID);
                     presenceService.Store(npcInfo);
@@ -353,7 +353,7 @@ namespace SilverSim.Scene.Npc
             }
             try
             {
-                npc.PresenceService.Remove(UUID.Zero, npcId);
+                npc.NpcPresenceService.Remove(UUID.Zero, npcId);
             }
             catch
             {
