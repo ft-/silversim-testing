@@ -71,6 +71,7 @@ namespace SilverSim.Scene.Types.Scene
         ObjectPart this[UUID id] { get; }
         ObjectPart this[UInt32 localId] { get; }
         bool TryGetValue(UUID id, out ObjectPart part);
+        bool TryGetValueByName(string name, out ObjectPart part);
         bool TryGetValue(UInt32 localid, out ObjectPart part);
         int Count { get; }
     }

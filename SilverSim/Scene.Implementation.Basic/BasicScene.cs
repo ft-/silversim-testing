@@ -116,11 +116,25 @@ namespace SilverSim.Scene.Implementation.Basic
 
             public ObjectPart this[UUID id] => m_Scene.m_Primitives[id];
 
-            public ObjectPart this[UInt32 localID] => m_Scene.m_Primitives[localID];
+            public ObjectPart this[UInt32 localId] => m_Scene.m_Primitives[localId];
 
-            public bool TryGetValue(UUID id, out ObjectPart obj) => m_Scene.m_Primitives.TryGetValue(id, out obj);
+            public bool TryGetValue(UUID id, out ObjectPart part) => m_Scene.m_Primitives.TryGetValue(id, out part);
 
-            public bool TryGetValue(UInt32 localID, out ObjectPart obj) => m_Scene.m_Primitives.TryGetValue(localID, out obj);
+            public bool TryGetValue(UInt32 localid, out ObjectPart part) => m_Scene.m_Primitives.TryGetValue(localid, out part);
+
+            public bool TryGetValueByName(string name, out ObjectPart part)
+            {
+                part = null;
+                foreach(ObjectPart p in this)
+                {
+                    if(p.Name == name)
+                    {
+                        part = p;
+                        return true;
+                    }
+                }
+                return false;
+            }
 
             public int Count => m_Scene.m_PrimitiveCount;
 

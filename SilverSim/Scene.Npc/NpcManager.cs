@@ -33,6 +33,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -449,17 +450,18 @@ namespace SilverSim.Scene.Npc
             UUID ncid;
             UGI group = UGI.Unknown;
             UUI owner = UUI.Unknown;
-            if (args[0] == "help" || args.Count < 5 || !UUID.TryParse(args[4], out ncid))
+            if (args[0] == "help" || args.Count < 5)
             {
                 io.Write("create npc <firstname> <lastname> <notecardid> [params...] - Remove NPC\n" +
                     "    owner <owner>\n" + 
                     "    group <group>\n" +
                     "    position <position>\n" +
-                    "    notecard <assetid>\n" +
+                    "    notecard <assetid>|(<primname>:<itemname>)\n" +
                     "    persistent\n" +
                     "    senseasagent");
                 return;
             }
+
             UUID sceneId;
 
             if(limitedToScene != UUID.Zero)
@@ -476,14 +478,33 @@ namespace SilverSim.Scene.Npc
                 sceneId = io.SelectedScene;
             }
 
-            NpcOptions options = NpcOptions.None;
-            Vector3 position = new Vector3(128, 128, 23);
+            var options = NpcOptions.None;
+            var position = new Vector3(128, 128, 23);
 
             SceneInterface scene;
             if (!m_KnownScenes.TryGetValue(sceneId, out scene))
             {
                 io.Write("Scene not found");
                 return;
+            }
+
+            if (!UUID.TryParse(args[4], out ncid))
+            {
+                string[] parts = args[4].Split(new char[] { ':' }, 2);
+                ObjectPart part;
+                ObjectPartInventoryItem item;
+                if(parts.Length >= 2 &&
+                    scene.Primitives.TryGetValueByName(parts[0], out part) &&
+                    part.Inventory.TryGetValue(parts[1], out item) &&
+                    item.InventoryType == InventoryType.Notecard)
+                {
+                    ncid = item.AssetID;
+                }
+                else
+                {
+                    io.Write("Notecard not found by prim / item reference");
+                    return;
+                }
             }
 
             owner = scene.Owner;
