@@ -644,6 +644,7 @@ namespace SilverSim.Scene.Npc
             if (!jsondata.ContainsKey("id"))
             {
                 m_AdminWebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
+                return;
             }
             UUID npcId = jsondata["id"].AsUUID;
 
