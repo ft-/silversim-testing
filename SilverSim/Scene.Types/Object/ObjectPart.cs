@@ -1813,6 +1813,18 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(ObjectGroup.IsTempAttached);
                         break;
 
+                    case ObjectDetailsType.CreationTime:
+                        paramList.Add(CreationDate.AsULong.ToString());
+                        break;
+
+                    case ObjectDetailsType.SelectCount:
+                        paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.SitCount:
+                        paramList.Add(ObjectGroup.AgentSitting.Count);
+                        break;
+
                     case ObjectDetailsType.BodyShapeType:
                     default:
                         paramList.Add(-1);

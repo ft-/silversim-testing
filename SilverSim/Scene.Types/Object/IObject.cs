@@ -67,7 +67,10 @@ namespace SilverSim.Scene.Types.Object
         RezzerKey = 32,
         GroupTag = 33,
         TempAttached = 34,
-        AttachedSlotsAvailable = 35
+        AttachedSlotsAvailable = 35,
+        CreationTime = 36,
+        SelectCount = 37,
+        SitCount = 38
     }
 
     public enum PathfindingType

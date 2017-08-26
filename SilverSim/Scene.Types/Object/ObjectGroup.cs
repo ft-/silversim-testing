@@ -1132,6 +1132,8 @@ namespace SilverSim.Scene.Types.Object
                 return false;
             }
 
+            public int Count => m_Group.m_SittingAgents.Count;
+
             private static readonly Vector3 SIT_TARGET_OFFSET = new Vector3(0, 0, 0.4);
 
             public void Sit(IAgent agent, int preferedLinkNumber = -1)

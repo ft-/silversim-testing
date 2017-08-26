@@ -897,6 +897,15 @@ namespace SilverSim.Scene.Agent
                         paramList.Add(AngularVelocity);
                         break;
 
+                    case ObjectDetailsType.CreationTime:
+                        paramList.Add(string.Empty);
+                        break;
+
+                    case ObjectDetailsType.SelectCount:
+                    case ObjectDetailsType.SitCount:
+                        paramList.Add(0);
+                        break;
+
                     case ObjectDetailsType.RenderWeight:
                     default:
                         paramList.Add(-1);
