@@ -174,7 +174,7 @@ namespace SilverSim.Scene.Npc
         private readonly RwLockedDictionary<UUID, UUID> m_ScriptedIMSessions = new RwLockedDictionary<UUID, UUID>();
 
         public UUID GetOrCreateIMSession(UUID targetid) =>
-            m_ScriptedIMSessions.AddIfNotExists(targetid, () => UUID.Random);
+            m_ScriptedIMSessions.GetOrAddIfNotExists(targetid, () => UUID.Random);
 
         public override bool IMSend(GridInstantMessage im)
         {
