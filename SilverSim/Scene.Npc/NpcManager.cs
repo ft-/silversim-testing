@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using System.Threading;
 
 namespace SilverSim.Scene.Npc
 {
@@ -325,20 +326,33 @@ namespace SilverSim.Scene.Npc
                 }
                 agent.EnableListen();
 
-                try
-                {
-                    agent.LoadAppearanceFromNotecard(nc);
-                }
-                catch
-                {
-                    m_Log.WarnFormat("Failed to load NPC appearance {0} {1} ({2})", npcId.FirstName, npcId.LastName, npcId.ID.ToString());
-                }
-
                 scene.SendAgentObjectToAllAgents(agent);
+
+                ThreadPool.QueueUserWorkItem(LoadAppearanceFromNotecardJob, new RebakeJob { Notecard = nc, Agent = agent });
                 return agent;
             }
 
             throw new KeyNotFoundException("Scene not found");
+        }
+
+        private class RebakeJob
+        {
+            public Notecard Notecard;
+            public NpcAgent Agent;
+        }
+
+        private void LoadAppearanceFromNotecardJob(object o)
+        {
+            var job = (RebakeJob)o;
+            UUI npcId = job.Agent.Owner;
+            try
+            {
+                job.Agent.LoadAppearanceFromNotecard(job.Notecard);
+            }
+            catch
+            {
+                m_Log.WarnFormat("Failed to load NPC appearance {0} {1} ({2})", npcId.FirstName, npcId.LastName, npcId.ID.ToString());
+            }
         }
 
         private void RemoveNpcData(NpcAgent npc)
@@ -547,12 +561,9 @@ namespace SilverSim.Scene.Npc
                         break;
 
                     case "position":
-                        if(++argi < args.Count)
+                        if (++argi < args.Count && !Vector3.TryParse(args[argi], out position))
                         {
-                            if(!Vector3.TryParse(args[argi], out position))
-                            {
-                                position = new Vector3(128, 128, 23);
-                            }
+                            position = new Vector3(128, 128, 23);
                         }
                         break;
 
