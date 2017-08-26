@@ -171,10 +171,19 @@ namespace SilverSim.Scene.Npc
         }
 
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>> m_ScriptedIMListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, int>>(() => new RwLockedDictionary<UUID, int>());
+        private readonly RwLockedDictionary<UUID, UUID> m_ScriptedIMSessions = new RwLockedDictionary<UUID, UUID>();
+
+        public UUID GetOrCreateIMSession(UUID targetid) =>
+            m_ScriptedIMSessions.AddIfNotExists(targetid, () => UUID.Random);
 
         public override bool IMSend(GridInstantMessage im)
         {
-            if(im.Dialog == GridInstantMessageDialog.MessageFromAgent ||
+            if(im.Dialog == GridInstantMessageDialog.MessageFromAgent)
+            {
+                m_ScriptedIMSessions.Add(im.FromAgent.ID, im.IMSessionID);
+            }
+
+            if (im.Dialog == GridInstantMessageDialog.MessageFromAgent ||
                 im.Dialog == GridInstantMessageDialog.MessageFromObject)
             {
                 foreach (KeyValuePair<UUID, RwLockedDictionary<UUID, int>> kvp in m_ScriptedChatListeners)
@@ -236,6 +245,12 @@ namespace SilverSim.Scene.Npc
 
         private void OnChatReceive(ListenEvent ev)
         {
+            if(ev.ID == ID)
+            {
+                /* if it is this npc, ignore the chat event */
+                return;
+            }
+
             foreach(KeyValuePair<UUID, RwLockedDictionary<UUID, int>> kvp in m_ScriptedChatListeners)
             {
                 ObjectPart part;
