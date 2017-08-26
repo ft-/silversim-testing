@@ -58,6 +58,11 @@ namespace SilverSim.Scene.Npc
             DoSay(0, text);
         }
 
+        public new void SendAnimations()
+        {
+            base.SendAnimations();
+        }
+
         public void DoShout(int channel, string text)
         {
             var chatService = CurrentScene.GetService<ChatServiceInterface>();

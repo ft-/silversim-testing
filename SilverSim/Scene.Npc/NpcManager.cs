@@ -327,6 +327,7 @@ namespace SilverSim.Scene.Npc
                 agent.EnableListen();
 
                 scene.SendAgentObjectToAllAgents(agent);
+                agent.SendAnimations();
 
                 ThreadPool.QueueUserWorkItem(LoadAppearanceFromNotecardJob, new RebakeJob { Notecard = nc, Agent = agent });
                 return agent;
