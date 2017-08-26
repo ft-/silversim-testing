@@ -528,16 +528,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private bool IMSend(GridInstantMessage im)
         {
             IAgent agent;
-            try
-            {
-                agent = Agents[im.ToAgent.ID];
-            }
-            catch
-            {
-                return false;
-            }
-
-            return agent.IMSend(im);
+            return Agents.TryGetValue(im.ToAgent.ID, out agent) && agent.IMSend(im);
         }
 
         private SimulationDataStorageInterface.TerrainListener m_TerrainListener;
