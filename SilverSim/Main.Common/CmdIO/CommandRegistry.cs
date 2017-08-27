@@ -71,17 +71,13 @@ namespace SilverSim.Main.Common.CmdIO
 
         public void AddRemoveAllCommand(string cmd, Action<List<string>, TTY, UUID> handler)
         {
-            lock(m_RegisterCmdGroupLock)
+            RwLockedDictionary<string, Action<List<string>, TTY, UUID>> removecmds = CheckAddCommandType("remove", ref m_RemoveCommands);
+            lock (m_RegisterCmdGroupLock)
             {
-                if (m_RemoveCommands == null)
-                {
-                    m_RemoveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-                    Commands.Add("remove", new CommandType("remove", m_RemoveCommands).Command_Handler);
-                }
                 if (m_RemoveAllCommands == null)
                 {
                     m_RemoveAllCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-                    m_RemoveCommands.Add("all", new CommandType("all", m_RemoveAllCommands).Command_Handler);
+                    removecmds.Add("all", new SubCommandType("remove all", m_RemoveAllCommands).Command_Handler);
                 }
             }
             m_RemoveAllCommands.Add(cmd, handler);
@@ -210,7 +206,7 @@ namespace SilverSim.Main.Common.CmdIO
                     if (args[0] == "help")
                     {
                         var commands = new StringBuilder(m_Command + " command list:\n");
-                        SortedDictionary<string, Action<List<string>, TTY, UUID>> sorted = new SortedDictionary<string, Action<List<string>, TTY, UUID>>(m_Dict);
+                        var sorted = new SortedDictionary<string, Action<List<string>, TTY, UUID>>(m_Dict);
                         foreach(string cmd in sorted.Keys)
                         {
                             commands.AppendFormat("{0} {1}\n", m_Command, cmd);
@@ -226,6 +222,58 @@ namespace SilverSim.Main.Common.CmdIO
                 try
                 {
                     del = m_Dict[args[1]];
+                }
+                catch (Exception)
+                {
+                    io.WriteFormatted("Unsupported {1} command '{0}'", args[1], m_Command);
+                    return;
+                }
+
+                try
+                {
+                    del(args, io, limitedToScene);
+                }
+                catch (Exception e)
+                {
+                    io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
+                }
+            }
+        }
+
+        private sealed class SubCommandType
+        {
+            private readonly string m_Command;
+            private readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Dict;
+            public SubCommandType(string command, RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
+            {
+                m_Command = command;
+                m_Dict = dict;
+            }
+
+            public void Command_Handler(List<string> args, TTY io, UUID limitedToScene)
+            {
+                Action<List<string>, TTY, UUID> del;
+                if (args.Count < 3)
+                {
+                    if (args[0] == "help")
+                    {
+                        var commands = new StringBuilder(m_Command + " command list:\n");
+                        var sorted = new SortedDictionary<string, Action<List<string>, TTY, UUID>>(m_Dict);
+                        foreach (string cmd in sorted.Keys)
+                        {
+                            commands.AppendFormat("{0} {1}\n", m_Command, cmd);
+                        }
+                        io.Write(commands.ToString());
+                    }
+                    else
+                    {
+                        io.Write("Invalid " + m_Command + " command");
+                    }
+                    return;
+                }
+                try
+                {
+                    del = m_Dict[args[2]];
                 }
                 catch (Exception)
                 {

@@ -673,6 +673,12 @@ namespace SilverSim.Scene.Npc
                 scene = null;
             }
 
+            if(scene == null)
+            {
+                io.Write("No scene selected");
+                return;
+            }
+
             NpcAgent npc;
             var npcs = new List<UUID>();
             foreach(IAgent agent in scene.Agents)
