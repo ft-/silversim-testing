@@ -131,6 +131,9 @@ namespace SilverSim.Scene.Types.Agent
             set; /* must not replace data and not the internal reference */
         }
 
+        /** <summary>Gender parameter ranging from 0.0 (female) to 1.0 (male)</summary> **/
+        double GenderVp { get; }
+
         byte[] VisualParams { get; set; }
 
         ObjectGroup SittingOnObject { get; set; }
