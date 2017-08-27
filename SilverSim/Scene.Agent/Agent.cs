@@ -757,6 +757,22 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public double GenderVp
+        {
+            get
+            {
+                byte[] vp = m_VisualParams;
+                if(vp.Length > 32)
+                {
+                    return vp[32] / 255;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
         public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
         {
             while (enumerator.MoveNext())
@@ -878,15 +894,7 @@ namespace SilverSim.Scene.Agent
                         break;
 
                     case ObjectDetailsType.BodyShapeType:
-                        byte[] vp = VisualParams;
-                        if (vp.Length > 31)
-                        {
-                            paramList.Add(vp[31] / 255f);
-                        }
-                        else
-                        {
-                            paramList.Add(-1f);
-                        }
+                        paramList.Add(GenderVp);
                         break;
 
                     case ObjectDetailsType.ClickAction:
