@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
 using SilverSim.Scene.Types.Object;
@@ -42,6 +43,7 @@ using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
+using SilverSim.Types.Groups;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.Primitive;
@@ -49,10 +51,7 @@ using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using log4net;
-using SilverSim.Types.Groups;
 
 namespace SilverSim.Scene.Agent
 {
