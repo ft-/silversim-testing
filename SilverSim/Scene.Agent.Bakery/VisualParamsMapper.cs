@@ -52,6 +52,8 @@ namespace SilverSim.Scene.Agent.Bakery
             }
         }
 
+        private static readonly byte[] DefaultVisualParams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
+
         public static byte[] CreateVisualParams(IEnumerable<Wearable> wearables, ref double avatarHeight)
         {
             var visualParamInputs = new Dictionary<uint, double>();
@@ -70,13 +72,32 @@ namespace SilverSim.Scene.Agent.Bakery
                 }
             }
 
-            /* update visual params */
+            /* map params */
+            foreach(VisualParamMap m in m_VisualParamMapping)
+            {
+                double v;
+                if(m.OtherValues != null && m.OtherValues.Length != 0 && visualParamInputs.TryGetValue(m.ValueId, out v))
+                {
+                    foreach(uint tid in m.OtherValues)
+                    {
+                        if(!visualParamInputs.ContainsKey(tid))
+                        {
+                            visualParamInputs[tid] = v;
+                        }
+                    }
+                }
+            }
+
+            /* build visual params */
             var visualParams = new byte[numberParams];
+            /* pre-load defaults */
+            Buffer.BlockCopy(DefaultVisualParams, 0, visualParams, 0, Math.Min(DefaultVisualParams.Length, visualParams.Length));
+
             for (int p = 0; p < numberParams; ++p)
             {
                 double val;
                 var map = m_VisualParamMapping[p];
-                if (!visualParamInputs.TryGetValue((uint)map.ValueId, out val))
+                if (!visualParamInputs.TryGetValue(map.ValueId, out val))
                 {
                     val = map.DefValue;
                 }
