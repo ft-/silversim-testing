@@ -32,6 +32,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
         public class ConvexHull
         {
             public readonly List<Vector3> Vertices = new List<Vector3>();
+            /** <summary>Do not rely on triangles being defined. They are optional and only used for visual debugging.</summary> */
             public readonly List<int> Triangles = new List<int>();
         }
 
@@ -201,7 +202,6 @@ namespace SilverSim.Types.Asset.Format.Mesh
                         var v = new Vector3(
                             x, y, z);
                         hull.Vertices.Add(v.ElementMultiply(range) + min);
-                        hull.Triangles.Add(idx);
                     }
                 }
                 Hulls.Add(hull);
@@ -225,7 +225,6 @@ namespace SilverSim.Types.Asset.Format.Mesh
                     var v = new Vector3(
                         x, y, z);
                     hull.Vertices.Add(v.ElementMultiply(range) + min);
-                    hull.Triangles.Add(idx);
                 }
                 Hulls.Add(hull);
             }
