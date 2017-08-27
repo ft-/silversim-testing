@@ -29,8 +29,6 @@ namespace SilverSim.Scene.Agent.Bakery
     {
         public static void CompleteParams(Dictionary<uint, double> param)
         {
-            var contained = new List<uint>(param.Keys);
-
             foreach(VisualParamMap m in m_VisualParamMapping)
             {
                 double val;
@@ -72,20 +70,7 @@ namespace SilverSim.Scene.Agent.Bakery
             }
 
             /* map params */
-            foreach(VisualParamMap m in m_VisualParamMapping)
-            {
-                double v;
-                if(m.OtherValues != null && m.OtherValues?.Length != 0 && visualParamInputs.TryGetValue(m.ValueId, out v))
-                {
-                    foreach(uint tid in m.OtherValues)
-                    {
-                        if(!visualParamInputs.ContainsKey(tid))
-                        {
-                            visualParamInputs[tid] = v;
-                        }
-                    }
-                }
-            }
+            CompleteParams(visualParamInputs);
 
             /* build visual params */
             var visualParams = new byte[numberParams];
@@ -127,13 +112,13 @@ namespace SilverSim.Scene.Agent.Bakery
             visualParamInputs.TryGetValue(842, out vpHipLength);
 
             /* algorithm has to be verified later but it at least provides a basis */
-            avatarHeight = 1.706 + 
+            avatarHeight = 1.706 +
                 (vpLegLength * 0.1918) +
                 (vpHipLength * 0.0375) +
-                (vpHeight * 0.12022) + 
-                (vpHeadSize * 0.01117) + 
+                (vpHeight * 0.12022) +
+                (vpHeadSize * 0.01117) +
                 (vpNeckLength * 0.038) +
-                (vpHeelHeight * .08) + 
+                (vpHeelHeight * .08) +
                 (vpPlatformHeight * .07);
 
             return visualParams;
