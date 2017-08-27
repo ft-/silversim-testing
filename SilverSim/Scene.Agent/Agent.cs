@@ -879,9 +879,9 @@ namespace SilverSim.Scene.Agent
 
                     case ObjectDetailsType.BodyShapeType:
                         byte[] vp = VisualParams;
-                        if (vp.Length > 32)
+                        if (vp.Length > 31)
                         {
-                            paramList.Add(vp[32] / 255f);
+                            paramList.Add(vp[31] / 255f);
                         }
                         else
                         {

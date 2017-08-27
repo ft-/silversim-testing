@@ -76,7 +76,7 @@ namespace SilverSim.Scene.Agent.Bakery
             foreach(VisualParamMap m in m_VisualParamMapping)
             {
                 double v;
-                if(m.OtherValues != null && m.OtherValues.Length != 0 && visualParamInputs.TryGetValue(m.ValueId, out v))
+                if(m.OtherValues != null && m.OtherValues?.Length != 0 && visualParamInputs.TryGetValue(m.ValueId, out v))
                 {
                     foreach(uint tid in m.OtherValues)
                     {
@@ -93,15 +93,19 @@ namespace SilverSim.Scene.Agent.Bakery
             /* pre-load defaults */
             Buffer.BlockCopy(DefaultVisualParams, 0, visualParams, 0, Math.Min(DefaultVisualParams.Length, visualParams.Length));
 
-            for (int p = 0; p < numberParams; ++p)
+            foreach(VisualParamMap map in m_VisualParamMapping)
             {
                 double val;
-                var map = m_VisualParamMapping[p];
+                if(map.ValueId >= numberParams)
+                {
+                    break;
+                }
+
                 if (!visualParamInputs.TryGetValue(map.ValueId, out val))
                 {
                     val = map.DefValue;
                 }
-                visualParams[p] = DoubleToByte(val, map.MinValue, map.MaxValue);
+                visualParams[map.ValueId] = DoubleToByte(val, map.MinValue, map.MaxValue);
             }
 
             double vpHeight;
