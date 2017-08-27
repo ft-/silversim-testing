@@ -40,6 +40,7 @@ namespace SilverSim.Main.Common.CmdIO
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ChangeCommands;
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_ClearCommands;
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RemoveCommands;
+        private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RemoveAllCommands;
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_EmptyCommands;
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_StartCommands;
         private RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_RestartCommands;
@@ -66,6 +67,24 @@ namespace SilverSim.Main.Common.CmdIO
                 }
                 return dict;
             }
+        }
+
+        public void AddRemoveAllCommand(string cmd, Action<List<string>, TTY, UUID> handler)
+        {
+            lock(m_RegisterCmdGroupLock)
+            {
+                if (m_RemoveCommands == null)
+                {
+                    m_RemoveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+                    Commands.Add("remove", new CommandType("remove", m_RemoveCommands).Command_Handler);
+                }
+                if (m_RemoveAllCommands == null)
+                {
+                    m_RemoveAllCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+                    m_RemoveCommands.Add("all", new CommandType("all", m_RemoveAllCommands).Command_Handler);
+                }
+            }
+            m_RemoveAllCommands.Add(cmd, handler);
         }
 
         public void AddCreateCommand(string cmd, Action<List<string>, TTY, UUID> handler)

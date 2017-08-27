@@ -147,6 +147,7 @@ namespace SilverSim.Scene.Npc
             loader.CommandRegistry.AddShowCommand("npcs", ShowNpcsCommand);
             loader.CommandRegistry.AddRemoveCommand("npc", RemoveNpcCommand);
             loader.CommandRegistry.AddCreateCommand("npc", CreateNpcCommand);
+            loader.CommandRegistry.AddRemoveAllCommand("npcs", RemoveAllNpcsCommand);
         }
 
         private readonly RwLockedDictionary<UUID, SceneInterface> m_KnownScenes = new RwLockedDictionary<UUID, SceneInterface>();
@@ -645,6 +646,82 @@ namespace SilverSim.Scene.Npc
                 RemoveNpcData(npc);
                 io.Write("Npc removed");
             }
+        }
+
+        private void RemoveAllNpcsCommand(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("remove all npcs - Remove all NPCs\n" +
+                    "remove all npcs persistentonly - Remove all persistent npcs\n" +
+                    "remove all npcs nonpersistentonly - Remove all non-persistent npcs");
+                return;
+            }
+
+            bool persistentonly = (args.Count > 3 && args[3] == "persistentonly");
+            bool nonpersistentonly = (args.Count > 3 && args[3] == "nonpersistentonly");
+
+            UUID selectedScene = io.SelectedScene;
+            if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+
+            SceneInterface scene;
+            if (!m_KnownScenes.TryGetValue(selectedScene, out scene))
+            {
+                scene = null;
+            }
+
+            NpcAgent npc;
+            var npcs = new List<UUID>();
+            foreach(IAgent agent in scene.Agents)
+            {
+                if(agent.IsNpc)
+                {
+                    npcs.Add(agent.ID);
+                }
+            }
+
+            var formattedListBuilder = new FormattedListBuilder();
+            formattedListBuilder.AddColumn("NPC", 40);
+            formattedListBuilder.AddColumn("Status", 20);
+            formattedListBuilder.AddHeader();
+            formattedListBuilder.AddSeparator();
+            foreach (UUID id in npcs)
+            {
+                if (!m_NpcAgents.TryGetValue(id, out npc))
+                {
+                    formattedListBuilder.AddData(id, "Not found");
+                }
+                else if (scene != null && npc.CurrentScene != scene)
+                {
+                    formattedListBuilder.AddData(id, "Not in region");
+                }
+                else if (!m_NpcAgents.Remove(id, out npc))
+                {
+                    formattedListBuilder.AddData(id, "Skipped");
+                }
+                else if((persistentonly && npc.NpcPresenceService != m_NpcPresenceService) ||
+                    (nonpersistentonly && npc.NpcPresenceService == m_NpcPresenceService))
+                {
+                    /* skip non-persistent */
+                }
+                else
+                {
+                    try
+                    {
+                        npc.CurrentScene.Remove(npc);
+                        RemoveNpcData(npc);
+                        formattedListBuilder.AddData(id, "Removed");
+                    }
+                    catch
+                    {
+                        formattedListBuilder.AddData(id, "Failed to remove");
+                    }
+                }
+            }
+            io.Write(formattedListBuilder.ToString());
         }
         #endregion
 
