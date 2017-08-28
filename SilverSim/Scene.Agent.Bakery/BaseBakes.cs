@@ -28,6 +28,7 @@ namespace SilverSim.Scene.Agent.Bakery
 {
     internal static class BaseBakes
     {
+        public static readonly AvatarLad DefaultAvatarLad = new AvatarLad();
         public static Image HeadAlpha { get; }
         public static Image HeadColor { get; }
         public static Image HeadHair { get; }

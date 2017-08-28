@@ -349,7 +349,7 @@ namespace SilverSim.Scene.Agent.Bakery
                                 dstAlphaMask = GetRawData(tgtimg);
                             }
 
-                            using (Bitmap srcbmp = new Bitmap(srcimg))
+                            using (var srcbmp = new Bitmap(srcimg))
                             {
                                 srcAlphaMask = GetRawData(srcbmp);
                             }

@@ -29,10 +29,10 @@ namespace SilverSim.Scene.Agent.Bakery
     {
         public static void CompleteParams(Dictionary<uint, double> param)
         {
-            foreach(VisualParamMap m in m_VisualParamMapping)
+            foreach (VisualParamMap m in m_VisualParamMapping)
             {
                 double val;
-                if(param.TryGetValue(m.ValueId, out val))
+                if (param.TryGetValue(m.ValueId, out val))
                 {
                     val = val.LimitRange(m.MinValue, m.MaxValue);
                     if (m.OtherValues != null)
@@ -77,10 +77,10 @@ namespace SilverSim.Scene.Agent.Bakery
             /* pre-load defaults */
             Buffer.BlockCopy(DefaultVisualParams, 0, visualParams, 0, Math.Min(DefaultVisualParams.Length, visualParams.Length));
 
-            foreach(VisualParamMap map in m_VisualParamMapping)
+            foreach (VisualParamMap map in m_VisualParamMapping)
             {
                 double val;
-                if(map.ValueId >= numberParams)
+                if (map.ValueId >= numberParams)
                 {
                     break;
                 }

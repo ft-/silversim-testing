@@ -19,26 +19,31 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Xml;
-using SilverSim.Types;
-using System.Globalization;
-using System;
 
 namespace SilverSim.Scene.Agent.Bakery
 {
     public sealed class AvatarLad
     {
-        private readonly Dictionary<uint, VisualParam> m_VisualParameters = new Dictionary<uint, VisualParam>();
+        public Dictionary<uint, VisualParam> VisualParams { get; }
         private readonly List<DriverParam> m_DriverParams = new List<DriverParam>();
+        private readonly List<VisualParam> m_VisualParamsTarget = new List<VisualParam>();
 
         private DriverParam[] m_DriverParamArray;
+        private VisualParam[] m_VisualParamTargetArray;
 
         public DriverParam[] DriverParams => m_DriverParamArray != null ? m_DriverParamArray : m_DriverParamArray = m_DriverParams.ToArray();
 
+        public VisualParam[] VisualParamsTarget => m_VisualParamTargetArray != null ? m_VisualParamTargetArray : m_VisualParamTargetArray = m_VisualParamsTarget.ToArray();
+
         public AvatarLad()
         {
+            VisualParams = new Dictionary<uint, VisualParam>();
             var assembly = typeof(AvatarLad).Assembly;
             using (Stream resource = assembly.GetManifestResourceStream(assembly.GetName().Name + ".Resources.avatar_lad.xml"))
             {
@@ -438,7 +443,11 @@ namespace SilverSim.Scene.Agent.Bakery
 
                         if (!isshared)
                         {
-                            m_VisualParameters.Add(vp.Id, vp);
+                            VisualParams.Add(vp.Id, vp);
+                            if (vp.Id <= 255)
+                            {
+                                m_VisualParamsTarget.Add(vp);
+                            }
                         }
                         return;
                 }
@@ -473,6 +482,7 @@ namespace SilverSim.Scene.Agent.Bakery
                         {
                             case "driven":
                                 string drivVal;
+                                bool haveweight = attrs.ContainsKey("min1") || attrs.ContainsKey("min2") || attrs.ContainsKey("max1") || attrs.ContainsKey("max2");
                                 double min1 = attrs.TryGetValue("min1", out drivVal) ? double.Parse(drivVal, CultureInfo.InvariantCulture) : 0;
                                 double min2 = attrs.TryGetValue("min2", out drivVal) ? double.Parse(drivVal, CultureInfo.InvariantCulture) : 0;
                                 double max1 = attrs.TryGetValue("max1", out drivVal) ? double.Parse(drivVal, CultureInfo.InvariantCulture) : 0;
@@ -480,7 +490,8 @@ namespace SilverSim.Scene.Agent.Bakery
                                 m_DriverParams.Add(new DriverParam(vp.Id,
                                     uint.Parse(attrs["id"]),
                                     min1, max1,
-                                    min2, max2));
+                                    min2, max2,
+                                    haveweight));
                                 goto default;
 
                             default:
@@ -575,8 +586,9 @@ namespace SilverSim.Scene.Agent.Bakery
             public double Min2 { get; }
             public double Max1 { get; }
             public double Max2 { get; }
+            public bool HaveWeight { get; }
 
-            public DriverParam(uint fromid, uint toid, double min1, double max1, double min2, double max2)
+            public DriverParam(uint fromid, uint toid, double min1, double max1, double min2, double max2, bool haveweight)
             {
                 FromId = fromid;
                 ToId = toid;
@@ -584,6 +596,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 Max1 = max1;
                 Min2 = min2;
                 Max2 = max2;
+                HaveWeight = haveweight;
             }
         }
 
