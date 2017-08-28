@@ -194,7 +194,6 @@ namespace SilverSim.Scene.Agent.Bakery
             }
         }
 
-
         private void ParseLindenAvatarDriverParameters(XmlTextReader reader, Dictionary<string, string> attrs, bool isEmptyElementOutside)
         {
             if (isEmptyElementOutside)
