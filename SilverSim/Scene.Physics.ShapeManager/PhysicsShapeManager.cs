@@ -44,7 +44,12 @@ namespace SilverSim.Scene.Physics.ShapeManager
         private AssetServiceInterface m_AssetService;
         private SimulationDataStorageInterface m_SimulationStorage;
 
-        private readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesBySculptMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
+        private string GetMeshKey(UUID meshid, PrimitivePhysicsShapeType physicsShape)
+        {
+            return string.Format("{0}-{1}", meshid, (int)physicsShape);
+        }
+
+        private readonly RwLockedDictionary<string, PhysicsConvexShape> m_ConvexShapesBySculptMesh = new RwLockedDictionary<string, PhysicsConvexShape>();
         private readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
 
         private readonly string m_AssetServiceName;
@@ -55,15 +60,17 @@ namespace SilverSim.Scene.Physics.ShapeManager
         public sealed class PhysicsShapeMeshReference : PhysicsShapeReference
         {
             private readonly UUID m_ID;
-            internal PhysicsShapeMeshReference(UUID id, PhysicsShapeManager manager, PhysicsConvexShape shape)
+            private readonly PrimitivePhysicsShapeType m_ShapeType;
+            internal PhysicsShapeMeshReference(UUID id, PrimitivePhysicsShapeType shapeType, PhysicsShapeManager manager, PhysicsConvexShape shape)
                 : base(manager, shape)
             {
                 m_ID = id;
+                m_ShapeType = shapeType;
             }
 
             ~PhysicsShapeMeshReference()
             {
-                m_PhysicsManager.DecrementUseCount(m_ID, m_ConvexShape);
+                m_PhysicsManager.DecrementUseCount(m_ID, m_ShapeType, m_ConvexShape);
             }
         }
 
@@ -189,11 +196,11 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
-        internal void DecrementUseCount(UUID id, PhysicsConvexShape shape)
+        internal void DecrementUseCount(UUID id, PrimitivePhysicsShapeType physicsShape, PhysicsConvexShape shape)
         {
             if (0 == Interlocked.Decrement(ref shape.UseCount))
             {
-                m_Lock.AcquireWriterLock(() => m_ConvexShapesBySculptMesh.RemoveIf(id, (PhysicsConvexShape s) => s.UseCount == 0));
+                m_Lock.AcquireWriterLock(() => m_ConvexShapesBySculptMesh.RemoveIf(GetMeshKey(id, physicsShape), (PhysicsConvexShape s) => s.UseCount == 0));
             }
         }
 
@@ -289,9 +296,9 @@ namespace SilverSim.Scene.Physics.ShapeManager
             UUID meshId = shape.SculptMap;
             bool s = m_Lock.AcquireReaderLock(() =>
             {
-                if (m_ConvexShapesBySculptMesh.TryGetValue(meshId, out physicshape))
+                if (m_ConvexShapesBySculptMesh.TryGetValue(GetMeshKey(meshId, physicsShape), out physicshape))
                 {
-                    physicshaperes = new PhysicsShapeMeshReference(meshId, this, physicshape);
+                    physicshaperes = new PhysicsShapeMeshReference(meshId, physicsShape, this, physicshape);
                     return true;
                 }
                 return false;
@@ -308,7 +315,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
                 physicshape = ConvertToMesh(physicsShape, shape);
-                m_SimulationStorage.PhysicsConvexShapes[meshId] = physicshape;
+                m_SimulationStorage.PhysicsConvexShapes[meshId, physicsShape] = physicshape;
             }
 
             /* we only lock out the decrement use count here */
@@ -316,13 +323,13 @@ namespace SilverSim.Scene.Physics.ShapeManager
             {
                 try
                 {
-                    m_ConvexShapesBySculptMesh.Add(meshId, physicshape);
+                    m_ConvexShapesBySculptMesh.Add(GetMeshKey(meshId, physicsShape), physicshape);
                 }
                 catch
                 {
-                    physicshape = m_ConvexShapesBySculptMesh[meshId];
+                    physicshape = m_ConvexShapesBySculptMesh[GetMeshKey(meshId, physicsShape)];
                 }
-                return new PhysicsShapeMeshReference(meshId, this, physicshape);
+                return new PhysicsShapeMeshReference(meshId, physicsShape, this, physicshape);
             });
 
             return true;

@@ -23,20 +23,20 @@ using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Scene.Types.Object;
 using System.Collections.Generic;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public interface ISimulationDataPhysicsConvexStorageInterface
     {
-        PhysicsConvexShape this[UUID meshid] { get;  set; }
+        PhysicsConvexShape this[UUID meshid, PrimitivePhysicsShapeType physicsShape] { get;  set; }
         PhysicsConvexShape this[ObjectPart.PrimitiveShape primShape] { get;  set; }
-        bool TryGetValue(UUID meshid, out PhysicsConvexShape shape);
+        bool TryGetValue(UUID meshid, PrimitivePhysicsShapeType physicsShape, out PhysicsConvexShape shape);
         bool TryGetValue(ObjectPart.PrimitiveShape primShape, out PhysicsConvexShape shape);
-        bool ContainsKey(UUID meshid);
+        bool ContainsKey(UUID meshid, PrimitivePhysicsShapeType physicsShape);
         bool ContainsKey(ObjectPart.PrimitiveShape primShape);
-        bool Remove(UUID meshid);
+        bool Remove(UUID meshid, PrimitivePhysicsShapeType physicsShape);
         bool Remove(ObjectPart.PrimitiveShape primShape);
         void RemoveAll();
-        ICollection<UUID> KnownMeshIds { get; }
     }
 }

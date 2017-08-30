@@ -25,20 +25,24 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
-using System.Collections.Generic;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
     partial class MemorySimulationDataStorage : ISimulationDataPhysicsConvexStorageInterface, IPhysicsHacdCleanCache
     {
-        private readonly RwLockedDictionary<UUID, PhysicsConvexShape> m_ConvexShapesByMesh = new RwLockedDictionary<UUID, PhysicsConvexShape>();
+        private static string GetMeshKey(UUID meshid, PrimitivePhysicsShapeType physicsShape)
+        {
+            return string.Format("{0}-{1}", meshid, (int)physicsShape);
+        }
+        private readonly RwLockedDictionary<string, PhysicsConvexShape> m_ConvexShapesByMesh = new RwLockedDictionary<string, PhysicsConvexShape>();
         private readonly RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape> m_ConvexShapesByPrimShape = new RwLockedDictionary<ObjectPart.PrimitiveShape, PhysicsConvexShape>();
 
-        PhysicsConvexShape ISimulationDataPhysicsConvexStorageInterface.this[UUID meshid]
+        PhysicsConvexShape ISimulationDataPhysicsConvexStorageInterface.this[UUID meshid, PrimitivePhysicsShapeType physicsShape]
         {
-            get { return m_ConvexShapesByMesh[meshid]; }
+            get { return m_ConvexShapesByMesh[GetMeshKey(meshid, physicsShape)]; }
 
-            set { m_ConvexShapesByMesh[meshid] = value; }
+            set { m_ConvexShapesByMesh[GetMeshKey(meshid, physicsShape)] = value; }
         }
 
         PhysicsConvexShape ISimulationDataPhysicsConvexStorageInterface.this[ObjectPart.PrimitiveShape primShape]
@@ -48,25 +52,23 @@ namespace SilverSim.Database.Memory.SimulationData
             set { m_ConvexShapesByPrimShape[primShape] = value; }
         }
 
-        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, out PhysicsConvexShape shape) =>
-            m_ConvexShapesByMesh.TryGetValue(meshid, out shape);
+        bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(UUID meshid, PrimitivePhysicsShapeType physicsShape, out PhysicsConvexShape shape) =>
+            m_ConvexShapesByMesh.TryGetValue(GetMeshKey(meshid, physicsShape), out shape);
 
         bool ISimulationDataPhysicsConvexStorageInterface.TryGetValue(ObjectPart.PrimitiveShape primShape, out PhysicsConvexShape shape) =>
             m_ConvexShapesByPrimShape.TryGetValue(primShape, out shape);
 
-        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(UUID meshid) =>
-            m_ConvexShapesByMesh.ContainsKey(meshid);
+        bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(UUID meshid, PrimitivePhysicsShapeType physicsShape) =>
+            m_ConvexShapesByMesh.ContainsKey(GetMeshKey(meshid, physicsShape));
 
         bool ISimulationDataPhysicsConvexStorageInterface.ContainsKey(ObjectPart.PrimitiveShape primShape) =>
             m_ConvexShapesByPrimShape.ContainsKey(primShape);
 
-        bool ISimulationDataPhysicsConvexStorageInterface.Remove(UUID meshid) =>
-            m_ConvexShapesByMesh.Remove(meshid);
+        bool ISimulationDataPhysicsConvexStorageInterface.Remove(UUID meshid, PrimitivePhysicsShapeType physicsShape) =>
+            m_ConvexShapesByMesh.Remove(GetMeshKey(meshid, physicsShape));
 
         bool ISimulationDataPhysicsConvexStorageInterface.Remove(ObjectPart.PrimitiveShape primShape) =>
             m_ConvexShapesByPrimShape.Remove(primShape);
-
-        ICollection<UUID> ISimulationDataPhysicsConvexStorageInterface.KnownMeshIds => m_ConvexShapesByMesh.Keys;
 
         void ISimulationDataPhysicsConvexStorageInterface.RemoveAll()
         {
