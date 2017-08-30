@@ -310,7 +310,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
 
 #if !DEBUG
-            if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(meshId, out physicshape))
+            if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(meshId, physicsShape, out physicshape))
 #endif
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
