@@ -205,76 +205,71 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
-        public bool TryGetConvexShape(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physics)
+        public bool TryGetConvexShape(PrimitivePhysicsShapeType physicsShape, ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physics)
         {
             if(shape.Type == PrimitiveShapeType.Sculpt)
             {
                 switch(shape.SculptType)
                 {
                     case PrimitiveSculptType.Mesh:
-                        return TryGetConvexShapeFromMesh(shape, out physics);
+                        return TryGetConvexShapeFromMesh(physicsShape, shape, out physics);
 
                     default:
                         /* calculate convex from sculpt */
-                        return TryGetConvexShapeFromPrim(shape, out physics);
+                        return TryGetConvexShapeFromPrim(physicsShape, shape, out physics);
                 }
             }
             else
             {
                 /* calculate convex from prim mesh */
-                return TryGetConvexShapeFromPrim(shape, out physics);
+                return TryGetConvexShapeFromPrim(physicsShape, shape, out physics);
             }
         }
 
-        private PhysicsConvexShape ConvertToMesh(ObjectPart.PrimitiveShape shape)
+        private PhysicsConvexShape ConvertToMesh(PrimitivePhysicsShapeType physicsShape, ObjectPart.PrimitiveShape shape)
         {
             PhysicsConvexShape convexShape = null;
             bool hasHullList = false;
             if (shape.Type == PrimitiveShapeType.Sculpt && shape.SculptType == PrimitiveSculptType.Mesh)
             {
                 var m = new LLMesh(m_AssetService[shape.SculptMap]);
-                if(m.HasConvexPhysics())
+                if(physicsShape == PrimitivePhysicsShapeType.Convex)
                 {
-                    try
+                    if (m.HasConvexPhysics())
                     {
-                        convexShape = m.GetConvexPhysics();
-                        hasHullList = convexShape.HasHullList;
-                    }
-                    catch
-                    {
-                        /* skip broken convex hulls */
+                        try
+                        {
+                            convexShape = m.GetConvexPhysics(false);
+                            hasHullList = convexShape.HasHullList;
+                            return convexShape;
+                        }
+                        catch
+                        {
+                            /* no shape */
+                        }
                     }
                 }
-                if(!hasHullList && m.HasLOD(LLMesh.LodLevel.Physics))
+                else
                 {
-                    /* check for physics mesh before giving out the single hull */
-                    MeshLOD lod = m.GetLOD(LLMesh.LodLevel.Physics);
-                    lod.Optimize();
-                    convexShape = DecomposeConvex(lod);
-                }
-
-                if(convexShape == null)
-                {
-                    /* go for visual LODs */
-                    MeshLOD lod;
-                    if(m.HasLOD(LLMesh.LodLevel.LOD0))
+                    if (m.HasLOD(LLMesh.LodLevel.Physics))
                     {
-                        lod = m.GetLOD(LLMesh.LodLevel.LOD0);
+                        /* check for physics mesh before giving out the single hull */
+                        MeshLOD lod = m.GetLOD(LLMesh.LodLevel.Physics);
+                        lod.Optimize();
+                        convexShape = DecomposeConvex(lod);
                     }
-                    else if (m.HasLOD(LLMesh.LodLevel.LOD1))
+                    else if(m.HasConvexPhysics())
                     {
-                        lod = m.GetLOD(LLMesh.LodLevel.LOD1);
+                        try
+                        {
+                            convexShape = m.GetConvexPhysics(true);
+                            hasHullList = convexShape.HasHullList;
+                        }
+                        catch
+                        {
+                            /* no shape */
+                        }
                     }
-                    else if (m.HasLOD(LLMesh.LodLevel.LOD2))
-                    {
-                        lod = m.GetLOD(LLMesh.LodLevel.LOD2);
-                    }
-                    else
-                    {
-                        lod = m.GetLOD(LLMesh.LodLevel.LOD3);
-                    }
-
-                    convexShape = DecomposeConvex(lod);
                 }
             }
             else
@@ -287,7 +282,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             return convexShape;
         }
 
-        private bool TryGetConvexShapeFromMesh(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
+        private bool TryGetConvexShapeFromMesh(PrimitivePhysicsShapeType physicsShape, ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
             PhysicsConvexShape physicshape;
             PhysicsShapeReference physicshaperes = null;
@@ -312,7 +307,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 #endif
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
-                physicshape = ConvertToMesh(shape);
+                physicshape = ConvertToMesh(physicsShape, shape);
                 m_SimulationStorage.PhysicsConvexShapes[meshId] = physicshape;
             }
 
@@ -333,7 +328,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             return true;
         }
 
-        private bool TryGetConvexShapeFromPrim(ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
+        private bool TryGetConvexShapeFromPrim(PrimitivePhysicsShapeType physicsShape, ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physicshaperef)
         {
             PhysicsConvexShape physicshape;
             PhysicsShapeReference physicshaperes = null;
@@ -357,7 +352,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 #endif
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
-                physicshape = ConvertToMesh(shape);
+                physicshape = ConvertToMesh(physicsShape, shape);
                 m_SimulationStorage.PhysicsConvexShapes[shape] = physicshape;
             }
 

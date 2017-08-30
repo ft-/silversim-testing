@@ -63,7 +63,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
         public bool HasConvexPhysics() => m_MeshData.ContainsKey("physics_convex");
 
-        public PhysicsConvexShape GetConvexPhysics()
+        public PhysicsConvexShape GetConvexPhysics(bool uselist)
         {
             IValue iv;
             if (!m_MeshData.TryGetValue("physics_convex", out iv))
@@ -85,7 +85,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 throw new NotAMeshFormatException();
             }
 
-            return new PhysicsConvexShape(m_AssetData, physOffset, physSize);
+            return new PhysicsConvexShape(m_AssetData, physOffset, physSize, uselist);
         }
 
         public bool HasLOD(LodLevel level)

@@ -44,9 +44,9 @@ namespace SilverSim.Types.Asset.Format.Mesh
         {
         }
 
-        public PhysicsConvexShape(byte[] data, int physOffset, int physSize)
+        public PhysicsConvexShape(byte[] data, int physOffset, int physSize, bool uselist)
         {
-            Load(data, physOffset, physSize);
+            Load(data, physOffset, physSize, uselist);
         }
 
         private static int LEBytesToInt32(byte[] b, int offset)
@@ -154,7 +154,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
         }
 
-        public void Load(byte[] data, int physOffset, int physSize)
+        public void Load(byte[] data, int physOffset, int physSize, bool uselist)
         {
             physOffset += 2;
             physSize -= 2;
@@ -180,7 +180,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             Hulls.Clear();
             HasHullList = false;
 
-            if(physics_convex.ContainsKey("HullList") && physics_convex.ContainsKey("Positions"))
+            if(physics_convex.ContainsKey("HullList") && physics_convex.ContainsKey("Positions") && uselist)
             {
                 /* we have to take multiple hulls */
                 byte[] hullList = (BinaryData)physics_convex["HullList"];
@@ -207,7 +207,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 Hulls.Add(hull);
                 HasHullList = true;
             }
-            else if(physics_convex.ContainsKey("BoundingVerts"))
+            else if(physics_convex.ContainsKey("BoundingVerts") && !uselist)
             {
                 byte[] positions = (BinaryData)physics_convex["BoundingVerts"];
                 int hullElements = positions.Length / 6;
