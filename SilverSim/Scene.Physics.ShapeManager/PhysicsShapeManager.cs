@@ -276,6 +276,18 @@ namespace SilverSim.Scene.Physics.ShapeManager
                         {
                             /* no shape */
                         }
+                        if(convexShape == null)
+                        {
+                            try
+                            {
+                                convexShape = m.GetConvexPhysics(false);
+                                hasHullList = convexShape.HasHullList;
+                            }
+                            catch
+                            {
+                                /* no shape */
+                            }
+                        }
                     }
                 }
             }
@@ -315,6 +327,11 @@ namespace SilverSim.Scene.Physics.ShapeManager
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
                 physicshape = ConvertToMesh(physicsShape, shape);
+                if(physicshape == null)
+                {
+                    physicshaperef = null;
+                    return false;
+                }
                 m_SimulationStorage.PhysicsConvexShapes[meshId, physicsShape] = physicshape;
             }
 
