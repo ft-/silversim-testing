@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using System.Linq;
 
 namespace SilverSim.Scene.Agent.Bakery
 {
@@ -82,6 +83,48 @@ namespace SilverSim.Scene.Agent.Bakery
                     }
                 }
             }
+
+            foreach (VisualParam vp in VisualParams.Values.OrderBy(e => e.Id))
+            {
+                if(vp.Group == 0 || vp.Group == 3)
+                {
+                    m_VisualParamsTarget.Add(vp);
+                }
+            }
+        }
+
+        public void ReadToEndElementNoParamElement(XmlTextReader reader, string tagname = null)
+        {
+            if (string.IsNullOrEmpty(tagname))
+            {
+                tagname = reader.Name;
+            }
+            XmlNodeType nodeType = reader.NodeType;
+            if ((nodeType == XmlNodeType.Element || nodeType == XmlNodeType.Attribute) && !reader.IsEmptyElement)
+            {
+                do
+                {
+                    nextelem:
+                    if (!reader.Read())
+                    {
+                        throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
+                    }
+                    nodeType = reader.NodeType;
+                    if (nodeType == XmlNodeType.Element)
+                    {
+                        if(reader.Name == "param")
+                        {
+                            throw new InvalidDataException("Unparsed param element found");
+                        }
+                        ReadToEndElementNoParamElement(reader);
+                        goto nextelem;
+                    }
+                } while (nodeType != XmlNodeType.EndElement);
+                if (tagname != reader.Name)
+                {
+                    throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
+                }
+            }
         }
 
         private void ParseLindenAvatar(XmlTextReader reader)
@@ -127,10 +170,18 @@ namespace SilverSim.Scene.Agent.Bakery
                                 ParseLindenAvatarSkeleton(reader, attrs, isEmptyElement);
                                 break;
 
+                            case "layer_set":
+                                ParseLindenAvatarLayerSet(reader, attrs, isEmptyElement);
+                                break;
+
+                            case "driver_parameters":
+                                ParseLindenAvatarDriverParameters(reader, attrs, isEmptyElement);
+                                break;
+
                             default:
                                 if (!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement(elementName);
+                                    ReadToEndElementNoParamElement(reader, elementName);
                                 }
                                 break;
                         }
@@ -140,6 +191,116 @@ namespace SilverSim.Scene.Agent.Bakery
                         if(reader.Name != "linden_avatar")
                         {
                             throw new InvalidDataException("invalid linden_avatar.xml");
+                        }
+                        return;
+                }
+            }
+        }
+
+        private void ParseLindenAvatarLayerSet(XmlTextReader reader, Dictionary<string, string> attrs, bool isEmptyElementOutside)
+        {
+            if (isEmptyElementOutside)
+            {
+                return;
+            }
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidDataException("Invalid linden_avatar.xml");
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        bool isEmptyElement = reader.IsEmptyElement;
+                        string elementName = reader.Name;
+                        attrs.Clear();
+                        if (reader.MoveToFirstAttribute())
+                        {
+                            do
+                            {
+                                attrs.Add(reader.Name, reader.Value);
+                            }
+                            while (reader.MoveToNextAttribute());
+                        }
+
+                        switch (elementName)
+                        {
+                            case "param":
+                                ParseLindenAvatarParam(reader, attrs);
+                                break;
+
+                            case "layer":
+                                ParseLindenAvatarLayer(reader, attrs, isEmptyElement);
+                                break;
+
+                            default:
+                                if (!isEmptyElement)
+                                {
+                                    ReadToEndElementNoParamElement(reader, elementName);
+                                }
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "layer_set")
+                        {
+                            throw new InvalidDataException("Invalid linden_avatar.xml");
+                        }
+                        return;
+                }
+            }
+        }
+
+        private void ParseLindenAvatarLayer(XmlTextReader reader, Dictionary<string, string> attrs, bool isEmptyElementOutside)
+        {
+            if (isEmptyElementOutside)
+            {
+                return;
+            }
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidDataException("Invalid linden_avatar.xml");
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        bool isEmptyElement = reader.IsEmptyElement;
+                        string elementName = reader.Name;
+                        attrs.Clear();
+                        if (reader.MoveToFirstAttribute())
+                        {
+                            do
+                            {
+                                attrs.Add(reader.Name, reader.Value);
+                            }
+                            while (reader.MoveToNextAttribute());
+                        }
+
+                        switch (elementName)
+                        {
+                            case "param":
+                                ParseLindenAvatarParam(reader, attrs);
+                                break;
+
+                            default:
+                                if (!isEmptyElement)
+                                {
+                                    ReadToEndElementNoParamElement(reader, elementName);
+                                }
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "layer")
+                        {
+                            throw new InvalidDataException("Invalid linden_avatar.xml");
                         }
                         return;
                 }
@@ -183,7 +344,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             default:
                                 if (!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement(elementName);
+                                    ReadToEndElementNoParamElement(reader, elementName);
                                 }
                                 break;
                         }
@@ -236,7 +397,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             default:
                                 if (!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement(elementName);
+                                    ReadToEndElementNoParamElement(reader, elementName);
                                 }
                                 break;
                         }
@@ -289,7 +450,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             default:
                                 if (!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement(elementName);
+                                    ReadToEndElementNoParamElement(reader, elementName);
                                 }
                                 break;
                         }
@@ -342,7 +503,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             default:
                                 if (!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement(elementName);
+                                    ReadToEndElementNoParamElement(reader, elementName);
                                 }
                                 break;
                         }
@@ -366,6 +527,11 @@ namespace SilverSim.Scene.Agent.Bakery
             double maxValue;
             double defValue;
             string defValueStr;
+            uint group = uint.MaxValue;
+            if(attrs.ContainsKey("group"))
+            {
+                group = uint.Parse(attrs["group"]);
+            }
             vpId = uint.Parse(attrs["id"]);
             if(!attrs.TryGetValue("name", out vpName))
             {
@@ -386,7 +552,7 @@ namespace SilverSim.Scene.Agent.Bakery
             }
             bool isshared = attrs.ContainsKey("shared");
 
-            var vp = new VisualParam(vpId, vpName, minValue, maxValue, defValue);
+            var vp = new VisualParam(group, vpId, vpName, minValue, maxValue, defValue);
 
             for (; ;)
             {
@@ -429,7 +595,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             default:
                                 if(!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement(elementName);
+                                    ReadToEndElementNoParamElement(reader, elementName);
                                 }
                                 break;
                         }
@@ -444,10 +610,6 @@ namespace SilverSim.Scene.Agent.Bakery
                         if (!isshared)
                         {
                             VisualParams.Add(vp.Id, vp);
-                            if (vp.Id <= 255)
-                            {
-                                m_VisualParamsTarget.Add(vp);
-                            }
                         }
                         return;
                 }
@@ -497,7 +659,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             default:
                                 if (!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement();
+                                    ReadToEndElementNoParamElement(reader);
                                 }
                                 break;
                         }
@@ -562,7 +724,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             default:
                                 if (!isEmptyElement)
                                 {
-                                    reader.ReadToEndElement();
+                                    ReadToEndElementNoParamElement(reader);
                                 }
                                 break;
                         }
@@ -616,6 +778,7 @@ namespace SilverSim.Scene.Agent.Bakery
 
         public sealed class VisualParam
         {
+            public uint Group { get; }
             public uint Id { get; }
             public string Name { get; }
             public double MinimumValue { get; }
@@ -623,8 +786,9 @@ namespace SilverSim.Scene.Agent.Bakery
             public double DefaultValue { get; }
             public readonly List<BoneParam> Bones = new List<BoneParam>();
 
-            public VisualParam(uint id, string name, double min, double max, double def)
+            public VisualParam(uint group, uint id, string name, double min, double max, double def)
             {
+                Group = group;
                 Id = id;
                 Name = name;
                 MinimumValue = min;
