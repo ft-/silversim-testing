@@ -2038,7 +2038,7 @@ namespace SilverSim.Scene.Types.Object
                         if (media != null)
                         {
                             writer.WriteStartElement("Media");
-                            using (MemoryStream ms = new MemoryStream())
+                            using (var ms = new MemoryStream())
                             {
                                 using (XmlTextWriter innerWriter = ms.UTF8XmlTextWriter())
                                 {
@@ -2058,7 +2058,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("SitTargetPositionLL", SitTargetOffset);
                     writer.WriteNamedValue("SitTargetOrientationLL", SitTargetOrientation);
                     writer.WriteNamedValue("ParentID", ObjectGroup.RootPart.ID);
-                    writer.WriteNamedValue("CreationDate", CreationDate.AsULong);
+                    writer.WriteNamedValue("CreationDate", CreationDate.AsULong.ToString());
                     if ((options & XmlSerializationOptions.WriteRezDate) != XmlSerializationOptions.None)
                     {
                         writer.WriteNamedValue("RezDate", RezDate.AsULong);
