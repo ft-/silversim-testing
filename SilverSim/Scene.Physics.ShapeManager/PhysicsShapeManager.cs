@@ -278,15 +278,10 @@ namespace SilverSim.Scene.Physics.ShapeManager
                         }
                         if(convexShape == null)
                         {
-                            try
-                            {
-                                convexShape = m.GetConvexPhysics(false);
-                                hasHullList = convexShape.HasHullList;
-                            }
-                            catch
-                            {
-                                /* no shape */
-                            }
+                            /* this way we keep convex hull type functional by having it only get active on PrimitivePhysicsShapeType.Prim */
+                            MeshLOD lod = m.GetLOD(LLMesh.LodLevel.LOD3);
+                            lod.Optimize();
+                            convexShape = DecomposeConvex(lod);
                         }
                     }
                 }
