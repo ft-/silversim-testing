@@ -2061,7 +2061,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("CreationDate", CreationDate.AsULong.ToString());
                     if ((options & XmlSerializationOptions.WriteRezDate) != XmlSerializationOptions.None)
                     {
-                        writer.WriteNamedValue("RezDate", RezDate.AsULong);
+                        writer.WriteNamedValue("RezDate", RezDate.AsULong.ToString());
                     }
                     writer.WriteNamedValue("Category", ObjectGroup.Category);
                     if (this == ObjectGroup.RootPart)
