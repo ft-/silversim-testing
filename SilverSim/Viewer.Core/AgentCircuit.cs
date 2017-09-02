@@ -883,6 +883,10 @@ namespace SilverSim.Viewer.Core
 
         protected override void LogMsgOnTimeout()
         {
+            if(Agent.IsInScene(Scene))
+            {
+                Agent.Attachments.RemoveAll();
+            }
             m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
         }
 
