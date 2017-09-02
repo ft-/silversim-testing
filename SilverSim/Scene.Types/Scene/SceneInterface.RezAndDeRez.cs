@@ -471,6 +471,10 @@ namespace SilverSim.Scene.Types.Scene
                 item.Permissions.Group = InventoryPermissionsMask.None;
                 item.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
                 item.Permissions.EveryOne = InventoryPermissionsMask.None;
+                if(!copyItems.ContainsKey(grp.Owner))
+                {
+                    copyItems.Add(grp.Owner, new List<InventoryItem>());
+                }
                 copyItems[grp.Owner].Add(item);
             }
 
