@@ -107,7 +107,7 @@ namespace SilverSim.Scene.Agent
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
 
-                grp.PostEvent(new AttachEvent());
+                grp.PostEvent(new AttachEvent { ObjectID = Owner.ID });
             }
         }
 
@@ -190,7 +190,7 @@ namespace SilverSim.Scene.Agent
                 grp.Position = grp.AttachedPos;
 
                 m_AttachmentsList.Add(newitem.ID, grp.LocalID, new KeyValuePair<UUID, UUID>(scene.ID, grp.ID));
-                grp.PostEvent(new AttachEvent());
+                grp.PostEvent(new AttachEvent { ObjectID = Owner.ID });
 
             }
         }
@@ -254,6 +254,7 @@ namespace SilverSim.Scene.Agent
                     grp.IsAttached = false;
                     grp.GlobalPosition = position;
                     grp.GlobalRotation = rotation;
+                    grp.PostEvent(new AttachEvent());
                 }
             }
         }

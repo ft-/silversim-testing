@@ -1075,7 +1075,21 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
-#warning Implement attachment drop
+
+            IAgent agent;
+            if(!RootAgents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            foreach(uint localid in req.ObjectList)
+            {
+                ObjectPart part;
+                if(Primitives.TryGetValue(localid, out part))
+                {
+                    agent.DropAttachment(part.ObjectGroup);
+                }
+            }
         }
 
         [PacketHandler(MessageType.ObjectAttach)]
