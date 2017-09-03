@@ -1087,7 +1087,31 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
-#warning Implement attach object from region
+            ObjectPart part;
+            IAgent agent;
+            if(!RootAgents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+            foreach(ObjectAttach.Data d in req.ObjectData)
+            {
+                if (Primitives.TryGetValue(d.ObjectLocalID, out part))
+                {
+                    Object.ObjectGroup grp = part.ObjectGroup;
+                    if (CanTake(agent, grp, grp.Position))
+                    {
+                        try
+                        {
+                            agent.AttachObject(grp, req.AttachmentPoint);
+                            grp.Rotation = d.Rotation;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+            }
         }
 
         [PacketHandler(MessageType.ObjectDescription)]
