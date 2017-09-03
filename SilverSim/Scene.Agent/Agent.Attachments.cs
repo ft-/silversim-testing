@@ -218,6 +218,46 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public void DropAttachment(UUID itemID, bool override_canrez = false)
+        {
+            KeyValuePair<UUID, UUID> kvp;
+            if (m_AttachmentsList.TryGetValue(itemID, out kvp))
+            {
+                DropAttachment(Attachments[kvp.Value], override_canrez);
+            }
+        }
+
+        public void DropAttachment(UUID itemID, Vector3 position, Quaternion rotation, bool override_canrez = false)
+        {
+            KeyValuePair<UUID, UUID> kvp;
+            if (m_AttachmentsList.TryGetValue(itemID, out kvp))
+            {
+                DropAttachment(Attachments[kvp.Value], position, rotation, override_canrez);
+            }
+        }
+
+        public void DropAttachment(ObjectGroup grp, bool override_canrez = false)
+        {
+            DropAttachment(grp, grp.Position + GlobalPosition, grp.Rotation + GlobalRotation, override_canrez);
+        }
+
+        public void DropAttachment(ObjectGroup grp, Vector3 position, Quaternion rotation, bool override_canrez = false)
+        {
+            if (override_canrez || grp.Scene.CanRez(Owner, position))
+            {
+                if (grp.FromItemID != UUID.Zero)
+                {
+                    m_AttachmentsList.Remove(grp.FromItemID);
+                }
+                if (Attachments.Remove(grp.ID))
+                {
+                    grp.IsAttached = false;
+                    grp.GlobalPosition = position;
+                    grp.GlobalRotation = rotation;
+                }
+            }
+        }
+
         protected abstract void DetachAttachment(DetachEntry entry);
 
         protected class RezAttachmentHandler : AssetTransferWorkItem
