@@ -388,6 +388,8 @@ namespace SilverSim.Scene.Agent
                     SendAlertMessage("ALERT: RezAttemptFailed");
                     return;
                 }
+                grp.PostEvent(new OnRezEvent());
+                grp.PostEvent(new AttachEvent { ObjectID = grp.Owner.ID });
             }
 
             public override void AssetTransferFailed(Exception e)
