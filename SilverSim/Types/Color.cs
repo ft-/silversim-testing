@@ -20,6 +20,8 @@
 // exception statement from your version.
 
 
+using System.Globalization;
+
 namespace SilverSim.Types
 {
     public class Color
@@ -154,6 +156,11 @@ namespace SilverSim.Types
         }
 
         public byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte };
+
+        public override string ToString()
+        {
+            return string.Format("R={0},G={1},B={2}", R.ToString(CultureInfo.InvariantCulture), G.ToString(CultureInfo.InvariantCulture), B.ToString(CultureInfo.InvariantCulture));
+        }
         #endregion
     }
 }

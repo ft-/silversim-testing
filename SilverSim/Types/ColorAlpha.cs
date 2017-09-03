@@ -20,6 +20,8 @@
 // exception statement from your version.
 
 
+using System.Globalization;
+
 namespace SilverSim.Types
 {
     public class ColorAlpha
@@ -223,12 +225,17 @@ namespace SilverSim.Types
         public static implicit operator Color(ColorAlpha c) => new Color(c.R, c.G, c.B);
 
         public byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte, A_AsByte };
+
+        public override string ToString()
+        {
+            return string.Format("R={0},G={1},B={2},A={3}", R.ToString(CultureInfo.InvariantCulture), G.ToString(CultureInfo.InvariantCulture), B.ToString(CultureInfo.InvariantCulture), A.ToString(CultureInfo.InvariantCulture));
+        }
         #endregion
 
         /// <summary>A Color4 with zero RGB values and fully opaque (alpha 1.0)</summary>
-        public readonly static ColorAlpha Black = new ColorAlpha(0f, 0f, 0f, 1f);
+        public static ColorAlpha Black => new ColorAlpha(0f, 0f, 0f, 1f);
 
         /// <summary>A Color4 with full RGB values (1.0) and fully opaque (alpha 1.0)</summary>
-        public readonly static ColorAlpha White = new ColorAlpha(1f, 1f, 1f, 1f);
+        public static ColorAlpha White => new ColorAlpha(1f, 1f, 1f, 1f);
     }
 }
