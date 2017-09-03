@@ -917,7 +917,6 @@ namespace SilverSim.Viewer.Core
             var lr = (LogoutRequest)o;
             /* agent wants to logout */
             m_Log.InfoFormat("Agent {0} {1} ({0}) wants to logout", FirstName, LastName, ID);
-            Attachments.RemoveAll();
             foreach (var c in Circuits.Values)
             {
                 SceneInterface scene = c.Scene;

@@ -36,34 +36,7 @@ namespace SilverSim.Scene.Npc
     public partial class NpcAgent
     {
         #region NPC Appearance
-        private struct DetachEntry
-        {
-            public UUID ItemID;
-            public UUID SceneID;
-            public UUID ObjectID;
-
-            public DetachEntry(UUID itemID, UUID sceneID, UUID objectID)
-            {
-                ItemID = itemID;
-                SceneID = sceneID;
-                ObjectID = objectID;
-            }
-        }
-
-        public void DetachAllAttachments()
-        {
-            var detachList = new List<DetachEntry>();
-            foreach (KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp in m_AttachmentsList.Key1ValuePairs)
-            {
-                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value));
-            }
-            foreach (DetachEntry entry in detachList)
-            {
-                DetachAttachment(entry);
-            }
-        }
-
-        private void DetachAttachment(DetachEntry entry)
+        protected override void DetachAttachment(DetachEntry entry)
         {
             ObjectGroup grp = CurrentScene.ObjectGroups[entry.ObjectID];
             try

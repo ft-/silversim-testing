@@ -1103,6 +1103,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 return false;
             }
             var objgroup = obj as ObjectGroup;
+            IAgent agent;
             if (objgroup != null)
             {
                 foreach (ObjectPart objpart in objgroup.Values)
@@ -1133,9 +1134,8 @@ namespace SilverSim.Scene.Implementation.Basic
                     Interlocked.Decrement(ref m_ObjectCount);
                 }
             }
-            else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
+            else if((agent = obj as IAgent) != null)
             {
-                var agent = (IAgent)obj;
                 foreach (IAgentListener aglistener in AgentListeners)
                 {
                     try
@@ -1147,9 +1147,11 @@ namespace SilverSim.Scene.Implementation.Basic
                         m_Log.DebugFormat("Exception {0}\n{1}", e.Message, e.StackTrace);
                     }
                 }
-                foreach(ObjectGroup grp in agent.Attachments.RemoveAll())
+
+                if (agent.IsInScene(this))
                 {
-                    Remove(grp);
+                    /* only detach if agent is at our scene */
+                    agent.DetachAllAttachments();
                 }
                 PhysicsScene.Remove(agent);
                 m_Objects.Remove(agent.ID);

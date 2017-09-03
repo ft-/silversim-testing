@@ -243,5 +243,7 @@ namespace SilverSim.Scene.Types.Agent
         void RebakeAppearance(Action<string> logOutput = null);
 
         void SetAssetUploadAsCompletionAction(UUID transactionID, UUID sceneID, Action<UUID> action);
+
+        void DetachAllAttachments();
     }
 }
