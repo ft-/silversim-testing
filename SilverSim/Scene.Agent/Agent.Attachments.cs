@@ -140,6 +140,8 @@ namespace SilverSim.Scene.Agent
 
                 ObjectGroup grp = objgroups[0];
 
+                bool attachPointChanged = false;
+
                 foreach (var part in grp.Values)
                 {
                     if (part.Shape.PCode == PrimitiveCode.Grass ||
@@ -155,6 +157,7 @@ namespace SilverSim.Scene.Agent
                 if (attachAt != AttachmentPoint.Default && attachAt != grp.AttachPoint)
                 {
                     grp.AttachedPos = Vector3.Zero;
+                    attachPointChanged = true;
                 }
 
                 if (attachAt == AttachmentPoint.Default)
@@ -165,6 +168,7 @@ namespace SilverSim.Scene.Agent
                     {
                         grp.AttachPoint = AttachmentPoint.LeftHand;
                         grp.AttachedPos = Vector3.Zero;
+                        attachPointChanged = true;
                     }
                 }
 
@@ -173,6 +177,11 @@ namespace SilverSim.Scene.Agent
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
                 grp.IsChangedEnabled = true;
+
+                if(attachPointChanged)
+                {
+                    grp.AttachPoint = attachAt;
+                }
 
 #if DEBUG
                 m_Log.DebugFormat("Adding attachment asset {0} at {4} for agent {1} {2} ({3})", data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID, grp.AttachPoint.ToString());
