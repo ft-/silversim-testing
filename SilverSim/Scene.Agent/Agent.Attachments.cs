@@ -106,6 +106,8 @@ namespace SilverSim.Scene.Agent
 
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
+
+                grp.PostEvent(new AttachEvent());
             }
         }
 
@@ -188,6 +190,8 @@ namespace SilverSim.Scene.Agent
                 grp.Position = grp.AttachedPos;
 
                 m_AttachmentsList.Add(newitem.ID, grp.LocalID, new KeyValuePair<UUID, UUID>(scene.ID, grp.ID));
+                grp.PostEvent(new AttachEvent());
+
             }
         }
 
