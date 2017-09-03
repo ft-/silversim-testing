@@ -236,6 +236,9 @@ namespace SilverSim.Scene.Agent.Bakery
                         Wearable wearableData;
                         if (assetService.TryGetValue(actualItem.AssetID, out outfitData))
                         {
+#if DEBUG
+                            logOutput?.Invoke(string.Format("Using item {0} {1} ({2}): asset {3}", actualItem.AssetType.ToString(), actualItem.Name, actualItem.ID, actualItem.AssetID));
+#endif
                             try
                             {
                                 wearableData = new Wearable(outfitData);

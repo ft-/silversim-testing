@@ -248,8 +248,19 @@ namespace SilverSim.Scene.Agent.Bakery
 
             foreach(AbstractSubBaker subbaker in cache.SubBakers)
             {
+#if DEBUG
+                logOutput?.Invoke(string.Format("Using subbaker {0}: baked={1}", subbaker.Type.ToString(), subbaker.IsBaked.ToString()));
+#endif
                 SourceBakers[subbaker.Type].Add(subbaker);
             }
+#if DEBUG
+            int subbakercount = 0;
+            foreach(List<AbstractSubBaker> entrylist in SourceBakers.Values)
+            {
+                subbakercount += entrylist.Count;
+            }
+            logOutput?.Invoke(string.Format("Using {0} subbakers", subbakercount));
+#endif
 
             try
             {
