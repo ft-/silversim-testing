@@ -184,23 +184,36 @@ namespace SilverSim.Scene.Agent.Bakery
                     CurrentOutfitFolderID = folder.ID;
                 }
 
+#if DEBUG
+                m_Log.DebugFormat("Using current outfit folder {0} for {1}", CurrentOutfitFolderID, principal.FullName);
+#endif
                 InventoryFolderContent folderContent = inventoryService.Folder.Content[principal.ID, CurrentOutfitFolderID];
                 AppearanceSerial = folderContent.Version;
 #if DEBUG
-                logOutput?.Invoke(string.Format("New appearance serial for {0} at {1}", principal.FullName.ToString(), AppearanceSerial));
+                logOutput?.Invoke(string.Format("New appearance serial for {0} at {1}", principal.FullName, AppearanceSerial));
 #endif
 
                 var items = new List<InventoryItem>();
                 var itemlinks = new List<UUID>();
                 foreach (var item in folderContent.Items)
                 {
-                    if (item.AssetType == AssetType.Link)
+                    if (item.AssetType == AssetType.Link &&
+                        item.InventoryType == InventoryType.Wearable)
                     {
                         items.Add(item);
                         itemlinks.Add(item.AssetID);
                     }
+#if DEBUG
+                    else
+                    {
+                        m_Log.DebugFormat("Skipped {0} (id {1}, type {2}) of {3}", item.Name, item.ID, item.InventoryType.ToString(), principal.FullName);
+                    }
+#endif
                 }
 
+#if DEBUG
+                logOutput?.Invoke(string.Format("Using {0} outfit items", items.Count));
+#endif
                 var actualItems = inventoryService.Item[principal.ID, itemlinks];
                 var actualItemsInDict = new Dictionary<UUID, InventoryItem>();
                 foreach (var item in actualItems)
@@ -217,8 +230,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 foreach (var linkItem in items)
                 {
                     InventoryItem actualItem;
-                    if (actualItemsInDict.TryGetValue(linkItem.AssetID, out actualItem) &&
-                        (actualItem.AssetType == AssetType.Clothing || actualItem.AssetType == AssetType.Bodypart))
+                    if (actualItemsInDict.TryGetValue(linkItem.AssetID, out actualItem))
                     {
                         AssetData outfitData;
                         Wearable wearableData;
@@ -245,6 +257,14 @@ namespace SilverSim.Scene.Agent.Bakery
                             }
                             wearables.Add(new AgentWearables.WearableInfo(linkItem.AssetID, actualItem.AssetID));
                         }
+                        else
+                        {
+                            logOutput?.Invoke(string.Format("Missing asset {0} for inventory item {1} ({2})", actualItem.AssetID, actualItem.Name, actualItem.ID));
+                        }
+                    }
+                    else
+                    {
+                        logOutput?.Invoke(string.Format("Missing inventory item {0} for link {1} ({2}", linkItem.AssetID, linkItem.Name, linkItem.ID));
                     }
                 }
 
