@@ -28,6 +28,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,122 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public void AttachObjectTemp(ObjectGroup grp, AttachmentPoint attachpoint)
+        {
+            SceneInterface scene = grp.Scene;
+            if (IsInScene(scene))
+            {
+                if(!scene.CanTake(this, grp, grp.Position))
+                {
+                    return;
+                }
+
+                var attachAt = attachpoint & AttachmentPoint.PositionMask;
+                if (attachAt != AttachmentPoint.Default && attachAt != grp.AttachPoint)
+                {
+                    grp.AttachedPos = Vector3.Zero;
+                }
+
+                if (attachAt == AttachmentPoint.Default)
+                {
+                    attachAt = grp.AttachPoint;
+
+                    if (attachAt == AttachmentPoint.NotAttached)
+                    {
+                        grp.AttachPoint = AttachmentPoint.LeftHand;
+                        grp.AttachedPos = Vector3.Zero;
+                    }
+                }
+
+                if (!grp.Owner.EqualsGrid(Owner))
+                {
+                    /* TODO: implement ownership transfer */
+                }
+
+                grp.IsAttached = true;
+                grp.Position = grp.AttachedPos;
+            }
+        }
+
+        public void AttachObject(ObjectGroup grp, AttachmentPoint attachpoint)
+        {
+            SceneInterface scene = grp.Scene;
+            if(IsInScene(scene))
+            {
+                if (!scene.CanTake(this, grp, grp.Position))
+                {
+                    return;
+                }
+
+                bool change_permissions = false;
+                UUID assetID;
+
+                if (change_permissions)
+                {
+                    assetID = grp.NextOwnerAssetID;
+                    if (UUID.Zero == assetID)
+                    {
+                        AssetData asset = grp.Asset(XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.WriteXml2 | XmlSerializationOptions.AdjustForNextOwner);
+                        asset.ID = UUID.Random;
+                        AssetService.Store(asset);
+                        assetID = asset.ID;
+                        AssetService.Store(asset);
+                    }
+                }
+                else
+                {
+                    assetID = grp.OriginalAssetID;
+                    if (UUID.Zero == assetID)
+                    {
+                        AssetData asset = grp.Asset(XmlSerializationOptions.WriteOwnerInfo | XmlSerializationOptions.WriteXml2);
+                        asset.ID = UUID.Random;
+                        AssetService.Store(asset);
+                        assetID = asset.ID;
+                        AssetService.Store(asset);
+                    }
+                }
+
+                var newitem = new InventoryItem()
+                {
+                    AssetID = assetID,
+                    AssetType = AssetType.Object,
+                    InventoryType = InventoryType.Object,
+                    Name = grp.Name,
+                    Description = grp.Description,
+                    LastOwner = grp.Owner,
+                    Owner = Owner,
+                    Creator = grp.RootPart.Creator,
+                    CreationDate = grp.RootPart.CreationDate
+                };
+                newitem.Permissions.Base = change_permissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
+                newitem.Permissions.Current = newitem.Permissions.Base;
+                newitem.Permissions.Group = InventoryPermissionsMask.None;
+                newitem.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
+                newitem.Permissions.EveryOne = InventoryPermissionsMask.None;
+
+                var attachAt = attachpoint & AttachmentPoint.PositionMask;
+                if (attachAt != AttachmentPoint.Default && attachAt != grp.AttachPoint)
+                {
+                    grp.AttachedPos = Vector3.Zero;
+                }
+
+                if (attachAt == AttachmentPoint.Default)
+                {
+                    attachAt = grp.AttachPoint;
+
+                    if (attachAt == AttachmentPoint.NotAttached)
+                    {
+                        grp.AttachPoint = AttachmentPoint.LeftHand;
+                        grp.AttachedPos = Vector3.Zero;
+                    }
+                }
+
+                grp.IsAttached = true;
+                grp.Position = grp.AttachedPos;
+
+                m_AttachmentsList.Add(newitem.ID, grp.LocalID, new KeyValuePair<UUID, UUID>(scene.ID, grp.ID));
+            }
+        }
 
         #region Actual attachment handling
         public void DetachAllAttachments()

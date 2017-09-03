@@ -191,6 +191,8 @@ namespace SilverSim.Scene.Types.Agent
         void HandleMessage(ChildAgentUpdate m);
         void HandleMessage(ChildAgentPositionUpdate m);
         bool UnSit();
+        void AttachObject(ObjectGroup grp, AttachmentPoint attachpoint);
+        void AttachObjectTemp(ObjectGroup grp, AttachmentPoint attachpoint);
 
         RwLockedList<UUID> SelectedObjects(UUID scene);
 
