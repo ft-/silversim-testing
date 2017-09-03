@@ -209,6 +209,15 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        public void DetachAttachment(UUID fromInventoryID)
+        {
+            KeyValuePair<UUID, UUID> kvp;
+            if(m_AttachmentsList.TryGetValue(fromInventoryID, out kvp))
+            {
+                DetachAttachment(new DetachEntry(fromInventoryID, kvp.Key, kvp.Value));
+            }
+        }
+
         protected abstract void DetachAttachment(DetachEntry entry);
 
         protected class RezAttachmentHandler : AssetTransferWorkItem

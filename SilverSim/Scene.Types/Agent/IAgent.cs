@@ -193,6 +193,7 @@ namespace SilverSim.Scene.Types.Agent
         bool UnSit();
         void AttachObject(ObjectGroup grp, AttachmentPoint attachpoint);
         void AttachObjectTemp(ObjectGroup grp, AttachmentPoint attachpoint);
+        void DetachAttachment(UUID fromInventoryID);
 
         RwLockedList<UUID> SelectedObjects(UUID scene);
 
