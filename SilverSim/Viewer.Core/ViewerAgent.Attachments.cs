@@ -273,6 +273,7 @@ namespace SilverSim.Viewer.Core
                     }
                 }
 
+                grp.Owner = m_RezzingAgent;
                 grp.FromItemID = m_ItemID;
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;

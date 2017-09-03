@@ -51,6 +51,7 @@ namespace SilverSim.Scene.Types.Scene
             public InventoryPermissionsMask GroupMask;
             public InventoryPermissionsMask EveryoneMask;
             public InventoryPermissionsMask NextOwnerMask;
+            public UUI RezzingAgent;
         }
 
         private Vector3 CalculateTargetedRezLocation(
@@ -166,6 +167,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 part.RezDate = Date.Now;
             }
+            group.Owner = rezparams.RezzingAgent;
             group.GlobalPosition = CalculateRezLocation(
                 rezparams,
                 group.Size);

@@ -52,9 +52,9 @@ namespace SilverSim.Scene.Types.Scene
             group.Name = "Primitive";
             IAgent agent = Agents[p.AgentID];
             UUI agentOwner = agent.Owner;
-            group.Owner = agentOwner;
             group.LastOwner = agentOwner;
             part.Creator = agentOwner;
+            rezparams.RezzingAgent = agentOwner;
             ObjectPart.PrimitiveShape pshape = part.Shape;
             pshape.PCode = p.PCode;
             part.Material = p.Material;

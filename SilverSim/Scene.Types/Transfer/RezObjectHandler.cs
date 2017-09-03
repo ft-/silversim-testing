@@ -49,6 +49,7 @@ namespace SilverSim.Scene.Types.Transfer
             m_RezzingAgent = rezzingagent;
             m_ItemOwnerPermissions = itemOwnerPermissions;
             m_RezParams = rezparams;
+            m_RezParams.RezzingAgent = m_RezzingAgent;
         }
 
         protected void SendAlertMessage(string msg)
