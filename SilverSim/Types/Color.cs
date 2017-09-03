@@ -20,21 +20,18 @@
 // exception statement from your version.
 
 
+using System;
 using System.Globalization;
 
 namespace SilverSim.Types
 {
-    public class Color
+    public struct Color : IEquatable<Color>
     {
         public double R;
         public double G;
         public double B;
 
         #region Constructors
-        public Color()
-        {
-        }
-
         public static Color FromRgb(uint r, uint g, uint b)
         {
             return new Color(r / 255.0, g / 255.0, b / 255.0);
@@ -160,6 +157,32 @@ namespace SilverSim.Types
         public override string ToString()
         {
             return string.Format("R={0},G={1},B={2}", R.ToString(CultureInfo.InvariantCulture), G.ToString(CultureInfo.InvariantCulture), B.ToString(CultureInfo.InvariantCulture));
+        }
+
+
+        public bool Equals(Color other)
+        {
+            return R == other.R && G == other.G && B == other.B;
+        }
+
+        public override int GetHashCode()
+        {
+            return R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return (obj is Color) ? Equals((Color)obj) : false;
+        }
+
+        public static bool operator ==(Color a, Color b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Color a, Color b)
+        {
+            return !a.Equals(b);
         }
         #endregion
     }

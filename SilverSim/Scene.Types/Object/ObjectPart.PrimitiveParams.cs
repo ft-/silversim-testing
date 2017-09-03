@@ -1759,7 +1759,9 @@ namespace SilverSim.Scene.Types.Object
                 case PrimitiveParamsType.Alpha:
                     {
                         double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_ALPHA").Clamp(0, 1);
-                        face.TextureColor.A = 1 - alpha;
+                        ColorAlpha color = face.TextureColor;
+                        color.A = 1 - alpha;
+                        face.TextureColor = color;
                     }
                     break;
 

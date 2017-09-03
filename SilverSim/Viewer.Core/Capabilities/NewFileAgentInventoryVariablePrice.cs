@@ -277,10 +277,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                                         var color4 = (AnArray)faceMap["diffuse_color"];
                                         if (color4.Count == 4)
                                         {
-                                            face.TextureColor.R = color4[0].AsReal;
-                                            face.TextureColor.G = color4[1].AsReal;
-                                            face.TextureColor.B = color4[2].AsReal;
-                                            face.TextureColor.A = color4[3].AsReal;
+                                            face.TextureColor = new ColorAlpha
+                                            {
+                                                R = color4[0].AsReal,
+                                                G = color4[1].AsReal,
+                                                B = color4[2].AsReal,
+                                                A = color4[3].AsReal
+                                            };
                                         }
                                     }
                                     int textureNum = faceMap["image"].AsInt;
