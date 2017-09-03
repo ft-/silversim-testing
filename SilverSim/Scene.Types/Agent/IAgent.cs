@@ -195,6 +195,11 @@ namespace SilverSim.Scene.Types.Agent
         void AttachObjectTemp(ObjectGroup grp, AttachmentPoint attachpoint);
         void DetachAttachment(UUID fromInventoryID);
 
+        void DropAttachment(UUID itemID, bool override_canrez = false);
+        void DropAttachment(UUID itemID, Vector3 position, Quaternion rotation, bool override_canrez = false);
+        void DropAttachment(ObjectGroup grp, bool override_canrez = false);
+        void DropAttachment(ObjectGroup grp, Vector3 position, Quaternion rotation, bool override_canrez = false);
+
         RwLockedList<UUID> SelectedObjects(UUID scene);
 
         ulong AddNewFile(string filename, byte[] data);
