@@ -22,6 +22,8 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
@@ -53,6 +55,23 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        private void ApplyNextOwner(ObjectGroup grp, UUI newOwner)
+        {
+            grp.LastOwner = grp.Owner;
+            grp.Owner = newOwner;
+            foreach(ObjectPart p in grp.Values)
+            {
+                p.BaseMask &= p.NextOwnerMask;
+                foreach(ObjectPartInventoryItem item in p.Inventory.Values)
+                {
+                    item.Permissions.Base &= item.Permissions.NextOwner;
+                    item.LastOwner = item.Owner;
+                    item.Owner = newOwner;
+                }
+            }
+            grp.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Owner));
+        }
+
         public void AttachObjectTemp(ObjectGroup grp, AttachmentPoint attachpoint)
         {
             SceneInterface scene = grp.Scene;
@@ -82,7 +101,7 @@ namespace SilverSim.Scene.Agent
 
                 if (!grp.Owner.EqualsGrid(Owner))
                 {
-                    /* TODO: implement ownership transfer */
+                    ApplyNextOwner(grp, Owner);
                 }
 
                 grp.IsAttached = true;
@@ -140,7 +159,7 @@ namespace SilverSim.Scene.Agent
                     Creator = grp.RootPart.Creator,
                     CreationDate = grp.RootPart.CreationDate
                 };
-                newitem.Permissions.Base = change_permissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
+                newitem.Permissions.Base &= change_permissions ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
                 newitem.Permissions.Current = newitem.Permissions.Base;
                 newitem.Permissions.Group = InventoryPermissionsMask.None;
                 newitem.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
@@ -162,6 +181,8 @@ namespace SilverSim.Scene.Agent
                         grp.AttachedPos = Vector3.Zero;
                     }
                 }
+
+                ApplyNextOwner(grp, Owner);
 
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
