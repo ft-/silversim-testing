@@ -610,7 +610,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            using (ObjectPropertiesSendHandler propHandler = new ObjectPropertiesSendHandler(agent, ID))
+            using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
                 foreach (uint d in req.ObjectList)
                 {
