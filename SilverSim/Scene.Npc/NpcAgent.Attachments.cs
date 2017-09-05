@@ -113,7 +113,6 @@ namespace SilverSim.Scene.Npc
             {
                 UUID targetFolder = clothingFolder;
                 var assetType = AssetType.Clothing;
-                var invType = InventoryType.Clothing;
                 switch (kvp.Key)
                 {
                     case WearableType.Shape:
@@ -123,10 +122,6 @@ namespace SilverSim.Scene.Npc
                     case WearableType.Physics:
                         targetFolder = bodypartsFolder;
                         assetType = AssetType.Bodypart;
-                        invType = InventoryType.Bodypart;
-                        break;
-
-                    default:
                         break;
                 }
 
@@ -139,7 +134,7 @@ namespace SilverSim.Scene.Npc
                         LastOwner = Owner,
                         Owner = Owner,
                         Creator = UUI.Unknown,
-                        InventoryType = invType,
+                        InventoryType = InventoryType.Wearable,
                         AssetType = assetType,
                         Flags = (InventoryFlags)(uint)kvp.Key,
                         Name = wInfo.ItemID.ToString(),
@@ -164,7 +159,7 @@ namespace SilverSim.Scene.Npc
                         LastOwner = Owner,
                         Owner = Owner,
                         Creator = Owner,
-                        InventoryType = invType,
+                        InventoryType = InventoryType.Wearable,
                         AssetType = AssetType.Link,
                         AssetID = wInfo.ItemID,
                         ParentFolderID = currentOutfitFolder,
