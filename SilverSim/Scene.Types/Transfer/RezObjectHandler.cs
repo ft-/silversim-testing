@@ -69,8 +69,9 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 data = m_Scene.AssetService[AssetID];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Error(string.Format("Failed to rez object from asset {0}", AssetID), e);
                 SendAlertMessage("ALERT: CantFindObject");
                 return;
             }
@@ -101,7 +102,8 @@ namespace SilverSim.Scene.Types.Transfer
         public override void AssetTransferFailed(Exception e)
         {
             IAgent agent;
-            if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
+            m_Log.Error(string.Format("Failed to rez object from asset {0}", AssetID), e);
+            if (m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
             {
                 agent.SendAlertMessage("ALERT: CantFindObject", m_Scene.ID);
             }
