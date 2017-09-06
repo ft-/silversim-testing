@@ -105,7 +105,7 @@ namespace SilverSim.Scene.Types.Transfer
             m_Log.Error(string.Format("Failed to rez object from asset {0}", AssetID), e);
             if (m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
             {
-                agent.SendAlertMessage("ALERT: CantFindObject", m_Scene.ID);
+                agent.SendAlertMessage("ALERT: RezAttemptFailed", m_Scene.ID);
             }
         }
     }
