@@ -303,7 +303,7 @@ namespace SilverSim.Scene.Agent
                 {
                     data = m_Scene.AssetService[AssetID];
                 }
-                catch
+                catch(Exception e)
                 {
                     m_Log.Error(string.Format("Failed to rez attachment from asset {0}", AssetID), e);
                     SendAlertMessage("ALERT: CantFindObject");
