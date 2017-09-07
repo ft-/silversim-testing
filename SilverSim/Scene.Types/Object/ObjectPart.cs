@@ -2515,23 +2515,24 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "PhysicsShapeType":
+                                switch(reader.ReadElementValueAsString())
                                 {
-                                    string t = reader.ReadElementValueAsString();
-                                    switch(t)
-                                    {
-                                        case "Prim":
-                                            part.PhysicsShapeType = PrimitivePhysicsShapeType.Prim;
-                                            break;
+                                    case "Prim":
+                                        part.PhysicsShapeType = PrimitivePhysicsShapeType.Prim;
+                                        break;
 
-                                        case "None":
-                                            part.PhysicsShapeType = PrimitivePhysicsShapeType.None;
-                                            break;
+                                    case "None":
+                                        part.PhysicsShapeType = PrimitivePhysicsShapeType.None;
+                                        break;
 
-                                        case "ConvexHull":
-                                            part.PhysicsShapeType = PrimitivePhysicsShapeType.Convex;
-                                            break;
-                                    }
+                                    case "ConvexHull":
+                                        part.PhysicsShapeType = PrimitivePhysicsShapeType.Convex;
+                                        break;
                                 }
+                                break;
+
+                            case "SculptType":
+                                shape.SculptType = (PrimitiveSculptType)reader.ReadElementContentAsInt();
                                 break;
 
                             default:
