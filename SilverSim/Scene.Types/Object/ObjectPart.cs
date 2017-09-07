@@ -2532,7 +2532,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "SculptType":
-                                shape.SculptType = (PrimitiveSculptType)reader.ReadElementContentAsInt();
+                                shape.SculptType = (PrimitiveSculptType)reader.ReadElementValueAsUInt();
                                 break;
 
                             default:
