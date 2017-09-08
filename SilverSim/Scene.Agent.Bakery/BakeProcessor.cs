@@ -66,6 +66,8 @@ namespace SilverSim.Scene.Agent.Bakery
             }
         }
 
+        private static readonly UUID DefaultTransparentTextureId = new UUID("8dcd4a48-2d37-4909-9f78-f7a9eb4ef903");
+
         private void TryLoadTexture(UUID textureID)
         {
             AssetData data;
@@ -74,7 +76,20 @@ namespace SilverSim.Scene.Agent.Bakery
                 return;
             }
             m_ProcessedAssetIDs.Add(textureID);
-            if (m_AssetService.TryGetValue(textureID, out data))
+            if(textureID == DefaultTransparentTextureId) /* we need to specifically recognize this texture */
+            {
+                var bmp = new Bitmap(512, 512, PixelFormat.Format32bppArgb);
+                using (Graphics gfx = Graphics.FromImage(bmp))
+                {
+                    gfx.CompositingMode = CompositingMode.SourceOver;
+                    using (var b = new SolidBrush(Color.FromArgb(0, 0, 0, 0)))
+                    {
+                        gfx.FillRectangle(b, 0, 0, 512, 512);
+                    }
+                }
+                m_Textures.Add(textureID, bmp);
+            }
+            else if (m_AssetService.TryGetValue(textureID, out data))
             {
                 byte[] bump = null;
                 Image img;
@@ -318,6 +333,11 @@ namespace SilverSim.Scene.Agent.Bakery
                 /* clean out alpha channel. the ones we used before are not necessary anymore */
                 foreach (KeyValuePair<BakeTarget, Bitmap> kvp in Tgt.Images)
                 {
+                    if(kvp.Key == BakeTarget.Hair)
+                    {
+                        /* skip hair */
+                        continue;
+                    }
                     int byteSize = kvp.Value.Width * kvp.Value.Height * 4;
                     BitmapData lockBits = kvp.Value.LockBits(Tgt.Rectangles[kvp.Key], ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
                     var rawdata = new byte[byteSize];
@@ -358,6 +378,7 @@ namespace SilverSim.Scene.Agent.Bakery
                                     continue;
                                 }
                                 dstAlphaMask = GetRawData(tgtimg);
+                                AlphaMaskBakes[tgt] = dstAlphaMask;
                             }
 
                             using (var srcbmp = new Bitmap(srcimg))
