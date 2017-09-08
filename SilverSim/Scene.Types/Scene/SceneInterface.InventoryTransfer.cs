@@ -238,7 +238,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 foreach(var sellItem in m_Items)
                 {
-                    var item = new InventoryItem(sellItem);
+                    var item = new InventoryItem(UUID.Random, sellItem);
                     item.LastOwner = item.Owner;
                     item.Owner = m_DestinationAgent;
                     item.ParentFolderID = folder.ID;
