@@ -115,7 +115,10 @@ namespace SilverSim.Scene.Agent.Bakery
                 {
                     foreach (KeyValuePair<AvatarTextureIndex, UUID> tex in item.Wearable.Textures)
                     {
-                        AvatarTextures[(int)tex.Key] = tex.Value;
+                        if (AvatarTextures.Length > (int)tex.Key)
+                        {
+                            AvatarTextures[(int)tex.Key] = tex.Value;
+                        }
                     }
                 }
 
