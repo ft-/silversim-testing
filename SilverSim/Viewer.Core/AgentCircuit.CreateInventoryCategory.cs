@@ -63,9 +63,10 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            var folder = new InventoryFolder()
+            var folder = new InventoryFolder
             {
                 ID = reqmap["folder_id"].AsUUID,
+                Owner = Agent.Owner,
                 ParentFolderID = reqmap["parent_id"].AsUUID,
                 InventoryType = (InventoryType)reqmap["type"].AsInt,
                 Name = reqmap["name"].ToString(),
