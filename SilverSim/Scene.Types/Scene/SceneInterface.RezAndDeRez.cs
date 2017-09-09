@@ -313,6 +313,7 @@ namespace SilverSim.Scene.Types.Scene
                 foreach (ObjectPart part in grp.ValuesByKey1)
                 {
                     var newpart = new ObjectPart(UUID.Random, part);
+                    newpart.RezDate = Date.Now;
                     newgrp.Add(part.LinkNumber, newpart.ID, newpart);
 
                     foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in part.Inventory.Key1ValuePairs)
