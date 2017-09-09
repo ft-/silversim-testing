@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -271,6 +272,76 @@ namespace SilverSim.Scene.Types.Scene
             return returned;
         }
 
+        [PacketHandler(MessageType.ObjectDuplicate)]
+        public void HandleObjectDuplicate(Message m)
+        {
+            var req = (Viewer.Messages.Object.ObjectDuplicate)m;
+            if (req.AgentID != m.CircuitAgentID ||
+                req.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            var objectgroups = new List<ObjectGroup>();
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            bool isGod = agent.IsInScene(this) && agent.IsActiveGod;
+
+            foreach (UInt32 localid in req.ObjectLocalIDs)
+            {
+                try
+                {
+                    ObjectGroup grp = Primitives[localid].ObjectGroup;
+                    if (isGod || CanTakeCopy(agent, grp, grp.Position))
+                    {
+                        objectgroups.Add(grp);
+                    }
+                }
+                catch
+                {
+                    agent.SendAlertMessage("ALERT: DeleteFailObjNotFound", ID);
+                }
+            }
+
+            foreach (ObjectGroup grp in objectgroups)
+            {
+                var newgrp = new ObjectGroup(grp);
+                foreach (ObjectPart part in grp.ValuesByKey1)
+                {
+                    var newpart = new ObjectPart(UUID.Random);
+                    newgrp.Add(part.LinkNumber, newpart.ID, newpart);
+
+                    foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in part.Inventory.Key1ValuePairs)
+                    {
+                        ScriptInstance instance = kvp.Value.ScriptInstance;
+                        var newItem = new ObjectPartInventoryItem(UUID.Random, kvp.Value)
+                        {
+                            ExperienceID = kvp.Value.ExperienceID
+                        };
+                        if (instance != null)
+                        {
+                            try
+                            {
+                                newItem.ScriptState = instance.ScriptState;
+                            }
+                            catch
+                            {
+                                /* if taking script state fails, we do not bail out */
+                            }
+                        }
+                        newpart.Inventory.Add(newItem);
+                    }
+                    newgrp.GlobalPosition += req.Offset;
+                }
+
+                Add(newgrp);
+            }
+        }
+
         [PacketHandler(MessageType.ObjectDelete)]
         public void HandleObjectDelete(Message m)
         {
@@ -280,7 +351,6 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
-
 
             IAgent agent;
             var objectgroups = new List<ObjectGroup>();
