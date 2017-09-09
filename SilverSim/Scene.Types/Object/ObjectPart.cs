@@ -274,6 +274,99 @@ namespace SilverSim.Scene.Types.Object
 
             ID = id;
         }
+
+        public ObjectPart(UUID id, ObjectPart fromPart)
+        {
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
+
+            ObjectGroup = null;
+            IsChanged = false;
+            Inventory = new ObjectPartInventory();
+            Inventory.OnChange += OnInventoryChange;
+            Inventory.OnInventoryUpdate += OnInventoryUpdate;
+            m_TextureEntryBytes = m_TextureEntry.GetBytes();
+            UpdateInfo = new ObjectUpdateInfo(this);
+            AnimationController = new ObjectAnimationController(this);
+            m_Shape = fromPart.Shape;
+            m_AngularVelocity = fromPart.AngularVelocity;
+            m_AttachmentLightLimitIntensity = fromPart.AttachmentLightLimitIntensity;
+            BaseMask = fromPart.BaseMask;
+            Buoyancy = fromPart.Buoyancy;
+            CameraAtOffset = fromPart.CameraAtOffset;
+            CameraEyeOffset = fromPart.CameraEyeOffset;
+            CollisionSound = fromPart.CollisionSound;
+            CreationDate = fromPart.CreationDate;
+            Creator = fromPart.Creator;
+            Name = fromPart.Name;
+            Description = fromPart.Description;
+            //this.DynAttrs = fromPart.DynAttrs;
+            EveryoneMask = fromPart.EveryoneMask;
+            ExtraParamsBytes = fromPart.ExtraParamsBytes;
+            FacelightLimitIntensity = fromPart.FacelightLimitIntensity;
+            Flags = fromPart.Flags;
+            ForceMouselook = fromPart.ForceMouselook;
+            LocalPosition = fromPart.LocalPosition;
+            LocalRotation = fromPart.LocalRotation;
+            Mass = fromPart.Mass;
+            Material = fromPart.Material;
+            UpdateMedia(fromPart.Media, UUID.Zero);
+            MediaURL = fromPart.MediaURL;
+            AllowUnsit = fromPart.AllowUnsit;
+            IsAllowedDrop = fromPart.IsAllowedDrop;
+            IsAttachmentLightsDisabled = fromPart.IsAttachmentLightsDisabled;
+            IsBlockGrab = fromPart.IsBlockGrab;
+            IsBlockGrabObject = fromPart.IsBlockGrabObject;
+            IsDieAtEdge = fromPart.IsDieAtEdge;
+            IsFacelightDisabled = fromPart.IsFacelightDisabled;
+            IsPhantom = fromPart.IsPhantom;
+            IsReturnAtEdge = fromPart.IsReturnAtEdge;
+            IsRotateXEnabled = fromPart.IsRotateXEnabled;
+            IsRotateYEnabled = fromPart.IsRotateYEnabled;
+            IsRotateZEnabled = fromPart.IsRotateZEnabled;
+            IsScripted = fromPart.IsScripted;
+            IsScriptedSitOnly = fromPart.IsScriptedSitOnly;
+            IsSitTargetActive = fromPart.IsSitTargetActive;
+            IsSoundQueueing = fromPart.IsSoundQueueing;
+            IsVolumeDetect = fromPart.IsVolumeDetect;
+            NextOwnerMask = fromPart.NextOwnerMask;
+            Omega = fromPart.Omega;
+            Owner = fromPart.Owner;
+            OwnerMask = fromPart.OwnerMask;
+            ParticleSystemBytes = fromPart.ParticleSystemBytes;
+            PassCollisionMode = fromPart.PassCollisionMode;
+            PassTouchMode = fromPart.PassTouchMode;
+            PathfindingType = fromPart.PathfindingType;
+            PhysicsDensity = fromPart.PhysicsDensity;
+            PhysicsFriction = fromPart.PhysicsFriction;
+            PhysicsGravityMultiplier = fromPart.PhysicsGravityMultiplier;
+            PhysicsRestitution = fromPart.PhysicsRestitution;
+            PhysicsShapeType = fromPart.PhysicsShapeType;
+            SandboxOrigin = fromPart.SandboxOrigin;
+            ScriptAccessPin = fromPart.ScriptAccessPin;
+            SitTargetOffset = fromPart.SitTargetOffset;
+            SitTargetOrientation = fromPart.SitTargetOrientation;
+            SitText = fromPart.SitText;
+            Size = fromPart.Size;
+            Slice = fromPart.Slice;
+            Sound = fromPart.Sound;
+            TextureAnimationBytes = fromPart.TextureAnimationBytes;
+            TextureEntryBytes = fromPart.TextureEntryBytes;
+            TouchText = fromPart.TouchText;
+            VehicleType = fromPart.VehicleType;
+            VehicleFlags = fromPart.VehicleFlags;
+            VehicleParams = fromPart.VehicleParams;
+            WalkableCoefficientA = fromPart.WalkableCoefficientA;
+            WalkableCoefficientAvatar = fromPart.WalkableCoefficientAvatar;
+            WalkableCoefficientB = fromPart.WalkableCoefficientB;
+            WalkableCoefficientC = fromPart.WalkableCoefficientC;
+            WalkableCoefficientD = fromPart.WalkableCoefficientD;
+
+            /* only enable IsSandbox and IsPhysics after loading everything else */
+            IsSandbox = fromPart.IsSandbox;
+            IsPhysics = fromPart.IsPhysics;
+
+            ID = id;
+        }
         #endregion
 
         #region Update Script Flags

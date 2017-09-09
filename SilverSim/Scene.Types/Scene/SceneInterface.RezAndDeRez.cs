@@ -312,7 +312,7 @@ namespace SilverSim.Scene.Types.Scene
                 var newgrp = new ObjectGroup(grp);
                 foreach (ObjectPart part in grp.ValuesByKey1)
                 {
-                    var newpart = new ObjectPart(UUID.Random);
+                    var newpart = new ObjectPart(UUID.Random, part);
                     newgrp.Add(part.LinkNumber, newpart.ID, newpart);
 
                     foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in part.Inventory.Key1ValuePairs)

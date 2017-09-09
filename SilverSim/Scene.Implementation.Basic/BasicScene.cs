@@ -887,6 +887,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     objgroup.Scene = this;
                     foreach (ObjectPart objpart in objgroup.Values)
                     {
+                        objpart.RezDate = Date.Now;
                         AddNewLocalID(objpart);
                         m_Primitives.Add(objpart.ID, objpart.LocalID, objpart);
                         removeAgain.Add(objpart);
