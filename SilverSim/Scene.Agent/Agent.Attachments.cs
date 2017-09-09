@@ -361,7 +361,6 @@ namespace SilverSim.Scene.Agent
                     {
                         grp.AttachPoint = AttachmentPoint.LeftHand;
                         grp.AttachedPos = Vector3.Zero;
-                        attachPointChanged = true;
                     }
                 }
 
