@@ -271,6 +271,49 @@ namespace SilverSim.Scene.Types.Scene
             return returned;
         }
 
+        [PacketHandler(MessageType.ObjectDelete)]
+        public void HandleObjectDelete(Message m)
+        {
+            var req = (Viewer.Messages.Object.ObjectDelete)m;
+            if (req.AgentID != m.CircuitAgentID ||
+                req.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+
+
+            IAgent agent;
+            var objectgroups = new List<ObjectGroup>();
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            bool isGod = agent.IsInScene(this) && agent.IsActiveGod;
+
+            foreach (UInt32 localid in req.ObjectLocalIDs)
+            {
+                try
+                {
+                    ObjectGroup grp = Primitives[localid].ObjectGroup;
+                    if ((isGod && req.Force) || CanDelete(agent, grp, grp.Position))
+                    {
+                        objectgroups.Add(grp);
+                    }
+                }
+                catch
+                {
+                    agent.SendAlertMessage("ALERT: DeleteFailObjNotFound", ID);
+                }
+            }
+
+            /* yes, this delete into no-where */
+            foreach(ObjectGroup grp in objectgroups)
+            {
+                Remove(grp);
+            }
+        }
+
         [PacketHandler(MessageType.DeRezObject)]
         public void HandleDeRezObject(Message m)
         {
