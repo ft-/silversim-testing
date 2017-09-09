@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 
@@ -41,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Object
         public bool CopyCenters;
         public bool CopyRotates;
         public UUID RayTargetID = UUID.Zero;
-        public UInt32 DuplicateFlags;
+        public PrimitiveFlags DuplicateFlags;
         public List<UInt32> ObjectLocalIDs = new List<uint>();
 
         public static Message Decode(UDPPacket p)
@@ -58,7 +59,7 @@ namespace SilverSim.Viewer.Messages.Object
                 CopyCenters = p.ReadBoolean(),
                 CopyRotates = p.ReadBoolean(),
                 RayTargetID = p.ReadUUID(),
-                DuplicateFlags = p.ReadUInt32()
+                DuplicateFlags = (PrimitiveFlags)p.ReadUInt32()
             };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
@@ -80,7 +81,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteBoolean(CopyCenters);
             p.WriteBoolean(CopyRotates);
             p.WriteUUID(RayTargetID);
-            p.WriteUInt32(DuplicateFlags);
+            p.WriteUInt32((uint)DuplicateFlags);
             p.WriteUInt8((byte)ObjectLocalIDs.Count);
             foreach (UInt32 d in ObjectLocalIDs)
             {

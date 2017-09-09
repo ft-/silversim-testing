@@ -51,6 +51,7 @@ namespace SilverSim.Types.Primitive
         CameraSource = 1 << 22,
         ObjectOwnerModify = 1 << 28,
         TemporaryOnRez = 1 << 29,
+        [Obsolete]
         Temporary = 1 << 30,
     }
 }

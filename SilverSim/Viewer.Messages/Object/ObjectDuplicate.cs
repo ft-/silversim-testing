@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 
@@ -34,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         public Vector3 Offset;
-        public UInt32 DuplicateFlags;
+        public PrimitiveFlags DuplicateFlags;
         public List<UInt32> ObjectLocalIDs = new List<uint>();
 
         public static Message Decode(UDPPacket p)
@@ -44,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Object
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
                 Offset = p.ReadVector3f(),
-                DuplicateFlags = p.ReadUInt32()
+                DuplicateFlags = (PrimitiveFlags)p.ReadUInt32()
             };
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
@@ -59,7 +60,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteVector3f(Offset);
-            p.WriteUInt32(DuplicateFlags);
+            p.WriteUInt32((uint)DuplicateFlags);
             p.WriteUInt8((byte)ObjectLocalIDs.Count);
             foreach (UInt32 d in ObjectLocalIDs)
             {
