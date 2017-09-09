@@ -140,7 +140,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                     else
                     {
                         LowerBake = CreateTargetBakeImage(target);
-                        using (Graphics gfx = Graphics.FromImage(UpperBake))
+                        using (Graphics gfx = Graphics.FromImage(LowerBake))
                         {
                             gfx.CompositingMode = CompositingMode.SourceCopy;
                             using (var b = new SolidBrush(Color.FromArgb(0, 0, 0, 0)))
