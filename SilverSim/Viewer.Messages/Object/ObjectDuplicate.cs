@@ -34,6 +34,7 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
         public Vector3 Offset;
         public PrimitiveFlags DuplicateFlags;
         public List<UInt32> ObjectLocalIDs = new List<uint>();
@@ -44,6 +45,7 @@ namespace SilverSim.Viewer.Messages.Object
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
+                GroupID = p.ReadUUID(),
                 Offset = p.ReadVector3f(),
                 DuplicateFlags = (PrimitiveFlags)p.ReadUInt32()
             };
@@ -59,6 +61,7 @@ namespace SilverSim.Viewer.Messages.Object
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
+            p.WriteUUID(GroupID);
             p.WriteVector3f(Offset);
             p.WriteUInt32((uint)DuplicateFlags);
             p.WriteUInt8((byte)ObjectLocalIDs.Count);

@@ -314,6 +314,8 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     var newpart = new ObjectPart(UUID.Random, part);
                     newpart.RezDate = Date.Now;
+                    newpart.ObjectGroup = newgrp;
+                    newpart.IsChangedEnabled = true;
                     newgrp.Add(part.LinkNumber, newpart.ID, newpart);
 
                     foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in part.Inventory.Key1ValuePairs)
@@ -337,6 +339,9 @@ namespace SilverSim.Scene.Types.Scene
                         newpart.Inventory.Add(newItem);
                     }
                     newgrp.GlobalPosition += req.Offset;
+                    UGI ugi = UGI.Unknown;
+                    GroupsNameService?.TryGetValue(req.GroupID, out ugi);
+                    newgrp.Group = ugi;
                 }
 
                 Add(newgrp);

@@ -71,7 +71,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
             m_Outershadow = skin.GetParamValueOrDefault(707, 0);
             skin.Textures.TryGetValue(AvatarTextureIndex.HeadBodypaint, out m_HeadTextureId);
             skin.Textures.TryGetValue(AvatarTextureIndex.UpperBodypaint, out m_UpperTextureId);
-            skin.Textures.TryGetValue(AvatarTextureIndex.LowerBaked, out m_LowerTextureId);
+            skin.Textures.TryGetValue(AvatarTextureIndex.LowerBodypaint, out m_LowerTextureId);
             if (m_HeadTextureId == AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID)
             {
                 m_HeadTextureId = UUID.Zero;
@@ -109,17 +109,20 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     }
                     gfx.CompositingMode = CompositingMode.SourceOver;
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.HeadColorAndSkinGrain);
-                    if(cache.TryGetTexture(m_HeadTextureId, target, out img))
+                    if (cache.TryGetTexture(m_HeadTextureId, target, out img))
                     {
-                        gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
+                        gfx.DrawUntinted(bakeRectangle, img);
                     }
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.RosyfaceAlpha, m_RosyComplexionColor);
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipsMask, m_LipPinknessColor);
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipstickAlpha, m_LipstickColor);
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.EyelinerAlpha, m_EyelinerColor);
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.BlushAlpha, m_BlushColor);
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.InnershadowAlpha, m_InnershadowColor, m_Innershadow);
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.OutershadowAlpha, m_OutershadowColor, m_Outershadow);
+                    else
+                    {
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.RosyfaceAlpha, m_RosyComplexionColor);
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipsMask, m_LipPinknessColor);
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipstickAlpha, m_LipstickColor);
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.EyelinerAlpha, m_EyelinerColor);
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.BlushAlpha, m_BlushColor);
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.InnershadowAlpha, m_InnershadowColor, m_Innershadow);
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.OutershadowAlpha, m_OutershadowColor, m_Outershadow);
+                    }
                 }
 
                 return HeadBake;
@@ -141,7 +144,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.LowerBodyColorAndSkinGrain);
                     if (cache.TryGetTexture(m_LowerTextureId, target, out img))
                     {
-                        gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
+                        gfx.DrawUntinted(bakeRectangle, img);
                     }
                 }
 
@@ -165,9 +168,12 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.UpperBodyColorAndSkinGrain);
                     if (cache.TryGetTexture(m_UpperTextureId, target, out img))
                     {
-                        gfx.DrawTinted(bakeRectangle, img, m_SkinColor);
+                        gfx.DrawUntinted(bakeRectangle, img);
                     }
-                    gfx.DrawColorKeyed(bakeRectangle, BaseBakes.NailpolishAlpha, m_NailpolishColor);
+                    else
+                    {
+                        gfx.DrawColorKeyed(bakeRectangle, BaseBakes.NailpolishAlpha, m_NailpolishColor);
+                    }
                 }
 
                 return UpperBake;
