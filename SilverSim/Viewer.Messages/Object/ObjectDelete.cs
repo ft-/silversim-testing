@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Messages.Object
 {
-    [UDPMessage(MessageType.ObjectBuy)]
+    [UDPMessage(MessageType.ObjectDelete)]
     [Reliable]
     [NotTrusted]
     [Zerocoded]
