@@ -550,15 +550,16 @@ namespace SilverSim.Scene.Implementation.Common
                         {
                             try
                             {
+                                bool hasState = item.ScriptState != null;
                                 item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, null);
-                                item.ScriptInstance.PostEvent(new OnRezEvent(0));
 
-                                if (item.ScriptInstance.IsResetRequired)
+                                if (item.ScriptInstance.IsResetRequired || !hasState)
                                 {
                                     item.ScriptInstance.IsResetRequired = false;
                                     item.ScriptInstance.IsRunning = true;
                                     item.ScriptInstance.Reset();
                                 }
+                                item.ScriptInstance.PostEvent(new OnRezEvent(0));
                             }
                             catch (Exception e)
                             {
