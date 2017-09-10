@@ -108,13 +108,14 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                         gfx.FillRectangle(brush, bakeRectangle);
                     }
                     gfx.CompositingMode = CompositingMode.SourceOver;
-                    gfx.DrawTinted(bakeRectangle, BaseBakes.HeadColorAndSkinGrain, m_SkinColor);
+                    gfx.DrawUntinted(bakeRectangle, BaseBakes.HeadColorAndSkinGrain);
                     if (m_HeadTextureId != UUID.Zero && cache.TryGetTexture(m_HeadTextureId, target, out img))
                     {
                         gfx.DrawUntinted(bakeRectangle, img);
                     }
                     else
                     {
+                        /*
                         gfx.DrawColorKeyed(bakeRectangle, BaseBakes.RosyfaceAlpha, m_RosyComplexionColor);
                         gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipsMask, m_LipPinknessColor);
                         gfx.DrawColorKeyed(bakeRectangle, BaseBakes.LipstickAlpha, m_LipstickColor);
@@ -122,6 +123,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                         gfx.DrawColorKeyed(bakeRectangle, BaseBakes.BlushAlpha, m_BlushColor);
                         gfx.DrawColorKeyed(bakeRectangle, BaseBakes.InnershadowAlpha, m_InnershadowColor, m_Innershadow);
                         gfx.DrawColorKeyed(bakeRectangle, BaseBakes.OutershadowAlpha, m_OutershadowColor, m_Outershadow);
+                        */
                     }
                 }
 
