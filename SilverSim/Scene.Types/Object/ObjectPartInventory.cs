@@ -427,10 +427,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "ItemID":
                                 origid = reader.ReadContentAsUUID();
-                                if ((options & XmlDeserializationOptions.RestoreIDs) != 0)
-                                {
-                                    item.SetNewID(origid);
-                                }
+                                item.SetNewID(origid);
                                 break;
 
                             case "LastOwnerID":
@@ -523,6 +520,11 @@ namespace SilverSim.Scene.Types.Object
                             case "TaskInventoryItem":
                                 UUID origid;
                                 ObjectPartInventoryItem item = FromXML(reader, currentOwner, options, out origid);
+                                if(ContainsKey(item.ID))
+                                {
+                                    /* skip duplicate ids. There seems to be at least one OpenSim version generating bogus task inventory */
+                                    break;
+                                }
                                 try
                                 {
                                     Add(item, false);

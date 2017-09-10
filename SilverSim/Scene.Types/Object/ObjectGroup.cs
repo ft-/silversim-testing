@@ -1696,6 +1696,15 @@ namespace SilverSim.Scene.Types.Object
                         foreach (ObjectPart part in group.Values)
                         {
                             part.Owner = currentOwner;
+                            if((options & XmlDeserializationOptions.RestoreIDs) == 0)
+                            {
+                                foreach(UUID key in part.Inventory.Keys1)
+                                {
+                                    UUID newid = UUID.Random;
+                                    part.Inventory[key].SetNewID(newid);
+                                    part.Inventory.ChangeKey(newid, key);
+                                }
+                            }
                         }
                         group.FinalizeObject();
                         return group;
@@ -1792,6 +1801,7 @@ namespace SilverSim.Scene.Types.Object
         private static void FromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             string tagname = reader.Name;
+            bool isEmptyElement = reader.IsEmptyElement;
             var attrs = new Dictionary<string, string>();
             if (reader.MoveToFirstAttribute())
             {
@@ -1804,7 +1814,10 @@ namespace SilverSim.Scene.Types.Object
 
             if (!attrs.ContainsKey("Asset") || !attrs.ContainsKey("Engine"))
             {
-                reader.ReadToEndElement(tagname);
+                if (!isEmptyElement)
+                {
+                    reader.ReadToEndElement(tagname);
+                }
                 return;
             }
 
@@ -1829,7 +1842,10 @@ namespace SilverSim.Scene.Types.Object
 
             if (item == null)
             {
-                reader.ReadToEndElement(tagname);
+                if (!isEmptyElement)
+                {
+                    reader.ReadToEndElement(tagname);
+                }
             }
             else
             {
@@ -1840,7 +1856,10 @@ namespace SilverSim.Scene.Types.Object
                 }
                 catch
                 {
-                    reader.ReadToEndElement(tagname);
+                    if (!isEmptyElement)
+                    {
+                        reader.ReadToEndElement(tagname);
+                    }
                     return;
                 }
 
@@ -1850,7 +1869,10 @@ namespace SilverSim.Scene.Types.Object
                 }
                 catch (ScriptStateLoaderNotImplementedException)
                 {
-                    reader.ReadToEndElement(tagname);
+                    if (!isEmptyElement)
+                    {
+                        reader.ReadToEndElement(tagname);
+                    }
                     return;
                 }
             }
