@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     }
                     gfx.CompositingMode = CompositingMode.SourceOver;
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.HeadColorAndSkinGrain);
-                    if (cache.TryGetTexture(m_HeadTextureId, target, out img))
+                    if (m_HeadTextureId != UUID.Zero && cache.TryGetTexture(m_HeadTextureId, target, out img))
                     {
                         gfx.DrawUntinted(bakeRectangle, img);
                     }
@@ -142,7 +142,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                         gfx.FillRectangle(brush, bakeRectangle);
                     }
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.LowerBodyColorAndSkinGrain);
-                    if (cache.TryGetTexture(m_LowerTextureId, target, out img))
+                    if (m_LowerTextureId != UUID.Zero && cache.TryGetTexture(m_LowerTextureId, target, out img))
                     {
                         gfx.DrawUntinted(bakeRectangle, img);
                     }
@@ -166,7 +166,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                     }
 
                     gfx.DrawUntinted(bakeRectangle, BaseBakes.UpperBodyColorAndSkinGrain);
-                    if (cache.TryGetTexture(m_UpperTextureId, target, out img))
+                    if (m_UpperTextureId != UUID.Zero && cache.TryGetTexture(m_UpperTextureId, target, out img))
                     {
                         gfx.DrawUntinted(bakeRectangle, img);
                     }
