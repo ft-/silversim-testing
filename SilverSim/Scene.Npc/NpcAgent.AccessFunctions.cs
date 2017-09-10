@@ -34,8 +34,6 @@ namespace SilverSim.Scene.Npc
 {
     public partial class NpcAgent
     {
-        private readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
-
         public void DoSay(int channel, string text)
         {
             ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
