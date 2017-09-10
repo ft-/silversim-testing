@@ -394,47 +394,6 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        protected override void RezScriptsForObject(ObjectGroup group)
-        {
-            foreach (ObjectPart part in group.Values)
-            {
-                foreach (ObjectPartInventoryItem item in part.Inventory.Values)
-                {
-                    if (item.AssetType == AssetType.LSLText)
-                    {
-                        AssetData assetData;
-                        if (AssetService.TryGetValue(item.AssetID, out assetData))
-                        {
-                            try
-                            {
-                                item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, null);
-                                item.ScriptInstance.PostEvent(new OnRezEvent(0));
-
-                                if (item.ScriptInstance.IsResetRequired)
-                                {
-                                    item.ScriptInstance.IsResetRequired = false;
-                                    item.ScriptInstance.IsRunning = true;
-                                    item.ScriptInstance.Reset();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-#if DEBUG
-                                m_Log.ErrorFormat("Loading script {0} (asset {1}) for {2} ({3}) in {4} ({5}) failed: {6}: {7}\n{8}", item.Name, item.AssetID, part.Name, part.ID, part.ObjectGroup.Name, part.ObjectGroup.ID, e.GetType().FullName, e.Message, e.StackTrace);
-#else
-                                    m_Log.ErrorFormat("Loading script {0} (asset {1}) for {2} ({3}) in {4} ({5}) failed: {6}", item.Name, item.AssetID, part.Name, part.ID, part.ObjectGroup.Name, part.ObjectGroup.ID, e.Message);
-#endif
-                            }
-                        }
-                        else
-                        {
-                            m_Log.ErrorFormat("Script {0} (asset {1}) is missing for {2} ({3}) in {4} ({5})", item.Name, item.AssetID, part.Name, part.ID, part.ObjectGroup.Name, part.ObjectGroup.ID);
-                        }
-                    }
-                }
-            }
-        }
-
         public override void Add(IObject obj)
         {
             var objgroup = obj as ObjectGroup;
