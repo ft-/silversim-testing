@@ -175,6 +175,7 @@ namespace SilverSim.Scene.Types.Scene
                 group.Size);
             group.RezzingObjectID = UUID.Zero;
             Add(group);
+            RezScriptsForObject(group);
             return group.LocalID;
         }
 
@@ -187,10 +188,11 @@ namespace SilverSim.Scene.Types.Scene
             group.Owner = rezzingAgent;
             group.RezzingObjectID = UUID.Zero;
             Add(group);
+            RezScriptsForObject(group);
             return group.LocalID;
         }
 
-        protected abstract void RezScriptsForObject(ObjectGroup group);
+        public abstract void RezScriptsForObject(ObjectGroup group);
 
         public List<UUID> ReturnObjects(UUI returningAgent, List<UUID> objectids)
         {

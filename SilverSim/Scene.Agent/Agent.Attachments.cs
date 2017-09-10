@@ -388,6 +388,7 @@ namespace SilverSim.Scene.Agent
                     SendAlertMessage("ALERT: RezAttemptFailed");
                     return;
                 }
+                m_Scene.RezScriptsForObject(grp);
                 grp.PostEvent(new OnRezEvent());
                 grp.PostEvent(new AttachEvent { ObjectID = grp.Owner.ID });
             }
