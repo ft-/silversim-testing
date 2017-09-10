@@ -108,7 +108,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                         gfx.FillRectangle(brush, bakeRectangle);
                     }
                     gfx.CompositingMode = CompositingMode.SourceOver;
-                    gfx.DrawUntinted(bakeRectangle, BaseBakes.HeadColorAndSkinGrain);
+                    gfx.DrawTinted(bakeRectangle, BaseBakes.HeadColorAndSkinGrain, m_SkinColor);
                     if (m_HeadTextureId != UUID.Zero && cache.TryGetTexture(m_HeadTextureId, target, out img))
                     {
                         gfx.DrawUntinted(bakeRectangle, img);
