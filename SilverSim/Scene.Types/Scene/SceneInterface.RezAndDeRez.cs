@@ -147,7 +147,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public List<UInt32> RezObjects(List<ObjectGroup> groups, RezObjectParams rezparams)
         {
-            List<UInt32> result = new List<uint>();
+            var result = new List<uint>();
             foreach(ObjectGroup grp in groups)
             {
                 try
@@ -196,7 +196,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public List<UUID> ReturnObjects(UUI returningAgent, List<UUID> objectids)
         {
-            List<UUID> returned = new List<UUID>();
+            var returned = new List<UUID>();
 
             foreach (UUID objectid in objectids)
             {
