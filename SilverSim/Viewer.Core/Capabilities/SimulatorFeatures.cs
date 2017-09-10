@@ -60,6 +60,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                 extrasMap.Add("GridName", gridName);
             }
 
+            extrasMap.Add("SimulatorFPS", 30.0);
+            extrasMap.Add("SimulatorFPSWarnPercent", 66.6);
+            extrasMap.Add("SimulatorFPSCritPercent", 33.3);
+            extrasMap.Add("SimulatorFPSFactor", 1.0);
+
             if(!string.IsNullOrEmpty(searchUrl))
             {
                 extrasMap.Add("search-server-url", searchUrl);
@@ -72,6 +77,37 @@ namespace SilverSim.Viewer.Core.Capabilities
             {
                 Features.Add("OpenSimExtras", extrasMap);
             }
+
+            /* known OpenSimExtras
+             * GrickName:string
+             * GridURL:string
+             * ExportSupported:bool
+             * map-server-url:string
+             * say-range:integer
+             * shout-range:integer
+             * whisper-range:integer
+             * SimulatorFPS:double
+             * SimulatorFPSFactor:double
+             * SimulatorFPSWarnPercent:double
+             * SimulatorFPSCritPercent:double
+             * search-server-url:string
+             * destination-guide-url:string
+             * avatar-picker-url:string
+             * camera-only-mode:bool
+             * special-ui:map(toolbar:string,floaters:map)
+             * 
+             * known root features:
+             * god_names:map(last_names:array(string),full_names:array(string))
+             * MeshRezEnabled:bool
+             * MeshUploadEnabled:bool
+             * MeshXferEnabled:true
+             * PhysicsMaterialsEnabled:true
+             * RenderMaterialsCapability:double
+             * MaxMaterialsPerTransaction:integer
+             * DynamicPathfindingEnabled:bool
+             * AvatarHoverHeightEnabled:bool
+             * PhysicsShapeTypes:map(convex:bool,none:bool,prim:bool)
+             */
         }
 
         public void HttpRequestHandler(HttpRequest httpreq)
