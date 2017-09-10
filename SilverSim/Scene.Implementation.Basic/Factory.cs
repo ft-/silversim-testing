@@ -22,6 +22,7 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Implementation.Common;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
@@ -50,9 +51,8 @@ namespace SilverSim.Scene.Implementation.Basic
 {
     [Description("Basic Scene Factory")]
     [PluginName("Scene")]
-    public sealed class SceneFactory : SceneFactoryInterface, IPlugin
+    public sealed class SceneFactory : SceneImplementationFactory, IPlugin
     {
-        internal ChatServiceFactoryInterface ChatFactory { get; private set; }
         private readonly string m_ChatFactoryName;
         private readonly string m_GroupsNameServiceName;
         private readonly string m_GroupsServiceName;
@@ -69,32 +69,6 @@ namespace SilverSim.Scene.Implementation.Basic
         private readonly string m_PathfindingServiceFactoryName;
         private readonly string m_ExperienceServiceName;
         private readonly List<string> m_AvatarNameServiceNames = new List<string>();
-
-        internal GroupsNameServiceInterface GroupsNameService { get; private set; }
-        internal AssetServiceInterface AssetService { get; private set; }
-        internal AssetServiceInterface AssetCacheService { get; private set; }
-        internal GridServiceInterface GridService { get; private set; }
-        internal GridServiceInterface RegionStorage { get; private set; }
-        internal GroupsServiceInterface GroupsService { get; private set; }
-        internal IMServiceInterface IMService { get; private set; }
-        internal EstateServiceInterface EstateService { get; private set; }
-        internal SimulationDataStorageInterface SimulationDataStorage { get; private set; }
-        internal readonly Dictionary<string, string> m_CapabilitiesConfig = new Dictionary<string, string>();
-        internal IPhysicsSceneFactory PhysicsFactory { get; private set; }
-        internal NeighborServiceInterface NeighborService { get; private set; }
-        internal ExternalHostNameServiceInterface ExternalHostNameService { get; private set; }
-        internal readonly List<AvatarNameServiceInterface> AvatarNameServices = new List<AvatarNameServiceInterface>();
-        internal SceneList Scenes { get; private set; }
-        internal IMRouter IMRouter { get; private set; }
-        internal BaseHttpServer HttpServer { get; private set; }
-        internal List<IPortControlServiceInterface> PortControlServices { get; private set; }
-        internal IWindModelFactory WindModelFactory { get; private set; }
-        internal IPathfindingServiceFactory PathfindingServiceFactory { get; private set; }
-        internal ExperienceServiceInterface ExperienceService { get; private set; }
-
-        internal List<IUserAgentServicePlugin> UserAgentServicePlugins { get; private set; }
-        internal List<IAssetServicePlugin> AssetServicePlugins { get; private set; }
-        internal List<IInventoryServicePlugin> InventoryServicePlugins { get; private set; }
 
         public SceneFactory(IConfig ownConfig)
         {

@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_5" name="SilverSim.Scene.Implementation.Basic" path="SilverSim/Scene.Implementation.Basic" type="Library">
+<Project frameworkVersion="v4_5" name="SilverSim.Scene.Implementation.Common" path="SilverSim/Scene.Implementation.Common" type="Library">
   <Configuration name="Release">
     <Options>
-      <OutputPath>../../bin/plugins</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="DebugRel">
     <Options>
-      <OutputPath>../../bin/plugins</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
     <Options>
-      <OutputPath>../../bin/plugins</OutputPath>
+      <OutputPath>../../bin</OutputPath>
     </Options>
   </Configuration>
   <ReferencePath>../../bin</ReferencePath>
@@ -26,7 +26,6 @@
   <Reference name="SilverSim.Scene.Types" localCopy="false"/>
   <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
   <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-  <Reference name="SilverSim.Scene.Implementation.Common" localCopy="false"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
   <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
   <Reference name="SilverSim.Viewer.Core" localCopy="false"/>
@@ -37,7 +36,6 @@
     <Match pattern="*.cs" recurse="true">
       <Exclude pattern="TemporaryGeneratedFile"/>
     </Match>
-    <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
     <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
     <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
     <Match pattern="Product.licenseheader" path=".." recurse="false" buildAction="None"/>

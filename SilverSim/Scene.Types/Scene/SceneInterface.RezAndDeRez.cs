@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -177,6 +178,20 @@ namespace SilverSim.Scene.Types.Scene
             return group.LocalID;
         }
 
+        public UInt32 RezObject(ObjectGroup group, UUI rezzingAgent)
+        {
+            foreach (ObjectPart part in group.Values)
+            {
+                part.RezDate = Date.Now;
+            }
+            group.Owner = rezzingAgent;
+            group.RezzingObjectID = UUID.Zero;
+            Add(group);
+            return group.LocalID;
+        }
+
+        protected abstract void RezScriptsForObject(ObjectGroup group);
+
         public List<UUID> ReturnObjects(UUI returningAgent, List<UUID> objectids)
         {
             List<UUID> returned = new List<UUID>();
@@ -273,7 +288,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectDuplicate)]
-        public void HandleObjectDuplicate(Message m)
+        internal void HandleObjectDuplicate(Message m)
         {
             var req = (Viewer.Messages.Object.ObjectDuplicate)m;
             if (req.AgentID != m.CircuitAgentID ||
@@ -344,12 +359,12 @@ namespace SilverSim.Scene.Types.Scene
                     newgrp.Group = ugi;
                 }
 
-                Add(newgrp);
+                RezObject(newgrp, grp.Owner);
             }
         }
 
         [PacketHandler(MessageType.ObjectDelete)]
-        public void HandleObjectDelete(Message m)
+        internal void HandleObjectDelete(Message m)
         {
             var req = (Viewer.Messages.Object.ObjectDelete)m;
             if (req.AgentID != m.CircuitAgentID ||

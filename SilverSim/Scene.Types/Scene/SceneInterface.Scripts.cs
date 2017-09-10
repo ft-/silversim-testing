@@ -93,6 +93,43 @@ namespace SilverSim.Scene.Types.Scene
             agent.SendMessageAlways(reply, ID);
         }
 
+        [PacketHandler(MessageType.SetScriptRunning)]
+        internal void HandleSetScriptRunning(Message m)
+        {
+            var req = (SetScriptRunning)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            Script.ScriptInstance instance;
+            ObjectPart part;
+            ObjectPartInventoryItem item;
+            if (!Primitives.TryGetValue(req.ObjectID, out part) ||
+                !part.Inventory.TryGetValue(req.ItemID, out item) ||
+                !Agents.TryGetValue(req.CircuitAgentID, out agent) ||
+                !part.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify) ||
+                !item.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Modify))
+            {
+                return;
+            }
+            instance = item.ScriptInstance;
+            if(instance != null)
+            {
+                instance.IsRunning = req.IsRunning;
+            }
+
+            var reply = new ScriptRunningReply()
+            {
+                ItemID = req.ItemID,
+                ObjectID = req.ObjectID,
+                IsRunning = instance?.IsRunning == true
+            };
+            agent.SendMessageAlways(reply, ID);
+        }
+
         [PacketHandler(MessageType.ScriptAnswerYes)]
         internal void HandleScriptAnswerYes(Message m)
         {

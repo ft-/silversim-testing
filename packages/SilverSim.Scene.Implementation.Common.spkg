@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Scene.Implementation.Common</name>
+	<files>
+		<file name="bin/SilverSim.Scene.Implementation.Common.dll"/>
+	</files>
+</package>

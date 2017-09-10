@@ -19,14 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.Viewer.Core
