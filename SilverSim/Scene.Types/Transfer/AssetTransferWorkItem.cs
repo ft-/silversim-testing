@@ -93,7 +93,14 @@ namespace SilverSim.Scene.Types.Transfer
                     {
                         if(!exists_assetids[assetid])
                         {
-                            m_DestinationAssetService.Store(m_SourceAssetService[assetid]);
+                            try
+                            {
+                                m_DestinationAssetService.Store(m_SourceAssetService[assetid]);
+                            }
+                            catch(AssetNotFoundException)
+                            {
+                                /* ignore this one since there is simply too many of incomplete items */
+                            }
                         }
 
                         List<UUID> ref_assetids = m_RefSource == ReferenceSource.Destination ?
