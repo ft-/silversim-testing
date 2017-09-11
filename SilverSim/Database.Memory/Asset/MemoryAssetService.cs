@@ -76,20 +76,8 @@ namespace SilverSim.Database.Memory.Asset
             AssetData internalAsset;
             if(m_Assets.TryGetValue(key, out internalAsset))
             {
-                internalAsset.CreateTime = Date.Now;
-                asset = new AssetData()
-                {
-                    ID = internalAsset.ID,
-                    Data = new byte[internalAsset.Data.Length],
-                    Type = internalAsset.Type,
-                    Name = internalAsset.Name,
-                    CreateTime = internalAsset.CreateTime,
-                    AccessTime = internalAsset.AccessTime,
-                    Creator = internalAsset.Creator,
-                    Flags = internalAsset.Flags,
-                    Temporary = internalAsset.Temporary
-                };
-                Buffer.BlockCopy(internalAsset.Data, 0, asset.Data, 0, internalAsset.Data.Length);
+                internalAsset.AccessTime = Date.Now;
+                asset = new AssetData(internalAsset);
                 return true;
             }
             asset = null;
@@ -132,17 +120,8 @@ namespace SilverSim.Database.Memory.Asset
             AssetData data;
             if (m_Assets.TryGetValue(key, out data))
             {
-                metadata = new AssetMetadata()
-                {
-                    ID = data.ID,
-                    Type = data.Type,
-                    Name = data.Name,
-                    CreateTime = data.CreateTime,
-                    AccessTime = data.AccessTime,
-                    Creator = data.Creator,
-                    Flags = data.Flags,
-                    Temporary = data.Temporary
-                };
+                data.AccessTime = Date.Now;
+                metadata = new AssetMetadata(data);
                 return true;
             }
             else
@@ -179,6 +158,7 @@ namespace SilverSim.Database.Memory.Asset
             AssetData data;
             if (m_Assets.TryGetValue(key, out data))
             {
+                data.AccessTime = Date.Now;
                 s = data.InputStream;
                 return true;
             }
@@ -198,39 +178,13 @@ namespace SilverSim.Database.Memory.Asset
             {
                 if(internalAsset.Flags != AssetFlags.Normal)
                 {
-                    internalAsset = new AssetData()
-                    {
-                        ID = asset.ID,
-                        Data = new byte[asset.Data.Length],
-                        Type = asset.Type,
-                        Name = asset.Name,
-                        CreateTime = asset.CreateTime,
-                        AccessTime = asset.AccessTime,
-                        Creator = asset.Creator,
-                        Flags = asset.Flags,
-                        Temporary = asset.Temporary
-                    };
-                    Buffer.BlockCopy(asset.Data, 0, internalAsset.Data, 0, asset.Data.Length);
-
+                    internalAsset = new AssetData(asset);
                     m_Assets[internalAsset.ID] = internalAsset;
                 }
             }
             else
             {
-                internalAsset = new AssetData()
-                {
-                    ID = asset.ID,
-                    Data = new byte[asset.Data.Length],
-                    Type = asset.Type,
-                    Name = asset.Name,
-                    CreateTime = asset.CreateTime,
-                    AccessTime = asset.AccessTime,
-                    Creator = asset.Creator,
-                    Flags = asset.Flags,
-                    Temporary = asset.Temporary
-                };
-                Buffer.BlockCopy(asset.Data, 0, internalAsset.Data, 0, asset.Data.Length);
-
+                internalAsset = new AssetData(asset);
                 m_Assets.Add(internalAsset.ID, internalAsset);
             }
         }
