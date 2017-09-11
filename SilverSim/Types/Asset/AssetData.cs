@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -27,6 +28,17 @@ namespace SilverSim.Types.Asset
     public class AssetData : AssetMetadata, Format.IReferencesAccessor
     {
         public byte[] Data = new byte[0];
+
+        public AssetData()
+        {
+        }
+
+        public AssetData(AssetData copy)
+            : base(copy)
+        {
+            Data = new byte[copy.Data.Length];
+            Buffer.BlockCopy(copy.Data, 0, Data, 0, Data.Length);
+        }
 
         public Stream InputStream
         {

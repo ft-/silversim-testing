@@ -35,6 +35,23 @@ namespace SilverSim.Types.Asset
         public Date CreateTime = new Date();
         public Date AccessTime = new Date();
 
+        public AssetMetadata()
+        {
+        }
+
+        public AssetMetadata(AssetMetadata copy)
+        {
+            ID = copy.ID;
+            Local = copy.Local;
+            Temporary = copy.Temporary;
+            Type = copy.Type;
+            Name = copy.Name;
+            Creator = copy.Creator;
+            Flags = copy.Flags;
+            CreateTime = copy.CreateTime;
+            AccessTime = copy.AccessTime;
+        }
+
         public string FileExtension
         {
             get
