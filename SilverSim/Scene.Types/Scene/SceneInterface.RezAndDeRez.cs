@@ -23,7 +23,6 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Script;
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -332,8 +331,8 @@ namespace SilverSim.Scene.Types.Scene
                     var newpart = new ObjectPart(UUID.Random, part);
                     newpart.RezDate = Date.Now;
                     newpart.ObjectGroup = newgrp;
-                    newpart.IsChangedEnabled = true;
                     newgrp.Add(part.LinkNumber, newpart.ID, newpart);
+                    newpart.UpdateData(ObjectPart.UpdateDataFlags.All);
 
                     foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in part.Inventory.Key1ValuePairs)
                     {
@@ -356,15 +355,18 @@ namespace SilverSim.Scene.Types.Scene
                         newpart.Inventory.Add(newItem);
                     }
                     newgrp.GlobalPosition += req.Offset;
-                    UGI ugi = UGI.Unknown;
-                    GroupsNameService?.TryGetValue(req.GroupID, out ugi);
-                    newgrp.Group = ugi;
+                    newpart.IsChangedEnabled = true;
                 }
 
-#if DEBUG
-                m_Log.DebugFormat("Duplicated object {0} ({1}) as {1} ({2})", grp.Name, grp.ID, newgrp.Name, newgrp.ID);
-#endif
+                UGI ugi = UGI.Unknown;
+                GroupsNameService?.TryGetValue(req.GroupID, out ugi);
+                newgrp.Group = ugi;
+                newgrp.Owner = agent.Owner;
+
                 RezObject(newgrp, grp.Owner);
+#if DEBUG
+                m_Log.DebugFormat("Duplicated object {0} ({1}, {2}) as {3} ({4}, {5})", grp.Name, grp.LocalID, grp.ID, newgrp.Name, newgrp.LocalID, newgrp.ID);
+#endif
             }
         }
 
