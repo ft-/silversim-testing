@@ -320,7 +320,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 catch
                 {
-                    agent.SendAlertMessage("ALERT: DeleteFailObjNotFound", ID);
+                    agent.SendAlertMessage("ALERT: CantFindObject", ID);
                 }
             }
 
