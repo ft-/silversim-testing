@@ -290,7 +290,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectDuplicate)]
-        internal void HandleObjectDuplicate(Message m)
+        public void HandleObjectDuplicate(Message m)
         {
             var req = (Viewer.Messages.Object.ObjectDuplicate)m;
             if (req.AgentID != m.CircuitAgentID ||
@@ -361,12 +361,15 @@ namespace SilverSim.Scene.Types.Scene
                     newgrp.Group = ugi;
                 }
 
+#if DEBUG
+                m_Log.DebugFormat("Duplicated object {0} ({1}) as {1} ({2})", grp.Name, grp.ID, newgrp.Name, newgrp.ID);
+#endif
                 RezObject(newgrp, grp.Owner);
             }
         }
 
         [PacketHandler(MessageType.ObjectDelete)]
-        internal void HandleObjectDelete(Message m)
+        public void HandleObjectDelete(Message m)
         {
             var req = (Viewer.Messages.Object.ObjectDelete)m;
             if (req.AgentID != m.CircuitAgentID ||
