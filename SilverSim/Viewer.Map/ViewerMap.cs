@@ -267,7 +267,7 @@ namespace SilverSim.Viewer.Map
 
                 if(ri == null && foundRegionButWrongProtocol)
                 {
-                    agent.SendAlertMessage(string.Format("Your home grid does not support the selected target grid (running {0}).", foundProtocolName), scene.ID);
+                    agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "YourHomeGridDoesNotSupportSelectedTargetGrid0", "Your home grid does not support the selected target grid (running {0})."), foundProtocolName), scene.ID);
                 }
                 else if(ri != null)
                 {
@@ -289,7 +289,7 @@ namespace SilverSim.Viewer.Map
             }
             else if(string.IsNullOrEmpty(regionName))
             {
-                agent.SendAlertMessage("Please enter a string", scene.ID);
+                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "PleaseEnterAString", "Please enter a string"), scene.ID);
             }
             else
             {
