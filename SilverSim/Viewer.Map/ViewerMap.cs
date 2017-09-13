@@ -210,38 +210,54 @@ namespace SilverSim.Viewer.Map
                     isForeignGridTarget = true;
                 }
             }
-            s = req.Name.Split(new char[] { ' ' }, 2);
-            if(s.Length > 1)
+            if (isForeignGridTarget)
             {
-                if(Uri.IsWellFormedUriString(s[0],UriKind.Absolute))
-                {
-                    /* this is a foreign grid URI of form <url> <region name> */
-                    gatekeeperURI = s[0];
-                    regionName = s[1];
-                }
-                else
-                {
-                    /* does not look like a uri at all */
-                }
-            }
-            else if(Uri.IsWellFormedUriString(req.Name, UriKind.Absolute))
-            {
-                /* this is a foreign Grid URI for the Default Region */
-                gatekeeperURI = req.Name;
-                regionName = string.Empty;
+                /* already identified one form */
             }
             else
             {
-                /* local Grid URI */
+                s = req.Name.Split(new char[] { ' ' }, 2);
+                if (s.Length > 1)
+                {
+                    if (Uri.IsWellFormedUriString(s[0], UriKind.Absolute))
+                    {
+                        /* this is a foreign grid URI of form <url> <region name> */
+                        gatekeeperURI = s[0];
+                        regionName = s[1];
+                        isForeignGridTarget = true;
+                    }
+                    else
+                    {
+                        /* does not look like a uri at all */
+                    }
+                }
+                else if (Uri.IsWellFormedUriString(req.Name, UriKind.Absolute))
+                {
+                    /* this is a foreign Grid URI for the Default Region */
+                    gatekeeperURI = req.Name;
+                    regionName = string.Empty;
+                    isForeignGridTarget = true;
+                }
+                else
+                {
+                    /* local Grid URI */
+                }
             }
 
             if(isForeignGridTarget)
             {
+#if DEBUG
+                m_Log.InfoFormat("MapNameRequest for foreign at {0} region={1}", gatekeeperURI, regionName);
+#endif
+
                 RegionInfo ri = null;
                 var foundRegionButWrongProtocol = false;
                 var foundProtocolName = string.Empty;
                 foreach(var foreignGrid in m_ForeignGridConnectorPlugins)
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Testing foreign grid protocol {0}", foreignGrid.Name);
+#endif
                     if(foreignGrid.IsProtocolSupported(gatekeeperURI))
                     {
                         try
@@ -293,6 +309,10 @@ namespace SilverSim.Viewer.Map
             }
             else
             {
+#if DEBUG
+                m_Log.InfoFormat("MapNameRequest for {0} at local grid", regionName);
+#endif
+
                 var service = scene.GridService;
                 if(service != null)
                 {
