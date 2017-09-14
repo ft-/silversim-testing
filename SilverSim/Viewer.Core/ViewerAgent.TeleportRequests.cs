@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Core
         private static readonly Random m_RandomNumber = new Random();
         private static readonly object m_RandomNumberLock = new object();
 
-        private ushort NewInterGridRegionLocY
+        private ushort NewInterGridRegionLocX
         {
             get
             {
@@ -70,8 +70,8 @@ namespace SilverSim.Viewer.Core
             CleanDestinationCache();
             var hgRegionHandle = new GridVector()
             {
-                GridX = 0,
-                GridY = NewInterGridRegionLocY
+                GridX = NewInterGridRegionLocX,
+                GridY = 0
             };
             m_InterGridDestinations[hgRegionHandle.RegionHandle] = new KeyValuePair<ulong, RegionInfo>(Date.GetUnixTime(), di);
             return hgRegionHandle;
