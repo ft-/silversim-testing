@@ -313,7 +313,6 @@ namespace SilverSim.Viewer.Map
                         Y = hgLoc.GridY,
                         SizeX = ri.Size.GridX,
                         SizeY = ri.Size.GridY,
-
                         Name = ri.Name,
                         Access = ri.Access,
                         RegionFlags = RegionOptionFlags.None, /* this is same region flags as seen on a sim */
