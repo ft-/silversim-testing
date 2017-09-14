@@ -24,7 +24,6 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using System;
 using System.ComponentModel;
 
 namespace SilverSim.ServiceInterfaces.Teleport
