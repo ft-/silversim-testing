@@ -30,6 +30,6 @@ namespace SilverSim.ServiceInterfaces.Grid
             get;
         }
 
-        public abstract bool TryGetValue(string name, out RegionInfo rInfo);
+        public abstract bool TryGetValue(string name, out RegionInfo rInfo, out string message);
     }
 }
