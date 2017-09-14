@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Map
         public UUID AgentID;
         public MapAgentFlags Flags;
 
-        public struct DataEntry
+        public class DataEntry
         {
             public UInt16 X;
             public UInt16 Y;
@@ -45,17 +45,11 @@ namespace SilverSim.Viewer.Messages.Map
             public byte WaterHeight;
             public byte Agents;
             public UUID MapImageID;
+            public UInt16 SizeX;
+            public UInt16 SizeY;
         }
 
         public List<DataEntry> Data = new List<DataEntry>();
-
-        public struct SizeInfo
-        {
-            public UInt16 X;
-            public UInt16 Y;
-        }
-
-        public List<SizeInfo> Size = new List<SizeInfo>();
 
         public override void Serialize(UDPPacket p)
         {
@@ -73,11 +67,11 @@ namespace SilverSim.Viewer.Messages.Map
                 p.WriteUInt8(d.Agents);
                 p.WriteUUID(d.MapImageID);
             }
-            p.WriteUInt8((byte)Size.Count);
-            foreach(var d in Size)
+            p.WriteUInt8((byte)Data.Count);
+            foreach(var d in Data)
             {
-                p.WriteUInt16(d.X);
-                p.WriteUInt16(d.Y);
+                p.WriteUInt16(d.SizeX);
+                p.WriteUInt16(d.SizeY);
             }
         }
 
@@ -104,13 +98,14 @@ namespace SilverSim.Viewer.Messages.Map
                 });
             }
             n = p.ReadUInt8();
-            while(n--!=0)
+            if(n > m.Data.Count)
             {
-                m.Size.Add(new SizeInfo()
-                {
-                    X = p.ReadUInt16(),
-                    Y = p.ReadUInt16()
-                });
+                n = (uint)m.Data.Count;
+            }
+            for (int i = 0; i < n; ++i)
+            {
+                m.Data[i].SizeX = p.ReadUInt16();
+                m.Data[i].SizeY = p.ReadUInt16();
             }
             return m;
         }

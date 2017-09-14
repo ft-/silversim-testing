@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Core
                 GridX = 0,
                 GridY = NewInterGridRegionLocY
             };
-            m_InterGridDestinations.Add(di.Location.RegionHandle, new KeyValuePair<ulong, RegionInfo>(Date.GetUnixTime(), di));
+            m_InterGridDestinations[hgRegionHandle.RegionHandle] = new KeyValuePair<ulong, RegionInfo>(Date.GetUnixTime(), di);
             return hgRegionHandle;
         }
 

@@ -265,6 +265,9 @@ namespace SilverSim.Viewer.Map
                         {
                             if(!foreignGrid.Instantiate(gatekeeperURI).TryGetValue(regionName, out ri, out message))
                             {
+#if DEBUG
+                                m_Log.DebugFormat("Foreign grid \"{0}\" does not have the region \"{1}\"", gatekeeperURI, regionName);
+#endif
                                 continue;
                             }
                         }
@@ -283,7 +286,7 @@ namespace SilverSim.Viewer.Map
                         else
                         {
 #if DEBUG
-                            m_Log.DebugFormat("Selected protocol {0}", foreignGrid.Name);
+                            m_Log.DebugFormat("Selected protocol \"{0}\" region => \"{1}\"", foreignGrid.Name, ri.Name);
 #endif
                             break;
                         }
@@ -308,6 +311,8 @@ namespace SilverSim.Viewer.Map
                         /* we map foreign grid locations in specific agent only */
                         X = hgLoc.GridX,
                         Y = hgLoc.GridY,
+                        SizeX = ri.Size.GridX,
+                        SizeY = ri.Size.GridY,
 
                         Name = ri.Name,
                         Access = ri.Access,
@@ -347,6 +352,8 @@ namespace SilverSim.Viewer.Map
                         {
                             X = ri.Location.GridX,
                             Y = ri.Location.GridY,
+                            SizeX = ri.Size.GridX,
+                            SizeY = ri.Size.GridY,
 
                             Name = ri.Name,
                             Access = ri.Access,
