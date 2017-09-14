@@ -25,11 +25,8 @@
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Teleport;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {

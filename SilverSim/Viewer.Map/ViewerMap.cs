@@ -253,21 +253,27 @@ namespace SilverSim.Viewer.Map
                 RegionInfo ri = null;
                 var foundRegionButWrongProtocol = false;
                 var foundProtocolName = string.Empty;
+                string message;
                 foreach(var foreignGrid in m_ForeignGridConnectorPlugins)
                 {
 #if DEBUG
-                    m_Log.DebugFormat("Testing foreign grid protocol {0}", foreignGrid.Name);
+                    m_Log.DebugFormat("Testing foreign grid protocol \"{0}\"", foreignGrid.DisplayName);
 #endif
                     if(foreignGrid.IsProtocolSupported(gatekeeperURI))
                     {
                         try
                         {
-                            ri = foreignGrid.Instantiate(gatekeeperURI)[regionName];
+                            if(!foreignGrid.Instantiate(gatekeeperURI).TryGetValue(regionName, out ri, out message))
+                            {
+                                continue;
+                            }
                         }
-                        catch
+                        catch(Exception e)
                         {
+                            m_Log.Error("Failed to connect to grid " + gatekeeperURI, e);
                             continue;
                         }
+
                         if(!foreignGrid.IsAgentSupported(agent.SupportedGridTypes))
                         {
                             foundRegionButWrongProtocol = true;
@@ -276,8 +282,17 @@ namespace SilverSim.Viewer.Map
                         }
                         else
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Selected protocol {0}", foreignGrid.Name);
+#endif
                             break;
                         }
+                    }
+                    else
+                    {
+#if DEBUG
+                        m_Log.DebugFormat("Foreign grid protocol \"{0}\" not supported for \"{1}\"", foreignGrid.DisplayName, gatekeeperURI);
+#endif
                     }
                 }
 
