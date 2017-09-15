@@ -19,16 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
-using System.Collections.Generic;
+using SilverSim.Types;
 
-namespace SilverSim.Types.Agent
+namespace SilverSim.ServiceInterfaces
 {
-    public class CircuitInfo
+    public interface ILoginResponseServiceInterface
     {
-        public uint CircuitCode;
-        public string CapsPath = string.Empty;
-        public bool IsChild;
-        public Dictionary<UInt64, string> ChildrenCapSeeds = new Dictionary<UInt64, string>();
+        void AppendLoginResponse(Map m);
     }
 }

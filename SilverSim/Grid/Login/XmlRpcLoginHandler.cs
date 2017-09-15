@@ -116,6 +116,7 @@ namespace SilverSim.Grid.Login
         private string m_GatekeeperUri;
         private List<IServiceURLsGetInterface> m_ServiceURLsGetters = new List<IServiceURLsGetInterface>();
         private List<IGridInfoServiceInterface> m_GridInfoGetters = new List<IGridInfoServiceInterface>();
+        private List<ILoginResponseServiceInterface> m_LoginResponseGetters = new List<ILoginResponseServiceInterface>();
 
         public XmlRpcLoginHandler(IConfig ownSection)
         {
@@ -135,6 +136,7 @@ namespace SilverSim.Grid.Login
         {
             m_ServiceURLsGetters = loader.GetServicesByValue<IServiceURLsGetInterface>();
             m_GridInfoGetters = loader.GetServicesByValue<IGridInfoServiceInterface>();
+            m_LoginResponseGetters = loader.GetServicesByValue<ILoginResponseServiceInterface>();
             m_HomeUri = loader.HomeURI;
             m_XmlRpcServer = loader.XmlRpcServer;
             m_GatekeeperUri = loader.GatekeeperURI;
@@ -700,6 +702,12 @@ namespace SilverSim.Grid.Login
             {
                 ReturnValue = resStruct
             };
+
+            foreach(ILoginResponseServiceInterface getter in m_LoginResponseGetters)
+            {
+                getter.AppendLoginResponse(resStruct);
+            }
+
             if (loginData.InventoryRoot != null)
             {
                 var data = new Map
@@ -849,7 +857,6 @@ namespace SilverSim.Grid.Login
             }
 
             resStruct.Add("sim_ip", ((IPEndPoint)loginData.DestinationInfo.SimIP).Address.ToString());
-            resStruct.Add("map-server-url", loginData.CircuitInfo.MapServerURL);
 
             if(loginData.Friends != null)
             {

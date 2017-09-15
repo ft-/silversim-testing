@@ -462,19 +462,79 @@ namespace SilverSim.Main.Common
                 ConstructorInfo ci;
                 if((ci = t.GetConstructor(new Type[] { typeof(IConfig) })) != null)
                 {
-                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { config }));
+                    try
+                    {
+                        PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { config }));
+                    }
+                    catch(TargetInvocationException e)
+                    {
+                        if (e.InnerException != null)
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.InnerException.GetType().FullName, e.InnerException.Message);
+                        }
+                        else
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.GetType().FullName, e.Message);
+                        }
+                        throw new ConfigurationErrorException();
+                    }
                 }
                 else if ((ci = t.GetConstructor(new Type[] { typeof(ConfigurationLoader), typeof(IConfig) })) != null)
                 {
-                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { this, config }));
+                    try
+                    {
+                        PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { this, config }));
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        if (e.InnerException != null)
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.InnerException.GetType().FullName, e.InnerException.Message);
+                        }
+                        else
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.GetType().FullName, e.Message);
+                        }
+                        throw new ConfigurationErrorException();
+                    }
                 }
                 else if ((ci = t.GetConstructor(new Type[] { typeof(ConfigurationLoader) })) != null)
                 {
-                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { this }));
+                    try
+                    {
+                        PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[] { this }));
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        if (e.InnerException != null)
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.InnerException.GetType().FullName, e.InnerException.Message);
+                        }
+                        else
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.GetType().FullName, e.Message);
+                        }
+                        throw new ConfigurationErrorException();
+                    }
                 }
                 else if ((ci = t.GetConstructor(Type.EmptyTypes)) != null)
                 {
-                    PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[0]));
+                    try
+                    {
+                        PluginInstances.Add(config.Name, (IPlugin)ci.Invoke(new object[0]));
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        if (e.InnerException != null)
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.InnerException.GetType().FullName, e.InnerException.Message);
+                        }
+                        else
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.GetType().FullName, e.Message);
+                        }
+                        throw new ConfigurationErrorException();
+                    }
                 }
                 else
                 {
