@@ -306,24 +306,39 @@ namespace SilverSim.Scene.Agent.Bakery
 
                 logOutput?.Invoke("Processing R,G,B and bump parts");
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Skin], SkinIndices);
-                DrawSubBakers(Tgt, SourceBakers[WearableType.Tattoo], SkinIndices);
+
+                DrawSubBakers(Tgt, SourceBakers[WearableType.Tattoo].OrderBy(item => item.Ordinal), SkinIndices);
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Hair], new BakeTarget[] { BakeTarget.Hair });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Hair], new BakeTarget[] { BakeTarget.Hair });
-                DrawSubBakers(Tgt, SourceBakers[WearableType.Eyes].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.Eyes });
+
+                DrawSubBakers(Tgt, SourceBakers[WearableType.Eyes], new BakeTarget[] { BakeTarget.Eyes });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Eyes], new BakeTarget[] { BakeTarget.Eyes });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Underpants].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.LowerBody });
+                DrawBumpMaps(Tgt, SourceBakers[WearableType.Underpants], new BakeTarget[] { BakeTarget.LowerBody });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Undershirt].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.UpperBody });
+                DrawBumpMaps(Tgt, SourceBakers[WearableType.Undershirt], new BakeTarget[] { BakeTarget.UpperBody });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Socks].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.LowerBody });
+                DrawBumpMaps(Tgt, SourceBakers[WearableType.Socks], new BakeTarget[] { BakeTarget.LowerBody });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Shoes].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.LowerBody });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Shoes], new BakeTarget[] { BakeTarget.LowerBody });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Pants].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.LowerBody });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Pants], new BakeTarget[] { BakeTarget.LowerBody });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Shirt].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.UpperBody });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Shirt], new BakeTarget[] { BakeTarget.UpperBody });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Jacket].OrderBy(item => item.Ordinal), ClothingIndices);
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Jacket], ClothingIndices);
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Gloves].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.UpperBody });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Gloves], new BakeTarget[] { BakeTarget.UpperBody });
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Skirt].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.Skirt });
                 DrawBumpMaps(Tgt, SourceBakers[WearableType.Skirt], new BakeTarget[] { BakeTarget.Skirt });
 
