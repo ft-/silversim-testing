@@ -54,8 +54,11 @@ namespace SilverSim.Scene.Agent.Bakery
 
             public Targets()
             {
+                Bumps.Add(BakeTarget.Eyes, new byte[128 * 128]);
+                Bumps.Add(BakeTarget.Hair, new byte[512 * 512]);
                 Bumps.Add(BakeTarget.Head, new byte[512 * 512]);
                 Bumps.Add(BakeTarget.UpperBody, new byte[512 * 512]);
+                Bumps.Add(BakeTarget.LowerBody, new byte[512 * 512]);
                 Bumps.Add(BakeTarget.LowerBody, new byte[512 * 512]);
                 Rectangles.Add(BakeTarget.Eyes, new Rectangle(0, 0, 128, 128));
                 Rectangles.Add(BakeTarget.Hair, new Rectangle(0, 0, 512, 512));
@@ -305,7 +308,9 @@ namespace SilverSim.Scene.Agent.Bakery
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Skin], SkinIndices);
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Tattoo], SkinIndices);
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Hair], new BakeTarget[] { BakeTarget.Hair });
+                DrawBumpMaps(Tgt, SourceBakers[WearableType.Hair], new BakeTarget[] { BakeTarget.Hair });
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Eyes].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.Eyes });
+                DrawBumpMaps(Tgt, SourceBakers[WearableType.Eyes], new BakeTarget[] { BakeTarget.Eyes });
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Underpants].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.LowerBody });
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Undershirt].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.UpperBody });
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Socks].OrderBy(item => item.Ordinal), new BakeTarget[] { BakeTarget.LowerBody });
@@ -406,9 +411,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     ID = UUID.RandomFixedFirst(0xffffffff),
                     Type = AssetType.Texture,
                     Temporary = true,
-                    Data = Tgt.Bumps.TryGetValue(BakeTarget.Hair, out finalbump) ? 
-                        J2cEncoder.EncodeWithBump(Tgt.Images[BakeTarget.Hair], true, finalbump) :
-                        J2cEncoder.Encode(Tgt.Images[BakeTarget.Hair], true),
+                    Data = J2cEncoder.EncodeWithBump(Tgt.Images[BakeTarget.Hair], true, Tgt.Bumps[BakeTarget.Hair]),
                     Name = "Bake Texture Hair"
                 };
                 output.HeadBake = new AssetData
@@ -443,7 +446,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     ID = UUID.RandomFixedFirst(0xffffffff),
                     Type = AssetType.Texture,
                     Temporary = true,
-                    Data = J2cEncoder.Encode(Tgt.Images[BakeTarget.Eyes], true),
+                    Data = J2cEncoder.EncodeWithBump(Tgt.Images[BakeTarget.Eyes], true, Tgt.Bumps[BakeTarget.Eyes]),
                     Name = "Bake Texture Eyes"
                 };
 
