@@ -99,6 +99,29 @@ namespace SilverSim.Http.Client
             }
         }
 
+        /*---------------------------------------------------------------------*/
+        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, string post, bool compressed, int timeoutms, Dictionary<string, string> headers)
+        {
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms, headers))
+            {
+                using (var reader = new StreamReader(responseStream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        /*---------------------------------------------------------------------*/
+        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, Action<Stream> postdelegate, bool compressed, int timeoutms, Dictionary<string, string> headers)
+        {
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms, headers))
+            {
+                using (var reader = new StreamReader(responseStream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
         #endregion
     }
 }
