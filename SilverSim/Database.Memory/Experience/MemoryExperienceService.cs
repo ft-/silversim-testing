@@ -134,7 +134,7 @@ namespace SilverSim.Database.Memory.Experience
             {
                 return false;
             }
-            if(!requestingAgent.EqualsGrid(info.Owner) && !Admins[id, requestingAgent])
+            if(!requestingAgent.EqualsGrid(info.Owner))
             {
                 return false;
             }
