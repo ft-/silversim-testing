@@ -289,7 +289,8 @@ namespace SilverSim.Database.Memory.Inventory
         private void PurgeOrDelete(UUID principalID, UUID folderID, bool deleteFolder)
         {
             List<UUID> folders;
-            if(!Folder.ContainsKey(principalID, folderID))
+            InventoryFolder ownfolder;
+            if(!Folder.TryGetValue(principalID, folderID, out ownfolder))
             {
                 throw new KeyNotFoundException();
             }
@@ -306,19 +307,21 @@ namespace SilverSim.Database.Memory.Inventory
                 folders = GetFolderIDs(principalID, folderID);
             }
 
-            for (int index = 0; index < folders.Count; ++index)
+            int index = 0;
+            while(index < folders.Count)
             {
-                foreach (var folder in GetFolderIDs(principalID, folders[index]))
+                foreach (UUID folder in GetFolderIDs(principalID, folders[index]))
                 {
                     if (!folders.Contains(folder))
                     {
-                        folders.Insert(0, folder);
+                        folders.Add(folder);
                     }
                 }
+                ++index;
             }
 
-            var itemSet = m_Items[principalID];
-            foreach(var item in itemSet.Values)
+            RwLockedDictionary<UUID, InventoryItem> itemSet = m_Items[principalID];
+            foreach(InventoryItem item in itemSet.Values)
             {
                 if(folders.Contains(item.ParentFolderID))
                 {
@@ -326,12 +329,22 @@ namespace SilverSim.Database.Memory.Inventory
                 }
             }
 
-            foreach (var folder in folders)
+            UUID[] folderArray = folders.ToArray();
+            Array.Reverse(folderArray);
+            RwLockedDictionary<UUID, InventoryFolder> folderSet = m_Folders[principalID];
+            foreach (UUID folder in folderArray)
             {
-                m_Folders.Remove(folder);
+                folderSet.Remove(folder);
             }
 
-            IncrementVersionNoExcept(principalID, folderID);
+            if (deleteFolder)
+            {
+                IncrementVersionNoExcept(principalID, ownfolder.ParentFolderID);
+            }
+            else
+            {
+                IncrementVersionNoExcept(principalID, folderID);
+            }
         }
 
         private List<UUID> GetFolderIDs(UUID principalID, UUID key)
