@@ -90,7 +90,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override List<UUID> GetCreatorExperiences(UUI creator)
         {
-            List<UUID> res = new List<UUID>();
+            var res = new List<UUID>();
             foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if (kvp.Value.Creator.Equals(creator))
@@ -103,7 +103,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override List<UUID> GetOwnerExperiences(UUI creator)
         {
-            List<UUID> res = new List<UUID>();
+            var res = new List<UUID>();
             foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if (kvp.Value.Owner.Equals(creator))
@@ -129,7 +129,12 @@ namespace SilverSim.Database.Memory.Experience
 
         public override bool Remove(UUI requestingAgent, UUID id)
         {
-            if(!Admins[id, requestingAgent])
+            ExperienceInfo info;
+            if(!m_Experiences.TryGetValue(id, out info))
+            {
+                return false;
+            }
+            if(!requestingAgent.EqualsGrid(info.Owner) && !Admins[id, requestingAgent])
             {
                 return false;
             }
