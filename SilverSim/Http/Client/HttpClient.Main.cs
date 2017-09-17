@@ -355,7 +355,7 @@ namespace SilverSim.Http.Client
                 headers.Clear();
             }
 
-            if (splits[1] != "200")
+            if (!splits[1].StartsWith("2"))
             {
                 ReadHeaderLines(s, headers);
                 int statusCode;
@@ -371,6 +371,11 @@ namespace SilverSim.Http.Client
                 {
                     throw new HttpException(statusCode, splits[2]);
                 }
+            }
+            else if(splits[1] != "200" && headers != null)
+            {
+                /* needs a little passthrough for not changing the API */
+                headers.Add("X-Http-Status-Code", splits[1]);
             }
 
             ReadHeaderLines(s, headers);
