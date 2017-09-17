@@ -79,17 +79,26 @@ namespace SilverSim.Types
             }
             set
             {
-                var parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
-                if (parts.Length < 2)
+                if (string.IsNullOrEmpty(value))
                 {
-                    throw new ArgumentException("\"" + value + "\" is not a valid CreatorData string");
+                    HomeURI = null;
+                    FirstName = string.Empty;
+                    LastName = string.Empty;
                 }
-                HomeURI = new Uri(parts[0]);
-                var names = parts[1].Split(new char[] { ' ' }, 2, StringSplitOptions.None);
-                FirstName = names[0];
-                LastName = (names.Length > 1) ?
-                    names[1] :
-                    string.Empty;
+                else
+                {
+                    var parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
+                    if (parts.Length < 2)
+                    {
+                        throw new ArgumentException("\"" + value + "\" is not a valid CreatorData string");
+                    }
+                    HomeURI = new Uri(parts[0]);
+                    var names = parts[1].Split(new char[] { ' ' }, 2, StringSplitOptions.None);
+                    FirstName = names[0];
+                    LastName = (names.Length > 1) ?
+                        names[1] :
+                        string.Empty;
+                }
             }
         }
 
