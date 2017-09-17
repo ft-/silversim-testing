@@ -64,7 +64,7 @@ namespace SilverSim.Database.Memory.Inventory
                 InventoryItem item;
                 if(!Item.TryGetValue(key, out item))
                 {
-                    throw new KeyNotFoundException();
+                    throw new InventoryItemNotFoundException(key);
                 }
                 return item;
             }
@@ -116,7 +116,7 @@ namespace SilverSim.Database.Memory.Inventory
                 InventoryItem item;
                 if(!Item.TryGetValue(principalID, key, out item))
                 {
-                    throw new KeyNotFoundException();
+                    throw new InventoryItemNotFoundException(key);
                 }
                 return item;
             }
@@ -150,6 +150,7 @@ namespace SilverSim.Database.Memory.Inventory
                 storedItem.Permissions.Group = item.Permissions.Group;
                 storedItem.SaleInfo.Price = item.SaleInfo.Price;
                 storedItem.SaleInfo.Type = item.SaleInfo.Type;
+                storedItem.Flags = item.Flags;
                 IncrementVersion(item.Owner.ID, item.ParentFolderID);
             }
         }

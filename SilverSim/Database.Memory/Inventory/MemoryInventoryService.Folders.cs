@@ -264,6 +264,7 @@ namespace SilverSim.Database.Memory.Inventory
                 }
                 IncrementVersionNoExcept(principalID, toFolderID);
                 IncrementVersionNoExcept(principalID, oldFolderID);
+                return;
             }
             throw new InventoryFolderNotStoredException(folderID);
         }
