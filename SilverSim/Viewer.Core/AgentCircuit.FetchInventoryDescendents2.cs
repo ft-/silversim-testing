@@ -61,6 +61,7 @@ namespace SilverSim.Viewer.Core
                         writer.WriteKeyValuePair("type", -1);
                     }
                     writer.WriteKeyValuePair("preferred_type", -1);
+                    writer.WriteKeyValuePair("version", childfolder.Version);
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
