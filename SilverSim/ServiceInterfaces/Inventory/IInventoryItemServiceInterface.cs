@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
@@ -31,6 +32,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         /* DO NOT USE this[UUID key] anywhere else than in a Robust Inventory handler 
          * Not all connectors / services support this access.
          */
+        [Obsolete("Do not use this outside of Robust inventory handler", false)]
         InventoryItem this[UUID key] { get; }
 
         bool TryGetValue(UUID key, out InventoryItem item);
