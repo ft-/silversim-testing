@@ -59,12 +59,10 @@ namespace SilverSim.Scene.Agent.Bakery
                 Bumps.Add(BakeTarget.Head, new byte[512 * 512]);
                 Bumps.Add(BakeTarget.UpperBody, new byte[512 * 512]);
                 Bumps.Add(BakeTarget.LowerBody, new byte[512 * 512]);
-                Bumps.Add(BakeTarget.LowerBody, new byte[512 * 512]);
                 Rectangles.Add(BakeTarget.Eyes, new Rectangle(0, 0, 128, 128));
                 Rectangles.Add(BakeTarget.Hair, new Rectangle(0, 0, 512, 512));
                 Rectangles.Add(BakeTarget.Head, new Rectangle(0, 0, 512, 512));
                 Rectangles.Add(BakeTarget.LowerBody, new Rectangle(0, 0, 512, 512));
-                Rectangles.Add(BakeTarget.Skirt, new Rectangle(0, 0, 512, 512));
                 Rectangles.Add(BakeTarget.UpperBody, new Rectangle(0, 0, 512, 512));
             }
         }
