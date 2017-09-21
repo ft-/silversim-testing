@@ -60,6 +60,37 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
+    public class InventoryItemNotCopiableException : Exception
+    {
+        public UUID ID { get; }
+
+        public InventoryItemNotCopiableException(UUID key)
+            : base(string.Format("InventoryItem {0} not copiable", key))
+        {
+            ID = key;
+        }
+
+        public InventoryItemNotCopiableException()
+        {
+        }
+
+        public InventoryItemNotCopiableException(string message)
+            : base(message)
+        {
+        }
+
+        protected InventoryItemNotCopiableException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public InventoryItemNotCopiableException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+    }
+
+    [Serializable]
     public class InventoryItemNotStoredException : Exception
     {
         public UUID ID { get; }

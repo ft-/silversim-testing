@@ -131,6 +131,22 @@ namespace SilverSim.ServiceInterfaces.Inventory
             VerifyInventoryFolder(principalID, rootFolder.ID, "My Outfits", AssetType.MyOutfitsFolder);
             VerifyInventoryFolder(principalID, rootFolder.ID, "Favorites", AssetType.FavoriteFolder);
         }
+
+        protected void CopyItem(UUID principalID, UUID itemID, UUID newFolder)
+        {
+            InventoryItem item;
+            if(!Item.TryGetValue(principalID, itemID, out item))
+            {
+                throw new InventoryItemNotFoundException(itemID);
+            }
+            if ((item.Permissions.Base & InventoryPermissionsMask.Copy) == 0)
+            {
+                throw new InventoryItemNotCopiableException(itemID);
+            }
+            item.SetNewID(UUID.Random);
+            item.ParentFolderID = newFolder;
+            Item.Add(item);
+        }
         #endregion
     }
 }
