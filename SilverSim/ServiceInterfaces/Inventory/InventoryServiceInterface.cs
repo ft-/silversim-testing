@@ -132,7 +132,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             VerifyInventoryFolder(principalID, rootFolder.ID, "Favorites", AssetType.FavoriteFolder);
         }
 
-        protected void CopyItem(UUID principalID, UUID itemID, UUID newFolder)
+        protected UUID CopyItem(UUID principalID, UUID itemID, UUID newFolder)
         {
             InventoryItem item;
             if(!Item.TryGetValue(principalID, itemID, out item))
@@ -146,6 +146,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             item.SetNewID(UUID.Random);
             item.ParentFolderID = newFolder;
             Item.Add(item);
+            return item.ID;
         }
         #endregion
     }

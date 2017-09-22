@@ -52,7 +52,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         void Delete(UUID principalID, UUID id);
         void Move(UUID principalID, UUID id, UUID newFolder);
-        void Copy(UUID principalID, UUID id, UUID newFolder);
+        UUID Copy(UUID principalID, UUID id, UUID newFolder);
 
         /* returns list of deleted items */
         List<UUID> Delete(UUID principalID, List<UUID> ids);

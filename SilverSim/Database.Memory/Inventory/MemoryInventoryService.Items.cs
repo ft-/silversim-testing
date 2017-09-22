@@ -190,10 +190,8 @@ namespace SilverSim.Database.Memory.Inventory
             throw new InventoryFolderNotStoredException(id);
         }
 
-        void IInventoryItemServiceInterface.Copy(UUID principalID, UUID itemID, UUID newFolder)
-        {
+        UUID IInventoryItemServiceInterface.Copy(UUID principalID, UUID itemID, UUID newFolder) =>
             CopyItem(principalID, itemID, newFolder);
-        }
 
         private void IncrementVersion(UUID principalID, UUID folderID)
         {
