@@ -35,7 +35,7 @@ namespace SilverSim.Http.Client
     public static partial class HttpClient
     {
 #if SUPPORT_REUSE
-        public static readonly bool SupportsPipelining = true;
+        public static readonly bool SupportsConnectionReuse = true;
 #else
         public static readonly bool SupportsPipelining /*= false */;
 #endif

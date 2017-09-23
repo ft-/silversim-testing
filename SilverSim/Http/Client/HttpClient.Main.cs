@@ -210,7 +210,7 @@ namespace SilverSim.Http.Client
 
                 reqdata += "Expect: 100-continue\r\n";
             }
-            if (!SupportsPipelining)
+            if (!SupportsConnectionReuse)
             {
                 reqdata += "Connection: close\r\n";
             }
