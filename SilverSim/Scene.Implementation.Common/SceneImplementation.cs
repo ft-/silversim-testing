@@ -521,7 +521,7 @@ namespace SilverSim.Scene.Implementation.Common
             {
                 foreach (IAgent agent in RootAgents)
                 {
-                    agent.SendAlertMessage("/Region restart cancelled.", 
+                    agent.SendAlertMessage("/Region restart cancelled.",
                         ID);
 #if NO_NOTICE
                     agent.SendRegionNotice(Owner,
