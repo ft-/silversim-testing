@@ -178,76 +178,14 @@ namespace SilverSim.Viewer.Map
 #if DEBUG
             m_Log.InfoFormat("MapNameRequest for {0}", req.Name);
 #endif
-            string[] s;
-            var isForeignGridTarget = false;
-            var regionName = req.Name;
-            var gatekeeperURI = string.Empty;
             var results = new List<MapBlockReply.DataEntry>();
 
-            s = req.Name.Split(new char[] { ':' }, 3);
-            if(s.Length > 1)
-            {
-                /* could be a foreign grid URI, check for number in second place */
-                uint val;
-                if(!uint.TryParse(s[1], out val))
-                {
-                    /* not a foreign grid map name */
-                }
-                else if(val > 65535)
-                {
-                    /* not a foreign grid map name */
-                }
-                else if(!Uri.IsWellFormedUriString("http://" + s[0] + ":" + s[1] + "/", UriKind.Absolute))
-                {
-                    /* not a foreign grid map name */
-                }
-                else
-                {
-                    gatekeeperURI = "http://" + s[0] + ":" + s[1] + "/";
-                    regionName = (s.Length > 2) ?
-                        s[2] :
-                        string.Empty; /* Default Region */
-                    isForeignGridTarget = true;
-                }
-            }
-            if (isForeignGridTarget)
-            {
-                /* already identified one form */
-            }
-            else
-            {
-                s = req.Name.Split(new char[] { ' ' }, 2);
-                if (s.Length > 1)
-                {
-                    if (Uri.IsWellFormedUriString(s[0], UriKind.Absolute))
-                    {
-                        /* this is a foreign grid URI of form <url> <region name> */
-                        gatekeeperURI = s[0];
-                        regionName = s[1];
-                        isForeignGridTarget = true;
-                    }
-                    else
-                    {
-                        /* does not look like a uri at all */
-                    }
-                }
-                else if (Uri.IsWellFormedUriString(req.Name, UriKind.Absolute))
-                {
-                    /* this is a foreign Grid URI for the Default Region */
-                    gatekeeperURI = req.Name;
-                    regionName = string.Empty;
-                    isForeignGridTarget = true;
-                }
-                else
-                {
-                    /* local Grid URI */
-                }
-            }
-
-            if(isForeignGridTarget)
+            var regionAddress = new RegionAddress(req.Name);
+            /* checking for targetting grid simplifies usability since user has not to think about from where */
+            if(regionAddress.IsForeignGrid && !regionAddress.TargetsGatekeeperUri(scene.GatekeeperURI))
             {
 #if DEBUG
-                m_Log.InfoFormat("MapNameRequest for foreign at {0} region={1}", gatekeeperURI, regionName);
+                m_Log.InfoFormat("MapNameRequest for foreign at {0} region={1}", regionAddress.GatekeeperUri, regionAddress.RegionName);
 #endif
 
                 RegionInfo ri = null;
@@ -259,21 +197,21 @@ namespace SilverSim.Viewer.Map
 #if DEBUG
                     m_Log.DebugFormat("Testing foreign grid protocol \"{0}\"", foreignGrid.DisplayName);
 #endif
-                    if(foreignGrid.IsProtocolSupported(gatekeeperURI))
+                    if(foreignGrid.IsProtocolSupported(regionAddress.GatekeeperUri))
                     {
                         try
                         {
-                            if(!foreignGrid.Instantiate(gatekeeperURI).TryGetValue(regionName, out ri, out message))
+                            if(!foreignGrid.Instantiate(regionAddress.GatekeeperUri).TryGetValue(regionAddress.RegionName, out ri, out message))
                             {
 #if DEBUG
-                                m_Log.DebugFormat("Foreign grid \"{0}\" does not have the region \"{1}\"", gatekeeperURI, regionName);
+                                m_Log.DebugFormat("Foreign grid \"{0}\" does not have the region \"{1}\"", regionAddress.GatekeeperUri, regionAddress.RegionName);
 #endif
                                 continue;
                             }
                         }
                         catch(Exception e)
                         {
-                            m_Log.Error("Failed to connect to grid " + gatekeeperURI, e);
+                            m_Log.Error("Failed to connect to grid " + regionAddress.GatekeeperUri, e);
                             continue;
                         }
 
@@ -294,7 +232,7 @@ namespace SilverSim.Viewer.Map
                     else
                     {
 #if DEBUG
-                        m_Log.DebugFormat("Foreign grid protocol \"{0}\" not supported for \"{1}\"", foreignGrid.DisplayName, gatekeeperURI);
+                        m_Log.DebugFormat("Foreign grid protocol \"{0}\" not supported for \"{1}\"", foreignGrid.DisplayName, regionAddress.GatekeeperUri);
 #endif
                     }
                 }
@@ -322,14 +260,14 @@ namespace SilverSim.Viewer.Map
                     });
                 }
             }
-            else if(string.IsNullOrEmpty(regionName))
+            else if(string.IsNullOrEmpty(regionAddress.RegionName))
             {
                 agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "PleaseEnterAString", "Please enter a string"), scene.ID);
             }
             else
             {
 #if DEBUG
-                m_Log.InfoFormat("MapNameRequest for {0} at local grid", regionName);
+                m_Log.InfoFormat("MapNameRequest for {0} at local grid", regionAddress.RegionName);
 #endif
 
                 var service = scene.GridService;
@@ -338,7 +276,7 @@ namespace SilverSim.Viewer.Map
                     List<RegionInfo> ris;
                     try
                     {
-                        ris = service.SearchRegionsByName(scene.ScopeID, regionName);
+                        ris = service.SearchRegionsByName(scene.ScopeID, regionAddress.RegionName);
                     }
                     catch
                     {
