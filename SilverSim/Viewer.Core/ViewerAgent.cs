@@ -49,6 +49,7 @@ using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Alert;
@@ -61,6 +62,7 @@ using SilverSim.Viewer.Messages.Script;
 using SilverSim.Viewer.Messages.User;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading;
 
@@ -1060,6 +1062,22 @@ namespace SilverSim.Viewer.Core
         public override void SendAlertMessage(string msg, UUID fromSceneID)
         {
             var m = new AlertMessage(msg);
+            SendMessageAlways(m, fromSceneID);
+        }
+
+        public override void SendAlertMessage(string msg, string notification, IValue llsd, UUID fromSceneID)
+        {
+            var m = new AlertMessage(msg);
+            var d = new AlertMessage.Data();
+            d.Message = notification;
+            byte[] b;
+            using (var ms = new MemoryStream())
+            {
+                LlsdXml.Serialize(llsd, ms);
+                b = ms.ToArray();
+            }
+            d.ExtraParams = b;
+            m.AlertInfo.Add(d);
             SendMessageAlways(m, fromSceneID);
         }
 

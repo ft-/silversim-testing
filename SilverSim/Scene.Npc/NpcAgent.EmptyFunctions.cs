@@ -39,6 +39,12 @@ namespace SilverSim.Scene.Npc
             /* ignored */
         }
 
+        public override void SendAlertMessage(string msg, string notification, IValue llsd, UUID fromSceneID)
+        {
+            /* ignored */
+        }
+
+
         public override void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true)
         {
             /* ignored */

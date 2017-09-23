@@ -450,8 +450,13 @@ namespace SilverSim.Scene.Implementation.Common
                     FirstTrigger = false;
                     foreach (IAgent agent in scene.RootAgents)
                     {
-                        agent.SendRegionNotice(scene.Owner,
+                        agent.SendAlertMessage(
                             string.Format(this.GetLanguageString(agent.CurrentCulture, "RegionIsRestartingInXSeconds", "Region is restarting in {0} seconds"), timeLeft),
+                            "RegionRestartSeconds",
+                            new Map {
+                                {"SECONDS", timeLeft },
+                                {"NAME", scene.Name }
+                            },
                             scene.ID);
                     }
                     m_Log.InfoFormat("Region {0} restarting in {1} seconds", scene.Name, timeLeft);
@@ -516,9 +521,13 @@ namespace SilverSim.Scene.Implementation.Common
             {
                 foreach (IAgent agent in RootAgents)
                 {
+                    agent.SendAlertMessage("/Region restart cancelled.", 
+                        ID);
+#if NO_NOTICE
                     agent.SendRegionNotice(Owner,
                         this.GetLanguageString(agent.CurrentCulture, "RegionRestartIsAborted", "Region restart is aborted."),
                         ID);
+#endif
                 }
                 m_Log.InfoFormat("Region restart of {0} is aborted.", Name);
             }
@@ -535,7 +544,7 @@ namespace SilverSim.Scene.Implementation.Common
             m_RestartObject.SecondsToRestart = seconds;
             m_RestartObject.RestartTimer.Start();
         }
-        #endregion
+#endregion
 
         public override void RezScriptsForObject(ObjectGroup group)
         {
@@ -724,7 +733,7 @@ namespace SilverSim.Scene.Implementation.Common
             }
         }
 
-        #region Scene Loading
+#region Scene Loading
         public override void LoadScene()
         {
             if (m_NeighborService != null)
@@ -747,9 +756,9 @@ namespace SilverSim.Scene.Implementation.Common
             }
             this.LoadSceneSync(m_SimulationDataStorage, m_Scenes);
         }
-        #endregion
+#endregion
 
-        #region Scene LL Message interface
+#region Scene LL Message interface
         [PacketHandler(MessageType.RequestRegionInfo)]
         public void HandleRequestRegionInfo(Message m)
         {
@@ -904,6 +913,6 @@ namespace SilverSim.Scene.Implementation.Common
             agent.SendMessageAlways(res, ID);
         }
 
-        #endregion
+#endregion
     }
 }

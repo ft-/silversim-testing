@@ -1074,6 +1074,7 @@ namespace SilverSim.Scene.Agent
         public abstract void SendMessageIfRootAgent(Message m, UUID fromSceneID);
         public abstract void SendMessageAlways(Message m, UUID fromSceneID);
         public abstract void SendAlertMessage(string msg, UUID fromSceneID);
+        public abstract void SendAlertMessage(string msg, string notification, IValue llsd, UUID fromSceneID);
         public abstract void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
         public abstract void HandleMessage(ChildAgentUpdate m);
         public abstract void HandleMessage(ChildAgentPositionUpdate m);
