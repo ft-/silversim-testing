@@ -140,9 +140,16 @@ namespace SilverSim.Viewer.Teleport
             {
                 RegionInfo hgRegionInfo;
 
+#if DEBUG
+                m_Log.DebugFormat("Teleport location request at location {0} for agent {1} ({2})", req.GridPosition, agent.Owner.FullName, agent.Owner.ID);
+#endif
+
                 /* check whether HG destination is addressed */
                 if (agent.TryGetDestination(req.GridPosition, out hgRegionInfo))
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Teleporting to {0}@{1}", hgRegionInfo.Name, hgRegionInfo.GridURI);
+#endif
                     if (!agent.TeleportTo(circuit.Scene, hgRegionInfo.GridURI, hgRegionInfo.ID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                     {
                         var failedmsg = new TeleportFailed()
