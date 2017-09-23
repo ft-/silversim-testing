@@ -116,12 +116,19 @@ namespace SilverSim.Main.Common.HttpServer
             if (!m_IsHeaderSent)
             {
                 IsCloseConnection = true;
-                Headers["Connection"] = "close";
                 Headers.Remove("Content-Length");
                 if (!disableCompression && AcceptedEncodings != null && AcceptedEncodings.Contains("gzip"))
                 {
                     gzipEnable = true;
                     Headers["Content-Encoding"] = "gzip";
+                }
+                if(IsChunkedAccepted)
+                {
+                    Headers["Transfer-Encoding"] = "chunked";
+                }
+                else
+                {
+                    Headers["Connection"] = "close";
                 }
                 SendHeaders();
             }
@@ -130,12 +137,21 @@ namespace SilverSim.Main.Common.HttpServer
                 throw new InvalidOperationException();
             }
 
+            Stream stream;
+            if(IsChunkedAccepted)
+            {
+                stream = new HttpWriteChunkedBodyStream(m_Output);
+            }
+            else
+            {
+                stream = new HttpResponseBodyStream(m_Output);
+            }
             /* we never give out the original stream because Close is working recursively according to .NET specs */
             if (gzipEnable)
             {
-                return new GZipStream(new HttpResponseBodyStream(m_Output), CompressionMode.Compress);
+                stream = new GZipStream(stream, CompressionMode.Compress);
             }
-            return new HttpResponseBodyStream(m_Output);
+            return stream;
         }
 
         public override Stream GetChunkedOutputStream()
