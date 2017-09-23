@@ -94,7 +94,11 @@ namespace SilverSim.Viewer.Core
                 }
 
                 /* this message must have exact the text "Home position set.". Otherwise, viewer thinks the request did not succeed: */
-                Agent.SendAlertMessage("Home position set.", Scene.ID);
+                Agent.SendAlertMessage(
+                    "Home position set.", 
+                    "HomePositionSet",
+                    new Map(),
+                    Scene.ID);
             }
             else
             {
