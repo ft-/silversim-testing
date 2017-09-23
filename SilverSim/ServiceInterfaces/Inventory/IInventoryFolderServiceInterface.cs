@@ -55,6 +55,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         void Update(InventoryFolder folder);
         void Move(UUID principalID, UUID folderID, UUID toFolderID);
         void Delete(UUID principalID, UUID folderID);
+        InventoryTree Copy(UUID principalID, UUID folderID, UUID toFolderID);
         /* DO NOT USE Purge[UUID folderID] anywhere else than in a Robust Inventory handler 
          * Not all connectors / services support this access.
          * Only required path to support this is from Robust Inventory handler towards database connector.

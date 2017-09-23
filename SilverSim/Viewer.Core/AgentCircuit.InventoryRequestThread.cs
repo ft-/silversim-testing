@@ -424,7 +424,7 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     item = Agent.InventoryService.Item[reqd.OldAgentID, reqd.OldItemID];
-                    if ((item.Permissions.Current & InventoryPermissionsMask.Copy) == 0)
+                    if(!item.CheckPermissions(Agent.Owner, Agent.Group, InventoryPermissionsMask.Copy))
                     {
                         /* skip item */
                         continue;
@@ -436,7 +436,7 @@ namespace SilverSim.Viewer.Core
                     }
                     if (item.Owner.ID != Agent.Owner.ID)
                     {
-                        if ((item.Permissions.Current & InventoryPermissionsMask.Transfer) == 0)
+                        if(!item.CheckPermissions(Agent.Owner, Agent.Group, InventoryPermissionsMask.Transfer))
                         {
                             continue;
                         }

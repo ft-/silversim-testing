@@ -240,6 +240,9 @@ namespace SilverSim.Database.Memory.Inventory
             }
         }
 
+        InventoryTree IInventoryFolderServiceInterface.Copy(UUID principalID, UUID folderID, UUID toFolderID) =>
+            CopyFolder(principalID, folderID, toFolderID);
+
         void IInventoryFolderServiceInterface.Move(UUID principalID, UUID folderID, UUID toFolderID)
         {
             if (folderID == toFolderID)

@@ -139,7 +139,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             {
                 throw new InventoryItemNotFoundException(itemID);
             }
-            if ((item.Permissions.Base & InventoryPermissionsMask.Copy) == 0)
+            if (!item.CheckPermissions(item.Owner, UGI.Unknown, InventoryPermissionsMask.Copy))
             {
                 throw new InventoryItemNotCopiableException(itemID);
             }
@@ -147,6 +147,88 @@ namespace SilverSim.ServiceInterfaces.Inventory
             item.ParentFolderID = newFolder;
             Item.Add(item);
             return item.ID;
+        }
+
+        protected InventoryTree CopyFolder(UUID principalID, UUID folderID, UUID toNewFolder)
+        {
+            int folderIdx = 0;
+            var folderList = new List<InventoryTree>();
+            var itemList = new List<InventoryItem>();
+            var treeDict = new Dictionary<UUID, InventoryTree>();
+
+            var copyFolder = new InventoryTree(Folder[principalID, folderID]);
+            folderList.Add(copyFolder);
+            treeDict[copyFolder.ID] = copyFolder;
+
+            var mapparents = new Dictionary<UUID, UUID>
+            {
+                [copyFolder.ParentFolderID] = toNewFolder,
+                [copyFolder.ID] = UUID.Random
+            };
+
+            if(!IsParentFolderIdValid(principalID, toNewFolder))
+            {
+                throw new InvalidParentFolderIdException();
+            }
+            while (folderIdx < folderList.Count)
+            {
+                List<InventoryFolder> folders;
+                UUID thisFolderID = folderList[folderIdx].ID;
+                try
+                {
+                    folders = Folder.GetFolders(principalID, thisFolderID);
+                }
+                catch
+                {
+                    continue;
+                }
+                foreach (InventoryFolder folder in folders)
+                {
+                    var childFolder = new InventoryTree(folder);
+                    treeDict[thisFolderID].Folders.Add(childFolder);
+                    treeDict[folder.ID] = childFolder;
+                }
+                ++folderIdx;
+            }
+
+            for(folderIdx = 0; folderIdx < folderList.Count; ++folderIdx)
+            {
+                List<InventoryItem> items;
+                InventoryTree parentFolder = folderList[folderIdx];
+                try
+                {
+                    items = Folder.GetItems(principalID, parentFolder.ID);
+                }
+                catch
+                {
+                    continue;
+                }
+                foreach(InventoryItem item in items)
+                {
+                    if(!item.CheckPermissions(item.Owner, UGI.Unknown, InventoryPermissionsMask.Copy))
+                    {
+                        throw new InventoryItemNotCopiableException(item.ID);
+                    }
+                    item.ParentFolderID = mapparents[item.ParentFolderID];
+                    parentFolder.Items.Add(item);
+                }
+            }
+
+            foreach(InventoryTree folder in folderList)
+            {
+                folder.ParentFolderID = mapparents[folder.ParentFolderID];
+                UUID prevFolderID = UUID.Random;
+                folder.ID = prevFolderID;
+                Folder.Add(folder);
+                mapparents[prevFolderID] = folder.ID; 
+            }
+
+            foreach(InventoryItem item in itemList)
+            {
+                Item.Add(item);
+            }
+
+            return copyFolder;
         }
         #endregion
     }
