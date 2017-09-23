@@ -19,7 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-//#define SUPPORT_PIPELINING
+#define SUPPORT_REUSE
 
 using SilverSim.Threading;
 using System;
@@ -34,7 +34,7 @@ namespace SilverSim.Http.Client
 {
     public static partial class HttpClient
     {
-#if SUPPORT_PIPELINING
+#if SUPPORT_REUSE
         public static readonly bool SupportsPipelining = true;
 #else
         public static readonly bool SupportsPipelining /*= false */;
@@ -122,12 +122,12 @@ namespace SilverSim.Http.Client
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation)
         {
-#if SUPPORT_PIPELINING
+#if SUPPORT_REUSE
             string key = scheme + "://" + host + ":" + port.ToString();
             RwLockedList<StreamInfo> streaminfo;
             if(m_StreamList.TryGetValue(key, out streaminfo))
             {
-                Stream stream = null;
+                AbstractHttpStream stream = null;
                 lock (streaminfo)
                 {
                     if(streaminfo.Count > 0)
@@ -139,7 +139,7 @@ namespace SilverSim.Http.Client
                         streaminfo.RemoveAt(0);
                     }
                 }
-                m_StreamList.RemoveIf(key, delegate(RwLockedList<StreamInfo> info) { return info.Count == 0; });
+                m_StreamList.RemoveIf(key, (RwLockedList<StreamInfo> info) => info.Count == 0);
                 
                 if(stream != null)
                 {
@@ -180,7 +180,7 @@ namespace SilverSim.Http.Client
 
         private static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
         {
-#if SUPPORT_PIPELINING
+#if SUPPORT_REUSE
             string key = scheme + "://" + host + ":" + port.ToString();
             m_StreamList[key].Add(new StreamInfo(st, scheme, host, port));
 #else
