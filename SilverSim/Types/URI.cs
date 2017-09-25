@@ -107,6 +107,18 @@ namespace SilverSim.Types
             return l.m_Value != r.m_Value;
         }
 
+        public static bool IsSameService(string a, string b)
+        {
+            Uri uri_a;
+            Uri uri_b;
+            if(!Uri.TryCreate(a, UriKind.Absolute, out uri_a) ||
+                !Uri.TryCreate(b, UriKind.Absolute, out uri_b))
+            {
+                return false;
+            }
+            return Uri.Compare(uri_a, uri_b, UriComponents.SchemeAndServer, UriFormat.SafeUnescaped, StringComparison.InvariantCultureIgnoreCase) == 0;
+        }
+
         #endregion Operators
 
         #region LSL Helpers
