@@ -52,33 +52,62 @@ namespace SilverSim.Http.Client
         /**********************************************************************/
         /* synchronous calls */
         public static Stream DoStreamGetRequest(string url, IDictionary<string, string> getValues, int timeoutms) =>
-            DoStreamRequest("GET", url, getValues, string.Empty, string.Empty, false, timeoutms);
+            DoStreamRequest("GET", url, getValues, string.Empty, string.Empty, false, timeoutms, ConnectionReuse);
+
+        public static Stream DoStreamGetRequest(string url, IDictionary<string, string> getValues, int timeoutms, ConnectionReuseMode reuseMode) =>
+            DoStreamRequest("GET", url, getValues, string.Empty, string.Empty, false, timeoutms, reuseMode);
 
         /*---------------------------------------------------------------------*/
         public static Stream DoStreamHeadRequest(string url, IDictionary<string, string> getvalues, int timeoutms) =>
-            DoStreamRequest("HEAD", url, getvalues, string.Empty, string.Empty, false, timeoutms);
+            DoStreamRequest("HEAD", url, getvalues, string.Empty, string.Empty, false, timeoutms, ConnectionReuse);
+
+        public static Stream DoStreamHeadRequest(string url, IDictionary<string, string> getvalues, int timeoutms, ConnectionReuseMode reuseMode) =>
+            DoStreamRequest("HEAD", url, getvalues, string.Empty, string.Empty, false, timeoutms, reuseMode);
 
         /*---------------------------------------------------------------------*/
         public static Stream DoStreamPostRequest(string url, IDictionary<string, string> getValues, IDictionary<string, string> postValues, bool compressed, int timeoutms) =>
-            DoStreamRequest("POST", url, getValues, "application/x-www-form-urlencoded", BuildQueryString(postValues), compressed, timeoutms);
+            DoStreamRequest("POST", url, getValues, "application/x-www-form-urlencoded", BuildQueryString(postValues), compressed, timeoutms, ConnectionReuse);
+
+        public static Stream DoStreamPostRequest(string url, IDictionary<string, string> getValues, IDictionary<string, string> postValues, bool compressed, int timeoutms, ConnectionReuseMode reuseMode) =>
+            DoStreamRequest("POST", url, getValues, "application/x-www-form-urlencoded", BuildQueryString(postValues), compressed, timeoutms, reuseMode);
 
         /**********************************************************************/
         /* synchronous calls */
         public static string DoGetRequest(string url, IDictionary<string, string> getValues, int timeoutms) =>
-            DoRequest("GET", url, getValues, string.Empty, string.Empty, false, timeoutms);
+            DoRequest("GET", url, getValues, string.Empty, string.Empty, false, timeoutms, ConnectionReuse);
+
+        public static string DoGetRequest(string url, IDictionary<string, string> getValues, int timeoutms, ConnectionReuseMode reuseMode) =>
+            DoRequest("GET", url, getValues, string.Empty, string.Empty, false, timeoutms, reuseMode);
 
         /*---------------------------------------------------------------------*/
         public static string DoHeadRequest(string url, IDictionary<string, string> getvalues, int timeoutms) =>
-            DoRequest("HEAD", url, getvalues, string.Empty, string.Empty, false, timeoutms);
+            DoRequest("HEAD", url, getvalues, string.Empty, string.Empty, false, timeoutms, ConnectionReuse);
+
+        public static string DoHeadRequest(string url, IDictionary<string, string> getvalues, int timeoutms, ConnectionReuseMode reuseMode) =>
+            DoRequest("HEAD", url, getvalues, string.Empty, string.Empty, false, timeoutms, reuseMode);
 
         /*---------------------------------------------------------------------*/
         public static string DoPostRequest(string url, IDictionary<string, string> getValues, IDictionary<string, string> postValues, bool compressed, int timeoutms) =>
-            DoRequest("POST", url, getValues, "application/x-www-form-urlencoded", BuildQueryString(postValues), compressed, timeoutms);
+            DoRequest("POST", url, getValues, "application/x-www-form-urlencoded", BuildQueryString(postValues), compressed, timeoutms, ConnectionReuse);
+
+        public static string DoPostRequest(string url, IDictionary<string, string> getValues, IDictionary<string, string> postValues, bool compressed, int timeoutms, ConnectionReuseMode reuseMode) =>
+            DoRequest("POST", url, getValues, "application/x-www-form-urlencoded", BuildQueryString(postValues), compressed, timeoutms, reuseMode);
 
         /*---------------------------------------------------------------------*/
         public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, string post, bool compressed, int timeoutms)
         {
-            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms))
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms, ConnectionReuse))
+            {
+                using (var reader = new StreamReader(responseStream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, string post, bool compressed, int timeoutms, ConnectionReuseMode reuseMode)
+        {
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms, reuseMode))
             {
                 using (var reader = new StreamReader(responseStream))
                 {
@@ -90,7 +119,18 @@ namespace SilverSim.Http.Client
         /*---------------------------------------------------------------------*/
         public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, Action<Stream> postdelegate, bool compressed, int timeoutms)
         {
-            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms))
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms, ConnectionReuse))
+            {
+                using (var reader = new StreamReader(responseStream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, Action<Stream> postdelegate, bool compressed, int timeoutms, ConnectionReuseMode reuseMode)
+        {
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms, reuseMode))
             {
                 using (var reader = new StreamReader(responseStream))
                 {
@@ -102,7 +142,18 @@ namespace SilverSim.Http.Client
         /*---------------------------------------------------------------------*/
         public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, string post, bool compressed, int timeoutms, Dictionary<string, string> headers)
         {
-            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms, headers))
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms, ConnectionReuse, headers))
+            {
+                using (var reader = new StreamReader(responseStream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, string post, bool compressed, int timeoutms, ConnectionReuseMode reuseMode, Dictionary<string, string> headers)
+        {
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms, reuseMode, headers))
             {
                 using (var reader = new StreamReader(responseStream))
                 {
@@ -114,7 +165,18 @@ namespace SilverSim.Http.Client
         /*---------------------------------------------------------------------*/
         public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, Action<Stream> postdelegate, bool compressed, int timeoutms, Dictionary<string, string> headers)
         {
-            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms, headers))
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms, ConnectionReuse, headers))
+            {
+                using (var reader = new StreamReader(responseStream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+        }
+
+        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, Action<Stream> postdelegate, bool compressed, int timeoutms, ConnectionReuseMode reuseMode, Dictionary<string, string> headers)
+        {
+            using (var responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms, reuseMode, headers))
             {
                 using (var reader = new StreamReader(responseStream))
                 {

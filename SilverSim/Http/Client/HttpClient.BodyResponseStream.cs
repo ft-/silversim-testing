@@ -30,17 +30,15 @@ namespace SilverSim.Http.Client
         {
             private AbstractHttpStream m_Input;
             private long m_RemainingLength;
-            private readonly bool m_KeepAlive;
             private readonly string m_Scheme;
             private readonly string m_Host;
             private readonly int m_Port;
 
-            internal ResponseBodyStream(AbstractHttpStream input, long contentLength, bool keepAlive, string scheme, string host, int port)
+            internal ResponseBodyStream(AbstractHttpStream input, long contentLength, string scheme, string host, int port)
             {
                 m_RemainingLength = contentLength;
                 m_Input = input;
                 Length = contentLength;
-                m_KeepAlive = keepAlive;
                 m_Scheme = scheme;
                 m_Host = host;
                 m_Port = port;
@@ -171,14 +169,7 @@ namespace SilverSim.Http.Client
 
                 if(m_RemainingLength == 0)
                 {
-                    if (m_KeepAlive)
-                    {
-                        AddStreamForNextRequest(m_Input, m_Scheme, m_Host, m_Port);
-                    }
-                    else
-                    {
-                        m_Input.Close();
-                    }
+                    AddStreamForNextRequest(m_Input, m_Scheme, m_Host, m_Port);
                     m_Input = null;
                 }
                 return rescount;

@@ -95,6 +95,18 @@ namespace SilverSim.Http.Client
             string post,
             bool compressed,
             int timeoutms,
+            IDictionary<string, string> headers = null) =>
+            DoStreamRequest(method, url, getValues, content_type, post, compressed, timeoutms, ConnectionReuse, headers);
+
+        public static Stream DoStreamRequest(
+            string method,
+            string url,
+            IDictionary<string, string> getValues,
+            string content_type,
+            string post,
+            bool compressed,
+            int timeoutms,
+            ConnectionReuseMode reuseMode,
             IDictionary<string, string> headers = null)
         {
             if (getValues != null)
@@ -127,7 +139,7 @@ namespace SilverSim.Http.Client
             }
 
             return DoStreamRequest(method, url, getValues, content_type, content_length, (Stream s) =>
-                s.Write(buffer, 0, buffer.Length), compressed, timeoutms, headers);
+                s.Write(buffer, 0, buffer.Length), compressed, timeoutms, reuseMode, headers);
         }
 
         /*---------------------------------------------------------------------*/
@@ -162,6 +174,20 @@ namespace SilverSim.Http.Client
             Action<Stream> postdelegate,
             bool compressed,
             int timeoutms,
+            IDictionary<string, string> headers = null) =>
+            DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms, ConnectionReuse, headers);
+
+        /*---------------------------------------------------------------------*/
+        public static Stream DoStreamRequest(
+            string method,
+            string url,
+            IDictionary<string, string> getValues,
+            string content_type,
+            int content_length,
+            Action<Stream> postdelegate,
+            bool compressed,
+            int timeoutms,
+            ConnectionReuseMode reuseMode,
             IDictionary<string, string> headers = null)
         {
             if (getValues != null)
@@ -222,7 +248,7 @@ namespace SilverSim.Http.Client
 
             int retrycnt = 1;
             retry:
-            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port);
+            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, reuseMode);
             string finalreqdata = reqdata;
             if (!s.IsReusable)
             {
@@ -272,12 +298,12 @@ namespace SilverSim.Http.Client
                     splits = resline.Split(new char[] { ' ' }, 3);
                     if (splits.Length < 3)
                     {
-                        throw new BadHttpResponseException();
+                        throw new BadHttpResponseException("Not a HTTP response");
                     }
 
                     if (!splits[0].StartsWith("HTTP/"))
                     {
-                        throw new BadHttpResponseException();
+                        throw new BadHttpResponseException("Missing HTTP version info");
                     }
 
                     if (splits[1] != "100")
@@ -340,12 +366,12 @@ namespace SilverSim.Http.Client
             splits = resline.Split(new char[] { ' ' }, 3);
             if (splits.Length < 3)
             {
-                throw new BadHttpResponseException();
+                throw new BadHttpResponseException("Not a HTTP response");
             }
 
             if (!splits[0].StartsWith("HTTP/"))
             {
-                throw new BadHttpResponseException();
+                throw new BadHttpResponseException("Missing HTTP version info");
             }
 
             if (headers == null)
@@ -399,10 +425,9 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            bool keepalive = true;
             if(splits[0] == "HTTP/1.0")
             {
-                keepalive = false;
+                s.IsReusable = false;
             }
 
             if(headers.TryGetValue("connection", out value))
@@ -410,27 +435,27 @@ namespace SilverSim.Http.Client
                 value = value.ToLower();
                 if(value == "keep-alive")
                 {
-                    keepalive = true;
+                    s.IsReusable = false;
                 }
                 else if(value == "close")
                 {
-                    keepalive = false;
+                    s.IsReusable = false;
                 }
             }
 
             if (method == "HEAD")
             {
                 /* HEAD does not have any response data */
-                return new ResponseBodyStream(s, 0, keepalive, uri.Scheme, uri.Host, uri.Port);
+                return new ResponseBodyStream(s, 0, uri.Scheme, uri.Host, uri.Port);
             }
             else if (headers.TryGetValue("content-length", out value))
             {
                 long contentLength;
                 if(!long.TryParse(value, out contentLength))
                 {
-                    throw new BadHttpResponseException();
+                    throw new BadHttpResponseException("Unparseable length in response");
                 }
-                Stream bs = new ResponseBodyStream(s, contentLength, keepalive, uri.Scheme, uri.Host, uri.Port);
+                Stream bs = new ResponseBodyStream(s, contentLength, uri.Scheme, uri.Host, uri.Port);
                 if(headers.TryGetValue("transfer-encoding", out value) && value == "chunked")
                 {
                     bs = new HttpReadChunkedBodyStream(bs);
