@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Messages.Teleport
                 ["Info"] = array
             };
             byte[] b = BitConverter.GetBytes((ulong)TeleportFlags);
-            if (!BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian)
             {
                 Array.Reverse(b);
             }
