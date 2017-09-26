@@ -44,6 +44,14 @@ namespace SilverSim.Main.Common.HttpServer
             MajorVersion = request.MajorVersion;
             MinorVersion = request.MinorVersion;
             IsCloseConnection = HttpConnectionMode.Close == request.ConnectionMode;
+            if(IsCloseConnection)
+            {
+                Headers["Connection"] = "close";
+            }
+            else
+            {
+                Headers["Connection"] = "keep-alive";
+            }
             StatusCode = statusCode;
             StatusDescription = statusDescription;
             IsChunkedAccepted = request.ContainsHeader("TE");
@@ -180,7 +188,10 @@ namespace SilverSim.Main.Common.HttpServer
         {
             ResponseBody?.Dispose();
             Close();
-            m_Output?.Dispose();
+            if (IsCloseConnection)
+            {
+                m_Output?.Dispose();
+            }
         }
     }
 }

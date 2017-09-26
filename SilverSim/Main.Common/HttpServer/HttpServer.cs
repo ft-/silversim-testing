@@ -66,6 +66,9 @@ namespace SilverSim.Main.Common.HttpServer
         private readonly Thread m_ListenerThread;
         private readonly List<IPortControlServiceInterface> m_PortControlServices = new List<IPortControlServiceInterface>();
 
+        private int m_AcceptedConnectionsCount;
+        public int AcceptedConnectionsCount => m_AcceptedConnectionsCount;
+
         public BaseHttpServer(IConfig httpConfig, ConfigurationLoader loader, bool useSsl = false)
         {
             m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
@@ -406,6 +409,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         private void AcceptedConnection_Internal(Stream httpstream, string remoteAddr, bool isSsl)
         {
+            Interlocked.Increment(ref m_AcceptedConnectionsCount);
             try
             {
                 while (true)
@@ -555,7 +559,10 @@ namespace SilverSim.Main.Common.HttpServer
                         using (var res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
                         {
                             byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
-                            res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+                            using (Stream s = res.GetOutputStream(buffer.LongLength))
+                            {
+                                s.Write(buffer, 0, buffer.Length);
+                            }
                         }
                     }
                     httpstream.ReadTimeout = 10000;

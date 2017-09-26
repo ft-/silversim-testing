@@ -206,8 +206,24 @@ namespace SilverSim.Http.Client
             string encval;
             if(headers != null)
             {
-                headers.Remove("Content-Length");
-                headers.Remove("Content-Type");
+                var removal = new List<string>();
+                foreach(string k in headers.Keys)
+                {
+                    if(string.Compare(k, "content-length", true) == 0 ||
+                        string.Compare(k, "content-type", true) == 0 ||
+                        string.Compare(k, "connection", true) == 0 ||
+                        string.Compare(k, "expect", true) == 0)
+                    {
+                        removal.Add(k);
+                    }
+                }
+                if (removal.Count != 0)
+                {
+                    foreach (string k in removal)
+                    {
+                        headers.Remove(k);
+                    }
+                }
                 foreach (KeyValuePair<string, string> kvp in headers)
                 {
                     reqdata += string.Format("{0}: {1}\r\n", kvp.Key, kvp.Value);
@@ -432,10 +448,10 @@ namespace SilverSim.Http.Client
 
             if(headers.TryGetValue("connection", out value))
             {
-                value = value.ToLower();
+                value = value.Trim().ToLower();
                 if(value == "keep-alive")
                 {
-                    s.IsReusable = false;
+                    s.IsReusable = true;
                 }
                 else if(value == "close")
                 {

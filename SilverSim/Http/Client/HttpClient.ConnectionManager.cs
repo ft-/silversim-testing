@@ -152,6 +152,11 @@ namespace SilverSim.Http.Client
 
                     if (stream != null)
                     {
+                        if (reuseMode == ConnectionReuseMode.Close)
+                        {
+                            stream.IsReusable = false;
+                        }
+
                         return stream;
                     }
                 }

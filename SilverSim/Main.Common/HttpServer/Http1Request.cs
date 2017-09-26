@@ -190,13 +190,14 @@ namespace SilverSim.Main.Common.HttpServer
                 m_Headers[lastHeader] = headerData[1].Trim();
             }
 
-            if (m_Headers.ContainsKey("connection"))
+            string connectionfield;
+            if(TryGetHeader("connection", out connectionfield))
             {
-                if (m_Headers["connection"] == "keep-alive")
+                if (connectionfield == "keep-alive")
                 {
                     ConnectionMode = HttpConnectionMode.KeepAlive;
                 }
-                else if (m_Headers["connection"] == "close")
+                else if (connectionfield == "close")
                 {
                     ConnectionMode = HttpConnectionMode.Close;
                 }
