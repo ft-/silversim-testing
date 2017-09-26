@@ -210,10 +210,6 @@ namespace SilverSim.Http.Client
 
                 reqdata += "Expect: 100-continue\r\n";
             }
-            if (!SupportsConnectionReuse)
-            {
-                reqdata += "Connection: close\r\n";
-            }
 
 #if DEBUG
             /* disable gzip encoding for debugging */
@@ -223,12 +219,18 @@ namespace SilverSim.Http.Client
                 reqdata += "Accept-Encoding: gzip\r\n";
             }
 #endif
-            reqdata += "\r\n";
-            outdata = Encoding.ASCII.GetBytes(reqdata);
 
             int retrycnt = 1;
-        retry:
+            retry:
             AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port);
+            string finalreqdata = reqdata;
+            if (!s.IsReusable)
+            {
+                finalreqdata += "Connection: close\r\n";
+            }
+            finalreqdata += "\r\n";
+            outdata = Encoding.ASCII.GetBytes(finalreqdata);
+
             try
             {
                 s.Write(outdata, 0, outdata.Length);

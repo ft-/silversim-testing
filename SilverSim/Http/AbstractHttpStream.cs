@@ -52,5 +52,7 @@ namespace SilverSim.Http
     public abstract class AbstractHttpStream : Stream
     {
         public abstract string ReadHeaderLine();
+
+        public bool IsReusable { get; set; }
     }
 }

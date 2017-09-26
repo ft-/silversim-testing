@@ -34,10 +34,16 @@ namespace SilverSim.Http.Client
 {
     public static partial class HttpClient
     {
+        public enum ConnectionReuseMode
+        {
+            SingleRequest,
+            Close,
+            Keepalive
+        }
 #if SUPPORT_REUSE
-        public static readonly bool SupportsConnectionReuse = true;
+        public static ConnectionReuseMode ConnectionReuse = ConnectionReuseMode.Keepalive;
 #else
-        public static readonly bool SupportsPipelining /*= false */;
+        public static ConnectionReuseMode ConnectionReuse /*= ConnectionReuseMode.ConnectionReuseMode */;
 #endif
 
         private struct StreamInfo
@@ -114,47 +120,64 @@ namespace SilverSim.Http.Client
             OpenStream(scheme, host, port,
                 null,
                 SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
-                false);
+                false,
+                ConnectionReuse);
+
+        private static AbstractHttpStream OpenStream(string scheme, string host, int port, ConnectionReuseMode reuseMode) =>
+            OpenStream(scheme, host, port,
+                null,
+                SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
+                false,
+                reuseMode);
 
         private static AbstractHttpStream OpenStream(
             string scheme, string host, int port,
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
-            bool checkCertificateRevocation)
+            bool checkCertificateRevocation) =>
+            OpenStream(scheme, host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, ConnectionReuse);
+
+        private static AbstractHttpStream OpenStream(
+            string scheme, string host, int port,
+            X509CertificateCollection clientCertificates,
+            SslProtocols enabledSslProtocols,
+            bool checkCertificateRevocation,
+            ConnectionReuseMode reuseMode)
         {
-#if SUPPORT_REUSE
-            string key = scheme + "://" + host + ":" + port.ToString();
-            RwLockedList<StreamInfo> streaminfo;
-            if(m_StreamList.TryGetValue(key, out streaminfo))
+            if (reuseMode != ConnectionReuseMode.SingleRequest)
             {
-                AbstractHttpStream stream = null;
-                lock (streaminfo)
+                string key = scheme + "://" + host + ":" + port.ToString();
+                RwLockedList<StreamInfo> streaminfo;
+                if (m_StreamList.TryGetValue(key, out streaminfo))
                 {
-                    if(streaminfo.Count > 0)
+                    AbstractHttpStream stream = null;
+                    lock (streaminfo)
                     {
-                        if ((streaminfo[0].ValidUntil - Environment.TickCount) > 0)
+                        if (streaminfo.Count > 0)
                         {
-                            stream = streaminfo[0].Stream;
+                            if ((streaminfo[0].ValidUntil - Environment.TickCount) > 0)
+                            {
+                                stream = streaminfo[0].Stream;
+                            }
+                            streaminfo.RemoveAt(0);
                         }
-                        streaminfo.RemoveAt(0);
+                    }
+                    m_StreamList.RemoveIf(key, (RwLockedList<StreamInfo> info) => info.Count == 0);
+
+                    if (stream != null)
+                    {
+                        return stream;
                     }
                 }
-                m_StreamList.RemoveIf(key, (RwLockedList<StreamInfo> info) => info.Count == 0);
-                
-                if(stream != null)
-                {
-                    return stream;
-                }
             }
-#endif
 
             if (scheme == Uri.UriSchemeHttp)
             {
-                return new HttpStream(ConnectToTcp(host, port));
+                return new HttpStream(ConnectToTcp(host, port)) { IsReusable = reuseMode == ConnectionReuseMode.Keepalive };
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
+                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, reuseMode == ConnectionReuseMode.Keepalive);
             }
             else
             {
@@ -167,7 +190,8 @@ namespace SilverSim.Http.Client
             int port,
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
-            bool checkCertificateRevocation)
+            bool checkCertificateRevocation,
+            bool enableReuseConnection)
         {
             var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
             sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
@@ -175,17 +199,20 @@ namespace SilverSim.Http.Client
             {
                 throw new AuthenticationException("Encryption not available");
             }
-            return new HttpsStream(sslstream);
+            return new HttpsStream(sslstream) { IsReusable = enableReuseConnection };
         }
 
         private static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
         {
-#if SUPPORT_REUSE
-            string key = scheme + "://" + host + ":" + port.ToString();
-            m_StreamList[key].Add(new StreamInfo(st, scheme, host, port));
-#else
-            st.Close();
-#endif
+            if (st.IsReusable)
+            {
+                string key = scheme + "://" + host + ":" + port.ToString();
+                m_StreamList[key].Add(new StreamInfo(st, scheme, host, port));
+            }
+            else
+            {
+                st.Close();
+            }
         }
         #endregion
     }
