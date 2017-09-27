@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using SilverSim.Types.Asset;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Asset
@@ -28,7 +27,5 @@ namespace SilverSim.ServiceInterfaces.Asset
     public interface IAssetMigrationSourceInterface
     {
         List<UUID> GetAssetList(long start, long count);
-        AssetData this[UUID key] { get; }
-        bool TryGetValue(UUID key, out AssetData assetData);
     }
 }
