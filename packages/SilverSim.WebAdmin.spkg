@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <package>
   <name>SilverSim.WebAdmin</name>
+  <version>0.0.0.0</version>
+  <license>Affero GPLv3 License+Link Exception</license>
   <dependencies>
     <dependency name="SilverSim.WebIF"/>
   </dependencies>

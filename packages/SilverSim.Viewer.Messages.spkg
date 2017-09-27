@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Viewer.Messages</name>
 	<files>
-		<file name="bin/SilverSim.Viewer.Messages.dll"/>
+		<file name="bin/SilverSim.Viewer.Messages.dll" is-version-src="true"/>
 	</files>
 </package>

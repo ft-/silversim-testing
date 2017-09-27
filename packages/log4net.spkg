@@ -2,6 +2,6 @@
 <package>
 	<name>log4net</name>
 	<files>
-		<file name="bin/log4net.dll"/>
+		<file name="bin/log4net.dll" is-version-src="true"/>
 	</files>
 </package>

@@ -3,6 +3,6 @@
 	<name>C5</name>
 	<license>MIT</license>
 	<files>
-		<file name="bin/C5.dll"/>
+		<file name="bin/C5.dll" is-version-src="true"/>
 	</files>
 </package>

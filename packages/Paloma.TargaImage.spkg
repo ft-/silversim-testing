@@ -2,6 +2,6 @@
 <package>
 	<name>Paloma.TargaImage</name>
 	<files>
-		<file name="bin/Paloma.TargaImage.dll"/>
+		<file name="bin/Paloma.TargaImage.dll" is-version-src="true"/>
 	</files>
 </package>

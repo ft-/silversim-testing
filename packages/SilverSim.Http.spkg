@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Http</name>
 	<files>
-		<file name="bin/SilverSim.Http.dll"/>
+		<file name="bin/SilverSim.Http.dll" is-version-src="true"/>
 	</files>
 </package>

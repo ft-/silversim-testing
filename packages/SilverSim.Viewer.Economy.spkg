@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Viewer.Economy</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Viewer.Economy.dll"/>
+		<file name="bin/plugins/SilverSim.Viewer.Economy.dll" is-version-src="true"/>
 	</files>
 </package>

@@ -17,6 +17,6 @@
 		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
 	<files>
-		<file name="bin/plugins/SilverSim.AssetPurger.dll"/>
+		<file name="bin/plugins/SilverSim.AssetPurger.dll" is-version-src="true"/>
 	</files>
 </package>

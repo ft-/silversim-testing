@@ -3,6 +3,6 @@
 	<name>CSJ2K</name>
 	<license>BSD</license>
 	<files>
-		<file name="bin/CSJ2K.dll"/>
+		<file name="bin/CSJ2K.dll" is-version-src="true"/>
 	</files>
 </package>

@@ -9,6 +9,6 @@
 		<use-if-started-as>grid</use-if-started-as>
 	</default-configuration>
 	<files>
-		<file name="bin/plugins/SilverSim.Main.IM.dll"/>
+		<file name="bin/plugins/SilverSim.Main.IM.dll" is-version-src="true"/>
 	</files>
 </package>

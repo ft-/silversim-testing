@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Scene.RegionLoader</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Scene.RegionLoader.dll"/>
+		<file name="bin/plugins/SilverSim.Scene.RegionLoader.dll" is-version-src="true"/>
 	</files>
 </package>

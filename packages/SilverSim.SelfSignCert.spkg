@@ -2,7 +2,7 @@
 <package>
 	<name>SilverSim.SelfSignCert</name>
 	<files>
-		<file name="bin/SilverSim.SelfSignCert.dll"/>
+		<file name="bin/SilverSim.SelfSignCert.dll" is-version-src="true"/>
 		<file name="bin/platform-libs/Mono.Security.dll"/>
 	</files>
 </package>

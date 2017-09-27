@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Scene.Implementation.Common</name>
 	<files>
-		<file name="bin/SilverSim.Scene.Implementation.Common.dll"/>
+		<file name="bin/SilverSim.Scene.Implementation.Common.dll" is-version-src="true"/>
 	</files>
 </package>

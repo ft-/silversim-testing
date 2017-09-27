@@ -5,6 +5,6 @@
 		<dependency name="SilverSim.Database.Memory"/>
 	</dependencies>
 	<files>
-		<file name="bin/plugins/SilverSim.Scene.Npc.dll"/>
+		<file name="bin/plugins/SilverSim.Scene.Npc.dll" is-version-src="true"/>
 	</files>
 </package>

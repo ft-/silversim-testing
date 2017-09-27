@@ -7,6 +7,6 @@
 		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
 	<files>
-		<file name="bin/plugins/SilverSim.Main.Cmd.UserServer.dll"/>
+		<file name="bin/plugins/SilverSim.Main.Cmd.UserServer.dll" is-version-src="true"/>
 	</files>
 </package>

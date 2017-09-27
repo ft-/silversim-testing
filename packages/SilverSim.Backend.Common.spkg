@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Backend.Common</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Backend.Common.dll"/>
+		<file name="bin/plugins/SilverSim.Backend.Common.dll" is-version-src="true"/>
 	</files>
 </package>

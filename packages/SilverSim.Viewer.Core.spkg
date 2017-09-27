@@ -13,7 +13,7 @@
 		<dependency name="SilverSim.Viewer.TerrainEdit"/>
 	</dependencies>
 	<files>
-		<file name="bin/SilverSim.Viewer.Core.dll"/>
+		<file name="bin/SilverSim.Viewer.Core.dll" is-version-src="true"/>
 		<file name="bin/languages/de/SilverSim.Viewer.Core.de.resources"/>
 		<file name="bin/languages/en/SilverSim.Viewer.Core.en.resources"/>
 	</files>

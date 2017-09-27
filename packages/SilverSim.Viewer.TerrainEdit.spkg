@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Viewer.TerrainEdit</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Viewer.TerrainEdit.dll"/>
+		<file name="bin/plugins/SilverSim.Viewer.TerrainEdit.dll" is-version-src="true"/>
 	</files>
 </package>

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <package>
 	<name>SilverSim.Meta.Core.Viewer</name>
+	<version>meta</version>
+	<license>Affero GPLv3 License+Link Exception</license>
 	<dependencies>
 		<dependency name="SilverSim.Viewer.Core"/>
 		<dependency name="SilverSim.Viewer.Economy"/>

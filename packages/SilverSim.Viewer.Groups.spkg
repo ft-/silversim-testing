@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Viewer.Groups</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Viewer.Groups.dll"/>
+		<file name="bin/plugins/SilverSim.Viewer.Groups.dll" is-version-src="true"/>
 	</files>
 </package>

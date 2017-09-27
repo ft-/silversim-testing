@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Scene.Registration</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Scene.Registration.dll"/>
+		<file name="bin/plugins/SilverSim.Scene.Registration.dll" is-version-src="true"/>
 	</files>
 </package>

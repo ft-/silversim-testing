@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Scene.Agent.Bakery</name>
 	<files>
-		<file name="bin/SilverSim.Scene.Agent.Bakery.dll"/>
+		<file name="bin/SilverSim.Scene.Agent.Bakery.dll" is-version-src="true"/>
 	</files>
 </package>

@@ -2,6 +2,6 @@
 <package>
 	<name>Nini</name>
 	<files>
-		<file name="bin/Nini.dll"/>
+		<file name="bin/Nini.dll" is-version-src="true"/>
 	</files>
 </package>

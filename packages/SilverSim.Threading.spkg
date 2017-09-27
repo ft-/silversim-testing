@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Threading</name>
 	<files>
-		<file name="bin/SilverSim.Threading.dll"/>
+		<file name="bin/SilverSim.Threading.dll" is-version-src="true"/>
 	</files>
 </package>

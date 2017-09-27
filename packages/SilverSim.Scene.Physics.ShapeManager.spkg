@@ -11,7 +11,7 @@
 		<dependency name="VHACD"/>
 	</dependencies>
 	<files>
-		<file name="bin/plugins/SilverSim.Scene.Physics.ShapeManager.dll"/>
+		<file name="bin/plugins/SilverSim.Scene.Physics.ShapeManager.dll" is-version-src="true"/>
 		<file name="bin/plugins/SilverSim.Scene.Physics.ShapeManager.dll.config"/>
 	</files>
 </package>

@@ -25,7 +25,7 @@
 		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
 	<files>
-		<file name="bin/plugins/SilverSim.WebIF.dll"/>
+		<file name="bin/plugins/SilverSim.WebIF.dll" is-version-src="true"/>
 		<file name="bin/languages/de/SilverSim.WebIF.de.resources"/>
 		<file name="bin/languages/en/SilverSim.WebIF.en.resources"/>
 	</files>

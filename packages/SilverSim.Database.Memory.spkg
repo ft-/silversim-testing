@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Database.Memory</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Database.Memory.dll"/>
+		<file name="bin/plugins/SilverSim.Database.Memory.dll" is-version-src="true"/>
 	</files>
 </package>

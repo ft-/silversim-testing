@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Viewer.Search</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Viewer.Search.dll"/>
+		<file name="bin/plugins/SilverSim.Viewer.Search.dll" is-version-src="true"/>
 	</files>
 </package>

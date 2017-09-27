@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Viewer.OfflineIM</name>
 	<files>
-		<file name="bin/plugins/SilverSim.Viewer.OfflineIM.dll"/>
+		<file name="bin/plugins/SilverSim.Viewer.OfflineIM.dll" is-version-src="true"/>
 	</files>
 </package>

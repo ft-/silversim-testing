@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Scene.Physics.Common</name>
 	<files>
-		<file name="bin/SilverSim.Scene.Physics.Common.dll"/>
+		<file name="bin/SilverSim.Scene.Physics.Common.dll" is-version-src="true"/>
 	</files>
 </package>

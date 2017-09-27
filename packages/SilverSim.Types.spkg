@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.Types</name>
 	<files>
-		<file name="bin/SilverSim.Types.dll"/>
+		<file name="bin/SilverSim.Types.dll" is-version-src="true"/>
 	</files>
 </package>

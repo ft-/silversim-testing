@@ -2,7 +2,7 @@
 <package>
 	<name>SilverSim.Scene.Management</name>
 	<files>
-		<file name="bin/SilverSim.Scene.Management.dll"/>
+		<file name="bin/SilverSim.Scene.Management.dll" is-version-src="true"/>
 		<file name="bin/languages/de/SilverSim.Scene.Management.de.resources"/>
 		<file name="bin/languages/en/SilverSim.Scene.Management.en.resources"/>
 	</files>

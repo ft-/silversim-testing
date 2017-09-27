@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <package>
 	<name>SilverSim.ExampleConfigs</name>
+	<version>meta</version>
 	<files>
 		<file name="data/SilverSim.Bare.ini.example"/>
 		<file name="data/SilverSim.Grid.ini.example"/>

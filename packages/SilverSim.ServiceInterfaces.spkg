@@ -2,6 +2,6 @@
 <package>
 	<name>SilverSim.ServiceInterfaces</name>
 	<files>
-		<file name="bin/SilverSim.ServiceInterfaces.dll"/>
+		<file name="bin/SilverSim.ServiceInterfaces.dll" is-version-src="true"/>
 	</files>
 </package>
