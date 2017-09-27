@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Viewer.GroupChat</name>
+	<files>
+		<file name="bin/plugins/SilverSim.Viewer.GroupChat.dll" is-version-src="true"/>
+	</files>
+</package>
