@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-// SilverSim is distributed under the terms of the
+﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3 with
 // the following clarification and special exception.
 
@@ -21,6 +19,8 @@ using System.Collections.Generic;
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using System;
+using System.Collections.Generic;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;

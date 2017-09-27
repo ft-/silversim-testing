@@ -1,5 +1,4 @@
-﻿using System;
-// SilverSim is distributed under the terms of the
+﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3 with
 // the following clarification and special exception.
 
@@ -20,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using System;
 using System.Threading;
 
 namespace SilverSim.Threading
