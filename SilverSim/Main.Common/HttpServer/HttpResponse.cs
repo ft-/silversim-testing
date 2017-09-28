@@ -100,9 +100,9 @@ namespace SilverSim.Main.Common.HttpServer
             IsCloseConnection = HttpConnectionMode.Close == request.ConnectionMode;
             StatusCode = statusCode;
             StatusDescription = statusDescription;
-            if(request.ContainsHeader("Accept"))
+            if(request.ContainsHeader("Accept-Encoding"))
             {
-                string[] parts = request["Accept"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] parts = request["Accept-Encoding"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 AcceptedEncodings = new List<string>();
                 foreach(string part in parts)
                 {

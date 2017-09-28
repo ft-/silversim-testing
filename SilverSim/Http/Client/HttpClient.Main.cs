@@ -253,14 +253,10 @@ namespace SilverSim.Http.Client
                 reqdata += "Expect: 100-continue\r\n";
             }
 
-#if DEBUG
-            /* disable gzip encoding for debugging */
-#else
             if(method != "HEAD")
             {
                 reqdata += "Accept-Encoding: gzip\r\n";
             }
-#endif
 
             int retrycnt = 1;
             retry:
@@ -487,7 +483,11 @@ namespace SilverSim.Http.Client
                 Stream bs = s;
                 if (headers.TryGetValue("transfer-encoding", out value) && value == "chunked")
                 {
-                    bs = new HttpReadChunkedBodyStream(bs);
+                    bs = new BodyResponseChunkedStream(s, uri.Scheme, uri.Host, uri.Port);
+                }
+                else
+                {
+                    s.IsReusable = false;
                 }
                 if (compressedresult)
                 {

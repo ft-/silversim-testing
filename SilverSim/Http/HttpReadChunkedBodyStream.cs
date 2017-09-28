@@ -28,7 +28,7 @@ namespace SilverSim.Http
 {
     public class HttpReadChunkedBodyStream : Stream
     {
-        private Stream m_Input;
+        protected Stream m_Input;
         private int m_RemainingChunkLength;
         private bool m_EndOfChunked;
 
@@ -143,9 +143,19 @@ namespace SilverSim.Http
             }
         }
 
+        protected virtual void ReachedEndOfChunked()
+        {
+
+        }
+
         public override int Read(byte[] buffer, int offset, int count)
         {
             int sumResult = 0;
+            if(m_Input == null)
+            {
+                return 0;
+            }
+
             while(!m_EndOfChunked && count > 0)
             {
                 if(m_RemainingChunkLength == 0)
@@ -169,6 +179,7 @@ namespace SilverSim.Http
                             {
                                 /* ReadHeaderLine() is all we have to do */
                             }
+                            ReachedEndOfChunked();
                         }
                     }
                     /* start to read a new chunk */

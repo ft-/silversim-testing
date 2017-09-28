@@ -123,7 +123,10 @@ namespace SilverSim.Main.Common.HttpServer
             bool gzipEnable = false;
             if (!m_IsHeaderSent)
             {
-                IsCloseConnection = true;
+                if (!IsChunkedAccepted)
+                {
+                    IsCloseConnection = true;
+                }
                 Headers.Remove("Content-Length");
                 if (!disableCompression && AcceptedEncodings != null && AcceptedEncodings.Contains("gzip"))
                 {
