@@ -980,16 +980,9 @@ namespace SilverSim.WebIF.Admin
 
                     using (var res = req.BeginResponse(contentType))
                     {
-                        using (var o = res.GetOutputStream(file.Length))
+                        using (var o = res.GetOutputStream())
                         {
-                            var buf = new byte[10240];
-                            int blocklen;
-                            for (blocklen = file.Read(buf, 0, 10240);
-                                0 != blocklen;
-                                blocklen = file.Read(buf, 0, 10240))
-                            {
-                                o.Write(buf, 0, blocklen);
-                            }
+                            file.CopyTo(o);
                         }
                     }
                 }
