@@ -433,7 +433,7 @@ namespace SilverSim.Http.Client
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException("Unsupport content-encoding");
                 }
             }
 
