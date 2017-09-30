@@ -24,18 +24,36 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 namespace SilverSim.Http
 {
-    public sealed class Http2Connection : IDisposable
+    public sealed class Http2Connection
     {
         private readonly Stream m_OriginalStream;
         private readonly RwLockedDictionary<uint, Http2Stream> m_Streams = new RwLockedDictionary<uint, Http2Stream>();
-        private int m_ActiveUsers;
         private bool m_GoAwaySent;
         private uint m_MaxTableByteSize = 4096;
         private uint m_InitialWindowSize = 65536;
+
+        [Serializable]
+        public class ConnectionClosedException : Exception
+        {
+            public ConnectionClosedException()
+            {
+            }
+
+            public ConnectionClosedException(string message) : base(message)
+            {
+            }
+
+            public ConnectionClosedException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected ConnectionClosedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+            {
+            }
+        }
 
         [Serializable]
         public class ProtocolErrorException : Exception
@@ -84,6 +102,22 @@ namespace SilverSim.Http
             SendFrame(Http2FrameType.Settings, 0, 0, settings.ToArray());
         }
 
+        ~Http2Connection()
+        {
+            if(!m_GoAwaySent)
+            {
+                try
+                {
+                    SendGoAway(Http2ErrorCode.NoError);
+                }
+                catch
+                {
+                    /* ignore this */
+                }
+            }
+            m_OriginalStream?.Dispose();
+        }
+
         private void AddSettingsData(List<byte> data, ushort paraid, uint paravalue)
         {
             data.Add((byte)((paraid >> 8) & 0xFF));
@@ -92,15 +126,6 @@ namespace SilverSim.Http
             data.Add((byte)((paravalue >> 16) & 0xFF));
             data.Add((byte)((paravalue >> 8) & 0xFF));
             data.Add((byte)((paravalue >> 0) & 0xFF));
-        }
-
-        public void Dispose()
-        {
-            if (Interlocked.Decrement(ref m_ActiveUsers) == 0)
-            {
-                SendGoAway(Http2ErrorCode.NoError);
-                m_OriginalStream?.Dispose();
-            }
         }
 
         public enum Http2ErrorCode
@@ -267,7 +292,12 @@ namespace SilverSim.Http
             {
                 frame = new Http2Frame();
                 var hdr = new byte[9];
-                if (9 != m_OriginalStream.Read(hdr, 0, 9))
+                int receivedbytes = m_OriginalStream.Read(hdr, 0, 9);
+                if(0 == receivedbytes)
+                {
+                    throw new ConnectionClosedException();
+                }
+                if (9 != receivedbytes)
                 {
                     SendGoAway(Http2ErrorCode.ProtocolError);
                     throw new ProtocolErrorException();
@@ -307,7 +337,10 @@ namespace SilverSim.Http
                         SendGoAway(Http2ErrorCode.FrameSizeError);
                         throw new ProtocolErrorException();
                     }
-                    SendFrame(Http2FrameType.Ping, (byte)PingFrameFlags.Ack, 0, frame.Data, 0, frame.Length);
+                    if ((frame.Flags & (byte)PingFrameFlags.Ack) == 0)
+                    {
+                        SendFrame(Http2FrameType.Ping, (byte)PingFrameFlags.Ack, 0, frame.Data, 0, frame.Length);
+                    }
                 }
             } while (frame.Type == Http2FrameType.Ping);
             m_LastReceivedStreamId = frame.StreamIdentifier;
@@ -351,7 +384,6 @@ namespace SilverSim.Http
 
         public void Run(Action<Http2Stream> action = null)
         {
-            Interlocked.Increment(ref m_ActiveUsers);
             for(; ;)
             {
                 Http2Frame frame = ReceiveFrame();
@@ -377,13 +409,19 @@ namespace SilverSim.Http
                                     /* pass settings through */
                                     s.NewFrameReceived(frame);
                                 }
+                                SendFrame(Http2FrameType.Settings, (byte)SettingsFrameFlags.Ack, 0, new byte[0]);
                             }
-                            SendFrame(Http2FrameType.Settings, (byte)SettingsFrameFlags.Ack, 0, new byte[0]);
                             break;
+
+                        case Http2FrameType.WindowUpdate:
+                            break;
+
+                        case Http2FrameType.GoAway:
+                            return;
 
                         default:
                             SendGoAway(Http2ErrorCode.ProtocolError);
-                            throw new ProtocolErrorException();
+                            throw new ProtocolErrorException("Unexpected frame " + frame.Type.ToString() + " received");
                     }
                 }
                 else
@@ -405,7 +443,7 @@ namespace SilverSim.Http
                                 }
                                 bool startStream = !stream.HaveReceivedHeaders;
                                 stream.NewFrameReceived(frame);
-                                if(startStream && stream.HaveReceivedHeaders)
+                                if(startStream && (frame.Flags & (byte)HeadersFrameFlags.EndHeaders) != 0)
                                 {
                                     action(stream);
                                 }
@@ -422,10 +460,6 @@ namespace SilverSim.Http
                         case Http2FrameType.Data:
                         case Http2FrameType.WindowUpdate:
                         case Http2FrameType.Continuation:
-                            if(frame.Type == Http2FrameType.Data)
-                            {
-
-                            }
                             if(frame.Type == Http2FrameType.WindowUpdate && frame.Data.Length != 4)
                             {
                                 SendGoAway(Http2ErrorCode.FrameSizeError);
@@ -503,7 +537,6 @@ namespace SilverSim.Http
                 m_StreamIdentifier = streamid;
                 m_MaxTableByteSize = maxtablebytesize;
                 m_WindowSize = windowsize;
-                Interlocked.Increment(ref conn.m_ActiveUsers);
             }
 
             public Http2Stream(Http2Connection conn, uint streamid, uint maxtablebytesize, uint windowsize, bool havepost)
@@ -514,12 +547,6 @@ namespace SilverSim.Http
                 m_WindowSize = windowsize;
                 m_HaveReceivedHeaders = true;
                 m_HaveReceivedEoS = !havepost;
-                Interlocked.Increment(ref conn.m_ActiveUsers);
-            }
-
-            ~Http2Stream()
-            {
-                m_Conn.Dispose();
             }
 
             public bool HaveReceivedEoS => m_HaveReceivedEoS;
@@ -557,7 +584,6 @@ namespace SilverSim.Http
                 {
                     m_Conn.SendFrame(Http2FrameType.Data, (byte)DataFrameFlags.EndStream, m_StreamIdentifier, m_BufferedTransmitData, 0, m_BufferedTransmitDataBytes);
                 }
-                m_Conn.Dispose();
             }
 
             internal void NewFrameReceived(Http2Frame frame)
@@ -755,9 +781,9 @@ namespace SilverSim.Http
             #endregion
 
             #region Send HTTP headers
-            public void SendHeaders(Dictionary<string, string> headers, bool eos = false)
+            public void SendHeaders(Dictionary<string, string> headers, uint statuscode = 0, bool eos = false)
             {
-                byte[] data = BuildHeaderData(headers);
+                byte[] data = BuildHeaderData(headers, statuscode);
                 int offset = 0;
                 var type = Http2FrameType.Headers;
                 while (data.Length - offset > 16384)
@@ -780,9 +806,48 @@ namespace SilverSim.Http
                 m_HaveSentEoS = eos;
             }
 
-            private byte[] BuildHeaderData(Dictionary<string, string> headers)
+            private byte[] BuildHeaderData(Dictionary<string, string> headers, uint statuscode = 0)
             {
                 var res = new List<byte>();
+                switch(statuscode)
+                {
+                    case 0:
+                        break;
+
+                    case 200:
+                        AppendInteger(res, INDEX_HEADER_FIELD, 7, 8);
+                        break;
+
+                    case 204:
+                        AppendInteger(res, INDEX_HEADER_FIELD, 7, 9);
+                        break;
+
+                    case 206:
+                        AppendInteger(res, INDEX_HEADER_FIELD, 7, 10);
+                        break;
+
+                    case 304:
+                        AppendInteger(res, INDEX_HEADER_FIELD, 7, 11);
+                        break;
+
+                    case 400:
+                        AppendInteger(res, INDEX_HEADER_FIELD, 7, 12);
+                        break;
+
+                    case 404:
+                        AppendInteger(res, INDEX_HEADER_FIELD, 7, 13);
+                        break;
+
+                    case 500:
+                        AppendInteger(res, INDEX_HEADER_FIELD, 7, 14);
+                        break;
+
+                    default:
+                        AppendInteger(res, LITERAL_HEADER_FIELD, 4, 8);
+                        AppendString(res, statuscode.ToString());
+                        break;
+                }
+
                 foreach (KeyValuePair<string, string> kvp in headers)
                 {
                     string name = kvp.Key.ToLowerInvariant();
@@ -838,41 +903,6 @@ namespace SilverSim.Http
                             }
                             continue;
 
-                        case ":status":
-                            if (kvp.Value == "200")
-                            {
-                                AppendInteger(res, INDEX_HEADER_FIELD, 7, 8);
-                            }
-                            else if (kvp.Value == "204")
-                            {
-                                AppendInteger(res, INDEX_HEADER_FIELD, 7, 9);
-                            }
-                            else if (kvp.Value == "206")
-                            {
-                                AppendInteger(res, INDEX_HEADER_FIELD, 7, 10);
-                            }
-                            else if (kvp.Value == "304")
-                            {
-                                AppendInteger(res, INDEX_HEADER_FIELD, 7, 11);
-                            }
-                            else if (kvp.Value == "400")
-                            {
-                                AppendInteger(res, INDEX_HEADER_FIELD, 7, 12);
-                            }
-                            else if (kvp.Value == "404")
-                            {
-                                AppendInteger(res, INDEX_HEADER_FIELD, 7, 13);
-                            }
-                            else if (kvp.Value == "500")
-                            {
-                                AppendInteger(res, INDEX_HEADER_FIELD, 7, 14);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                            continue;
-
                         case "accept-encoding":
                             if (kvp.Value == "gzip, deflate" || kvp.Value == "gzip,deflate")
                             {
@@ -894,7 +924,6 @@ namespace SilverSim.Http
                         AppendString(res, kvp.Key);
                         AppendString(res, kvp.Value);
                     }
-                    break;
                 }
                 return res.ToArray();
             }
@@ -985,6 +1014,7 @@ namespace SilverSim.Http
                         res.Add((byte)((i & 0x7F) | 0x80));
                         i >>= 7;
                     }
+                    res.Add((byte)(i & 0x7F));
                 }
             }
             #endregion
@@ -1117,7 +1147,7 @@ namespace SilverSim.Http
                 while (m_HeaderRxBuf.Count > 0)
                 {
                     byte cmd = m_HeaderRxBuf[0];
-                    offset = 1;
+                    offset = 0;
                     if((cmd & 0x80) != 0)
                     {
                         int value;
@@ -1126,7 +1156,7 @@ namespace SilverSim.Http
                             break;
                         }
                         KeyValuePair<string, string> entry;
-                        if(value >= m_RxStaticTable.Length)
+                        if(value > m_RxStaticTable.Length)
                         {
                             value -= m_RxStaticTable.Length;
                             if(m_RxDynamicTable.Count <= value)
@@ -1134,7 +1164,7 @@ namespace SilverSim.Http
                                 m_Conn.SendRstStream(m_StreamIdentifier, Http2ErrorCode.ProtocolError);
                                 throw new StreamErrorException();
                             }
-                            KeyValuePair<byte[], byte[]> bdat = m_RxDynamicTable[(int)value];
+                            KeyValuePair<byte[], byte[]> bdat = m_RxDynamicTable[value];
                             entry = new KeyValuePair<string, string>(
                                 UTF8NoBOM.GetString(bdat.Key),
                                 UTF8NoBOM.GetString(bdat.Value));
@@ -1224,7 +1254,7 @@ namespace SilverSim.Http
                 {
                     return false;
                 }
-                if (offset + valuelen < m_HeaderRxBuf.Count)
+                if (offset + valuelen > m_HeaderRxBuf.Count)
                 {
                     return false;
                 }
@@ -1246,9 +1276,9 @@ namespace SilverSim.Http
 
             private bool TryGetInteger(ref int offset, int nbits, out int value)
             {
-                byte b = m_HeaderRxBuf[offset++];
                 var bmask = (byte)((1 << nbits) - 1);
-                if((b & bmask) != bmask)
+                byte b = (byte)(m_HeaderRxBuf[offset++] & bmask);
+                if(b != bmask)
                 {
                     value = b & bmask;
                 }
@@ -1258,7 +1288,14 @@ namespace SilverSim.Http
                     value = b & bmask;
                     do
                     {
-                        b = m_HeaderRxBuf[offset++];
+                        try
+                        {
+                            b = m_HeaderRxBuf[offset++];
+                        }
+                        catch
+                        {
+                            return false;
+                        }
                         value += ((b & 0x7F) << m);
                         m += 7;
                     } while ((b & 128) != 0);
@@ -1319,7 +1356,7 @@ namespace SilverSim.Http
 
                 m_HaveReceivedHeaders = true;
 
-                throw new NotImplementedException();
+                return headers;
             }
             #endregion
 

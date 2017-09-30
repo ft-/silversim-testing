@@ -148,6 +148,32 @@ namespace SilverSim.Main.Common.HttpServer
                 throw new InvalidDataException();
             }
 
+            if(MajorVersion == 2)
+            {
+                Method = requestData[0];
+                RawUrl = requestData[1];
+
+                /* this is HTTP/2 client preface */
+                while (ReadHeaderLine().Length != 0)
+                {
+                    /* skip headers */
+                }
+                if(ReadHeaderLine() != "SM")
+                {
+                    ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                    throw new InvalidDataException();
+                }
+                if(ReadHeaderLine().Length != 0)
+                {
+                    ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                    throw new InvalidDataException();
+                }
+                CallerIP = (m_Headers.ContainsKey("x-forwarded-for") && isBehindProxy) ?
+                    m_Headers["x-forwarded-for"] :
+                    callerIP;
+                return;
+            }
+
             if (MajorVersion != 1)
             {
                 MajorVersion = 1;

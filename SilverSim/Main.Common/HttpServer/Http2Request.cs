@@ -186,24 +186,33 @@ namespace SilverSim.Main.Common.HttpServer
                 callerIP;
         }
 
-        public override HttpResponse BeginChunkedResponse()
-        {
-            throw new NotImplementedException();
-        }
+        public override HttpResponse BeginChunkedResponse() =>
+            BeginResponse(HttpStatusCode.OK, "OK");
 
         public override HttpResponse BeginChunkedResponse(string contentType)
         {
-            throw new NotImplementedException();
+            HttpResponse res = BeginResponse(HttpStatusCode.OK, "OK");
+            res.ContentType = ContentType;
+            return res;
         }
 
         public override HttpResponse BeginResponse()
-        {
-            throw new NotImplementedException();
-        }
+            => BeginResponse(HttpStatusCode.OK, "OK");
 
         public override HttpResponse BeginResponse(HttpStatusCode statuscode, string statusDescription)
         {
-            throw new NotImplementedException();
+            if (!m_Stream.HaveReceivedEoS)
+            {
+                var postbuf = new byte[10240];
+                while (!m_Stream.HaveReceivedEoS)
+                {
+                    m_Stream.Read(postbuf, 0, postbuf.Length);
+                }
+            }
+
+            var res = new Http2Response(m_Stream, this, statuscode, statusDescription);
+            m_Stream = null;
+            return res;
         }
 
         public override HttpWebSocket BeginWebSocket(string websocketprotocol = "")
@@ -213,12 +222,10 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override void Close()
         {
-            throw new NotImplementedException();
         }
 
         public override void SetConnectionClose()
         {
-            throw new NotImplementedException();
         }
 
         public class RequestBodyStream : Stream

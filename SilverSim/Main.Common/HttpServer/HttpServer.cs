@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -478,6 +479,19 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             httpstream.Write(m_H2cUpgrade, 0, m_H2cUpgrade.Length);
                             byte[] settingsdata = FromUriBase64(http2settings);
+                            var preface_receive = new byte[24];
+                            if (24 != httpstream.Read(preface_receive, 0, 24))
+                            {
+                                httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
+                                httpstream.Close();
+                                return;
+                            }
+                            if(!preface_receive.SequenceEqual(m_H2cClientPreface))
+                            {
+                                httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
+                                httpstream.Close();
+                                return;
+                            }
                             var h2con = new Http2Connection(httpstream);
                             Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, false);
                             req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req);
@@ -491,9 +505,20 @@ namespace SilverSim.Main.Common.HttpServer
                     httpstream.ReadTimeout = 10000;
                 }
             }
-            catch(Http2Connection.ProtocolErrorException)
+            catch(Http2Connection.ConnectionClosedException)
+            {
+                /* HTTP/2 connection closed */
+            }
+            catch(Http2Connection.ProtocolErrorException
+#if DEBUG
+                    e
+#endif
+                )
             {
                 /* HTTP/2 protocol errors */
+#if DEBUG
+                m_Log.Debug("HTTP/2 Protocol Exception: ", e);
+#endif
             }
             catch (HttpResponse.DisconnectFromThreadException)
             {
@@ -521,6 +546,10 @@ namespace SilverSim.Main.Common.HttpServer
                 m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
             }
         }
+
+        private byte[] m_H2cGoAwayProtocolError = new byte[] { 0x00, 0x00, 0x08, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+
+        private byte[] m_H2cClientPreface = new byte[] { 0x50, 0x52, 0x49, 0x20, 0x2a, 0x20, 0x48, 0x54, 0x54, 0x50, 0x2f, 0x32, 0x2e, 0x30, 0x0d, 0x0a, 0x0d, 0x0a, 0x53, 0x4d, 0x0d, 0x0a, 0x0d, 0x0a };
 
         private byte[] m_H2cUpgrade = Encoding.ASCII.GetBytes("HTTP/1.1 101 Switching Protocols\r\n\r\n");
 

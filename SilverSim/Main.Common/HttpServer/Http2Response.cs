@@ -48,8 +48,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         private void SendHeaders(bool eos)
         {
-            Headers[":status"] = ((uint)StatusCode).ToString();
-            m_Output.SendHeaders(Headers, eos);
+            m_Output.SendHeaders(Headers, (uint)StatusCode, eos);
             m_IsHeaderSent = true;
         }
 
