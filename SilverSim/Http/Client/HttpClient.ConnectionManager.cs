@@ -250,6 +250,13 @@ namespace SilverSim.Http.Client
             return new HttpsStream(sslstream) { IsReusable = enableReuseConnection };
         }
 
+        private static void AddH2Connection(Http2Connection conn, string scheme, string host, int port)
+        {
+            string key = scheme + "://" + host + ":" + port.ToString();
+            m_H2StreamList[key].Add(new H2StreamInfo(conn, scheme, host, port));
+            ThreadManager.CreateThread(() => conn.Run()).Start();
+        }
+
         private static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
         {
             if (st.IsReusable)
@@ -272,6 +279,31 @@ namespace SilverSim.Http.Client
                 false,
                 reuseMode);
 
+        private static Http2Connection.Http2Stream TryReuseStream(string scheme, string host, int port)
+        {
+            string key = scheme + "://" + host + ":" + port.ToString();
+            Http2Connection.Http2Stream h2stream = null;
+
+            RwLockedList<H2StreamInfo> streaminfo;
+            if (m_H2StreamList.TryGetValue(key, out streaminfo))
+            {
+                lock (streaminfo)
+                {
+                    for (int i = 0; i < streaminfo.Count; ++i)
+                    {
+                        H2StreamInfo h2info = streaminfo[i];
+                        if ((h2info.ValidUntil - Environment.TickCount) > 0 &&
+                            h2info.Connection.AvailableStreams > 0)
+                        {
+                            h2info.ValidUntil = Environment.TickCount + 5000;
+                            h2stream = h2info.Connection.OpenClientStream();
+                        }
+                    }
+                }
+            }
+            return h2stream;
+        }
+
         private static Http2Connection.Http2Stream OpenHttp2Stream(
             string scheme, string host, int port,
             X509CertificateCollection clientCertificates,
@@ -284,50 +316,22 @@ namespace SilverSim.Http.Client
 
             if (reuseMode != ConnectionReuseMode.Http2PriorKnowledgeSingleRequest)
             {
-                RwLockedList<H2StreamInfo> streaminfo;
-                if (m_H2StreamList.TryGetValue(key, out streaminfo))
-                {
-                    lock (streaminfo)
-                    {
-                        for(int i = 0; i < streaminfo.Count; ++i)
-                        {
-                            H2StreamInfo h2info = streaminfo[i];
-                            if ((h2info.ValidUntil - Environment.TickCount) > 0 &&
-                                h2info.Connection.AvailableStreams > 0)
-                            {
-                                h2info.ValidUntil = Environment.TickCount + 5000;
-                                h2stream = h2info.Connection.OpenClientStream();
-                            }
-                        }
-                    }
-
-                    if(h2stream != null)
-                    {
-                        return h2stream;
-                    }
-                }
+                h2stream = TryReuseStream(scheme, host, port);
             }
 
             Stream s;
             if (scheme == Uri.UriSchemeHttp)
             {
-                s = new HttpStream(ConnectToTcp(host, port));
+                s = new HttpStream(ConnectToTcp(host, port)) { IsReusable = false };
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
-                sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
-                if (!sslstream.IsEncrypted)
-                {
-                    throw new AuthenticationException("Encryption not available");
-                }
-                s = sslstream;
+                s = ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, false);
             }
             else
             {
                 throw new NotSupportedException();
             }
-
 
             var h2con = new Http2Connection(s, false);
             h2stream = h2con.OpenClientStream();

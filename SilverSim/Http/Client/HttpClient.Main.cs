@@ -203,6 +203,14 @@ namespace SilverSim.Http.Client
                 return DoStreamRequestHttp2(method, uri, content_type, content_length, postdelegate, compressed, timeoutms, reuseMode, headers);
             }
 
+            if(reuseMode == ConnectionReuseMode.UpgradeHttp2)
+            {
+                Http2Connection.Http2Stream h2stream = TryReuseStream(uri.Scheme, uri.Host, uri.Port);
+                if(h2stream != null)
+                {
+                    return DoStreamRequestHttp2(method, uri, content_type, content_length, postdelegate, compressed, timeoutms, reuseMode, headers, h2stream);
+                }
+            }
 
             byte[] outdata;
 
@@ -275,6 +283,11 @@ namespace SilverSim.Http.Client
             {
                 finalreqdata += "Connection: close\r\n";
             }
+            bool h2cUpgrade = reuseMode == ConnectionReuseMode.UpgradeHttp2;
+            if(h2cUpgrade)
+            {
+                finalreqdata += "Upgrade: h2c\r\nHTTP2-Settings:\r\n";
+            }
             finalreqdata += "\r\n";
             outdata = Encoding.ASCII.GetBytes(finalreqdata);
 
@@ -325,6 +338,17 @@ namespace SilverSim.Http.Client
                     if (!splits[0].StartsWith("HTTP/"))
                     {
                         throw new BadHttpResponseException("Missing HTTP version info");
+                    }
+
+                    if(splits[1] == "101")
+                    {
+                        ReadHeaderLines(s, headers);
+                        headers.Clear();
+                        var conn = new Http2Connection(s, false);
+                        Http2Connection.Http2Stream h2stream = conn.UpgradeClientStream();
+                        AddH2Connection(conn, uri.Scheme, uri.Host, uri.Port);
+
+                        return DoStreamRequestHttp2Response(h2stream, method, uri, postdelegate, timeoutms, headers, doPost);
                     }
 
                     if (splits[1] != "100")
@@ -402,6 +426,17 @@ namespace SilverSim.Http.Client
             else
             {
                 headers.Clear();
+            }
+
+            if(splits[1] == "101")
+            {
+                ReadHeaderLines(s, headers);
+                headers.Clear();
+                var conn = new Http2Connection(s, false);
+                Http2Connection.Http2Stream h2stream = conn.UpgradeClientStream();
+                AddH2Connection(conn, uri.Scheme, uri.Host, uri.Port);
+
+                return DoStreamRequestHttp2Response(h2stream, method, uri, postdelegate, timeoutms, headers, doPost);
             }
 
             if (!splits[1].StartsWith("2"))
@@ -534,7 +569,8 @@ namespace SilverSim.Http.Client
             bool compressed,
             int timeoutms,
             ConnectionReuseMode reuseMode,
-            IDictionary<string, string> headers = null)
+            IDictionary<string, string> headers = null,
+            Http2Connection.Http2Stream reuseStream = null)
         {
             bool doPost = false;
             string encval;
@@ -568,7 +604,7 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            if(actheaders.TryGetValue("transfer-encoding", out encval) && encval == "chunked")
+            if (actheaders.TryGetValue("transfer-encoding", out encval) && encval == "chunked")
             {
                 actheaders.Remove("transfer-encoding");
             }
@@ -593,7 +629,7 @@ namespace SilverSim.Http.Client
 
             int retrycnt = 1;
             retry:
-            Http2Connection.Http2Stream s = OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, reuseMode);
+            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, reuseMode);
             headers.Clear();
             try
             {
@@ -625,13 +661,31 @@ namespace SilverSim.Http.Client
             }
             s.ReadTimeout = 10000;
 
-            Dictionary<string, string> rxheaders;
+            return DoStreamRequestHttp2Response(
+                s,
+                method,
+                uri,
+                postdelegate,
+                timeoutms,
+                headers,
+                doPost);
+        }
 
+        private static Stream DoStreamRequestHttp2Response(
+            Http2Connection.Http2Stream s,
+            string method,
+            Uri uri,
+            Action<Stream> postdelegate,
+            int timeoutms,
+            IDictionary<string, string> headers,
+            bool doPost)
+        {
+            Dictionary<string, string> rxheaders;
             if (doPost)
             {
                 rxheaders = s.ReceiveHeaders();
                 string status;
-                if(!headers.TryGetValue(":status", out status))
+                if(!rxheaders.TryGetValue(":status", out status))
                 {
                     s.SendRstStream(Http2Connection.Http2ErrorCode.ProtocolError);
                     throw new BadHttpResponseException("Not a HTTP response");

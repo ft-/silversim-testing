@@ -361,6 +361,7 @@ namespace SilverSim.Http
         uint m_ClientStreamIdentifier = 1;
 
         public int AvailableStreams => (int)m_MaxConcurrentStreams - m_Streams.Count;
+        public int NumStreams => m_Streams.Count;
 
         public Http2Stream OpenClientStream()
         {
@@ -392,6 +393,17 @@ namespace SilverSim.Http
                 m_ClientStreamIdentifier = (m_ClientStreamIdentifier + 2) & 0x7FFFFFFF;
             }
             return new Http2Stream(this, streamid, m_MaxTableByteSize, m_InitialWindowSize, hasPost);
+        }
+
+        public Http2Stream UpgradeClientStream()
+        {
+            uint streamid;
+            lock (m_ClientStreamIdentifierLock)
+            {
+                streamid = m_ClientStreamIdentifier;
+                m_ClientStreamIdentifier = (m_ClientStreamIdentifier + 2) & 0x7FFFFFFF;
+            }
+            return new Http2Stream(this, true, streamid, m_MaxTableByteSize, m_InitialWindowSize);
         }
 
         public void Run(Action<Http2Stream> action = null)
@@ -549,6 +561,7 @@ namespace SilverSim.Http
 
             public Http2Stream(Http2Connection conn, uint streamid, uint maxtablebytesize, uint windowsize)
             {
+                ReadTimeout = 10000;
                 m_Conn = conn;
                 m_StreamIdentifier = streamid;
                 m_MaxTableByteSize = maxtablebytesize;
@@ -557,12 +570,24 @@ namespace SilverSim.Http
 
             public Http2Stream(Http2Connection conn, uint streamid, uint maxtablebytesize, uint windowsize, bool havepost)
             {
+                ReadTimeout = 10000;
                 m_Conn = conn;
                 m_StreamIdentifier = streamid;
                 m_MaxTableByteSize = maxtablebytesize;
                 m_WindowSize = windowsize;
                 m_HaveReceivedHeaders = true;
                 m_HaveReceivedEoS = !havepost;
+            }
+
+            public Http2Stream(Http2Connection conn, bool isUpgrade, uint streamid, uint maxtablebytesize, uint windowsize)
+            {
+                ReadTimeout = 10000;
+                m_Conn = conn;
+                m_StreamIdentifier = streamid;
+                m_MaxTableByteSize = maxtablebytesize;
+                m_WindowSize = windowsize;
+                m_HaveSentHeaders = isUpgrade;
+                m_HaveSentEoS = isUpgrade;
             }
 
             public bool HaveReceivedEoS => m_HaveReceivedEoS;
@@ -620,6 +645,8 @@ namespace SilverSim.Http
             public override bool CanSeek => false;
 
             public override bool CanWrite => true;
+
+            public override int ReadTimeout { get; set;  }
 
             #region Unsupported methods
             public override long Length
@@ -692,7 +719,7 @@ namespace SilverSim.Http
                             return 0;
                         }
 
-                        Http2Frame frame = m_Http2Queue.Dequeue();
+                        Http2Frame frame = m_Http2Queue.Dequeue(ReadTimeout);
                         uint value;
                         m_Conn.SendFrame(Http2FrameType.WindowUpdate, 0, m_StreamIdentifier, new byte[] { 0, 0x1, 0, 0 });
                         if (TryGetSettingsValue(frame.Data, SETTINGS_HEADER_TABLE_SIZE, out value))
@@ -772,7 +799,7 @@ namespace SilverSim.Http
                     int remaining = m_MaxTransmitDataBytes - m_BufferedTransmitDataBytes;
                     while(m_WindowSize == 0)
                     {
-                        Http2Frame frame = m_Http2WindowUpdateQueue.Dequeue();
+                        Http2Frame frame = m_Http2WindowUpdateQueue.Dequeue(ReadTimeout);
                         m_WindowSize = GetWindowSize(frame);
                     }
                     /* prevent stalls due to inconsistent settings */
