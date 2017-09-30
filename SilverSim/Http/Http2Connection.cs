@@ -328,6 +328,27 @@ namespace SilverSim.Http
             return new Http2Stream(this, streamid, m_MaxTableByteSize, m_InitialWindowSize);
         }
 
+        public Http2Stream UpgradeStream(byte[] settings, bool hasPost)
+        {
+            uint value;
+            if (TryGetSettingsValue(settings, SETTINGS_HEADER_TABLE_SIZE, out value))
+            {
+                m_MaxTableByteSize = value;
+            }
+            if (TryGetSettingsValue(settings, SETTINGS_INITIAL_WINDOW_SIZE, out value))
+            {
+                m_InitialWindowSize = value;
+            }
+
+            uint streamid;
+            lock (m_ClientStreamIdentifierLock)
+            {
+                streamid = m_ClientStreamIdentifier;
+                m_ClientStreamIdentifier = (m_ClientStreamIdentifier + 2) & 0x7FFFFFFF;
+            }
+            return new Http2Stream(this, streamid, m_MaxTableByteSize, m_InitialWindowSize, hasPost);
+        }
+
         public void Run(Action<Http2Stream> action = null)
         {
             Interlocked.Increment(ref m_ActiveUsers);
@@ -482,6 +503,17 @@ namespace SilverSim.Http
                 m_StreamIdentifier = streamid;
                 m_MaxTableByteSize = maxtablebytesize;
                 m_WindowSize = windowsize;
+                Interlocked.Increment(ref conn.m_ActiveUsers);
+            }
+
+            public Http2Stream(Http2Connection conn, uint streamid, uint maxtablebytesize, uint windowsize, bool havepost)
+            {
+                m_Conn = conn;
+                m_StreamIdentifier = streamid;
+                m_MaxTableByteSize = maxtablebytesize;
+                m_WindowSize = windowsize;
+                m_HaveReceivedHeaders = true;
+                m_HaveReceivedEoS = !havepost;
                 Interlocked.Increment(ref conn.m_ActiveUsers);
             }
 

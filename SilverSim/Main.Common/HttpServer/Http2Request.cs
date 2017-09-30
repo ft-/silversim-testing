@@ -34,21 +34,37 @@ namespace SilverSim.Main.Common.HttpServer
     {
         Http2Connection.Http2Stream m_Stream;
 
-        public Http2Request(Http2Connection.Http2Stream stream, string callerIP, bool isBehindProxy, bool isSsl)
+        public Http2Request(Http2Connection.Http2Stream stream, string callerIP, bool isBehindProxy, bool isSsl, HttpRequest upgradeReq = null)
             : base(isSsl)
         {
             MajorVersion = 2;
             MinorVersion = 0;
             m_Stream = stream;
-            Dictionary<string, string> headers = m_Stream.ReceiveHeaders();
+            if (upgradeReq == null)
+            {
+                foreach (KeyValuePair<string, string> kvp in m_Stream.ReceiveHeaders())
+                {
+                    m_Headers[kvp.Key] = kvp.Value;
+                }
+            }
+            else
+            {
+                foreach(KeyValuePair<string, string> kvp in upgradeReq.m_Headers)
+                {
+                    m_Headers[kvp.Key] = kvp.Value;
+                }
+                m_Headers[":method"] = upgradeReq.Method;
+                m_Headers[":path"] = upgradeReq.RawUrl;
+            }
+
             string value;
-            if(!headers.TryGetValue(":method", out value))
+            if(!m_Headers.TryGetValue(":method", out value))
             {
                 m_Stream.SendRstStream(Http2Connection.Http2ErrorCode.ProtocolError);
                 throw new InvalidDataException();
             }
             Method = value;
-            if (!headers.TryGetValue(":path", out value))
+            if (!m_Headers.TryGetValue(":path", out value))
             {
                 m_Stream.SendRstStream(Http2Connection.Http2ErrorCode.ProtocolError);
                 throw new InvalidDataException();

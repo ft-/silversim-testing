@@ -453,6 +453,9 @@ namespace SilverSim.Main.Common.HttpServer
                         return;
                     }
 
+                    string upgrade;
+                    string http2settings;
+
                     /* Recognition for HTTP/2.0 connection */
                     if(req.Method == "PRI")
                     {
@@ -464,26 +467,24 @@ namespace SilverSim.Main.Common.HttpServer
                         else
                         {
                             req = null; /* no need for the initial request data */
-                            var http2Connection = new Http2Connection(httpstream);
-                            http2Connection.Run((ht2stream) =>
-                            {
-                                try
-                                {
-                                    req = new Http2Request(ht2stream, remoteAddr, m_IsBehindProxy, isSsl);
-                                }
-                                catch(Http2Connection.StreamErrorException)
-                                {
-                                    /* ignore */
-                                    return;
-                                }
-                                catch(HttpResponse.ConnectionCloseException)
-                                {
-                                    /* ignore */
-                                }
-                                ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
-                            });
+                            HandleHttp2(new Http2Connection(httpstream), remoteAddr, isSsl);
                         }
                         return;
+                    }
+                    else if(req.TryGetHeader("upgrade", out upgrade) && upgrade.ToLowerInvariant() == "h2c" && !isSsl &&
+                        req.TryGetHeader("http2-settings", out http2settings))
+                    {
+                        if (req.Body == null)
+                        {
+                            httpstream.Write(m_H2cUpgrade, 0, m_H2cUpgrade.Length);
+                            byte[] settingsdata = FromUriBase64(http2settings);
+                            var h2con = new Http2Connection(httpstream);
+                            Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, false);
+                            req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req);
+                            ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
+                            HandleHttp2(new Http2Connection(httpstream), remoteAddr, isSsl);
+                            return;
+                        }
                     }
 
                     ProcessHttpRequest(req);
@@ -519,6 +520,34 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
             }
+        }
+
+        private byte[] m_H2cUpgrade = Encoding.ASCII.GetBytes("HTTP/1.1 101 Switching Protocols\r\n\r\n");
+
+        private byte[] FromUriBase64(string val) =>
+            Convert.FromBase64String(val.Replace('_', '+').Replace('_', '/').PadRight(val.Length % 4 == 0 ? val.Length : val.Length + 4 - (val.Length % 4), '='));
+
+        private void HandleHttp2(Http2Connection http2Connection, string remoteAddr, bool isSsl)
+        {
+            http2Connection.Run((ht2stream) =>
+            {
+                HttpRequest req;
+                try
+                {
+                    req = new Http2Request(ht2stream, remoteAddr, m_IsBehindProxy, isSsl);
+                }
+                catch (Http2Connection.StreamErrorException)
+                {
+                    /* ignore */
+                    return;
+                }
+                catch (HttpResponse.ConnectionCloseException)
+                {
+                    /* ignore */
+                    return;
+                }
+                ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
+            });
         }
 
         private void HandleHttp2WorkItem(object o)
@@ -564,7 +593,11 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             Action<HttpRequest> del;
-            if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
+            if(req.RawUrl == "*")
+            {
+                req.EmptyResponse();
+            }
+            else if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
             {
                 try
                 {

@@ -35,7 +35,7 @@ namespace SilverSim.Main.Common.HttpServer
     public abstract class HttpRequest
     {
         #region Private Fields
-        protected readonly Dictionary<string, string> m_Headers = new Dictionary<string, string>();
+        internal readonly Dictionary<string, string> m_Headers = new Dictionary<string, string>();
         #endregion
 
         #region Properties
