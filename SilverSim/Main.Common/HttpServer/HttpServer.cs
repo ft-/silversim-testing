@@ -453,120 +453,46 @@ namespace SilverSim.Main.Common.HttpServer
                         return;
                     }
 
-                    /* Recognition for plaintext HTTP/2.0 connection */
+                    /* Recognition for HTTP/2.0 connection */
                     if(req.Method == "PRI")
                     {
-                        if (req.MajorVersion != 2 || req.MinorVersion != 0 || req.IsSsl)
+                        if (req.MajorVersion != 2 || req.MinorVersion != 0)
                         {
                             req.SetConnectionClose();
                             req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                         }
                         else
                         {
-                            req.SetConnectionClose();
-                            req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
-                        }
-                        return;
-                    }
-
-                    if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
-                    {
-                        req.SetConnectionClose();
-                        req.ErrorResponse(HttpStatusCode.LengthRequired, "Length Required");
-                        return;
-                    }
-
-                    Action<HttpRequest> del;
-                    if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
-                    {
-                        try
-                        {
-                            del(req);
-                        }
-                        catch (HttpServerException e)
-                        {
-                            e.Serialize(req);
-                        }
-                        catch (HttpResponse.ConnectionCloseException)
-                        {
-                            return;
-                        }
-                        catch (HttpResponse.DisconnectFromThreadException)
-                        {
-                            throw;
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
-                        }
-                        req.Close();
-                    }
-                    else if (UriHandlers.TryGetValue(req.RawUrl, out del))
-                    {
-                        try
-                        {
-                            del(req);
-                        }
-                        catch (HttpServerException e)
-                        {
-                            e.Serialize(req);
-                        }
-                        catch (HttpResponse.ConnectionCloseException)
-                        {
-                            return;
-                        }
-                        catch (HttpResponse.DisconnectFromThreadException)
-                        {
-                            throw;
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
-                        }
-                        req.Close();
-                    }
-                    else
-                    {
-                        foreach (KeyValuePair<string, Action<HttpRequest>> kvp in StartsWithUriHandlers)
-                        {
-                            if (req.RawUrl.StartsWith(kvp.Key))
+                            req = null; /* no need for the initial request data */
+                            var http2Connection = new Http2Connection(httpstream);
+                            http2Connection.Run((ht2stream) =>
                             {
                                 try
                                 {
-                                    kvp.Value(req);
+                                    req = new Http2Request(ht2stream, remoteAddr, m_IsBehindProxy, isSsl);
                                 }
-                                catch (HttpServerException e)
+                                catch(Http2Connection.StreamErrorException)
                                 {
-                                    e.Serialize(req);
-                                }
-                                catch (HttpResponse.ConnectionCloseException)
-                                {
+                                    /* ignore */
                                     return;
                                 }
-                                catch (HttpResponse.DisconnectFromThreadException)
+                                catch(HttpResponse.ConnectionCloseException)
                                 {
-                                    throw;
+                                    /* ignore */
                                 }
-                                catch (Exception e)
-                                {
-                                    m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
-                                }
-                                req.Close();
-                                return;
-                            }
+                                ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
+                            });
                         }
-
-                        using (var res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
-                        {
-                            byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
-                            using (Stream s = res.GetOutputStream(buffer.LongLength))
-                            {
-                                s.Write(buffer, 0, buffer.Length);
-                            }
-                        }
+                        return;
                     }
+
+                    ProcessHttpRequest(req);
                     httpstream.ReadTimeout = 10000;
                 }
+            }
+            catch(Http2Connection.ProtocolErrorException)
+            {
+                /* HTTP/2 protocol errors */
             }
             catch (HttpResponse.DisconnectFromThreadException)
             {
@@ -592,6 +518,139 @@ namespace SilverSim.Main.Common.HttpServer
             catch (Exception e)
             {
                 m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
+            }
+        }
+
+        private void HandleHttp2WorkItem(object o)
+        {
+            var req = (HttpRequest)o;
+            try
+            {
+                ProcessHttpRequest(req);
+            }
+            catch (HttpResponse.DisconnectFromThreadException)
+            {
+                /* we simply disconnected that HttpRequest from HttpServer */
+            }
+            catch (HttpResponse.ConnectionCloseException)
+            {
+                /* simply a closed connection */
+            }
+            catch (IOException)
+            {
+                /* commonly a broken pipe */
+            }
+            catch (SocketException)
+            {
+                /* commonly a broken pipe */
+            }
+            catch (ObjectDisposedException)
+            {
+                /* commonly a broken pipe */
+            }
+            catch (Exception e)
+            {
+                m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
+            }
+        }
+
+        public void ProcessHttpRequest(HttpRequest req)
+        {
+            if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
+            {
+                req.SetConnectionClose();
+                req.ErrorResponse(HttpStatusCode.LengthRequired, "Length Required");
+                throw new HttpResponse.ConnectionCloseException();
+            }
+
+            Action<HttpRequest> del;
+            if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
+            {
+                try
+                {
+                    del(req);
+                }
+                catch (HttpServerException e)
+                {
+                    e.Serialize(req);
+                }
+                catch (HttpResponse.ConnectionCloseException)
+                {
+                    throw;
+                }
+                catch (HttpResponse.DisconnectFromThreadException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                }
+                req.Close();
+            }
+            else if (UriHandlers.TryGetValue(req.RawUrl, out del))
+            {
+                try
+                {
+                    del(req);
+                }
+                catch (HttpServerException e)
+                {
+                    e.Serialize(req);
+                }
+                catch (HttpResponse.ConnectionCloseException)
+                {
+                    return;
+                }
+                catch (HttpResponse.DisconnectFromThreadException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                }
+                req.Close();
+            }
+            else
+            {
+                foreach (KeyValuePair<string, Action<HttpRequest>> kvp in StartsWithUriHandlers)
+                {
+                    if (req.RawUrl.StartsWith(kvp.Key))
+                    {
+                        try
+                        {
+                            kvp.Value(req);
+                        }
+                        catch (HttpServerException e)
+                        {
+                            e.Serialize(req);
+                        }
+                        catch (HttpResponse.ConnectionCloseException)
+                        {
+                            throw;
+                        }
+                        catch (HttpResponse.DisconnectFromThreadException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                        }
+                        req.Close();
+                        return;
+                    }
+                }
+
+                using (var res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
+                {
+                    byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
+                    using (Stream s = res.GetOutputStream(buffer.LongLength))
+                    {
+                        s.Write(buffer, 0, buffer.Length);
+                    }
+                }
             }
         }
 

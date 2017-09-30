@@ -29,13 +29,11 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private Stream m_Input;
         private long m_RemainingLength;
-        private bool m_Expect100Continue;
-        public HttpRequestBodyStream(Stream input, long contentLength, bool expect100Continue)
+        public HttpRequestBodyStream(Stream input, long contentLength)
         {
             m_RemainingLength = contentLength;
             m_Input = input;
             Length = contentLength;
-            m_Expect100Continue = expect100Continue;
         }
 
         public override bool CanRead => true;
@@ -62,16 +60,6 @@ namespace SilverSim.Main.Common.HttpServer
             set { m_Input.ReadTimeout = value; }
         }
 
-        private void CheckExpect100()
-        {
-            if(m_Expect100Continue)
-            {
-                byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
-                m_Input.Write(b, 0, b.Length);
-                m_Expect100Continue = false;
-            }
-        }
-
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             throw new NotSupportedException();
@@ -81,8 +69,6 @@ namespace SilverSim.Main.Common.HttpServer
         {
             if(m_Input != null)
             {
-                CheckExpect100();
-
                 var b = new byte[10240];
                 while(m_RemainingLength > 0)
                 {
@@ -96,8 +82,6 @@ namespace SilverSim.Main.Common.HttpServer
         {
             if (m_Input != null)
             {
-                CheckExpect100();
-
                 var b = new byte[10240];
                 while (m_RemainingLength > 0)
                 {
@@ -117,8 +101,6 @@ namespace SilverSim.Main.Common.HttpServer
         {
             if (m_Input != null && m_RemainingLength > 0)
             {
-                CheckExpect100();
-
                 var b = new byte[10240];
                 while (m_RemainingLength > 0)
                 {
@@ -129,8 +111,6 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            CheckExpect100();
-
             int rescount = 0;
             while (count > 0)
             {

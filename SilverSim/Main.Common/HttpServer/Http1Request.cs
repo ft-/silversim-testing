@@ -221,7 +221,7 @@ namespace SilverSim.Main.Common.HttpServer
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     throw new InvalidDataException();
                 }
-                RawBody = new HttpRequestBodyStream(m_HttpStream, contentLength, Expect100Continue);
+                RawBody = new HttpRequestBodyStream(m_HttpStream, contentLength);
                 Body = RawBody;
 
                 if (m_Headers.ContainsKey("transfer-encoding"))
@@ -273,11 +273,6 @@ namespace SilverSim.Main.Common.HttpServer
                         throw new InvalidDataException();
                     }
                 }
-                if (Expect100Continue)
-                {
-                    byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
-                    m_HttpStream.Write(b, 0, b.Length);
-                }
 
                 havePostData = true;
             }
@@ -317,6 +312,12 @@ namespace SilverSim.Main.Common.HttpServer
                     ConnectionMode = HttpConnectionMode.Close;
                     ErrorResponse(HttpStatusCode.NotImplemented, "Content-Encoding not accepted");
                     throw new InvalidDataException();
+                }
+
+                if (Expect100Continue)
+                {
+                    byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
+                    m_HttpStream.Write(b, 0, b.Length);
                 }
             }
 
