@@ -23,6 +23,7 @@
 
 using SilverSim.Threading;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -41,7 +42,8 @@ namespace SilverSim.Http.Client
             Close,
             Keepalive,
             UpgradeHttp2,
-            Http2PriorKnowledge
+            Http2PriorKnowledge,
+            Http2PriorKnowledgeSingleRequest
         }
 #if SUPPORT_REUSE
         public static ConnectionReuseMode ConnectionReuse = ConnectionReuseMode.Keepalive;
@@ -70,14 +72,14 @@ namespace SilverSim.Http.Client
         private struct H2StreamInfo
         {
             public int ValidUntil;
-            public AbstractHttpStream Stream;
+            public Http2Connection Connection;
             public string Scheme;
             public string Host;
             public int Port;
 
-            public H2StreamInfo(AbstractHttpStream stream, string scheme, string host, int port)
+            public H2StreamInfo(Http2Connection connection, string scheme, string host, int port)
             {
-                Stream = stream;
+                Connection = connection;
                 Scheme = scheme;
                 Host = host;
                 Port = port;
@@ -91,6 +93,34 @@ namespace SilverSim.Http.Client
 
         private static void CleanUpTimer(object sender, ElapsedEventArgs e)
         {
+            try
+            {
+                foreach(RwLockedList<H2StreamInfo> infolist in m_H2StreamList.Values)
+                {
+                    var removelist = new List<H2StreamInfo>();
+                    foreach(H2StreamInfo si in infolist)
+                    {
+                        if(si.ValidUntil - Environment.TickCount < 0)
+                        {
+                            removelist.Add(si);
+                        }
+                    }
+                    foreach(H2StreamInfo si in removelist)
+                    {
+                        infolist.Remove(si);
+                    }
+                }
+
+                /* cleanup empty entries */
+                foreach (string key in m_StreamList.Keys)
+                {
+                    m_StreamList.RemoveIf(key, (RwLockedList<StreamInfo> val) => val.Count == 0);
+                }
+            }
+            catch
+            {
+                /* just ensure that the caller does not get exceptioned */
+            }
             try
             {
                 foreach (RwLockedList<StreamInfo> infolist in m_StreamList.Values)
@@ -249,6 +279,35 @@ namespace SilverSim.Http.Client
             bool checkCertificateRevocation,
             ConnectionReuseMode reuseMode)
         {
+            string key = scheme + "://" + host + ":" + port.ToString();
+            Http2Connection.Http2Stream h2stream = null;
+
+            if (reuseMode != ConnectionReuseMode.Http2PriorKnowledgeSingleRequest)
+            {
+                RwLockedList<H2StreamInfo> streaminfo;
+                if (m_H2StreamList.TryGetValue(key, out streaminfo))
+                {
+                    lock (streaminfo)
+                    {
+                        for(int i = 0; i < streaminfo.Count; ++i)
+                        {
+                            H2StreamInfo h2info = streaminfo[i];
+                            if ((h2info.ValidUntil - Environment.TickCount) > 0 &&
+                                h2info.Connection.AvailableStreams > 0)
+                            {
+                                h2info.ValidUntil = Environment.TickCount + 5000;
+                                h2stream = h2info.Connection.OpenClientStream();
+                            }
+                        }
+                    }
+
+                    if(h2stream != null)
+                    {
+                        return h2stream;
+                    }
+                }
+            }
+
             Stream s;
             if (scheme == Uri.UriSchemeHttp)
             {
@@ -269,8 +328,11 @@ namespace SilverSim.Http.Client
                 throw new NotSupportedException();
             }
 
-            var h2con = new Http2Connection(s,false);
-            return h2con.OpenClientStream();
+
+            var h2con = new Http2Connection(s, false);
+            h2stream = h2con.OpenClientStream();
+            m_H2StreamList[key].Add(new H2StreamInfo(h2con, scheme, host, port));
+            return h2stream;
         }
         #endregion
     }

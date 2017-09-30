@@ -197,7 +197,8 @@ namespace SilverSim.Http.Client
 
             var uri = new Uri(url);
 
-            if (reuseMode == ConnectionReuseMode.Http2PriorKnowledge)
+            if (reuseMode == ConnectionReuseMode.Http2PriorKnowledge ||
+                reuseMode == ConnectionReuseMode.Http2PriorKnowledgeSingleRequest)
             {
                 return DoStreamRequestHttp2(method, uri, content_type, content_length, postdelegate, compressed, timeoutms, reuseMode, headers);
             }
@@ -263,7 +264,7 @@ namespace SilverSim.Http.Client
 
             if(method != "HEAD")
             {
-                reqdata += "Accept-Encoding: gzip\r\n";
+                reqdata += "Accept-Encoding: gzip, deflate\r\n";
             }
 
             int retrycnt = 1;
@@ -587,7 +588,7 @@ namespace SilverSim.Http.Client
 
             if (method != "HEAD")
             {
-                actheaders.Add("Accept-Encoding", "gzip");
+                actheaders.Add("Accept-Encoding", "gzip, deflate");
             }
 
             int retrycnt = 1;

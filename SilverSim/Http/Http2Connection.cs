@@ -34,6 +34,7 @@ namespace SilverSim.Http
         private bool m_GoAwaySent;
         private uint m_MaxTableByteSize = 4096;
         private uint m_InitialWindowSize = 65536;
+        private uint m_MaxConcurrentStreams = 100;
 
         [Serializable]
         public class ConnectionClosedException : Exception
@@ -359,6 +360,8 @@ namespace SilverSim.Http
         private readonly object m_ClientStreamIdentifierLock = new object();
         uint m_ClientStreamIdentifier = 1;
 
+        public int AvailableStreams => (int)m_MaxConcurrentStreams - m_Streams.Count;
+
         public Http2Stream OpenClientStream()
         {
             uint streamid;
@@ -412,6 +415,10 @@ namespace SilverSim.Http
                                 if(TryGetSettingsValue(frame.Data, SETTINGS_INITIAL_WINDOW_SIZE, out value))
                                 {
                                     m_InitialWindowSize = value;
+                                }
+                                if(TryGetSettingsValue(frame.Data, SETTINGS_MAX_CONCURRENT_STREAMS, out value))
+                                {
+                                    m_MaxConcurrentStreams = value;
                                 }
                                 foreach (Http2Stream s in m_Streams.Values)
                                 {
