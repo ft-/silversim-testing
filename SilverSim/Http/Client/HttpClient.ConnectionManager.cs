@@ -23,6 +23,7 @@
 
 using SilverSim.Threading;
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -38,7 +39,9 @@ namespace SilverSim.Http.Client
         {
             SingleRequest,
             Close,
-            Keepalive
+            Keepalive,
+            UpgradeHttp2,
+            Http2PriorKnowledge
         }
 #if SUPPORT_REUSE
         public static ConnectionReuseMode ConnectionReuse = ConnectionReuseMode.Keepalive;
@@ -64,6 +67,25 @@ namespace SilverSim.Http.Client
             }
         }
 
+        private struct H2StreamInfo
+        {
+            public int ValidUntil;
+            public AbstractHttpStream Stream;
+            public string Scheme;
+            public string Host;
+            public int Port;
+
+            public H2StreamInfo(AbstractHttpStream stream, string scheme, string host, int port)
+            {
+                Stream = stream;
+                Scheme = scheme;
+                Host = host;
+                Port = port;
+                ValidUntil = Environment.TickCount + 5000;
+            }
+        }
+
+        private static readonly RwLockedDictionaryAutoAdd<string, RwLockedList<H2StreamInfo>> m_H2StreamList = new RwLockedDictionaryAutoAdd<string, RwLockedList<H2StreamInfo>>(() => new RwLockedList<H2StreamInfo>());
         private static readonly RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>> m_StreamList = new RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>>(() => new RwLockedList<StreamInfo>());
         private static readonly Timer m_Timer;
 
@@ -130,6 +152,11 @@ namespace SilverSim.Http.Client
             bool checkCertificateRevocation,
             ConnectionReuseMode reuseMode)
         {
+            if(reuseMode == ConnectionReuseMode.UpgradeHttp2 && scheme != Uri.UriSchemeHttp)
+            {
+                throw new ArgumentException(nameof(reuseMode));
+            }
+
             if (reuseMode != ConnectionReuseMode.SingleRequest)
             {
                 string key = scheme + "://" + host + ":" + port.ToString();
@@ -204,6 +231,46 @@ namespace SilverSim.Http.Client
             {
                 st.Close();
             }
+        }
+        #endregion
+
+        #region HTTP/2 stream handling
+        private static Http2Connection.Http2Stream OpenHttp2Stream(string scheme, string host, int port, ConnectionReuseMode reuseMode) =>
+            OpenHttp2Stream(scheme, host, port,
+                null,
+                SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
+                false,
+                reuseMode);
+
+        private static Http2Connection.Http2Stream OpenHttp2Stream(
+            string scheme, string host, int port,
+            X509CertificateCollection clientCertificates,
+            SslProtocols enabledSslProtocols,
+            bool checkCertificateRevocation,
+            ConnectionReuseMode reuseMode)
+        {
+            Stream s;
+            if (scheme == Uri.UriSchemeHttp)
+            {
+                s = new HttpStream(ConnectToTcp(host, port));
+            }
+            else if (scheme == Uri.UriSchemeHttps)
+            {
+                var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
+                sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
+                if (!sslstream.IsEncrypted)
+                {
+                    throw new AuthenticationException("Encryption not available");
+                }
+                s = sslstream;
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+
+            var h2con = new Http2Connection(s,false);
+            return h2con.OpenClientStream();
         }
         #endregion
     }

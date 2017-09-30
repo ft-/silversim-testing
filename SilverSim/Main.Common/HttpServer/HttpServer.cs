@@ -53,7 +53,7 @@ namespace SilverSim.Main.Common.HttpServer
         private ExternalHostNameServiceInterface m_ExternalHostNameService;
         public string ExternalHostName => m_ExternalHostNameService.ExternalHostName;
 
-        public string ServerURI => string.Format("{0}://{1}:{2}/", Scheme, ExternalHostName, Port);
+        public string ServerURI => $"{Scheme}://{ExternalHostName}:{Port}/";
         public string Scheme { get; }
 
         private readonly bool m_IsBehindProxy;
@@ -468,7 +468,7 @@ namespace SilverSim.Main.Common.HttpServer
                         else
                         {
                             req = null; /* no need for the initial request data */
-                            HandleHttp2(new Http2Connection(httpstream), remoteAddr, isSsl);
+                            HandleHttp2(new Http2Connection(httpstream, true), remoteAddr, isSsl);
                         }
                         return;
                     }
@@ -492,11 +492,11 @@ namespace SilverSim.Main.Common.HttpServer
                                 httpstream.Close();
                                 return;
                             }
-                            var h2con = new Http2Connection(httpstream);
+                            var h2con = new Http2Connection(httpstream, true);
                             Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, false);
                             req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req);
                             ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
-                            HandleHttp2(new Http2Connection(httpstream), remoteAddr, isSsl);
+                            HandleHttp2(h2con, remoteAddr, isSsl);
                             return;
                         }
                     }
@@ -547,11 +547,11 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        private byte[] m_H2cGoAwayProtocolError = new byte[] { 0x00, 0x00, 0x08, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+        private static readonly byte[] m_H2cGoAwayProtocolError = new byte[] { 0x00, 0x00, 0x08, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
 
-        private byte[] m_H2cClientPreface = new byte[] { 0x50, 0x52, 0x49, 0x20, 0x2a, 0x20, 0x48, 0x54, 0x54, 0x50, 0x2f, 0x32, 0x2e, 0x30, 0x0d, 0x0a, 0x0d, 0x0a, 0x53, 0x4d, 0x0d, 0x0a, 0x0d, 0x0a };
+        private static readonly byte[] m_H2cClientPreface = new byte[] { 0x50, 0x52, 0x49, 0x20, 0x2a, 0x20, 0x48, 0x54, 0x54, 0x50, 0x2f, 0x32, 0x2e, 0x30, 0x0d, 0x0a, 0x0d, 0x0a, 0x53, 0x4d, 0x0d, 0x0a, 0x0d, 0x0a };
 
-        private byte[] m_H2cUpgrade = Encoding.ASCII.GetBytes("HTTP/1.1 101 Switching Protocols\r\n\r\n");
+        private static readonly byte[] m_H2cUpgrade = Encoding.ASCII.GetBytes("HTTP/1.1 101 Switching Protocols\r\n\r\n");
 
         private byte[] FromUriBase64(string val) =>
             Convert.FromBase64String(val.Replace('_', '+').Replace('_', '/').PadRight(val.Length % 4 == 0 ? val.Length : val.Length + 4 - (val.Length % 4), '='));

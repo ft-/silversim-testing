@@ -194,12 +194,20 @@ namespace SilverSim.Http.Client
             {
                 url += "?" + BuildQueryString(getValues);
             }
+
             var uri = new Uri(url);
+
+            if (reuseMode == ConnectionReuseMode.Http2PriorKnowledge)
+            {
+                return DoStreamRequestHttp2(method, uri, content_type, content_length, postdelegate, compressed, timeoutms, reuseMode, headers);
+            }
+
+
             byte[] outdata;
 
             string reqdata = uri.IsDefaultPort ?
-                string.Format("{0} {1} HTTP/1.1\r\nHost: {2}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host) :
-                string.Format("{0} {1} HTTP/1.1\r\nHost: {2}:{3}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host, uri.Port);
+                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}\r\nAccept: */*\r\n":
+                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}:{uri.Port}\r\nAccept: */*\r\n";
 
             bool doPost = false;
             bool doChunked = false;
@@ -226,14 +234,14 @@ namespace SilverSim.Http.Client
                 }
                 foreach (KeyValuePair<string, string> kvp in headers)
                 {
-                    reqdata += string.Format("{0}: {1}\r\n", kvp.Key, kvp.Value);
+                    reqdata += $"{kvp.Key}: {kvp.Value}\r\n";
                 }
             }
             if(headers != null && headers.TryGetValue("Transfer-Encoding", out encval) && encval == "chunked")
             {
                 doPost = true;
                 doChunked = true;
-                reqdata += string.Format("Content-Type: {0}\r\n", content_type);
+                reqdata += $"Content-Type: {content_type}\r\n";
                 if (compressed && content_type != "application/x-gzip")
                 {
                     reqdata += "X-Content-Encoding: gzip\r\n";
@@ -244,7 +252,7 @@ namespace SilverSim.Http.Client
             else if (content_type.Length != 0)
             {
                 doPost = true;
-                reqdata += string.Format("Content-Type: {0}\r\nContent-Length: {1}\r\n", content_type, content_length);
+                reqdata += $"Content-Type: {content_type}\r\nContent-Length: {content_length}\r\n";
                 if (compressed && content_type != "application/x-gzip")
                 {
                     reqdata += "X-Content-Encoding: gzip\r\n";
@@ -412,24 +420,29 @@ namespace SilverSim.Http.Client
                     throw new HttpException(statusCode, splits[2]);
                 }
             }
-            else if(splits[1] != "200" && headers != null)
+            
+            if(headers != null)
             {
-                /* needs a little passthrough for not changing the API */
-                headers.Add("X-Http-Status-Code", splits[1]);
+                /* needs a little passthrough for not changing the API, this actually comes from HTTP/2 */
+                headers.Add(":status", splits[1]);
             }
 
             ReadHeaderLines(s, headers);
             s.ReadTimeout = timeoutms;
 
             string value;
-            bool compressedresult = false;
+            string compressedresult = string.Empty;
             if (headers.TryGetValue("content-encoding", out value) || headers.TryGetValue("x-content-encoding", out value))
             {
                 /* Content-Encoding */
                 /* x-gzip is deprecated but better feel safe about having that */
                 if (value == "gzip" || value == "x-gzip")
                 {
-                    compressedresult = true;
+                    compressedresult = "gzip";
+                }
+                else if(value == "deflate")
+                {
+                    compressedresult = "deflate";
                 }
                 else
                 {
@@ -472,9 +485,16 @@ namespace SilverSim.Http.Client
                 {
                     bs = new HttpReadChunkedBodyStream(bs);
                 }
-                if (compressedresult)
+                if(compressedresult.Length != 0)
                 {
-                    bs = new GZipStream(bs, CompressionMode.Decompress);
+                    if (compressedresult == "gzip")
+                    {
+                        bs = new GZipStream(bs, CompressionMode.Decompress);
+                    }
+                    else if (compressedresult == "deflate")
+                    {
+                        bs = new DeflateStream(bs, CompressionMode.Decompress);
+                    }
                 }
                 return bs;
             }
@@ -489,9 +509,232 @@ namespace SilverSim.Http.Client
                 {
                     s.IsReusable = false;
                 }
-                if (compressedresult)
+                if (compressedresult.Length != 0)
                 {
-                    bs = new GZipStream(bs, CompressionMode.Decompress);
+                    if (compressedresult == "gzip")
+                    {
+                        bs = new GZipStream(bs, CompressionMode.Decompress);
+                    }
+                    else if (compressedresult == "deflate")
+                    {
+                        bs = new DeflateStream(bs, CompressionMode.Decompress);
+                    }
+                }
+                return bs;
+            }
+        }
+
+        private static Stream DoStreamRequestHttp2(
+            string method,
+            Uri uri,
+            string content_type,
+            int content_length,
+            Action<Stream> postdelegate,
+            bool compressed,
+            int timeoutms,
+            ConnectionReuseMode reuseMode,
+            IDictionary<string, string> headers = null)
+        {
+            bool doPost = false;
+            string encval;
+
+            var actheaders = new Dictionary<string, string>();
+            actheaders.Add(":method", method);
+            actheaders.Add(":scheme", uri.Scheme);
+            actheaders.Add(":path", uri.PathAndQuery);
+            if (uri.IsDefaultPort)
+            {
+                actheaders.Add(":authority", uri.Host);
+            }
+            else
+            {
+                actheaders.Add(":authority", $"{uri.Host}:{uri.Port}");
+            }
+            if (headers != null)
+            {
+                var removal = new List<string>();
+                foreach (KeyValuePair<string, string> k in headers)
+                {
+                    string kn = k.Key.ToLower();
+                    if (kn == "content-length" ||
+                        kn == "content-type" ||
+                        kn == "connection" ||
+                        kn == "expect")
+                    {
+                        continue;
+                    }
+                    actheaders.Add(kn, k.Value);
+                }
+            }
+
+            if(actheaders.TryGetValue("transfer-encoding", out encval) && encval == "chunked")
+            {
+                actheaders.Remove("transfer-encoding");
+            }
+
+            if (content_type.Length != 0)
+            {
+                doPost = true;
+                actheaders.Add("content-type", content_type);
+                actheaders.Add("content-length", content_length.ToString());
+                if (compressed && content_type != "application/x-gzip")
+                {
+                    actheaders.Add("x-content-encoding", "gzip");
+                }
+
+                actheaders.Add("expect", "100-continue");
+            }
+
+            if (method != "HEAD")
+            {
+                actheaders.Add("Accept-Encoding", "gzip");
+            }
+
+            int retrycnt = 1;
+            retry:
+            Http2Connection.Http2Stream s = OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, reuseMode);
+            headers.Clear();
+            try
+            {
+                s.SendHeaders(actheaders, 0, doPost);
+            }
+            catch (ObjectDisposedException)
+            {
+                if (retrycnt-- > 0)
+                {
+                    goto retry;
+                }
+                throw;
+            }
+            catch (SocketException)
+            {
+                if (retrycnt-- > 0)
+                {
+                    goto retry;
+                }
+                throw;
+            }
+            catch (IOException)
+            {
+                if (retrycnt-- > 0)
+                {
+                    goto retry;
+                }
+                throw;
+            }
+            s.ReadTimeout = 10000;
+
+            Dictionary<string, string> rxheaders;
+
+            if (doPost)
+            {
+                rxheaders = s.ReceiveHeaders();
+                string status;
+                if(!headers.TryGetValue(":status", out status))
+                {
+                    s.SendRstStream(Http2Connection.Http2ErrorCode.ProtocolError);
+                    throw new BadHttpResponseException("Not a HTTP response");
+                }
+
+                if(status != "100")
+                {
+                    int statusCode;
+                    if (!int.TryParse(status, out statusCode))
+                    {
+                        statusCode = 500;
+                    }
+                    if (statusCode == 404)
+                    {
+                        s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
+                        throw new HttpException(statusCode, statusCode.ToString() + " (" + uri + ")");
+                    }
+                    else
+                    {
+                        s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
+                        throw new HttpException(statusCode, statusCode.ToString());
+                    }
+                }
+
+                /* append request POST data */
+                postdelegate(s);
+            }
+
+            s.ReadTimeout = timeoutms;
+            rxheaders = s.ReceiveHeaders();
+
+            if(headers != null)
+            {
+                foreach(KeyValuePair<string, string> kvp in rxheaders)
+                {
+                    headers.Add(kvp.Key, kvp.Value);
+                }
+            }
+            string statusVal;
+            if(!rxheaders.TryGetValue(":status", out statusVal))
+            {
+                s.SendRstStream(Http2Connection.Http2ErrorCode.ProtocolError);
+                throw new BadHttpResponseException("Missing status");
+            }
+
+            if (!statusVal.StartsWith("2"))
+            {
+                int statusCode;
+                if (!int.TryParse(statusVal, out statusCode))
+                {
+                    statusCode = 500;
+                }
+                if (statusCode == 404)
+                {
+                    s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
+                    throw new HttpException(statusCode, statusVal + " (" + uri.ToString() + ")");
+                }
+                else
+                {
+                    s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
+                    throw new HttpException(statusCode, statusVal);
+                }
+            }
+
+            s.ReadTimeout = timeoutms;
+
+            string value;
+            string compressedresult = string.Empty;
+            if (headers.TryGetValue("content-encoding", out value) || headers.TryGetValue("x-content-encoding", out value))
+            {
+                /* Content-Encoding */
+                /* x-gzip is deprecated but better feel safe about having that */
+                if (value == "gzip" || value == "x-gzip")
+                {
+                    compressedresult = "gzip";
+                }
+                else if(value == "deflate")
+                {
+                    compressedresult = "deflate";
+                }
+                else
+                {
+                    throw new NotSupportedException("Unsupport content-encoding");
+                }
+            }
+
+            if (method == "HEAD")
+            {
+                /* HEAD does not have any response data */
+                return s;
+            }
+            else
+            {
+                Stream bs = s;
+                if (compressedresult.Length != 0)
+                {
+                    if (compressedresult == "gzip")
+                    {
+                        bs = new GZipStream(bs, CompressionMode.Decompress);
+                    }
+                    else if (compressedresult == "deflate")
+                    {
+                        bs = new DeflateStream(bs, CompressionMode.Decompress);
+                    }
                 }
                 return bs;
             }

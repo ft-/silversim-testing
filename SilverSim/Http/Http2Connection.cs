@@ -95,11 +95,20 @@ namespace SilverSim.Http
             }
         }
 
-        public Http2Connection(Stream originalStream)
+        private static readonly byte[] m_H2cClientPreface = new byte[] { 0x50, 0x52, 0x49, 0x20, 0x2a, 0x20, 0x48, 0x54, 0x54, 0x50, 0x2f, 0x32, 0x2e, 0x30, 0x0d, 0x0a, 0x0d, 0x0a, 0x53, 0x4d, 0x0d, 0x0a, 0x0d, 0x0a };
+
+        public Http2Connection(Stream originalStream, bool isServer)
         {
             m_OriginalStream = originalStream;
-            var settings = new List<byte>();
-            SendFrame(Http2FrameType.Settings, 0, 0, settings.ToArray());
+            if (isServer)
+            {
+                var settings = new List<byte>();
+                SendFrame(Http2FrameType.Settings, 0, 0, settings.ToArray());
+            }
+            else
+            {
+                m_OriginalStream.Write(m_H2cClientPreface, 0, m_H2cClientPreface.Length);
+            }
         }
 
         ~Http2Connection()
@@ -583,6 +592,7 @@ namespace SilverSim.Http
                 if (!m_HaveSentEoS)
                 {
                     m_Conn.SendFrame(Http2FrameType.Data, (byte)DataFrameFlags.EndStream, m_StreamIdentifier, m_BufferedTransmitData, 0, m_BufferedTransmitDataBytes);
+                    m_Conn.m_Streams.RemoveIf(m_StreamIdentifier, (elem) => (elem == this));
                 }
             }
 
@@ -642,7 +652,9 @@ namespace SilverSim.Http
 
             public void SendRstStream(Http2ErrorCode errorcode)
             {
+                m_HaveSentEoS = true;
                 m_Conn.SendRstStream(m_StreamIdentifier, errorcode);
+                m_Conn.m_Streams.RemoveIf(m_StreamIdentifier, (elem) => (elem == this));
             }
 
             public void SendEndOfStream()
@@ -1306,11 +1318,6 @@ namespace SilverSim.Http
             public Dictionary<string, string> ReceiveHeaders()
             {
                 var headers = new Dictionary<string, string>();
-                if (m_HaveReceivedHeaders)
-                {
-                    m_Conn.SendRstStream(m_StreamIdentifier, Http2ErrorCode.ProtocolError);
-                    throw new StreamErrorException();
-                }
                 Http2Frame frame = m_Http2Queue.Dequeue();
                 if (frame.Type != Http2FrameType.Headers)
                 {
