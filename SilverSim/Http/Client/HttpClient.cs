@@ -96,6 +96,14 @@ namespace SilverSim.Http.Client
             {
                 Url = url;
             }
+
+            public Request(string url, IDictionary<string, string> postValues)
+            {
+                Url = url;
+                RequestBody = BuildQueryString(postValues);
+                RequestContentType = "application/x-www-form-urlencoded";
+                Method = "POST";
+            }
         }
 
         #region HTTP Utility Functions
