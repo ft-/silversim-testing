@@ -190,22 +190,11 @@ namespace SilverSim.Http.Client
             }
         }
 
-        public class Copy : Post
+        public class Copy : Request
         {
             public Copy(string url) : base(url)
             {
-            }
-
-            public Copy(string url, IDictionary<string, string> postValues) : base(url, postValues)
-            {
-            }
-
-            public Copy(string url, string contenttype, string body) : base(url, contenttype, body)
-            {
-            }
-
-            public Copy(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
-            {
+                Method = "COPY";
             }
         }
 
@@ -213,18 +202,30 @@ namespace SilverSim.Http.Client
         {
             public Patch(string url) : base(url)
             {
+                Method = "PATCH";
             }
 
             public Patch(string url, IDictionary<string, string> postValues) : base(url, postValues)
             {
+                Method = "PATCH";
             }
 
             public Patch(string url, string contenttype, string body) : base(url, contenttype, body)
             {
+                Method = "PATCH";
             }
 
             public Patch(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
             {
+                Method = "PATCH";
+            }
+        }
+
+        public class Move : Request
+        {
+            public Move(string url) : base(url)
+            {
+                Method = "MOVE";
             }
         }
 
