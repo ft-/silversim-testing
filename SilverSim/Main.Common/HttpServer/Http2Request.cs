@@ -32,6 +32,26 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public class Http2Request : HttpRequest
     {
+        private Stream m_Body;
+        public override Stream Body
+        {
+            get
+            {
+                if (Expect100Continue && m_Body != null)
+                {
+                    m_Stream.SendHeaders(new Dictionary<string, string>
+                    {
+                        [":status"] = "100"
+                    });
+                    Expect100Continue = false;
+                }
+
+                return m_Body;
+            }
+        }
+
+        public override bool HasRequestBody => m_Body != null;
+
         Http2Connection.Http2Stream m_Stream;
 
         public Http2Request(Http2Connection.Http2Stream stream, string callerIP, bool isBehindProxy, bool isSsl, HttpRequest upgradeReq = null)
@@ -80,17 +100,11 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             bool havePostData = false;
-            if (m_Headers.ContainsKey("content-length"))
+            if (m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("content-type") ||
+                m_Headers.ContainsKey("transfer-encoding"))
             {
                 /* there is a body */
-                long contentLength;
-                if (!long.TryParse(m_Headers["content-length"], out contentLength))
-                {
-                    ConnectionMode = HttpConnectionMode.Close;
-                    ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                    throw new InvalidDataException();
-                }
-                Body = new RequestBodyStream(this);
+                m_Body = new RequestBodyStream(this);
 
                 if (m_Headers.ContainsKey("transfer-encoding"))
                 {
@@ -98,11 +112,11 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
                         {
-                            Body = new GZipStream(Body, CompressionMode.Decompress);
+                            m_Body = new GZipStream(m_Body, CompressionMode.Decompress);
                         }
                         else if (transferEncoding == "deflate")
                         {
-                            Body = new DeflateStream(Body, CompressionMode.Decompress);
+                            m_Body = new DeflateStream(m_Body, CompressionMode.Decompress);
                         }
                         else
                         {
@@ -110,25 +124,6 @@ namespace SilverSim.Main.Common.HttpServer
                             ErrorResponse(HttpStatusCode.NotImplemented, "Transfer-Encoding " + transferEncoding + " not implemented");
                             throw new InvalidDataException();
                         }
-                    }
-                }
-
-                havePostData = true;
-            }
-            else if (m_Headers.ContainsKey("transfer-encoding"))
-            {
-                Body = new RequestBodyStream(this);
-
-                foreach (string transferEncoding in m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
-                    {
-                        Body = new GZipStream(Body, CompressionMode.Decompress);
-                    }
-                    else
-                    {
-                        ErrorResponse(HttpStatusCode.NotImplemented, "Transfer-Encoding " + transferEncoding + " not implemented");
-                        throw new InvalidDataException();
                     }
                 }
 
@@ -154,11 +149,11 @@ namespace SilverSim.Main.Common.HttpServer
                 /* check for gzip encoding */
                 if (contentEncoding == "gzip" || contentEncoding == "x-gzip") /* x-gzip is deprecated as per RFC7230 but better accept it if sent */
                 {
-                    Body = new GZipStream(Body, CompressionMode.Decompress);
+                    m_Body = new GZipStream(m_Body, CompressionMode.Decompress);
                 }
                 else if (contentEncoding == "deflate")
                 {
-                    Body = new DeflateStream(Body, CompressionMode.Decompress);
+                    m_Body = new DeflateStream(m_Body, CompressionMode.Decompress);
                 }
                 else if (contentEncoding == "identity")
                 {
@@ -171,14 +166,6 @@ namespace SilverSim.Main.Common.HttpServer
                     ErrorResponse(HttpStatusCode.NotImplemented, "Content-Encoding not accepted");
                     throw new InvalidDataException();
                 }
-
-                if (Expect100Continue)
-                {
-                    m_Stream.SendHeaders(new Dictionary<string, string>
-                    {
-                        [":status"] = "100"
-                    });
-                }
             }
 
             CallerIP = (m_Headers.ContainsKey("x-forwarded-for") && isBehindProxy) ?
@@ -188,6 +175,22 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override HttpResponse BeginChunkedResponse() =>
             BeginResponse(HttpStatusCode.OK, "OK");
+
+        private void FinishRequestBody()
+        {
+            if (m_Body != null && !Expect100Continue)
+            {
+                if (!m_Stream.HaveReceivedEoS)
+                {
+                    var postbuf = new byte[10240];
+                    while (!m_Stream.HaveReceivedEoS)
+                    {
+                        m_Stream.Read(postbuf, 0, postbuf.Length);
+                    }
+                }
+                m_Body = null;
+            }
+        }
 
         public override HttpResponse BeginChunkedResponse(string contentType)
         {
@@ -201,15 +204,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override HttpResponse BeginResponse(HttpStatusCode statuscode, string statusDescription)
         {
-            if (!m_Stream.HaveReceivedEoS)
-            {
-                var postbuf = new byte[10240];
-                while (!m_Stream.HaveReceivedEoS)
-                {
-                    m_Stream.Read(postbuf, 0, postbuf.Length);
-                }
-            }
-
+            FinishRequestBody();
             var res = new Http2Response(m_Stream, this, statuscode, statusDescription);
             m_Stream = null;
             return res;
@@ -238,7 +233,7 @@ namespace SilverSim.Main.Common.HttpServer
 
             protected override void Dispose(bool disposing)
             {
-                byte[] buf = new byte[10240];
+                var buf = new byte[10240];
                 while(!m_Req.m_Stream.HaveReceivedEoS)
                 {
                     m_Req.m_Stream.Read(buf, 0, 10240);

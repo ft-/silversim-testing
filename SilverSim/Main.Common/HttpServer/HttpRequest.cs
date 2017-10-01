@@ -43,7 +43,8 @@ namespace SilverSim.Main.Common.HttpServer
         public uint MinorVersion { get; protected set; }
         public string RawUrl { get; protected set; }
         public string Method { get; protected set; }
-        public Stream Body { get; protected set; }
+        public abstract Stream Body { get; }
+        public abstract bool HasRequestBody { get; }
         public HttpConnectionMode ConnectionMode { get; protected set; }
         public HttpResponse Response { get; protected set; }
         public string CallerIP { get; protected set; }
@@ -125,7 +126,6 @@ namespace SilverSim.Main.Common.HttpServer
         protected HttpRequest(bool isSsl)
         {
             IsSsl = isSsl;
-            Body = null;
         }
 
         public abstract HttpResponse BeginResponse();

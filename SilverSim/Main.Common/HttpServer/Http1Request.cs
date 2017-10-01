@@ -35,7 +35,25 @@ namespace SilverSim.Main.Common.HttpServer
         #region Private Fields
         private Stream m_HttpStream;
         private HttpRequestBodyStream RawBody;
+
+        private Stream m_Body;
         #endregion
+
+        public override Stream Body
+        {
+            get
+            {
+                if(Expect100Continue && m_Body != null)
+                {
+                    byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
+                    m_HttpStream.Write(b, 0, b.Length);
+                    Expect100Continue = false;
+                }
+                return m_Body;
+            }
+        }
+
+        public override bool HasRequestBody => m_Body != null;
 
         public override void Close()
         {
@@ -94,7 +112,7 @@ namespace SilverSim.Main.Common.HttpServer
             : base(isSsl)
         {
             m_HttpStream = httpStream;
-            Body = null;
+            m_Body = null;
             string headerLine;
             string requestInfo = ReadHeaderLine();
 
@@ -243,7 +261,7 @@ namespace SilverSim.Main.Common.HttpServer
             string upgradeToken;
             if (!isSsl && m_Headers.TryGetValue("upgrade", out upgradeToken) && upgradeToken == "h2c" &&
                 m_Headers.ContainsKey("http2-settings") &&
-                (Expect100Continue || !(m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("transfer-encoding"))))
+                !(m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("transfer-encoding")))
             {
                 IsH2CUpgradable = true;
                 /* skip over post handling */
@@ -259,7 +277,7 @@ namespace SilverSim.Main.Common.HttpServer
                     throw new InvalidDataException();
                 }
                 RawBody = new HttpRequestBodyStream(m_HttpStream, contentLength);
-                Body = RawBody;
+                m_Body = RawBody;
 
                 if (m_Headers.ContainsKey("transfer-encoding"))
                 {
@@ -267,11 +285,11 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
                         {
-                            Body = new GZipStream(Body, CompressionMode.Decompress);
+                            m_Body = new GZipStream(m_Body, CompressionMode.Decompress);
                         }
                         else if (transferEncoding == "deflate")
                         {
-                            Body = new DeflateStream(Body, CompressionMode.Decompress);
+                            m_Body = new DeflateStream(m_Body, CompressionMode.Decompress);
                         }
                         else
                         {
@@ -287,7 +305,7 @@ namespace SilverSim.Main.Common.HttpServer
             else if (m_Headers.ContainsKey("transfer-encoding"))
             {
                 bool HaveChunkedInFront = false;
-                Body = m_HttpStream;
+                m_Body = m_HttpStream;
                 foreach (string transferEncoding in m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
@@ -296,12 +314,12 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             ConnectionMode = HttpConnectionMode.Close;
                         }
-                        Body = new GZipStream(Body, CompressionMode.Decompress);
+                        m_Body = new GZipStream(m_Body, CompressionMode.Decompress);
                     }
                     else if (transferEncoding == "chunked")
                     {
                         HaveChunkedInFront = true;
-                        Body = new HttpReadChunkedBodyStream(Body);
+                        m_Body = new HttpReadChunkedBodyStream(m_Body);
                     }
                     else
                     {
@@ -333,11 +351,11 @@ namespace SilverSim.Main.Common.HttpServer
                 /* check for gzip encoding */
                 if (contentEncoding == "gzip" || contentEncoding == "x-gzip") /* x-gzip is deprecated as per RFC7230 but better accept it if sent */
                 {
-                    Body = new GZipStream(Body, CompressionMode.Decompress);
+                    m_Body = new GZipStream(m_Body, CompressionMode.Decompress);
                 }
                 else if (contentEncoding == "deflate")
                 {
-                    Body = new DeflateStream(Body, CompressionMode.Decompress);
+                    m_Body = new DeflateStream(m_Body, CompressionMode.Decompress);
                 }
                 else if (contentEncoding == "identity")
                 {
@@ -350,12 +368,6 @@ namespace SilverSim.Main.Common.HttpServer
                     ErrorResponse(HttpStatusCode.NotImplemented, "Content-Encoding not accepted");
                     throw new InvalidDataException();
                 }
-
-                if (Expect100Continue)
-                {
-                    byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
-                    m_HttpStream.Write(b, 0, b.Length);
-                }
             }
 
             CallerIP = (m_Headers.ContainsKey("x-forwarded-for") && isBehindProxy) ?
@@ -365,46 +377,47 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override HttpResponse BeginResponse()
         {
-            if (Body != null)
+            FinishRequestBody();
+            return Response = new Http1Response(m_HttpStream, this, HttpStatusCode.OK, "OK");
+        }
+
+        private void FinishRequestBody()
+        {
+            if (m_Body != null)
             {
-                Body.Close();
-                Body = null;
+                if (Expect100Continue)
+                {
+                    m_Body.Dispose();
+                }
+                else
+                {
+                    m_Body.Close();
+                }
+                m_Body = null;
             }
             if (RawBody != null)
             {
-                RawBody.Close();
+                if (Expect100Continue)
+                {
+                    RawBody.Dispose();
+                }
+                else
+                {
+                    RawBody.Close();
+                }
                 RawBody = null;
             }
-            return Response = new Http1Response(m_HttpStream, this, HttpStatusCode.OK, "OK");
         }
 
         public override HttpResponse BeginResponse(HttpStatusCode statuscode, string statusDescription)
         {
-            if (Body != null)
-            {
-                Body.Close();
-                Body = null;
-            }
-            if (RawBody != null)
-            {
-                RawBody.Close();
-                RawBody = null;
-            }
+            FinishRequestBody();
             return Response = new Http1Response(m_HttpStream, this, statuscode, statusDescription);
         }
 
         public override HttpResponse BeginChunkedResponse()
         {
-            if (Body != null)
-            {
-                Body.Close();
-                Body = null;
-            }
-            if (RawBody != null)
-            {
-                RawBody.Close();
-                RawBody = null;
-            }
+            FinishRequestBody();
             Response = new Http1Response(m_HttpStream, this, HttpStatusCode.OK, "OK");
             Response.Headers["Transfer-Encoding"] = "chunked";
             return Response;
@@ -412,16 +425,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override HttpResponse BeginChunkedResponse(string contentType)
         {
-            if (Body != null)
-            {
-                Body.Close();
-                Body = null;
-            }
-            if (RawBody != null)
-            {
-                RawBody.Close();
-                RawBody = null;
-            }
+            FinishRequestBody();
             Response = new Http1Response(m_HttpStream, this, HttpStatusCode.OK, "OK");
             Response.Headers["Transfer-Encoding"] = "chunked";
             Response.Headers["Content-Type"] = contentType;

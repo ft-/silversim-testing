@@ -616,10 +616,10 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void ProcessHttpRequest(HttpRequest req)
         {
-            if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
+            if ((req.Method == "POST" || req.Method == "PUT") && !req.HasRequestBody)
             {
                 req.SetConnectionClose();
-                req.ErrorResponse(HttpStatusCode.LengthRequired, "Length Required");
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
                 throw new HttpResponse.ConnectionCloseException();
             }
 
