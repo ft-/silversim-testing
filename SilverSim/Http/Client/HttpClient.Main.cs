@@ -197,8 +197,7 @@ namespace SilverSim.Http.Client
 
             var uri = new Uri(url);
 
-            if (reuseMode == ConnectionReuseMode.Http2PriorKnowledge ||
-                reuseMode == ConnectionReuseMode.Http2PriorKnowledgeSingleRequest)
+            if (reuseMode == ConnectionReuseMode.Http2PriorKnowledge)
             {
                 return DoStreamRequestHttp2(method, uri, content_type, content_length, postdelegate, compressed, timeoutms, reuseMode, headers);
             }
@@ -629,7 +628,7 @@ namespace SilverSim.Http.Client
 
             int retrycnt = 1;
             retry:
-            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, reuseMode);
+            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port);
             headers.Clear();
             try
             {

@@ -42,8 +42,7 @@ namespace SilverSim.Http.Client
             Close,
             Keepalive,
             UpgradeHttp2,
-            Http2PriorKnowledge,
-            Http2PriorKnowledgeSingleRequest
+            Http2PriorKnowledge
         }
 #if SUPPORT_REUSE
         public static ConnectionReuseMode ConnectionReuse = ConnectionReuseMode.Keepalive;
@@ -285,12 +284,11 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region HTTP/2 stream handling
-        private static Http2Connection.Http2Stream OpenHttp2Stream(string scheme, string host, int port, ConnectionReuseMode reuseMode) =>
+        private static Http2Connection.Http2Stream OpenHttp2Stream(string scheme, string host, int port) =>
             OpenHttp2Stream(scheme, host, port,
                 null,
                 SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
-                false,
-                reuseMode);
+                false);
 
         private static Http2Connection.Http2Stream TryReuseStream(string scheme, string host, int port)
         {
@@ -321,19 +319,13 @@ namespace SilverSim.Http.Client
             string scheme, string host, int port,
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
-            bool checkCertificateRevocation,
-            ConnectionReuseMode reuseMode)
+            bool checkCertificateRevocation)
         {
             string key = scheme + "://" + host + ":" + port.ToString();
-            Http2Connection.Http2Stream h2stream = null;
-
-            if (reuseMode != ConnectionReuseMode.Http2PriorKnowledgeSingleRequest)
+            Http2Connection.Http2Stream h2stream = TryReuseStream(scheme, host, port);
+            if(h2stream != null)
             {
-                h2stream = TryReuseStream(scheme, host, port);
-                if(h2stream != null)
-                {
-                    return h2stream;
-                }
+                return h2stream;
             }
 
             Stream s;
