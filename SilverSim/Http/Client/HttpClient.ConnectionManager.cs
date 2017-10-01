@@ -36,7 +36,7 @@ namespace SilverSim.Http.Client
 {
     public static partial class HttpClient
     {
-        public enum ConnectionReuseMode
+        public enum ConnectionModeEnum
         {
             SingleRequest,
             Close,
@@ -45,9 +45,9 @@ namespace SilverSim.Http.Client
             Http2PriorKnowledge
         }
 #if SUPPORT_REUSE
-        public static ConnectionReuseMode ConnectionReuse = ConnectionReuseMode.Keepalive;
+        public static ConnectionModeEnum ConnectionReuse = ConnectionModeEnum.Keepalive;
 #else
-        public static ConnectionReuseMode ConnectionReuse /*= ConnectionReuseMode.ConnectionReuseMode */;
+        public static ConnectionModeEnum ConnectionReuse /*= ConnectionModeEnum.SingleRequest */;
 #endif
 
         private struct StreamInfo
@@ -167,7 +167,7 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region Stream pipeling handling
-        private static AbstractHttpStream OpenStream(string scheme, string host, int port, ConnectionReuseMode reuseMode) =>
+        private static AbstractHttpStream OpenStream(string scheme, string host, int port, ConnectionModeEnum reuseMode) =>
             OpenStream(scheme, host, port,
                 null,
                 SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
@@ -179,14 +179,14 @@ namespace SilverSim.Http.Client
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation,
-            ConnectionReuseMode reuseMode)
+            ConnectionModeEnum reuseMode)
         {
-            if(reuseMode == ConnectionReuseMode.UpgradeHttp2 && scheme != Uri.UriSchemeHttp)
+            if(reuseMode == ConnectionModeEnum.UpgradeHttp2 && scheme != Uri.UriSchemeHttp)
             {
                 throw new ArgumentException(nameof(reuseMode));
             }
 
-            if (reuseMode != ConnectionReuseMode.SingleRequest)
+            if (reuseMode != ConnectionModeEnum.SingleRequest)
             {
                 string key = scheme + "://" + host + ":" + port.ToString();
                 RwLockedList<StreamInfo> streaminfo;
@@ -208,7 +208,7 @@ namespace SilverSim.Http.Client
 
                     if (stream != null)
                     {
-                        if (reuseMode == ConnectionReuseMode.Close)
+                        if (reuseMode == ConnectionModeEnum.Close)
                         {
                             stream.IsReusable = false;
                         }
@@ -220,11 +220,11 @@ namespace SilverSim.Http.Client
 
             if (scheme == Uri.UriSchemeHttp)
             {
-                return new HttpStream(ConnectToTcp(host, port)) { IsReusable = reuseMode == ConnectionReuseMode.Keepalive };
+                return new HttpStream(ConnectToTcp(host, port)) { IsReusable = reuseMode == ConnectionModeEnum.Keepalive };
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, reuseMode == ConnectionReuseMode.Keepalive);
+                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, reuseMode == ConnectionModeEnum.Keepalive);
             }
             else
             {

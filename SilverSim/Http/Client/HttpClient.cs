@@ -87,7 +87,7 @@ namespace SilverSim.Http.Client
             public Action<Stream> RequestBodyDelegate;
             public bool IsCompressed;
             public int TimeoutMs = 20000;
-            public ConnectionReuseMode ReuseMode = ConnectionReuse;
+            public ConnectionModeEnum ConnectionMode = ConnectionReuse;
             public IDictionary<string, string> Headers;
             public bool Expect100Continue;
             public bool UseChunkedEncoding;
@@ -296,12 +296,12 @@ namespace SilverSim.Http.Client
 
             var uri = new Uri(url);
 
-            if (request.ReuseMode == ConnectionReuseMode.Http2PriorKnowledge)
+            if (request.ConnectionMode == ConnectionModeEnum.Http2PriorKnowledge)
             {
                 return DoStreamRequestHttp2(request, uri);
             }
 
-            if(request.ReuseMode == ConnectionReuseMode.UpgradeHttp2)
+            if(request.ConnectionMode == ConnectionModeEnum.UpgradeHttp2)
             {
                 Http2Connection.Http2Stream h2stream = TryReuseStream(uri.Scheme, uri.Host, uri.Port);
                 if(h2stream != null)
@@ -395,13 +395,13 @@ namespace SilverSim.Http.Client
 
             int retrycnt = 1;
             retry:
-            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ReuseMode);
+            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ConnectionMode);
             string finalreqdata = reqdata;
             if (!s.IsReusable)
             {
                 finalreqdata += "Connection: close\r\n";
             }
-            bool h2cUpgrade = request.ReuseMode == ConnectionReuseMode.UpgradeHttp2;
+            bool h2cUpgrade = request.ConnectionMode == ConnectionModeEnum.UpgradeHttp2;
             if(h2cUpgrade)
             {
                 finalreqdata += "Upgrade: h2c\r\nHTTP2-Settings:\r\n";
