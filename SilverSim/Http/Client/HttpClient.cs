@@ -131,6 +131,15 @@ namespace SilverSim.Http.Client
                 RequestContentType = contenttype;
                 Method = "POST";
             }
+
+            public Post(string url, string contenttype, Action<Stream> body)
+                : base(url)
+            {
+                UseChunkedEncoding = true;
+                RequestBodyDelegate = body;
+                RequestContentType = contenttype;
+                Method = "POST";
+            }
         }
 
         public class Get : Request
