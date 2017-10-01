@@ -454,9 +454,6 @@ namespace SilverSim.Main.Common.HttpServer
                         return;
                     }
 
-                    string upgrade;
-                    string http2settings;
-
                     /* Recognition for HTTP/2.0 connection */
                     if(req.Method == "PRI")
                     {
@@ -472,33 +469,29 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         return;
                     }
-                    else if(req.TryGetHeader("upgrade", out upgrade) && upgrade.ToLowerInvariant() == "h2c" && !isSsl &&
-                        req.TryGetHeader("http2-settings", out http2settings))
+                    else if(req.IsH2CUpgradable)
                     {
-                        if (req.Body == null)
+                        httpstream.Write(m_H2cUpgrade, 0, m_H2cUpgrade.Length);
+                        byte[] settingsdata = FromUriBase64(req["http2-settings"]);
+                        var preface_receive = new byte[24];
+                        if (24 != httpstream.Read(preface_receive, 0, 24))
                         {
-                            httpstream.Write(m_H2cUpgrade, 0, m_H2cUpgrade.Length);
-                            byte[] settingsdata = FromUriBase64(http2settings);
-                            var preface_receive = new byte[24];
-                            if (24 != httpstream.Read(preface_receive, 0, 24))
-                            {
-                                httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
-                                httpstream.Close();
-                                return;
-                            }
-                            if(!preface_receive.SequenceEqual(m_H2cClientPreface))
-                            {
-                                httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
-                                httpstream.Close();
-                                return;
-                            }
-                            var h2con = new Http2Connection(httpstream, true);
-                            Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, false);
-                            req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req);
-                            ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
-                            HandleHttp2(h2con, remoteAddr, isSsl);
+                            httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
+                            httpstream.Close();
                             return;
                         }
+                        if(!preface_receive.SequenceEqual(m_H2cClientPreface))
+                        {
+                            httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
+                            httpstream.Close();
+                            return;
+                        }
+                        var h2con = new Http2Connection(httpstream, true);
+                        Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, false);
+                        req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req);
+                        ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
+                        HandleHttp2(h2con, remoteAddr, isSsl);
+                        return;
                     }
 
                     ProcessHttpRequest(req);

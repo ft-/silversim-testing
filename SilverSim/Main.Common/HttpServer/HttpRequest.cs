@@ -48,6 +48,7 @@ namespace SilverSim.Main.Common.HttpServer
         public HttpResponse Response { get; protected set; }
         public string CallerIP { get; protected set; }
         public bool Expect100Continue { get; protected set; }
+        public bool IsH2CUpgradable { get; protected set; }
         public bool IsSsl { get; }
 
         static protected readonly Dictionary<HttpStatusCode, string> m_StatusCodeMap = new Dictionary<HttpStatusCode, string>();

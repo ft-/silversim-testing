@@ -69,8 +69,11 @@ namespace SilverSim.Main.Common.HttpServer
                     MajorVersion = 1;
                     MinorVersion = 1;
                     ConnectionMode = HttpConnectionMode.Close;
-                    ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                    throw new InvalidDataException();
+                    if (headerLine.Length != 0)
+                    {
+                        ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                    }
+                    throw new HttpResponse.ConnectionCloseException();
                 }
                 headerLine.Append((char)c);
             }
@@ -237,7 +240,15 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             bool havePostData = false;
-            if (m_Headers.ContainsKey("content-length"))
+            string upgradeToken;
+            if (!isSsl && m_Headers.TryGetValue("upgrade", out upgradeToken) && upgradeToken == "h2c" &&
+                m_Headers.ContainsKey("http2-settings") &&
+                (Expect100Continue || !(m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("transfer-encoding"))))
+            {
+                IsH2CUpgradable = true;
+                /* skip over post handling */
+            }
+            else if (m_Headers.ContainsKey("content-length"))
             {
                 /* there is a body */
                 long contentLength;
