@@ -47,9 +47,8 @@ namespace SilverSim.ServiceInterfaces
             var headers = new Dictionary<string, string>();
             try
             {
-                new HttpClient.Request(uri)
+                new HttpClient.Head(uri)
                 {
-                    Method = "HEAD",
                     Headers = headers
                 }.ExecuteRequest();
             }

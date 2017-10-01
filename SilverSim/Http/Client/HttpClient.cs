@@ -98,14 +98,123 @@ namespace SilverSim.Http.Client
             }
         }
 
-        public class PostRequest : Request
+        public class Post : Request
         {
-            public PostRequest(string url, IDictionary<string, string> postValues)
+            public Post(string url)
+                : base(url)
+            {
+                Method = "POST";
+            }
+
+            public Post(string url, IDictionary<string, string> postValues)
                 : base(url)
             {
                 RequestBody = BuildQueryString(postValues);
                 RequestContentType = "application/x-www-form-urlencoded";
                 Method = "POST";
+            }
+
+            public Post(string url, string contenttype, string body)
+                : base(url)
+            {
+                RequestBody = body;
+                RequestContentType = contenttype;
+                Method = "POST";
+            }
+
+            public Post(string url, string contenttype, int contentlength, Action<Stream> body)
+                : base(url)
+            {
+                RequestBodyDelegate = body;
+                RequestContentLength = contentlength;
+                RequestContentType = contenttype;
+                Method = "POST";
+            }
+        }
+
+        public class Get : Request
+        {
+            public Get(string url) : base(url)
+            {
+            }
+        }
+
+        public class Head : Request
+        {
+            public Head(string url)
+                : base(url)
+            {
+                Method = "HEAD";
+            }
+        }
+
+        public class Delete : Request
+        {
+            public Delete(string url)
+                : base(url)
+            {
+                Method = "DELETE";
+            }
+        }
+
+        public class Put : Post
+        {
+            public Put(string url) : base(url)
+            {
+                Method = "PUT";
+            }
+
+            public Put(string url, IDictionary<string, string> postValues) : base(url, postValues)
+            {
+                Method = "PUT";
+            }
+
+            public Put(string url, string contenttype, string body) : base(url, contenttype, body)
+            {
+                Method = "PUT";
+            }
+
+            public Put(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
+            {
+                Method = "PUT";
+            }
+        }
+
+        public class Copy : Post
+        {
+            public Copy(string url) : base(url)
+            {
+            }
+
+            public Copy(string url, IDictionary<string, string> postValues) : base(url, postValues)
+            {
+            }
+
+            public Copy(string url, string contenttype, string body) : base(url, contenttype, body)
+            {
+            }
+
+            public Copy(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
+            {
+            }
+        }
+
+        public class Patch : Post
+        {
+            public Patch(string url) : base(url)
+            {
+            }
+
+            public Patch(string url, IDictionary<string, string> postValues) : base(url, postValues)
+            {
+            }
+
+            public Patch(string url, string contenttype, string body) : base(url, contenttype, body)
+            {
+            }
+
+            public Patch(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
+            {
             }
         }
 

@@ -94,7 +94,7 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    using (XmlReader r = new XmlTextReader(new HttpClient.Request(Name).ExecuteStreamRequest()))
+                    using (XmlReader r = new XmlTextReader(new HttpClient.Get(Name).ExecuteStreamRequest()))
                     {
                         return new XmlConfigSource(r);
                     }
