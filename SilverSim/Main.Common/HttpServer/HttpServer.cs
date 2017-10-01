@@ -469,7 +469,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         return;
                     }
-                    else if(req.IsH2CUpgradable)
+                    else if(req.IsH2CUpgradable || req.IsH2CUpgradableAfterReadingBody)
                     {
                         httpstream.Write(m_H2cUpgrade, 0, m_H2cUpgrade.Length);
                         byte[] settingsdata = FromUriBase64(req["http2-settings"]);

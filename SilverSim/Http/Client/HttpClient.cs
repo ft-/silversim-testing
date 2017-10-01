@@ -91,6 +91,7 @@ namespace SilverSim.Http.Client
             public IDictionary<string, string> Headers;
             public bool Expect100Continue;
             public bool UseChunkedEncoding;
+            public int Expect100ContinueMinSize = 8192;
 
             public Request(string url)
             {
@@ -315,8 +316,8 @@ namespace SilverSim.Http.Client
             string method = request.Method;
 
             string reqdata = uri.IsDefaultPort ?
-                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}\r\nAccept: */*\r\n":
-                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}:{uri.Port}\r\nAccept: */*\r\n";
+                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}\r\n":
+                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}:{uri.Port}\r\n";
 
             bool doPost = false;
             bool doChunked = false;
@@ -324,6 +325,7 @@ namespace SilverSim.Http.Client
             int content_length = request.RequestContentLength;
 
             IDictionary<string, string> headers = request.Headers;
+            bool haveAccept = false;
             if(headers != null)
             {
                 var removal = new List<string>();
@@ -336,6 +338,10 @@ namespace SilverSim.Http.Client
                         string.Compare(k, "transfer-encoding", true) == 0)
                     {
                         removal.Add(k);
+                    }
+                    if(string.Compare(k, "accept", true) == 0)
+                    {
+                        haveAccept = true;
                     }
                 }
                 if (removal.Count != 0)
@@ -382,6 +388,11 @@ namespace SilverSim.Http.Client
                 else
                 {
                     doPost = true;
+                    if(content_length > request.Expect100ContinueMinSize)
+                    {
+                        expect100Continue = true;
+                        request.Expect100Continue = true;
+                    }
                     reqdata += $"Content-Length: {content_length}\r\n";
                     if (compressed && content_type != "application/x-gzip")
                     {
@@ -398,6 +409,11 @@ namespace SilverSim.Http.Client
             if(method != "HEAD")
             {
                 reqdata += "Accept-Encoding: gzip, deflate\r\n";
+            }
+
+            if(!haveAccept)
+            {
+                reqdata += "Accept: */*\r\n";
             }
 
             int retrycnt = 1;

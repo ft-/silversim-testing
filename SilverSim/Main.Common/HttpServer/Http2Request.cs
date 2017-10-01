@@ -19,14 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using SilverSim.Http;
-using System.Net;
 using System.IO.Compression;
+using System.Net;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -100,7 +98,14 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             bool havePostData = false;
-            if (m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("content-type") ||
+            if(upgradeReq != null && upgradeReq.IsH2CUpgradableAfterReadingBody)
+            {
+                havePostData = true;
+                m_Body = new MemoryStream();
+                upgradeReq.Body.CopyTo(m_Body);
+                m_Body.Seek(0, SeekOrigin.Begin);
+            }
+            else if (m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("content-type") ||
                 m_Headers.ContainsKey("transfer-encoding"))
             {
                 /* there is a body */

@@ -259,14 +259,20 @@ namespace SilverSim.Main.Common.HttpServer
 
             bool havePostData = false;
             string upgradeToken;
-            if (!isSsl && m_Headers.TryGetValue("upgrade", out upgradeToken) && upgradeToken == "h2c" &&
-                m_Headers.ContainsKey("http2-settings") &&
-                !(m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("transfer-encoding")))
+            bool isH2CUpgrade = !isSsl && m_Headers.TryGetValue("upgrade", out upgradeToken) && upgradeToken == "h2c" &&
+                m_Headers.ContainsKey("http2-settings");
+
+            bool hasContentLength = m_Headers.ContainsKey("content-length");
+            bool hasH2cRequestBody = isH2CUpgrade && (hasContentLength || m_Headers.ContainsKey("transfer-encoding"));
+
+            IsH2CUpgradableAfterReadingBody = isH2CUpgrade && hasH2cRequestBody && !Expect100Continue && hasContentLength;
+
+            if (isH2CUpgrade && (!hasH2cRequestBody || Expect100Continue))
             {
                 IsH2CUpgradable = true;
                 /* skip over post handling */
             }
-            else if (m_Headers.ContainsKey("content-length"))
+            else if (hasContentLength)
             {
                 /* there is a body */
                 long contentLength;
@@ -275,6 +281,10 @@ namespace SilverSim.Main.Common.HttpServer
                     ConnectionMode = HttpConnectionMode.Close;
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     throw new InvalidDataException();
+                }
+                if(IsH2CUpgradableAfterReadingBody && contentLength > 65536)
+                {
+                    IsH2CUpgradableAfterReadingBody = false;
                 }
                 RawBody = new HttpRequestBodyStream(m_HttpStream, contentLength);
                 m_Body = RawBody;
@@ -304,6 +314,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             else if (m_Headers.ContainsKey("transfer-encoding"))
             {
+                IsH2CUpgradableAfterReadingBody = false;
                 bool HaveChunkedInFront = false;
                 m_Body = m_HttpStream;
                 foreach (string transferEncoding in m_Headers["transfer-encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries))
