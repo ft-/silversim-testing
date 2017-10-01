@@ -373,7 +373,7 @@ namespace SilverSim.Http.Client
                     reqdata += "Expect: 100-continue\r\n";
                 }
             }
-            else if (content_type.Length != 0)
+            else if (content_type != null)
             {
                 doPost = true;
                 reqdata += $"Content-Type: {content_type}\r\nContent-Length: {content_length}\r\n";
