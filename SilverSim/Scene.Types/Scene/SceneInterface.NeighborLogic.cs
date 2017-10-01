@@ -251,13 +251,12 @@ namespace SilverSim.Scene.Types.Scene
             var headers = new Dictionary<string,string>();
             try
             {
-                using (var responseStream = HttpClient.DoStreamRequest("HEAD", rinfo.ServerURI + "helo", null, string.Empty, string.Empty, false, 20000, headers))
+                new HttpClient.Request
                 {
-                    using (var reader = new StreamReader(responseStream))
-                    {
-                        reader.ReadToEnd();
-                    }
-                }
+                    Method = "HEAD",
+                    Url = rinfo.ServerURI + "helo",
+                    Headers = headers
+                }.ExecuteRequest();
             }
             catch
             {
@@ -302,17 +301,14 @@ namespace SilverSim.Scene.Types.Scene
             var ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
 
             Map resmap;
-            using(var responseStream =
-                HttpClient.DoStreamRequest(
-                    "POST",
-                    destinationInfo.ServerURI + "circuit",
-                    null,
-                    "application/llsd+xml",
-                    reqdata.Length,
-                    (Stream s) => s.Write(reqdata, 0, reqdata.Length),
-                    false,
-                    10000,
-                    null))
+            using(var responseStream = new HttpClient.Request
+            {
+                Method = "POST",
+                Url = destinationInfo.ServerURI + "circuit",
+                RequestContentType = "application/llsd+xml",
+                RequestContentLength = reqdata.Length,
+                RequestBodyDelegate = (Stream s) => s.Write(reqdata, 0, reqdata.Length)
+            }.ExecuteStreamRequest())
             {
                 resmap = (Map)LlsdXml.Deserialize(responseStream);
             }

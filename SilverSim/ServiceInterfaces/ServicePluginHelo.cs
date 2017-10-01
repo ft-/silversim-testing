@@ -47,13 +47,12 @@ namespace SilverSim.ServiceInterfaces
             var headers = new Dictionary<string, string>();
             try
             {
-                using (var responseStream = HttpClient.DoStreamRequest("HEAD", uri, null, string.Empty, string.Empty, false, 20000, headers))
+                new HttpClient.Request
                 {
-                    using (var reader = new StreamReader(responseStream))
-                    {
-                        reader.ReadToEnd();
-                    }
-                }
+                    Method = "HEAD",
+                    Url = uri,
+                    Headers = headers
+                }.ExecuteRequest();
             }
             catch
             {

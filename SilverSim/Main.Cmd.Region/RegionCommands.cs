@@ -21,6 +21,7 @@
 
 using log4net;
 using Nini.Config;
+using SilverSim.Http.Client;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
@@ -670,12 +671,13 @@ namespace SilverSim.Main.Cmd.Region
                 {
                     if (Uri.IsWellFormedUriString(args[4], UriKind.Absolute))
                     {
-                        using (var s = Http.Client.HttpClient.DoStreamGetRequest(args[4], null, 20000))
+                        using (var s = new HttpClient.Request
                         {
-                            using (var r = XmlReader.Create(s))
-                            {
-                                cfg = new XmlConfigSource(r);
-                            }
+                            Url = args[4]
+                        }.ExecuteStreamRequest())
+                        using (var r = XmlReader.Create(s))
+                        {
+                            cfg = new XmlConfigSource(r);
                         }
                     }
                     else
