@@ -1265,7 +1265,7 @@ namespace SilverSim.Http
                         /* Literal Header field never indexed */
 
                         int index;
-                        if (!TryGetInteger(ref offset, 6, out index))
+                        if (!TryGetInteger(ref offset, 4, out index))
                         {
                             break;
                         }
@@ -1343,7 +1343,7 @@ namespace SilverSim.Http
                 else
                 {
                     int m = 0;
-                    value = b & bmask;
+                    value = b;
                     do
                     {
                         try

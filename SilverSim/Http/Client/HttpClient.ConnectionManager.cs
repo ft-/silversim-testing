@@ -330,6 +330,10 @@ namespace SilverSim.Http.Client
             if (reuseMode != ConnectionReuseMode.Http2PriorKnowledgeSingleRequest)
             {
                 h2stream = TryReuseStream(scheme, host, port);
+                if(h2stream != null)
+                {
+                    return h2stream;
+                }
             }
 
             Stream s;
