@@ -358,33 +358,40 @@ namespace SilverSim.Http.Client
             string content_type = request.RequestContentType;
             bool expect100Continue = request.Expect100Continue;
 
-            if (request.UseChunkedEncoding)
+            if (request.RequestBodyDelegate != null)
             {
-                doPost = true;
-                doChunked = true;
-                reqdata += $"Content-Type: {content_type}\r\n";
-                if (compressed && content_type != "application/x-gzip")
+                if(content_type != null)
                 {
-                    reqdata += "X-Content-Encoding: gzip\r\n";
+                    reqdata += $"Content-Type: {content_type}\r\n";
                 }
 
-                if (expect100Continue)
+                if (request.UseChunkedEncoding)
                 {
-                    reqdata += "Expect: 100-continue\r\n";
-                }
-            }
-            else if (content_type != null)
-            {
-                doPost = true;
-                reqdata += $"Content-Type: {content_type}\r\nContent-Length: {content_length}\r\n";
-                if (compressed && content_type != "application/x-gzip")
-                {
-                    reqdata += "X-Content-Encoding: gzip\r\n";
-                }
+                    doPost = true;
+                    doChunked = true;
+                    if (compressed && content_type != "application/x-gzip")
+                    {
+                        reqdata += "X-Content-Encoding: gzip\r\n";
+                    }
 
-                if (expect100Continue)
+                    if (expect100Continue)
+                    {
+                        reqdata += "Expect: 100-continue\r\n";
+                    }
+                }
+                else
                 {
-                    reqdata += "Expect: 100-continue\r\n";
+                    doPost = true;
+                    reqdata += $"Content-Length: {content_length}\r\n";
+                    if (compressed && content_type != "application/x-gzip")
+                    {
+                        reqdata += "X-Content-Encoding: gzip\r\n";
+                    }
+
+                    if (expect100Continue)
+                    {
+                        reqdata += "Expect: 100-continue\r\n";
+                    }
                 }
             }
 
@@ -728,11 +735,13 @@ namespace SilverSim.Http.Client
                 actheaders.Remove("transfer-encoding");
             }
 
-            if (content_type.Length != 0)
+            if (request.RequestBodyDelegate != null)
             {
                 doPost = true;
-                actheaders.Add("content-type", content_type);
-                actheaders.Add("content-length", content_length.ToString());
+                if (content_type != null)
+                {
+                    actheaders.Add("content-type", content_type);
+                }
                 if (compressed && content_type != "application/x-gzip")
                 {
                     actheaders.Add("x-content-encoding", "gzip");
