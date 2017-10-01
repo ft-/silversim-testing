@@ -633,7 +633,7 @@ namespace SilverSim.Http.Client
             headers.Clear();
             try
             {
-                s.SendHeaders(actheaders, 0, doPost);
+                s.SendHeaders(actheaders, 0, !doPost);
             }
             catch (ObjectDisposedException)
             {

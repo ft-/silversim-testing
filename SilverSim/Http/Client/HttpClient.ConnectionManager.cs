@@ -253,8 +253,21 @@ namespace SilverSim.Http.Client
         private static void AddH2Connection(Http2Connection conn, string scheme, string host, int port)
         {
             string key = scheme + "://" + host + ":" + port.ToString();
-            m_H2StreamList[key].Add(new H2StreamInfo(conn, scheme, host, port));
-            ThreadManager.CreateThread(() => conn.Run()).Start();
+            var h2info = new H2StreamInfo(conn, scheme, host, port);
+            m_H2StreamList[key].Add(h2info);
+            ThreadManager.CreateThread((o) =>
+            {
+                var info = (H2StreamInfo)o;
+                System.Threading.Thread.CurrentThread.Name = "HTTP/2 client connection for " + key;
+                try
+                {
+                    info.Connection.Run();
+                }
+                catch
+                {
+                    m_H2StreamList[key].Remove(info);
+                }
+            }).Start(h2info);
         }
 
         private static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
@@ -335,7 +348,7 @@ namespace SilverSim.Http.Client
 
             var h2con = new Http2Connection(s, false);
             h2stream = h2con.OpenClientStream();
-            m_H2StreamList[key].Add(new H2StreamInfo(h2con, scheme, host, port));
+            AddH2Connection(h2con, scheme, host, port);
             return h2stream;
         }
         #endregion

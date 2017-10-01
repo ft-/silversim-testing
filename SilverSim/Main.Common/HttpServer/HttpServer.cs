@@ -505,7 +505,11 @@ namespace SilverSim.Main.Common.HttpServer
                     httpstream.ReadTimeout = 10000;
                 }
             }
-            catch(Http2Connection.ConnectionClosedException)
+            catch (HttpStream.TimeoutException)
+            {
+                /* ignore */
+            }
+            catch (Http2Connection.ConnectionClosedException)
             {
                 /* HTTP/2 connection closed */
             }
@@ -571,6 +575,11 @@ namespace SilverSim.Main.Common.HttpServer
                     return;
                 }
                 catch (HttpResponse.ConnectionCloseException)
+                {
+                    /* ignore */
+                    return;
+                }
+                catch(HttpStream.TimeoutException)
                 {
                     /* ignore */
                     return;

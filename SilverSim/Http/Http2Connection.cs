@@ -109,6 +109,7 @@ namespace SilverSim.Http
             else
             {
                 m_OriginalStream.Write(m_H2cClientPreface, 0, m_H2cClientPreface.Length);
+                SendFrame(Http2FrameType.Settings, 0, 0, new byte[0]);
             }
         }
 
@@ -252,6 +253,8 @@ namespace SilverSim.Http
             SendFrame(Http2FrameType.GoAway, 0, 0, goawaydata, 0, goawaydata.Length);
         }
 
+        internal void Flush() => m_OriginalStream.Flush();
+
         internal void SendFrame(Http2FrameType type, byte flags, uint streamid, byte[] data) =>
             SendFrame(type, flags, streamid, data, 0, data.Length);
 
@@ -371,7 +374,9 @@ namespace SilverSim.Http
                 streamid = m_ClientStreamIdentifier;
                 m_ClientStreamIdentifier = (m_ClientStreamIdentifier + 2) & 0x7FFFFFFF;
             }
-            return new Http2Stream(this, streamid, m_MaxTableByteSize, m_InitialWindowSize);
+            Http2Stream h2s = new Http2Stream(this, streamid, m_MaxTableByteSize, m_InitialWindowSize);
+            m_Streams.Add(streamid, h2s);
+            return h2s;
         }
 
         public Http2Stream UpgradeStream(byte[] settings, bool hasPost)
@@ -392,7 +397,9 @@ namespace SilverSim.Http
                 streamid = m_ClientStreamIdentifier;
                 m_ClientStreamIdentifier = (m_ClientStreamIdentifier + 2) & 0x7FFFFFFF;
             }
-            return new Http2Stream(this, streamid, m_MaxTableByteSize, m_InitialWindowSize, hasPost);
+            Http2Stream h2s = new Http2Stream(this, streamid, m_MaxTableByteSize, m_InitialWindowSize, hasPost);
+            m_Streams.Add(streamid, h2s);
+            return h2s;
         }
 
         public Http2Stream UpgradeClientStream()
@@ -403,7 +410,9 @@ namespace SilverSim.Http
                 streamid = m_ClientStreamIdentifier;
                 m_ClientStreamIdentifier = (m_ClientStreamIdentifier + 2) & 0x7FFFFFFF;
             }
-            return new Http2Stream(this, true, streamid, m_MaxTableByteSize, m_InitialWindowSize);
+            Http2Stream h2s = new Http2Stream(this, true, streamid, m_MaxTableByteSize, m_InitialWindowSize);
+            m_Streams.Add(streamid, h2s);
+            return h2s;
         }
 
         public void Run(Action<Http2Stream> action = null)
@@ -458,23 +467,21 @@ namespace SilverSim.Http
                     switch (frame.Type)
                     {
                         case Http2FrameType.Headers:
-                            if (action == null)
+                            if (!m_Streams.TryGetValue(frame.StreamIdentifier, out stream))
                             {
-                                SendRstStream(frame.StreamIdentifier, Http2ErrorCode.RefusedStream);
+                                if (action == null)
+                                {
+                                    SendRstStream(frame.StreamIdentifier, Http2ErrorCode.RefusedStream);
+                                    break;
+                                }
+                                stream = new Http2Stream(this, frame.StreamIdentifier, m_MaxTableByteSize, m_InitialWindowSize);
+                                m_Streams[frame.StreamIdentifier] = stream;
                             }
-                            else
+                            bool startStream = !stream.HaveReceivedHeaders;
+                            stream.NewFrameReceived(frame);
+                            if(startStream && (frame.Flags & (byte)HeadersFrameFlags.EndHeaders) != 0 && action != null)
                             {
-                                if (!m_Streams.TryGetValue(frame.StreamIdentifier, out stream))
-                                {
-                                    stream = new Http2Stream(this, frame.StreamIdentifier, m_MaxTableByteSize, m_InitialWindowSize);
-                                    m_Streams[frame.StreamIdentifier] = stream;
-                                }
-                                bool startStream = !stream.HaveReceivedHeaders;
-                                stream.NewFrameReceived(frame);
-                                if(startStream && (frame.Flags & (byte)HeadersFrameFlags.EndHeaders) != 0)
-                                {
-                                    action(stream);
-                                }
+                                action(stream);
                             }
                             break;
 
@@ -624,8 +631,8 @@ namespace SilverSim.Http
                 if (!m_HaveSentEoS)
                 {
                     m_Conn.SendFrame(Http2FrameType.Data, (byte)DataFrameFlags.EndStream, m_StreamIdentifier, m_BufferedTransmitData, 0, m_BufferedTransmitDataBytes);
-                    m_Conn.m_Streams.RemoveIf(m_StreamIdentifier, (elem) => (elem == this));
                 }
+                m_Conn.m_Streams.RemoveIf(m_StreamIdentifier, (elem) => (elem == this));
             }
 
             internal void NewFrameReceived(Http2Frame frame)
@@ -716,16 +723,18 @@ namespace SilverSim.Http
                     {
                         if (m_HaveReceivedEoS)
                         {
-                            return 0;
+                            return consumed;
                         }
 
                         Http2Frame frame = m_Http2Queue.Dequeue(ReadTimeout);
                         uint value;
-                        m_Conn.SendFrame(Http2FrameType.WindowUpdate, 0, m_StreamIdentifier, new byte[] { 0, 0x1, 0, 0 });
-                        if (TryGetSettingsValue(frame.Data, SETTINGS_HEADER_TABLE_SIZE, out value))
+                        if (frame.Type == Http2FrameType.Settings)
                         {
-                            m_MaxTableByteSize = value;
-                            ChangeTableSize((int)m_MaxTableByteSize);
+                            if (TryGetSettingsValue(frame.Data, SETTINGS_HEADER_TABLE_SIZE, out value))
+                            {
+                                m_MaxTableByteSize = value;
+                                ChangeTableSize((int)m_MaxTableByteSize);
+                            }
                         }
                         else if (frame.Type == Http2FrameType.Headers)
                         {
@@ -739,6 +748,10 @@ namespace SilverSim.Http
                         if ((frame.Flags & (byte)DataFrameFlags.EndStream) != 0)
                         {
                             m_HaveReceivedEoS = true;
+                        }
+                        else
+                        {
+                            m_Conn.SendFrame(Http2FrameType.WindowUpdate, 0, m_StreamIdentifier, new byte[] { 0, 0x1, 0, 0 });
                         }
 
                         if ((frame.Flags & (byte)DataFrameFlags.Padded) != 0)
@@ -838,18 +851,17 @@ namespace SilverSim.Http
                     offset += 16384;
                     type = Http2FrameType.Continuation;
                 }
-                if (data.Length - offset <= 16384)
+
+                var hf = (byte)HeadersFrameFlags.EndHeaders;
+                if (eos)
                 {
-                    var hf = (byte)HeadersFrameFlags.EndHeaders;
-                    if (eos)
-                    {
-                        hf |= (byte)HeadersFrameFlags.EndStream;
-                    }
-                    m_Conn.SendFrame(type, hf, m_StreamIdentifier, data, offset, data.Length - offset);
+                    hf |= (byte)HeadersFrameFlags.EndStream;
                 }
+                m_Conn.SendFrame(type, hf, m_StreamIdentifier, data, offset, data.Length - offset);
 
                 m_HaveSentHeaders = true;
                 m_HaveSentEoS = eos;
+                m_Conn.Flush();
             }
 
             private byte[] BuildHeaderData(Dictionary<string, string> headers, uint statuscode = 0)
@@ -1352,7 +1364,22 @@ namespace SilverSim.Http
             public Dictionary<string, string> ReceiveHeaders()
             {
                 var headers = new Dictionary<string, string>();
-                Http2Frame frame = m_Http2Queue.Dequeue();
+                Http2Frame frame;
+
+                do
+                {
+                    frame = m_Http2Queue.Dequeue(ReadTimeout);
+                    if (frame.Type == Http2FrameType.Settings)
+                    {
+                        uint value;
+                        if (TryGetSettingsValue(frame.Data, SETTINGS_HEADER_TABLE_SIZE, out value))
+                        {
+                            m_MaxTableByteSize = value;
+                            ChangeTableSize((int)m_MaxTableByteSize);
+                        }
+                    }
+                } while (frame.Type == Http2FrameType.Settings);
+
                 if (frame.Type != Http2FrameType.Headers)
                 {
                     m_Conn.SendRstStream(m_StreamIdentifier, Http2ErrorCode.ProtocolError);
