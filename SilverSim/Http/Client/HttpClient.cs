@@ -79,7 +79,7 @@ namespace SilverSim.Http.Client
         public sealed class Request
         {
             public string Method = "GET";
-            public string Url = string.Empty;
+            public string Url;
             public IDictionary<string, string> GetValues;
             public string RequestContentType;
             public int RequestContentLength;
@@ -91,6 +91,11 @@ namespace SilverSim.Http.Client
             public IDictionary<string, string> Headers;
             public bool Expect100Continue;
             public bool UseChunkedEncoding;
+
+            public Request(string url)
+            {
+                Url = url;
+            }
         }
 
         #region HTTP Utility Functions

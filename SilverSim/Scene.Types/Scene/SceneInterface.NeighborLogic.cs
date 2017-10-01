@@ -251,10 +251,9 @@ namespace SilverSim.Scene.Types.Scene
             var headers = new Dictionary<string,string>();
             try
             {
-                new HttpClient.Request
+                new HttpClient.Request(rinfo.ServerURI + "helo")
                 {
                     Method = "HEAD",
-                    Url = rinfo.ServerURI + "helo",
                     Headers = headers
                 }.ExecuteRequest();
             }
@@ -301,10 +300,9 @@ namespace SilverSim.Scene.Types.Scene
             var ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
 
             Map resmap;
-            using(var responseStream = new HttpClient.Request
+            using(var responseStream = new HttpClient.Request(destinationInfo.ServerURI + "circuit")
             {
                 Method = "POST",
-                Url = destinationInfo.ServerURI + "circuit",
                 RequestContentType = "application/llsd+xml",
                 RequestContentLength = reqdata.Length,
                 RequestBodyDelegate = (Stream s) => s.Write(reqdata, 0, reqdata.Length)

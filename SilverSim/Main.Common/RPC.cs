@@ -32,10 +32,9 @@ namespace SilverSim.Main.Common.Rpc
         public static IValue DoJson20RpcRequest(string url, string method, string jsonId, IValue param, int timeoutms)
         {
             string jsonReq = Json20Rpc.SerializeRequest(method, jsonId, param);
-            using (Stream res = new HttpClient.Request
+            using (Stream res = new HttpClient.Request(url)
             {
                 Method = "POST",
-                Url = url,
                 RequestContentType = "application/json-rpc",
                 RequestBody = jsonReq,
                 TimeoutMs = timeoutms
@@ -48,10 +47,9 @@ namespace SilverSim.Main.Common.Rpc
         public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms)
         {
             byte[] rpcdata = req.Serialize();
-            using (Stream res = new HttpClient.Request
+            using (Stream res = new HttpClient.Request(url)
             {
                 Method = "POST",
-                Url = url,
                 RequestContentType = "text/xml",
                 RequestContentLength = rpcdata.Length,
                 RequestBodyDelegate = (Stream s) => s.Write(rpcdata, 0, rpcdata.Length),
