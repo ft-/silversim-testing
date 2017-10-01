@@ -76,7 +76,7 @@ namespace SilverSim.Http.Client
             }
         }
 
-        public sealed class Request
+        public class Request
         {
             public string Method = "GET";
             public string Url;
@@ -96,10 +96,13 @@ namespace SilverSim.Http.Client
             {
                 Url = url;
             }
+        }
 
-            public Request(string url, IDictionary<string, string> postValues)
+        public class PostRequest : Request
+        {
+            public PostRequest(string url, IDictionary<string, string> postValues)
+                : base(url)
             {
-                Url = url;
                 RequestBody = BuildQueryString(postValues);
                 RequestContentType = "application/x-www-form-urlencoded";
                 Method = "POST";
