@@ -77,7 +77,21 @@ namespace SilverSim.Http
         public int ReadBytesInternal(byte[] buffer, int maxbytes, int timeoutms)
         {
             m_Socket.ReceiveTimeout = timeoutms;
-            return m_Socket.Receive(buffer, maxbytes, SocketFlags.Partial);
+            try
+            {
+                return m_Socket.Receive(buffer, maxbytes, SocketFlags.Partial);
+            }
+            catch(SocketException e)
+            {
+                if(e.SocketErrorCode == SocketError.TimedOut)
+                {
+                    throw new TimeoutException();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         public override int ReadByte()
