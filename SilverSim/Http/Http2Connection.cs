@@ -111,6 +111,7 @@ namespace SilverSim.Http
                 m_OriginalStream.Write(m_H2cClientPreface, 0, m_H2cClientPreface.Length);
                 SendFrame(Http2FrameType.Settings, 0, 0, new byte[0]);
             }
+            Flush();
         }
 
         ~Http2Connection()
@@ -251,6 +252,7 @@ namespace SilverSim.Http
             goawaydata[7] = (byte)((int)reason & 0xFF);
 
             SendFrame(Http2FrameType.GoAway, 0, 0, goawaydata, 0, goawaydata.Length);
+            Flush();
         }
 
         internal void Flush() => m_OriginalStream.Flush();
@@ -296,6 +298,7 @@ namespace SilverSim.Http
                 Array.Reverse(block);
             }
             SendFrame(Http2FrameType.RstStream, 0, streamid, block, 0, 4);
+            m_OriginalStream.Flush();
         }
 
         private Http2Frame ReceiveFrame()
@@ -353,6 +356,7 @@ namespace SilverSim.Http
                     if ((frame.Flags & (byte)PingFrameFlags.Ack) == 0)
                     {
                         SendFrame(Http2FrameType.Ping, (byte)PingFrameFlags.Ack, 0, frame.Data, 0, frame.Length);
+                        Flush();
                     }
                 }
             } while (frame.Type == Http2FrameType.Ping);
@@ -631,6 +635,7 @@ namespace SilverSim.Http
                 if (!m_HaveSentEoS)
                 {
                     m_Conn.SendFrame(Http2FrameType.Data, (byte)DataFrameFlags.EndStream, m_StreamIdentifier, m_BufferedTransmitData, 0, m_BufferedTransmitDataBytes);
+                    m_Conn.Flush();
                 }
                 m_Conn.m_Streams.RemoveIf(m_StreamIdentifier, (elem) => (elem == this));
             }
@@ -689,6 +694,7 @@ namespace SilverSim.Http
 
             public override void Flush()
             {
+                m_Conn.Flush();
             }
 
             public void SendRstStream(Http2ErrorCode errorcode)
@@ -704,6 +710,7 @@ namespace SilverSim.Http
                 {
                     m_HaveSentEoS = true;
                     m_Conn.SendFrame(Http2FrameType.Data, (byte)DataFrameFlags.EndStream, m_StreamIdentifier, m_BufferedTransmitData, 0, m_BufferedTransmitDataBytes);
+                    m_Conn.Flush();
                 }
             }
 

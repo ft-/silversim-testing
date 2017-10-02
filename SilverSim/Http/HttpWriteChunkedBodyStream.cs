@@ -77,6 +77,7 @@ namespace SilverSim.Http
                     FlushBuffer();
                 }
                 m_Output.Write(LastChunkData, 0, LastChunkData.Length);
+                m_Output.Flush();
                 m_Output = null;
             }
         }
@@ -90,6 +91,7 @@ namespace SilverSim.Http
                     FlushBuffer();
                 }
                 m_Output.Write(LastChunkData, 0, LastChunkData.Length);
+                m_Output.Flush();
                 m_Output = null;
             }
             base.Dispose(disposing);
@@ -104,6 +106,7 @@ namespace SilverSim.Http
                     FlushBuffer();
                 }
                 m_Output.Write(LastChunkData, 0, LastChunkData.Length);
+                m_Output.Flush();
                 m_Output = null;
             }
         }
