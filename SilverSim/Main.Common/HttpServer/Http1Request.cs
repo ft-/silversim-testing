@@ -266,7 +266,7 @@ namespace SilverSim.Main.Common.HttpServer
             bool hasContentLength = m_Headers.ContainsKey("content-length");
             bool hasH2cRequestBody = isH2CUpgrade && (hasContentLength || m_Headers.ContainsKey("transfer-encoding"));
 
-            IsH2CUpgradableAfterReadingBody = isH2CUpgrade && hasH2cRequestBody && !Expect100Continue && hasContentLength;
+            IsH2CUpgradableAfterReadingBody = isH2CUpgrade && !Expect100Continue && hasContentLength;
 
             if (isH2CUpgrade && (!hasH2cRequestBody || Expect100Continue))
             {
