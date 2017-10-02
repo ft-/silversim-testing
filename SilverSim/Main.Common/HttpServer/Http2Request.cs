@@ -52,7 +52,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         Http2Connection.Http2Stream m_Stream;
 
-        public Http2Request(Http2Connection.Http2Stream stream, string callerIP, bool isBehindProxy, bool isSsl, HttpRequest upgradeReq = null)
+        public Http2Request(Http2Connection.Http2Stream stream, string callerIP, bool isBehindProxy, bool isSsl, HttpRequest upgradeReq = null, Stream upgradeBody = null)
             : base(isSsl)
         {
             MajorVersion = 2;
@@ -100,10 +100,8 @@ namespace SilverSim.Main.Common.HttpServer
             bool havePostData = false;
             if(upgradeReq != null && upgradeReq.IsH2CUpgradableAfterReadingBody)
             {
-                havePostData = true;
-                m_Body = new MemoryStream();
-                upgradeReq.Body.CopyTo(m_Body);
-                m_Body.Seek(0, SeekOrigin.Begin);
+                /* skip following postdata handling here since it is already decoded */
+                m_Body = upgradeBody;
             }
             else if (m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("content-type") ||
                 m_Headers.ContainsKey("transfer-encoding"))

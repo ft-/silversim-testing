@@ -264,11 +264,11 @@ namespace SilverSim.Main.Common.HttpServer
                 m_Headers.ContainsKey("http2-settings");
 
             bool hasContentLength = m_Headers.ContainsKey("content-length");
-            bool hasH2cRequestBody = isH2CUpgrade && (hasContentLength || m_Headers.ContainsKey("transfer-encoding"));
+            bool hasRequestBody = (hasContentLength || m_Headers.ContainsKey("transfer-encoding"));
 
             IsH2CUpgradableAfterReadingBody = isH2CUpgrade && !Expect100Continue && hasContentLength;
 
-            if (isH2CUpgrade && (!hasH2cRequestBody || Expect100Continue))
+            if (isH2CUpgrade && (!hasRequestBody || Expect100Continue))
             {
                 IsH2CUpgradable = true;
                 /* skip over post handling */

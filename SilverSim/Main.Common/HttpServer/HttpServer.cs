@@ -471,6 +471,13 @@ namespace SilverSim.Main.Common.HttpServer
                     }
                     else if(req.IsH2CUpgradable || req.IsH2CUpgradableAfterReadingBody)
                     {
+                        Stream upgradeStream = null;
+                        if(req.IsH2CUpgradableAfterReadingBody)
+                        {
+                            upgradeStream = new MemoryStream();
+                            req.Body.CopyTo(upgradeStream);
+                            upgradeStream.Seek(0, SeekOrigin.Begin);
+                        }
                         httpstream.Write(m_H2cUpgrade, 0, m_H2cUpgrade.Length);
                         byte[] settingsdata = FromUriBase64(req["http2-settings"]);
                         var preface_receive = new byte[24];
@@ -478,17 +485,19 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
                             httpstream.Close();
+                            upgradeStream?.Dispose();
                             return;
                         }
                         if(!preface_receive.SequenceEqual(m_H2cClientPreface))
                         {
                             httpstream.Write(m_H2cGoAwayProtocolError, 0, m_H2cGoAwayProtocolError.Length);
                             httpstream.Close();
+                            upgradeStream?.Dispose();
                             return;
                         }
                         var h2con = new Http2Connection(httpstream, true);
-                        Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, false);
-                        req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req);
+                        Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, !req.IsH2CUpgradableAfterReadingBody && req.Expect100Continue);
+                        req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req, upgradeStream);
                         ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
                         HandleHttp2(h2con, remoteAddr, isSsl);
                         return;
