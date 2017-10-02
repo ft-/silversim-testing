@@ -385,6 +385,7 @@ namespace SilverSim.Http.Client
                 {
                     doPost = true;
                     doChunked = true;
+                    reqdata += "Transfer-Encoding: chunked\r\n";
                     if (compressed && content_type != "application/x-gzip")
                     {
                         reqdata += "X-Content-Encoding: gzip\r\n";

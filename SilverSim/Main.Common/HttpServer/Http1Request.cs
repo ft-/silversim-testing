@@ -124,14 +124,14 @@ namespace SilverSim.Main.Common.HttpServer
                 MinorVersion = 1;
                 ConnectionMode = HttpConnectionMode.Close;
                 ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                throw new InvalidDataException();
+                throw new InvalidDataException("Invalid header line");
             }
             string[] version = requestData[2].Split('/');
             if (version.Length != 2)
             {
                 ConnectionMode = HttpConnectionMode.Close;
                 ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                throw new InvalidDataException();
+                throw new InvalidDataException("Invalid version part");
             }
 
             /* Check for version */
@@ -141,7 +141,7 @@ namespace SilverSim.Main.Common.HttpServer
                 MinorVersion = 1;
                 ConnectionMode = HttpConnectionMode.Close;
                 ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                throw new InvalidDataException();
+                throw new InvalidDataException("Missing HTTP specifier");
             }
 
             string[] versiondata = version[1].Split('.');
@@ -151,7 +151,7 @@ namespace SilverSim.Main.Common.HttpServer
                 MinorVersion = 1;
                 ConnectionMode = HttpConnectionMode.Close;
                 ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                throw new InvalidDataException();
+                throw new InvalidDataException("Invalid version string");
             }
 
             /* Check whether we know that request version */
@@ -166,7 +166,7 @@ namespace SilverSim.Main.Common.HttpServer
                 MinorVersion = 1;
                 ConnectionMode = HttpConnectionMode.Close;
                 ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                throw new InvalidDataException();
+                throw new InvalidDataException("Version string parts not a number");
             }
 
             if(MajorVersion == 2)
@@ -182,12 +182,12 @@ namespace SilverSim.Main.Common.HttpServer
                 if(ReadHeaderLine() != "SM")
                 {
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                    throw new InvalidDataException();
+                    throw new InvalidDataException("HTTP/2 client preface error");
                 }
                 if(ReadHeaderLine().Length != 0)
                 {
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                    throw new InvalidDataException();
+                    throw new InvalidDataException("HTTP/2 client preface error");
                 }
                 CallerIP = (m_Headers.ContainsKey("x-forwarded-for") && isBehindProxy) ?
                     m_Headers["x-forwarded-for"] :
@@ -201,7 +201,7 @@ namespace SilverSim.Main.Common.HttpServer
                 MinorVersion = 1;
                 ConnectionMode = HttpConnectionMode.Close;
                 ErrorResponse(HttpStatusCode.HttpVersionNotSupported, "HTTP Version not supported");
-                throw new InvalidDataException();
+                throw new InvalidDataException("HTTP version not supported");
             }
 
             /* Configure connection mode default according to version */
@@ -231,7 +231,7 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     ConnectionMode = HttpConnectionMode.Close;
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                    throw new InvalidDataException();
+                    throw new InvalidDataException("Invalid header");
                 }
                 lastHeader = headerData[0].ToLowerInvariant();
                 m_Headers[lastHeader] = headerData[1].Trim();
@@ -305,7 +305,7 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             ConnectionMode = HttpConnectionMode.Close;
                             ErrorResponse(HttpStatusCode.NotImplemented, "Transfer-Encoding " + transferEncoding + " not implemented");
-                            throw new InvalidDataException();
+                            throw new InvalidDataException("Transfer-Encoding " + transferEncoding + " not implemented");
                         }
                     }
                 }
@@ -336,7 +336,7 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         ConnectionMode = HttpConnectionMode.Close;
                         ErrorResponse(HttpStatusCode.NotImplemented, "Transfer-Encoding " + transferEncoding + " not implemented");
-                        throw new InvalidDataException();
+                        throw new InvalidDataException("Transfer-Encoding " + transferEncoding + " not implemented");
                     }
                 }
 
@@ -377,7 +377,7 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     ConnectionMode = HttpConnectionMode.Close;
                     ErrorResponse(HttpStatusCode.NotImplemented, "Content-Encoding not accepted");
-                    throw new InvalidDataException();
+                    throw new InvalidDataException("Content-Encoding not accepted");
                 }
             }
 
