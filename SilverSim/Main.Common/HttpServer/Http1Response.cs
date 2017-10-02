@@ -73,11 +73,10 @@ namespace SilverSim.Main.Common.HttpServer
                         w.Write(string.Format("{0}: {1}\r\n", kvp.Key.Replace("\r", string.Empty).Replace("\n", string.Empty), kvp.Value.Replace("\r", string.Empty).Replace("\n", string.Empty)));
                     }
                     w.Write("\r\n");
-                    w.Flush();
-                    byte[] b = ms.ToArray();
-                    m_Output.Write(b, 0, b.Length);
-                    m_Output.Flush();
                 }
+                byte[] b = ms.ToArray();
+                m_Output.Write(b, 0, b.Length);
+                m_Output.Flush();
             }
             m_IsHeaderSent = true;
         }

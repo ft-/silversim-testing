@@ -60,6 +60,7 @@ namespace SilverSim.Http
             ReadTimeout = 5000;
             m_Buffer = new byte[4096];
             m_Socket = sock;
+            m_Socket.NoDelay = true;
         }
 
         protected override void Dispose(bool flag)
