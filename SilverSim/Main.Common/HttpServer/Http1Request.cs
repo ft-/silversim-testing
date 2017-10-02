@@ -47,6 +47,7 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     byte[] b = Encoding.ASCII.GetBytes("HTTP/1.0 100 Continue\r\n\r\n");
                     m_HttpStream.Write(b, 0, b.Length);
+                    m_HttpStream.Flush();
                     Expect100Continue = false;
                 }
                 return m_Body;

@@ -76,29 +76,7 @@ namespace SilverSim.Http
 
         public int ReadBytesInternal(byte[] buffer, int maxbytes, int timeoutms)
         {
-            var readList = new ArrayList
-            {
-                m_Socket
-            };
-            var errorList = new ArrayList
-            {
-                m_Socket
-            };
-            Socket.Select(readList, null, errorList, timeoutms * 1000);
-            if(errorList.Count > 0 && readList.Count == 0)
-            {
-                throw new EndOfStreamException();
-            }
-            if(readList.Count == 0)
-            {
-                throw new TimeoutException();
-            }
-
-            int availableBytes = m_Socket.Available;
-            if(availableBytes < maxbytes)
-            {
-                maxbytes = availableBytes;
-            }
+            m_Socket.ReceiveTimeout = timeoutms;
             return m_Socket.Receive(buffer, maxbytes, SocketFlags.Partial);
         }
 
