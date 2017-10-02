@@ -102,7 +102,12 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 havePostData = true;
                 m_Body = new MemoryStream();
-                upgradeReq.Body.CopyTo(m_Body);
+                int copySize;
+                var copyData = new byte[10240];
+                while(0 != (copySize = upgradeReq.Body.Read(copyData, 0, 10240)))
+                {
+                    m_Body.Write(copyData, 0, copySize);
+                }
                 m_Body.Seek(0, SeekOrigin.Begin);
             }
             else if (m_Headers.ContainsKey("content-length") || m_Headers.ContainsKey("content-type") ||
