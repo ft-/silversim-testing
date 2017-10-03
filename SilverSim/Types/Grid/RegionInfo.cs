@@ -19,6 +19,10 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
+using System;
+using System.Net;
+
 namespace SilverSim.Types.Grid
 {
     public class RegionInfo
@@ -71,6 +75,27 @@ namespace SilverSim.Types.Grid
         public string ProductName = string.Empty; /* e.g. "Mainland" */
         public string ProtocolVariant = string.Empty; /* see ProtocolVariantId */
         public string GridURI = string.Empty; /* empty when addressing local grid */
+
+        public EndPoint SimIP
+        {
+            get
+            {
+                if (m_SimIP == null)
+                {
+                    var addresses = DnsNameCache.GetHostAddresses(ServerIP, true);
+                    if (addresses.Length == 0)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    m_SimIP = new IPEndPoint(addresses[0], (int)ServerPort);
+                }
+                return m_SimIP;
+            }
+
+            set { m_SimIP = value; }
+        }
+
+        protected EndPoint m_SimIP;
 
         public static class ProtocolVariantId
         {

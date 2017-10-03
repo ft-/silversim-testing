@@ -72,33 +72,11 @@ namespace SilverSim.Types.Grid
         #endregion
 
         #region Fields
-        public string GatekeeperURI = string.Empty;
         public Vector3 Position = Vector3.Zero;
         public Vector3 LookAt = Vector3.Zero;
         public TeleportFlags TeleportFlags;
         public string StartLocation = string.Empty;
         public bool LocalToGrid;
         #endregion
-
-        public EndPoint SimIP
-        {
-            get
-            {
-                if (m_SimIP == null)
-                {
-                    var addresses = DnsNameCache.GetHostAddresses(ServerIP, true);
-                    if (addresses.Length == 0)
-                    {
-                        throw new InvalidOperationException();
-                    }
-                    m_SimIP = new IPEndPoint(addresses[0], (int)ServerPort);
-                }
-                return m_SimIP;
-            }
-
-            set { m_SimIP = value; }
-        }
-
-        private EndPoint m_SimIP;
     }
 }
