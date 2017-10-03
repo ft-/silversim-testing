@@ -899,7 +899,7 @@ namespace SilverSim.Http.Client
                 if (statusCode == 404)
                 {
                     s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
-                    throw new HttpException(statusCode, statusVal + " (" + uri.ToString() + ")");
+                    throw new HttpException(statusCode, statusVal + " (" + uri + ")");
                 }
                 else
                 {
