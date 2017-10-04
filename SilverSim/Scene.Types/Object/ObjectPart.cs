@@ -2174,7 +2174,7 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteUUID("OwnerID", ObjectGroup.Owner.ID);
                         writer.WriteUUID("LastOwnerID", ObjectGroup.LastOwner.ID);
                     }
-                    else if(XmlSerializationOptions.None != (options & XmlSerializationOptions.AdjustForNextOwner))
+                    else if (XmlSerializationOptions.None != (options & XmlSerializationOptions.AdjustForNextOwner))
                     {
                         writer.WriteUUID("GroupID", UUID.Zero);
                         writer.WriteUUID("OwnerID", nextOwner.ID);
@@ -2187,7 +2187,7 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteUUID("LastOwnerID", ObjectGroup.LastOwner.ID);
                     }
                     writer.WriteNamedValue("BaseMask", (uint)BaseMask);
-                    if(XmlSerializationOptions.None == (options & XmlSerializationOptions.AdjustForNextOwner))
+                    if (XmlSerializationOptions.None == (options & XmlSerializationOptions.AdjustForNextOwner))
                     {
                         writer.WriteNamedValue("OwnerMask", (uint)OwnerMask);
                     }
@@ -2199,11 +2199,56 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("EveryoneMask", (uint)EveryoneMask);
                     writer.WriteNamedValue("NextOwnerMask", (uint)NextOwnerMask);
                     PrimitiveFlags flags = Flags;
-                    if(IsScripted)
+                    var flagsStrs = new List<string>();
+                    if ((flags & PrimitiveFlags.Physics) != 0)
                     {
-                        flags |= PrimitiveFlags.Scripted;
+                        flagsStrs.Add("Physics");
                     }
-                    writer.WriteNamedValue("Flags", flags.ToString().Replace(",", string.Empty));
+                    if (IsScripted)
+                    {
+                        flagsStrs.Add("Scripted");
+                    }
+                    if ((flags & PrimitiveFlags.Touch) != 0)
+                    {
+                        flagsStrs.Add("Touch");
+                    }
+                    if ((flags & PrimitiveFlags.TakesMoney) != 0)
+                    {
+                        flagsStrs.Add("Money");
+                    }
+                    if ((flags & PrimitiveFlags.Phantom) != 0)
+                    {
+                        flagsStrs.Add("Phantom");
+                    }
+                    if ((flags & PrimitiveFlags.IncludeInSearch) != 0)
+                    {
+                        flagsStrs.Add("JointWheel"); /* yes, its name is a messed up naming in OpenSim object xml */
+                    }
+                    if ((flags & PrimitiveFlags.AllowInventoryDrop) != 0)
+                    {
+                        flagsStrs.Add("AllowInventoryDrop");
+                    }
+                    if ((flags & PrimitiveFlags.CameraDecoupled) != 0)
+                    {
+                        flagsStrs.Add("CameraDecoupled");
+                    }
+                    if ((flags & PrimitiveFlags.AnimSource) != 0)
+                    {
+                        flagsStrs.Add("AnimSource");
+                    }
+                    if ((flags & PrimitiveFlags.CameraSource) != 0)
+                    {
+                        flagsStrs.Add("CameraSource");
+                    }
+                    if ((flags & PrimitiveFlags.TemporaryOnRez) != 0)
+                    {
+                        flagsStrs.Add("TemporaryOnRez");
+                    }
+                    if ((flags & PrimitiveFlags.Temporary) != 0)
+                    {
+                        flagsStrs.Add("Temporary");
+                    }
+                    writer.WriteNamedValue("Flags", string.Join(",", flagsStrs));
                     CollisionSoundParam sp = CollisionSound;
                     writer.WriteUUID("CollisionSound", sp.ImpactSound);
                     writer.WriteNamedValue("CollisionSoundVolume", sp.ImpactVolume);
@@ -2217,6 +2262,10 @@ namespace SilverSim.Scene.Types.Object
                     LlsdXml.Serialize(DynAttrs, writer);
                     writer.WriteEndElement();
 
+                    if (XmlSerializationOptions.None != (options & XmlSerializationOptions.WriteOwnerInfo))
+                    {
+                        writer.WriteNamedValue("RezzerID", ObjectGroup.RezzingObjectID);
+                    }
                     writer.WriteNamedValue("TextureAnimation", TextureAnimationBytes);
                     writer.WriteNamedValue("ParticleSystem", ParticleSystemBytes);
                     writer.WriteNamedValue("PayPrice0", ObjectGroup.PayPrice0);
@@ -2699,6 +2748,68 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        private static PrimitiveFlags ReadPrimitiveFlagsEnum(XmlTextReader reader)
+        {
+            string value = reader.ReadElementValueAsString();
+            if (value.Contains(" ") && !value.Contains(","))
+            {
+                value = value.Replace(" ", ", ");
+            }
+            string[] elems = value.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            var flags = PrimitiveFlags.None;
+            foreach(string elem in elems)
+            {
+                switch(elem)
+                {
+                    case "Physics":
+                        flags |= PrimitiveFlags.Physics;
+                        break;
+
+                    case "Money":
+                        flags |= PrimitiveFlags.TakesMoney;
+                        break;
+
+                    case "Phantom":
+                        flags |= PrimitiveFlags.Phantom;
+                        break;
+
+                    case "InventoryEmpty":
+                        flags |= PrimitiveFlags.InventoryEmpty;
+                        break;
+
+                    case "JointWheel": /* yes, its name is a messed up naming in OpenSim object xml */
+                        flags |= PrimitiveFlags.IncludeInSearch;
+                        break;
+
+                    case "AllowInventoryDrop":
+                        flags |= PrimitiveFlags.AllowInventoryDrop;
+                        break;
+
+                    case "CameraDecoupled":
+                        flags |= PrimitiveFlags.CameraDecoupled;
+                        break;
+
+                    case "AnimSource":
+                        flags |= PrimitiveFlags.AnimSource;
+                        break;
+
+                    case "CameraSource":
+                        flags |= PrimitiveFlags.CameraSource;
+                        break;
+
+                    case "TemporaryOnRez":
+                        flags |= PrimitiveFlags.TemporaryOnRez;
+                        break;
+
+                    case "Temporary":
+                        flags |= PrimitiveFlags.Temporary;
+                        break;
+                }
+            }
+
+            return flags;
+        }
+
         public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner, XmlDeserializationOptions options)
         {
             var part = new ObjectPart()
@@ -2752,6 +2863,18 @@ namespace SilverSim.Scene.Types.Object
 
                             case "ForceMouselook": /* boolean field */
                                 part.ForceMouselook = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "RezzerID":
+                                if ((options & XmlDeserializationOptions.RestoreIDs) != 0)
+                                {
+                                    /* only makes sense to restore when keeping the other object ids same */
+                                    part.ObjectGroup.RezzingObjectID = reader.ReadContentAsUUID();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "CreatorID":
@@ -3065,7 +3188,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Flags":
-                                part.Flags = reader.ReadContentAsEnum<PrimitiveFlags>();
+                                part.Flags = ReadPrimitiveFlagsEnum(reader);
                                 break;
 
                             case "ObjectFlags":

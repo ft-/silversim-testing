@@ -93,7 +93,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "NotAllowedToModifyNotecard", "Not allowed to modify notecard"));
                 }
 
-                data.Creator = item.Creator;
                 data.Name = item.Name;
 
                 try

@@ -150,19 +150,6 @@ namespace SilverSim.Types.StructuredData.AssetXml
                                 }
                                 break;
 
-                            case "CreatorID":
-                                if (isEmptyElement)
-                                {
-                                    asset.Creator = UUI.Unknown;
-                                }
-                                else
-                                {
-                                    var creatorID = reader.ReadElementValueAsString();
-                                    UUI uui;
-                                    asset.Creator = UUI.TryParse(creatorID, out uui) ? uui : UUI.Unknown;
-                                }
-                                break;
-
                             case "Flags":
                                 asset.Flags = AssetFlags.Normal;
                                 var flags = reader.ReadElementValueAsString();
@@ -187,7 +174,8 @@ namespace SilverSim.Types.StructuredData.AssetXml
                                 break;
 
                             default:
-                                throw new InvalidAssetSerializationException();
+                                reader.ReadToEndElement();
+                                break;
                         }
                         break;
 
@@ -302,10 +290,6 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
                             case "Temporary":
                                 asset.Temporary = reader.ReadElementValueAsBoolean();
-                                break;
-
-                            case "CreatorID":
-                                asset.Creator = new UUI(reader.ReadElementValueAsString());
                                 break;
 
                             case "Flags":

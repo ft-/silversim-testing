@@ -1125,7 +1125,6 @@ namespace SilverSim.Viewer.Core
 
             AssetData asset = lm;
             asset.Name = item.Name;
-            asset.Creator = Agent.Owner;
             asset.ID = UUID.Random;
             try
             {
@@ -1148,7 +1147,6 @@ namespace SilverSim.Viewer.Core
         {
             AssetData asset = new Gesture();
             asset.Name = "New Gesture";
-            asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
             asset.ID = new UUID("cf83499a-6547-4b07-8669-ff1d567071d3");
             try
             {
@@ -1167,7 +1165,6 @@ namespace SilverSim.Viewer.Core
         {
             AssetData asset = new Notecard();
             asset.Name = "New Note";
-            asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
             asset.ID = new UUID("43b761c3-5e3f-43c5-8bc9-d048f8df496f");
             try
             {

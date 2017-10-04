@@ -238,7 +238,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                 asset.Local = AssetIsLocal;
                 asset.Temporary = AssetIsTemporary;
                 asset.Name = string.Empty;
-                asset.Creator = Creator;
 
                 Map llsdreply;
                 try

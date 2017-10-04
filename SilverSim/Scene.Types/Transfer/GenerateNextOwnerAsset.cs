@@ -112,7 +112,6 @@ namespace SilverSim.Scene.Types.Transfer
                                 grps.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
 
                             newAsset.ID = replaceAssets[objectid];
-                            newAsset.Creator = data.Creator;
                             newAsset.CreateTime = data.CreateTime;
                             assetService.Store(newAsset);
                             break;

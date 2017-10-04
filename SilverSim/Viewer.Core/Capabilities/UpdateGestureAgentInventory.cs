@@ -86,7 +86,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "NotAllowedToModifyGesture", "Not allowed to modify gesture"));
                 }
                 item.AssetID = data.ID;
-                data.Creator = item.Creator;
                 data.Name = item.Name;
 
                 try

@@ -109,7 +109,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "NotAllowedToModifyScript", "Not allowed to modify script"));
                 }
 
-                data.Creator = item.Creator;
                 data.Name = item.Name;
                 item.ExperienceID = kvp.Value.ExperienceID;
                 item.SetNewID(kvp.Value.ItemID);

@@ -94,7 +94,6 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 item.AssetID = data.ID;
                 data.Name = item.Name;
-                data.Creator = item.Creator;
 
                 try
                 {

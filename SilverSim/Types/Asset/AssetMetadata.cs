@@ -30,7 +30,6 @@ namespace SilverSim.Types.Asset
         public bool Temporary;
         public AssetType Type = AssetType.Unknown;
         public string Name = string.Empty;
-        public UUI Creator = UUI.Unknown;
         public AssetFlags Flags;
         public Date CreateTime = new Date();
         public Date AccessTime = new Date();
@@ -46,7 +45,6 @@ namespace SilverSim.Types.Asset
             Temporary = copy.Temporary;
             Type = copy.Type;
             Name = copy.Name;
-            Creator = copy.Creator;
             Flags = copy.Flags;
             CreateTime = copy.CreateTime;
             AccessTime = copy.AccessTime;

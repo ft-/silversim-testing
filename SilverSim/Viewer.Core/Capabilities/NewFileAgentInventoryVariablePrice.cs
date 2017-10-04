@@ -167,7 +167,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                             {
                                 ID = UUID.Random,
                                 Type = AssetType.Texture,
-                                Creator = Creator,
                                 Data = (BinaryData)iv,
                                 Name = data.Name + " - Texture " + idx.ToString()
                             };
@@ -252,7 +251,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                                     {
                                         ID = UUID.Random,
                                         Type = AssetType.Mesh,
-                                        Creator = Creator,
                                         Data = meshstream.ToArray(),
                                         Name = data.Name + " - Mesh " + (idx + 1).ToString()
                                     };
