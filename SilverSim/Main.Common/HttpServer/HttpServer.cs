@@ -657,7 +657,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch (Exception e)
                 {
-                    m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                    m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, req.RawUrl, e.GetType().Name, e.Message, e.StackTrace);
                 }
                 req.Close();
             }
@@ -681,7 +681,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch (Exception e)
                 {
-                    m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                    m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, req.RawUrl, e.GetType().Name, e.Message, e.StackTrace);
                 }
                 req.Close();
             }
@@ -709,7 +709,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                            m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, req.RawUrl, e.GetType().Name, e.Message, e.StackTrace);
                         }
                         req.Close();
                         return;
