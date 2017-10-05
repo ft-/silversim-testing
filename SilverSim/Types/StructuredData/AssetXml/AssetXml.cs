@@ -316,7 +316,8 @@ namespace SilverSim.Types.StructuredData.AssetXml
                                 break;
 
                             default:
-                                throw new InvalidAssetMetadataSerializationException();
+                                reader.ReadToEndElement();
+                                break;
                         }
                         break;
 
