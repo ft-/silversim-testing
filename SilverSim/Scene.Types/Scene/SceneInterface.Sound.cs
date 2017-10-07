@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Sound;
@@ -209,6 +210,31 @@ namespace SilverSim.Scene.Types.Scene
 
             if(!ownAgent.IsInScene(this))
             {
+                return;
+            }
+
+            AssetMetadata metadata;
+            AssetData data;
+            if(!AssetService.Metadata.TryGetValue(req.SoundID, out metadata))
+            {
+                if(ownAgent.AssetService.TryGetValue(req.SoundID, out data))
+                {
+                    AssetService.Store(data);
+                    if(data.Type != AssetType.Sound)
+                    {
+                        /* ignore non-sound assets here */
+                        return;
+                    }
+                }
+                else
+                {
+                    /* ignore non-sound assets here */
+                    return;
+                }
+            }
+            else if (metadata.Type != AssetType.Sound)
+            {
+                /* ignore non-sound assets here */
                 return;
             }
 

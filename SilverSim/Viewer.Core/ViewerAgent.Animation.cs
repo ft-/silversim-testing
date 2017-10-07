@@ -19,7 +19,10 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Avatar;
@@ -40,11 +43,54 @@ namespace SilverSim.Viewer.Core
         public void HandleAgentAnimation(Message m)
         {
             var req = (AgentAnimation)m;
+            SceneInterface scene;
+            AgentCircuit circuit;
+
+            if(!Circuits.TryGetValue(m.CircuitSceneID, out circuit))
+            {
+                return;
+            }
+
+            scene = circuit.Scene;
+            if(scene == null)
+            {
+                return;
+            }
+            AssetServiceInterface sceneAssetService = scene.AssetService;
+            if(sceneAssetService == null)
+            {
+                return;
+            }
+
+            AssetMetadata metadata;
 
             foreach(var e in req.AnimationEntryList)
             {
                 if(e.StartAnim)
                 {
+                    if(!sceneAssetService.Metadata.TryGetValue(e.AnimID, out metadata))
+                    {
+                        AssetData data;
+                        if(AssetService.TryGetValue(e.AnimID, out data))
+                        {
+                            sceneAssetService.Store(data);
+                            if (data.Type != AssetType.Animation)
+                            {
+                                /* ignore non-animation content here */
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            /* asset not there so ignore */
+                            continue;
+                        }
+                    }
+                    else if(metadata.Type != AssetType.Animation)
+                    {
+                        /* ignore non-animation content here */
+                        continue;
+                    }
                     PlayAnimation(e.AnimID, UUID.Zero);
                 }
                 else
