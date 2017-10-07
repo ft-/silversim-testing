@@ -59,6 +59,8 @@ namespace SilverSim.Types.Inventory
         WearableType_Tattoo = 14,
         WearableType_Physics = 15,
 
+        SettingsType_Mask = 0xFF,
+
         SharedSingleReference = 1 << 30,
         PermOverwriteMask = ObjectPermOverwriteBase | ObjectPermOverwriteOwner | ObjectPermOverwriteGroup | ObjectPermOverwriteEveryOne | ObjectPermOverwriteNextOwner
     }

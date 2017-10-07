@@ -75,6 +75,7 @@ namespace SilverSim.Types.Asset
                     case AssetType.Simstate: return "_simstate.bin";
                     case AssetType.Mesh: return "_mesh.llmesh";
                     case AssetType.Material: return "_material.xml";
+                    case AssetType.Settings: return "_settings.xml";
                     default: throw new ArgumentException("Unmapped asset type " + Type.ToString());
                 }
             }
@@ -163,6 +164,10 @@ namespace SilverSim.Types.Asset
                 {
                     type = AssetType.Material;
                 }
+                else if(value.EndsWith("_settings.xml"))
+                {
+                    type = AssetType.Settings;
+                }
                 else
                 {
                     throw new ArgumentException("Unknown extension " + value);
@@ -203,6 +208,7 @@ namespace SilverSim.Types.Asset
                     case AssetType.Simstate: return "application/x-metaverse-simstate";
                     case AssetType.Mesh: return "application/vnd.ll.mesh";
                     case AssetType.Material: return "application/llsd+xml";
+                    case AssetType.Settings: return "application/vnd.ll.settings";
                     default: return "application/octet-stream";
                 }
             }
@@ -263,6 +269,9 @@ namespace SilverSim.Types.Asset
                         break;
                     case "application/llsd+xml":
                         Type = AssetType.Material;
+                        break;
+                    case "application/vnd.ll.settings":
+                        Type = AssetType.Settings;
                         break;
                     default:
                         throw new InvalidOperationException();

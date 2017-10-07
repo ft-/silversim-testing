@@ -55,7 +55,8 @@ namespace SilverSim.Types.Inventory
         Mesh = 49,
         Inbox = 50,
         Outbox = 51,
-        BasicRoot = 51
+        BasicRoot = 51,
+        Settings = 55
     }
 
     public static class InventoryTypeExtensionMethods
@@ -90,6 +91,7 @@ namespace SilverSim.Types.Inventory
                 case InventoryType.Gesture: return "gesture";
                 case InventoryType.Simstate: return "simstate";
                 case InventoryType.Mesh: return "mesh";
+                case InventoryType.Settings: return "settings";
                 default: return "unknown";
             }
         }
@@ -134,6 +136,8 @@ namespace SilverSim.Types.Inventory
                     return InventoryType.Wearable;
                 case "mesh":
                     return InventoryType.Mesh;
+                case "settings":
+                    return InventoryType.Settings;
                 default:
                     return InventoryType.Unknown;
             }

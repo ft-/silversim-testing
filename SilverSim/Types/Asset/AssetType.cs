@@ -61,7 +61,8 @@ namespace SilverSim.Types.Asset
         Outbox = 51,
         BasicRoot = 52,
         MarketplaceListings = 53,
-        MarketplaceStock = 54
+        MarketplaceStock = 54,
+        Settings = 55
     }
 
     public static class AssetTypeExtensionMethods
@@ -90,6 +91,7 @@ namespace SilverSim.Types.Asset
                 case AssetType.Link: return "link";
                 case AssetType.LinkFolder: return "link_f";
                 case AssetType.Mesh: return "mesh";
+                case AssetType.Settings: return "settings";
                 default: return "unknown";
             }
         }
@@ -138,6 +140,8 @@ namespace SilverSim.Types.Asset
                     return AssetType.LinkFolder;
                 case "mesh":
                     return AssetType.Mesh;
+                case "settings":
+                    return AssetType.Settings;
                 default:
                     return AssetType.Unknown;
             }
