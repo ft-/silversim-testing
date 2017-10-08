@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                SendAlertMessage("ALERT: ", m.CircuitSceneID);
+                SendAlertMessage("ALERT: CantFindInvItem", m.CircuitSceneID);
                 return;
             }
             if(item.AssetType == Types.Asset.AssetType.Link)
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    SendAlertMessage("ALERT: ", m.CircuitSceneID);
+                    SendAlertMessage("ALERT: CantFindInvItem", m.CircuitSceneID);
                     return;
                 }
             }
