@@ -217,7 +217,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         Owner = m_DestinationAgent,
                         ParentFolderID = rootFolderID,
-                        InventoryType = InventoryType.Unknown,
+                        DefaultType = AssetType.Unknown,
                         Version = 1,
                         Name = m_DestinationFolder,
                         ID = UUID.Random

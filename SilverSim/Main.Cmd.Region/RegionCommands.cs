@@ -296,7 +296,7 @@ namespace SilverSim.Main.Cmd.Region
                     foreach (ObjectPartInventoryItem item in part.Inventory.Values)
                     {
                         ScriptInstance instance = item.ScriptInstance;
-                        if(item.InventoryType == Types.Inventory.InventoryType.LSLText)
+                        if(item.InventoryType == Types.Inventory.InventoryType.LSL)
                         {
                             if(excludeNonFunctional && instance == null)
                             {

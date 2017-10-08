@@ -217,7 +217,7 @@ namespace SilverSim.Viewer.Core
                 Flags = 0,
                 Group = Group,
                 IsGroupOwned = false,
-                InventoryType = InventoryType.LSLText,
+                InventoryType = InventoryType.LSL,
                 LastOwner = Owner,
                 ParentFolderID = part.ID
             };

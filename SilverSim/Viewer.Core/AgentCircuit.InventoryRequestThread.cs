@@ -487,7 +487,7 @@ namespace SilverSim.Viewer.Core
                 {
                     ID = req.FolderID,
                     ParentFolderID = req.ParentFolderID,
-                    InventoryType = req.FolderType,
+                    DefaultType = req.DefaultType,
                     Name = req.FolderName,
                     Owner = Agent.Owner,
                     Version = 1
@@ -638,7 +638,7 @@ namespace SilverSim.Viewer.Core
                     {
                         FolderID = folder.ID,
                         ParentID = folder.ParentFolderID,
-                        Type = folder.InventoryType,
+                        DefaultType = folder.DefaultType,
                         Name = folder.Name
                     };
                     res.FolderData.Add(d);
@@ -889,7 +889,7 @@ namespace SilverSim.Viewer.Core
                 {
                     InventoryFolder folder = Agent.InventoryService.Folder[AgentID, d.FolderID];
                     folder.Name = d.Name;
-                    folder.InventoryType = d.Type;
+                    folder.DefaultType = d.DefaultType;
                     folder.ParentFolderID = d.ParentID;
                     Agent.InventoryService.Folder.Update(folder);
                 }
@@ -1247,7 +1247,7 @@ namespace SilverSim.Viewer.Core
                             item.AssetID = CreateLandmarkForInventory(item);
                             break;
 
-                        case InventoryType.LSLText:
+                        case InventoryType.LSL:
                             item.AssetID = CreateDefaultScriptForInventory(item);
                             break;
 

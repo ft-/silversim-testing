@@ -160,9 +160,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 case InventoryType.Animation:
                 case InventoryType.Attachable:
-                case InventoryType.Bodypart:
                 case InventoryType.CallingCard:
-                case InventoryType.Clothing:
                 case InventoryType.Gesture:
                 case InventoryType.Landmark:
                 case InventoryType.Notecard:
@@ -170,7 +168,6 @@ namespace SilverSim.Scene.Types.Scene
                 case InventoryType.Snapshot:
                 case InventoryType.Sound:
                 case InventoryType.Texture:
-                case InventoryType.TextureTGA:
                 case InventoryType.Wearable:
                     break;
 
@@ -280,7 +277,7 @@ namespace SilverSim.Scene.Types.Scene
             if(req.TransactionID != UUID.Zero)
             {
                 if (item.AssetType == AssetType.LSLText || item.AssetType == AssetType.LSLBytecode ||
-                    item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+                    item.InventoryType == InventoryType.LSL)
                 {
                     /* do not allow editing scripts through this */
                     return;

@@ -122,11 +122,9 @@ namespace SilverSim.Database.Memory.Inventory
                 }
                 else
                 {
-                    var invtype = (InventoryType)type;
-
                     foreach(var folder in folderSet.Values)
                     {
-                        if(folder.InventoryType == invtype)
+                        if(folder.DefaultType == type)
                         {
                             return true;
                         }
@@ -154,11 +152,9 @@ namespace SilverSim.Database.Memory.Inventory
                 }
                 else
                 {
-                    var invtype = (InventoryType)type;
-
                     foreach (var sfolder in folderSet.Values)
                     {
-                        if (sfolder.InventoryType == invtype)
+                        if (sfolder.DefaultType == type)
                         {
                             folder = new InventoryFolder(sfolder);
                             return true;

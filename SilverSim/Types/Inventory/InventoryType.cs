@@ -28,35 +28,18 @@ namespace SilverSim.Types.Inventory
         Sound = 1,
         CallingCard = 2,
         Landmark = 3,
-        //[Obsolete]
-        //Script = 4,
-        Clothing = 5,
         Object = 6,
         Notecard = 7,
         Folder = 8,
         RootFolder = 9,
-        LSLText = 10,
-        LSLBytecode = 11,
-        TextureTGA = 12,
-        Bodypart = 13,
-        TrashFolder = 14,
-        SnapshotFolder = 15,
+        LSL = 10,
         Snapshot = 15,
-        LostAndFoundFolder = 16,
         Attachable = 17,
         Wearable = 18,
-        Animation = 20,
-        Gesture = 21,
-        Simstate = 22,
-        FavoriteFolder = 23,
-        CurrentOutfitFolder = 46,
-        OutfitFolder = 47,
-        MyOutfitsFolder = 48,
-        Mesh = 49,
-        Inbox = 50,
-        Outbox = 51,
-        BasicRoot = 51,
-        Settings = 55
+        Animation = 19,
+        Gesture = 20,
+        Mesh = 22,
+        Settings = 25
     }
 
     public static class InventoryTypeExtensionMethods
@@ -80,16 +63,11 @@ namespace SilverSim.Types.Inventory
                 case InventoryType.Sound: return "sound";
                 case InventoryType.CallingCard: return "callcard";
                 case InventoryType.Landmark: return "Landmark";
-                case InventoryType.Clothing: return "clothing";
                 case InventoryType.Object: return "object";
                 case InventoryType.Notecard: return "notecard";
-                case InventoryType.LSLText: return "lsltext";
-                case InventoryType.LSLBytecode: return "lslbyte";
-                case InventoryType.TextureTGA: return "txtr_tga";
-                case InventoryType.Bodypart: return "bodypart";
+                case InventoryType.LSL: return "lsltext";
                 case InventoryType.Animation: return "animatn";
                 case InventoryType.Gesture: return "gesture";
-                case InventoryType.Simstate: return "simstate";
                 case InventoryType.Mesh: return "mesh";
                 case InventoryType.Settings: return "settings";
                 default: return "unknown";
@@ -108,26 +86,16 @@ namespace SilverSim.Types.Inventory
                     return InventoryType.CallingCard;
                 case "landmark":
                     return InventoryType.Landmark;
-                case "clothing":
-                    return InventoryType.Clothing;
                 case "object":
                     return InventoryType.Object;
                 case "notecard":
                     return InventoryType.Notecard;
                 case "lsltext":
-                    return InventoryType.LSLText;
-                case "lslbyte":
-                    return InventoryType.LSLBytecode;
-                case "txtr_tga":
-                    return InventoryType.TextureTGA;
-                case "bodypart":
-                    return InventoryType.Bodypart;
+                    return InventoryType.LSL;
                 case "animatn":
                     return InventoryType.Animation;
                 case "gesture":
                     return InventoryType.Gesture;
-                case "simstate":
-                    return InventoryType.Simstate;
                 case "snapshot":
                     return InventoryType.Snapshot;
                 case "attach":

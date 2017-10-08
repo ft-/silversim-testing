@@ -129,7 +129,7 @@ namespace SilverSim.Scene.Types.Object
                 int n = 0;
                 foreach (var item in this.Values)
                 {
-                    if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+                    if (item.InventoryType == InventoryType.LSL)
                     {
                         ++n;
                     }
@@ -146,7 +146,7 @@ namespace SilverSim.Scene.Types.Object
                 int n = 0;
                 foreach (var item in this.Values)
                 {
-                    if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+                    if (item.InventoryType == InventoryType.LSL)
                     {
                         var script = item.ScriptInstance;
                         if(script?.IsRunning == true)

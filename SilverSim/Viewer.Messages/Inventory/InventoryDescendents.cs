@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         {
             public UUID FolderID;
             public UUID ParentID;
-            public InventoryType Type;
+            public AssetType DefaultType;
             public string Name;
         }
 
@@ -88,7 +88,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             {
                 p.WriteUUID(d.FolderID);
                 p.WriteUUID(d.ParentID);
-                p.WriteInt8((sbyte)d.Type);
+                p.WriteInt8((sbyte)d.DefaultType);
                 p.WriteStringLen8(d.Name);
             }
 
@@ -159,7 +159,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                 {
                     FolderID = p.ReadUUID(),
                     ParentID = p.ReadUUID(),
-                    Type = (InventoryType)p.ReadInt8(),
+                    DefaultType = (AssetType)p.ReadInt8(),
                     Name = p.ReadStringLen8()
                 });
             }

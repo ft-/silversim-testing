@@ -152,7 +152,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                         {
                             Name = data.Name + " - Textures",
                             Owner = Creator,
-                            InventoryType = InventoryType.Unknown,
+                            DefaultType = AssetType.Unknown,
                             ParentFolderID = textureFolder,
                             Version = 1
                         };

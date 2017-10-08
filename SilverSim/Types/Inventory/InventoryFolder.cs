@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Asset;
+
 namespace SilverSim.Types.Inventory
 {
     public class InventoryFolder
@@ -27,7 +29,7 @@ namespace SilverSim.Types.Inventory
         public UUID ID = UUID.Zero;
         public UUID ParentFolderID = UUID.Zero;
         public string Name = string.Empty;
-        public InventoryType InventoryType = InventoryType.Unknown;
+        public AssetType DefaultType = AssetType.Unknown;
         public UUI Owner = UUI.Unknown;
         public int Version = 1;
         #endregion
@@ -48,7 +50,7 @@ namespace SilverSim.Types.Inventory
             ID = src.ID;
             ParentFolderID = src.ParentFolderID;
             Name = src.Name;
-            InventoryType = src.InventoryType;
+            DefaultType = src.DefaultType;
             Owner = new UUI(src.Owner);
             Version = src.Version;
         }

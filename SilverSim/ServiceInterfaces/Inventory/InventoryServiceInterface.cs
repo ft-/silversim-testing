@@ -50,7 +50,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 folder = new InventoryFolder();
                 folder.Owner.ID = principalID;
                 folder.Name = name;
-                folder.InventoryType = (InventoryType)type;
+                folder.DefaultType = type;
                 folder.ParentFolderID = parentFolderID;
                 folder.Version = 1;
                 Folder.Add(folder);
@@ -107,7 +107,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 rootFolder = new InventoryFolder();
                 rootFolder.Owner.ID = principalID;
                 rootFolder.Name = "My Inventory";
-                rootFolder.InventoryType = InventoryType.Folder;
+                rootFolder.DefaultType = AssetType.RootFolder;
                 rootFolder.ParentFolderID = UUID.Zero;
                 rootFolder.Version = 1;
                 Folder.Add(rootFolder);

@@ -21,6 +21,7 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
@@ -52,9 +53,9 @@ namespace SilverSim.Viewer.Core
                     writer.WriteKeyValuePair("folder_id", childfolder.ID);
                     writer.WriteKeyValuePair("parent_id", childfolder.ParentFolderID);
                     writer.WriteKeyValuePair("name", childfolder.Name);
-                    if (childfolder.InventoryType != InventoryType.Folder)
+                    if (childfolder.DefaultType != AssetType.RootFolder)
                     {
-                        writer.WriteKeyValuePair("type", (byte)childfolder.InventoryType);
+                        writer.WriteKeyValuePair("type", (byte)childfolder.DefaultType);
                     }
                     else
                     {

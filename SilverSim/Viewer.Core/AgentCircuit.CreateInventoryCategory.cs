@@ -21,6 +21,7 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
@@ -68,7 +69,7 @@ namespace SilverSim.Viewer.Core
                 ID = reqmap["folder_id"].AsUUID,
                 Owner = Agent.Owner,
                 ParentFolderID = reqmap["parent_id"].AsUUID,
-                InventoryType = (InventoryType)reqmap["type"].AsInt,
+                DefaultType = (AssetType)reqmap["type"].AsInt,
                 Name = reqmap["name"].ToString(),
                 Version = 1
             };
@@ -86,7 +87,7 @@ namespace SilverSim.Viewer.Core
             {
                 { "folder_id", folder.ID },
                 { "parent_id", folder.ParentFolderID },
-                { "type", (int)folder.InventoryType },
+                { "type", (int)folder.DefaultType },
                 { "name", folder.Name }
             };
             using (var res = httpreq.BeginResponse())

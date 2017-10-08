@@ -848,7 +848,7 @@ namespace SilverSim.Grid.Login
                         { "folder_id", folder.ID },
                         { "parent_id", folder.ParentFolderID },
                         { "name", folder.Name },
-                        { "type_default", (int)folder.InventoryType },
+                        { "type_default", (int)folder.DefaultType },
                         { "version", folder.Version }
                     };
                     folderArray.Add(folderData);
@@ -927,7 +927,7 @@ namespace SilverSim.Grid.Login
                         { "folder_id", folder.ID },
                         { "parent_id", folder.ParentFolderID },
                         { "name", folder.Name },
-                        { "type_default", (int)folder.InventoryType },
+                        { "type_default", (int)folder.DefaultType },
                         { "version", folder.Version }
                     };
                     folderArray.Add(folderData);

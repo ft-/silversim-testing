@@ -55,13 +55,11 @@ namespace SilverSim.Scene.Types.Object
                     InventoryType = InventoryType.Animation;
                     break;
                 case AssetType.Bodypart:
-                    InventoryType = InventoryType.Bodypart;
+                case AssetType.Clothing:
+                    InventoryType = InventoryType.Wearable;
                     break;
                 case AssetType.CallingCard:
                     InventoryType = InventoryType.CallingCard;
-                    break;
-                case AssetType.Clothing:
-                    InventoryType = InventoryType.Clothing;
                     break;
                 case AssetType.Gesture:
                     InventoryType = InventoryType.Gesture;
@@ -74,10 +72,8 @@ namespace SilverSim.Scene.Types.Object
                     InventoryType = InventoryType.Landmark;
                     break;
                 case AssetType.LSLBytecode:
-                    InventoryType = InventoryType.LSLBytecode;
-                    break;
                 case AssetType.LSLText:
-                    InventoryType = InventoryType.LSLText;
+                    InventoryType = InventoryType.LSL;
                     break;
                 case AssetType.Notecard:
                     InventoryType = InventoryType.Notecard;
@@ -87,10 +83,8 @@ namespace SilverSim.Scene.Types.Object
                     InventoryType = InventoryType.Sound;
                     break;
                 case AssetType.Texture:
-                    InventoryType = InventoryType.Texture;
-                    break;
                 case AssetType.TextureTGA:
-                    InventoryType = InventoryType.TextureTGA;
+                    InventoryType = InventoryType.Texture;
                     break;
                 default:
                     InventoryType = InventoryType.Unknown;

@@ -20,7 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using SilverSim.Types.Inventory;
+using SilverSim.Types.Asset;
 
 namespace SilverSim.Viewer.Messages.Inventory
 {
@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         public UUID SessionID;
         public UUID FolderID;
         public UUID ParentFolderID;
-        public InventoryType FolderType;
+        public AssetType DefaultType;
         public string FolderName;
 
         public static Message Decode(UDPPacket p) => new CreateInventoryFolder()
@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
             FolderID = p.ReadUUID(),
             ParentFolderID = p.ReadUUID(),
-            FolderType = (InventoryType)p.ReadInt8(),
+            DefaultType = (AssetType)p.ReadInt8(),
             FolderName = p.ReadStringLen8()
         };
 
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             p.WriteUUID(SessionID);
             p.WriteUUID(FolderID);
             p.WriteUUID(ParentFolderID);
-            p.WriteInt8((sbyte)FolderType);
+            p.WriteInt8((sbyte)DefaultType);
             p.WriteStringLen8(FolderName);
         }
     }

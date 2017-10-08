@@ -1832,7 +1832,7 @@ namespace SilverSim.Scene.Types.Object
                     /* validate inventory item */
                     if (!UUID.TryParse(attrs["Asset"], out assetid) ||
                         item.AssetType != SilverSim.Types.Asset.AssetType.LSLText ||
-                        item.InventoryType != SilverSim.Types.Inventory.InventoryType.LSLText ||
+                        item.InventoryType != SilverSim.Types.Inventory.InventoryType.LSL ||
                         assetid != item.AssetID)
                     {
                         item = null;
