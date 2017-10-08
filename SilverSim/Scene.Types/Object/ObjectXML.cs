@@ -168,15 +168,15 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         switch (reader.Name)
                                         {
-                                            case "x":
+                                            case "offsetx":
                                                 sogpos.X_String = reader.Value;
                                                 break;
 
-                                            case "y":
+                                            case "offsety":
                                                 sogpos.Y_String = reader.Value;
                                                 break;
 
-                                            case "z":
+                                            case "offsetz":
                                                 sogpos.Z_String = reader.Value;
                                                 break;
 
@@ -187,7 +187,7 @@ namespace SilverSim.Scene.Types.Object
                                     while (reader.MoveToNextAttribute());
                                 }
                                 var grp = FromXmlSingleWithinCoalescedObject(reader, currentOwner, options);
-                                grp.Position = sogpos;
+                                grp.CoalescedRestoreOffset = sogpos;
                                 list.Add(grp);
                                 break;
 

@@ -111,6 +111,7 @@ namespace SilverSim.Scene.Types.Object
 
         private Vector3 m_Acceleration = Vector3.Zero;
         private Vector3 m_AngularAcceleration = Vector3.Zero;
+        public Vector3 CoalescedRestoreOffset = Vector3.Zero;
 
         private bool m_IsChangedEnabled;
         public bool IsChangedEnabled

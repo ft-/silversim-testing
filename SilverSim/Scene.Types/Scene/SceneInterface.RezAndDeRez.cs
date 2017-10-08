@@ -147,11 +147,31 @@ namespace SilverSim.Scene.Types.Scene
         public List<UInt32> RezObjects(List<ObjectGroup> groups, RezObjectParams rezparams)
         {
             var result = new List<uint>();
+            if(groups.Count == 0)
+            {
+                return result;
+            }
+            Vector3 aabbMin = groups[0].CoalescedRestoreOffset;
+            Vector3 aabbMax = aabbMin;
+            foreach (ObjectGroup grp in groups)
+            {
+                aabbMin = aabbMin.ComponentMin(grp.CoalescedRestoreOffset - grp.Size / 2);
+                aabbMax = aabbMax.ComponentMax(grp.CoalescedRestoreOffset + grp.Size / 2);
+            }
+            Vector3 coalescedOffset = (aabbMax - aabbMin) / 2;
+#if DEBUG
+            m_Log.DebugFormat("RezObject at coalescedbaseoffset={0} aabbmin={1} aabbmax={2}", coalescedOffset, aabbMin, aabbMax);
+#endif
+            Vector3 basePosition = CalculateRezLocation(rezparams, aabbMax - aabbMin) - coalescedOffset;
             foreach(ObjectGroup grp in groups)
             {
+#if DEBUG
+                m_Log.DebugFormat("RezObject \"{0}\" at coalescedrestoreoffset={1} size={2}", grp.Name, grp.CoalescedRestoreOffset, grp.Size);
+#endif
                 try
                 {
-                    result.Add(RezObject(grp, rezparams));
+                    grp.GlobalPosition = basePosition + grp.CoalescedRestoreOffset;
+                    result.Add(RezObject(grp, rezparams.RezzingAgent));
                 }
                 catch(Exception e)
                 {
@@ -164,18 +184,10 @@ namespace SilverSim.Scene.Types.Scene
 
         public UInt32 RezObject(ObjectGroup group, RezObjectParams rezparams)
         {
-            foreach (ObjectPart part in group.Values)
-            {
-                part.RezDate = Date.Now;
-            }
-            group.Owner = rezparams.RezzingAgent;
             group.GlobalPosition = CalculateRezLocation(
                 rezparams,
                 group.Size);
-            group.RezzingObjectID = UUID.Zero;
-            Add(group);
-            RezScriptsForObject(group);
-            return group.LocalID;
+            return RezObject(group, rezparams.RezzingAgent);
         }
 
         public UInt32 RezObject(ObjectGroup group, UUI rezzingAgent)
