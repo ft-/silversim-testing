@@ -189,9 +189,9 @@ namespace SilverSim.Types
             writer.WriteEndElement();
         }
 
-        public static T ReadContentAsEnum<T>(this XmlTextReader reader)
+        public static T ReadContentAsEnum<T>(this XmlTextReader reader, string tagname = null)
         {
-            string value = reader.ReadElementValueAsString();
+            string value = reader.ReadElementValueAsString(tagname);
             if (value.Contains(" ") && !value.Contains(","))
             {
                 value = value.Replace(" ", ", ");
@@ -200,14 +200,21 @@ namespace SilverSim.Types
             return (T)Enum.Parse(typeof(T), value);
         }
 
-        public static T ReadContentAsEnumValue<T>(this XmlTextReader reader) => (T)Enum.Parse(typeof(T), reader.ReadElementValueAsString());
+        public static T ReadContentAsEnumValue<T>(this XmlTextReader reader, string tagname = null) => (T)Enum.Parse(typeof(T), reader.ReadElementValueAsString(tagname));
 
-        public static UUID ReadContentAsUUID(this XmlTextReader reader)
+        public static UUID ReadContentAsUUID(this XmlTextReader reader, string tagname = null)
         {
-            string name = reader.Name;
-            if(reader.IsEmptyElement)
+            if (string.IsNullOrEmpty(tagname))
             {
-                return UUID.Zero;
+                tagname = reader.Name;
+                if (reader.NodeType != XmlNodeType.Element)
+                {
+                    throw new XmlException("Not pointing on element node");
+                }
+                if (reader.IsEmptyElement)
+                {
+                    return UUID.Zero;
+                }
             }
 
             XmlNodeType nodeType;
@@ -239,20 +246,20 @@ namespace SilverSim.Types
             {
                 throw new XmlException();
             }
-            if(reader.Name != name)
+            if(reader.Name != tagname)
             {
                 throw new XmlException();
             }
             return res;
         }
 
-        public static byte[] ReadContentAsBase64(this XmlTextReader reader)
+        public static byte[] ReadContentAsBase64(this XmlTextReader reader, string tagname = null)
         {
-            if(reader.IsEmptyElement)
+            if (reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
             {
                 return new byte[0];
             }
-            return Convert.FromBase64String(reader.ReadElementValueAsString());
+            return Convert.FromBase64String(reader.ReadElementValueAsString(tagname));
         }
 
         public static void ReadToEndElement(this XmlTextReader reader, string tagname = null)
@@ -260,6 +267,10 @@ namespace SilverSim.Types
             if (string.IsNullOrEmpty(tagname))
             {
                 tagname = reader.Name;
+                if (reader.NodeType != XmlNodeType.Element)
+                {
+                    throw new XmlException("Not pointing on element node");
+                }
             }
             XmlNodeType nodeType = reader.NodeType;
             if((nodeType == XmlNodeType.Element || nodeType == XmlNodeType.Attribute) && !reader.IsEmptyElement)
@@ -285,68 +296,75 @@ namespace SilverSim.Types
             }
         }
 
-        public static int ReadElementValueAsInt(this XmlTextReader reader)
+        public static int ReadElementValueAsInt(this XmlTextReader reader, string tagname = null)
         {
-            if(reader.IsEmptyElement)
+            if(reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
             {
                 return 0;
             }
-            return int.Parse(ReadElementValueAsString(reader));
+            return int.Parse(reader.ReadElementValueAsString(tagname));
         }
 
-        public static uint ReadElementValueAsUInt(this XmlTextReader reader)
+        public static uint ReadElementValueAsUInt(this XmlTextReader reader, string tagname = null)
         {
-            if (reader.IsEmptyElement)
+            if (reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
             {
                 return 0;
             }
-            return uint.Parse(ReadElementValueAsString(reader));
+            return uint.Parse(reader.ReadElementValueAsString(tagname));
         }
 
-        public static long ReadElementValueAsLong(this XmlTextReader reader)
+        public static long ReadElementValueAsLong(this XmlTextReader reader, string tagname = null)
         {
-            if(reader.IsEmptyElement)
+            if(reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
             {
                 return 0;
             }
-            return long.Parse(ReadElementValueAsString(reader));
+            return long.Parse(ReadElementValueAsString(reader, tagname));
         }
 
-        public static ulong ReadElementValueAsULong(this XmlTextReader reader)
+        public static ulong ReadElementValueAsULong(this XmlTextReader reader, string tagname = null)
         {
-            if (reader.IsEmptyElement)
+            if (reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
             {
                 return 0;
             }
-            return ulong.Parse(ReadElementValueAsString(reader));
+            return ulong.Parse(reader.ReadElementValueAsString(tagname));
         }
 
-        public static double ReadElementValueAsFloat(this XmlTextReader reader)
+        public static double ReadElementValueAsFloat(this XmlTextReader reader, string tagname = null)
         {
-            if (reader.IsEmptyElement)
+            if (reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
             {
                 return 0;
             }
-            return float.Parse(ReadElementValueAsString(reader), NumberStyles.Float, CultureInfo.InvariantCulture);
+            return float.Parse(reader.ReadElementValueAsString(tagname), NumberStyles.Float, CultureInfo.InvariantCulture);
         }
 
-        public static double ReadElementValueAsDouble(this XmlTextReader reader)
+        public static double ReadElementValueAsDouble(this XmlTextReader reader, string tagname = null)
         {
-            if (reader.IsEmptyElement)
+            if (reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
             {
                 return 0;
             }
-            return double.Parse(ReadElementValueAsString(reader), NumberStyles.Float, CultureInfo.InvariantCulture);
+            return double.Parse(reader.ReadElementValueAsString(tagname), NumberStyles.Float, CultureInfo.InvariantCulture);
         }
 
-        public static ColorAlpha ReadElementChildsAsColorAlpha(this XmlTextReader reader)
+        public static ColorAlpha ReadElementChildsAsColorAlpha(this XmlTextReader reader, string tagname = null)
         {
-            string tagname = reader.Name;
+            if (string.IsNullOrEmpty(tagname))
+            {
+                tagname = reader.Name;
+                if (reader.NodeType != XmlNodeType.Element)
+                {
+                    throw new XmlException("Not pointing on element node");
+                }
+                if (reader.IsEmptyElement)
+                {
+                    return ColorAlpha.White;
+                }
+            }
             var v = ColorAlpha.White;
-            if (reader.IsEmptyElement)
-            {
-                return v;
-            }
             for (; ; )
             {
                 if (!reader.Read())
@@ -397,14 +415,21 @@ namespace SilverSim.Types
             }
         }
 
-        public static Vector3 ReadElementChildsAsVector3(this XmlTextReader reader)
+        public static Vector3 ReadElementChildsAsVector3(this XmlTextReader reader, string tagname = null)
         {
-            var tagname = reader.Name;
-            var v = Vector3.Zero;
-            if(reader.IsEmptyElement)
+            if (string.IsNullOrEmpty(tagname))
             {
-                return v;
+                tagname = reader.Name;
+                if (reader.NodeType != XmlNodeType.Element)
+                {
+                    throw new XmlException("Not pointing on element node");
+                }
+                if (reader.IsEmptyElement)
+                {
+                    return Vector3.Zero;
+                }
             }
+            var v = Vector3.Zero;
             for(;;)
             {
                 if(!reader.Read())
@@ -451,14 +476,21 @@ namespace SilverSim.Types
             }
         }
 
-        public static Quaternion ReadElementChildsAsQuaternion(this XmlTextReader reader)
+        public static Quaternion ReadElementChildsAsQuaternion(this XmlTextReader reader, string tagname = null)
         {
-            var tagname = reader.Name;
-            var v = Quaternion.Identity;
-            if (reader.IsEmptyElement)
+            if (string.IsNullOrEmpty(tagname))
             {
-                return v;
+                tagname = reader.Name;
+                if (reader.NodeType != XmlNodeType.Element)
+                {
+                    throw new XmlException("Not pointing on element node");
+                }
+                if (reader.IsEmptyElement)
+                {
+                    return Quaternion.Identity;
+                }
             }
+            var v = Quaternion.Identity;
             for (; ; )
             {
                 if (!reader.Read())
@@ -509,44 +541,21 @@ namespace SilverSim.Types
             }
         }
 
-        public static string ReadElementValueAsString(this XmlTextReader reader)
+        public static string ReadElementValueAsString(this XmlTextReader reader, string tagname = null)
         {
-            var tagname = reader.Name;
-            if(reader.IsEmptyElement)
+            if (string.IsNullOrEmpty(tagname))
             {
-                return string.Empty;
-            }
-
-            for(;;)
-            {
-                if(!reader.Read())
+                if (reader.NodeType != XmlNodeType.Element)
                 {
-                    throw new XmlException("Premature end of XML");
+                    throw new XmlException("Not pointing on element node");
                 }
-
-                switch(reader.NodeType)
+                tagname = reader.Name;
+                if (reader.IsEmptyElement)
                 {
-                    case XmlNodeType.Element:
-                        throw new XmlException("Unexpected child node");
-
-                    case XmlNodeType.Text:
-                        return reader.ReadContentAsString();
-
-                    case XmlNodeType.EndElement:
-                        if(reader.Name != tagname)
-                        {
-                            throw new XmlException("closing tag does not match");
-                        }
-                        return string.Empty;
-
-                    default:
-                        break;
+                    return string.Empty;
                 }
             }
-        }
 
-        public static string ReadElementValueAsString(this XmlTextReader reader, string tagname)
-        {
             for (;;)
             {
                 if (!reader.Read())
@@ -575,53 +584,21 @@ namespace SilverSim.Types
             }
         }
 
-        public static bool ReadElementValueAsBoolean(this XmlTextReader reader)
+        public static bool ReadElementValueAsBoolean(this XmlTextReader reader, string tagname = null)
         {
-            var tagname = reader.Name;
-            if (reader.IsEmptyElement)
+            string val = reader.ReadElementValueAsString(tagname).ToLowerInvariant();
+            if(val == "true")
+            {
+                return true;
+            }
+            else if(val == "false" || string.IsNullOrEmpty(val))
             {
                 return false;
             }
-
-            for (; ; )
+            else
             {
-                if (!reader.Read())
-                {
-                    throw new XmlException("Premature end of XML");
-                }
-
-                switch (reader.NodeType)
-                {
-                    case XmlNodeType.Element:
-                        throw new XmlException("Unexpected child node");
-
-                    case XmlNodeType.Text:
-                        {
-                            var val = reader.ReadContentAsString().ToLower();
-                            int ival;
-                            if(val == "true")
-                            {
-                                return true;
-                            }
-                            else if(val == "false")
-                            {
-                                return false;
-                            }
-                            else
-                            {
-                                return int.TryParse(val, out ival) && ival != 0;
-                            }
-                        }
-                    case XmlNodeType.EndElement:
-                        if (reader.Name != tagname)
-                        {
-                            throw new XmlException("closing tag does not match");
-                        }
-                        return false;
-
-                    default:
-                        break;
-                }
+                int ival;
+                return int.TryParse(val, out ival) && ival != 0;
             }
         }
     }
