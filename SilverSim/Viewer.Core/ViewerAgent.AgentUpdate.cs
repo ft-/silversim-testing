@@ -26,6 +26,7 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Camera;
 using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Core
@@ -260,6 +261,10 @@ namespace SilverSim.Viewer.Core
             CameraLeftAxis = au.CameraLeftAxis;
             CameraUpAxis = au.CameraUpAxis;
             ProcessAgentControls();
+
+            Vector4 camCollisionPlane;
+            TryGetCameraConstraints(CameraPosition, out camCollisionPlane);
+            SendMessageIfRootAgent(new CameraConstraint { CameraCollidePlane = camCollisionPlane }, au.SessionID);
 
             if (knownScriptControls != ControlFlags.None)
             {

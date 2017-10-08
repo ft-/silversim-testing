@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Physics;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 
 namespace SilverSim.Viewer.Core
@@ -125,6 +127,41 @@ namespace SilverSim.Viewer.Core
                     m_CameraUpAxis = value;
                 }
             }
+        }
+
+        public bool TryGetCameraConstraints(Vector3 wantedCamPosition, out Vector4 collisionplane)
+        {
+            AgentCircuit circuit;
+            SceneInterface scene;
+            collisionplane = new Vector4(0.9f, 0.0f, 0.361f, -10000f);
+            if(!Circuits.TryGetValue(m_CurrentSceneID, out circuit))
+            {
+                return false;
+            }
+            scene = circuit.Scene;
+            if(scene == null)
+            {
+                return false;
+            }
+            IPhysicsScene physicsScene = scene.PhysicsScene;
+            if(physicsScene == null)
+            {
+                return false;
+            }
+
+            RayResult[] results = physicsScene.ClosestRayTest(GlobalPosition, wantedCamPosition);
+            if(results.Length == 0)
+            {
+                return false;
+            }
+
+            Vector3 normal = results[0].HitNormalWorld;
+
+            collisionplane.X = normal.X;
+            collisionplane.Y = normal.Y;
+            collisionplane.Z = normal.Z;
+            collisionplane.W = results[0].HitPointWorld.Dot(normal);
+            return true;
         }
     }
 }
