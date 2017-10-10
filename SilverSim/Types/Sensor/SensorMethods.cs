@@ -29,6 +29,23 @@ namespace SilverSim.Types.Sensor
 {
     public static class SensorMethods
     {
+        public static double DirectionToCosine(this Vector3 direction, Vector3 forwardUnitVector)
+        {
+            double cosine = direction.Dot(forwardUnitVector);
+            double length = direction.Length * forwardUnitVector.Length;
+            try
+            {
+                return cosine / length;
+            }
+            catch
+            {
+                return Math.PI;
+            }
+        }
+
+        public static double DirectionToSensorArc(this Vector3 direction, Vector3 forwardUnitVector)
+            => Math.Acos(direction.DirectionToCosine(forwardUnitVector));
+
         public static double DirectionToCosine(this Vector3 direction, Quaternion sensorRotation)
         {
             Vector3 bodyVec = direction / sensorRotation;
