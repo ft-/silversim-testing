@@ -1594,7 +1594,8 @@ namespace SilverSim.WebIF.Admin
                         var entry = new Map
                         {
                             { "parameter", parameter },
-                            { "value", value }
+                            { "value", value },
+                            { "regionid", regionid }
                         };
                         resultlist.Add(entry);
                     }
