@@ -1581,7 +1581,7 @@ namespace SilverSim.WebIF.Admin
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
-                    string parameter = jsondata["parameter"].ToString();
+                    string parameter = reqdata["parameter"].ToString();
                     string value;
                     if (parameter.StartsWith("WebIF.Admin.User."))
                     {
@@ -1634,7 +1634,7 @@ namespace SilverSim.WebIF.Admin
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
-                    var parameter = jsondata["parameter"].ToString();
+                    var parameter = reqdata["parameter"].ToString();
                     string value;
                     if (parameter.StartsWith("WebIF.Admin.User."))
                     {
@@ -1642,12 +1642,23 @@ namespace SilverSim.WebIF.Admin
                         return;
                     }
 
-                    if(m_ServerParams.TryGetValue(regionid, parameter, out value))
+                    if (m_ServerParams.TryGetExplicitValue(regionid, parameter, out value))
                     {
                         var entry = new Map
                         {
                             { "parameter", parameter },
-                            { "value", value }
+                            { "value", value },
+                            { "regionid", regionid }
+                        };
+                        resultlist.Add(entry);
+                    }
+                    else if (m_ServerParams.TryGetExplicitValue(UUID.Zero, parameter, out value))
+                    {
+                        var entry = new Map
+                        {
+                            { "parameter", parameter },
+                            { "value", value },
+                            { "regionid", UUID.Zero }
                         };
                         resultlist.Add(entry);
                     }
@@ -1695,8 +1706,25 @@ namespace SilverSim.WebIF.Admin
                 }
                 var res = new Map
                 {
-                    { "value", value }
+                    { "parameter", parameter }
                 };
+
+                if (m_ServerParams.TryGetExplicitValue(regionid, parameter, out value))
+                {
+                    res.Add("value", value);
+                    res.Add("regionid", regionid);
+                }
+                else if (m_ServerParams.TryGetExplicitValue(UUID.Zero, parameter, out value))
+                {
+                    res.Add("value", value);
+                    res.Add("regionid", UUID.Zero);
+                }
+                else
+                {
+                    ErrorResponse(req, AdminWebIfErrorResult.NotFound);
+                    return;
+                }
+
                 SuccessResponse(req, res);
             }
         }
