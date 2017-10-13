@@ -1576,7 +1576,7 @@ namespace SilverSim.WebIF.Admin
                         return;
                     }
                     UUID regionid = UUID.Zero;
-                    if (jsondata.ContainsKey("regionid") && !UUID.TryParse(jsondata["regionid"].ToString(), out regionid))
+                    if (reqdata.ContainsKey("regionid") && !UUID.TryParse(reqdata["regionid"].ToString(), out regionid))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
@@ -1630,7 +1630,7 @@ namespace SilverSim.WebIF.Admin
                         return;
                     }
                     var regionid = UUID.Zero;
-                    if (jsondata.ContainsKey("regionid") && !UUID.TryParse(jsondata["regionid"].ToString(), out regionid))
+                    if (reqdata.ContainsKey("regionid") && !UUID.TryParse(reqdata["regionid"].ToString(), out regionid))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
