@@ -399,6 +399,44 @@ namespace SilverSim.Scene.Implementation.Basic
             var objgroup = obj as ObjectGroup;
             if (objgroup != null)
             {
+                UUI uui = objgroup.LastOwner;
+                if (uui.HomeURI == null && AvatarNameService.TryGetValue(uui, out uui))
+                {
+                    objgroup.LastOwner = uui;
+                }
+                foreach (ObjectPart part in objgroup.Values)
+                {
+                    uui = part.Owner;
+                    if (uui.HomeURI == null && AvatarNameService.TryGetValue(uui, out uui))
+                    {
+                        part.Owner = uui;
+                    }
+                    uui = part.Creator;
+                    if (uui.HomeURI == null && AvatarNameService.TryGetValue(uui, out uui))
+                    {
+                        part.Creator = uui;
+                    }
+                    foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
+                    {
+                        uui = item.Owner;
+                        if (uui.HomeURI == null && AvatarNameService.TryGetValue(uui, out uui))
+                        {
+                            item.Owner = uui;
+                        }
+                        uui = item.LastOwner;
+                        if (uui.HomeURI == null && AvatarNameService.TryGetValue(uui, out uui))
+                        {
+                            item.LastOwner = uui;
+                        }
+                        uui = item.Creator;
+                        if (uui.HomeURI == null && AvatarNameService.TryGetValue(uui, out uui))
+                        {
+                            item.Creator = uui;
+                        }
+                    }
+                    part.RezDate = Date.Now;
+                }
+
                 var removeAgain = new List<ObjectPart>();
 
                 AddLegacyMaterials(objgroup);
