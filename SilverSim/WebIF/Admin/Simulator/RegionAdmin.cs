@@ -643,7 +643,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 rInfo.ServerHttpPort = m_HttpServer.Port;
                 rInfo.ScopeID = UUID.Zero;
                 rInfo.ServerIP = string.Empty;
-                rInfo.Size = new GridVector(256, 256);
+                rInfo.Size = GridVector.StandardRegionSize;
                 rInfo.ProductName = "Mainland";
 
                 if (Uri.IsWellFormedUriString(rInfo.Name, UriKind.Absolute))

@@ -824,7 +824,7 @@ namespace SilverSim.Main.Cmd.Region
                     ServerHttpPort = m_HttpServer.Port,
                     ScopeID = UUID.Zero,
                     ServerIP = string.Empty,
-                    Size = new GridVector(256, 256),
+                    Size = GridVector.StandardRegionSize,
                     ProductName = "Mainland"
                 };
                 if (!uint.TryParse(args[3], out rInfo.ServerPort))

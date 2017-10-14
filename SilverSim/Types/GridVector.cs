@@ -154,6 +154,8 @@ namespace SilverSim.Types
 
         public static GridVector Zero => new GridVector();
 
+        public static GridVector StandardRegionSize => new GridVector(256, 256);
+
         public override string ToString() => String.Format("{0},{1}", X, Y);
 
         public string GridLocation => string.Format("{0},{1}", GridX, GridY);
