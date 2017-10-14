@@ -1275,6 +1275,11 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
 
+            if(uui.HomeURI == null)
+            {
+                uui.HomeURI = new Uri(m_Loader.HomeURI);
+            }
+
             var resdata = new Map
             {
                 ["user"] = uui.ToMap()
@@ -1306,6 +1311,10 @@ namespace SilverSim.WebIF.Admin
             var resarray = new AnArray();
             foreach(var uui in uuis)
             {
+                if (uui.HomeURI == null)
+                {
+                    uui.HomeURI = new Uri(m_Loader.HomeURI);
+                }
                 resarray.Add(uui.ToMap());
             }
             resdata.Add("uuis", resarray);
@@ -1327,6 +1336,10 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
+                if (uui.HomeURI == null)
+                {
+                    uui.HomeURI = new Uri(m_Loader.HomeURI);
+                }
                 var res = new Map
                 {
                     ["user"] = uui.ToMap()
