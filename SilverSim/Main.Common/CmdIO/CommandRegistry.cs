@@ -188,7 +188,7 @@ namespace SilverSim.Main.Common.CmdIO
             CheckAddCommandType("kick", ref m_KickCommands).Add(cmd, handler);
         }
 
-        private sealed class CommandType
+        public sealed class CommandType
         {
             private readonly string m_Command;
             private readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Dict;
