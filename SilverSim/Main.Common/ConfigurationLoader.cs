@@ -522,6 +522,22 @@ namespace SilverSim.Main.Common
             }
         }
 
+        private void DumpIniToFile(string filename)
+        {
+            using (var writer = new StreamWriter(filename))
+            {
+                foreach (IConfig dumpcfg in Config.Configs)
+                {
+                    writer.WriteLine("[{0}]", dumpcfg.Name);
+                    foreach (string key in dumpcfg.GetKeys())
+                    {
+                        writer.WriteLine("{0}={1}", key, dumpcfg.GetString(key));
+                    }
+                    writer.WriteLine();
+                }
+            }
+        }
+
         public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed, bool disableShutdownCommand = false)
         {
             string defaultConfigName;
@@ -752,6 +768,12 @@ namespace SilverSim.Main.Common
                     {
                         continue;
                     }
+
+                    if (dumpResultingIniName.Length != 0)
+                    {
+                        DumpIniToFile(dumpResultingIniName);
+                    }
+
                     throw new ConfigurationErrorException(string.Format("Parameter value {0} for {1} in section {2}",
                         sourceParam, useparam[1], useparam[0]));
                 }
@@ -759,18 +781,7 @@ namespace SilverSim.Main.Common
 
             if (dumpResultingIniName.Length != 0)
             {
-                using (var writer = new StreamWriter(dumpResultingIniName))
-                {
-                    foreach (IConfig cfg in Config.Configs)
-                    {
-                        writer.WriteLine("[{0}]", cfg.Name);
-                        foreach (string key in cfg.GetKeys())
-                        {
-                            writer.WriteLine("{0}={1}", key, cfg.GetString(key));
-                        }
-                        writer.WriteLine();
-                    }
-                }
+                DumpIniToFile(dumpResultingIniName);
             }
 
             string logConfigFile = string.Empty;
