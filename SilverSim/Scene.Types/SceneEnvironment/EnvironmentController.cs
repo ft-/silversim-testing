@@ -217,5 +217,13 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
         }
+
+        private void SendToAllRootAgents(Message m)
+        {
+            foreach (IAgent agent in m_Scene.Agents)
+            {
+                agent.SendMessageIfRootAgent(m, m_Scene.ID);
+            }
+        }
     }
 }

@@ -292,12 +292,12 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         private void SendSimulatorTimeMessageToAllClients()
         {
-            SendToAllClients(BuildTimeMessage());
+            SendToAllRootAgents(BuildTimeMessage());
         }
 
         public void SendSimulatorTimeMessageToClient(IAgent agent)
         {
-            agent.SendMessageAlways(BuildTimeMessage(), m_Scene.ID);
+            agent.SendMessageIfRootAgent(BuildTimeMessage(), m_Scene.ID);
         }
         #endregion
     }
