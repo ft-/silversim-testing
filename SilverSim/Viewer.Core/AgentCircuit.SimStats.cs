@@ -44,6 +44,7 @@ namespace SilverSim.Viewer.Core
             PendingUploads,
             ActiveScripts,
             ScriptEventsPerSeconds,
+            PercentExecutingScripts,
 
             NumStatIndex
         }
@@ -68,6 +69,7 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.PendingUploads] = new SimStats.Data(SimStats.Data.StatType.PendingUploads, 0);
             m_SimStatsData[(int)SimStatIndex.ActiveScripts] = new SimStats.Data(SimStats.Data.StatType.ActiveScripts, 0);
             m_SimStatsData[(int)SimStatIndex.ScriptEventsPerSeconds] = new SimStats.Data(SimStats.Data.StatType.ScriptEps, 0);
+            m_SimStatsData[(int)SimStatIndex.PercentExecutingScripts] = new SimStats.Data(SimStats.Data.StatType.PercentScriptsRun, 0);
         }
 
         private int m_LastPacketsReceived;
@@ -116,9 +118,11 @@ namespace SilverSim.Viewer.Core
                 m_SimStatsData[(int)SimStatIndex.ChildAgents].StatValue = childAgents;
                 m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = scene.Primitives.Count;
                 m_SimStatsData[(int)SimStatIndex.ActivePrim].StatValue = scene.ActiveObjects;
-                m_SimStatsData[(int)SimStatIndex.ActiveScripts].StatValue = scene.ActiveScripts;
+                int activeScripts = scene.ActiveScripts;
+                m_SimStatsData[(int)SimStatIndex.ActiveScripts].StatValue = scene.ScriptedObjects;
                 m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;
                 m_SimStatsData[(int)SimStatIndex.ScriptEventsPerSeconds].StatValue = scene.ScriptThreadPool.ScriptEventsPerSec;
+                m_SimStatsData[(int)SimStatIndex.PercentExecutingScripts].StatValue = 100.0 * scene.ScriptThreadPool.ExecutingScripts / activeScripts;
 
                 var physics = scene.PhysicsScene;
                 if (physics != null)

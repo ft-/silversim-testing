@@ -610,6 +610,7 @@ namespace SilverSim.Scene.Types.Scene
         private Date m_ActiveStatsLastUpdated = Date.Now;
         private int m_ActiveScripts;
         private int m_ActiveObjects;
+        private int m_ScriptedObjects;
 
         private void CheckActiveStats()
         {
@@ -618,6 +619,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_ActiveStatsLastUpdated = Date.Now;
                 int activeScripts = 0;
                 int activeObjects = 0;
+                int scriptedObjects = 0;
 
                 foreach (ObjectPart part in Primitives)
                 {
@@ -626,6 +628,7 @@ namespace SilverSim.Scene.Types.Scene
                     if (runningScripts > 0)
                     {
                         ++activeObjects;
+                        ++scriptedObjects;
                     }
                     else if (part.IsPhysics && part.ObjectGroup.ID == part.ID)
                     {
@@ -633,6 +636,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
                 m_ActiveScripts = activeScripts;
+                m_ScriptedObjects = scriptedObjects;
                 m_ActiveObjects = activeObjects;
             }
         }
@@ -643,6 +647,15 @@ namespace SilverSim.Scene.Types.Scene
             {
                 CheckActiveStats();
                 return m_ActiveScripts;
+            }
+        }
+
+        public int ScriptedObjects
+        {
+            get
+            {
+                CheckActiveStats();
+                return m_ScriptedObjects;
             }
         }
 

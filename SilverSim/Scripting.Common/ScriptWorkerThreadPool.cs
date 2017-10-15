@@ -252,6 +252,10 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        int m_ExecutingScripts;
+
+        public int ExecutingScripts => m_ExecutingScripts;
+
         private void ThreadMain(object obj)
         {
             var tc = (ScriptThreadContext)obj;
@@ -283,6 +287,7 @@ namespace SilverSim.Scripting.Common
                 int executionStart = Environment.TickCount;
                 try
                 {
+                    Interlocked.Increment(ref m_ExecutingScripts);
                     lock (tc)
                     {
                         ev.ThreadPool = this;
@@ -358,6 +363,7 @@ namespace SilverSim.Scripting.Common
                 }
                 finally
                 {
+                    Interlocked.Decrement(ref m_ExecutingScripts);
                     uint localId;
                     lock (tc)
                     {
