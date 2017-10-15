@@ -613,7 +613,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private void CheckActiveStats()
         {
-            if (m_ActiveStatsLastUpdated - DateTime.Now > TimeSpan.FromSeconds(1))
+            if (DateTime.Now - m_ActiveStatsLastUpdated > TimeSpan.FromSeconds(1))
             {
                 m_ActiveStatsLastUpdated = Date.Now;
                 int activeScripts = 0;
