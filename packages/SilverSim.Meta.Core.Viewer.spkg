@@ -6,7 +6,9 @@
 	<dependencies>
 		<dependency name="SilverSim.Viewer.Core"/>
 		<dependency name="SilverSim.Viewer.Economy"/>
+		<dependency name="SilverSim.Viewer.ExperienceTools"/>
 		<dependency name="SilverSim.Viewer.Friends"/>
+		<dependency name="SilverSim.Viewer.GroupChat"/>
 		<dependency name="SilverSim.Viewer.Groups"/>
 		<dependency name="SilverSim.Viewer.Map"/>
 		<dependency name="SilverSim.Viewer.Messages"/>
