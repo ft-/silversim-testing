@@ -635,16 +635,18 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                rInfo = new RegionInfo();
                 EstateInfo selectedEstate = null;
-                rInfo.Name = jsondata["name"].ToString();
-                rInfo.ID = UUID.Random;
-                rInfo.Access = RegionAccess.Mature;
-                rInfo.ServerHttpPort = m_HttpServer.Port;
-                rInfo.ScopeID = UUID.Zero;
-                rInfo.ServerIP = string.Empty;
-                rInfo.Size = GridVector.StandardRegionSize;
-                rInfo.ProductName = "Mainland";
+                rInfo = new RegionInfo
+                {
+                    Name = jsondata["name"].ToString(),
+                    ID = UUID.Random,
+                    Access = RegionAccess.Mature,
+                    ServerHttpPort = m_HttpServer.Port,
+                    ScopeID = UUID.Zero,
+                    ServerIP = string.Empty,
+                    Size = GridVector.StandardRegionSize,
+                    ProductName = "Mainland"
+                };
 
                 if (Uri.IsWellFormedUriString(rInfo.Name, UriKind.Absolute))
                 {

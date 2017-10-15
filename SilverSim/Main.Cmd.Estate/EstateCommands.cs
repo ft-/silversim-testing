@@ -251,7 +251,7 @@ namespace SilverSim.Main.Cmd.Estate
             }
             else
             {
-                estateInfo = new EstateInfo()
+                estateInfo = new EstateInfo
                 {
                     ID = estateID,
                     Name = args[2],
@@ -262,10 +262,6 @@ namespace SilverSim.Main.Cmd.Estate
                 {
                     switch (args[argi].ToLower())
                     {
-                        case "name":
-                            estateInfo.Name = args[argi + 1];
-                            break;
-
                         case "abuseemail":
                             estateInfo.AbuseEmail = args[argi + 1];
                             break;
@@ -295,7 +291,7 @@ namespace SilverSim.Main.Cmd.Estate
                             break;
 
                         case "pricepermeter":
-                            if (!int.TryParse(args[argi + 1], NumberStyles.Float, CultureInfo.InvariantCulture, out estateInfo.PricePerMeter))
+                            if (!int.TryParse(args[argi + 1], out estateInfo.PricePerMeter))
                             {
                                 io.WriteFormatted("{0} is not a valid integer number.", args[argi + 1]);
                                 return;
