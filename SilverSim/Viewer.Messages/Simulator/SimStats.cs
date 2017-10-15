@@ -68,6 +68,9 @@ namespace SilverSim.Viewer.Messages.Simulator
                 SimSleepTimeMs = 33,
                 SimIoPumpTimeMs = 34,
                 PercentScriptsRun = 35,
+                SimAIStepTimeMs = 38,
+                PercentSkippedAISilhouetteSteps = 39,
+                PercentSteppedCharacter = 40
             }
 
             public StatType StatID;

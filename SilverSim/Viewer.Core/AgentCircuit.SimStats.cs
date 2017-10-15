@@ -36,20 +36,13 @@ namespace SilverSim.Viewer.Core
             ChildAgents,
             TotalPrim,
             ActivePrim,
-            FrameTimeMs,
-            NetTimeMs,
             PhysicsTimeMs,
-            ImageTimeMs,
-            OtherTimeMs,
             InPacketsPerSecond,
             OutPacketsPerSecond,
             UnAckedBytes,
-            AgentTimeMs,
             PendingDownloads,
             PendingUploads,
             ActiveScripts,
-            ScriptLinesPerSecond,
-            SimSpareTimeMs,
             ScriptEventsPerSeconds,
 
             NumStatIndex
@@ -67,20 +60,13 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.ChildAgents] = new SimStats.Data(SimStats.Data.StatType.ChildAgents, 0);
             m_SimStatsData[(int)SimStatIndex.TotalPrim] = new SimStats.Data(SimStats.Data.StatType.TotalPrim, 0);
             m_SimStatsData[(int)SimStatIndex.ActivePrim] = new SimStats.Data(SimStats.Data.StatType.ActivePrim, 0);
-            m_SimStatsData[(int)SimStatIndex.FrameTimeMs] = new SimStats.Data(SimStats.Data.StatType.FrameTimeMs, 0);
-            m_SimStatsData[(int)SimStatIndex.NetTimeMs] = new SimStats.Data(SimStats.Data.StatType.NetTimeMs, 0);
             m_SimStatsData[(int)SimStatIndex.PhysicsTimeMs] = new SimStats.Data(SimStats.Data.StatType.PhysicsTimeMs, 0);
-            m_SimStatsData[(int)SimStatIndex.ImageTimeMs] = new SimStats.Data(SimStats.Data.StatType.ImageTimeMs, 0);
-            m_SimStatsData[(int)SimStatIndex.OtherTimeMs] = new SimStats.Data(SimStats.Data.StatType.OtherTimeMs, 0);
             m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond] = new SimStats.Data(SimStats.Data.StatType.InPacketsPerSecond, 1);
             m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond] = new SimStats.Data(SimStats.Data.StatType.OutPacketsPerSecond, 1);
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes] = new SimStats.Data(SimStats.Data.StatType.UnAckedBytes, 0);
-            m_SimStatsData[(int)SimStatIndex.AgentTimeMs] = new SimStats.Data(SimStats.Data.StatType.AgentTimeMs, 0);
             m_SimStatsData[(int)SimStatIndex.PendingDownloads] = new SimStats.Data(SimStats.Data.StatType.PendingDownloads, 0);
             m_SimStatsData[(int)SimStatIndex.PendingUploads] = new SimStats.Data(SimStats.Data.StatType.PendingUploads, 0);
             m_SimStatsData[(int)SimStatIndex.ActiveScripts] = new SimStats.Data(SimStats.Data.StatType.ActiveScripts, 0);
-            m_SimStatsData[(int)SimStatIndex.ScriptLinesPerSecond] = new SimStats.Data(SimStats.Data.StatType.ScriptLinesPerSecond, 0);
-            m_SimStatsData[(int)SimStatIndex.SimSpareTimeMs] = new SimStats.Data(SimStats.Data.StatType.SimSpareTimeMs, 0);
             m_SimStatsData[(int)SimStatIndex.ScriptEventsPerSeconds] = new SimStats.Data(SimStats.Data.StatType.ScriptEps, 0);
         }
 
