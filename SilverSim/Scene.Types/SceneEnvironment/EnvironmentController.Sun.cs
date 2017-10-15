@@ -280,7 +280,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #endregion
 
         #region Viewer time message update
-        private SimulatorViewerTimeMessage BuildTimeMessage() => new SimulatorViewerTimeMessage()
+        private SimulatorViewerTimeMessage BuildTimeMessage() => new SimulatorViewerTimeMessage
         {
             SunPhase = m_SunData.SunPhase,
             UsecSinceStart = Date.GetUnixTime() * 1000000,
