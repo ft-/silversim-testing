@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Region
             p.WriteVector3f(SunAngVelocity);
         }
 
-        public static Message Decode(UDPPacket p) => new SimulatorViewerTimeMessage()
+        public static Message Decode(UDPPacket p) => new SimulatorViewerTimeMessage
         {
             UsecSinceStart = p.ReadUInt64(),
             SecPerDay = p.ReadUInt32(),

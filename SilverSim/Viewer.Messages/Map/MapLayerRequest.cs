@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Map
         public UInt32 EstateID;
         public bool IsGodlike;
 
-        public static Message Decode(UDPPacket p) => new MapLayerRequest()
+        public static Message Decode(UDPPacket p) => new MapLayerRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Object
         public UInt32 RequestFlags;
         public UUID ObjectID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new RequestObjectPropertiesFamily()
+        public static Message Decode(UDPPacket p) => new RequestObjectPropertiesFamily
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

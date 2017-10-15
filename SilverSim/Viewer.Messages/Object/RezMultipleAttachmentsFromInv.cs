@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new RezMultipleAttachmentsFromInv()
+            var m = new RezMultipleAttachmentsFromInv
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -68,7 +68,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.ObjectData.Add(new ObjectDataS()
+                m.ObjectData.Add(new ObjectDataS
                 {
                     ItemID = p.ReadUUID(),
                     OwnerID = p.ReadUUID(),

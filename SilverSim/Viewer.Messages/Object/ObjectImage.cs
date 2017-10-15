@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static ObjectImage Decode(UDPPacket p)
         {
-            var m = new ObjectImage()
+            var m = new ObjectImage
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint entrycnt = p.ReadUInt8();
             while(entrycnt-- != 0)
             {
-                m.ObjectData.Add(new ObjectDataEntry()
+                m.ObjectData.Add(new ObjectDataEntry
                 {
                     ObjectLocalID = p.ReadUInt32(),
                     MediaURL = p.ReadStringLen8(),

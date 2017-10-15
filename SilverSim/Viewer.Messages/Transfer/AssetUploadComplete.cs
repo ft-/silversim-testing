@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Transfer
         public AssetType AssetType;
         public bool Success;
 
-        public static Message Decode(UDPPacket p) => new AssetUploadComplete()
+        public static Message Decode(UDPPacket p) => new AssetUploadComplete
         {
             AssetID = p.ReadUUID(),
             AssetType = (AssetType)p.ReadInt8(),

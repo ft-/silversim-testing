@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID SessionID = UUID.Zero;
         public UUID ObjectID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new ObjectSpinStop()
+        public static Message Decode(UDPPacket p) => new ObjectSpinStop
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

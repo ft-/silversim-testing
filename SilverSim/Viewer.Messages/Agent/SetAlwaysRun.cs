@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Agent
         public UUID SessionID = UUID.Zero;
         public bool AlwaysRun;
 
-        public static Message Decode(UDPPacket p) => new SetAlwaysRun()
+        public static Message Decode(UDPPacket p) => new SetAlwaysRun
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

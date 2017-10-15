@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Economy
         public UUID SessionID;
         public UUID TransactionID;
 
-        public static Message Decode(UDPPacket p) => new MoneyBalanceRequest()
+        public static Message Decode(UDPPacket p) => new MoneyBalanceRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

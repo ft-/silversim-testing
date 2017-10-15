@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Circuit
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new LogoutRequest()
+        public static Message Decode(UDPPacket p) => new LogoutRequest
         {
             SessionID = p.ReadUUID(),
             AgentID = p.ReadUUID()

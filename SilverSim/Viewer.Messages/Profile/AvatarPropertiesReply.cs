@@ -58,7 +58,7 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteUInt32(Flags);
         }
 
-        public static Message Decode(UDPPacket p) => new AvatarPropertiesReply()
+        public static Message Decode(UDPPacket p) => new AvatarPropertiesReply
         {
             AgentID = p.ReadUUID(),
             AvatarID = p.ReadUUID(),

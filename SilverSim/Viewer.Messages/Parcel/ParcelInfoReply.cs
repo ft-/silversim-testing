@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteUInt32(AuctionID);
         }
 
-        public static Message Decode(UDPPacket p) => new ParcelInfoReply()
+        public static Message Decode(UDPPacket p) => new ParcelInfoReply
         {
             AgentID = p.ReadUUID(),
             ParcelID = new ParcelID(p.ReadBytes(16), 0),

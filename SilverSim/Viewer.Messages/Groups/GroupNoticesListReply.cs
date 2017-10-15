@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Messages.Groups
         }
         public static Message Decode(UDPPacket p)
         {
-            var m = new GroupNoticesListReply()
+            var m = new GroupNoticesListReply
             {
                 AgentID = p.ReadUUID(),
                 GroupID = p.ReadUUID()
@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Messages.Groups
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                m.Data.Add(new GroupNoticeData()
+                m.Data.Add(new GroupNoticeData
                 {
                     NoticeID = p.ReadUUID(),
                     Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32()),

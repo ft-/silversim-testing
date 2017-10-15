@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteInt32(PriceForListing);
         }
 
-        public static Message Decode(UDPPacket p) => new ClassifiedInfoReply()
+        public static Message Decode(UDPPacket p) => new ClassifiedInfoReply
         {
             AgentID = p.ReadUUID(),
             ClassifiedID = p.ReadUUID(),

@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public string SkillsText;
         public string LanguagesText;
 
-        public static Message Decode(UDPPacket p) => new AvatarInterestsUpdate()
+        public static Message Decode(UDPPacket p) => new AvatarInterestsUpdate
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

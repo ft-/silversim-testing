@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.User
         public string Details;
         public string VersionString;
 
-        public static UserReport Decode(UDPPacket p) => new UserReport()
+        public static UserReport Decode(UDPPacket p) => new UserReport
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

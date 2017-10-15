@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Appearance
         public UUID AgentID;
         public UUID SessionID;
 
-        public static Message Decode(UDPPacket p) => new AgentWearablesRequest()
+        public static Message Decode(UDPPacket p) => new AgentWearablesRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID()

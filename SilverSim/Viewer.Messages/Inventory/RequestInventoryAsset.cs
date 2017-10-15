@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         public UUID OwnerID;
         public UUID ItemID;
 
-        public static Message Decode(UDPPacket p) => new RequestInventoryAsset()
+        public static Message Decode(UDPPacket p) => new RequestInventoryAsset
         {
             QueryID = p.ReadUUID(),
             AgentID = p.ReadUUID(),

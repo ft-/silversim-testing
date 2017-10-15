@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Messages.Sound
             p.WriteUUID(SoundID);
         }
 
-        public static Message Decode(UDPPacket p) => new PreloadSound()
+        public static Message Decode(UDPPacket p) => new PreloadSound
         {
             ObjectID = p.ReadUUID(),
             OwnerID = p.ReadUUID(),

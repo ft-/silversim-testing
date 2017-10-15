@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.User
         public UInt32 KickFlags;
         public string Reason;
 
-        public static Message Decode(UDPPacket p) => new GodKickUser()
+        public static Message Decode(UDPPacket p) => new GodKickUser
         {
             GodID = p.ReadUUID(),
             GodSessionID = p.ReadUUID(),

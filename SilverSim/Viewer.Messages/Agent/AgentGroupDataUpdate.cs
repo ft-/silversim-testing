@@ -64,14 +64,14 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AgentGroupDataUpdate()
+            var m = new AgentGroupDataUpdate
             {
                 AgentID = p.ReadUUID()
             };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                m.GroupData.Add(new GroupDataEntry()
+                m.GroupData.Add(new GroupDataEntry
                 {
                     GroupID = p.ReadUUID(),
                     GroupPowers = (GroupPowers)p.ReadUInt64(),

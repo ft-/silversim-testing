@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ItemID = UUID.Zero;
         public ScriptPermissions Questions;
 
-        public static Message Decode(UDPPacket p) => new ScriptAnswerYes()
+        public static Message Decode(UDPPacket p) => new ScriptAnswerYes
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

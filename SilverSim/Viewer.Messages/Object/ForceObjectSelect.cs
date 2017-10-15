@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ForceObjectSelect()
+            var m = new ForceObjectSelect
             {
                 ResetList = p.ReadBoolean()
             };

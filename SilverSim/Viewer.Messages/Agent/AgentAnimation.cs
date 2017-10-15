@@ -43,19 +43,22 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AgentAnimation();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
+            var m = new AgentAnimation
+            {
+                AgentID = p.ReadUUID(),
+                SessionID = p.ReadUUID()
+            };
             int n;
             int i;
 
             n = p.ReadUInt8();
             for (i = 0; i < n; ++i)
             {
-                var e = new AnimationEntry();
-                e.AnimID = p.ReadUUID();
-                e.StartAnim = p.ReadBoolean();
-                m.AnimationEntryList.Add(e);
+                m.AnimationEntryList.Add(new AnimationEntry
+                {
+                    AnimID = p.ReadUUID(),
+                    StartAnim = p.ReadBoolean()
+                });
             }
 
             n = p.ReadUInt8();

@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
         public UUID EjecteeID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new EjectGroupMemberRequest()
+        public static Message Decode(UDPPacket p) => new EjectGroupMemberRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

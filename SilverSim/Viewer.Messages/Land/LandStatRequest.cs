@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Land
         public string Filter;
         public Int32 ParcelLocalID;
 
-        public static Message Decode(UDPPacket p) => new LandStatRequest()
+        public static Message Decode(UDPPacket p) => new LandStatRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

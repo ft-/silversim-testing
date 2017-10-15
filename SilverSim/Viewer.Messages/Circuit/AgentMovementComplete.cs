@@ -48,7 +48,7 @@ namespace SilverSim.Viewer.Messages.Circuit
             p.WriteStringLen16(ChannelVersion);
         }
 
-        public static Message Decode(UDPPacket p) => new AgentMovementComplete()
+        public static Message Decode(UDPPacket p) => new AgentMovementComplete
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

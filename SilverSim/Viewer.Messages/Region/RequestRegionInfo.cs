@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Region
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new RequestRegionInfo()
+        public static Message Decode(UDPPacket p) => new RequestRegionInfo
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID()

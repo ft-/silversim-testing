@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new RemoveInventoryFolder()
+            var m = new RemoveInventoryFolder
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()

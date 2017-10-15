@@ -246,7 +246,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 }
             }
 
-            Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
+            var tiltRot = new Quaternion(tilt, 1, 0, 0);
 
             lock (m_LightShareLock)
             {

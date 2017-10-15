@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public bool AllowPublish;
         public bool MaturePublish;
 
-        public static Message Decode(UDPPacket p) => new CreateGroupRequest()
+        public static Message Decode(UDPPacket p) => new CreateGroupRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

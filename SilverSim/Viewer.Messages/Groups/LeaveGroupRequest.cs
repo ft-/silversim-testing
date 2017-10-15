@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID SessionID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new LeaveGroupRequest()
+        public static Message Decode(UDPPacket p) => new LeaveGroupRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

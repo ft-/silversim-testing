@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.TaskInventory
         public UInt32 LocalID;
         public UUID ItemID;
 
-        public static Message Decode(UDPPacket p) => new MoveTaskInventory()
+        public static Message Decode(UDPPacket p) => new MoveTaskInventory
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

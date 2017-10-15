@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectFlagUpdate()
+            var m = new ObjectFlagUpdate
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.ExtraPhysics.Add(new ExtraPhysicsData()
+                m.ExtraPhysics.Add(new ExtraPhysicsData
                 {
                     PhysicsShapeType = (PrimitivePhysicsShapeType)p.ReadUInt8(),
                     Density = p.ReadFloat(),

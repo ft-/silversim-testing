@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.MuteList
         public Int32 MuteType;
         public UInt32 MuteFlags;
 
-        public static UpdateMuteListEntry Decode(UDPPacket p) => new UpdateMuteListEntry()
+        public static UpdateMuteListEntry Decode(UDPPacket p) => new UpdateMuteListEntry
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

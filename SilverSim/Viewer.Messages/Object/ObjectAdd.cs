@@ -80,7 +80,7 @@ namespace SilverSim.Viewer.Messages.Object
         public InventoryPermissionsMask NextOwnerPermissions;
         public InventoryPermissionsMask GroupPermissions;
 
-        public static Message Decode(UDPPacket p) => new ObjectAdd()
+        public static Message Decode(UDPPacket p) => new ObjectAdd
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

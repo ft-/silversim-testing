@@ -51,7 +51,7 @@ namespace SilverSim.Viewer.Messages.Telehub
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new TelehubInfo()
+            var m = new TelehubInfo
             {
                 ObjectID = p.ReadUUID(),
                 ObjectName = p.ReadStringLen8(),

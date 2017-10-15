@@ -92,12 +92,14 @@ namespace SilverSim.Viewer.Messages.Agent
         {
             var location = new AnArray();
             var agentdata = new AnArray();
-            var index = new AnArray();
-            index.Add(new MapType
+            var index = new AnArray
             {
-                { "Prey", Prey },
-                { "You", You }
-            });
+                new MapType
+                {
+                    { "Prey", Prey },
+                    { "You", You }
+                }
+            };
 
             foreach (AgentDataEntry d in AgentData)
             {

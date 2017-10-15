@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Economy
             p.WriteInt32(PriceGroupCreate);
         }
 
-        public static Message Decode(UDPPacket p) => new EconomyData()
+        public static Message Decode(UDPPacket p) => new EconomyData
         {
             ObjectCapacity = p.ReadInt32(),
             ObjectCount = p.ReadInt32(),

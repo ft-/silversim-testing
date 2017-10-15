@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.God
             p.WriteUUID(Token);
         }
 
-        public static Message Decode(UDPPacket p) => new GrantGodlikePowers()
+        public static Message Decode(UDPPacket p) => new GrantGodlikePowers
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

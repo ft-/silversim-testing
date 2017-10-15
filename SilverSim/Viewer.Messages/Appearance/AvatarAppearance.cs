@@ -88,7 +88,7 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AvatarAppearance()
+            var m = new AvatarAppearance
             {
                 Sender = p.ReadUUID(),
                 IsTrial = p.ReadBoolean(),

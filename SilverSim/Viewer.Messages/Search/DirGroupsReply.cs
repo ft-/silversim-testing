@@ -59,7 +59,7 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new DirGroupsReply()
+            var m = new DirGroupsReply
             {
                 AgentID = p.ReadUUID(),
                 QueryID = p.ReadUUID()
@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Search
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.QueryReplies.Add(new QueryReplyData()
+                m.QueryReplies.Add(new QueryReplyData
                 {
                     GroupID = p.ReadUUID(),
                     GroupName = p.ReadStringLen8(),

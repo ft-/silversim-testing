@@ -46,7 +46,7 @@ namespace SilverSim.Viewer.Messages.Sound
             p.WriteFloat((float)Gain);
         }
 
-        public static Message Decode(UDPPacket p) => new SoundTrigger()
+        public static Message Decode(UDPPacket p) => new SoundTrigger
         {
             SoundID = p.ReadUUID(),
             OwnerID = p.ReadUUID(),

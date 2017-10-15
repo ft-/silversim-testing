@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID InviteeID = UUID.Zero;
         public UUID RoleID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new InviteGroupRequest()
+        public static Message Decode(UDPPacket p) => new InviteGroupRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

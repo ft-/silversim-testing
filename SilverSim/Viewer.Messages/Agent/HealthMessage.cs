@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Agent
             p.WriteFloat((float)Health);
         }
 
-        public static Message Decode(UDPPacket p) => new HealthMessage()
+        public static Message Decode(UDPPacket p) => new HealthMessage
         {
             Health = p.ReadFloat()
         };

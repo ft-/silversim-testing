@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Messages.Image
             uint count = p.ReadUInt8();
             for (uint idx = 0; idx < count; ++idx)
             {
-                m.RequestImageList.Add(new RequestImageEntry()
+                m.RequestImageList.Add(new RequestImageEntry
                 {
                     ImageID = p.ReadUUID(),
                     DiscardLevel = p.ReadInt8(),

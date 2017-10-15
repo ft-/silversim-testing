@@ -72,7 +72,7 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new DirClassifiedReply()
+            var m = new DirClassifiedReply
             {
                 AgentID = p.ReadUUID(),
                 QueryID = p.ReadUUID()
@@ -80,7 +80,7 @@ namespace SilverSim.Viewer.Messages.Search
             uint n = p.ReadUInt8();
             while (n-- != 0)
             {
-                m.QueryReplies.Add(new QueryReplyData()
+                m.QueryReplies.Add(new QueryReplyData
                 {
                     ClassifiedID = p.ReadUUID(),
                     Name = p.ReadStringLen8(),

@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectExportSelected()
+            var m = new ObjectExportSelected
             {
                 AgentID = p.ReadUUID(),
                 RequestID = p.ReadUUID(),

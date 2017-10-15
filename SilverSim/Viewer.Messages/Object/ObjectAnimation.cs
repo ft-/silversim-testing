@@ -58,14 +58,14 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectAnimation()
+            var m = new ObjectAnimation
             {
                 Sender = p.ReadUUID()
             };
             uint n = p.ReadUInt8();
             for (uint i = 0; i < n; ++i)
             {
-                m.AnimationList.Add(new AnimationData()
+                m.AnimationList.Add(new AnimationData
                 {
                     AnimID = p.ReadUUID(),
                     AnimSequenceID = p.ReadUInt32()

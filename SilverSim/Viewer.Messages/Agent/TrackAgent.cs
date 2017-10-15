@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Agent
 
         public UUID PreyID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new TrackAgent()
+        public static Message Decode(UDPPacket p) => new TrackAgent
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

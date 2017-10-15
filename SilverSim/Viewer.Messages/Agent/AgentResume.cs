@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Agent
         public UUID SessionID = UUID.Zero;
         public UInt32 SerialNum;
 
-        public static Message Decode(UDPPacket p) => new AgentResume()
+        public static Message Decode(UDPPacket p) => new AgentResume
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

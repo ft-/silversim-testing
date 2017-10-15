@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         public bool FetchFolders;
         public bool FetchItems;
 
-        public static Message Decode(UDPPacket p) => new FetchInventoryDescendents()
+        public static Message Decode(UDPPacket p) => new FetchInventoryDescendents
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

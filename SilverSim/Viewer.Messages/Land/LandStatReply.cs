@@ -74,7 +74,7 @@ namespace SilverSim.Viewer.Messages.Land
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new LandStatReply()
+            var m = new LandStatReply
             {
                 ReportType = p.ReadUInt32(),
                 RequestFlags = p.ReadUInt32(),
@@ -83,7 +83,7 @@ namespace SilverSim.Viewer.Messages.Land
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.ReportData.Add(new ReportDataEntry()
+                m.ReportData.Add(new ReportDataEntry
                 {
                     TaskLocalID = p.ReadUInt32(),
                     TaskID = p.ReadUUID(),

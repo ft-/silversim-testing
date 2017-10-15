@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ObjectID = UUID.Zero;
         public ScriptPermissions ObjectPermissions;
 
-        public static Message Decode(UDPPacket p) => new RevokePermissions()
+        public static Message Decode(UDPPacket p) => new RevokePermissions
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

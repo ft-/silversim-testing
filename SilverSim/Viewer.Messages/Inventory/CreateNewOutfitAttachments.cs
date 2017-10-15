@@ -44,7 +44,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static CreateNewOutfitAttachments Decode(UDPPacket p)
         {
-            var m = new CreateNewOutfitAttachments()
+            var m = new CreateNewOutfitAttachments
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             uint cnt = p.ReadUInt8();
             for(uint i = 0; i < cnt; ++i)
             {
-                m.ObjectData.Add(new ObjectDataEntry()
+                m.ObjectData.Add(new ObjectDataEntry
                 {
                     OldItemID = p.ReadUUID(),
                     OldFolderID = p.ReadUUID()

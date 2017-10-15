@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectBuy()
+            var m = new ObjectBuy
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.ObjectData.Add(new Data()
+                m.ObjectData.Add(new Data
                 {
                     ObjectLocalID = p.ReadUInt32(),
                     SaleType = (InventoryItem.SaleInfoData.SaleType)p.ReadUInt8(),

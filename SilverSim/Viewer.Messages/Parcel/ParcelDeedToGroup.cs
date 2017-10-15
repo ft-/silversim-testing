@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID GroupID;
         public Int32 LocalID;
 
-        public static Message Decode(UDPPacket p) => new ParcelDeedToGroup()
+        public static Message Decode(UDPPacket p) => new ParcelDeedToGroup
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

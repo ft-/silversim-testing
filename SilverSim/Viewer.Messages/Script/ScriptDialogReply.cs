@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Messages.Script
         public Int32 ButtonIndex;
         public string ButtonLabel = string.Empty;
 
-        public static Message Decode(UDPPacket p) => new ScriptDialogReply()
+        public static Message Decode(UDPPacket p) => new ScriptDialogReply
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

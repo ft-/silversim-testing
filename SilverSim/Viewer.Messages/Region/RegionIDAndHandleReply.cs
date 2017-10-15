@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Messages.Region
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new RegionIDAndHandleReply()
+            var m = new RegionIDAndHandleReply
             {
                 RegionID = p.ReadUUID(),
                 RegionPosition = new GridVector(p.ReadUInt64())

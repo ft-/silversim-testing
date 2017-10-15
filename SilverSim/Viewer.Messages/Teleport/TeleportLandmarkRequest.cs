@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Teleport
         public UUID SessionID;
         public UUID LandmarkID;
 
-        public static Message Decode(UDPPacket p) => new TeleportLandmarkRequest()
+        public static Message Decode(UDPPacket p) => new TeleportLandmarkRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

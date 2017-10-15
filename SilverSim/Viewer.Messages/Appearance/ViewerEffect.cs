@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ViewerEffect()
+            var m = new ViewerEffect
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Appearance
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                var d = new EffectData()
+                var d = new EffectData
                 {
                     ID = p.ReadUUID(),
                     AgentID = p.ReadUUID(),

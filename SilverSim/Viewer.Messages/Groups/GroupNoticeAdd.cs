@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteBytes(BinaryBucket);
         }
 
-        public static Message Decode(UDPPacket p) => new GroupNoticeAdd()
+        public static Message Decode(UDPPacket p) => new GroupNoticeAdd
         {
             AgentID = p.ReadUUID(),
             ToGroupID = p.ReadUUID(),

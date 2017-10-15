@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteStringLen8(TaxDate);
         }
 
-        public static Message Decode(UDPPacket p) => new GroupAccountSummaryReply()
+        public static Message Decode(UDPPacket p) => new GroupAccountSummaryReply
         {
             AgentID = p.ReadUUID(),
             GroupID = p.ReadUUID(),

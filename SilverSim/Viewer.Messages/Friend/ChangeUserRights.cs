@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Friend
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ChangeUserRights()
+            var m = new ChangeUserRights
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()
@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Messages.Friend
             uint n = p.ReadUInt8();
             for (uint i = 0; i < n; ++i)
             {
-                m.Rights.Add(new RightsEntry()
+                m.Rights.Add(new RightsEntry
                 {
                     AgentRelated = p.ReadUUID(),
                     RelatedRights = (FriendRightFlags)p.ReadUInt32()

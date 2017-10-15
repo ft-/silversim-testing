@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Object
         public UInt32 CreationDate;
         public UInt32 CRC;
 
-        public static Message Decode(UDPPacket p) => new RezRestoreToWorld()
+        public static Message Decode(UDPPacket p) => new RezRestoreToWorld
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Transfer
         public UUID VFileID;
         public Int16 VFileType;
 
-        public static Message Decode(UDPPacket p) => new RequestXfer()
+        public static Message Decode(UDPPacket p) => new RequestXfer
         {
             ID = p.ReadUInt64(),
             Filename = p.ReadStringLen8(),

@@ -875,7 +875,7 @@ namespace SilverSim.Scene.Implementation.Common
 
             RegionOptionFlags regionFlags = RegionSettings.AsFlags;
 
-            var res = new Viewer.Messages.Region.RegionInfo()
+            var res = new Viewer.Messages.Region.RegionInfo
             {
                 AgentID = agent.Owner.ID,
                 SessionID = agent.Session.SessionID,

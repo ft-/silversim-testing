@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Event
         public UUID SessionID;
         public UInt32 EventID;
 
-        public static Message Decode(UDPPacket p) => new EventNotificationAddRequest()
+        public static Message Decode(UDPPacket p) => new EventNotificationAddRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

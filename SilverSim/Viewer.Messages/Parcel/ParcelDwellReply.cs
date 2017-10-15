@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteFloat((float)Dwell);
         }
 
-        public static Message Decode(UDPPacket p) => new ParcelDwellReply()
+        public static Message Decode(UDPPacket p) => new ParcelDwellReply
         {
             AgentID = p.ReadUUID(),
             LocalID = p.ReadInt32(),

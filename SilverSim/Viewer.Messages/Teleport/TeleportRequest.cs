@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Teleport
         public Vector3 Position;
         public Vector3 LookAt;
 
-        public static Message Decode(UDPPacket p) => new TeleportRequest()
+        public static Message Decode(UDPPacket p) => new TeleportRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

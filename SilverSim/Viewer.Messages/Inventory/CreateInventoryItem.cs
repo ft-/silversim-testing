@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         public string Name;
         public string Description;
 
-        public static Message Decode(UDPPacket p) => new CreateInventoryItem()
+        public static Message Decode(UDPPacket p) => new CreateInventoryItem
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

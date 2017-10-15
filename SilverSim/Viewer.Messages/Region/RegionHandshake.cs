@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Messages.Region
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new RegionHandshake()
+            var m = new RegionHandshake
             {
                 RegionFlags = (RegionOptionFlags)p.ReadUInt32(),
                 SimAccess = (RegionAccess)p.ReadUInt8(),
@@ -151,7 +151,7 @@ namespace SilverSim.Viewer.Messages.Region
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.RegionExtData.Add(new RegionExtDataEntry()
+                m.RegionExtData.Add(new RegionExtDataEntry
                 {
                     RegionFlagsExtended = p.ReadUInt64(),
                     RegionProtocols = p.ReadUInt64()

@@ -52,7 +52,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.InventoryData.Add(new InventoryDataEntry()
+                m.InventoryData.Add(new InventoryDataEntry
                 {
                     FolderID = p.ReadUUID(),
                     ParentID = p.ReadUUID(),

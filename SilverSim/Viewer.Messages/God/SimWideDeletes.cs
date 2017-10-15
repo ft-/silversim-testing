@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Messages.God
         public UUID TargetID;
         public DeleteFlags Flags;
 
-        public static SimWideDeletes Decode(UDPPacket p) => new SimWideDeletes()
+        public static SimWideDeletes Decode(UDPPacket p) => new SimWideDeletes
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

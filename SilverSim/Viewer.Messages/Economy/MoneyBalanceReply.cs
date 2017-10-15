@@ -62,7 +62,7 @@ namespace SilverSim.Viewer.Messages.Economy
             p.WriteStringLen8(ItemDescription);
         }
 
-        public static Message Decode(UDPPacket p) => new MoneyBalanceReply()
+        public static Message Decode(UDPPacket p) => new MoneyBalanceReply
         {
             AgentID = p.ReadUUID(),
             TransactionID = p.ReadUUID(),

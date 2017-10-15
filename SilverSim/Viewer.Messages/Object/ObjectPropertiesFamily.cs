@@ -68,7 +68,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteStringLen8(Description);
         }
 
-        public static Message Decode(UDPPacket p) => new ObjectPropertiesFamily()
+        public static Message Decode(UDPPacket p) => new ObjectPropertiesFamily
         {
             RequestFlags = p.ReadUInt32(),
             ObjectID = p.ReadUUID(),

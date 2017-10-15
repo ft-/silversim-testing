@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static MultipleObjectUpdate Decode(UDPPacket p)
         {
-            var m = new MultipleObjectUpdate()
+            var m = new MultipleObjectUpdate
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()
@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint objcnt = p.ReadUInt8();
             while(objcnt-- != 0)
             {
-                m.ObjectData.Add(new ObjectDataEntry()
+                m.ObjectData.Add(new ObjectDataEntry
                 {
                     ObjectLocalID = p.ReadUInt32(),
                     Flags = (UpdateFlags)p.ReadUInt8(),

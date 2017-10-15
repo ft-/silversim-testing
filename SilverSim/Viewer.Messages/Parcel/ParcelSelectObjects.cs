@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ParcelSelectObjects()
+            var m = new ParcelSelectObjects
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

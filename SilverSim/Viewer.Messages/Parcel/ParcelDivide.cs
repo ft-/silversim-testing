@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public double East;
         public double North;
 
-        public static Message Decode(UDPPacket p) => new ParcelDivide()
+        public static Message Decode(UDPPacket p) => new ParcelDivide
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

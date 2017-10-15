@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Messages.Script
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.Data.Add(new DataEntry()
+                m.Data.Add(new DataEntry
                 {
                     TakeControls = p.ReadBoolean(),
                     Controls = p.ReadUInt32(),

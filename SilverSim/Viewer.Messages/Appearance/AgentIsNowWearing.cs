@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AgentIsNowWearing()
+            var m = new AgentIsNowWearing
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()
@@ -51,7 +51,7 @@ namespace SilverSim.Viewer.Messages.Appearance
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.WearableData.Add(new WearableDataEntry()
+                m.WearableData.Add(new WearableDataEntry
                 {
                     ItemID = p.ReadUUID(),
                     WearableType = (WearableType)p.ReadUInt8()

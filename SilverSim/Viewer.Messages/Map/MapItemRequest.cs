@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Map
         public MapItemType ItemType;
         public GridVector Location;
 
-        public static Message Decode(UDPPacket p) => new MapItemRequest()
+        public static Message Decode(UDPPacket p) => new MapItemRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

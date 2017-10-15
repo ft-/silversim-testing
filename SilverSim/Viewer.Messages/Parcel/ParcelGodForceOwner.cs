@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID OwnerID;
         public Int32 LocalID;
 
-        public static Message Decode(UDPPacket p) => new ParcelGodForceOwner()
+        public static Message Decode(UDPPacket p) => new ParcelGodForceOwner
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

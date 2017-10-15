@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectDuplicateOnRay()
+            var m = new ObjectDuplicateOnRay
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

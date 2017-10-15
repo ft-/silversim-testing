@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AvatarPickerReply()
+            var m = new AvatarPickerReply
             {
                 AgentID = p.ReadUUID(),
                 QueryID = p.ReadUUID()
@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Messages.Search
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.Data.Add(new DataEntry()
+                m.Data.Add(new DataEntry
                 {
                     AvatarID = p.ReadUUID(),
                     FirstName = p.ReadStringLen8(),

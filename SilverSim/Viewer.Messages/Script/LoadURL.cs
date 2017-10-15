@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteStringLen8(URL);
         }
 
-        public static Message Decode(UDPPacket p) => new LoadURL()
+        public static Message Decode(UDPPacket p) => new LoadURL
         {
             ObjectName = p.ReadStringLen8(),
             ObjectID = p.ReadUUID(),

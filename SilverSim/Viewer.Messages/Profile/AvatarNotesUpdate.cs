@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID TargetID = UUID.Zero;
         public string Notes;
 
-        public static Message Decode(UDPPacket p) => new AvatarNotesUpdate()
+        public static Message Decode(UDPPacket p) => new AvatarNotesUpdate
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

@@ -54,7 +54,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Vector3 UserLookAt = Vector3.Zero;
         public TeleportLandingType LandingType;
 
-        public static Message Decode(UDPPacket p) => new ParcelPropertiesUpdate()
+        public static Message Decode(UDPPacket p) => new ParcelPropertiesUpdate
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

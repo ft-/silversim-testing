@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Estate
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new EstateCovenantRequest()
+        public static Message Decode(UDPPacket p) => new EstateCovenantRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID()

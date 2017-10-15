@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public Int32 SortOrder;
         public bool IsEnabled;
 
-        public static Message Decode(UDPPacket p) => new PickInfoUpdate()
+        public static Message Decode(UDPPacket p) => new PickInfoUpdate
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

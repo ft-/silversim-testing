@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Friend
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AcceptFriendship()
+            var m = new AcceptFriendship
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

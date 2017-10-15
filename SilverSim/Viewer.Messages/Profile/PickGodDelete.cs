@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID PickID;
         public UUID QueryID;
 
-        public static Message Decode(UDPPacket p) => new PickGodDelete()
+        public static Message Decode(UDPPacket p) => new PickGodDelete
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

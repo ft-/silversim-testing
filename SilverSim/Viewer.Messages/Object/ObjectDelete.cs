@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectDelete()
+            var m = new ObjectDelete
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

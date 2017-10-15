@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteUUID(OwnerRoleID);
         }
 
-        public static Message Decode(UDPPacket p) => new GroupProfileReply()
+        public static Message Decode(UDPPacket p) => new GroupProfileReply
         {
             AgentID = p.ReadUUID(),
             GroupID = p.ReadUUID(),

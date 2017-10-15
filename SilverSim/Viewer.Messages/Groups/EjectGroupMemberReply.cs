@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteBoolean(Success);
         }
 
-        public static Message Decode(UDPPacket p) => new EjectGroupMemberReply()
+        public static Message Decode(UDPPacket p) => new EjectGroupMemberReply
         {
             AgentID = p.ReadUUID(),
             GroupID = p.ReadUUID(),

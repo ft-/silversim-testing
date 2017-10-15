@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.Agent
         public ControlFlags ControlFlags;
         public byte Flags;
 
-        public static Message Decode(UDPPacket p) => new AgentUpdate()
+        public static Message Decode(UDPPacket p) => new AgentUpdate
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

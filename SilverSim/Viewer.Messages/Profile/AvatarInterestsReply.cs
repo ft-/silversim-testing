@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteStringLen8(LanguagesText);
         }
 
-        public static Message Decode(UDPPacket p) => new AvatarInterestsReply()
+        public static Message Decode(UDPPacket p) => new AvatarInterestsReply
         {
             AgentID = p.ReadUUID(),
             AvatarID = p.ReadUUID(),

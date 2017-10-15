@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Transfer
         public UInt32 Packet;
         public byte[] Data = new byte[0];
 
-        public static Message Decode(UDPPacket p) => new SendXferPacket()
+        public static Message Decode(UDPPacket p) => new SendXferPacket
         {
             ID = p.ReadUInt64(),
             Packet = p.ReadUInt32(),

@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Circuit
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         public UInt32 CircuitCode;
-        public static Message Decode(UDPPacket p) => new CompleteAgentMovement()
+        public static Message Decode(UDPPacket p) => new CompleteAgentMovement
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

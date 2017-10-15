@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public static Message Decode(UDPPacket p) => new ForceScriptControlRelease()
+        public static Message Decode(UDPPacket p) => new ForceScriptControlRelease
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID()

@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new RezObjectFromNotecard()
+            var m = new RezObjectFromNotecard
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

@@ -165,7 +165,7 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectUpdate()
+            var m = new ObjectUpdate
             {
                 GridPosition = new GridVector(p.ReadUInt64()),
                 TimeDilation = p.ReadUInt16()
@@ -173,7 +173,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint n = p.ReadUInt8();
             while (n-- != 0)
             {
-                var d = new ObjData()
+                var d = new ObjData
                 {
                     LocalID = p.ReadUInt32(),
                     State = p.ReadUInt8(),

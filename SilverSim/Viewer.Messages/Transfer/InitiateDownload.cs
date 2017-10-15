@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Transfer
         public string SimFilename;
         public string ViewerFilename;
 
-        public static Message Decode(UDPPacket p) => new InitiateDownload()
+        public static Message Decode(UDPPacket p) => new InitiateDownload
         {
             AgentID = p.ReadUUID(),
             SimFilename = p.ReadStringLen8(),

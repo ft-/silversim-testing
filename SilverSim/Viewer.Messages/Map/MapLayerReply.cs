@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Messages.Map
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new MapLayerReply()
+            var m = new MapLayerReply
             {
                 AgentID = p.ReadUUID(),
                 Flags = (MapAgentFlags)p.ReadUInt32()
@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.Messages.Map
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.LayerData.Add(new LayerDataEntry()
+                m.LayerData.Add(new LayerDataEntry
                 {
                     Left = p.ReadUInt32(),
                     Right = p.ReadUInt32(),

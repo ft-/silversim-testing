@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Int32 LocalID;
         public Int32 OtherCleanTime;
 
-        public static Message Decode(UDPPacket p) => new ParcelSetOtherCleanTime()
+        public static Message Decode(UDPPacket p) => new ParcelSetOtherCleanTime
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new LogoutReply()
+            var m = new LogoutReply
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()

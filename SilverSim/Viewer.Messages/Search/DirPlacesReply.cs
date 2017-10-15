@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.Messages.Search
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new DirPlacesReply()
+            var m = new DirPlacesReply
             {
                 AgentID = p.ReadUUID(),
                 QueryID = p.ReadUUID()
@@ -77,7 +77,7 @@ namespace SilverSim.Viewer.Messages.Search
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.QueryReplies.Add(new QueryReplyData()
+                m.QueryReplies.Add(new QueryReplyData
                 {
                     ParcelID = new ParcelID(p.ReadBytes(16), 0),
                     Name = p.ReadStringLen8(),

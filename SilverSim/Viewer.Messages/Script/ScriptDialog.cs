@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Script
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ScriptDialog()
+            var m = new ScriptDialog
             {
                 ObjectID = p.ReadUUID(),
                 FirstName = p.ReadStringLen8(),

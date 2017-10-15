@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Messages.Chat
             p.WriteStringLen16(Message);
         }
 
-        public static Message Decode(UDPPacket p) => new ChatFromSimulator()
+        public static Message Decode(UDPPacket p) => new ChatFromSimulator
         {
             FromName = p.ReadStringLen8(),
             SourceID = p.ReadUUID(),

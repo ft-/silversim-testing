@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Image
             p.WriteUUID(ID);
         }
 
-        public static Message Decode(UDPPacket p) => new ImageNotInDatabase()
+        public static Message Decode(UDPPacket p) => new ImageNotInDatabase
         {
             ID = p.ReadUUID()
         };

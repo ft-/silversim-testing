@@ -44,7 +44,7 @@ namespace SilverSim.Viewer.Messages.Object
         public string Name;
         public string Description;
 
-        public static Message Decode(UDPPacket p) => new RezSingleAttachmentFromInv()
+        public static Message Decode(UDPPacket p) => new RezSingleAttachmentFromInv
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

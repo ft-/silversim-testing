@@ -53,14 +53,14 @@ namespace SilverSim.Viewer.Messages.Camera
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new SetFollowCamProperties()
+            var m = new SetFollowCamProperties
             {
                 ObjectID = p.ReadUUID()
             };
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                m.CameraProperties.Add(new CameraProperty()
+                m.CameraProperties.Add(new CameraProperty
                 {
                     Type = p.ReadInt32(),
                     Value = p.ReadFloat()

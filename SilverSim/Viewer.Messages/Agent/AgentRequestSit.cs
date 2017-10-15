@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Agent
         public UUID TargetID = UUID.Zero;
         public Vector3 Offset = Vector3.Zero;
 
-        public static Message Decode(UDPPacket p) => new AgentRequestSit()
+        public static Message Decode(UDPPacket p) => new AgentRequestSit
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

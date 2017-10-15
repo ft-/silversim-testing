@@ -174,7 +174,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new UpdateCreateInventoryItem()
+            var m = new UpdateCreateInventoryItem
             {
                 AgentID = p.ReadUUID(),
                 SimApproved = p.ReadBoolean(),
@@ -183,7 +183,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.ItemData.Add(new ItemDataEntry()
+                m.ItemData.Add(new ItemDataEntry
                 {
                     ItemID = p.ReadUUID(),
                     FolderID = p.ReadUUID(),

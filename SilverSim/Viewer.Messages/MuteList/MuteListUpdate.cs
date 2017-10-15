@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.MuteList
             p.WriteStringLen8(Filename);
         }
 
-        public static Message Decode(UDPPacket p) => new MuteListUpdate()
+        public static Message Decode(UDPPacket p) => new MuteListUpdate
         {
             AgentID = p.ReadUUID(),
             Filename = p.ReadStringLen8()

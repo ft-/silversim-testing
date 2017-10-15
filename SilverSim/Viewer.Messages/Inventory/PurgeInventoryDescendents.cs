@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         public UUID SessionID;
         public UUID FolderID;
 
-        public static Message Decode(UDPPacket p) => new PurgeInventoryDescendents()
+        public static Message Decode(UDPPacket p) => new PurgeInventoryDescendents
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

@@ -62,7 +62,7 @@ namespace SilverSim.Viewer.Messages.TaskInventory
         public UInt32 CreationDate;
         public UInt32 CRC;
 
-        public static Message Decode(UDPPacket p) => new UpdateTaskInventory()
+        public static Message Decode(UDPPacket p) => new UpdateTaskInventory
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

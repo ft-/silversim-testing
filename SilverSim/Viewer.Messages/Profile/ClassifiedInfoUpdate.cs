@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public byte ClassifiedFlags;
         public int PriceForListing;
 
-        public static ClassifiedInfoUpdate Decode(UDPPacket p) => new ClassifiedInfoUpdate()
+        public static ClassifiedInfoUpdate Decode(UDPPacket p) => new ClassifiedInfoUpdate
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

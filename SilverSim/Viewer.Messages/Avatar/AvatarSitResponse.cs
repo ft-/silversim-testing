@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Messages.Avatar
             p.WriteBoolean(ForceMouselook);
         }
 
-        public static Message Decode(UDPPacket p) => new AvatarSitResponse()
+        public static Message Decode(UDPPacket p) => new AvatarSitResponse
         {
             SitObject = p.ReadUUID(),
             IsAutoPilot = p.ReadBoolean(),

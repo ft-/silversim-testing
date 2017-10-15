@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.Circuit
             p.WriteUUID(SessionID);
         }
 
-        public static Message Decode(UDPPacket p) => new ConfirmEnableSimulator()
+        public static Message Decode(UDPPacket p) => new ConfirmEnableSimulator
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID()

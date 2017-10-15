@@ -62,7 +62,7 @@ namespace SilverSim.Viewer.Messages.Event
             p.WriteUInt32(EventFlags);
         }
 
-        public static Message Decode(UDPPacket p) => new EventInfoReply()
+        public static Message Decode(UDPPacket p) => new EventInfoReply
         {
             AgentID = p.ReadUUID(),
             EventID = p.ReadUInt32(),

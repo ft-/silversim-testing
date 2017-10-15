@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Teleport
             p.WriteUInt32((UInt32)TeleportFlags);
         }
 
-        public static Message Decode(UDPPacket p) => new TeleportStart()
+        public static Message Decode(UDPPacket p) => new TeleportStart
         {
             TeleportFlags = (TeleportFlags)p.ReadUInt32()
         };

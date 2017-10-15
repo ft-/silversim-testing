@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.Economy
         public Int32 TransactionType;
         public string Description;
 
-        public static Message Decode(UDPPacket p) => new MoneyTransferRequest()
+        public static Message Decode(UDPPacket p) => new MoneyTransferRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

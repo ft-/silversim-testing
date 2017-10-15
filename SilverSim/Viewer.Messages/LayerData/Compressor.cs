@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         public static LayerData ToLayerMessage(List<LayerPatch> patches, LayerData.LayerDataType type, int offset, int length, out int outlength)
         {
             outlength = 0;
-            var layer = new LayerData()
+            var layer = new LayerData
             {
                 LayerType = type
             };
@@ -52,7 +52,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                     break;
             }
 
-            var header = new GroupHeader()
+            var header = new GroupHeader
             {
                 Stride = STRIDE,
                 PatchSize = LAYER_PATCH_NUM_XY_ENTRIES,

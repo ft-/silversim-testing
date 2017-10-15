@@ -40,7 +40,7 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteStringLen16(Notes);
         }
 
-        public static Message Decode(UDPPacket p) => new AvatarNotesReply()
+        public static Message Decode(UDPPacket p) => new AvatarNotesReply
         {
             AgentID = p.ReadUUID(),
             TargetID = p.ReadUUID(),

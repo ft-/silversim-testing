@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Messages.Profile
             p.WriteBoolean(IsEnabled);
         }
 
-        public static Message Decode(UDPPacket p) => new PickInfoReply()
+        public static Message Decode(UDPPacket p) => new PickInfoReply
         {
             AgentID = p.ReadUUID(),
             PickID = p.ReadUUID(),

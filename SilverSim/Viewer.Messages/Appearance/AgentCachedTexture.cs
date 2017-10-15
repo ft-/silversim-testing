@@ -44,7 +44,7 @@ namespace SilverSim.Viewer.Messages.Appearance
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AgentCachedTexture()
+            var m = new AgentCachedTexture
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Appearance
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.WearableData.Add(new WearableDataEntry()
+                m.WearableData.Add(new WearableDataEntry
                 {
                     ID = p.ReadUUID(),
                     TextureIndex = p.ReadUInt8()

@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Inventory
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new MoveInventoryItem()
+            var m = new MoveInventoryItem
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -52,7 +52,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.InventoryData.Add(new InventoryDataEntry()
+                m.InventoryData.Add(new InventoryDataEntry
                 {
                     ItemID = p.ReadUUID(),
                     FolderID = p.ReadUUID(),

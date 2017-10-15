@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Inventory
         public AssetType DefaultType;
         public string FolderName;
 
-        public static Message Decode(UDPPacket p) => new CreateInventoryFolder()
+        public static Message Decode(UDPPacket p) => new CreateInventoryFolder
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

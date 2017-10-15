@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteVector3f(LookAt);
         }
 
-        public static Message Decode(UDPPacket p) => new ScriptTeleportRequest()
+        public static Message Decode(UDPPacket p) => new ScriptTeleportRequest
         {
             ObjectName = p.ReadStringLen8(),
             SimName = p.ReadStringLen8(),

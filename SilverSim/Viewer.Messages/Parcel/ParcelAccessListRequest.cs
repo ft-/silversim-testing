@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public ParcelAccessList Flags;
         public Int32 LocalID;
 
-        public static Message Decode(UDPPacket p) => new ParcelAccessListRequest()
+        public static Message Decode(UDPPacket p) => new ParcelAccessListRequest
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

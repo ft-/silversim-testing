@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Teleport
         public UUID AgentID;
         public UUID SessionID;
 
-        public static Message Decode(UDPPacket p) => new TeleportCancel()
+        public static Message Decode(UDPPacket p) => new TeleportCancel
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID()

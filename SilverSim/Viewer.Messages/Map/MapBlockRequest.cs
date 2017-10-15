@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Messages.Map
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new MapBlockRequest()
+            var m = new MapBlockRequest
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

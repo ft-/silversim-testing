@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Land
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ModifyLand()
+            var m = new ModifyLand
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Land
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.ParcelData.Add(new Data()
+                m.ParcelData.Add(new Data
                 {
                     LocalID = p.ReadInt32(),
                     West = p.ReadFloat(),

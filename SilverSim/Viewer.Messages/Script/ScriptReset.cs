@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID ObjectID;
         public UUID ItemID;
 
-        public static Message Decode(UDPPacket p) => new ScriptReset()
+        public static Message Decode(UDPPacket p) => new ScriptReset
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

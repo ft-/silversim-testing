@@ -62,7 +62,7 @@ namespace SilverSim.Viewer.Messages.Chat
             p.WriteStringLen16(Message);
         }
 
-        public static ChatPass Decode(UDPPacket p) => new ChatPass()
+        public static ChatPass Decode(UDPPacket p) => new ChatPass
         {
             Channel = p.ReadInt32(),
             Position = p.ReadVector3f(),

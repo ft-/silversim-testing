@@ -99,7 +99,7 @@ namespace SilverSim.Viewer.Messages.Region
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new RegionInfo()
+            var m = new RegionInfo
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

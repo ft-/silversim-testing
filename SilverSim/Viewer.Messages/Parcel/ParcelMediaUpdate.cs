@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteBoolean(MediaLoop);
         }
 
-        public static Message Decode(UDPPacket p) => new ParcelMediaUpdate()
+        public static Message Decode(UDPPacket p) => new ParcelMediaUpdate
         {
             MediaURL = p.ReadStringLen8(),
             MediaID = p.ReadUUID(),

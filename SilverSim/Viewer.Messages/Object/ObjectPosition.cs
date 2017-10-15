@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static ObjectPosition Decode(UDPPacket p)
         {
-            var m = new ObjectPosition()
+            var m = new ObjectPosition
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint cnt = p.ReadUInt8();
             while(cnt--!= 0)
             {
-                m.ObjectData.Add(new ObjectDataEntry()
+                m.ObjectData.Add(new ObjectDataEntry
                 {
                     ObjectLocalID = p.ReadUInt32(),
                     Position = p.ReadVector3f()

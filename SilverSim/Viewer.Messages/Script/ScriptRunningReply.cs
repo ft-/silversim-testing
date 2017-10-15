@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.Script
             p.WriteBoolean(IsRunning);
         }
 
-        public static Message Decode(UDPPacket p) => new ScriptRunningReply()
+        public static Message Decode(UDPPacket p) => new ScriptRunningReply
         {
             ObjectID = p.ReadUUID(),
             ItemID = p.ReadUUID(),

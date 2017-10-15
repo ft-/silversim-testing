@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public Int32 Price;
         public Int32 Area;
 
-        public static Message Decode(UDPPacket p) => new ParcelBuy()
+        public static Message Decode(UDPPacket p) => new ParcelBuy
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

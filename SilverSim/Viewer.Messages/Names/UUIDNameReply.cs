@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Messages.Names
             uint n = p.ReadUInt8();
             while (n-- != 0)
             {
-                m.UUIDNameBlock.Add(new Data()
+                m.UUIDNameBlock.Add(new Data
                 {
                     ID = p.ReadUUID(),
                     FirstName = p.ReadStringLen8(),

@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Event
         public UUID QueryID;
         public UInt32 EventID;
 
-        public static Message Decode(UDPPacket p) => new EventLocationRequest()
+        public static Message Decode(UDPPacket p) => new EventLocationRequest
         {
             QueryID = p.ReadUUID(),
             EventID = p.ReadUInt32()

@@ -46,7 +46,7 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new TeleportFinish()
+            var m = new TeleportFinish
             {
                 AgentID = p.ReadUUID(),
                 LocationID = p.ReadUInt32(),

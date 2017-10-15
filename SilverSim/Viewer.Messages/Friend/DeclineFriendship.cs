@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.Friend
         public UUID SessionID;
         public UUID TransactionID;
 
-        public static Message Decode(UDPPacket p) => new DeclineFriendship()
+        public static Message Decode(UDPPacket p) => new DeclineFriendship
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

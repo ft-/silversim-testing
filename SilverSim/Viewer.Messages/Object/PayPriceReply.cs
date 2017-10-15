@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new PayPriceReply()
+            var m = new PayPriceReply
             {
                 ObjectID = p.ReadUUID(),
                 DefaultPayPrice = p.ReadInt32()

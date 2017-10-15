@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Camera
             p.WriteFloat((float)CameraCollidePlane.W);
         }
 
-        public static Message Decode(UDPPacket p) => new CameraConstraint()
+        public static Message Decode(UDPPacket p) => new CameraConstraint
         {
             CameraCollidePlane = new Vector4
             {

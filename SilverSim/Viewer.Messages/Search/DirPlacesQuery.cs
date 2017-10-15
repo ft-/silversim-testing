@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.Search
         public string SimName;
         public int QueryStart;
 
-        public static DirPlacesQuery Decode(UDPPacket p) => new DirPlacesQuery()
+        public static DirPlacesQuery Decode(UDPPacket p) => new DirPlacesQuery
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

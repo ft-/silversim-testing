@@ -63,7 +63,7 @@ namespace SilverSim.Viewer.Messages.Parcel
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ParcelAccessListReply()
+            var m = new ParcelAccessListReply
             {
                 AgentID = p.ReadUUID(),
                 SequenceID = p.ReadInt32(),
@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                m.AccessList.Add(new Data()
+                m.AccessList.Add(new Data
                 {
                     ID = p.ReadUUID(),
                     Time = p.ReadUInt32(),

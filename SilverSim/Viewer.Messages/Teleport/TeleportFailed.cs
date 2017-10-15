@@ -54,7 +54,7 @@ namespace SilverSim.Viewer.Messages.Teleport
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new TeleportFailed()
+            var m = new TeleportFailed
             {
                 AgentID = p.ReadUUID(),
                 Reason = p.ReadStringLen8()
@@ -62,7 +62,7 @@ namespace SilverSim.Viewer.Messages.Teleport
             uint n = p.ReadUInt8();
             while(n-- != 0)
             {
-                var e = new AlertInfoEntry()
+                var e = new AlertInfoEntry
                 {
                     Message = p.ReadStringLen8(),
                     ExtraParams = p.ReadStringLen8()

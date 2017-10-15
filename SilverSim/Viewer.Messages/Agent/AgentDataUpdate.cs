@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Agent
         public GroupPowers GroupPowers;
         public string GroupName = string.Empty;
 
-        public static Message Decode(UDPPacket p) => new AgentDataUpdate()
+        public static Message Decode(UDPPacket p) => new AgentDataUpdate
         {
             AgentID = p.ReadUUID(),
             FirstName = p.ReadStringLen8(),

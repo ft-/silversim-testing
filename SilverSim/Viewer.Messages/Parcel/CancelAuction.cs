@@ -30,7 +30,7 @@ namespace SilverSim.Viewer.Messages.Parcel
     {
         public ParcelID ParcelID;
 
-        public static Message Decode(UDPPacket p) => new CancelAuction()
+        public static Message Decode(UDPPacket p) => new CancelAuction
         {
             ParcelID = new ParcelID(p.ReadBytes(16), 0)
         };

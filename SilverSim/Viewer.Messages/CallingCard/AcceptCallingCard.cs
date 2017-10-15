@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.CallingCard
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AcceptCallingCard()
+            var m = new AcceptCallingCard
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),

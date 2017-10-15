@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectName()
+            var m = new ObjectName
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()
@@ -51,7 +51,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.ObjectData.Add(new Data()
+                m.ObjectData.Add(new Data
                 {
                     ObjectLocalID = p.ReadUInt32(),
                     Name = p.ReadStringLen8()

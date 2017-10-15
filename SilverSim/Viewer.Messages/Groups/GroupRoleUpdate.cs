@@ -58,7 +58,7 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new GroupRoleUpdate()
+            var m = new GroupRoleUpdate
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Groups
             uint cnt = p.ReadUInt8();
             for(uint i = 0; i < cnt; ++i)
             {
-                m.RoleData.Add(new RoleDataEntry()
+                m.RoleData.Add(new RoleDataEntry
                 {
                     RoleID = p.ReadUUID(),
                     Name = p.ReadStringLen8(),

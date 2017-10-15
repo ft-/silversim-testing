@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Event
         public UInt32 QueryFlags;
         public Int32 QueryStart;
 
-        public static Message Decode(UDPPacket p) => new EventGodDelete()
+        public static Message Decode(UDPPacket p) => new EventGodDelete
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

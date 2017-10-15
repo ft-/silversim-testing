@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Profile
         public bool IMViaEmail;
         public string DirectoryVisibility;
 
-        public static UpdateUserInfo Decode(UDPPacket p) => new UpdateUserInfo()
+        public static UpdateUserInfo Decode(UDPPacket p) => new UpdateUserInfo
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

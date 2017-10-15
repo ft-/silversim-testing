@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Messages.Alert
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new AlertMessage()
+            var m = new AlertMessage
             {
                 Message = p.ReadStringLen8()
             };

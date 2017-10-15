@@ -46,7 +46,7 @@ namespace SilverSim.Viewer.Messages.Agent
             p.WriteBytes(Throttles);
         }
 
-        public static Message Decode(UDPPacket p) => new AgentThrottle()
+        public static Message Decode(UDPPacket p) => new AgentThrottle
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

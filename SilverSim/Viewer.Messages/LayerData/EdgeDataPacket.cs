@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             p.WriteBytes(Data);
         }
 
-        public static Message Decode(UDPPacket p) => new EdgeDataPacket()
+        public static Message Decode(UDPPacket p) => new EdgeDataPacket
         {
             LayerType = (LayerData.LayerDataType)p.ReadUInt8(),
             Direction = p.ReadUInt8(),

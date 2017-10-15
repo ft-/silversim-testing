@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Search
         public sbyte Category;
         public string SimName;
 
-        public static Message Decode(UDPPacket p) => new PlacesQuery()
+        public static Message Decode(UDPPacket p) => new PlacesQuery
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

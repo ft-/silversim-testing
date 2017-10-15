@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Messages.Transfer
             p.WriteBytes(Data);
         }
 
-        public static Message Decode(UDPPacket p) => new TransferPacket()
+        public static Message Decode(UDPPacket p) => new TransferPacket
         {
             TransferID = p.ReadUUID(),
             ChannelType = p.ReadInt32(),

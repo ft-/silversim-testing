@@ -82,7 +82,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new RezObject()
+            var m = new RezObject
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -163,7 +163,6 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteStringLen8(InventoryData.Description);
             p.WriteUInt32(InventoryData.CreationDate);
             p.WriteUInt32(InventoryData.CRC);
-
         }
     }
 }

@@ -44,7 +44,7 @@ namespace SilverSim.Viewer.Messages.User
             p.WriteStringLen16(Message);
         }
 
-        public static Message Decode(UDPPacket p) => new KickUser()
+        public static Message Decode(UDPPacket p) => new KickUser
         {
             IpAddr = p.ReadUInt32(),
             Port = p.ReadUInt16(),

@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public static Message Decode(UDPPacket p)
         {
-            var m = new ObjectLink()
+            var m = new ObjectLink
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()

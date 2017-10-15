@@ -77,7 +77,7 @@ namespace SilverSim.Viewer.Messages.IM
             Timestamp = gim.Timestamp ?? new Date();
         }
 
-        public static explicit operator GridInstantMessage(ImprovedInstantMessage m) => new GridInstantMessage()
+        public static explicit operator GridInstantMessage(ImprovedInstantMessage m) => new GridInstantMessage
         {
             FromAgent = new UUI { ID = m.AgentID, FullName = m.FromAgentName },
             FromGroup = new UGI(m.AgentID),
@@ -113,7 +113,7 @@ namespace SilverSim.Viewer.Messages.IM
             p.WriteBytes(BinaryBucket);
         }
 
-        public static ImprovedInstantMessage Decode(UDPPacket p) => new ImprovedInstantMessage()
+        public static ImprovedInstantMessage Decode(UDPPacket p) => new ImprovedInstantMessage
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),

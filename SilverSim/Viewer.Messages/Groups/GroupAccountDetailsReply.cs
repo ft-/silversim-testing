@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Messages.Groups
             p.WriteInt32(Amount);
         }
 
-        public static Message Decode(UDPPacket p) => new GroupAccountDetailsReply()
+        public static Message Decode(UDPPacket p) => new GroupAccountDetailsReply
         {
             AgentID = p.ReadUUID(),
             GroupID = p.ReadUUID(),

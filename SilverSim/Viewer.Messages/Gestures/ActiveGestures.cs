@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Gestures
 
         public static ActivateGestures Decode(UDPPacket p)
         {
-            var m = new ActivateGestures()
+            var m = new ActivateGestures
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
@@ -54,7 +54,7 @@ namespace SilverSim.Viewer.Messages.Gestures
             uint c = p.ReadUInt8();
             for(uint i = 0; i < c; ++i)
             {
-                m.Data.Add(new DataEntry()
+                m.Data.Add(new DataEntry
                 {
                     ItemID = p.ReadUUID(),
                     AssetID = p.ReadUUID(),
