@@ -606,5 +606,53 @@ namespace SilverSim.Scene.Types.Scene
         {
             m_LocalIDs.Remove(v.LocalID);
         }
+
+        private Date m_ActiveStatsLastUpdated = Date.Now;
+        private int m_ActiveScripts;
+        private int m_ActiveObjects;
+
+        private void CheckActiveStats()
+        {
+            if (m_ActiveStatsLastUpdated - DateTime.Now > TimeSpan.FromSeconds(1))
+            {
+                m_ActiveStatsLastUpdated = Date.Now;
+                int activeScripts = 0;
+                int activeObjects = 0;
+
+                foreach (ObjectPart part in Primitives)
+                {
+                    int runningScripts = part.Inventory.CountRunningScripts;
+                    activeScripts += runningScripts;
+                    if (runningScripts > 0)
+                    {
+                        ++activeObjects;
+                    }
+                    else if (part.IsPhysics && part.ObjectGroup.ID == part.ID)
+                    {
+                        ++activeObjects;
+                    }
+                }
+                m_ActiveScripts = activeScripts;
+                m_ActiveObjects = activeObjects;
+            }
+        }
+
+        public int ActiveScripts
+        {
+            get
+            {
+                CheckActiveStats();
+                return m_ActiveScripts;
+            }
+        }
+
+        public int ActiveObjects
+        {
+            get
+            {
+                CheckActiveStats();
+                return m_ActiveObjects;
+            }
+        }
     }
 }

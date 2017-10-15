@@ -129,6 +129,8 @@ namespace SilverSim.Viewer.Core
                 m_SimStatsData[(int)SimStatIndex.Agents].StatValue = rootAgents;
                 m_SimStatsData[(int)SimStatIndex.ChildAgents].StatValue = childAgents;
                 m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = scene.Primitives.Count;
+                m_SimStatsData[(int)SimStatIndex.ActivePrim].StatValue = scene.ActiveObjects;
+                m_SimStatsData[(int)SimStatIndex.ActiveScripts].StatValue = scene.ActiveScripts;
                 m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;
                 m_SimStatsData[(int)SimStatIndex.ScriptEventsPerSeconds].StatValue = scene.ScriptThreadPool.ScriptEventsPerSec;
 
