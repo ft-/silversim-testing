@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <package>
   <name>SilverSim.WebAdmin</name>
-  <version>0.0.0.0</version>
-  <license>Affero GPLv3 License+Link Exception</license>
   <dependencies>
     <dependency name="SilverSim.WebIF"/>
   </dependencies>
@@ -6585,6 +6583,7 @@
     <file name="data/adminpages/js/silversim/logincontrol.js"/>
     <file name="data/adminpages/js/silversim/modules.js"/>
     <file name="data/adminpages/js/silversim/npcs.js"/>
+    <file name="data/adminpages/js/silversim/osslperms.js"/>
     <file name="data/adminpages/js/silversim/packages.js"/>
     <file name="data/adminpages/js/silversim/realtimelog.js"/>
     <file name="data/adminpages/js/silversim/regionenable.js"/>
