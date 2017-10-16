@@ -27,6 +27,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public interface ISimulationDataParcelStorageInterface
     {
+        ISimulationDataParcelAccessListStorageInterface LandpassList { get; }
+
         ISimulationDataParcelAccessListStorageInterface WhiteList { get; }
 
         ISimulationDataParcelAccessListStorageInterface BlackList { get; }

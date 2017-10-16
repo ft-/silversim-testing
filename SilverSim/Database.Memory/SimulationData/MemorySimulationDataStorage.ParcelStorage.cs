@@ -31,8 +31,6 @@ namespace SilverSim.Database.Memory.SimulationData
     public partial class MemorySimulationDataStorage : ISimulationDataParcelStorageInterface
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ParcelInfo>> m_ParcelData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ParcelInfo>>(() => new RwLockedDictionary<UUID, ParcelInfo>());
-        private readonly MemorySimulationDataParcelAccessListStorage m_WhiteListStorage = new MemorySimulationDataParcelAccessListStorage();
-        private readonly MemorySimulationDataParcelAccessListStorage m_BlackListStorage = new MemorySimulationDataParcelAccessListStorage();
 
         ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
         {
@@ -71,9 +69,11 @@ namespace SilverSim.Database.Memory.SimulationData
             m_ParcelData[regionID][parcel.ID] = new ParcelInfo(parcel);
         }
 
-        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList => m_WhiteListStorage;
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList { get; } = new MemorySimulationDataParcelAccessListStorage();
 
-        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList => m_BlackListStorage;
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList { get; } = new MemorySimulationDataParcelAccessListStorage();
+
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.LandpassList { get; } = new MemorySimulationDataParcelAccessListStorage();
 
         ISimulationDataParcelExperienceListStorageInterface ISimulationDataParcelStorageInterface.Experiences => this;
     }
