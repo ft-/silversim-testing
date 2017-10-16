@@ -184,6 +184,12 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
+            if((parcel.Flags & ParcelFlags.UsePassList) != 0 &&
+                Parcels.LandpassList[ID, parcel.ID, agent.Owner])
+            {
+                return true;
+            }
+
             if ((parcel.Flags & ParcelFlags.UseAccessGroup) != 0)
             {
                 if(GroupsService == null)

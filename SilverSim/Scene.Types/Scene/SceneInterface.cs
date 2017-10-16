@@ -136,6 +136,7 @@ namespace SilverSim.Scene.Types.Scene
 
         IParcelAccessList WhiteList { get; }
         IParcelAccessList BlackList { get; }
+        IParcelAccessList LandpassList { get; }
 
         IParcelExperienceList Experiences { get; }
     }
