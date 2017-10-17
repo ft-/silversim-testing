@@ -42,6 +42,6 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract void ChargeAmount(UUI agentID, ITransaction transactionData, int amount, Action processOperation); /* exception from action results into abort */
 
-        public abstract void IncreaseAmount(UUI agentID, ITransaction transactionData, int amount);
+        public abstract void TransferMoney(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount, Action processOperation); /* exception from action results into abort */
     }
 }
