@@ -19,29 +19,11 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
-using SilverSim.Types.Economy.Transactions;
-using System;
-
-namespace SilverSim.ServiceInterfaces.Economy
+namespace SilverSim.Types.Economy.Transactions
 {
-    public abstract class EconomyServiceInterface
+    public class GroupJoinTransaction : ITransaction
     {
-        public interface IMoneyBalanceAccessor
-        {
-            Int32 this[UUI agentID] { get; set; }
-
-            bool TryGetValue(UUI agentID, out Int32 balance);
-        }
-
-        public abstract void Login(UUI agentID, UUID sessionID, UUID secureSessionID);
-
-        public abstract void Logout(UUI agentID, UUID sessionID, UUID secureSessionID);
-
-        public abstract IMoneyBalanceAccessor MoneyBalance { get; }
-
-        public abstract void ChargeAmount(UUI agentID, ITransaction transactionData, int amount, Action processOperation); /* exception from action results into abort */
-
-        public abstract void IncreaseAmount(UUI agentID, ITransaction transactionData, int amount);
+        public UGI Group = UGI.Unknown;
+        public UUI Joiner = UUI.Unknown;
     }
 }

@@ -32,6 +32,7 @@ using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Economy.Transactions;
 using SilverSim.Types.Groups;
 using SilverSim.Types.IM;
 using SilverSim.Types.StructuredData.Llsd;
@@ -476,7 +477,7 @@ namespace SilverSim.Viewer.Groups
             groupinfo.IsAllowPublish = req.AllowPublish;
             groupinfo.IsMaturePublish = req.MaturePublish;
 
-            var reply = new CreateGroupReply()
+            var reply = new CreateGroupReply
             {
                 AgentID = req.AgentID
             };
@@ -485,7 +486,11 @@ namespace SilverSim.Viewer.Groups
             {
                 if (economyService != null && scene.EconomyData.PriceGroupCreate > 0)
                 {
-                    economyService.ChargeAmount(agent.Owner, EconomyServiceInterface.TransactionType.GroupCreate, scene.EconomyData.PriceGroupCreate, () =>
+                    economyService.ChargeAmount(agent.Owner, new GroupCreateTransaction
+                    {
+                        Group = groupinfo.ID,
+                        Founder = groupinfo.Founder
+                    }, scene.EconomyData.PriceGroupCreate, () =>
                         groupinfo = groupsService.Groups.Create(agent.Owner, groupinfo));
                 }
                 else
