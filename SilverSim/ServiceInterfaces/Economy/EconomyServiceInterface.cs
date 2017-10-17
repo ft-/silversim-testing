@@ -27,6 +27,12 @@ namespace SilverSim.ServiceInterfaces.Economy
 {
     public abstract class EconomyServiceInterface
     {
+        public interface IActiveTransaction
+        {
+            void Commit();
+            void Rollback(Exception exception);
+        }
+
         public interface IMoneyBalanceAccessor
         {
             Int32 this[UUI agentID] { get; set; }
@@ -40,8 +46,37 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract IMoneyBalanceAccessor MoneyBalance { get; }
 
-        public abstract void ChargeAmount(UUI agentID, ITransaction transactionData, int amount, Action processOperation); /* exception from action results into abort */
+        public abstract IActiveTransaction BeginTransaction(UUI agentID, ITransaction transactionData, int amount);
+        public abstract IActiveTransaction BeginTransaction(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount);
 
-        public abstract void TransferMoney(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount, Action processOperation); /* exception from action results into abort */
+        public void ChargeAmount(UUI agentID, ITransaction transactionData, int amount, Action processOperation)
+        {
+            IActiveTransaction transaction = BeginTransaction(agentID, transactionData, amount);
+            try
+            {
+                processOperation();
+            }
+            catch(Exception e)
+            {
+                transaction.Rollback(e);
+                throw;
+            }
+            transaction.Commit();
+        }
+
+        public void TransferMoney(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount, Action processOperation)
+        {
+            IActiveTransaction transaction = BeginTransaction(sourceID, destinationID, transactionData, amount);
+            try
+            {
+                processOperation();
+            }
+            catch(Exception e)
+            {
+                transaction.Rollback(e);
+                throw;
+            }
+            transaction.Commit();
+        }
     }
 }
