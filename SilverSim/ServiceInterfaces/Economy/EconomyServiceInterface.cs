@@ -46,12 +46,12 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract IMoneyBalanceAccessor MoneyBalance { get; }
 
-        public abstract IActiveTransaction BeginTransaction(UUI agentID, ITransaction transactionData, int amount);
-        public abstract IActiveTransaction BeginTransaction(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount);
+        public abstract IActiveTransaction BeginChargeTransaction(UUI agentID, ITransaction transactionData, int amount);
+        public abstract IActiveTransaction BeginTransferTransaction(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount);
 
         public void ChargeAmount(UUI agentID, ITransaction transactionData, int amount, Action processOperation)
         {
-            IActiveTransaction transaction = BeginTransaction(agentID, transactionData, amount);
+            IActiveTransaction transaction = BeginChargeTransaction(agentID, transactionData, amount);
             try
             {
                 processOperation();
@@ -66,7 +66,7 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public void TransferMoney(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount, Action processOperation)
         {
-            IActiveTransaction transaction = BeginTransaction(sourceID, destinationID, transactionData, amount);
+            IActiveTransaction transaction = BeginTransferTransaction(sourceID, destinationID, transactionData, amount);
             try
             {
                 processOperation();
